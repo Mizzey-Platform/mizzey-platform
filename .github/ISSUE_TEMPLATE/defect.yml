@@ -1,0 +1,44 @@
+name: Defect
+description: Accepted behaviour that stopped working, or never matched its criteria
+title: "Defect: "
+labels: ["type:defect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A defect is where the system does not do what the Feature Register says it does.
+        If the system does what the register says and something else is now wanted,
+        that is a Change Request, not a defect. See MS-UAT-2026-013 section 3.
+  - type: input
+    id: story
+    attributes:
+      label: Which story
+      placeholder: US-05-11
+    validations: {required: true}
+  - type: input
+    id: criterion
+    attributes:
+      label: Which acceptance criterion fails
+      placeholder: Criterion 4, the stock cap on merge
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps, expected, actual
+    validations: {required: true}
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language it occurs in
+      options: ["English", "Arabic", "Both"]
+    validations: {required: true}
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "Critical, blocks launch or loses money"
+        - "Major, a contracted capability does not work"
+        - "Minor, works with a workaround"
+        - "Cosmetic"
+    validations: {required: true}

@@ -1,0 +1,26 @@
+name: Change request
+description: Something wanted that the Feature Register does not contain
+title: "CR: "
+labels: ["type:change-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **No work starts on this until it is agreed in writing under MS-CHG-2026-014**,
+        with its cost and its effect on the timeline stated first. Raising it here records it.
+  - type: textarea
+    id: want
+    attributes:
+      label: What is wanted
+    validations: {required: true}
+  - type: textarea
+    id: why-not-scope
+    attributes:
+      label: Why this is not already in scope
+      description: Which register section was checked, and what it says instead
+    validations: {required: true}
+  - type: textarea
+    id: impact
+    attributes:
+      label: Stories and sprints it would affect
+    validations: {required: true}

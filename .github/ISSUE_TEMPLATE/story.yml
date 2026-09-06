@@ -1,0 +1,33 @@
+name: User story
+description: A story that is already in the Functional Specification
+title: "US-NN-NN "
+labels: ["type:story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Stories are generated from the Functional Specification MS-SPC-2026-018.
+        Use this form only to recreate one that was lost, never to invent a new one.
+        Anything not in the Feature Register is a Change Request under MS-CHG-2026-014.
+  - type: input
+    id: narrative
+    attributes:
+      label: Narrative
+      placeholder: As a returning customer, I want ..., so that ...
+    validations: {required: true}
+  - type: input
+    id: trace
+    attributes:
+      label: Traceability
+      description: Every Feature Register id this delivers
+      placeholder: CART-14, CART-18, AC-18
+    validations: {required: true}
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance criteria
+      description: Copied from the specification, unchanged
+      value: |
+        - [ ] 1.
+        - [ ] 2.
+    validations: {required: true}

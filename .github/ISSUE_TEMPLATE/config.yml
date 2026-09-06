@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Is it in scope?
+    url: https://github.com/MustafaShaaban/mizzey-platform/blob/main/docs/engagement/Mizzey-Feature-Register.md
+    about: The Feature Register defines scope, and only the Feature Register.
+  - name: What are the acceptance criteria?
+    url: https://github.com/MustafaShaaban/mizzey-platform/blob/main/docs/engagement/Mizzey-Operations-Platform-Functional-Specification.md
+    about: The Functional Specification holds every story and its criteria.

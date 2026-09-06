@@ -1,0 +1,39 @@
+# Never commit these. The signature and identity assets are private.
+personal identity/
+*-PRIVATE/
+*.p12
+*.pfx
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies and build output
+node_modules/
+vendor/
+dist/
+build/
+.wrangler/
+
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp/
+
+# Local
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+*.sql
+*.sql.gz
+
+# AI working files, per the working contract
+.specify/
+.claude/
+.agents/
