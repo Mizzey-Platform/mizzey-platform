@@ -6,6 +6,7 @@ Nothing else defines a field name.
 
 import json
 import os
+from collections import namedtuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'data')
@@ -38,6 +39,12 @@ PLUGIN_FIELDS = ('id', 'need', 'stories', 'candidates', 'decision', 'evidence',
                  'acknowledged_over_quote')
 
 JOURNEY_FIELDS = ('id', 'name', 'actor', 'language', 'steps', 'gaps')
+
+# Every dataset in one bundle. Rules and generators take this rather than five
+# positional lists: probes and plugins are both lists of dicts with an id, so as
+# positional arguments they could be transposed at a call site and a test would
+# pass for the wrong reason. Naming the field makes that impossible.
+Data = namedtuple('Data', 'stories verdicts probes plugins journeys')
 
 
 def missing_fields(row, fields):
@@ -82,3 +89,9 @@ def load_stories():
     """The generated story list. Read only. Never write to this file."""
     with open(STORIES, encoding='utf-8') as fh:
         return json.load(fh)
+
+
+def load_data():
+    """Every dataset, in one bundle."""
+    return Data(load_stories(), load('verdicts'), load('probes'),
+                load('plugins'), load('journeys'))

@@ -18,6 +18,15 @@ class TestSchema(unittest.TestCase):
     def test_the_overage_acknowledgement_is_part_of_a_plugin_row(self):
         self.assertIn('acknowledged_over_quote', schema.PLUGIN_FIELDS)
 
+    def test_the_data_bundle_names_all_five_datasets(self):
+        self.assertEqual(schema.Data._fields,
+                         ('stories', 'verdicts', 'probes', 'plugins', 'journeys'))
+
+    def test_load_data_returns_a_bundle_with_the_real_stories(self):
+        data = schema.load_data()
+        self.assertEqual(len(data.stories), 205)
+        self.assertIsInstance(data.verdicts, list)
+
     def test_missing_fields_are_reported(self):
         row = {'story': 'US-01-01'}
         missing = schema.missing_fields(row, schema.VERDICT_FIELDS)
