@@ -41,3 +41,6 @@ __pycache__/
 .specify/
 .claude/
 .agents/
+
+# Board sync state, local to whoever ran the setup script
+scripts/.board-state.json
