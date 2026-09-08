@@ -13,7 +13,9 @@ Keeping rules pure means each one is unit-testable without touching disk, and
 adding a rule is adding a function to RULES.
 """
 
+import os
 import sys
+import unicodedata
 
 from discovery import riskset, schema
 from discovery.schema import Data  # re-exported so tests can build a bundle
@@ -265,6 +267,62 @@ def check_allowed_values(data):
     return problems
 
 
+GENERATED = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
+
+
+def check_journey_steps(data):
+    """A journey step that names no story is narrative, not validation."""
+    problems = []
+    for j in data.journeys:
+        if j.get('actor') not in schema.ACTORS:
+            problems.append('journey %s has actor %s, which is not one of %s'
+                            % (j.get('id'), j.get('actor'), ', '.join(schema.ACTORS)))
+        if j.get('language') not in schema.LANGUAGES:
+            problems.append('journey %s has language %s, which is not one of %s'
+                            % (j.get('id'), j.get('language'), ', '.join(schema.LANGUAGES)))
+        for step in j.get('steps', []):
+            if not step.get('stories'):
+                problems.append('journey %s step %s names no story'
+                                % (j.get('id'), step.get('n')))
+    return problems
+
+
+def _is_emoji(ch):
+    return ord(ch) > 0x2500 and unicodedata.category(ch) == 'So'
+
+
+def check_house_rules_in(directory):
+    """No emoji and no em dash in generated markdown.
+
+    These documents feed client-facing work even though they are not sent, and
+    the house rule is easier to keep than to retrofit.
+    """
+    problems = []
+    if not os.path.isdir(directory):
+        return problems
+    for name in sorted(os.listdir(directory)):
+        if not name.endswith('.md'):
+            continue
+        path = os.path.join(directory, name)
+        with open(path, encoding='utf-8') as fh:
+            text = fh.read()
+        if '—' in text:
+            problems.append('%s contains an em dash' % name)
+        found = sorted({ch for ch in text if _is_emoji(ch)})
+        if found:
+            problems.append('%s contains emoji: %s' % (name, ' '.join(found)))
+    return problems
+
+
+def check_house_rules(data):
+    """Rule-signature wrapper so the gate can run it alongside the others.
+
+    It reads the generated directory rather than the datasets, so it ignores
+    data entirely. That is the one rule here that is about output, not input.
+    """
+    return check_house_rules_in(GENERATED)
+
+
 RULES = [
     check_unknown_stories,
     check_traceable,
@@ -275,6 +333,8 @@ RULES = [
     check_no_duplicate_rows,
     check_plugin_complete,
     check_plugin_ceiling,
+    check_journey_steps,
+    check_house_rules,
 ]
 
 
