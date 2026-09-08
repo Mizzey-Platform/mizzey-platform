@@ -984,6 +984,35 @@ class TestPluginCompleteness(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn('negative', problems[0])
 
+    def test_an_empty_decision_is_not_the_same_as_undecided(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision='', cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('Use null for undecided', problems[0])
+
+    def test_a_non_string_decision_fails(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision=0, cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_non_numeric_cost_fails_rather_than_crashing(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', cost_annual='250')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('non-numeric', problems[0])
+
+    def test_a_cost_that_disagrees_with_the_chosen_candidate_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=0,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 250}])]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('listed at', problems[0])
+
+    def test_a_cost_that_agrees_with_the_chosen_candidate_passes(self):
+        self.assertEqual(check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=107,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 107}])])), [])
+
     def test_a_complete_decision_passes(self):
         self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 
@@ -1004,6 +1033,17 @@ class TestPluginCeiling(unittest.TestCase):
     def test_a_total_at_the_quoted_figure_passes(self):
         self.assertEqual(check.check_plugin_ceiling(
             data(plugins=[plugin('PL-01', cost_annual=107)])), [])
+
+    def test_an_acknowledgement_on_another_row_does_not_license_an_overage(self):
+        rows = [plugin('PL-01', cost_annual=500),
+                plugin('PL-02', cost_annual=1, acknowledged_over_quote=True)]
+        problems = check.check_plugin_ceiling(data(plugins=rows))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('501', problems[0])
+
+    def test_a_blank_decision_does_not_hide_a_cost_from_the_total(self):
+        rows = [plugin('PL-01', decision='', cost_annual=500)]
+        self.assertEqual(check.check_plugin_complete(data(plugins=rows)) != [], True)
 
     def test_non_usd_costs_are_not_silently_summed(self):
         rows = [plugin('PL-01', cost_annual=107),
@@ -1026,8 +1066,33 @@ Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute '
 In `discovery/check.py`, insert after `check_build_traces_to_gap`:
 
 ```python
+def _is_decided(pl):
+    """True when the row names a real product to buy, so its cost counts.
+
+    None means undecided, which is work in progress rather than a failure.
+    "build instead" is a decision that costs no licence. Anything else that is
+    not a real name is reported by check_plugin_complete, not silently skipped.
+    """
+    decision = pl.get('decision')
+    return (isinstance(decision, str) and decision.strip()
+            and decision != 'build instead')
+
+
+def _money(value):
+    """Format a cost without inventing or hiding decimals."""
+    return '%d' % value if float(value).is_integer() else '%.2f' % value
+
+
+def _usable_cost(pl):
+    """The row's cost when it is a number that can be summed, else None."""
+    cost = pl.get('cost_annual')
+    if isinstance(cost, bool) or not isinstance(cost, (int, float)) or cost < 0:
+        return None
+    return cost
+
+
 def check_plugin_complete(data):
-    """A decided plugin needs a licence and an annual figure.
+    """A decided plugin needs a licence and a sane annual figure.
 
     An undecided need is work in progress, not a failure. "build instead" is a
     decision that costs no licence.
@@ -1035,18 +1100,40 @@ def check_plugin_complete(data):
     problems = []
     for pl in data.plugins:
         decision = pl.get('decision')
-        if not decision or decision == 'build instead':
+        if decision is None:
             continue
-        if pl.get('cost_annual') is None:
+        if not isinstance(decision, str) or not decision.strip():
+            # A blanked cell is not the same as an undecided one. Skipping it
+            # would drop the cost and licence checks on a row that may carry a
+            # real figure.
+            problems.append('plugin %s has decision %r. Use null for undecided'
+                            % (pl.get('id'), decision))
+            continue
+        if decision == 'build instead':
+            continue
+        cost = pl.get('cost_annual')
+        if cost is None:
             problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
-        elif pl.get('cost_annual') < 0:
+        elif isinstance(cost, bool) or not isinstance(cost, (int, float)):
+            # Left unguarded this raises and takes the whole gate down with it,
+            # which is worse than a wrong answer because nothing else gets run.
+            problems.append('plugin %s has a non-numeric cost_annual, %r'
+                            % (pl.get('id'), cost))
+        elif cost < 0:
             # A negative figure on one row subtracts from the register total and
             # can hide a real overage on another, which would put a cost above
             # the quoted figure in front of the client with nobody told.
             problems.append('plugin %s has a negative cost_annual, %s'
-                            % (pl.get('id'), pl.get('cost_annual')))
+                            % (pl.get('id'), cost))
         if not pl.get('licence'):
             problems.append('plugin %s is decided with no licence' % pl.get('id'))
+        for candidate in pl.get('candidates') or []:
+            listed = candidate.get('cost_annual')
+            if candidate.get('name') != decision or listed is None:
+                continue
+            if listed != cost:
+                problems.append('plugin %s is decided as %s at %r, but that candidate is '
+                                'listed at %r' % (pl.get('id'), decision, cost, listed))
     return problems
 
 
@@ -1054,16 +1141,17 @@ def check_plugin_ceiling(data):
     """The register total must not quietly exceed what the client was quoted.
 
     Technical Design section 11 put about 107 USD a year in front of them. Going
-    above that is a commercial conversation. It is allowed, but it has to be
-    acknowledged on the row that causes it, not absorbed.
+    above that is a commercial conversation. It is allowed, but the rows that
+    acknowledge it have to account for the overage: a cheap row carrying the
+    flag cannot license an expensive row that does not.
     """
     problems = []
     total = 0
-    acknowledged = False
+    acknowledged = 0
     for pl in data.plugins:
-        if not pl.get('decision') or pl.get('decision') == 'build instead':
+        if not _is_decided(pl):
             continue
-        cost = pl.get('cost_annual') or 0
+        cost = _usable_cost(pl)
         if not cost:
             continue
         currency = pl.get('currency') or 'USD'
@@ -1073,11 +1161,13 @@ def check_plugin_ceiling(data):
             continue
         total += cost
         if pl.get('acknowledged_over_quote'):
-            acknowledged = True
-    if total > schema.QUOTED_ANNUAL_USD and not acknowledged:
-        problems.append('plugin register totals %d USD a year against the %d USD quoted to the '
-                        'client in Technical Design section 11, and no row acknowledges it'
-                        % (total, schema.QUOTED_ANNUAL_USD))
+            acknowledged += cost
+    if (total > schema.QUOTED_ANNUAL_USD
+            and total - acknowledged > schema.QUOTED_ANNUAL_USD):
+        problems.append('plugin register totals %s USD a year against the %d USD quoted to '
+                        'the client in Technical Design section 11, and the acknowledged rows '
+                        'do not account for the difference'
+                        % (_money(total), schema.QUOTED_ANNUAL_USD))
     return problems
 ```
 
@@ -1086,7 +1176,7 @@ Then extend `RULES` with `check_plugin_complete` and `check_plugin_ceiling`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_plugins -v`
-Expected: PASS, 10 tests.
+Expected: PASS, 17 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -1265,7 +1355,7 @@ Expected: PASS, 9 tests.
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 67 tests.
+Expected: PASS, 74 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2858,7 +2948,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 111 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 118 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed

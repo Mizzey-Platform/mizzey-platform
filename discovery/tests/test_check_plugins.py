@@ -44,6 +44,35 @@ class TestPluginCompleteness(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn('negative', problems[0])
 
+    def test_an_empty_decision_is_not_the_same_as_undecided(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision='', cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('Use null for undecided', problems[0])
+
+    def test_a_non_string_decision_fails(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision=0, cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_non_numeric_cost_fails_rather_than_crashing(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', cost_annual='250')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('non-numeric', problems[0])
+
+    def test_a_cost_that_disagrees_with_the_chosen_candidate_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=0,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 250}])]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('listed at', problems[0])
+
+    def test_a_cost_that_agrees_with_the_chosen_candidate_passes(self):
+        self.assertEqual(check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=107,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 107}])])), [])
+
     def test_a_complete_decision_passes(self):
         self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 
@@ -64,6 +93,17 @@ class TestPluginCeiling(unittest.TestCase):
     def test_a_total_at_the_quoted_figure_passes(self):
         self.assertEqual(check.check_plugin_ceiling(
             data(plugins=[plugin('PL-01', cost_annual=107)])), [])
+
+    def test_an_acknowledgement_on_another_row_does_not_license_an_overage(self):
+        rows = [plugin('PL-01', cost_annual=500),
+                plugin('PL-02', cost_annual=1, acknowledged_over_quote=True)]
+        problems = check.check_plugin_ceiling(data(plugins=rows))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('501', problems[0])
+
+    def test_a_blank_decision_does_not_hide_a_cost_from_the_total(self):
+        rows = [plugin('PL-01', decision='', cost_annual=500)]
+        self.assertEqual(check.check_plugin_complete(data(plugins=rows)) != [], True)
 
     def test_non_usd_costs_are_not_silently_summed(self):
         rows = [plugin('PL-01', cost_annual=107),

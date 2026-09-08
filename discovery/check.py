@@ -137,8 +137,33 @@ def check_build_traces_to_gap(data):
             and not (v.get('risk') or '').strip()]
 
 
+def _is_decided(pl):
+    """True when the row names a real product to buy, so its cost counts.
+
+    None means undecided, which is work in progress rather than a failure.
+    "build instead" is a decision that costs no licence. Anything else that is
+    not a real name is reported by check_plugin_complete, not silently skipped.
+    """
+    decision = pl.get('decision')
+    return (isinstance(decision, str) and decision.strip()
+            and decision != 'build instead')
+
+
+def _money(value):
+    """Format a cost without inventing or hiding decimals."""
+    return '%d' % value if float(value).is_integer() else '%.2f' % value
+
+
+def _usable_cost(pl):
+    """The row's cost when it is a number that can be summed, else None."""
+    cost = pl.get('cost_annual')
+    if isinstance(cost, bool) or not isinstance(cost, (int, float)) or cost < 0:
+        return None
+    return cost
+
+
 def check_plugin_complete(data):
-    """A decided plugin needs a licence and an annual figure.
+    """A decided plugin needs a licence and a sane annual figure.
 
     An undecided need is work in progress, not a failure. "build instead" is a
     decision that costs no licence.
@@ -146,18 +171,40 @@ def check_plugin_complete(data):
     problems = []
     for pl in data.plugins:
         decision = pl.get('decision')
-        if not decision or decision == 'build instead':
+        if decision is None:
             continue
-        if pl.get('cost_annual') is None:
+        if not isinstance(decision, str) or not decision.strip():
+            # A blanked cell is not the same as an undecided one. Skipping it
+            # would drop the cost and licence checks on a row that may carry a
+            # real figure.
+            problems.append('plugin %s has decision %r. Use null for undecided'
+                            % (pl.get('id'), decision))
+            continue
+        if decision == 'build instead':
+            continue
+        cost = pl.get('cost_annual')
+        if cost is None:
             problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
-        elif pl.get('cost_annual') < 0:
+        elif isinstance(cost, bool) or not isinstance(cost, (int, float)):
+            # Left unguarded this raises and takes the whole gate down with it,
+            # which is worse than a wrong answer because nothing else gets run.
+            problems.append('plugin %s has a non-numeric cost_annual, %r'
+                            % (pl.get('id'), cost))
+        elif cost < 0:
             # A negative figure on one row subtracts from the register total and
             # can hide a real overage on another, which would put a cost above
             # the quoted figure in front of the client with nobody told.
             problems.append('plugin %s has a negative cost_annual, %s'
-                            % (pl.get('id'), pl.get('cost_annual')))
+                            % (pl.get('id'), cost))
         if not pl.get('licence'):
             problems.append('plugin %s is decided with no licence' % pl.get('id'))
+        for candidate in pl.get('candidates') or []:
+            listed = candidate.get('cost_annual')
+            if candidate.get('name') != decision or listed is None:
+                continue
+            if listed != cost:
+                problems.append('plugin %s is decided as %s at %r, but that candidate is '
+                                'listed at %r' % (pl.get('id'), decision, cost, listed))
     return problems
 
 
@@ -165,16 +212,17 @@ def check_plugin_ceiling(data):
     """The register total must not quietly exceed what the client was quoted.
 
     Technical Design section 11 put about 107 USD a year in front of them. Going
-    above that is a commercial conversation. It is allowed, but it has to be
-    acknowledged on the row that causes it, not absorbed.
+    above that is a commercial conversation. It is allowed, but the rows that
+    acknowledge it have to account for the overage: a cheap row carrying the
+    flag cannot license an expensive row that does not.
     """
     problems = []
     total = 0
-    acknowledged = False
+    acknowledged = 0
     for pl in data.plugins:
-        if not pl.get('decision') or pl.get('decision') == 'build instead':
+        if not _is_decided(pl):
             continue
-        cost = pl.get('cost_annual') or 0
+        cost = _usable_cost(pl)
         if not cost:
             continue
         currency = pl.get('currency') or 'USD'
@@ -184,12 +232,15 @@ def check_plugin_ceiling(data):
             continue
         total += cost
         if pl.get('acknowledged_over_quote'):
-            acknowledged = True
-    if total > schema.QUOTED_ANNUAL_USD and not acknowledged:
-        problems.append('plugin register totals %d USD a year against the %d USD quoted to the '
-                        'client in Technical Design section 11, and no row acknowledges it'
-                        % (total, schema.QUOTED_ANNUAL_USD))
+            acknowledged += cost
+    if (total > schema.QUOTED_ANNUAL_USD
+            and total - acknowledged > schema.QUOTED_ANNUAL_USD):
+        problems.append('plugin register totals %s USD a year against the %d USD quoted to '
+                        'the client in Technical Design section 11, and the acknowledged rows '
+                        'do not account for the difference'
+                        % (_money(total), schema.QUOTED_ANNUAL_USD))
     return problems
+
 
 
 def check_allowed_values(data):
