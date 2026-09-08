@@ -137,6 +137,55 @@ def check_build_traces_to_gap(data):
             and not (v.get('risk') or '').strip()]
 
 
+def check_plugin_complete(data):
+    """A decided plugin needs a licence and an annual figure.
+
+    An undecided need is work in progress, not a failure. "build instead" is a
+    decision that costs no licence.
+    """
+    problems = []
+    for pl in data.plugins:
+        decision = pl.get('decision')
+        if not decision or decision == 'build instead':
+            continue
+        if pl.get('cost_annual') is None:
+            problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
+        if not pl.get('licence'):
+            problems.append('plugin %s is decided with no licence' % pl.get('id'))
+    return problems
+
+
+def check_plugin_ceiling(data):
+    """The register total must not quietly exceed what the client was quoted.
+
+    Technical Design section 11 put about 107 USD a year in front of them. Going
+    above that is a commercial conversation. It is allowed, but it has to be
+    acknowledged on the row that causes it, not absorbed.
+    """
+    problems = []
+    total = 0
+    acknowledged = False
+    for pl in data.plugins:
+        if not pl.get('decision') or pl.get('decision') == 'build instead':
+            continue
+        cost = pl.get('cost_annual') or 0
+        if not cost:
+            continue
+        currency = pl.get('currency') or 'USD'
+        if currency != 'USD':
+            problems.append('plugin %s is priced in %s and cannot be summed against the '
+                            'USD figure quoted to the client' % (pl.get('id'), currency))
+            continue
+        total += cost
+        if pl.get('acknowledged_over_quote'):
+            acknowledged = True
+    if total > schema.QUOTED_ANNUAL_USD and not acknowledged:
+        problems.append('plugin register totals %d USD a year against the %d USD quoted to the '
+                        'client in Technical Design section 11, and no row acknowledges it'
+                        % (total, schema.QUOTED_ANNUAL_USD))
+    return problems
+
+
 def check_allowed_values(data):
     """A typo in an enumerated field must not pass silently.
 
@@ -167,6 +216,8 @@ RULES = [
     check_build_traces_to_gap,
     check_allowed_values,
     check_no_duplicate_rows,
+    check_plugin_complete,
+    check_plugin_ceiling,
 ]
 
 
