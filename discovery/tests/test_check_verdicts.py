@@ -55,10 +55,35 @@ class TestProvedNeedsEvidence(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn('P-999', problems[0])
 
-    def test_proved_with_a_real_probe_passes(self):
+    def test_proved_on_a_probe_that_has_not_run_fails(self):
+        problems = check.check_proved_has_evidence(
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
+                 probes=[{'id': 'P-001', 'verdict': None}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('has not been run', problems[0])
+
+    def test_proved_with_a_probe_that_ran_passes(self):
         self.assertEqual(check.check_proved_has_evidence(
             data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
-                 probes=[{'id': 'P-001'}])), [])
+                 probes=[{'id': 'P-001', 'verdict': 'confirmed'}])), [])
+
+
+class TestOneVerdictPerStory(unittest.TestCase):
+    def test_a_duplicate_row_fails(self):
+        problems = check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01', confidence='assumed'),
+                           verdict('US-13-01', confidence='reasoned')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('US-13-01', problems[0])
+
+    def test_a_story_reported_once_however_many_duplicates(self):
+        problems = check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01'), verdict('US-13-01'), verdict('US-13-01')]))
+        self.assertEqual(len(problems), 1)
+
+    def test_distinct_stories_pass(self):
+        self.assertEqual(check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')])), [])
 
 
 class TestAllowedValues(unittest.TestCase):

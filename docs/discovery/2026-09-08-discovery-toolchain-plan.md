@@ -670,10 +670,35 @@ class TestProvedNeedsEvidence(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn('P-999', problems[0])
 
-    def test_proved_with_a_real_probe_passes(self):
+    def test_proved_on_a_probe_that_has_not_run_fails(self):
+        problems = check.check_proved_has_evidence(
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
+                 probes=[{'id': 'P-001', 'verdict': None}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('has not been run', problems[0])
+
+    def test_proved_with_a_probe_that_ran_passes(self):
         self.assertEqual(check.check_proved_has_evidence(
             data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
-                 probes=[{'id': 'P-001'}])), [])
+                 probes=[{'id': 'P-001', 'verdict': 'confirmed'}])), [])
+
+
+class TestOneVerdictPerStory(unittest.TestCase):
+    def test_a_duplicate_row_fails(self):
+        problems = check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01', confidence='assumed'),
+                           verdict('US-13-01', confidence='reasoned')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('US-13-01', problems[0])
+
+    def test_a_story_reported_once_however_many_duplicates(self):
+        problems = check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01'), verdict('US-13-01'), verdict('US-13-01')]))
+        self.assertEqual(len(problems), 1)
+
+    def test_distinct_stories_pass(self):
+        self.assertEqual(check.check_one_verdict_per_story(
+            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')])), [])
 
 
 class TestAllowedValues(unittest.TestCase):
@@ -752,8 +777,12 @@ def check_no_assumed_in_risk_set(data):
 
 
 def check_proved_has_evidence(data):
-    """confidence "proved" means a probe ran. Name it, and let it exist."""
-    known = {p.get('id') for p in data.probes}
+    """confidence "proved" means a probe ran and reached a verdict.
+
+    Citing a probe that exists but was never executed is the false confidence
+    this whole dataset exists to prevent, so an unrun probe is not evidence.
+    """
+    by_id = {p.get('id'): p for p in data.probes}
     problems = []
     for v in data.verdicts:
         if v.get('confidence') != 'proved':
@@ -762,10 +791,30 @@ def check_proved_has_evidence(data):
         if not evidence:
             problems.append('%s is proved with no probe in evidence' % v.get('story'))
         for pid in evidence:
-            if pid not in known:
+            if pid not in by_id:
                 problems.append('%s cites probe %s, which does not exist'
                                 % (v.get('story'), pid))
+            elif not by_id[pid].get('verdict'):
+                problems.append('%s is proved on probe %s, which has not been run'
+                                % (v.get('story'), pid))
     return problems
+
+
+def check_one_verdict_per_story(data):
+    """Two rows for one story means one of them is invisible.
+
+    The verdict rules index by story id, so a duplicate silently wins and the
+    row it replaced is never inspected. Parallel agents append to this file, so
+    say so rather than letting the later row erase the earlier one.
+    """
+    seen = set()
+    duplicates = []
+    for v in data.verdicts:
+        sid = v.get('story')
+        if sid in seen and sid not in duplicates:
+            duplicates.append(sid)
+        seen.add(sid)
+    return ['%s has more than one verdict row' % sid for sid in duplicates]
 
 
 def check_build_traces_to_gap(data):
@@ -818,13 +867,14 @@ RULES = [
     check_proved_has_evidence,
     check_build_traces_to_gap,
     check_allowed_values,
+    check_one_verdict_per_story,
 ]
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: PASS, 14 tests.
+Expected: PASS, 18 tests.
 
 - [ ] **Step 5: Confirm the gate now reports the real backlog**
 
@@ -1169,7 +1219,7 @@ Expected: PASS, 9 tests.
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 58 tests.
+Expected: PASS, 62 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2762,7 +2812,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 102 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 106 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed

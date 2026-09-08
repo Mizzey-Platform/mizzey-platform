@@ -71,8 +71,12 @@ def check_no_assumed_in_risk_set(data):
 
 
 def check_proved_has_evidence(data):
-    """confidence "proved" means a probe ran. Name it, and let it exist."""
-    known = {p.get('id') for p in data.probes}
+    """confidence "proved" means a probe ran and reached a verdict.
+
+    Citing a probe that exists but was never executed is the false confidence
+    this whole dataset exists to prevent, so an unrun probe is not evidence.
+    """
+    by_id = {p.get('id'): p for p in data.probes}
     problems = []
     for v in data.verdicts:
         if v.get('confidence') != 'proved':
@@ -81,10 +85,30 @@ def check_proved_has_evidence(data):
         if not evidence:
             problems.append('%s is proved with no probe in evidence' % v.get('story'))
         for pid in evidence:
-            if pid not in known:
+            if pid not in by_id:
                 problems.append('%s cites probe %s, which does not exist'
                                 % (v.get('story'), pid))
+            elif not by_id[pid].get('verdict'):
+                problems.append('%s is proved on probe %s, which has not been run'
+                                % (v.get('story'), pid))
     return problems
+
+
+def check_one_verdict_per_story(data):
+    """Two rows for one story means one of them is invisible.
+
+    The verdict rules index by story id, so a duplicate silently wins and the
+    row it replaced is never inspected. Parallel agents append to this file, so
+    say so rather than letting the later row erase the earlier one.
+    """
+    seen = set()
+    duplicates = []
+    for v in data.verdicts:
+        sid = v.get('story')
+        if sid in seen and sid not in duplicates:
+            duplicates.append(sid)
+        seen.add(sid)
+    return ['%s has more than one verdict row' % sid for sid in duplicates]
 
 
 def check_build_traces_to_gap(data):
@@ -129,6 +153,7 @@ RULES = [
     check_proved_has_evidence,
     check_build_traces_to_gap,
     check_allowed_values,
+    check_one_verdict_per_story,
 ]
 
 
