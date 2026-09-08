@@ -2574,6 +2574,28 @@ Append to `.gitignore`:
 scripts/.board-state.json
 ```
 
+- [ ] **Step 1b: Normalise line endings**
+
+Git reports `LF will be replaced by CRLF` on every Python and JSON file written here, so the
+datasets would carry different line endings depending on who wrote them. Create `.gitattributes`
+at the repo root:
+
+```
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.zip binary
+```
+
+Then renormalise what is already committed:
+
+```bash
+git add --renormalize .
+git status --short
+```
+
+Expect a list of files whose line endings changed. Commit them with the rest of this task.
+
 - [ ] **Step 2: Write `discovery/README.md`**
 
 ```markdown
