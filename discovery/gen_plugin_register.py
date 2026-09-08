@@ -39,6 +39,14 @@ def register(plugins):
                 if (p.get('currency') or 'USD') == 'USD')
     w('**Total, USD a year: %d.** Quoted to the client in Technical Design section 11: '
       'about %d.\n\n' % (total, schema.QUOTED_ANNUAL_USD))
+    other = [p for p in decided if (p.get('currency') or 'USD') != 'USD']
+    if other:
+        # Without this the total reads as the whole cost while a priced row
+        # sits outside it.
+        w('That total excludes %s, priced in a currency other than USD and so not '
+          'comparable with the quoted figure until converted.\n\n'
+          % ', '.join('%s (%s %s)' % (p['id'], p.get('cost_annual'), p.get('currency'))
+                      for p in other))
     if total > schema.QUOTED_ANNUAL_USD:
         w('> This exceeds the figure already in the client\'s hands. It is a commercial '
           'conversation, not a technical one.\n\n')
