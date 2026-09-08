@@ -1,0 +1,271 @@
+[
+  {
+    "id": "P-001",
+    "question": "On login, does WooCommerce replace the guest session cart rather than merging it, and does woocommerce_cart_loaded_from_session fire where the Technical Design assumes?",
+    "stories": [
+      "US-05-10",
+      "US-05-11",
+      "US-05-12"
+    ],
+    "gap_rows": [
+      1
+    ],
+    "script": "P-001-cart-merge-on-login.php",
+    "method": "wp-cli",
+    "expected": "On login, Woo replaces the session cart with the persistent cart, or keeps the session cart and discards the saved one, depending on path. It does not merge. Section 7 row 1 calls this the most delicate logic in the storefront.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "CART-13, CART-14, CART-15, CART-18, AC-18."
+  },
+  {
+    "id": "P-002",
+    "question": "Is the BR-005 price snapshot genuinely native to WooCommerce, with the price frozen onto the order line item at the point the Technical Design assumes?",
+    "stories": [
+      "US-14-05",
+      "US-27-04"
+    ],
+    "gap_rows": [],
+    "script": "P-002-price-snapshot-native.php",
+    "method": "wp-cli",
+    "expected": "Order line items store the price charged. Section 6 classifies this as Native and calls it the highest risk business rule in the register, one the platform already guarantees.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "BR-005, ENT-08, AC-09. Section 6 row, not a section 7 gap row, which is why gap_rows is empty: the design claims this one is already solved."
+  },
+  {
+    "id": "P-003",
+    "question": "Do WooCommerce coupons stack freely with no priority or stacking policy, as BR-004 and the Technical Design assume?",
+    "stories": [
+      "US-14-04"
+    ],
+    "gap_rows": [
+      3
+    ],
+    "script": "P-003-coupon-stacking.php",
+    "method": "wp-cli",
+    "expected": "Coupons combine freely. There is no priority and no stacking policy. Section 7 row 3.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "BR-004, PROMO-16, PROMO-17, ADM-111."
+  },
+  {
+    "id": "P-004",
+    "question": "Is WooCommerce order placement idempotent by default, such that a repeated payment provider callback is safely a no-operation without the extension the Technical Design proposes?",
+    "stories": [
+      "US-07-07",
+      "US-27-04"
+    ],
+    "gap_rows": [
+      12
+    ],
+    "script": "P-004-order-idempotency.php",
+    "method": "php",
+    "expected": "Some protection exists, and gateway callback idempotency is the integrator's responsibility. Section 7 row 12.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "PAY-05, NFR-07, AC-06, AC-07."
+  },
+  {
+    "id": "P-005",
+    "question": "Is corex-kit-woo inactive scaffolding only, gating nothing in the running store, as the Technical Design's section 4 describes?",
+    "stories": [],
+    "gap_rows": [],
+    "script": "P-005-corex-kit-woo-gate.php",
+    "method": "wp-cli",
+    "expected": "corex-kit-woo is four files, being a blueprint, a gate and a service provider, and its own documentation describes it as reserving the seam rather than being a store kit. It is milestone M9 on the CoreX roadmap and it is not started.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "This probe bears on the platform seam itself, not on a contracted user story, so stories is empty. Source: Technical Design section 4, 'The one that matters: there is no CoreX commerce kit'."
+  },
+  {
+    "id": "P-006",
+    "question": "Does the candidate translation plugin translate Woo product data, including variations and attributes?",
+    "stories": [
+      "US-16-03",
+      "US-22-09"
+    ],
+    "gap_rows": [
+      17
+    ],
+    "script": "P-006-translation-plugin-product-data.js",
+    "method": "playwright",
+    "expected": "WordPress is single language and Woo provides nothing for multilingual product or content data. The design assumes a commercial translation plugin, at about 107 USD per year, will translate product data reliably where the free options do not. Section 7 row 17 and section 11.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "FIX-04, NFR-04, SSC-12, SSC-21."
+  },
+  {
+    "id": "P-007",
+    "question": "Does the native WordPress LIKE search fail to return relevant results for Arabic and Franco-Arabic search terms, as the Technical Design assumes?",
+    "stories": [
+      "US-03-07"
+    ],
+    "gap_rows": [
+      9
+    ],
+    "script": "P-007-arabic-search.php",
+    "method": "wp-cli",
+    "expected": "WordPress search is a LIKE query. It has no synonyms, no correction and no relevance. Section 7 row 9.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "SRCH-06, SRCH-07."
+  },
+  {
+    "id": "P-008",
+    "question": "Does the WooCommerce CSV importer correctly detect Arabic encoding, and does re-running an import safely update existing rows by SKU rather than duplicating them?",
+    "stories": [
+      "US-23-01"
+    ],
+    "gap_rows": [
+      6
+    ],
+    "script": "P-008-csv-import-arabic.php",
+    "method": "wp-cli",
+    "expected": "Woo ships a basic CSV importer with fixed column handling, no dry run, no saved mappings, and no safe re run semantics. Section 7 row 6.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "MIG-01 to MIG-25, Section U."
+  },
+  {
+    "id": "P-009",
+    "question": "Does WooCommerce's native stock validation and decrement hold under concurrent checkout, so that concurrent purchases of the last unit of stock result in one sale and not two?",
+    "stories": [
+      "US-07-06",
+      "US-27-04"
+    ],
+    "gap_rows": [],
+    "script": "P-009-stock-decrement-concurrency.php",
+    "method": "php",
+    "expected": "Section 6 classifies stock validation and decrement under concurrency as Native: reduce stock at payment, restore on cancel, which is BR-007.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "BR-003, CHK-12, AC-05. Section 6 row, not a section 7 gap row: the design claims this one is already solved."
+  },
+  {
+    "id": "P-010",
+    "question": "Does the CoreX header, mobile navigation, mega menu and footer system mirror correctly in right to left at every tested breakpoint?",
+    "stories": [
+      "US-01-01",
+      "US-01-05",
+      "US-01-06",
+      "US-22-06"
+    ],
+    "gap_rows": [],
+    "script": "P-010-rtl-header-nav-footer.js",
+    "method": "playwright",
+    "expected": "CoreX section 4 rates the header, mobile navigation, mega menu and footer system as Stable. The Technical Design and the acceptance criteria under FIX-04 and NFR-04 assume the storefront renders right to left with correct alignment, Arabic typography and spacing, mirrored directional icons, and no broken layout at any tested breakpoint.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "No single section 7 gap row names this; it tests the CoreX Stable claim against NAV-01 to NAV-10, SSC-07, SSC-08 and the RTL acceptance criteria in US-01-01."
+  },
+  {
+    "id": "P-011",
+    "question": "Does WooCommerce's native free shipping method support only a minimum order amount or coupon condition, with no item count condition, as the Technical Design assumes?",
+    "stories": [
+      "US-05-04",
+      "US-14-03"
+    ],
+    "gap_rows": [
+      2
+    ],
+    "script": "P-011-free-shipping-item-count.php",
+    "method": "wp-cli",
+    "expected": "Free shipping supports a minimum order amount or a coupon. It has no item count condition. Section 7 row 2.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "BR-002, FIX-07, AC-01, AC-02."
+  },
+  {
+    "id": "P-012",
+    "question": "Does WooCommerce lack a Returned to Origin order status, and does an unrecognised carrier status currently risk being mapped to Delivered?",
+    "stories": [
+      "US-09-06"
+    ],
+    "gap_rows": [
+      10
+    ],
+    "script": "P-012-carrier-status-map.php",
+    "method": "php",
+    "expected": "Woo has no such status, and the carrier integration has reported cases of mapping a returned parcel to Delivered. Section 7 row 10.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "ORD-13, SHIP-17, AC-16."
+  },
+  {
+    "id": "P-013",
+    "question": "Does WooCommerce ship only the Shop Manager and Customer roles, with no built-in path to the six granular staff roles the contract requires?",
+    "stories": [
+      "US-21-01"
+    ],
+    "gap_rows": [
+      15
+    ],
+    "script": "P-013-role-capabilities.php",
+    "method": "wp-cli",
+    "expected": "Woo ships Shop Manager and Customer only. Section 7 row 15.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "ROLE-03 to ROLE-09, ADM-130. Story trace records the range as 'ROLE-01 to ROLE-09'."
+  },
+  {
+    "id": "P-014",
+    "question": "Does the native WooCommerce refund API enforce a ceiling at the amount actually paid to the gateway, for both full and partial refunds?",
+    "stories": [
+      "US-08-06",
+      "US-27-04"
+    ],
+    "gap_rows": [],
+    "script": "P-014-partial-refund-cap.php",
+    "method": "php",
+    "expected": "Section 6 states the Woo refund API enforces the paid amount ceiling, which is BR-006, for full and partial refunds against the gateway.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "PAY-07, PAY-08, PAY-17, ADM-91. Section 6 row, not a section 7 gap row: the design claims this one is already solved."
+  },
+  {
+    "id": "P-015",
+    "question": "Does WooCommerce provide no wishlist functionality out of the box, and would a guest wishlist that is later built be exposed to the same replace-not-merge failure mode identified for the cart in row 1?",
+    "stories": [
+      "US-11-04"
+    ],
+    "gap_rows": [
+      13
+    ],
+    "script": "P-015-wishlist-guest-transfer.php",
+    "method": "php",
+    "expected": "Nothing. WooCommerce provides no wishlist functionality. Section 7 row 13.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "WISH-01 to WISH-04, WISH-07, ENT-07."
+  }
+]
