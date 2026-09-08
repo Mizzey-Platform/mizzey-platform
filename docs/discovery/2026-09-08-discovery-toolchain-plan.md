@@ -358,7 +358,7 @@ from discovery.schema import CUSTOM_EPICS
 def risk_set(stories):
     """Story ids requiring full validation."""
     return {s['id'] for s in stories
-            if s['epic'] in CUSTOM_EPICS or s.get('key')}
+            if s['epic'] in CUSTOM_EPICS or s['key']}
 
 
 def light_set(stories):
