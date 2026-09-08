@@ -1580,10 +1580,12 @@ class TestPluginSeed(unittest.TestCase):
             self.assertIsNone(p['decision'], p['id'])
 
     def test_the_translation_need_names_the_quoted_figure_as_a_candidate(self):
-        translation = [p for p in self.plugins if 'ranslat' in p['need']]
-        self.assertEqual(len(translation), 1)
-        self.assertTrue(translation[0]['candidates'],
+        # Keyed on the id, not the prose: renaming the need must not break this.
+        translation = [p for p in self.plugins if p['id'] == 'PL-01'][0]
+        self.assertTrue(translation['candidates'],
                         'the 107 USD already quoted must appear as a candidate to beat')
+        self.assertEqual([c['cost_annual'] for c in translation['candidates']],
+                         [schema.QUOTED_ANNUAL_USD])
 
     def test_the_undecided_seed_does_not_fail_the_gate(self):
         data = schema.Data(schema.load_stories(), [], [], self.plugins, [])
@@ -1608,7 +1610,7 @@ Create `discovery/data/plugins.json` with six rows in this shape:
 [
   {
     "id": "PL-01",
-    "need": "Multilingual products, categories and content, per FIX-04 and SSC-21",
+    "need": "Translation for multilingual products, categories and content, per FIX-04 and SSC-21",
     "stories": [],
     "candidates": [
       {
