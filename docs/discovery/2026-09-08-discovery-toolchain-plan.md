@@ -153,6 +153,15 @@ class TestSchema(unittest.TestCase):
     def test_the_overage_acknowledgement_is_part_of_a_plugin_row(self):
         self.assertIn('acknowledged_over_quote', schema.PLUGIN_FIELDS)
 
+    def test_the_data_bundle_names_all_five_datasets(self):
+        self.assertEqual(schema.Data._fields,
+                         ('stories', 'verdicts', 'probes', 'plugins', 'journeys'))
+
+    def test_load_data_returns_a_bundle_with_the_real_stories(self):
+        data = schema.load_data()
+        self.assertEqual(len(data.stories), 205)
+        self.assertIsInstance(data.verdicts, list)
+
     def test_missing_fields_are_reported(self):
         row = {'story': 'US-01-01'}
         missing = schema.missing_fields(row, schema.VERDICT_FIELDS)
@@ -192,6 +201,7 @@ Nothing else defines a field name.
 
 import json
 import os
+from collections import namedtuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'data')
@@ -224,6 +234,12 @@ PLUGIN_FIELDS = ('id', 'need', 'stories', 'candidates', 'decision', 'evidence',
                  'acknowledged_over_quote')
 
 JOURNEY_FIELDS = ('id', 'name', 'actor', 'language', 'steps', 'gaps')
+
+# Every dataset in one bundle. Rules and generators take this rather than five
+# positional lists: probes and plugins are both lists of dicts with an id, so as
+# positional arguments they could be transposed at a call site and a test would
+# pass for the wrong reason. Naming the field makes that impossible.
+Data = namedtuple('Data', 'stories verdicts probes plugins journeys')
 
 
 def missing_fields(row, fields):
@@ -268,12 +284,18 @@ def load_stories():
     """The generated story list. Read only. Never write to this file."""
     with open(STORIES, encoding='utf-8') as fh:
         return json.load(fh)
+
+
+def load_data():
+    """Every dataset, in one bundle."""
+    return Data(load_stories(), load('verdicts'), load('probes'),
+                load('plugins'), load('journeys'))
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_schema -v`
-Expected: PASS, 7 tests.
+Expected: PASS, 9 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -406,41 +428,57 @@ STORIES = [
 ]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 class TestUnknownStoryReferences(unittest.TestCase):
     def test_a_verdict_for_an_unknown_story_fails(self):
-        verdicts = [{'story': 'US-99-99'}]
-        problems = check.check_unknown_stories(STORIES, verdicts, [], [], [])
+        problems = check.check_unknown_stories(data(verdicts=[{'story': 'US-99-99'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-99-99', problems[0])
 
     def test_a_probe_naming_an_unknown_story_fails(self):
-        probes = [{'id': 'P-001', 'stories': ['US-99-99']}]
-        problems = check.check_unknown_stories(STORIES, [], probes, [], [])
+        problems = check.check_unknown_stories(
+            data(probes=[{'id': 'P-001', 'stories': ['US-99-99']}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('P-001', problems[0])
 
+    def test_a_plugin_naming_an_unknown_story_fails(self):
+        problems = check.check_unknown_stories(
+            data(plugins=[{'id': 'PL-01', 'stories': ['US-99-99']}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('PL-01', problems[0])
+
     def test_a_journey_step_naming_an_unknown_story_fails(self):
-        journeys = [{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-99-99']}]}]
-        problems = check.check_unknown_stories(STORIES, [], [], [], journeys)
+        problems = check.check_unknown_stories(
+            data(journeys=[{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-99-99']}]}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('J-01', problems[0])
 
     def test_known_story_ids_pass(self):
-        verdicts = [{'story': 'US-01-01'}]
-        probes = [{'id': 'P-001', 'stories': ['US-04-02']}]
-        journeys = [{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-01-01']}]}]
-        self.assertEqual(check.check_unknown_stories(STORIES, verdicts, probes, [], journeys), [])
+        self.assertEqual(check.check_unknown_stories(data(
+            verdicts=[{'story': 'US-01-01'}],
+            probes=[{'id': 'P-001', 'stories': ['US-04-02']}],
+            journeys=[{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-01-01']}]}])), [])
 
 
 class TestTraceability(unittest.TestCase):
     def test_a_verdict_for_a_story_with_no_annex_a_trace_fails(self):
         stories = [{'id': 'US-01-01', 'epic': 'E01', 'key': True, 'trace': '  '}]
-        problems = check.check_traceable(stories, [{'story': 'US-01-01'}], [], [], [])
+        problems = check.check_traceable(
+            data(stories=stories, verdicts=[{'story': 'US-01-01'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-01-01', problems[0])
 
     def test_a_traced_story_passes(self):
-        self.assertEqual(check.check_traceable(STORIES, [{'story': 'US-01-01'}], [], [], []), [])
+        self.assertEqual(check.check_traceable(data(verdicts=[{'story': 'US-01-01'}])), [])
+
+    def test_an_unknown_story_is_left_to_the_other_rule(self):
+        """One fault, one message. check_unknown_stories already reports this."""
+        self.assertEqual(check.check_traceable(data(verdicts=[{'story': 'US-99-99'}])), [])
 
 
 if __name__ == '__main__':
@@ -460,8 +498,13 @@ Create `discovery/check.py`:
 """The discovery gate.
 
 Every rule is a function with the signature
-    rule(stories, verdicts, probes, plugins, journeys) -> list[str]
+    rule(data) -> list[str]
 returning one string per problem. An empty list means the rule passed.
+
+`data` is the Data bundle below rather than five positional lists. Probes and
+plugins are both lists of dicts with an id, so as positional arguments they could
+be transposed at a call site and a test would pass for the wrong reason. Naming
+the field makes that impossible.
 
 Keeping rules pure means each one is unit-testable without touching disk, and
 adding a rule is adding a function to RULES.
@@ -470,28 +513,25 @@ adding a rule is adding a function to RULES.
 import sys
 
 from discovery import riskset, schema
+from discovery.schema import Data  # re-exported so tests can build a bundle
 
 
-def _known_ids(stories):
-    return {s['id'] for s in stories}
-
-
-def check_unknown_stories(stories, verdicts, probes, plugins, journeys):
+def check_unknown_stories(data):
     """No dataset may reference a story id that is not in stories.json."""
-    known = _known_ids(stories)
+    known = {s['id'] for s in data.stories}
     problems = []
-    for v in verdicts:
+    for v in data.verdicts:
         if v.get('story') not in known:
             problems.append('verdict names unknown story %s' % v.get('story'))
-    for p in probes:
+    for p in data.probes:
         for sid in p.get('stories', []):
             if sid not in known:
                 problems.append('probe %s names unknown story %s' % (p.get('id'), sid))
-    for pl in plugins:
+    for pl in data.plugins:
         for sid in pl.get('stories', []):
             if sid not in known:
                 problems.append('plugin %s names unknown story %s' % (pl.get('id'), sid))
-    for j in journeys:
+    for j in data.journeys:
         for step in j.get('steps', []):
             for sid in step.get('stories', []):
                 if sid not in known:
@@ -500,11 +540,13 @@ def check_unknown_stories(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_traceable(stories, verdicts, probes, plugins, journeys):
+def check_traceable(data):
     """Every story carrying a verdict must trace to Annex A."""
-    trace = {s['id']: (s.get('trace') or '').strip() for s in stories}
+    trace = {s['id']: (s.get('trace') or '').strip() for s in data.stories}
+    # A verdict naming a story that does not exist is check_unknown_stories'
+    # problem, not this one. Staying silent here keeps one fault to one message.
     return ['verdict for %s, which has no Annex A trace' % v['story']
-            for v in verdicts
+            for v in data.verdicts
             if v.get('story') in trace and not trace[v['story']]]
 
 
@@ -515,15 +557,11 @@ RULES = [
 
 
 def run_checks():
-    """Load every dataset and run every rule. Returns the problem list."""
-    stories = schema.load_stories()
-    verdicts = schema.load('verdicts')
-    probes = schema.load('probes')
-    plugins = schema.load('plugins')
-    journeys = schema.load('journeys')
+    """Run every rule over every dataset. Returns the problem list."""
+    data = schema.load_data()
     problems = []
     for rule in RULES:
-        problems.extend(rule(stories, verdicts, probes, plugins, journeys))
+        problems.extend(rule(data))
     return problems
 
 
@@ -532,7 +570,8 @@ def main():
     for p in problems:
         print('  FAIL  ' + p)
     if problems:
-        print('\n%d problem(s)' % len(problems))
+        print('
+%d problem(s)' % len(problems))
         return 1
     print('clean')
     return 0
@@ -545,7 +584,7 @@ if __name__ == '__main__':
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_stories -v`
-Expected: PASS, 6 tests.
+Expected: PASS, 8 tests.
 
 - [ ] **Step 5: Run the gate against the empty datasets**
 
@@ -586,6 +625,12 @@ STORIES = [
 ]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 def verdict(story, **kw):
     row = {'story': story, 'claimed': 'custom', 'actual': 'build',
            'confidence': 'reasoned', 'evidence': [], 'plugins': [],
@@ -597,16 +642,17 @@ def verdict(story, **kw):
 class TestAssumedInRiskSet(unittest.TestCase):
     def test_a_risk_set_story_left_assumed_fails(self):
         problems = check.check_no_assumed_in_risk_set(
-            STORIES, [verdict('US-13-01', confidence='assumed')], [], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='assumed')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
     def test_a_light_pass_story_may_stay_assumed(self):
         self.assertEqual(check.check_no_assumed_in_risk_set(
-            STORIES, [verdict('US-04-02', confidence='assumed')], [], [], []), [])
+            data(verdicts=[verdict('US-04-02', confidence='assumed'),
+                           verdict('US-13-01')])), [])
 
     def test_a_risk_set_story_with_no_verdict_at_all_fails(self):
-        problems = check.check_no_assumed_in_risk_set(STORIES, [], [], [], [])
+        problems = check.check_no_assumed_in_risk_set(data())
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
@@ -614,46 +660,46 @@ class TestAssumedInRiskSet(unittest.TestCase):
 class TestProvedNeedsEvidence(unittest.TestCase):
     def test_proved_with_no_probe_fails(self):
         problems = check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=[])], [], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=[])]))
         self.assertEqual(len(problems), 1)
 
     def test_proved_naming_a_probe_that_does_not_exist_fails(self):
         problems = check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=['P-999'])],
-            [{'id': 'P-001'}], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-999'])],
+                 probes=[{'id': 'P-001'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('P-999', problems[0])
 
     def test_proved_with_a_real_probe_passes(self):
         self.assertEqual(check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=['P-001'])],
-            [{'id': 'P-001'}], [], []), [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
+                 probes=[{'id': 'P-001'}])), [])
 
 
 class TestAllowedValues(unittest.TestCase):
     def test_a_misspelt_confidence_fails(self):
         problems = check.check_allowed_values(
-            STORIES, [verdict('US-13-01', confidence='reasonned')], [], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='reasonned')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('reasonned', problems[0])
 
     def test_an_unknown_actual_fails(self):
         problems = check.check_allowed_values(
-            STORIES, [verdict('US-13-01', actual='mostly')], [], [], [])
+            data(verdicts=[verdict('US-13-01', actual='mostly')]))
         self.assertEqual(len(problems), 1)
 
     def test_an_unknown_points_flag_fails(self):
         problems = check.check_allowed_values(
-            STORIES, [verdict('US-13-01', points_flag='way under')], [], [], [])
+            data(verdicts=[verdict('US-13-01', points_flag='way under')]))
         self.assertEqual(len(problems), 1)
 
     def test_an_undecided_actual_is_allowed(self):
         self.assertEqual(check.check_allowed_values(
-            STORIES, [verdict('US-13-01', actual=None)], [], [], []), [])
+            data(verdicts=[verdict('US-13-01', actual=None)])), [])
 
     def test_a_bad_probe_verdict_fails(self):
         problems = check.check_allowed_values(
-            STORIES, [], [{'id': 'P-001', 'verdict': 'maybe'}], [], [])
+            data(probes=[{'id': 'P-001', 'verdict': 'maybe'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('P-001', problems[0])
 
@@ -661,17 +707,17 @@ class TestAllowedValues(unittest.TestCase):
 class TestBuildNeedsAGapRow(unittest.TestCase):
     def test_build_with_no_gap_row_and_no_risk_note_fails(self):
         problems = check.check_build_traces_to_gap(
-            STORIES, [verdict('US-13-01', actual='build', gap_rows=[], risk='')], [], [], [])
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[], risk='')]))
         self.assertEqual(len(problems), 1)
 
     def test_build_with_no_gap_row_but_an_explanation_passes(self):
         self.assertEqual(check.check_build_traces_to_gap(
-            STORIES, [verdict('US-13-01', actual='build', gap_rows=[],
-                              risk='Not in section 7; found by probe P-012')], [], [], []), [])
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[],
+                                   risk='Not in section 7; found by probe P-012')])), [])
 
     def test_native_needs_no_gap_row(self):
         self.assertEqual(check.check_build_traces_to_gap(
-            STORIES, [verdict('US-04-02', actual='native', gap_rows=[], risk='')], [], [], []), [])
+            data(verdicts=[verdict('US-04-02', actual='native', gap_rows=[], risk='')])), [])
 
 
 if __name__ == '__main__':
@@ -688,14 +734,14 @@ Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute '
 In `discovery/check.py`, insert these three functions immediately after `check_traceable`:
 
 ```python
-def check_no_assumed_in_risk_set(stories, verdicts, probes, plugins, journeys):
+def check_no_assumed_in_risk_set(data):
     """Every risk-set story needs a verdict, and none of them may stay assumed.
 
     A missing verdict is the same failure as an assumed one: in both cases
     nobody has looked.
     """
-    risky = riskset.risk_set(stories)
-    seen = {v['story']: v for v in verdicts if 'story' in v}
+    risky = riskset.risk_set(data.stories)
+    seen = {v['story']: v for v in data.verdicts if 'story' in v}
     problems = []
     for sid in sorted(risky):
         if sid not in seen:
@@ -705,11 +751,11 @@ def check_no_assumed_in_risk_set(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_proved_has_evidence(stories, verdicts, probes, plugins, journeys):
+def check_proved_has_evidence(data):
     """confidence "proved" means a probe ran. Name it, and let it exist."""
-    known = {p.get('id') for p in probes}
+    known = {p.get('id') for p in data.probes}
     problems = []
-    for v in verdicts:
+    for v in data.verdicts:
         if v.get('confidence') != 'proved':
             continue
         evidence = v.get('evidence') or []
@@ -722,14 +768,14 @@ def check_proved_has_evidence(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_build_traces_to_gap(stories, verdicts, probes, plugins, journeys):
+def check_build_traces_to_gap(data):
     """Anything classed build should trace to a Technical Design gap row.
 
     If it does not, that is allowed, but it means section 7 missed something and
     the risk note has to say so.
     """
     return ['%s is classed build with no gap row and no explanation in risk' % v.get('story')
-            for v in verdicts
+            for v in data.verdicts
             if v.get('actual') == 'build'
             and not (v.get('gap_rows') or [])
             and not (v.get('risk') or '').strip()]
@@ -740,13 +786,13 @@ Without it, `confidence: "reasonned"` passes the gate silently, which is exactly
 a single source of truth exists to prevent:
 
 ```python
-def check_allowed_values(stories, verdicts, probes, plugins, journeys):
+def check_allowed_values(data):
     """A typo in an enumerated field must not pass silently.
 
     None means undecided and is allowed. A wrong string is not.
     """
     problems = []
-    for v in verdicts:
+    for v in data.verdicts:
         for field, allowed in (('actual', schema.ACTUAL),
                                ('confidence', schema.CONFIDENCE),
                                ('points_flag', schema.POINTS_FLAG)):
@@ -754,7 +800,7 @@ def check_allowed_values(stories, verdicts, probes, plugins, journeys):
             if value is not None and value not in allowed:
                 problems.append('%s has %s %r, which is not one of %s'
                                 % (v.get('story'), field, value, ', '.join(allowed)))
-    for p in probes:
+    for p in data.probes:
         value = p.get('verdict')
         if value is not None and value not in schema.PROBE_VERDICT:
             problems.append('probe %s has verdict %r, which is not one of %s'
@@ -814,6 +860,12 @@ from discovery import check
 STORIES = [{'id': 'US-01-01', 'epic': 'E01', 'key': False, 'leverage': 'partial', 'trace': 'FIX-04'}]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 def plugin(pid, **kw):
     row = {'id': pid, 'need': 'Multilingual product data', 'stories': ['US-01-01'],
            'candidates': [], 'decision': 'Example Plugin', 'evidence': [],
@@ -825,31 +877,31 @@ def plugin(pid, **kw):
 
 class TestPluginCompleteness(unittest.TestCase):
     def test_a_decision_with_no_cost_fails(self):
-        problems = check.check_plugin_complete(STORIES, [], [], [plugin('PL-01', cost_annual=None)], [])
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', cost_annual=None)]))
         self.assertEqual(len(problems), 1)
         self.assertIn('PL-01', problems[0])
 
     def test_a_decision_with_no_licence_fails(self):
-        problems = check.check_plugin_complete(STORIES, [], [], [plugin('PL-01', licence=None)], [])
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', licence=None)]))
         self.assertEqual(len(problems), 1)
 
     def test_an_undecided_need_is_not_yet_a_failure(self):
         self.assertEqual(check.check_plugin_complete(
-            STORIES, [], [], [plugin('PL-01', decision=None, cost_annual=None, licence=None)], []), [])
+            data(plugins=[plugin('PL-01', decision=None, cost_annual=None, licence=None)])), [])
 
     def test_build_instead_needs_no_cost(self):
         self.assertEqual(check.check_plugin_complete(
-            STORIES, [], [], [plugin('PL-01', decision='build instead',
-                                     cost_annual=None, licence=None)], []), [])
+            data(plugins=[plugin('PL-01', decision='build instead',
+                                 cost_annual=None, licence=None)])), [])
 
     def test_a_complete_decision_passes(self):
-        self.assertEqual(check.check_plugin_complete(STORIES, [], [], [plugin('PL-01')], []), [])
+        self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 
 
 class TestPluginCeiling(unittest.TestCase):
     def test_a_total_above_the_quoted_figure_fails(self):
         rows = [plugin('PL-01', cost_annual=107), plugin('PL-02', cost_annual=60)]
-        problems = check.check_plugin_ceiling(STORIES, [], [], rows, [])
+        problems = check.check_plugin_ceiling(data(plugins=rows))
         self.assertEqual(len(problems), 1)
         self.assertIn('167', problems[0])
         self.assertIn('107', problems[0])
@@ -857,16 +909,16 @@ class TestPluginCeiling(unittest.TestCase):
     def test_an_acknowledged_overage_passes(self):
         rows = [plugin('PL-01', cost_annual=107),
                 plugin('PL-02', cost_annual=60, acknowledged_over_quote=True)]
-        self.assertEqual(check.check_plugin_ceiling(STORIES, [], [], rows, []), [])
+        self.assertEqual(check.check_plugin_ceiling(data(plugins=rows)), [])
 
     def test_a_total_at_the_quoted_figure_passes(self):
         self.assertEqual(check.check_plugin_ceiling(
-            STORIES, [], [], [plugin('PL-01', cost_annual=107)], []), [])
+            data(plugins=[plugin('PL-01', cost_annual=107)])), [])
 
     def test_non_usd_costs_are_not_silently_summed(self):
         rows = [plugin('PL-01', cost_annual=107),
                 plugin('PL-02', cost_annual=50, currency='EUR')]
-        problems = check.check_plugin_ceiling(STORIES, [], [], rows, [])
+        problems = check.check_plugin_ceiling(data(plugins=rows))
         self.assertTrue(any('EUR' in p for p in problems))
 
 
@@ -884,14 +936,14 @@ Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute '
 In `discovery/check.py`, insert after `check_build_traces_to_gap`:
 
 ```python
-def check_plugin_complete(stories, verdicts, probes, plugins, journeys):
+def check_plugin_complete(data):
     """A decided plugin needs a licence and an annual figure.
 
     An undecided need is work in progress, not a failure. "build instead" is a
     decision that costs no licence.
     """
     problems = []
-    for pl in plugins:
+    for pl in data.plugins:
         decision = pl.get('decision')
         if not decision or decision == 'build instead':
             continue
@@ -902,7 +954,7 @@ def check_plugin_complete(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_plugin_ceiling(stories, verdicts, probes, plugins, journeys):
+def check_plugin_ceiling(data):
     """The register total must not quietly exceed what the client was quoted.
 
     Technical Design section 11 put about 107 USD a year in front of them. Going
@@ -912,7 +964,7 @@ def check_plugin_ceiling(stories, verdicts, probes, plugins, journeys):
     problems = []
     total = 0
     acknowledged = False
-    for pl in plugins:
+    for pl in data.plugins:
         if not pl.get('decision') or pl.get('decision') == 'build instead':
             continue
         cost = pl.get('cost_annual') or 0
@@ -972,30 +1024,36 @@ from discovery import check
 STORIES = [{'id': 'US-01-01', 'epic': 'E01', 'key': False, 'leverage': 'partial', 'trace': 'FIX-04'}]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 class TestJourneySteps(unittest.TestCase):
     def test_a_step_with_no_story_fails(self):
         journeys = [{'id': 'J-01', 'name': 'Guest buys', 'actor': 'guest',
                      'language': 'both', 'steps': [{'n': 1, 'stories': []}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertEqual(len(problems), 1)
         self.assertIn('J-01', problems[0])
 
     def test_an_unknown_actor_fails(self):
         journeys = [{'id': 'J-01', 'name': 'x', 'actor': 'wizard', 'language': 'both',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertTrue(any('wizard' in p for p in problems))
 
     def test_an_unknown_language_fails(self):
         journeys = [{'id': 'J-01', 'name': 'x', 'actor': 'guest', 'language': 'fr',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertTrue(any('fr' in p for p in problems))
 
     def test_a_well_formed_journey_passes(self):
         journeys = [{'id': 'J-01', 'name': 'Guest buys', 'actor': 'guest', 'language': 'both',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        self.assertEqual(check.check_journey_steps(STORIES, [], [], [], journeys), [])
+        self.assertEqual(check.check_journey_steps(data(journeys=journeys)), [])
 
 
 class TestHouseRules(unittest.TestCase):
@@ -1027,6 +1085,9 @@ class TestHouseRules(unittest.TestCase):
         self.write('data.json', '{"note": "an em dash \u2014 in data is fine"}')
         self.assertEqual(check.check_house_rules_in(self.dir), [])
 
+    def test_a_missing_directory_is_not_a_failure(self):
+        self.assertEqual(check.check_house_rules_in(os.path.join(self.dir, 'nope')), [])
+
 
 if __name__ == '__main__':
     unittest.main()
@@ -1045,10 +1106,10 @@ Add `import os` and `import unicodedata` to the imports at the top of `discovery
 GENERATED = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
-def check_journey_steps(stories, verdicts, probes, plugins, journeys):
+def check_journey_steps(data):
     """A journey step that names no story is narrative, not validation."""
     problems = []
-    for j in journeys:
+    for j in data.journeys:
         if j.get('actor') not in schema.ACTORS:
             problems.append('journey %s has actor %s, which is not one of %s'
                             % (j.get('id'), j.get('actor'), ', '.join(schema.ACTORS)))
@@ -1089,8 +1150,12 @@ def check_house_rules_in(directory):
     return problems
 
 
-def check_house_rules(stories, verdicts, probes, plugins, journeys):
-    """Rule-signature wrapper so the gate can run it alongside the others."""
+def check_house_rules(data):
+    """Rule-signature wrapper so the gate can run it alongside the others.
+
+    It reads the generated directory rather than the datasets, so it ignores
+    data entirely. That is the one rule here that is about output, not input.
+    """
     return check_house_rules_in(GENERATED)
 ```
 
@@ -1099,12 +1164,12 @@ Then extend `RULES` with `check_journey_steps` and `check_house_rules`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_journeys -v`
-Expected: PASS, 8 tests.
+Expected: PASS, 9 tests.
 
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 53 tests.
+Expected: PASS, 58 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -1307,9 +1372,9 @@ class TestPluginSeed(unittest.TestCase):
                         'the 107 USD already quoted must appear as a candidate to beat')
 
     def test_the_undecided_seed_does_not_fail_the_gate(self):
-        stories = schema.load_stories()
-        self.assertEqual(check.check_plugin_complete(stories, [], [], self.plugins, []), [])
-        self.assertEqual(check.check_plugin_ceiling(stories, [], [], self.plugins, []), [])
+        data = schema.Data(schema.load_stories(), [], [], self.plugins, [])
+        self.assertEqual(check.check_plugin_complete(data), [])
+        self.assertEqual(check.check_plugin_ceiling(data), [])
 
 
 if __name__ == '__main__':
@@ -1851,7 +1916,7 @@ Create `discovery/tests/test_gen_reports.py`:
 ```python
 import unittest
 
-from discovery import gen_journey_docs, gen_plugin_register, gen_validation_report
+from discovery import gen_journey_docs, gen_plugin_register, gen_validation_report, schema
 
 STORIES = [
     {'id': 'US-13-01', 'epic': 'E13', 'epicname': 'RETURNS', 'title': 'Request a return',
@@ -1873,7 +1938,8 @@ PROBES = [
 
 class TestValidationReport(unittest.TestCase):
     def setUp(self):
-        self.text = gen_validation_report.report(STORIES, [], PROBES, [], [])
+        self.text = gen_validation_report.report(
+            schema.Data(STORIES, [], PROBES, [], []))
 
     def test_refuted_probes_are_called_out_first(self):
         self.assertIn('P-002', self.text)
@@ -1948,9 +2014,9 @@ from discovery import riskset, schema
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
-def report(stories, verdicts, probes, plugins, journeys):
-    risky = riskset.risk_set(stories)
-    by_story = {v['story']: v for v in verdicts}
+def report(data):
+    risky = riskset.risk_set(data.stories)
+    by_story = {v['story']: v for v in data.verdicts}
     o = io.StringIO()
     w = o.write
 
@@ -1959,9 +2025,9 @@ def report(stories, verdicts, probes, plugins, journeys):
     validated = sum(1 for sid in risky if sid in by_story)
     w('Risk-weighted set validated: %d of %d.\n' % (validated, len(risky)))
     w('Probes run: %d of %d.\n\n'
-      % (sum(1 for p in probes if p.get('verdict')), len(probes)))
+      % (sum(1 for p in data.probes if p.get('verdict')), len(data.probes)))
 
-    refuted = [p for p in probes if p.get('verdict') == 'refuted']
+    refuted = [p for p in data.probes if p.get('verdict') == 'refuted']
     w('## Refuted\n\n')
     if refuted:
         w('The Technical Design asserts something these probes did not find. '
@@ -1977,7 +2043,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('Nothing refuted.\n\n')
 
-    partial = [p for p in probes if p.get('verdict') == 'partial']
+    partial = [p for p in data.probes if p.get('verdict') == 'partial']
     w('## Partial\n\n')
     if partial:
         for p in partial:
@@ -1986,7 +2052,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('Nothing partial.\n\n')
 
-    confirmed = [p for p in probes if p.get('verdict') == 'confirmed']
+    confirmed = [p for p in data.probes if p.get('verdict') == 'confirmed']
     w('## Confirmed\n\n')
     if confirmed:
         for p in confirmed:
@@ -2008,7 +2074,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('No story is flagged under or over.\n\n')
 
-    questions = [(v['story'], q) for v in verdicts for q in (v.get('open') or [])]
+    questions = [(v['story'], q) for v in data.verdicts for q in (v.get('open') or [])]
     w('## Open questions\n\n')
     if questions:
         for sid, q in questions:
@@ -2021,8 +2087,7 @@ def report(stories, verdicts, probes, plugins, journeys):
 
 
 def main():
-    text = report(schema.load_stories(), schema.load('verdicts'), schema.load('probes'),
-                  schema.load('plugins'), schema.load('journeys'))
+    text = report(schema.load_data())
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, 'validation-report.md'), 'w', encoding='utf-8') as fh:
         fh.write(text)
@@ -2697,7 +2762,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 97 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 102 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
