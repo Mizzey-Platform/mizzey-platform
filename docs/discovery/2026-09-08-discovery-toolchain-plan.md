@@ -630,6 +630,34 @@ class TestProvedNeedsEvidence(unittest.TestCase):
             [{'id': 'P-001'}], [], []), [])
 
 
+class TestAllowedValues(unittest.TestCase):
+    def test_a_misspelt_confidence_fails(self):
+        problems = check.check_allowed_values(
+            STORIES, [verdict('US-13-01', confidence='reasonned')], [], [], [])
+        self.assertEqual(len(problems), 1)
+        self.assertIn('reasonned', problems[0])
+
+    def test_an_unknown_actual_fails(self):
+        problems = check.check_allowed_values(
+            STORIES, [verdict('US-13-01', actual='mostly')], [], [], [])
+        self.assertEqual(len(problems), 1)
+
+    def test_an_unknown_points_flag_fails(self):
+        problems = check.check_allowed_values(
+            STORIES, [verdict('US-13-01', points_flag='way under')], [], [], [])
+        self.assertEqual(len(problems), 1)
+
+    def test_an_undecided_actual_is_allowed(self):
+        self.assertEqual(check.check_allowed_values(
+            STORIES, [verdict('US-13-01', actual=None)], [], [], []), [])
+
+    def test_a_bad_probe_verdict_fails(self):
+        problems = check.check_allowed_values(
+            STORIES, [], [{'id': 'P-001', 'verdict': 'maybe'}], [], [])
+        self.assertEqual(len(problems), 1)
+        self.assertIn('P-001', problems[0])
+
+
 class TestBuildNeedsAGapRow(unittest.TestCase):
     def test_build_with_no_gap_row_and_no_risk_note_fails(self):
         problems = check.check_build_traces_to_gap(
@@ -707,6 +735,33 @@ def check_build_traces_to_gap(stories, verdicts, probes, plugins, journeys):
             and not (v.get('risk') or '').strip()]
 ```
 
+And this one, which closes the loop on the allowed-value tuples in `schema.py`.
+Without it, `confidence: "reasonned"` passes the gate silently, which is exactly the failure
+a single source of truth exists to prevent:
+
+```python
+def check_allowed_values(stories, verdicts, probes, plugins, journeys):
+    """A typo in an enumerated field must not pass silently.
+
+    None means undecided and is allowed. A wrong string is not.
+    """
+    problems = []
+    for v in verdicts:
+        for field, allowed in (('actual', schema.ACTUAL),
+                               ('confidence', schema.CONFIDENCE),
+                               ('points_flag', schema.POINTS_FLAG)):
+            value = v.get(field)
+            if value is not None and value not in allowed:
+                problems.append('%s has %s %r, which is not one of %s'
+                                % (v.get('story'), field, value, ', '.join(allowed)))
+    for p in probes:
+        value = p.get('verdict')
+        if value is not None and value not in schema.PROBE_VERDICT:
+            problems.append('probe %s has verdict %r, which is not one of %s'
+                            % (p.get('id'), value, ', '.join(schema.PROBE_VERDICT)))
+    return problems
+```
+
 Then extend `RULES`:
 
 ```python
@@ -716,13 +771,14 @@ RULES = [
     check_no_assumed_in_risk_set,
     check_proved_has_evidence,
     check_build_traces_to_gap,
+    check_allowed_values,
 ]
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: PASS, 9 tests.
+Expected: PASS, 14 tests.
 
 - [ ] **Step 5: Confirm the gate now reports the real backlog**
 
@@ -1048,7 +1104,7 @@ Expected: PASS, 8 tests.
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 48 tests.
+Expected: PASS, 53 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2619,7 +2675,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 92 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 97 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
