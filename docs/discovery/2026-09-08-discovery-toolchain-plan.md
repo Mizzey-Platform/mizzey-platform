@@ -2043,6 +2043,11 @@ from discovery import riskset, schema
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
+def _cell(value):
+    """A markdown table cell. A pipe in the content would split the row."""
+    return str(value).replace('|', r'\|')
+
+
 def dossier(epic, stories, verdicts, probes, plugins):
     """The markdown for one epic."""
     rows = [s for s in stories if s['epic'] == epic]
@@ -2075,7 +2080,8 @@ def dossier(epic, stories, verdicts, probes, plugins):
         else:
             actual, confidence, points = 'not yet validated', '', str(s['points'])
         w('| %s | %s | %s | %s | %s | %s | %s | %s |\n'
-          % (s['id'], s['title'], s['trace'], in_set, s['leverage'], actual, confidence, points))
+          % (s['id'], _cell(s['title']), _cell(s['trace']), in_set,
+             s['leverage'], actual, confidence, points))
     w('\n')
 
     risks = [(s, by_story[s['id']]) for s in rows
@@ -2092,7 +2098,7 @@ def dossier(epic, stories, verdicts, probes, plugins):
         w('| Probe | Question | Verdict |\n|---|---|---|\n')
         for pid in evidence:
             p = probe_by_id.get(pid, {})
-            w('| %s | %s | %s |\n' % (pid, p.get('question', 'unknown probe'),
+            w('| %s | %s | %s |\n' % (pid, _cell(p.get('question', 'unknown probe')),
                                       p.get('verdict') or 'not yet run'))
         w('\n')
 
