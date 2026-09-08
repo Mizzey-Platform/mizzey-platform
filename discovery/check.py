@@ -150,6 +150,12 @@ def check_plugin_complete(data):
             continue
         if pl.get('cost_annual') is None:
             problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
+        elif pl.get('cost_annual') < 0:
+            # A negative figure on one row subtracts from the register total and
+            # can hide a real overage on another, which would put a cost above
+            # the quoted figure in front of the client with nobody told.
+            problems.append('plugin %s has a negative cost_annual, %s'
+                            % (pl.get('id'), pl.get('cost_annual')))
         if not pl.get('licence'):
             problems.append('plugin %s is decided with no licence' % pl.get('id'))
     return problems

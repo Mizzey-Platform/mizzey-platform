@@ -39,6 +39,11 @@ class TestPluginCompleteness(unittest.TestCase):
             data(plugins=[plugin('PL-01', decision='build instead',
                                  cost_annual=None, licence=None)])), [])
 
+    def test_a_negative_cost_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', cost_annual=-150)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('negative', problems[0])
+
     def test_a_complete_decision_passes(self):
         self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 

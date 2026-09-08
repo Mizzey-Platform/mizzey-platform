@@ -979,6 +979,11 @@ class TestPluginCompleteness(unittest.TestCase):
             data(plugins=[plugin('PL-01', decision='build instead',
                                  cost_annual=None, licence=None)])), [])
 
+    def test_a_negative_cost_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', cost_annual=-150)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('negative', problems[0])
+
     def test_a_complete_decision_passes(self):
         self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 
@@ -1034,6 +1039,12 @@ def check_plugin_complete(data):
             continue
         if pl.get('cost_annual') is None:
             problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
+        elif pl.get('cost_annual') < 0:
+            # A negative figure on one row subtracts from the register total and
+            # can hide a real overage on another, which would put a cost above
+            # the quoted figure in front of the client with nobody told.
+            problems.append('plugin %s has a negative cost_annual, %s'
+                            % (pl.get('id'), pl.get('cost_annual')))
         if not pl.get('licence'):
             problems.append('plugin %s is decided with no licence' % pl.get('id'))
     return problems
@@ -1075,7 +1086,7 @@ Then extend `RULES` with `check_plugin_complete` and `check_plugin_ceiling`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_plugins -v`
-Expected: PASS, 9 tests.
+Expected: PASS, 10 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -1254,7 +1265,7 @@ Expected: PASS, 9 tests.
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 66 tests.
+Expected: PASS, 67 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2847,7 +2858,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 110 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 111 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
