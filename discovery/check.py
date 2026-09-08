@@ -53,13 +53,14 @@ def check_traceable(data):
             if v.get('story') in trace and not trace[v['story']]]
 
 
-def check_no_assumed_in_risk_set(data):
+def check_risk_set_has_real_verdict(data):
     """Every risk-set story needs a verdict, and none of them may stay assumed.
 
     A missing verdict is the same failure as an assumed one: in both cases
     nobody has looked.
     """
     risky = riskset.risk_set(data.stories)
+    # Last write wins here. check_no_duplicate_rows is what makes that safe.
     seen = {v['story']: v for v in data.verdicts if 'story' in v}
     problems = []
     for sid in sorted(risky):
@@ -76,6 +77,9 @@ def check_proved_has_evidence(data):
     Citing a probe that exists but was never executed is the false confidence
     this whole dataset exists to prevent, so an unrun probe is not evidence.
     """
+    # Last write wins here. check_no_duplicate_rows is what makes that safe:
+    # without it a second row reusing a probe id could mask an unrun probe and
+    # let a proved verdict through the whole gate.
     by_id = {p.get('id'): p for p in data.probes}
     problems = []
     for v in data.verdicts:
@@ -94,21 +98,30 @@ def check_proved_has_evidence(data):
     return problems
 
 
-def check_one_verdict_per_story(data):
-    """Two rows for one story means one of them is invisible.
+def check_no_duplicate_rows(data):
+    """Every row must be reachable by its key.
 
-    The verdict rules index by story id, so a duplicate silently wins and the
-    row it replaced is never inspected. Parallel agents append to this file, so
-    say so rather than letting the later row erase the earlier one.
+    The rules index each dataset by key, so a duplicate silently wins and the
+    row it replaced is never inspected. For probes that is not cosmetic: a
+    second row reusing an id can mask an unrun probe and let a proved verdict
+    through the entire gate. Parallel agents append to these files, so say so
+    rather than letting the later row erase the earlier one.
     """
-    seen = set()
-    duplicates = []
-    for v in data.verdicts:
-        sid = v.get('story')
-        if sid in seen and sid not in duplicates:
-            duplicates.append(sid)
-        seen.add(sid)
-    return ['%s has more than one verdict row' % sid for sid in duplicates]
+    problems = []
+    for label, rows, key in (('verdict', data.verdicts, 'story'),
+                             ('probe', data.probes, 'id'),
+                             ('plugin', data.plugins, 'id'),
+                             ('journey', data.journeys, 'id')):
+        seen = set()
+        duplicates = []
+        for row in rows:
+            value = row.get(key)
+            if value in seen and value not in duplicates:
+                duplicates.append(value)
+            seen.add(value)
+        problems.extend('%s %s appears in more than one row' % (label, value)
+                        for value in duplicates)
+    return problems
 
 
 def check_build_traces_to_gap(data):
@@ -149,11 +162,11 @@ def check_allowed_values(data):
 RULES = [
     check_unknown_stories,
     check_traceable,
-    check_no_assumed_in_risk_set,
+    check_risk_set_has_real_verdict,
     check_proved_has_evidence,
     check_build_traces_to_gap,
     check_allowed_values,
-    check_one_verdict_per_story,
+    check_no_duplicate_rows,
 ]
 
 

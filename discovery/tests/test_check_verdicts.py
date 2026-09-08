@@ -24,20 +24,20 @@ def verdict(story, **kw):
     return row
 
 
-class TestAssumedInRiskSet(unittest.TestCase):
+class TestRiskSetHasRealVerdict(unittest.TestCase):
     def test_a_risk_set_story_left_assumed_fails(self):
-        problems = check.check_no_assumed_in_risk_set(
+        problems = check.check_risk_set_has_real_verdict(
             data(verdicts=[verdict('US-13-01', confidence='assumed')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
     def test_a_light_pass_story_may_stay_assumed(self):
-        self.assertEqual(check.check_no_assumed_in_risk_set(
+        self.assertEqual(check.check_risk_set_has_real_verdict(
             data(verdicts=[verdict('US-04-02', confidence='assumed'),
                            verdict('US-13-01')])), [])
 
     def test_a_risk_set_story_with_no_verdict_at_all_fails(self):
-        problems = check.check_no_assumed_in_risk_set(data())
+        problems = check.check_risk_set_has_real_verdict(data())
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
@@ -68,22 +68,40 @@ class TestProvedNeedsEvidence(unittest.TestCase):
                  probes=[{'id': 'P-001', 'verdict': 'confirmed'}])), [])
 
 
-class TestOneVerdictPerStory(unittest.TestCase):
-    def test_a_duplicate_row_fails(self):
-        problems = check.check_one_verdict_per_story(
+class TestNoDuplicateRows(unittest.TestCase):
+    def test_a_duplicate_verdict_fails(self):
+        problems = check.check_no_duplicate_rows(
             data(verdicts=[verdict('US-13-01', confidence='assumed'),
                            verdict('US-13-01', confidence='reasoned')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
-    def test_a_story_reported_once_however_many_duplicates(self):
-        problems = check.check_one_verdict_per_story(
+    def test_a_key_is_reported_once_however_many_duplicates(self):
+        problems = check.check_no_duplicate_rows(
             data(verdicts=[verdict('US-13-01'), verdict('US-13-01'), verdict('US-13-01')]))
         self.assertEqual(len(problems), 1)
 
-    def test_distinct_stories_pass(self):
-        self.assertEqual(check.check_one_verdict_per_story(
-            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')])), [])
+    def test_a_duplicate_probe_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(probes=[{'id': 'P-001', 'verdict': None},
+                         {'id': 'P-001', 'verdict': 'confirmed'}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('P-001', problems[0])
+
+    def test_a_duplicate_plugin_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(plugins=[{'id': 'PL-01'}, {'id': 'PL-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_duplicate_journey_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(journeys=[{'id': 'J-01'}, {'id': 'J-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_distinct_keys_pass(self):
+        self.assertEqual(check.check_no_duplicate_rows(
+            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')],
+                 probes=[{'id': 'P-001'}, {'id': 'P-002'}])), [])
 
 
 class TestAllowedValues(unittest.TestCase):
@@ -124,6 +142,10 @@ class TestBuildNeedsAGapRow(unittest.TestCase):
         self.assertEqual(check.check_build_traces_to_gap(
             data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[],
                                    risk='Not in section 7; found by probe P-012')])), [])
+
+    def test_build_with_a_gap_row_passes(self):
+        self.assertEqual(check.check_build_traces_to_gap(
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[5], risk='')])), [])
 
     def test_native_needs_no_gap_row(self):
         self.assertEqual(check.check_build_traces_to_gap(

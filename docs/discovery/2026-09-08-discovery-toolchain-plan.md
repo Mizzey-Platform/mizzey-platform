@@ -639,20 +639,20 @@ def verdict(story, **kw):
     return row
 
 
-class TestAssumedInRiskSet(unittest.TestCase):
+class TestRiskSetHasRealVerdict(unittest.TestCase):
     def test_a_risk_set_story_left_assumed_fails(self):
-        problems = check.check_no_assumed_in_risk_set(
+        problems = check.check_risk_set_has_real_verdict(
             data(verdicts=[verdict('US-13-01', confidence='assumed')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
     def test_a_light_pass_story_may_stay_assumed(self):
-        self.assertEqual(check.check_no_assumed_in_risk_set(
+        self.assertEqual(check.check_risk_set_has_real_verdict(
             data(verdicts=[verdict('US-04-02', confidence='assumed'),
                            verdict('US-13-01')])), [])
 
     def test_a_risk_set_story_with_no_verdict_at_all_fails(self):
-        problems = check.check_no_assumed_in_risk_set(data())
+        problems = check.check_risk_set_has_real_verdict(data())
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
@@ -683,22 +683,40 @@ class TestProvedNeedsEvidence(unittest.TestCase):
                  probes=[{'id': 'P-001', 'verdict': 'confirmed'}])), [])
 
 
-class TestOneVerdictPerStory(unittest.TestCase):
-    def test_a_duplicate_row_fails(self):
-        problems = check.check_one_verdict_per_story(
+class TestNoDuplicateRows(unittest.TestCase):
+    def test_a_duplicate_verdict_fails(self):
+        problems = check.check_no_duplicate_rows(
             data(verdicts=[verdict('US-13-01', confidence='assumed'),
                            verdict('US-13-01', confidence='reasoned')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
-    def test_a_story_reported_once_however_many_duplicates(self):
-        problems = check.check_one_verdict_per_story(
+    def test_a_key_is_reported_once_however_many_duplicates(self):
+        problems = check.check_no_duplicate_rows(
             data(verdicts=[verdict('US-13-01'), verdict('US-13-01'), verdict('US-13-01')]))
         self.assertEqual(len(problems), 1)
 
-    def test_distinct_stories_pass(self):
-        self.assertEqual(check.check_one_verdict_per_story(
-            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')])), [])
+    def test_a_duplicate_probe_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(probes=[{'id': 'P-001', 'verdict': None},
+                         {'id': 'P-001', 'verdict': 'confirmed'}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('P-001', problems[0])
+
+    def test_a_duplicate_plugin_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(plugins=[{'id': 'PL-01'}, {'id': 'PL-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_duplicate_journey_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(journeys=[{'id': 'J-01'}, {'id': 'J-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_distinct_keys_pass(self):
+        self.assertEqual(check.check_no_duplicate_rows(
+            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')],
+                 probes=[{'id': 'P-001'}, {'id': 'P-002'}])), [])
 
 
 class TestAllowedValues(unittest.TestCase):
@@ -740,6 +758,10 @@ class TestBuildNeedsAGapRow(unittest.TestCase):
             data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[],
                                    risk='Not in section 7; found by probe P-012')])), [])
 
+    def test_build_with_a_gap_row_passes(self):
+        self.assertEqual(check.check_build_traces_to_gap(
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[5], risk='')])), [])
+
     def test_native_needs_no_gap_row(self):
         self.assertEqual(check.check_build_traces_to_gap(
             data(verdicts=[verdict('US-04-02', actual='native', gap_rows=[], risk='')])), [])
@@ -752,20 +774,21 @@ if __name__ == '__main__':
 - [ ] **Step 2: Run it to make sure it fails**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute 'check_no_assumed_in_risk_set'`
+Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute 'check_risk_set_has_real_verdict'`
 
 - [ ] **Step 3: Write the implementation**
 
 In `discovery/check.py`, insert these three functions immediately after `check_traceable`:
 
 ```python
-def check_no_assumed_in_risk_set(data):
+def check_risk_set_has_real_verdict(data):
     """Every risk-set story needs a verdict, and none of them may stay assumed.
 
     A missing verdict is the same failure as an assumed one: in both cases
     nobody has looked.
     """
     risky = riskset.risk_set(data.stories)
+    # Last write wins here. check_no_duplicate_rows is what makes that safe.
     seen = {v['story']: v for v in data.verdicts if 'story' in v}
     problems = []
     for sid in sorted(risky):
@@ -782,6 +805,9 @@ def check_proved_has_evidence(data):
     Citing a probe that exists but was never executed is the false confidence
     this whole dataset exists to prevent, so an unrun probe is not evidence.
     """
+    # Last write wins here. check_no_duplicate_rows is what makes that safe:
+    # without it a second row reusing a probe id could mask an unrun probe and
+    # let a proved verdict through the whole gate.
     by_id = {p.get('id'): p for p in data.probes}
     problems = []
     for v in data.verdicts:
@@ -800,21 +826,30 @@ def check_proved_has_evidence(data):
     return problems
 
 
-def check_one_verdict_per_story(data):
-    """Two rows for one story means one of them is invisible.
+def check_no_duplicate_rows(data):
+    """Every row must be reachable by its key.
 
-    The verdict rules index by story id, so a duplicate silently wins and the
-    row it replaced is never inspected. Parallel agents append to this file, so
-    say so rather than letting the later row erase the earlier one.
+    The rules index each dataset by key, so a duplicate silently wins and the
+    row it replaced is never inspected. For probes that is not cosmetic: a
+    second row reusing an id can mask an unrun probe and let a proved verdict
+    through the entire gate. Parallel agents append to these files, so say so
+    rather than letting the later row erase the earlier one.
     """
-    seen = set()
-    duplicates = []
-    for v in data.verdicts:
-        sid = v.get('story')
-        if sid in seen and sid not in duplicates:
-            duplicates.append(sid)
-        seen.add(sid)
-    return ['%s has more than one verdict row' % sid for sid in duplicates]
+    problems = []
+    for label, rows, key in (('verdict', data.verdicts, 'story'),
+                             ('probe', data.probes, 'id'),
+                             ('plugin', data.plugins, 'id'),
+                             ('journey', data.journeys, 'id')):
+        seen = set()
+        duplicates = []
+        for row in rows:
+            value = row.get(key)
+            if value in seen and value not in duplicates:
+                duplicates.append(value)
+            seen.add(value)
+        problems.extend('%s %s appears in more than one row' % (label, value)
+                        for value in duplicates)
+    return problems
 
 
 def check_build_traces_to_gap(data):
@@ -863,18 +898,18 @@ Then extend `RULES`:
 RULES = [
     check_unknown_stories,
     check_traceable,
-    check_no_assumed_in_risk_set,
+    check_risk_set_has_real_verdict,
     check_proved_has_evidence,
     check_build_traces_to_gap,
     check_allowed_values,
-    check_one_verdict_per_story,
+    check_no_duplicate_rows,
 ]
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: PASS, 18 tests.
+Expected: PASS, 22 tests.
 
 - [ ] **Step 5: Confirm the gate now reports the real backlog**
 
@@ -1219,7 +1254,7 @@ Expected: PASS, 9 tests.
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 62 tests.
+Expected: PASS, 66 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2812,7 +2847,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 106 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 110 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
