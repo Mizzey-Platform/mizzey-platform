@@ -14,7 +14,6 @@ WooCommerce updates, re-run it and find out what changed.
 import datetime
 import json
 import os
-import re
 import subprocess
 import sys
 
@@ -27,21 +26,44 @@ WP_PATH = os.environ.get('MIZZEY_WP', 'C:/wamp64/www/corex/wp')
 
 
 def parse_result(stdout):
-    """Pull the JSON object out of a probe's stdout and validate it."""
-    match = re.search(r'\{.*\}', stdout, re.S)
-    if not match:
+    """Pull the JSON object out of a probe's stdout and validate it.
+
+    Decodes from each opening brace rather than matching greedily from the
+    first to the last: wp-cli and PHP notices routinely contain braces of their
+    own, and a greedy match swallows them and fails on valid output. Two
+    objects is an error rather than a guess about which one was meant.
+    """
+    decoder = json.JSONDecoder()
+    found = []
+    i = 0
+    while i < len(stdout):
+        if stdout[i] != '{':
+            i += 1
+            continue
+        try:
+            value, end = decoder.raw_decode(stdout[i:])
+        except ValueError:
+            i += 1
+            continue
+        if isinstance(value, dict):
+            found.append(value)
+            i += end  # skip what was consumed, so a nested brace is not recounted
+        else:
+            i += 1
+    if not found:
         raise ValueError('no JSON object found in probe output')
-    try:
-        data = json.loads(match.group(0))
-    except json.JSONDecodeError as exc:
-        raise ValueError('probe output is not valid JSON: %s' % exc)
-    if 'observed' not in data:
-        raise ValueError('probe output has no "observed"')
+    if len(found) > 1:
+        raise ValueError('probe printed %d JSON objects, expected one' % len(found))
+    data = found[0]
+    observed = data.get('observed')
+    if not isinstance(observed, str) or not observed.strip():
+        # A verdict with nothing observed would still stamp run_at and env onto
+        # the row, so it would read as run while carrying no evidence at all.
+        raise ValueError('probe output has no usable "observed"')
     if data.get('verdict') not in schema.PROBE_VERDICT:
         raise ValueError('probe verdict %r is not one of %s'
                          % (data.get('verdict'), ', '.join(schema.PROBE_VERDICT)))
     return data
-
 
 def apply_result(row, result, env):
     """Write a parsed result onto a probe row, in place."""

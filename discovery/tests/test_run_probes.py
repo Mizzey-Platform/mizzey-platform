@@ -22,6 +22,23 @@ class TestParseResult(unittest.TestCase):
         with self.assertRaises(ValueError):
             run_probes.parse_result('{"observed": "x", "verdict": "maybe"}')
 
+    def test_noise_containing_its_own_braces_is_tolerated(self):
+        out = 'PHP Warning: {something broke} in file\n{"observed": "x", "verdict": "confirmed"}\n'
+        self.assertEqual(run_probes.parse_result(out)['verdict'], 'confirmed')
+
+    def test_two_objects_raise_rather_than_guessing(self):
+        out = '{"observed": "a", "verdict": "confirmed"}\n{"observed": "b", "verdict": "refuted"}'
+        with self.assertRaises(ValueError):
+            run_probes.parse_result(out)
+
+    def test_a_null_observed_raises(self):
+        with self.assertRaises(ValueError):
+            run_probes.parse_result('{"observed": null, "verdict": "confirmed"}')
+
+    def test_an_empty_observed_raises(self):
+        with self.assertRaises(ValueError):
+            run_probes.parse_result('{"observed": "   ", "verdict": "confirmed"}')
+
     def test_a_missing_observed_raises(self):
         with self.assertRaises(ValueError):
             run_probes.parse_result('{"verdict": "confirmed"}')
