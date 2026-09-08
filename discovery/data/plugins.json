@@ -1,0 +1,109 @@
+[
+  {
+    "id": "PL-01",
+    "need": "Translation for multilingual products, categories and content, per FIX-04 and SSC-21",
+    "stories": [
+      "US-01-01",
+      "US-01-02",
+      "US-16-03",
+      "US-22-09"
+    ],
+    "candidates": [
+      {
+        "name": "The plugin behind the Technical Design section 11 figure",
+        "licence": "commercial",
+        "cost_annual": 107,
+        "currency": "USD",
+        "last_update": null,
+        "installs": null,
+        "maintenance_risk": null,
+        "notes": "This is the figure already in the client's hands. Any candidate has to beat it or justify exceeding it."
+      }
+    ],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  },
+  {
+    "id": "PL-02",
+    "need": "Google sign in, per AUTH-10 and AUTH-13",
+    "stories": [
+      "US-05-12",
+      "US-06-03",
+      "US-06-04"
+    ],
+    "candidates": [],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  },
+  {
+    "id": "PL-03",
+    "need": "Redirect manager and missing page log, per MKT-13 and MKT-14",
+    "stories": [
+      "US-25-05"
+    ],
+    "candidates": [],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  },
+  {
+    "id": "PL-04",
+    "need": "Two factor authentication for admin, per ADM-131",
+    "stories": [
+      "US-21-02",
+      "US-27-03"
+    ],
+    "candidates": [],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  },
+  {
+    "id": "PL-05",
+    "need": "Product feeds for Meta and Google Merchant, per MKT-05 and MKT-06",
+    "stories": [
+      "US-25-02"
+    ],
+    "candidates": [],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  },
+  {
+    "id": "PL-06",
+    "need": "Campaign parameter preservation to the order record, per MKT-09",
+    "stories": [
+      "US-25-03"
+    ],
+    "candidates": [],
+    "decision": null,
+    "evidence": [],
+    "cost_annual": null,
+    "currency": "USD",
+    "licence": null,
+    "owner": "client",
+    "acknowledged_over_quote": false
+  }
+]
