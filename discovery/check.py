@@ -53,9 +53,82 @@ def check_traceable(data):
             if v.get('story') in trace and not trace[v['story']]]
 
 
+def check_no_assumed_in_risk_set(data):
+    """Every risk-set story needs a verdict, and none of them may stay assumed.
+
+    A missing verdict is the same failure as an assumed one: in both cases
+    nobody has looked.
+    """
+    risky = riskset.risk_set(data.stories)
+    seen = {v['story']: v for v in data.verdicts if 'story' in v}
+    problems = []
+    for sid in sorted(risky):
+        if sid not in seen:
+            problems.append('%s is in the risk set and has no verdict' % sid)
+        elif seen[sid].get('confidence') == 'assumed':
+            problems.append('%s is in the risk set and is still assumed' % sid)
+    return problems
+
+
+def check_proved_has_evidence(data):
+    """confidence "proved" means a probe ran. Name it, and let it exist."""
+    known = {p.get('id') for p in data.probes}
+    problems = []
+    for v in data.verdicts:
+        if v.get('confidence') != 'proved':
+            continue
+        evidence = v.get('evidence') or []
+        if not evidence:
+            problems.append('%s is proved with no probe in evidence' % v.get('story'))
+        for pid in evidence:
+            if pid not in known:
+                problems.append('%s cites probe %s, which does not exist'
+                                % (v.get('story'), pid))
+    return problems
+
+
+def check_build_traces_to_gap(data):
+    """Anything classed build should trace to a Technical Design gap row.
+
+    If it does not, that is allowed, but it means section 7 missed something and
+    the risk note has to say so.
+    """
+    return ['%s is classed build with no gap row and no explanation in risk' % v.get('story')
+            for v in data.verdicts
+            if v.get('actual') == 'build'
+            and not (v.get('gap_rows') or [])
+            and not (v.get('risk') or '').strip()]
+
+
+def check_allowed_values(data):
+    """A typo in an enumerated field must not pass silently.
+
+    None means undecided and is allowed. A wrong string is not.
+    """
+    problems = []
+    for v in data.verdicts:
+        for field, allowed in (('actual', schema.ACTUAL),
+                               ('confidence', schema.CONFIDENCE),
+                               ('points_flag', schema.POINTS_FLAG)):
+            value = v.get(field)
+            if value is not None and value not in allowed:
+                problems.append('%s has %s %r, which is not one of %s'
+                                % (v.get('story'), field, value, ', '.join(allowed)))
+    for p in data.probes:
+        value = p.get('verdict')
+        if value is not None and value not in schema.PROBE_VERDICT:
+            problems.append('probe %s has verdict %r, which is not one of %s'
+                            % (p.get('id'), value, ', '.join(schema.PROBE_VERDICT)))
+    return problems
+
+
 RULES = [
     check_unknown_stories,
     check_traceable,
+    check_no_assumed_in_risk_set,
+    check_proved_has_evidence,
+    check_build_traces_to_gap,
+    check_allowed_values,
 ]
 
 
