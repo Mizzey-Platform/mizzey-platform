@@ -2556,18 +2556,21 @@ class TestTaskTemplates(unittest.TestCase):
         with open(os.path.join(TASKS, name + '.md'), encoding='utf-8') as fh:
             return fh.read()
 
+    def flat(self, name):
+        """Whitespace collapsed, so a line wrap cannot hide a required phrase."""
+        return ' '.join(self.read(name).split())
+
     def test_all_five_exist(self):
         for name in NAMES:
             self.assertTrue(os.path.exists(os.path.join(TASKS, name + '.md')), name)
 
     def test_each_states_the_two_lanes_rule(self):
         for name in NAMES:
-            self.assertIn('Annex A', self.read(name), name)
+            self.assertIn('Annex A', self.flat(name), name)
 
     def test_each_tells_a_blocked_agent_to_write_open_and_continue(self):
         for name in NAMES:
-            text = self.read(name)
-            self.assertIn('do not stop', text.lower(), name)
+            self.assertIn('do not stop', self.flat(name).lower(), name)
 
     def test_each_names_the_files_to_read_and_the_file_to_write(self):
         for name in NAMES:
@@ -2577,7 +2580,7 @@ class TestTaskTemplates(unittest.TestCase):
 
     def test_each_forbids_exploring_the_archive(self):
         for name in NAMES:
-            self.assertIn('_archive', self.read(name), name)
+            self.assertIn('_archive', self.flat(name), name)
 
     def test_no_em_dash_and_no_emoji(self):
         for name in NAMES:
@@ -2600,22 +2603,29 @@ Expected: FAIL, the files do not exist.
 
 You are running one probe. You will be given a probe id, such as `P-001`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, sections 5 and 8
-- The single row in `discovery/data/probes.json` whose `id` matches yours
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, sections 5 and 8
+- The single row in `platform/discovery/data/probes.json` whose `id` matches yours
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 7,
   the rows named in your `gap_rows`
 
-Read nothing else. In particular, never read anything under `_archive`: it holds superseded
+Read nothing else. In particular, never read anything under `_archive/`: it holds superseded
 pricing drafts and will give you wrong figures.
 
 ## Write
 
-- One probe script at `discovery/probes/<your script filename>`, taken from the `script`
-  field of your row
-- Nothing else. You must not touch `verdicts.json`, `plugins.json` or `journeys.json`
+- One probe script at `platform/discovery/probes/<the script filename in your row>`
+- Nothing else. You must not touch `verdicts.json`, `plugins.json` or `journeys.json`, and you
+  must not edit your own row in `probes.json`. The runner writes the result, not you
 
 ## What the script must do
 
@@ -2623,8 +2633,12 @@ Answer the `question` field, and nothing wider. Print exactly one JSON object on
 
     {"observed": "what actually happened, in one or two sentences", "verdict": "confirmed"}
 
-`verdict` is `confirmed`, `refuted`, or `partial`, measured against the `expected` field,
-which records what the Technical Design assumes today.
+`verdict` is `confirmed`, `refuted`, or `partial`, measured against the `expected` field, which
+records what the Technical Design assumes today. `observed` must be a non-empty string: a verdict
+with nothing observed is refused by the runner, because it would stamp a timestamp on a row that
+carries no evidence.
+
+Print one object only. Two objects is an error, not a choice between them.
 
 Write the script so it can be run again later without leaving state behind. When it needs
 fixtures, it creates them and removes them.
@@ -2633,19 +2647,24 @@ The runner executes it: `python -m discovery.run_probes <your id>`.
 
 ## Rules
 
-- **Do not edit the `expected` field.** It is the prior claim, recorded before the test, and
-  a refutation is only legible against it.
+- **Do not edit the `expected` field.** It is the prior claim, recorded before the test, and a
+  refutation is only legible against it.
 - **Refuting the Technical Design is a good outcome**, not a failure. Report it plainly.
-- Anything with no id in the Feature Register, Annex A, is out of scope. It is not a defect
-  and it does not become work. Note it and move on.
-- If you cannot answer, add a sentence to your row's `notes` saying exactly what blocked you,
-  and stop cleanly. **Do not stop to ask a question.** Questions are collected and reviewed
-  in one batch at the gate.
+- Anything with no id in the Feature Register, Annex A, is out of scope. It is not a defect and it
+  does not become work. Note it and move on.
+- If you cannot answer, add a sentence to your row's `notes` saying exactly what blocked you, and
+  finish cleanly. **Do not stop to ask a question.** Questions are collected and reviewed in one
+  batch at the gate.
 
 ## Done
 
-The script exists, runs, and prints a valid result object. `python -m discovery.check` reports
-nothing new.
+The script exists at the path your row names, and `python -m discovery.check` reports nothing new:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | tail -1
+```
+
+It must still say `73 problem(s)` until verdicts start landing.
 ```
 
 - [ ] **Step 4: Write `discovery/tasks/VERDICT.md`**
@@ -2655,23 +2674,30 @@ nothing new.
 
 You are writing the verdict rows for one epic. You will be given an epic id, such as `E13`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, sections 3.2 and 8
-- Every story in `scripts/stories.json` whose `epic` matches yours
-- Every probe in `discovery/data/probes.json` whose `stories` intersect yours, or whose
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, sections 3.2 and 8
+- Every story in `platform/scripts/stories.json` whose `epic` matches yours
+- Every probe in `platform/discovery/data/probes.json` whose `stories` intersect yours, or whose
   `gap_rows` are relevant
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 7
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Functional-Specification.md`, the
   sections covering your epic
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- One row per story of your epic in `discovery/data/verdicts.json`
-- Nothing else. You must not run probes, and you must never edit `scripts/stories.json`,
+- One row per story of your epic, appended to `platform/discovery/data/verdicts.json`
+- Nothing else. You must not run probes, and you must never edit `platform/scripts/stories.json`,
   which is generated from the specification and will be overwritten
 
 ## The row
@@ -2680,28 +2706,35 @@ Use `discovery.schema.blank_verdict(story_id)` as the starting shape, then fill:
 
 - `claimed`: the `leverage` from the story. Copy it, do not judge it
 - `actual`: `native`, `extend`, `build`, or `plugin`
-- `confidence`: `proved` only if a probe ran and you name it in `evidence`. Otherwise
-  `reasoned`. Never leave a risk-set story at `assumed`
-- `evidence`: probe ids. Required when `confidence` is `proved`
-- `gap_rows`: Technical Design section 7 rows. If you class something `build` with no gap
-  row, section 7 missed it, and `risk` must say so
-- `points_flag`: `under` if the story is worth more than it was pointed, `over` if less.
-  This is how estimate drift surfaces before Stage 4, which already runs at 68 points a week
+- `confidence`: `proved` only if a probe ran, reached a verdict, and you name it in `evidence`.
+  Otherwise `reasoned`. Never leave a risk-set story at `assumed`
+- `evidence`: probe ids. Required when `confidence` is `proved`, and each must be a probe that has
+  actually been run. Citing an unrun probe is refused
+- `gap_rows`: Technical Design section 7 rows. If you class something `build` with no gap row,
+  section 7 missed it, and `risk` must say so
+- `points_flag`: `under` if the story is worth more than it was pointed, `over` if less. This is
+  how estimate drift surfaces before Stage 4, which already runs at 68 points a week
 - `open`: anything you could not resolve
+
+Write exactly one row per story. A second row for the same story is refused.
 
 ## Rules
 
-- Anything with no id in the Feature Register, Annex A, is not a story and does not become
-  one, however good an idea it looks. Record it in `open` and move on.
+- Anything with no id in the Feature Register, Annex A, is not a story and does not become one,
+  however good an idea it looks. Record it in `open` and move on.
 - Never edit acceptance criteria. If the specification is wrong, say so in `open`. The
   specification is corrected and regenerated, never patched at the edges.
-- If you cannot decide, write the question into `open` and carry on to the next story.
-  **Do not stop to ask.** Questions are reviewed in one batch at the gate.
+- If you cannot decide, write the question into `open` and carry on to the next story. **Do not stop to ask.** Questions are reviewed in one batch at the gate.
 
 ## Done
 
-Every story in your epic has a row. `python -m discovery.check` reports nothing about your
-epic.
+Every story in your epic has exactly one row, and the gate reports nothing about your epic:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | grep "US-<your epic number>-"
+```
+
+That must print nothing.
 ```
 
 - [ ] **Step 5: Write `discovery/tasks/PLUGIN.md`**
@@ -2711,52 +2744,80 @@ epic.
 
 You are deciding one plugin need. You will be given a need id, such as `PL-02`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.3
-- Your single row in `discovery/data/plugins.json`
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.3
+- Your single row in `platform/discovery/data/plugins.json`
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 11
-- Any probe in `discovery/data/probes.json` that bears on your need
+- Any probe in `platform/discovery/data/probes.json` that bears on your need
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- Your single row in `discovery/data/plugins.json`
+- Your single row in `platform/discovery/data/plugins.json`
 - Nothing else
 
 ## The decision
 
-Fill `candidates` with at least two real options before deciding, each with name, licence,
-annual cost, currency, date last updated, active installs, and a maintenance risk judgement.
+Fill `candidates` with at least two real options before deciding. Each candidate is an object with
+these exact keys, which are the keys already used in the `PL-01` seed row:
 
-Then set `decision` to the chosen name, or to `build instead`, and fill `cost_annual`,
-`currency`, `licence` and `owner`. Cite the probes that support it in `evidence`.
+    name, licence, cost_annual, currency, last_update, installs, maintenance_risk, notes
+
+Then set `decision` to the chosen `name`, or to the exact string `build instead`, and fill
+`cost_annual`, `currency`, `licence` and `owner` on the row itself. Cite the probes that support
+it in `evidence`.
+
+`decision` must be a non-empty string. Leaving it `null` means undecided, which is allowed while
+you work. An empty string is not the same thing and is refused.
+
+`cost_annual` must be a number and must not be negative. If the chosen candidate lists a
+`cost_annual`, the row's `cost_annual` must match it.
 
 ## The cost ceiling, which is the point of this task
 
-Technical Design section 11 has already put **about 107 USD a year** in front of the client,
-and named everything else as free or free-tier. **That figure is in their hands.**
+Technical Design section 11 has already put **about 107 USD a year** in front of the client, and
+named everything else as free or free-tier. **That figure is in their hands.**
 
-If your decision takes the register above it, set `acknowledged_over_quote` to `true` and
-state the reason in the row. The gate fails otherwise. This is not a technical judgement you
-are allowed to absorb quietly: it is a commercial conversation Mustafa has to have.
+If your decision takes the register above it, set `acknowledged_over_quote` to `true` **on the row
+that causes the overage** and state the reason in the row. The acknowledging rows must account for
+the difference: a one dollar row cannot license a five hundred dollar one. The gate refuses
+otherwise.
 
-Licences are held in the client's name, per Annex A R-14. `owner` is `client` unless there
-is a stated reason otherwise.
+This is not a technical judgement you are allowed to absorb quietly. It is a commercial
+conversation Mustafa has to have.
+
+Licences are held in the client's name, per Annex A R-14. `owner` is `client` unless there is a
+stated reason otherwise.
 
 ## Rules
 
 - A plugin that solves a problem nobody has is not a saving. Every need traces to story ids.
 - Prefer a maintained free option to an unmaintained paid one, and say why in the row.
-- If you cannot decide, leave `decision` as `null`, write what is missing into the row's
-  candidate notes, and finish. **Do not stop to ask.**
+- **Never invent a product name, version, install count or cost.** This register feeds a figure
+  that reaches a client. If you cannot verify a number, leave it `null` and say so in `notes`.
+- If you cannot decide, leave `decision` as `null`, write what is missing into the candidate
+  notes, and finish. **Do not stop to ask.**
 
 ## Done
 
-The row has candidates, a decision, a licence, an annual figure, and evidence.
-`python -m discovery.check` reports nothing about your row.
+The row has candidates, a decision, a licence, an annual figure and evidence, and the gate reports
+nothing about it:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | grep "plugin"
+```
+
+That must print nothing.
 ```
 
 - [ ] **Step 6: Write `discovery/tasks/JOURNEY.md`**
@@ -2764,58 +2825,73 @@ The row has candidates, a decision, a licence, an annual figure, and evidence.
 ```markdown
 # Task type: JOURNEY
 
-You are writing one end-to-end journey. You will be given a journey id and a one-line brief,
-such as `J-01, guest adds to cart, signs in, checks out on cash on delivery, requests a return`.
+You are writing one end-to-end journey. You will be given a journey id and a one-line brief, such
+as `J-01, guest adds to cart, signs in, checks out on cash on delivery, requests a return`.
+
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Run python commands from `C:\wamp64\www\mizzey\platform`.
 
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.4
-- `discovery/data/verdicts.json`, for the stories your journey crosses
-- `scripts/stories.json`, for titles and acceptance criteria
-- The generated dossiers in `discovery/generated/` for the epics you cross
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.4
+- `platform/discovery/data/verdicts.json`, for the stories your journey crosses
+- `platform/scripts/stories.json`, for titles and acceptance criteria
+- The generated dossiers in `platform/discovery/generated/` for the epics you cross
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- One row in `discovery/data/journeys.json`
+- One row in `platform/discovery/data/journeys.json`
 - Nothing else
 
 ## The row
 
-- `actor`: one of shopper, guest, admin, fulfilment, support
-- `language`: `ar`, `en`, or `both`. Arabic is not a translation pass. Where direction
-  carries meaning, the journey differs, and that is a step, not a footnote
-- `steps`: ordered. **Every step names at least one story id.** A step with no story is
-  narrative, not validation, and the gate rejects it
+Every field of `schema.JOURNEY_FIELDS` must be present:
+
+- `id`: the journey id you were given, such as `J-01`
+- `name`: a short name for the journey, from your brief
+- `actor`: one of `shopper`, `guest`, `admin`, `fulfilment`, `support`
+- `language`: `ar`, `en`, or `both`. Arabic is not a translation pass. Where direction carries
+  meaning, the journey differs, and that is a step, not a footnote
+- `steps`: ordered. Each step is an object with `n`, `description`, `stories` and `screen`.
+  **Every step names at least one story id.** A step with no story is narrative, not validation,
+  and the gate rejects it
 - `gaps`: the reason this task exists
 
 ## What a gap is
 
-A failure visible only across stories, which no single story shows. The worked example is
-already known: a guest builds a cart, signs in, and WooCommerce replaces the cart instead of
-merging it. That is Technical Design row 1, it spans E05 and E06, and it is invisible in 205
-separate rows.
+A failure visible only across stories, which no single story shows. The worked example is already
+known: a guest builds a cart, signs in, and WooCommerce replaces the cart instead of merging it.
+That is Technical Design row 1, it spans E05 and E06, and it is invisible in 205 separate rows.
 
-Look hardest at the seams: guest to account, cart to checkout, payment to fulfilment,
-delivery to return, English to Arabic.
+Look hardest at the seams: guest to account, cart to checkout, payment to fulfilment, delivery to
+return, English to Arabic.
 
-A gap you find becomes a new probe. Write it into `gaps` plainly enough that someone can turn
-it into a yes-or-no question.
+A gap you find becomes a new probe. Write it into `gaps` plainly enough that someone can turn it
+into a yes-or-no question.
 
 ## Rules
 
-- Every step traces to a story id, and every story id traces to Annex A. A step you want that
-  has no story behind it is out of scope. Record it in `gaps` and move on.
+- Every step traces to a story id, and every story id traces to Annex A. A step you want that has
+  no story behind it is out of scope. Record it in `gaps` and move on.
 - Do not invent acceptance criteria. Read them.
-- If you cannot resolve something, write it into `gaps` and finish the journey.
-  **Do not stop to ask.**
+- If you cannot resolve something, write it into `gaps` and finish the journey. **Do not stop to
+  ask.**
 
 ## Done
 
-The row validates. `python -m discovery.gen_journey_docs` renders it and
-`python -m discovery.check` reports nothing about it.
+The row renders and the gate reports nothing about it:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.gen_journey_docs && python -m discovery.check | grep "journey"
+```
+
+The generator must report your journey, and the grep must print nothing.
 ```
 
 - [ ] **Step 7: Write `discovery/tasks/WIREFRAME.md`**
@@ -2825,51 +2901,69 @@ The row validates. `python -m discovery.gen_journey_docs` renders it and
 
 You are building the low fidelity screens for one journey. You will be given a journey id.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `design/`, `final docs/` and `_archive/`. Wireframes go in
+`design/`, which is **not** in the repo. Run python commands from `C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 9
-- The generated journey document at `discovery/generated/journey-<id>.md`
-- The stories that journey names, in `scripts/stories.json`
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 9
+- The generated journey document at `platform/discovery/generated/journey-<id>.md`
+- The stories that journey names, in `platform/scripts/stories.json`
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- HTML and CSS screens under `C:/wamp64/www/mizzey/design/01-wireframes/<journey id>/`
+- HTML and CSS screens under `design/01-wireframes/<journey id>/`
 - Nothing in the platform repo. Wireframes are not data
 
 ## What these are for
 
-Validating that the scenario holds as a sequence of screens, before anything is built. They
-are structural. Boxes, labels, real copy where copy carries meaning, and nothing else.
+Validating that the scenario holds as a sequence of screens, before anything is built. They are
+structural. Boxes, labels, real copy where copy carries meaning, and nothing else.
 
 **Do not apply visual identity.** The client's brand identity has not arrived. Applying a
-provisional one produces work that is thrown away and, worse, invites approval of something
-that is not the design.
+provisional one produces work that is thrown away and, worse, invites approval of something that
+is not the design.
 
-The contracted deliverable is working HTML and CSS with design tokens, not a design-tool
-source file. These wireframes are the first step toward that, so write real HTML and CSS,
-not images.
+The contracted deliverable is working HTML and CSS with design tokens, not a design-tool source
+file. These wireframes are the first step toward that, so write real HTML and CSS, not images.
 
 ## Arabic
 
-Every screen is checked right to left. Direction-carrying icons mirror. This is US-01-01, it
-is 13 points, and it touches every screen in the build. A wireframe that only works in
-English has validated nothing.
+Every screen is checked right to left. Direction-carrying icons mirror. This is US-01-01, it is 13
+points, and it touches every screen in the build. A wireframe that only works in English has
+validated nothing.
 
 ## Rules
 
-- One screen per journey step that needs one. Reuse a screen across steps where the journey
-  reuses it, and say so.
-- Every screen names the story ids it serves, in an HTML comment at the top.
-- If a step cannot be drawn because the journey is ambiguous, note it in the journey row's
-  `gaps` and draw the rest. **Do not stop to ask.**
+- Every screen serves a step of the journey, and every step traces to a story id, and every story
+  id traces to Annex A. **A screen for something with no Annex A id is out of scope.** It is not a
+  wireframe, it is a change request. Note it in the journey row's `gaps` and do not draw it.
+- One screen per journey step that needs one. Reuse a screen across steps where the journey reuses
+  it, and say so.
+- Every screen names the story ids it serves, in an HTML comment on the first line, in the form
+  `<!-- stories: US-05-10, US-05-11 -->`.
+- If a step cannot be drawn because the journey is ambiguous, note it in the journey row's `gaps`
+  and draw the rest. **Do not stop to ask.**
 
 ## Done
 
-Every step of the journey that needs a screen has one, both directions render, and each file
-names its stories.
+Every step of the journey that needs a screen has one, each names its stories, and each renders in
+both directions. Check the first two mechanically:
+
+```bash
+cd "C:/wamp64/www/mizzey/design/01-wireframes/<journey id>"
+grep -L "<!-- stories:" *.html
+grep -L 'dir="rtl"' *.html
+```
+
+Both must print nothing. `grep -L` lists files **missing** the pattern, so any filename printed is
+a screen that is not finished.
 ```
 
 - [ ] **Step 8: Run the tests**
