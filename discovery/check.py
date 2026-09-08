@@ -296,23 +296,32 @@ def check_house_rules_in(directory):
 
     These documents feed client-facing work even though they are not sent, and
     the house rule is easier to keep than to retrofit.
+
+    Walks the tree rather than one level, matches the extension case
+    insensitively, and reports an unreadable file rather than raising: an
+    exception here would take the whole gate down and nothing else would run.
     """
     problems = []
     if not os.path.isdir(directory):
         return problems
-    for name in sorted(os.listdir(directory)):
-        if not name.endswith('.md'):
-            continue
-        path = os.path.join(directory, name)
-        with open(path, encoding='utf-8') as fh:
-            text = fh.read()
-        if '—' in text:
-            problems.append('%s contains an em dash' % name)
-        found = sorted({ch for ch in text if _is_emoji(ch)})
-        if found:
-            problems.append('%s contains emoji: %s' % (name, ' '.join(found)))
+    for root, _dirs, names in os.walk(directory):
+        for name in sorted(names):
+            if not name.lower().endswith('.md'):
+                continue
+            path = os.path.join(root, name)
+            label = os.path.relpath(path, directory).replace(os.sep, '/')
+            try:
+                with open(path, encoding='utf-8') as fh:
+                    text = fh.read()
+            except (OSError, UnicodeDecodeError) as exc:
+                problems.append('%s could not be read: %s' % (label, exc))
+                continue
+            if '\u2014' in text:
+                problems.append('%s contains an em dash' % label)
+            found = sorted({ch for ch in text if _is_emoji(ch)})
+            if found:
+                problems.append('%s contains emoji: %s' % (label, ' '.join(found)))
     return problems
-
 
 def check_house_rules(data):
     """Rule-signature wrapper so the gate can run it alongside the others.

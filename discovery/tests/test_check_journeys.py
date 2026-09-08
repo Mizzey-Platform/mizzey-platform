@@ -69,6 +69,25 @@ class TestHouseRules(unittest.TestCase):
         self.write('data.json', '{"note": "an em dash — in data is fine"}')
         self.assertEqual(check.check_house_rules_in(self.dir), [])
 
+    def test_a_nested_markdown_file_is_examined(self):
+        os.makedirs(os.path.join(self.dir, 'nested'))
+        with open(os.path.join(self.dir, 'nested', 'deep.md'), 'w', encoding='utf-8') as fh:
+            fh.write('Nested \u2014 dash.\n')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('nested/deep.md', problems[0])
+
+    def test_an_uppercase_extension_is_examined(self):
+        self.write('REPORT.MD', 'Shouting \u2014 loudly.\n')
+        self.assertEqual(len(check.check_house_rules_in(self.dir)), 1)
+
+    def test_an_unreadable_file_is_reported_rather_than_raising(self):
+        with open(os.path.join(self.dir, 'broken.md'), 'wb') as fh:
+            fh.write(b'\xff\xfe not utf 8 at all')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('could not be read', problems[0])
+
     def test_a_missing_directory_is_not_a_failure(self):
         self.assertEqual(check.check_house_rules_in(os.path.join(self.dir, 'nope')), [])
 

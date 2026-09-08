@@ -1252,7 +1252,7 @@ class TestHouseRules(unittest.TestCase):
             fh.write(text)
 
     def test_an_em_dash_in_generated_output_fails(self):
-        self.write('report.md', 'A sentence \u2014 with an em dash.\n')
+        self.write('report.md', 'A sentence — with an em dash.\n')
         problems = check.check_house_rules_in(self.dir)
         self.assertEqual(len(problems), 1)
         self.assertIn('em dash', problems[0])
@@ -1268,8 +1268,27 @@ class TestHouseRules(unittest.TestCase):
         self.assertEqual(check.check_house_rules_in(self.dir), [])
 
     def test_only_markdown_is_examined(self):
-        self.write('data.json', '{"note": "an em dash \u2014 in data is fine"}')
+        self.write('data.json', '{"note": "an em dash — in data is fine"}')
         self.assertEqual(check.check_house_rules_in(self.dir), [])
+
+    def test_a_nested_markdown_file_is_examined(self):
+        os.makedirs(os.path.join(self.dir, 'nested'))
+        with open(os.path.join(self.dir, 'nested', 'deep.md'), 'w', encoding='utf-8') as fh:
+            fh.write('Nested \u2014 dash.\n')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('nested/deep.md', problems[0])
+
+    def test_an_uppercase_extension_is_examined(self):
+        self.write('REPORT.MD', 'Shouting \u2014 loudly.\n')
+        self.assertEqual(len(check.check_house_rules_in(self.dir)), 1)
+
+    def test_an_unreadable_file_is_reported_rather_than_raising(self):
+        with open(os.path.join(self.dir, 'broken.md'), 'wb') as fh:
+            fh.write(b'\xff\xfe not utf 8 at all')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('could not be read', problems[0])
 
     def test_a_missing_directory_is_not_a_failure(self):
         self.assertEqual(check.check_house_rules_in(os.path.join(self.dir, 'nope')), [])
@@ -1318,23 +1337,32 @@ def check_house_rules_in(directory):
 
     These documents feed client-facing work even though they are not sent, and
     the house rule is easier to keep than to retrofit.
+
+    Walks the tree rather than one level, matches the extension case
+    insensitively, and reports an unreadable file rather than raising: an
+    exception here would take the whole gate down and nothing else would run.
     """
     problems = []
     if not os.path.isdir(directory):
         return problems
-    for name in sorted(os.listdir(directory)):
-        if not name.endswith('.md'):
-            continue
-        path = os.path.join(directory, name)
-        with open(path, encoding='utf-8') as fh:
-            text = fh.read()
-        if '\u2014' in text:
-            problems.append('%s contains an em dash' % name)
-        found = sorted({ch for ch in text if _is_emoji(ch)})
-        if found:
-            problems.append('%s contains emoji: %s' % (name, ' '.join(found)))
+    for root, _dirs, names in os.walk(directory):
+        for name in sorted(names):
+            if not name.lower().endswith('.md'):
+                continue
+            path = os.path.join(root, name)
+            label = os.path.relpath(path, directory).replace(os.sep, '/')
+            try:
+                with open(path, encoding='utf-8') as fh:
+                    text = fh.read()
+            except (OSError, UnicodeDecodeError) as exc:
+                problems.append('%s could not be read: %s' % (label, exc))
+                continue
+            if '\u2014' in text:
+                problems.append('%s contains an em dash' % label)
+            found = sorted({ch for ch in text if _is_emoji(ch)})
+            if found:
+                problems.append('%s contains emoji: %s' % (label, ' '.join(found)))
     return problems
-
 
 def check_house_rules(data):
     """Rule-signature wrapper so the gate can run it alongside the others.
@@ -1350,12 +1378,12 @@ Then extend `RULES` with `check_journey_steps` and `check_house_rules`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_journeys -v`
-Expected: PASS, 9 tests.
+Expected: PASS, 12 tests.
 
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 74 tests.
+Expected: PASS, 77 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -2948,7 +2976,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 118 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 121 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
