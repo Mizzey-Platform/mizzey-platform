@@ -13,10 +13,15 @@
     "script": "P-001-cart-merge-on-login.php",
     "method": "wp-cli",
     "expected": "On login, Woo replaces the session cart with the persistent cart, or keeps the session cart and discards the saved one, depending on path. It does not merge. Section 7 row 1 calls this the most delicate logic in the storefront.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0. Guest session cart held product 39; the user had a saved persistent cart holding product 40. Cart before login: [39]. After becoming the user and reloading from session: [39]. Guest item present: yes. Saved item present: no. The hook the Technical Design builds the merge on, woocommerce_cart_loaded_from_session, is a real action in this version: yes. Exactly one cart survived: the guest one. Woo replaces rather than merges, so the merge in CART-13 to CART-18 is Mizzey work and section 7 row 1 is right to flag it. Whichever side is dropped is dropped silently, which is what makes this the delicate one.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "CART-13, CART-14, CART-15, CART-18, AC-18."
   },
   {
@@ -30,10 +35,15 @@
     "script": "P-002-price-snapshot-native.php",
     "method": "wp-cli",
     "expected": "Order line items store the price charged. Section 6 classifies this as Native and calls it the highest risk business rule in the register, one the platform already guarantees.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0. Order 27 for 3 units at 100: order total 300.0, line total 300.0. Product price then raised to 250. Same order re-read: order total 300.0, line total 300.0. The price is frozen onto the order line at sale. BR-005 holds natively and section 6 is right to call it already solved. Note this is the price only: cost is a separate promise, tested in P-017.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "BR-005, ENT-08, AC-09. Section 6 row, not a section 7 gap row, which is why gap_rows is empty: the design claims this one is already solved."
   },
   {
@@ -48,10 +58,15 @@
     "script": "P-003-coupon-stacking.php",
     "method": "wp-cli",
     "expected": "Coupons combine freely. There is no priority and no stacking policy. Section 7 row 3.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0 coupon schema exposes 26 fields: id, code, amount, status, date_created, date_modified, date_expires, discount_type, description, usage_count, individual_use, product_ids, excluded_product_ids, usage_limit, usage_limit_per_user, limit_usage_to_x_items, free_shipping, product_categories, excluded_product_categories, exclude_sale_items, minimum_amount, maximum_amount, email_restrictions, used_by, virtual, meta_data. Priority or stacking fields: none. individual_use is the only exclusivity control: all or nothing, not a priority. Two percent coupons (10% and 20%) on a 100 item: apply calls returned true and true, cart holds [p003a, p003b], total discount 30.0. Both coupons applied together and the schema carries no priority or stacking field. The order of application is the order they were added, which is not a policy. BR-004 and PROMO-16/17 are Mizzey work, and the ENT-11 promotion rules table is justified.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "BR-004, PROMO-16, PROMO-17, ADM-111."
   },
   {
@@ -67,10 +82,15 @@
     "script": "P-004-order-idempotency.php",
     "method": "php",
     "expected": "Some protection exists, and gateway callback idempotency is the integrator's responsibility. Section 7 row 12.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0. Order 42, payment_complete called twice with the same transaction reference PROBE-TXN-0001. Status after the first call: processing, after the second: processing. Date paid after the first: 2026-09-09T09:59:36+00:00, after the second: 2026-09-09T09:59:36+00:00. Transaction id stored: PROBE-TXN-0001. Stock left from 10: 9. Order notes recorded: 3. The second call did not reduce stock again, so Woo carries a guard on the order side: _order_stock_reduced is set on the first pass and respected on the second. That is real protection against a repeated callback for the SAME order. What this does NOT establish, and PAY-05 still needs: Woo protects a repeated callback against one order. It does nothing about a customer submitting checkout twice and creating two separate orders, or about a gateway retrying against an order that was meanwhile cancelled. Both are integrator work, so section 7 row 12 is right that callback idempotency belongs to Mizzey, and this probe narrows what is left rather than clearing it.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "PAY-05, NFR-07, AC-06, AC-07."
   },
   {
@@ -81,10 +101,15 @@
     "script": "P-005-corex-kit-woo-gate.php",
     "method": "wp-cli",
     "expected": "corex-kit-woo is four files, being a blueprint, a gate and a service provider, and its own documentation describes it as reserving the seam rather than being a store kit. It is milestone M9 on the CoreX roadmap and it is not started.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "corex-kit-woo holds 4 PHP file(s) totalling about 204 lines: corex-kit-woo.php, src\\WooBlueprint.php, src\\WooKitGate.php, src\\WooServiceProvider.php. Active on this site: no. It registers no post type, taxonomy, shortcode, block or template override. It hooks: before_woocommerce_init. Its only hook declares HPOS compatibility, which is boilerplate, not behaviour. It reserves a seam and does nothing else, exactly as Technical Design section 4 says. The custom epic pricing that rests on CoreX contributing no commerce is sound.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "This probe bears on the platform seam itself, not on a contracted user story, so stories is empty. Source: Technical Design section 4, 'The one that matters: there is no CoreX commerce kit'."
   },
   {
@@ -104,7 +129,7 @@
     "verdict": null,
     "env": null,
     "run_at": null,
-    "notes": "FIX-04, NFR-04, SSC-12, SSC-21."
+    "notes": "FIX-04, NFR-04, SSC-12, SSC-21. NOT RUN 9 September 2026 and deliberately left unrun: the candidate translation plugin is a paid product, about 107 USD a year per Technical Design section 11, and it has been neither chosen nor bought. Testing a different plugin would answer a question nobody asked. Blocked on that purchase decision, which is also a client cost line."
   },
   {
     "id": "P-007",
@@ -118,10 +143,15 @@
     "script": "P-007-arabic-search.php",
     "method": "wp-cli",
     "expected": "WordPress search is a LIKE query. It has no synonyms, no correction and no relevance. Section 7 row 9.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WordPress 7.1, WooCommerce 11.1.0. Two products seeded: one named in Arabic, one Latin decoy named \"Attar Bottle\" that contains the Franco-Arabic string. Asking only whether each term reaches THE ARABIC product: exact Arabic name FOUND, first Arabic word alone FOUND, orthographic variant not found, Franco-Arabic \"attar\" not found. Native search is substring matching and nothing more. It reaches the Arabic product only when the query is literally contained in the name, and fails both the orthographic variant and the Franco-Arabic rendering. There is no relevance to tune, which is exactly why SRCH-06 and SRCH-07 specify a curated synonym and correction list rather than a scoring change. Note on the first run of this probe: searching \"attar\" does return a row, because the Latin decoy contains that string. Counting rows would report success where an Arabic shopper finds nothing.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "SRCH-06, SRCH-07."
   },
   {
@@ -136,10 +166,15 @@
     "script": "P-008-csv-import-arabic.php",
     "method": "wp-cli",
     "expected": "Woo ships a basic CSV importer with fixed column handling, no dry run, no saved mappings, and no safe re run semantics. Section 7 row 6.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0 ships WC_Product_CSV_Importer with 33 methods. A dry-run method: no. A saved-mapping method: no. A UTF-8 CSV with a BOM and an Arabic product name was imported twice with update_existing on. Pass one imported 1 and updated 0; pass two imported 0 and updated 0. Products carrying SKU P008-SKU-1 afterwards: 1. The Arabic name round-tripped intact: yes. Encoding and re-run by SKU are both sound, but there is no dry run and no saved mapping, so section 7 row 6 is right that the native importer does not meet MIG-01 to MIG-25. The gap is the operator safety net, not the parsing.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "MIG-01 to MIG-25, Section U."
   },
   {
@@ -153,10 +188,15 @@
     "script": "P-009-stock-decrement-concurrency.php",
     "method": "php",
     "expected": "Section 6 classifies stock validation and decrement under concurrency as Native: reduce stock at payment, restore on cancel, which is BR-007.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0. wc_update_product_stock delegates to the data store: yes. The product data store issues arithmetic SQL for stock changes (meta_value +/- operand): yes. Two sequential decreases of 1 from a stock of 1 left the quantity at -1, so the write itself does not refuse to go negative. The guard against overselling is a validation step before payment (present), not the write. NOT TESTED: true simultaneity. One PHP process cannot place two checkouts at the same instant, so this probe cannot say whether two buyers of the last unit both succeed. What it establishes is the mechanism: an arithmetic SQL write is atomic per statement, but validation and decrement are separate steps, so a gap exists in principle. Settling BR-003 needs a parallel load test against a staging site, and that should be booked rather than assumed. Section 6 calls this Native. The write is atomic, which supports that, but the check-then-write gap is real and untested, so Native is not yet earned for the concurrent case.",
+    "verdict": "partial",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "BR-003, CHK-12, AC-05. Section 6 row, not a section 7 gap row: the design claims this one is already solved."
   },
   {
@@ -176,7 +216,7 @@
     "verdict": null,
     "env": null,
     "run_at": null,
-    "notes": "No single section 7 gap row names this; it tests the CoreX Stable claim against NAV-01 to NAV-10, SSC-07, SSC-08 and the RTL acceptance criteria in US-01-01."
+    "notes": "No single section 7 gap row names this; it tests the CoreX Stable claim against NAV-01 to NAV-10, SSC-07, SSC-08 and the RTL acceptance criteria in US-01-01. NOT RUN 9 September 2026: it needs a storefront with real navigation, a mega menu, a footer and Arabic content at several breakpoints. The runtime is a bare install with none of those, so a pass would prove nothing and a failure would only be measuring the absence of content. Blocked until the storefront exists."
   },
   {
     "id": "P-011",
@@ -191,10 +231,15 @@
     "script": "P-011-free-shipping-item-count.php",
     "method": "wp-cli",
     "expected": "Free shipping supports a minimum order amount or a coupon. It has no item count condition. Section 7 row 2.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WC_Shipping_Free_Shipping offers 5 condition(s):  = No requirement; coupon = A valid free shipping coupon; min_amount = A minimum order amount; either = A minimum order amount OR coupon; both = A minimum order amount AND coupon. Instance fields: title, requires, min_amount, ignore_discounts. No item count or quantity condition exists. The only threshold field is min_amount, an order total. BR-002 is custom work under either reading of OD-04, so the OD-04 answer changes the rule but not the fact that it must be written.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "BR-002, FIX-07, AC-01, AC-02."
   },
   {
@@ -209,10 +254,15 @@
     "script": "P-012-carrier-status-map.php",
     "method": "php",
     "expected": "Woo has no such status, and the carrier integration has reported cases of mapping a returned parcel to Delivered. Section 7 row 10.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0 ships 8 order statuses: wc-pending, wc-processing, wc-on-hold, wc-completed, wc-cancelled, wc-refunded, wc-failed, wc-checkout-draft. There is no returned-to-origin status. SHIP-17 needs a registered custom status, and every report, filter and role view that enumerates statuses has to know about it. The closest existing terminal states are wc-completed and wc-cancelled and wc-refunded and wc-failed. Nothing in core distinguishes a parcel that came back from one that arrived, so an unmapped carrier status has no correct home and the mapping in SHIP-14 is what prevents it landing on completed. The second half of the question, whether the Bosta integration has mapped a returned parcel to Delivered, is NOT tested here: the carrier plugin is not installed on this runtime. It needs re-running against the integration before SHIP-14 is signed off.",
+    "verdict": "partial",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "ORD-13, SHIP-17, AC-16."
   },
   {
@@ -227,10 +277,15 @@
     "script": "P-013-role-capabilities.php",
     "method": "wp-cli",
     "expected": "Woo ships Shop Manager and Customer only. Section 7 row 15.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "Roles on the site: administrator, editor, author, contributor, subscriber, customer, shop_manager. Beyond WordPress core, WooCommerce contributes: customer, shop_manager. shop_manager carries 93 capabilities. Report-related ones: view_woocommerce_reports. Report access is a single all-or-nothing capability, so hiding product cost or margin from one role while showing the rest of a report is not expressible in the capability model and is custom work. Shop Manager and Customer only. The six contracted staff roles and the reporting access matrix are entirely Mizzey work, as section 7 row 15 assumes.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "ROLE-03 to ROLE-09, ADM-130. Story trace records the range as 'ROLE-01 to ROLE-09'."
   },
   {
@@ -244,10 +299,15 @@
     "script": "P-014-partial-refund-cap.php",
     "method": "php",
     "expected": "Section 6 states the Woo refund API enforces the paid amount ceiling, which is BR-006, for full and partial refunds against the gateway.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0. Order 32 total 100.0. A 30 partial refund was accepted. A further refund of 200 against 70 remaining was REJECTED: Invalid refund amount. Total refunded now stands at 30.0 against a paid total of 100.0. The ceiling holds: partials are allowed and the total cannot exceed what was paid. BR-006 is native and section 6 is right that this one is already solved. Scope note: this tests the Woo bookkeeping ceiling only. Whether Paymob enforces the same limit on the gateway side is a separate question and is not tested here.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "PAY-07, PAY-08, PAY-17, ADM-91. Section 6 row, not a section 7 gap row: the design claims this one is already solved."
   },
   {
@@ -262,10 +322,15 @@
     "script": "P-015-wishlist-guest-transfer.php",
     "method": "php",
     "expected": "Nothing. WooCommerce provides no wishlist functionality. Section 7 row 13.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0: wishlist functions found none; wishlist classes found none; wishlist tables found none. Guest state in Woo rides on WC_Session_Handler (present) backed by mz_woocommerce_sessions, and the persistent cart is user meta. A guest wishlist has no equivalent, so whatever carries it across login has to be written, and it is the same replace-versus-merge decision as row 1. Designing the two together is cheaper than discovering the second one after the first is built. Nothing wishlist-shaped exists in WooCommerce. WISH-01 to WISH-07 and ENT-07 are entirely custom, as section 7 row 13 assumes.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "WISH-01 to WISH-04, WISH-07, ENT-07."
   },
   {
