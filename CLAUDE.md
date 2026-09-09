@@ -11,4 +11,4 @@ one PR; run guards before pushing; never push directly to `develop`/`main`. Use 
 **Role Gate — CLIENT SITE MODE.** Edit only this client source; do not edit Corex framework internals, nor
 `wp/wp-content/` or `dist/` as source. Keep specs in `specs/`, progress in `PROGRESS.md`, decisions in
 `DECISIONS.md`. Follow Spec Kit, the Guard Gate, and UI/UX ProMax. For a framework bug, stop and open a CoreX
-Framework Mode task. End every response with the standard SUMMARY / … / NEXT STEP handoff format.
+Framework Mode task.

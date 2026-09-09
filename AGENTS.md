@@ -16,9 +16,6 @@ repo and is updated separately — **do not edit Corex framework folders here.**
 - For a **framework** bug or a reusable block/component, **stop** and open a CoreX Framework Mode task in the
   framework repo — never patch CoreX internals for one client.
 
-End every working response with the SUMMARY / WORKSPACE / MODE / SPEC KIT STATUS / VERIFICATION / BLOCKERS /
-RECOMMENDED NEXT STEP + the `--- NEXT STEP ---` block (the team's standard handoff format).
-
 ## Where code goes
 - **App / business code** → the site plugin `mizzey-site/` (namespace `MizzeySite\`).
 - **Presentation / theme code** → the site theme `mizzey-theme/`.
