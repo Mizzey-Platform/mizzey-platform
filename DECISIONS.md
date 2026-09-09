@@ -72,3 +72,29 @@ being designed, permanently unrecoverable for every shipment closed before anyon
 
 Recorded as a choice rather than a requirement so nobody later mistakes them for assumed scope.
 C-RPT-15, which consumes them, stays lane two and is charged.
+
+## 2026-09-09 - BR-003 concurrency: booked, not assumed
+
+P-009 established the mechanism and could not settle the question. The stock write is atomic per
+statement but does not refuse to go negative: two sequential decreases of 1 from a stock of 1 left the
+quantity at -1. The guard against overselling is the validation step before payment, not the write, so
+validation and decrement are separate steps with a gap in principle. One PHP process cannot create
+simultaneity, so whether two buyers of the last unit both succeed is still open.
+
+Technical Design section 6 classifies this **Native**. On the evidence, Native is not yet earned for
+the concurrent case.
+
+Booked as [#233](https://github.com/MustafaShaaban/mizzey-platform/issues/233), **sprint 8, Stage 3**,
+linked from [#120](https://github.com/MustafaShaaban/mizzey-platform/issues/120) US-07-06 with a note
+that acceptance of that story should wait on it.
+
+**Why sprint 8.** Checkout is built in sprint 8, so it is the first sprint the test can run at all, and
+at 53 points against a 55 average it is the least loaded sprint in Stage 3. Sprints 9 to 11 run at 61,
+64 and 64; sprints 12 and 13 at 75 and 82. Every sprint after this one is worse. The only other place
+BR-003 is verified today is US-27-04 Data integrity (#222) in **Stage 6, sprint 14**, which would mean
+discovering an overselling store after the operations system and the migration are built on it.
+
+**New label `type:task`**, for verification or enabling work that is not a story. The two-lanes rule
+still binds it: #233 cites BR-003, CHK-12, AC-05 and AC-15, so it is lane one. A task that cannot cite
+an Annex A id is still a change request. The issue generator is additive and keeps its state in
+`scripts/issues.json`, so a hand-made issue is not at risk from a regeneration.

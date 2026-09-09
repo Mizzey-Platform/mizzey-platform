@@ -197,7 +197,7 @@
       "wp_path": "C:/wamp64/www/mizzey/app/wp"
     },
     "run_at": "2026-09-09",
-    "notes": "BR-003, CHK-12, AC-05. Section 6 row, not a section 7 gap row: the design claims this one is already solved."
+    "notes": "BR-003, CHK-12, AC-05. Section 6 row, not a section 7 gap row: the design claims this one is already solved. Verdict is partial because one PHP process cannot create simultaneity. The parallel load test that settles it is booked as MustafaShaaban/mizzey-platform#233, sprint 8, Stage 3, against #120 US-07-06. Update this row from partial when that test has run."
   },
   {
     "id": "P-010",
