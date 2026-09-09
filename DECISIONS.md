@@ -120,6 +120,11 @@ terminal outcomes collapse into one Woo status, and whoever enables that mapping
 established from the integration and must come from Bosta documentation or an account. That is a
 blocking input for SHIP-14: if 46 is a return-to-origin outcome, enabling the stock mapping records a
 returned parcel as delivered, which SHIP-17 forbids. This absence is the argument for SHIP-14 existing.
+Raised as [#234](https://github.com/MustafaShaaban/mizzey-platform/issues/234), in Stage 1 rather than
+sprint 11 where the carrier stories sit: the answer costs an email and then waiting, so the lead time is
+free, and Stage 4 runs at 64 points against a 55 average with no slack to absorb an unknown. It is
+developer-side vendor documentation, deliberately not labelled `blocked:client-input`, because nothing
+in it is owed by Mizzey.
 
 **Direction for the build:** do not enable the plugin's mapping. Write the Mizzey mapping explicitly,
 code by code, with a named legend visible in admin per SHIP-14, and an unmapped code must land

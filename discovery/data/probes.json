@@ -263,7 +263,7 @@
       "wp_path": "C:/wamp64/www/mizzey/app/wp"
     },
     "run_at": "2026-09-09",
-    "notes": "ORD-13, SHIP-17, AC-16. Re-run 9 September 2026 against the real integration, Bosta WooCommerce 4.5.7, installed on the runtime. Refuted: the mapping is commented out in handle_status_update, so nothing is silently marked Delivered today, and an unknown state falls back to processing rather than completed. The exposure is that states 45 and 46 both map to completed while only 45 sets a delivery date, and the plugin ships no legend for the codes. What state 46 means is a blocking input from Bosta documentation. Recorded on the board at mizzey-platform#166 (SHIP-14) and #165 (SHIP-13)."
+    "notes": "ORD-13, SHIP-17, AC-16. Re-run 9 September 2026 against the real integration, Bosta WooCommerce 4.5.7, installed on the runtime. Refuted: the mapping is commented out in handle_status_update, so nothing is silently marked Delivered today, and an unknown state falls back to processing rather than completed. The exposure is that states 45 and 46 both map to completed while only 45 sets a delivery date, and the plugin ships no legend for the codes. What state 46 means is a blocking input from Bosta documentation, raised as mizzey-platform#234. Recorded on the board at mizzey-platform#166 (SHIP-14) and #165 (SHIP-13)."
   },
   {
     "id": "P-013",
