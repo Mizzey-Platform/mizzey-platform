@@ -267,5 +267,38 @@
     "env": null,
     "run_at": null,
     "notes": "WISH-01 to WISH-04, WISH-07, ENT-07."
+  },
+  {
+    "id": "P-016",
+    "question": "Does WooCommerce provide a native product cost field on products and variations, or must ADM-27 be a field Mizzey adds?",
+    "stories": [
+      "US-16-05"
+    ],
+    "gap_rows": [],
+    "script": "P-016-product-cost-field-native.php",
+    "method": "wp-cli",
+    "expected": "US-16-05 is classified Native, and the Technical Design section 9 calls ADM-27 a New field on product and variation. Those two disagree. If Woo core carries no cost field, Native is wrong for this story and the classification, not the design, is the thing to correct.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "ADM-27, RPT-11, OD-12. US-16-05 is key, so it is in the risk set. Check the installed Woo version for a cost of goods feature before concluding, and record the version in observed: a newer Woo may carry one that older guidance says it does not."
+  },
+  {
+    "id": "P-017",
+    "question": "When an order is placed, is the product cost frozen onto the order line item the way the price is, or does the line read a mutable current cost?",
+    "stories": [
+      "US-16-05",
+      "US-24-03"
+    ],
+    "gap_rows": [],
+    "script": "P-017-cost-snapshot-on-order-line.php",
+    "method": "wp-cli",
+    "expected": "ENT-08 records the price snapshot as native but says nothing about cost. If cost is not frozen at the point of sale, editing a product cost silently rewrites every historical margin, and ADM-27's promise of accurate history does not hold. This is the one gap that cannot be repaired later, because the cost that applied on the day is gone.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "ADM-27, RPT-11, ENT-08, OD-12. Compare with P-002, which tests the price snapshot: price and cost are different promises and only one of them is in the register."
   }
 ]

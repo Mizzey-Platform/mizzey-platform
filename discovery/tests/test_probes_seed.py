@@ -8,12 +8,15 @@ class TestProbeSeed(unittest.TestCase):
         self.probes = schema.load('probes')
         self.stories = {s['id'] for s in schema.load_stories()}
 
-    def test_fifteen_probes_are_seeded(self):
-        self.assertEqual(len(self.probes), 15)
+    def test_probes_are_seeded(self):
+        # A floor, not an equality. The phase exists to add probes as the design
+        # is questioned, and an exact count would fail on the first one added.
+        self.assertGreaterEqual(len(self.probes), 15)
 
     def test_ids_are_unique_and_sequential(self):
         ids = [p['id'] for p in self.probes]
-        self.assertEqual(ids, ['P-%03d' % n for n in range(1, 16)])
+        self.assertEqual(ids, ['P-%03d' % n for n in range(1, len(ids) + 1)],
+                         'probe ids must run from P-001 with no gaps and no duplicates')
 
     def test_every_probe_has_every_field(self):
         for p in self.probes:
