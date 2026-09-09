@@ -121,7 +121,7 @@ node tools/corex-sync.mjs
 Then create the database and install WordPress:
 
 ```bash
-cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizzey --admin_user=admin --admin_email=mustafashaaban22@gmail.com --prompt=admin_password
+cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizzey --admin_user=mustafa --admin_email=mustafashaaban22@gmail.com --prompt=admin_password
 ```
 
 `node tools/corex-sync.mjs --check` reports drift and changes nothing. It fails if a framework link has
