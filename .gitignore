@@ -33,7 +33,14 @@ Thumbs.db
 *.sql
 *.sql.gz
 
+# Python
+__pycache__/
+*.pyc
+
 # AI working files, per the working contract
 .specify/
 .claude/
 .agents/
+
+# Board sync state, local to whoever ran the setup script
+scripts/.board-state.json

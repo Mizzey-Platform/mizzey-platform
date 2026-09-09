@@ -153,6 +153,15 @@ class TestSchema(unittest.TestCase):
     def test_the_overage_acknowledgement_is_part_of_a_plugin_row(self):
         self.assertIn('acknowledged_over_quote', schema.PLUGIN_FIELDS)
 
+    def test_the_data_bundle_names_all_five_datasets(self):
+        self.assertEqual(schema.Data._fields,
+                         ('stories', 'verdicts', 'probes', 'plugins', 'journeys'))
+
+    def test_load_data_returns_a_bundle_with_the_real_stories(self):
+        data = schema.load_data()
+        self.assertEqual(len(data.stories), 205)
+        self.assertIsInstance(data.verdicts, list)
+
     def test_missing_fields_are_reported(self):
         row = {'story': 'US-01-01'}
         missing = schema.missing_fields(row, schema.VERDICT_FIELDS)
@@ -192,6 +201,7 @@ Nothing else defines a field name.
 
 import json
 import os
+from collections import namedtuple
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'data')
@@ -224,6 +234,12 @@ PLUGIN_FIELDS = ('id', 'need', 'stories', 'candidates', 'decision', 'evidence',
                  'acknowledged_over_quote')
 
 JOURNEY_FIELDS = ('id', 'name', 'actor', 'language', 'steps', 'gaps')
+
+# Every dataset in one bundle. Rules and generators take this rather than five
+# positional lists: probes and plugins are both lists of dicts with an id, so as
+# positional arguments they could be transposed at a call site and a test would
+# pass for the wrong reason. Naming the field makes that impossible.
+Data = namedtuple('Data', 'stories verdicts probes plugins journeys')
 
 
 def missing_fields(row, fields):
@@ -268,12 +284,18 @@ def load_stories():
     """The generated story list. Read only. Never write to this file."""
     with open(STORIES, encoding='utf-8') as fh:
         return json.load(fh)
+
+
+def load_data():
+    """Every dataset, in one bundle."""
+    return Data(load_stories(), load('verdicts'), load('probes'),
+                load('plugins'), load('journeys'))
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_schema -v`
-Expected: PASS, 7 tests.
+Expected: PASS, 9 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -358,7 +380,7 @@ from discovery.schema import CUSTOM_EPICS
 def risk_set(stories):
     """Story ids requiring full validation."""
     return {s['id'] for s in stories
-            if s['epic'] in CUSTOM_EPICS or s.get('key')}
+            if s['epic'] in CUSTOM_EPICS or s['key']}
 
 
 def light_set(stories):
@@ -406,41 +428,57 @@ STORIES = [
 ]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 class TestUnknownStoryReferences(unittest.TestCase):
     def test_a_verdict_for_an_unknown_story_fails(self):
-        verdicts = [{'story': 'US-99-99'}]
-        problems = check.check_unknown_stories(STORIES, verdicts, [], [], [])
+        problems = check.check_unknown_stories(data(verdicts=[{'story': 'US-99-99'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-99-99', problems[0])
 
     def test_a_probe_naming_an_unknown_story_fails(self):
-        probes = [{'id': 'P-001', 'stories': ['US-99-99']}]
-        problems = check.check_unknown_stories(STORIES, [], probes, [], [])
+        problems = check.check_unknown_stories(
+            data(probes=[{'id': 'P-001', 'stories': ['US-99-99']}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('P-001', problems[0])
 
+    def test_a_plugin_naming_an_unknown_story_fails(self):
+        problems = check.check_unknown_stories(
+            data(plugins=[{'id': 'PL-01', 'stories': ['US-99-99']}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('PL-01', problems[0])
+
     def test_a_journey_step_naming_an_unknown_story_fails(self):
-        journeys = [{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-99-99']}]}]
-        problems = check.check_unknown_stories(STORIES, [], [], [], journeys)
+        problems = check.check_unknown_stories(
+            data(journeys=[{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-99-99']}]}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('J-01', problems[0])
 
     def test_known_story_ids_pass(self):
-        verdicts = [{'story': 'US-01-01'}]
-        probes = [{'id': 'P-001', 'stories': ['US-04-02']}]
-        journeys = [{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-01-01']}]}]
-        self.assertEqual(check.check_unknown_stories(STORIES, verdicts, probes, [], journeys), [])
+        self.assertEqual(check.check_unknown_stories(data(
+            verdicts=[{'story': 'US-01-01'}],
+            probes=[{'id': 'P-001', 'stories': ['US-04-02']}],
+            journeys=[{'id': 'J-01', 'steps': [{'n': 1, 'stories': ['US-01-01']}]}])), [])
 
 
 class TestTraceability(unittest.TestCase):
     def test_a_verdict_for_a_story_with_no_annex_a_trace_fails(self):
         stories = [{'id': 'US-01-01', 'epic': 'E01', 'key': True, 'trace': '  '}]
-        problems = check.check_traceable(stories, [{'story': 'US-01-01'}], [], [], [])
+        problems = check.check_traceable(
+            data(stories=stories, verdicts=[{'story': 'US-01-01'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-01-01', problems[0])
 
     def test_a_traced_story_passes(self):
-        self.assertEqual(check.check_traceable(STORIES, [{'story': 'US-01-01'}], [], [], []), [])
+        self.assertEqual(check.check_traceable(data(verdicts=[{'story': 'US-01-01'}])), [])
+
+    def test_an_unknown_story_is_left_to_the_other_rule(self):
+        """One fault, one message. check_unknown_stories already reports this."""
+        self.assertEqual(check.check_traceable(data(verdicts=[{'story': 'US-99-99'}])), [])
 
 
 if __name__ == '__main__':
@@ -460,8 +498,13 @@ Create `discovery/check.py`:
 """The discovery gate.
 
 Every rule is a function with the signature
-    rule(stories, verdicts, probes, plugins, journeys) -> list[str]
+    rule(data) -> list[str]
 returning one string per problem. An empty list means the rule passed.
+
+`data` is the Data bundle below rather than five positional lists. Probes and
+plugins are both lists of dicts with an id, so as positional arguments they could
+be transposed at a call site and a test would pass for the wrong reason. Naming
+the field makes that impossible.
 
 Keeping rules pure means each one is unit-testable without touching disk, and
 adding a rule is adding a function to RULES.
@@ -470,28 +513,25 @@ adding a rule is adding a function to RULES.
 import sys
 
 from discovery import riskset, schema
+from discovery.schema import Data  # re-exported so tests can build a bundle
 
 
-def _known_ids(stories):
-    return {s['id'] for s in stories}
-
-
-def check_unknown_stories(stories, verdicts, probes, plugins, journeys):
+def check_unknown_stories(data):
     """No dataset may reference a story id that is not in stories.json."""
-    known = _known_ids(stories)
+    known = {s['id'] for s in data.stories}
     problems = []
-    for v in verdicts:
+    for v in data.verdicts:
         if v.get('story') not in known:
             problems.append('verdict names unknown story %s' % v.get('story'))
-    for p in probes:
+    for p in data.probes:
         for sid in p.get('stories', []):
             if sid not in known:
                 problems.append('probe %s names unknown story %s' % (p.get('id'), sid))
-    for pl in plugins:
+    for pl in data.plugins:
         for sid in pl.get('stories', []):
             if sid not in known:
                 problems.append('plugin %s names unknown story %s' % (pl.get('id'), sid))
-    for j in journeys:
+    for j in data.journeys:
         for step in j.get('steps', []):
             for sid in step.get('stories', []):
                 if sid not in known:
@@ -500,11 +540,13 @@ def check_unknown_stories(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_traceable(stories, verdicts, probes, plugins, journeys):
+def check_traceable(data):
     """Every story carrying a verdict must trace to Annex A."""
-    trace = {s['id']: (s.get('trace') or '').strip() for s in stories}
+    trace = {s['id']: (s.get('trace') or '').strip() for s in data.stories}
+    # A verdict naming a story that does not exist is check_unknown_stories'
+    # problem, not this one. Staying silent here keeps one fault to one message.
     return ['verdict for %s, which has no Annex A trace' % v['story']
-            for v in verdicts
+            for v in data.verdicts
             if v.get('story') in trace and not trace[v['story']]]
 
 
@@ -515,15 +557,11 @@ RULES = [
 
 
 def run_checks():
-    """Load every dataset and run every rule. Returns the problem list."""
-    stories = schema.load_stories()
-    verdicts = schema.load('verdicts')
-    probes = schema.load('probes')
-    plugins = schema.load('plugins')
-    journeys = schema.load('journeys')
+    """Run every rule over every dataset. Returns the problem list."""
+    data = schema.load_data()
     problems = []
     for rule in RULES:
-        problems.extend(rule(stories, verdicts, probes, plugins, journeys))
+        problems.extend(rule(data))
     return problems
 
 
@@ -532,7 +570,8 @@ def main():
     for p in problems:
         print('  FAIL  ' + p)
     if problems:
-        print('\n%d problem(s)' % len(problems))
+        print('
+%d problem(s)' % len(problems))
         return 1
     print('clean')
     return 0
@@ -545,7 +584,7 @@ if __name__ == '__main__':
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_stories -v`
-Expected: PASS, 6 tests.
+Expected: PASS, 8 tests.
 
 - [ ] **Step 5: Run the gate against the empty datasets**
 
@@ -586,6 +625,12 @@ STORIES = [
 ]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 def verdict(story, **kw):
     row = {'story': story, 'claimed': 'custom', 'actual': 'build',
            'confidence': 'reasoned', 'evidence': [], 'plugins': [],
@@ -594,19 +639,20 @@ def verdict(story, **kw):
     return row
 
 
-class TestAssumedInRiskSet(unittest.TestCase):
+class TestRiskSetHasRealVerdict(unittest.TestCase):
     def test_a_risk_set_story_left_assumed_fails(self):
-        problems = check.check_no_assumed_in_risk_set(
-            STORIES, [verdict('US-13-01', confidence='assumed')], [], [], [])
+        problems = check.check_risk_set_has_real_verdict(
+            data(verdicts=[verdict('US-13-01', confidence='assumed')]))
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
     def test_a_light_pass_story_may_stay_assumed(self):
-        self.assertEqual(check.check_no_assumed_in_risk_set(
-            STORIES, [verdict('US-04-02', confidence='assumed')], [], [], []), [])
+        self.assertEqual(check.check_risk_set_has_real_verdict(
+            data(verdicts=[verdict('US-04-02', confidence='assumed'),
+                           verdict('US-13-01')])), [])
 
     def test_a_risk_set_story_with_no_verdict_at_all_fails(self):
-        problems = check.check_no_assumed_in_risk_set(STORIES, [], [], [], [])
+        problems = check.check_risk_set_has_real_verdict(data())
         self.assertEqual(len(problems), 1)
         self.assertIn('US-13-01', problems[0])
 
@@ -614,36 +660,111 @@ class TestAssumedInRiskSet(unittest.TestCase):
 class TestProvedNeedsEvidence(unittest.TestCase):
     def test_proved_with_no_probe_fails(self):
         problems = check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=[])], [], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=[])]))
         self.assertEqual(len(problems), 1)
 
     def test_proved_naming_a_probe_that_does_not_exist_fails(self):
         problems = check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=['P-999'])],
-            [{'id': 'P-001'}], [], [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-999'])],
+                 probes=[{'id': 'P-001'}]))
         self.assertEqual(len(problems), 1)
         self.assertIn('P-999', problems[0])
 
-    def test_proved_with_a_real_probe_passes(self):
+    def test_proved_on_a_probe_that_has_not_run_fails(self):
+        problems = check.check_proved_has_evidence(
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
+                 probes=[{'id': 'P-001', 'verdict': None}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('has not been run', problems[0])
+
+    def test_proved_with_a_probe_that_ran_passes(self):
         self.assertEqual(check.check_proved_has_evidence(
-            STORIES, [verdict('US-13-01', confidence='proved', evidence=['P-001'])],
-            [{'id': 'P-001'}], [], []), [])
+            data(verdicts=[verdict('US-13-01', confidence='proved', evidence=['P-001'])],
+                 probes=[{'id': 'P-001', 'verdict': 'confirmed'}])), [])
+
+
+class TestNoDuplicateRows(unittest.TestCase):
+    def test_a_duplicate_verdict_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(verdicts=[verdict('US-13-01', confidence='assumed'),
+                           verdict('US-13-01', confidence='reasoned')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('US-13-01', problems[0])
+
+    def test_a_key_is_reported_once_however_many_duplicates(self):
+        problems = check.check_no_duplicate_rows(
+            data(verdicts=[verdict('US-13-01'), verdict('US-13-01'), verdict('US-13-01')]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_duplicate_probe_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(probes=[{'id': 'P-001', 'verdict': None},
+                         {'id': 'P-001', 'verdict': 'confirmed'}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('P-001', problems[0])
+
+    def test_a_duplicate_plugin_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(plugins=[{'id': 'PL-01'}, {'id': 'PL-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_duplicate_journey_id_fails(self):
+        problems = check.check_no_duplicate_rows(
+            data(journeys=[{'id': 'J-01'}, {'id': 'J-01'}]))
+        self.assertEqual(len(problems), 1)
+
+    def test_distinct_keys_pass(self):
+        self.assertEqual(check.check_no_duplicate_rows(
+            data(verdicts=[verdict('US-13-01'), verdict('US-04-02')],
+                 probes=[{'id': 'P-001'}, {'id': 'P-002'}])), [])
+
+
+class TestAllowedValues(unittest.TestCase):
+    def test_a_misspelt_confidence_fails(self):
+        problems = check.check_allowed_values(
+            data(verdicts=[verdict('US-13-01', confidence='reasonned')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('reasonned', problems[0])
+
+    def test_an_unknown_actual_fails(self):
+        problems = check.check_allowed_values(
+            data(verdicts=[verdict('US-13-01', actual='mostly')]))
+        self.assertEqual(len(problems), 1)
+
+    def test_an_unknown_points_flag_fails(self):
+        problems = check.check_allowed_values(
+            data(verdicts=[verdict('US-13-01', points_flag='way under')]))
+        self.assertEqual(len(problems), 1)
+
+    def test_an_undecided_actual_is_allowed(self):
+        self.assertEqual(check.check_allowed_values(
+            data(verdicts=[verdict('US-13-01', actual=None)])), [])
+
+    def test_a_bad_probe_verdict_fails(self):
+        problems = check.check_allowed_values(
+            data(probes=[{'id': 'P-001', 'verdict': 'maybe'}]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('P-001', problems[0])
 
 
 class TestBuildNeedsAGapRow(unittest.TestCase):
     def test_build_with_no_gap_row_and_no_risk_note_fails(self):
         problems = check.check_build_traces_to_gap(
-            STORIES, [verdict('US-13-01', actual='build', gap_rows=[], risk='')], [], [], [])
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[], risk='')]))
         self.assertEqual(len(problems), 1)
 
     def test_build_with_no_gap_row_but_an_explanation_passes(self):
         self.assertEqual(check.check_build_traces_to_gap(
-            STORIES, [verdict('US-13-01', actual='build', gap_rows=[],
-                              risk='Not in section 7; found by probe P-012')], [], [], []), [])
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[],
+                                   risk='Not in section 7; found by probe P-012')])), [])
+
+    def test_build_with_a_gap_row_passes(self):
+        self.assertEqual(check.check_build_traces_to_gap(
+            data(verdicts=[verdict('US-13-01', actual='build', gap_rows=[5], risk='')])), [])
 
     def test_native_needs_no_gap_row(self):
         self.assertEqual(check.check_build_traces_to_gap(
-            STORIES, [verdict('US-04-02', actual='native', gap_rows=[], risk='')], [], [], []), [])
+            data(verdicts=[verdict('US-04-02', actual='native', gap_rows=[], risk='')])), [])
 
 
 if __name__ == '__main__':
@@ -653,21 +774,22 @@ if __name__ == '__main__':
 - [ ] **Step 2: Run it to make sure it fails**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute 'check_no_assumed_in_risk_set'`
+Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute 'check_risk_set_has_real_verdict'`
 
 - [ ] **Step 3: Write the implementation**
 
 In `discovery/check.py`, insert these three functions immediately after `check_traceable`:
 
 ```python
-def check_no_assumed_in_risk_set(stories, verdicts, probes, plugins, journeys):
+def check_risk_set_has_real_verdict(data):
     """Every risk-set story needs a verdict, and none of them may stay assumed.
 
     A missing verdict is the same failure as an assumed one: in both cases
     nobody has looked.
     """
-    risky = riskset.risk_set(stories)
-    seen = {v['story']: v for v in verdicts if 'story' in v}
+    risky = riskset.risk_set(data.stories)
+    # Last write wins here. check_no_duplicate_rows is what makes that safe.
+    seen = {v['story']: v for v in data.verdicts if 'story' in v}
     problems = []
     for sid in sorted(risky):
         if sid not in seen:
@@ -677,34 +799,97 @@ def check_no_assumed_in_risk_set(stories, verdicts, probes, plugins, journeys):
     return problems
 
 
-def check_proved_has_evidence(stories, verdicts, probes, plugins, journeys):
-    """confidence "proved" means a probe ran. Name it, and let it exist."""
-    known = {p.get('id') for p in probes}
+def check_proved_has_evidence(data):
+    """confidence "proved" means a probe ran and reached a verdict.
+
+    Citing a probe that exists but was never executed is the false confidence
+    this whole dataset exists to prevent, so an unrun probe is not evidence.
+    """
+    # Last write wins here. check_no_duplicate_rows is what makes that safe:
+    # without it a second row reusing a probe id could mask an unrun probe and
+    # let a proved verdict through the whole gate.
+    by_id = {p.get('id'): p for p in data.probes}
     problems = []
-    for v in verdicts:
+    for v in data.verdicts:
         if v.get('confidence') != 'proved':
             continue
         evidence = v.get('evidence') or []
         if not evidence:
             problems.append('%s is proved with no probe in evidence' % v.get('story'))
         for pid in evidence:
-            if pid not in known:
+            if pid not in by_id:
                 problems.append('%s cites probe %s, which does not exist'
+                                % (v.get('story'), pid))
+            elif not by_id[pid].get('verdict'):
+                problems.append('%s is proved on probe %s, which has not been run'
                                 % (v.get('story'), pid))
     return problems
 
 
-def check_build_traces_to_gap(stories, verdicts, probes, plugins, journeys):
+def check_no_duplicate_rows(data):
+    """Every row must be reachable by its key.
+
+    The rules index each dataset by key, so a duplicate silently wins and the
+    row it replaced is never inspected. For probes that is not cosmetic: a
+    second row reusing an id can mask an unrun probe and let a proved verdict
+    through the entire gate. Parallel agents append to these files, so say so
+    rather than letting the later row erase the earlier one.
+    """
+    problems = []
+    for label, rows, key in (('verdict', data.verdicts, 'story'),
+                             ('probe', data.probes, 'id'),
+                             ('plugin', data.plugins, 'id'),
+                             ('journey', data.journeys, 'id')):
+        seen = set()
+        duplicates = []
+        for row in rows:
+            value = row.get(key)
+            if value in seen and value not in duplicates:
+                duplicates.append(value)
+            seen.add(value)
+        problems.extend('%s %s appears in more than one row' % (label, value)
+                        for value in duplicates)
+    return problems
+
+
+def check_build_traces_to_gap(data):
     """Anything classed build should trace to a Technical Design gap row.
 
     If it does not, that is allowed, but it means section 7 missed something and
     the risk note has to say so.
     """
     return ['%s is classed build with no gap row and no explanation in risk' % v.get('story')
-            for v in verdicts
+            for v in data.verdicts
             if v.get('actual') == 'build'
             and not (v.get('gap_rows') or [])
             and not (v.get('risk') or '').strip()]
+```
+
+And this one, which closes the loop on the allowed-value tuples in `schema.py`.
+Without it, `confidence: "reasonned"` passes the gate silently, which is exactly the failure
+a single source of truth exists to prevent:
+
+```python
+def check_allowed_values(data):
+    """A typo in an enumerated field must not pass silently.
+
+    None means undecided and is allowed. A wrong string is not.
+    """
+    problems = []
+    for v in data.verdicts:
+        for field, allowed in (('actual', schema.ACTUAL),
+                               ('confidence', schema.CONFIDENCE),
+                               ('points_flag', schema.POINTS_FLAG)):
+            value = v.get(field)
+            if value is not None and value not in allowed:
+                problems.append('%s has %s %r, which is not one of %s'
+                                % (v.get('story'), field, value, ', '.join(allowed)))
+    for p in data.probes:
+        value = p.get('verdict')
+        if value is not None and value not in schema.PROBE_VERDICT:
+            problems.append('probe %s has verdict %r, which is not one of %s'
+                            % (p.get('id'), value, ', '.join(schema.PROBE_VERDICT)))
+    return problems
 ```
 
 Then extend `RULES`:
@@ -713,16 +898,18 @@ Then extend `RULES`:
 RULES = [
     check_unknown_stories,
     check_traceable,
-    check_no_assumed_in_risk_set,
+    check_risk_set_has_real_verdict,
     check_proved_has_evidence,
     check_build_traces_to_gap,
+    check_allowed_values,
+    check_no_duplicate_rows,
 ]
 ```
 
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_verdicts -v`
-Expected: PASS, 9 tests.
+Expected: PASS, 22 tests.
 
 - [ ] **Step 5: Confirm the gate now reports the real backlog**
 
@@ -758,6 +945,12 @@ from discovery import check
 STORIES = [{'id': 'US-01-01', 'epic': 'E01', 'key': False, 'leverage': 'partial', 'trace': 'FIX-04'}]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 def plugin(pid, **kw):
     row = {'id': pid, 'need': 'Multilingual product data', 'stories': ['US-01-01'],
            'candidates': [], 'decision': 'Example Plugin', 'evidence': [],
@@ -769,31 +962,65 @@ def plugin(pid, **kw):
 
 class TestPluginCompleteness(unittest.TestCase):
     def test_a_decision_with_no_cost_fails(self):
-        problems = check.check_plugin_complete(STORIES, [], [], [plugin('PL-01', cost_annual=None)], [])
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', cost_annual=None)]))
         self.assertEqual(len(problems), 1)
         self.assertIn('PL-01', problems[0])
 
     def test_a_decision_with_no_licence_fails(self):
-        problems = check.check_plugin_complete(STORIES, [], [], [plugin('PL-01', licence=None)], [])
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', licence=None)]))
         self.assertEqual(len(problems), 1)
 
     def test_an_undecided_need_is_not_yet_a_failure(self):
         self.assertEqual(check.check_plugin_complete(
-            STORIES, [], [], [plugin('PL-01', decision=None, cost_annual=None, licence=None)], []), [])
+            data(plugins=[plugin('PL-01', decision=None, cost_annual=None, licence=None)])), [])
 
     def test_build_instead_needs_no_cost(self):
         self.assertEqual(check.check_plugin_complete(
-            STORIES, [], [], [plugin('PL-01', decision='build instead',
-                                     cost_annual=None, licence=None)], []), [])
+            data(plugins=[plugin('PL-01', decision='build instead',
+                                 cost_annual=None, licence=None)])), [])
+
+    def test_a_negative_cost_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin('PL-01', cost_annual=-150)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('negative', problems[0])
+
+    def test_an_empty_decision_is_not_the_same_as_undecided(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision='', cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('Use null for undecided', problems[0])
+
+    def test_a_non_string_decision_fails(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', decision=0, cost_annual=500)]))
+        self.assertEqual(len(problems), 1)
+
+    def test_a_non_numeric_cost_fails_rather_than_crashing(self):
+        problems = check.check_plugin_complete(
+            data(plugins=[plugin('PL-01', cost_annual='250')]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('non-numeric', problems[0])
+
+    def test_a_cost_that_disagrees_with_the_chosen_candidate_fails(self):
+        problems = check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=0,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 250}])]))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('listed at', problems[0])
+
+    def test_a_cost_that_agrees_with_the_chosen_candidate_passes(self):
+        self.assertEqual(check.check_plugin_complete(data(plugins=[plugin(
+            'PL-01', decision='Example Plugin', cost_annual=107,
+            candidates=[{'name': 'Example Plugin', 'cost_annual': 107}])])), [])
 
     def test_a_complete_decision_passes(self):
-        self.assertEqual(check.check_plugin_complete(STORIES, [], [], [plugin('PL-01')], []), [])
+        self.assertEqual(check.check_plugin_complete(data(plugins=[plugin('PL-01')])), [])
 
 
 class TestPluginCeiling(unittest.TestCase):
     def test_a_total_above_the_quoted_figure_fails(self):
         rows = [plugin('PL-01', cost_annual=107), plugin('PL-02', cost_annual=60)]
-        problems = check.check_plugin_ceiling(STORIES, [], [], rows, [])
+        problems = check.check_plugin_ceiling(data(plugins=rows))
         self.assertEqual(len(problems), 1)
         self.assertIn('167', problems[0])
         self.assertIn('107', problems[0])
@@ -801,16 +1028,27 @@ class TestPluginCeiling(unittest.TestCase):
     def test_an_acknowledged_overage_passes(self):
         rows = [plugin('PL-01', cost_annual=107),
                 plugin('PL-02', cost_annual=60, acknowledged_over_quote=True)]
-        self.assertEqual(check.check_plugin_ceiling(STORIES, [], [], rows, []), [])
+        self.assertEqual(check.check_plugin_ceiling(data(plugins=rows)), [])
 
     def test_a_total_at_the_quoted_figure_passes(self):
         self.assertEqual(check.check_plugin_ceiling(
-            STORIES, [], [], [plugin('PL-01', cost_annual=107)], []), [])
+            data(plugins=[plugin('PL-01', cost_annual=107)])), [])
+
+    def test_an_acknowledgement_on_another_row_does_not_license_an_overage(self):
+        rows = [plugin('PL-01', cost_annual=500),
+                plugin('PL-02', cost_annual=1, acknowledged_over_quote=True)]
+        problems = check.check_plugin_ceiling(data(plugins=rows))
+        self.assertEqual(len(problems), 1)
+        self.assertIn('501', problems[0])
+
+    def test_a_blank_decision_does_not_hide_a_cost_from_the_total(self):
+        rows = [plugin('PL-01', decision='', cost_annual=500)]
+        self.assertEqual(check.check_plugin_complete(data(plugins=rows)) != [], True)
 
     def test_non_usd_costs_are_not_silently_summed(self):
         rows = [plugin('PL-01', cost_annual=107),
                 plugin('PL-02', cost_annual=50, currency='EUR')]
-        problems = check.check_plugin_ceiling(STORIES, [], [], rows, [])
+        problems = check.check_plugin_ceiling(data(plugins=rows))
         self.assertTrue(any('EUR' in p for p in problems))
 
 
@@ -828,38 +1066,92 @@ Expected: FAIL with `AttributeError: module 'discovery.check' has no attribute '
 In `discovery/check.py`, insert after `check_build_traces_to_gap`:
 
 ```python
-def check_plugin_complete(stories, verdicts, probes, plugins, journeys):
-    """A decided plugin needs a licence and an annual figure.
+def _is_decided(pl):
+    """True when the row names a real product to buy, so its cost counts.
+
+    None means undecided, which is work in progress rather than a failure.
+    "build instead" is a decision that costs no licence. Anything else that is
+    not a real name is reported by check_plugin_complete, not silently skipped.
+    """
+    decision = pl.get('decision')
+    return (isinstance(decision, str) and decision.strip()
+            and decision != 'build instead')
+
+
+def _money(value):
+    """Format a cost without inventing or hiding decimals."""
+    return '%d' % value if float(value).is_integer() else '%.2f' % value
+
+
+def _usable_cost(pl):
+    """The row's cost when it is a number that can be summed, else None."""
+    cost = pl.get('cost_annual')
+    if isinstance(cost, bool) or not isinstance(cost, (int, float)) or cost < 0:
+        return None
+    return cost
+
+
+def check_plugin_complete(data):
+    """A decided plugin needs a licence and a sane annual figure.
 
     An undecided need is work in progress, not a failure. "build instead" is a
     decision that costs no licence.
     """
     problems = []
-    for pl in plugins:
+    for pl in data.plugins:
         decision = pl.get('decision')
-        if not decision or decision == 'build instead':
+        if decision is None:
             continue
-        if pl.get('cost_annual') is None:
+        if not isinstance(decision, str) or not decision.strip():
+            # A blanked cell is not the same as an undecided one. Skipping it
+            # would drop the cost and licence checks on a row that may carry a
+            # real figure.
+            problems.append('plugin %s has decision %r. Use null for undecided'
+                            % (pl.get('id'), decision))
+            continue
+        if decision == 'build instead':
+            continue
+        cost = pl.get('cost_annual')
+        if cost is None:
             problems.append('plugin %s is decided with no cost_annual' % pl.get('id'))
+        elif isinstance(cost, bool) or not isinstance(cost, (int, float)):
+            # Left unguarded this raises and takes the whole gate down with it,
+            # which is worse than a wrong answer because nothing else gets run.
+            problems.append('plugin %s has a non-numeric cost_annual, %r'
+                            % (pl.get('id'), cost))
+        elif cost < 0:
+            # A negative figure on one row subtracts from the register total and
+            # can hide a real overage on another, which would put a cost above
+            # the quoted figure in front of the client with nobody told.
+            problems.append('plugin %s has a negative cost_annual, %s'
+                            % (pl.get('id'), cost))
         if not pl.get('licence'):
             problems.append('plugin %s is decided with no licence' % pl.get('id'))
+        for candidate in pl.get('candidates') or []:
+            listed = candidate.get('cost_annual')
+            if candidate.get('name') != decision or listed is None:
+                continue
+            if listed != cost:
+                problems.append('plugin %s is decided as %s at %r, but that candidate is '
+                                'listed at %r' % (pl.get('id'), decision, cost, listed))
     return problems
 
 
-def check_plugin_ceiling(stories, verdicts, probes, plugins, journeys):
+def check_plugin_ceiling(data):
     """The register total must not quietly exceed what the client was quoted.
 
     Technical Design section 11 put about 107 USD a year in front of them. Going
-    above that is a commercial conversation. It is allowed, but it has to be
-    acknowledged on the row that causes it, not absorbed.
+    above that is a commercial conversation. It is allowed, but the rows that
+    acknowledge it have to account for the overage: a cheap row carrying the
+    flag cannot license an expensive row that does not.
     """
     problems = []
     total = 0
-    acknowledged = False
-    for pl in plugins:
-        if not pl.get('decision') or pl.get('decision') == 'build instead':
+    acknowledged = 0
+    for pl in data.plugins:
+        if not _is_decided(pl):
             continue
-        cost = pl.get('cost_annual') or 0
+        cost = _usable_cost(pl)
         if not cost:
             continue
         currency = pl.get('currency') or 'USD'
@@ -869,11 +1161,13 @@ def check_plugin_ceiling(stories, verdicts, probes, plugins, journeys):
             continue
         total += cost
         if pl.get('acknowledged_over_quote'):
-            acknowledged = True
-    if total > schema.QUOTED_ANNUAL_USD and not acknowledged:
-        problems.append('plugin register totals %d USD a year against the %d USD quoted to the '
-                        'client in Technical Design section 11, and no row acknowledges it'
-                        % (total, schema.QUOTED_ANNUAL_USD))
+            acknowledged += cost
+    if (total > schema.QUOTED_ANNUAL_USD
+            and total - acknowledged > schema.QUOTED_ANNUAL_USD):
+        problems.append('plugin register totals %s USD a year against the %d USD quoted to '
+                        'the client in Technical Design section 11, and the acknowledged rows '
+                        'do not account for the difference'
+                        % (_money(total), schema.QUOTED_ANNUAL_USD))
     return problems
 ```
 
@@ -882,7 +1176,7 @@ Then extend `RULES` with `check_plugin_complete` and `check_plugin_ceiling`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_plugins -v`
-Expected: PASS, 9 tests.
+Expected: PASS, 17 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -916,30 +1210,36 @@ from discovery import check
 STORIES = [{'id': 'US-01-01', 'epic': 'E01', 'key': False, 'leverage': 'partial', 'trace': 'FIX-04'}]
 
 
+def data(stories=None, verdicts=(), probes=(), plugins=(), journeys=()):
+    """A Data bundle built by keyword, so nothing can be transposed by position."""
+    return check.Data(STORIES if stories is None else stories,
+                      list(verdicts), list(probes), list(plugins), list(journeys))
+
+
 class TestJourneySteps(unittest.TestCase):
     def test_a_step_with_no_story_fails(self):
         journeys = [{'id': 'J-01', 'name': 'Guest buys', 'actor': 'guest',
                      'language': 'both', 'steps': [{'n': 1, 'stories': []}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertEqual(len(problems), 1)
         self.assertIn('J-01', problems[0])
 
     def test_an_unknown_actor_fails(self):
         journeys = [{'id': 'J-01', 'name': 'x', 'actor': 'wizard', 'language': 'both',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertTrue(any('wizard' in p for p in problems))
 
     def test_an_unknown_language_fails(self):
         journeys = [{'id': 'J-01', 'name': 'x', 'actor': 'guest', 'language': 'fr',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        problems = check.check_journey_steps(STORIES, [], [], [], journeys)
+        problems = check.check_journey_steps(data(journeys=journeys))
         self.assertTrue(any('fr' in p for p in problems))
 
     def test_a_well_formed_journey_passes(self):
         journeys = [{'id': 'J-01', 'name': 'Guest buys', 'actor': 'guest', 'language': 'both',
                      'steps': [{'n': 1, 'stories': ['US-01-01']}], 'gaps': []}]
-        self.assertEqual(check.check_journey_steps(STORIES, [], [], [], journeys), [])
+        self.assertEqual(check.check_journey_steps(data(journeys=journeys)), [])
 
 
 class TestHouseRules(unittest.TestCase):
@@ -952,7 +1252,7 @@ class TestHouseRules(unittest.TestCase):
             fh.write(text)
 
     def test_an_em_dash_in_generated_output_fails(self):
-        self.write('report.md', 'A sentence \u2014 with an em dash.\n')
+        self.write('report.md', 'A sentence — with an em dash.\n')
         problems = check.check_house_rules_in(self.dir)
         self.assertEqual(len(problems), 1)
         self.assertIn('em dash', problems[0])
@@ -968,8 +1268,30 @@ class TestHouseRules(unittest.TestCase):
         self.assertEqual(check.check_house_rules_in(self.dir), [])
 
     def test_only_markdown_is_examined(self):
-        self.write('data.json', '{"note": "an em dash \u2014 in data is fine"}')
+        self.write('data.json', '{"note": "an em dash — in data is fine"}')
         self.assertEqual(check.check_house_rules_in(self.dir), [])
+
+    def test_a_nested_markdown_file_is_examined(self):
+        os.makedirs(os.path.join(self.dir, 'nested'))
+        with open(os.path.join(self.dir, 'nested', 'deep.md'), 'w', encoding='utf-8') as fh:
+            fh.write('Nested \u2014 dash.\n')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('nested/deep.md', problems[0])
+
+    def test_an_uppercase_extension_is_examined(self):
+        self.write('REPORT.MD', 'Shouting \u2014 loudly.\n')
+        self.assertEqual(len(check.check_house_rules_in(self.dir)), 1)
+
+    def test_an_unreadable_file_is_reported_rather_than_raising(self):
+        with open(os.path.join(self.dir, 'broken.md'), 'wb') as fh:
+            fh.write(b'\xff\xfe not utf 8 at all')
+        problems = check.check_house_rules_in(self.dir)
+        self.assertEqual(len(problems), 1)
+        self.assertIn('could not be read', problems[0])
+
+    def test_a_missing_directory_is_not_a_failure(self):
+        self.assertEqual(check.check_house_rules_in(os.path.join(self.dir, 'nope')), [])
 
 
 if __name__ == '__main__':
@@ -989,10 +1311,10 @@ Add `import os` and `import unicodedata` to the imports at the top of `discovery
 GENERATED = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
-def check_journey_steps(stories, verdicts, probes, plugins, journeys):
+def check_journey_steps(data):
     """A journey step that names no story is narrative, not validation."""
     problems = []
-    for j in journeys:
+    for j in data.journeys:
         if j.get('actor') not in schema.ACTORS:
             problems.append('journey %s has actor %s, which is not one of %s'
                             % (j.get('id'), j.get('actor'), ', '.join(schema.ACTORS)))
@@ -1015,26 +1337,39 @@ def check_house_rules_in(directory):
 
     These documents feed client-facing work even though they are not sent, and
     the house rule is easier to keep than to retrofit.
+
+    Walks the tree rather than one level, matches the extension case
+    insensitively, and reports an unreadable file rather than raising: an
+    exception here would take the whole gate down and nothing else would run.
     """
     problems = []
     if not os.path.isdir(directory):
         return problems
-    for name in sorted(os.listdir(directory)):
-        if not name.endswith('.md'):
-            continue
-        path = os.path.join(directory, name)
-        with open(path, encoding='utf-8') as fh:
-            text = fh.read()
-        if '\u2014' in text:
-            problems.append('%s contains an em dash' % name)
-        found = sorted({ch for ch in text if _is_emoji(ch)})
-        if found:
-            problems.append('%s contains emoji: %s' % (name, ' '.join(found)))
+    for root, _dirs, names in os.walk(directory):
+        for name in sorted(names):
+            if not name.lower().endswith('.md'):
+                continue
+            path = os.path.join(root, name)
+            label = os.path.relpath(path, directory).replace(os.sep, '/')
+            try:
+                with open(path, encoding='utf-8') as fh:
+                    text = fh.read()
+            except (OSError, UnicodeDecodeError) as exc:
+                problems.append('%s could not be read: %s' % (label, exc))
+                continue
+            if '\u2014' in text:
+                problems.append('%s contains an em dash' % label)
+            found = sorted({ch for ch in text if _is_emoji(ch)})
+            if found:
+                problems.append('%s contains emoji: %s' % (label, ' '.join(found)))
     return problems
 
+def check_house_rules(data):
+    """Rule-signature wrapper so the gate can run it alongside the others.
 
-def check_house_rules(stories, verdicts, probes, plugins, journeys):
-    """Rule-signature wrapper so the gate can run it alongside the others."""
+    It reads the generated directory rather than the datasets, so it ignores
+    data entirely. That is the one rule here that is about output, not input.
+    """
     return check_house_rules_in(GENERATED)
 ```
 
@@ -1043,12 +1378,12 @@ Then extend `RULES` with `check_journey_steps` and `check_house_rules`.
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_check_journeys -v`
-Expected: PASS, 8 tests.
+Expected: PASS, 12 tests.
 
 - [ ] **Step 5: Run the whole suite**
 
 Run: `python -m unittest discover -s discovery/tests -t . -v`
-Expected: PASS, 48 tests.
+Expected: PASS, 77 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -1245,15 +1580,17 @@ class TestPluginSeed(unittest.TestCase):
             self.assertIsNone(p['decision'], p['id'])
 
     def test_the_translation_need_names_the_quoted_figure_as_a_candidate(self):
-        translation = [p for p in self.plugins if 'ranslat' in p['need']]
-        self.assertEqual(len(translation), 1)
-        self.assertTrue(translation[0]['candidates'],
+        # Keyed on the id, not the prose: renaming the need must not break this.
+        translation = [p for p in self.plugins if p['id'] == 'PL-01'][0]
+        self.assertTrue(translation['candidates'],
                         'the 107 USD already quoted must appear as a candidate to beat')
+        self.assertEqual([c['cost_annual'] for c in translation['candidates']],
+                         [schema.QUOTED_ANNUAL_USD])
 
     def test_the_undecided_seed_does_not_fail_the_gate(self):
-        stories = schema.load_stories()
-        self.assertEqual(check.check_plugin_complete(stories, [], [], self.plugins, []), [])
-        self.assertEqual(check.check_plugin_ceiling(stories, [], [], self.plugins, []), [])
+        data = schema.Data(schema.load_stories(), [], [], self.plugins, [])
+        self.assertEqual(check.check_plugin_complete(data), [])
+        self.assertEqual(check.check_plugin_ceiling(data), [])
 
 
 if __name__ == '__main__':
@@ -1273,7 +1610,7 @@ Create `discovery/data/plugins.json` with six rows in this shape:
 [
   {
     "id": "PL-01",
-    "need": "Multilingual products, categories and content, per FIX-04 and SSC-21",
+    "need": "Translation for multilingual products, categories and content, per FIX-04 and SSC-21",
     "stories": [],
     "candidates": [
       {
@@ -1371,6 +1708,23 @@ class TestParseResult(unittest.TestCase):
         with self.assertRaises(ValueError):
             run_probes.parse_result('{"observed": "x", "verdict": "maybe"}')
 
+    def test_noise_containing_its_own_braces_is_tolerated(self):
+        out = 'PHP Warning: {something broke} in file\n{"observed": "x", "verdict": "confirmed"}\n'
+        self.assertEqual(run_probes.parse_result(out)['verdict'], 'confirmed')
+
+    def test_two_objects_raise_rather_than_guessing(self):
+        out = '{"observed": "a", "verdict": "confirmed"}\n{"observed": "b", "verdict": "refuted"}'
+        with self.assertRaises(ValueError):
+            run_probes.parse_result(out)
+
+    def test_a_null_observed_raises(self):
+        with self.assertRaises(ValueError):
+            run_probes.parse_result('{"observed": null, "verdict": "confirmed"}')
+
+    def test_an_empty_observed_raises(self):
+        with self.assertRaises(ValueError):
+            run_probes.parse_result('{"observed": "   ", "verdict": "confirmed"}')
+
     def test_a_missing_observed_raises(self):
         with self.assertRaises(ValueError):
             run_probes.parse_result('{"verdict": "confirmed"}')
@@ -1435,7 +1789,6 @@ WooCommerce updates, re-run it and find out what changed.
 import datetime
 import json
 import os
-import re
 import subprocess
 import sys
 
@@ -1448,21 +1801,44 @@ WP_PATH = os.environ.get('MIZZEY_WP', 'C:/wamp64/www/corex/wp')
 
 
 def parse_result(stdout):
-    """Pull the JSON object out of a probe's stdout and validate it."""
-    match = re.search(r'\{.*\}', stdout, re.S)
-    if not match:
+    """Pull the JSON object out of a probe's stdout and validate it.
+
+    Decodes from each opening brace rather than matching greedily from the
+    first to the last: wp-cli and PHP notices routinely contain braces of their
+    own, and a greedy match swallows them and fails on valid output. Two
+    objects is an error rather than a guess about which one was meant.
+    """
+    decoder = json.JSONDecoder()
+    found = []
+    i = 0
+    while i < len(stdout):
+        if stdout[i] != '{':
+            i += 1
+            continue
+        try:
+            value, end = decoder.raw_decode(stdout[i:])
+        except ValueError:
+            i += 1
+            continue
+        if isinstance(value, dict):
+            found.append(value)
+            i += end  # skip what was consumed, so a nested brace is not recounted
+        else:
+            i += 1
+    if not found:
         raise ValueError('no JSON object found in probe output')
-    try:
-        data = json.loads(match.group(0))
-    except json.JSONDecodeError as exc:
-        raise ValueError('probe output is not valid JSON: %s' % exc)
-    if 'observed' not in data:
-        raise ValueError('probe output has no "observed"')
+    if len(found) > 1:
+        raise ValueError('probe printed %d JSON objects, expected one' % len(found))
+    data = found[0]
+    observed = data.get('observed')
+    if not isinstance(observed, str) or not observed.strip():
+        # A verdict with nothing observed would still stamp run_at and env onto
+        # the row, so it would read as run while carrying no evidence at all.
+        raise ValueError('probe output has no usable "observed"')
     if data.get('verdict') not in schema.PROBE_VERDICT:
         raise ValueError('probe verdict %r is not one of %s'
                          % (data.get('verdict'), ', '.join(schema.PROBE_VERDICT)))
     return data
-
 
 def apply_result(row, result, env):
     """Write a parsed result onto a probe row, in place."""
@@ -1555,7 +1931,7 @@ if __name__ == '__main__':
 - [ ] **Step 4: Run the tests**
 
 Run: `python -m unittest discovery.tests.test_run_probes -v`
-Expected: PASS, 10 tests.
+Expected: PASS, 14 tests.
 
 - [ ] **Step 5: Confirm it reports missing scripts rather than crashing**
 
@@ -1667,6 +2043,11 @@ from discovery import riskset, schema
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
+def _cell(value):
+    """A markdown table cell. A pipe in the content would split the row."""
+    return str(value).replace('|', r'\|')
+
+
 def dossier(epic, stories, verdicts, probes, plugins):
     """The markdown for one epic."""
     rows = [s for s in stories if s['epic'] == epic]
@@ -1699,7 +2080,8 @@ def dossier(epic, stories, verdicts, probes, plugins):
         else:
             actual, confidence, points = 'not yet validated', '', str(s['points'])
         w('| %s | %s | %s | %s | %s | %s | %s | %s |\n'
-          % (s['id'], s['title'], s['trace'], in_set, s['leverage'], actual, confidence, points))
+          % (s['id'], _cell(s['title']), _cell(s['trace']), in_set,
+             s['leverage'], actual, confidence, points))
     w('\n')
 
     risks = [(s, by_story[s['id']]) for s in rows
@@ -1716,7 +2098,7 @@ def dossier(epic, stories, verdicts, probes, plugins):
         w('| Probe | Question | Verdict |\n|---|---|---|\n')
         for pid in evidence:
             p = probe_by_id.get(pid, {})
-            w('| %s | %s | %s |\n' % (pid, p.get('question', 'unknown probe'),
+            w('| %s | %s | %s |\n' % (pid, _cell(p.get('question', 'unknown probe')),
                                       p.get('verdict') or 'not yet run'))
         w('\n')
 
@@ -1795,7 +2177,7 @@ Create `discovery/tests/test_gen_reports.py`:
 ```python
 import unittest
 
-from discovery import gen_journey_docs, gen_plugin_register, gen_validation_report
+from discovery import gen_journey_docs, gen_plugin_register, gen_validation_report, schema
 
 STORIES = [
     {'id': 'US-13-01', 'epic': 'E13', 'epicname': 'RETURNS', 'title': 'Request a return',
@@ -1817,7 +2199,8 @@ PROBES = [
 
 class TestValidationReport(unittest.TestCase):
     def setUp(self):
-        self.text = gen_validation_report.report(STORIES, [], PROBES, [], [])
+        self.text = gen_validation_report.report(
+            schema.Data(STORIES, [], PROBES, [], []))
 
     def test_refuted_probes_are_called_out_first(self):
         self.assertIn('P-002', self.text)
@@ -1892,9 +2275,9 @@ from discovery import riskset, schema
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generated')
 
 
-def report(stories, verdicts, probes, plugins, journeys):
-    risky = riskset.risk_set(stories)
-    by_story = {v['story']: v for v in verdicts}
+def report(data):
+    risky = riskset.risk_set(data.stories)
+    by_story = {v['story']: v for v in data.verdicts}
     o = io.StringIO()
     w = o.write
 
@@ -1903,9 +2286,9 @@ def report(stories, verdicts, probes, plugins, journeys):
     validated = sum(1 for sid in risky if sid in by_story)
     w('Risk-weighted set validated: %d of %d.\n' % (validated, len(risky)))
     w('Probes run: %d of %d.\n\n'
-      % (sum(1 for p in probes if p.get('verdict')), len(probes)))
+      % (sum(1 for p in data.probes if p.get('verdict')), len(data.probes)))
 
-    refuted = [p for p in probes if p.get('verdict') == 'refuted']
+    refuted = [p for p in data.probes if p.get('verdict') == 'refuted']
     w('## Refuted\n\n')
     if refuted:
         w('The Technical Design asserts something these probes did not find. '
@@ -1921,7 +2304,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('Nothing refuted.\n\n')
 
-    partial = [p for p in probes if p.get('verdict') == 'partial']
+    partial = [p for p in data.probes if p.get('verdict') == 'partial']
     w('## Partial\n\n')
     if partial:
         for p in partial:
@@ -1930,7 +2313,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('Nothing partial.\n\n')
 
-    confirmed = [p for p in probes if p.get('verdict') == 'confirmed']
+    confirmed = [p for p in data.probes if p.get('verdict') == 'confirmed']
     w('## Confirmed\n\n')
     if confirmed:
         for p in confirmed:
@@ -1952,7 +2335,7 @@ def report(stories, verdicts, probes, plugins, journeys):
     else:
         w('No story is flagged under or over.\n\n')
 
-    questions = [(v['story'], q) for v in verdicts for q in (v.get('open') or [])]
+    questions = [(v['story'], q) for v in data.verdicts for q in (v.get('open') or [])]
     w('## Open questions\n\n')
     if questions:
         for sid, q in questions:
@@ -1965,8 +2348,7 @@ def report(stories, verdicts, probes, plugins, journeys):
 
 
 def main():
-    text = report(schema.load_stories(), schema.load('verdicts'), schema.load('probes'),
-                  schema.load('plugins'), schema.load('journeys'))
+    text = report(schema.load_data())
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, 'validation-report.md'), 'w', encoding='utf-8') as fh:
         fh.write(text)
@@ -2022,6 +2404,14 @@ def register(plugins):
                 if (p.get('currency') or 'USD') == 'USD')
     w('**Total, USD a year: %d.** Quoted to the client in Technical Design section 11: '
       'about %d.\n\n' % (total, schema.QUOTED_ANNUAL_USD))
+    other = [p for p in decided if (p.get('currency') or 'USD') != 'USD']
+    if other:
+        # Without this the total reads as the whole cost while a priced row
+        # sits outside it.
+        w('That total excludes %s, priced in a currency other than USD and so not '
+          'comparable with the quoted figure until converted.\n\n'
+          % ', '.join('%s (%s %s)' % (p['id'], p.get('cost_annual'), p.get('currency'))
+                      for p in other))
     if total > schema.QUOTED_ANNUAL_USD:
         w('> This exceeds the figure already in the client\'s hands. It is a commercial '
           'conversation, not a technical one.\n\n')
@@ -2166,18 +2556,21 @@ class TestTaskTemplates(unittest.TestCase):
         with open(os.path.join(TASKS, name + '.md'), encoding='utf-8') as fh:
             return fh.read()
 
+    def flat(self, name):
+        """Whitespace collapsed, so a line wrap cannot hide a required phrase."""
+        return ' '.join(self.read(name).split())
+
     def test_all_five_exist(self):
         for name in NAMES:
             self.assertTrue(os.path.exists(os.path.join(TASKS, name + '.md')), name)
 
     def test_each_states_the_two_lanes_rule(self):
         for name in NAMES:
-            self.assertIn('Annex A', self.read(name), name)
+            self.assertIn('Annex A', self.flat(name), name)
 
     def test_each_tells_a_blocked_agent_to_write_open_and_continue(self):
         for name in NAMES:
-            text = self.read(name)
-            self.assertIn('do not stop', text.lower(), name)
+            self.assertIn('do not stop', self.flat(name).lower(), name)
 
     def test_each_names_the_files_to_read_and_the_file_to_write(self):
         for name in NAMES:
@@ -2187,7 +2580,7 @@ class TestTaskTemplates(unittest.TestCase):
 
     def test_each_forbids_exploring_the_archive(self):
         for name in NAMES:
-            self.assertIn('_archive', self.read(name), name)
+            self.assertIn('_archive', self.flat(name), name)
 
     def test_no_em_dash_and_no_emoji(self):
         for name in NAMES:
@@ -2210,22 +2603,29 @@ Expected: FAIL, the files do not exist.
 
 You are running one probe. You will be given a probe id, such as `P-001`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, sections 5 and 8
-- The single row in `discovery/data/probes.json` whose `id` matches yours
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, sections 5 and 8
+- The single row in `platform/discovery/data/probes.json` whose `id` matches yours
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 7,
   the rows named in your `gap_rows`
 
-Read nothing else. In particular, never read anything under `_archive`: it holds superseded
+Read nothing else. In particular, never read anything under `_archive/`: it holds superseded
 pricing drafts and will give you wrong figures.
 
 ## Write
 
-- One probe script at `discovery/probes/<your script filename>`, taken from the `script`
-  field of your row
-- Nothing else. You must not touch `verdicts.json`, `plugins.json` or `journeys.json`
+- One probe script at `platform/discovery/probes/<the script filename in your row>`
+- Nothing else. You must not touch `verdicts.json`, `plugins.json` or `journeys.json`, and you
+  must not edit your own row in `probes.json`. The runner writes the result, not you
 
 ## What the script must do
 
@@ -2233,8 +2633,12 @@ Answer the `question` field, and nothing wider. Print exactly one JSON object on
 
     {"observed": "what actually happened, in one or two sentences", "verdict": "confirmed"}
 
-`verdict` is `confirmed`, `refuted`, or `partial`, measured against the `expected` field,
-which records what the Technical Design assumes today.
+`verdict` is `confirmed`, `refuted`, or `partial`, measured against the `expected` field, which
+records what the Technical Design assumes today. `observed` must be a non-empty string: a verdict
+with nothing observed is refused by the runner, because it would stamp a timestamp on a row that
+carries no evidence.
+
+Print one object only. Two objects is an error, not a choice between them.
 
 Write the script so it can be run again later without leaving state behind. When it needs
 fixtures, it creates them and removes them.
@@ -2243,19 +2647,24 @@ The runner executes it: `python -m discovery.run_probes <your id>`.
 
 ## Rules
 
-- **Do not edit the `expected` field.** It is the prior claim, recorded before the test, and
-  a refutation is only legible against it.
+- **Do not edit the `expected` field.** It is the prior claim, recorded before the test, and a
+  refutation is only legible against it.
 - **Refuting the Technical Design is a good outcome**, not a failure. Report it plainly.
-- Anything with no id in the Feature Register, Annex A, is out of scope. It is not a defect
-  and it does not become work. Note it and move on.
-- If you cannot answer, add a sentence to your row's `notes` saying exactly what blocked you,
-  and stop cleanly. **Do not stop to ask a question.** Questions are collected and reviewed
-  in one batch at the gate.
+- Anything with no id in the Feature Register, Annex A, is out of scope. It is not a defect and it
+  does not become work. Note it and move on.
+- If you cannot answer, add a sentence to your row's `notes` saying exactly what blocked you, and
+  finish cleanly. **Do not stop to ask a question.** Questions are collected and reviewed in one
+  batch at the gate.
 
 ## Done
 
-The script exists, runs, and prints a valid result object. `python -m discovery.check` reports
-nothing new.
+The script exists at the path your row names, and `python -m discovery.check` reports nothing new:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | tail -1
+```
+
+It must still say `73 problem(s)` until verdicts start landing.
 ```
 
 - [ ] **Step 4: Write `discovery/tasks/VERDICT.md`**
@@ -2265,23 +2674,30 @@ nothing new.
 
 You are writing the verdict rows for one epic. You will be given an epic id, such as `E13`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, sections 3.2 and 8
-- Every story in `scripts/stories.json` whose `epic` matches yours
-- Every probe in `discovery/data/probes.json` whose `stories` intersect yours, or whose
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, sections 3.2 and 8
+- Every story in `platform/scripts/stories.json` whose `epic` matches yours
+- Every probe in `platform/discovery/data/probes.json` whose `stories` intersect yours, or whose
   `gap_rows` are relevant
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 7
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Functional-Specification.md`, the
   sections covering your epic
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- One row per story of your epic in `discovery/data/verdicts.json`
-- Nothing else. You must not run probes, and you must never edit `scripts/stories.json`,
+- One row per story of your epic, appended to `platform/discovery/data/verdicts.json`
+- Nothing else. You must not run probes, and you must never edit `platform/scripts/stories.json`,
   which is generated from the specification and will be overwritten
 
 ## The row
@@ -2290,28 +2706,35 @@ Use `discovery.schema.blank_verdict(story_id)` as the starting shape, then fill:
 
 - `claimed`: the `leverage` from the story. Copy it, do not judge it
 - `actual`: `native`, `extend`, `build`, or `plugin`
-- `confidence`: `proved` only if a probe ran and you name it in `evidence`. Otherwise
-  `reasoned`. Never leave a risk-set story at `assumed`
-- `evidence`: probe ids. Required when `confidence` is `proved`
-- `gap_rows`: Technical Design section 7 rows. If you class something `build` with no gap
-  row, section 7 missed it, and `risk` must say so
-- `points_flag`: `under` if the story is worth more than it was pointed, `over` if less.
-  This is how estimate drift surfaces before Stage 4, which already runs at 68 points a week
+- `confidence`: `proved` only if a probe ran, reached a verdict, and you name it in `evidence`.
+  Otherwise `reasoned`. Never leave a risk-set story at `assumed`
+- `evidence`: probe ids. Required when `confidence` is `proved`, and each must be a probe that has
+  actually been run. Citing an unrun probe is refused
+- `gap_rows`: Technical Design section 7 rows. If you class something `build` with no gap row,
+  section 7 missed it, and `risk` must say so
+- `points_flag`: `under` if the story is worth more than it was pointed, `over` if less. This is
+  how estimate drift surfaces before Stage 4, which already runs at 68 points a week
 - `open`: anything you could not resolve
+
+Write exactly one row per story. A second row for the same story is refused.
 
 ## Rules
 
-- Anything with no id in the Feature Register, Annex A, is not a story and does not become
-  one, however good an idea it looks. Record it in `open` and move on.
+- Anything with no id in the Feature Register, Annex A, is not a story and does not become one,
+  however good an idea it looks. Record it in `open` and move on.
 - Never edit acceptance criteria. If the specification is wrong, say so in `open`. The
   specification is corrected and regenerated, never patched at the edges.
-- If you cannot decide, write the question into `open` and carry on to the next story.
-  **Do not stop to ask.** Questions are reviewed in one batch at the gate.
+- If you cannot decide, write the question into `open` and carry on to the next story. **Do not stop to ask.** Questions are reviewed in one batch at the gate.
 
 ## Done
 
-Every story in your epic has a row. `python -m discovery.check` reports nothing about your
-epic.
+Every story in your epic has exactly one row, and the gate reports nothing about your epic:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | grep "US-<your epic number>-"
+```
+
+That must print nothing.
 ```
 
 - [ ] **Step 5: Write `discovery/tasks/PLUGIN.md`**
@@ -2321,52 +2744,80 @@ epic.
 
 You are deciding one plugin need. You will be given a need id, such as `PL-02`.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Paths starting `final docs/` are not. Run python commands from
+`C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.3
-- Your single row in `discovery/data/plugins.json`
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.3
+- Your single row in `platform/discovery/data/plugins.json`
 - `final docs/Client/Branded/Mizzey-Operations-Platform-Technical-Design.md`, section 11
-- Any probe in `discovery/data/probes.json` that bears on your need
+- Any probe in `platform/discovery/data/probes.json` that bears on your need
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- Your single row in `discovery/data/plugins.json`
+- Your single row in `platform/discovery/data/plugins.json`
 - Nothing else
 
 ## The decision
 
-Fill `candidates` with at least two real options before deciding, each with name, licence,
-annual cost, currency, date last updated, active installs, and a maintenance risk judgement.
+Fill `candidates` with at least two real options before deciding. Each candidate is an object with
+these exact keys, which are the keys already used in the `PL-01` seed row:
 
-Then set `decision` to the chosen name, or to `build instead`, and fill `cost_annual`,
-`currency`, `licence` and `owner`. Cite the probes that support it in `evidence`.
+    name, licence, cost_annual, currency, last_update, installs, maintenance_risk, notes
+
+Then set `decision` to the chosen `name`, or to the exact string `build instead`, and fill
+`cost_annual`, `currency`, `licence` and `owner` on the row itself. Cite the probes that support
+it in `evidence`.
+
+`decision` must be a non-empty string. Leaving it `null` means undecided, which is allowed while
+you work. An empty string is not the same thing and is refused.
+
+`cost_annual` must be a number and must not be negative. If the chosen candidate lists a
+`cost_annual`, the row's `cost_annual` must match it.
 
 ## The cost ceiling, which is the point of this task
 
-Technical Design section 11 has already put **about 107 USD a year** in front of the client,
-and named everything else as free or free-tier. **That figure is in their hands.**
+Technical Design section 11 has already put **about 107 USD a year** in front of the client, and
+named everything else as free or free-tier. **That figure is in their hands.**
 
-If your decision takes the register above it, set `acknowledged_over_quote` to `true` and
-state the reason in the row. The gate fails otherwise. This is not a technical judgement you
-are allowed to absorb quietly: it is a commercial conversation Mustafa has to have.
+If your decision takes the register above it, set `acknowledged_over_quote` to `true` **on the row
+that causes the overage** and state the reason in the row. The acknowledging rows must account for
+the difference: a one dollar row cannot license a five hundred dollar one. The gate refuses
+otherwise.
 
-Licences are held in the client's name, per Annex A R-14. `owner` is `client` unless there
-is a stated reason otherwise.
+This is not a technical judgement you are allowed to absorb quietly. It is a commercial
+conversation Mustafa has to have.
+
+Licences are held in the client's name, per Annex A R-14. `owner` is `client` unless there is a
+stated reason otherwise.
 
 ## Rules
 
 - A plugin that solves a problem nobody has is not a saving. Every need traces to story ids.
 - Prefer a maintained free option to an unmaintained paid one, and say why in the row.
-- If you cannot decide, leave `decision` as `null`, write what is missing into the row's
-  candidate notes, and finish. **Do not stop to ask.**
+- **Never invent a product name, version, install count or cost.** This register feeds a figure
+  that reaches a client. If you cannot verify a number, leave it `null` and say so in `notes`.
+- If you cannot decide, leave `decision` as `null`, write what is missing into the candidate
+  notes, and finish. **Do not stop to ask.**
 
 ## Done
 
-The row has candidates, a decision, a licence, an annual figure, and evidence.
-`python -m discovery.check` reports nothing about your row.
+The row has candidates, a decision, a licence, an annual figure and evidence, and the gate reports
+nothing about it:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.check | grep "plugin"
+```
+
+That must print nothing.
 ```
 
 - [ ] **Step 6: Write `discovery/tasks/JOURNEY.md`**
@@ -2374,58 +2825,73 @@ The row has candidates, a decision, a licence, an annual figure, and evidence.
 ```markdown
 # Task type: JOURNEY
 
-You are writing one end-to-end journey. You will be given a journey id and a one-line brief,
-such as `J-01, guest adds to cart, signs in, checks out on cash on delivery, requests a return`.
+You are writing one end-to-end journey. You will be given a journey id and a one-line brief, such
+as `J-01, guest adds to cart, signs in, checks out on cash on delivery, requests a return`.
+
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `final docs/`, `design/` and `_archive/`. Paths starting
+`platform/` are inside the repo. Run python commands from `C:\wamp64\www\mizzey\platform`.
 
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.4
-- `discovery/data/verdicts.json`, for the stories your journey crosses
-- `scripts/stories.json`, for titles and acceptance criteria
-- The generated dossiers in `discovery/generated/` for the epics you cross
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 3.4
+- `platform/discovery/data/verdicts.json`, for the stories your journey crosses
+- `platform/scripts/stories.json`, for titles and acceptance criteria
+- The generated dossiers in `platform/discovery/generated/` for the epics you cross
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- One row in `discovery/data/journeys.json`
+- One row in `platform/discovery/data/journeys.json`
 - Nothing else
 
 ## The row
 
-- `actor`: one of shopper, guest, admin, fulfilment, support
-- `language`: `ar`, `en`, or `both`. Arabic is not a translation pass. Where direction
-  carries meaning, the journey differs, and that is a step, not a footnote
-- `steps`: ordered. **Every step names at least one story id.** A step with no story is
-  narrative, not validation, and the gate rejects it
+Every field of `schema.JOURNEY_FIELDS` must be present:
+
+- `id`: the journey id you were given, such as `J-01`
+- `name`: a short name for the journey, from your brief
+- `actor`: one of `shopper`, `guest`, `admin`, `fulfilment`, `support`
+- `language`: `ar`, `en`, or `both`. Arabic is not a translation pass. Where direction carries
+  meaning, the journey differs, and that is a step, not a footnote
+- `steps`: ordered. Each step is an object with `n`, `description`, `stories` and `screen`.
+  **Every step names at least one story id.** A step with no story is narrative, not validation,
+  and the gate rejects it
 - `gaps`: the reason this task exists
 
 ## What a gap is
 
-A failure visible only across stories, which no single story shows. The worked example is
-already known: a guest builds a cart, signs in, and WooCommerce replaces the cart instead of
-merging it. That is Technical Design row 1, it spans E05 and E06, and it is invisible in 205
-separate rows.
+A failure visible only across stories, which no single story shows. The worked example is already
+known: a guest builds a cart, signs in, and WooCommerce replaces the cart instead of merging it.
+That is Technical Design row 1, it spans E05 and E06, and it is invisible in 205 separate rows.
 
-Look hardest at the seams: guest to account, cart to checkout, payment to fulfilment,
-delivery to return, English to Arabic.
+Look hardest at the seams: guest to account, cart to checkout, payment to fulfilment, delivery to
+return, English to Arabic.
 
-A gap you find becomes a new probe. Write it into `gaps` plainly enough that someone can turn
-it into a yes-or-no question.
+A gap you find becomes a new probe. Write it into `gaps` plainly enough that someone can turn it
+into a yes-or-no question.
 
 ## Rules
 
-- Every step traces to a story id, and every story id traces to Annex A. A step you want that
-  has no story behind it is out of scope. Record it in `gaps` and move on.
+- Every step traces to a story id, and every story id traces to Annex A. A step you want that has
+  no story behind it is out of scope. Record it in `gaps` and move on.
 - Do not invent acceptance criteria. Read them.
-- If you cannot resolve something, write it into `gaps` and finish the journey.
-  **Do not stop to ask.**
+- If you cannot resolve something, write it into `gaps` and finish the journey. **Do not stop to
+  ask.**
 
 ## Done
 
-The row validates. `python -m discovery.gen_journey_docs` renders it and
-`python -m discovery.check` reports nothing about it.
+The row renders and the gate reports nothing about it:
+
+```bash
+cd C:/wamp64/www/mizzey/platform && python -m discovery.gen_journey_docs && python -m discovery.check | grep "journey"
+```
+
+The generator must report your journey, and the grep must print nothing.
 ```
 
 - [ ] **Step 7: Write `discovery/tasks/WIREFRAME.md`**
@@ -2435,51 +2901,69 @@ The row validates. `python -m discovery.gen_journey_docs` renders it and
 
 You are building the low fidelity screens for one journey. You will be given a journey id.
 
+## Where you are
+
+**Every path below is relative to `C:\wamp64\www\mizzey`.** That directory contains `platform/`,
+which is the git repo, alongside `design/`, `final docs/` and `_archive/`. Wireframes go in
+`design/`, which is **not** in the repo. Run python commands from `C:\wamp64\www\mizzey\platform`.
+
 ## Read
 
-- `CLAUDE.md` at the project root
-- `docs/discovery/2026-09-08-discovery-phase-design.md`, section 9
-- The generated journey document at `discovery/generated/journey-<id>.md`
-- The stories that journey names, in `scripts/stories.json`
+- `CLAUDE.md`
+- `platform/docs/discovery/2026-09-08-discovery-phase-design.md`, section 9
+- The generated journey document at `platform/discovery/generated/journey-<id>.md`
+- The stories that journey names, in `platform/scripts/stories.json`
 
-Read nothing else. Never read anything under `_archive`.
+Read nothing else. Never read anything under `_archive/`.
 
 ## Write
 
-- HTML and CSS screens under `C:/wamp64/www/mizzey/design/01-wireframes/<journey id>/`
+- HTML and CSS screens under `design/01-wireframes/<journey id>/`
 - Nothing in the platform repo. Wireframes are not data
 
 ## What these are for
 
-Validating that the scenario holds as a sequence of screens, before anything is built. They
-are structural. Boxes, labels, real copy where copy carries meaning, and nothing else.
+Validating that the scenario holds as a sequence of screens, before anything is built. They are
+structural. Boxes, labels, real copy where copy carries meaning, and nothing else.
 
 **Do not apply visual identity.** The client's brand identity has not arrived. Applying a
-provisional one produces work that is thrown away and, worse, invites approval of something
-that is not the design.
+provisional one produces work that is thrown away and, worse, invites approval of something that
+is not the design.
 
-The contracted deliverable is working HTML and CSS with design tokens, not a design-tool
-source file. These wireframes are the first step toward that, so write real HTML and CSS,
-not images.
+The contracted deliverable is working HTML and CSS with design tokens, not a design-tool source
+file. These wireframes are the first step toward that, so write real HTML and CSS, not images.
 
 ## Arabic
 
-Every screen is checked right to left. Direction-carrying icons mirror. This is US-01-01, it
-is 13 points, and it touches every screen in the build. A wireframe that only works in
-English has validated nothing.
+Every screen is checked right to left. Direction-carrying icons mirror. This is US-01-01, it is 13
+points, and it touches every screen in the build. A wireframe that only works in English has
+validated nothing.
 
 ## Rules
 
-- One screen per journey step that needs one. Reuse a screen across steps where the journey
-  reuses it, and say so.
-- Every screen names the story ids it serves, in an HTML comment at the top.
-- If a step cannot be drawn because the journey is ambiguous, note it in the journey row's
-  `gaps` and draw the rest. **Do not stop to ask.**
+- Every screen serves a step of the journey, and every step traces to a story id, and every story
+  id traces to Annex A. **A screen for something with no Annex A id is out of scope.** It is not a
+  wireframe, it is a change request. Note it in the journey row's `gaps` and do not draw it.
+- One screen per journey step that needs one. Reuse a screen across steps where the journey reuses
+  it, and say so.
+- Every screen names the story ids it serves, in an HTML comment on the first line, in the form
+  `<!-- stories: US-05-10, US-05-11 -->`.
+- If a step cannot be drawn because the journey is ambiguous, note it in the journey row's `gaps`
+  and draw the rest. **Do not stop to ask.**
 
 ## Done
 
-Every step of the journey that needs a screen has one, both directions render, and each file
-names its stories.
+Every step of the journey that needs a screen has one, each names its stories, and each renders in
+both directions. Check the first two mechanically:
+
+```bash
+cd "C:/wamp64/www/mizzey/design/01-wireframes/<journey id>"
+grep -L "<!-- stories:" *.html
+grep -L 'dir="rtl"' *.html
+```
+
+Both must print nothing. `grep -L` lists files **missing** the pattern, so any filename printed is
+a screen that is not finished.
 ```
 
 - [ ] **Step 8: Run the tests**
@@ -2517,6 +3001,28 @@ Append to `.gitignore`:
 # Board sync state, local to whoever ran the setup script
 scripts/.board-state.json
 ```
+
+- [ ] **Step 1b: Normalise line endings**
+
+Git reports `LF will be replaced by CRLF` on every Python and JSON file written here, so the
+datasets would carry different line endings depending on who wrote them. Create `.gitattributes`
+at the repo root:
+
+```
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.zip binary
+```
+
+Then renormalise what is already committed:
+
+```bash
+git add --renormalize .
+git status --short
+```
+
+Expect a list of files whose line endings changed. Commit them with the rest of this task.
 
 - [ ] **Step 2: Write `discovery/README.md`**
 
@@ -2619,7 +3125,7 @@ Once the site is up, Step 2 begins: fifteen PROBE tasks, dispatchable in paralle
 
 At the end of this plan:
 
-- `python -m unittest discover -s discovery/tests -t .` passes, 92 tests
+- `python -m unittest discover -s discovery/tests -t .` passes, 125 tests
 - `python -m discovery.check` reports 73 missing verdicts and nothing else
 - `discovery/generated/` holds 27 epic dossiers, a validation report and a plugin register
 - `discovery/data/probes.json` holds 15 seeded probes with `expected` recorded and nothing observed
