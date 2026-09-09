@@ -168,6 +168,27 @@ function wire() {
 
 	link(join(CONTENT, 'themes', 'corex'), join(COREX, 'theme'), 'themes/corex');
 
+	// The CoreX dist builder packages a client from `sites/<slug>/`, taking any directory there whose
+	// name ends in -site or -theme. This repository root already has exactly those two names, so one
+	// link makes `npm run build:dist -- --client=mizzey` work with no change to CoreX at all.
+	//
+	// The link is created inside the pinned checkout, which is disposable and outside version control,
+	// so no client path reaches the CoreX repository. It is excluded from that clone's index too, so a
+	// `git status` there stays clean.
+	if (!CHECK_ONLY) {
+		mkdirSync(join(COREX, 'sites'), { recursive: true });
+		const exclude = join(COREX, '.git', 'info', 'exclude');
+		if (existsSync(exclude) && !readFileSync(exclude, 'utf8').includes('/sites/')) {
+			writeFileSync(exclude, `${readFileSync(exclude, 'utf8')}\n# Client source is linked in here by tools/corex-sync.mjs. Never CoreX's to track.\n/sites/\n`);
+		}
+	}
+	link(join(COREX, 'sites', 'mizzey'), REPO, 'sites/mizzey (dist builder input)');
+
+	// The builder takes WordPress core from <corex>/wp, which in this layout lives at ../wp instead.
+	// It copies everything there except wp-content and wp-config.php, and debug.log is refused
+	// globally, so linking the dev install in ships core without shipping local state.
+	link(join(COREX, 'wp'), WP, 'wp (dist builder core input)');
+
 	// The client source. Absent until `wp corex make:site` has run, which is not an error.
 	for (const [name, target] of [
 		['mizzey-site', join(REPO, 'mizzey-site')],

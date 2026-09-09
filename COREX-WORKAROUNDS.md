@@ -64,3 +64,20 @@ touched.
 **The real fix, for CoreX.** Either declare `nikic/php-parser` in `require`, or build `DocsCommand`
 inside the command closure so a docs-only dependency cannot take the migration command down with it.
 The second is better: no command should be able to unregister its neighbours.
+
+### What it costs the deploy
+
+The CoreX `dist` builder copies `vendor/` verbatim, so the defect reaches the artifact and there is no
+good answer until it is fixed. Only a choice:
+
+| Build | Vendor | CoreX CLI in the artifact |
+|---|---|---|
+| `node tools/build-dist.mjs` | dev included, 125 MB | whole |
+| `node tools/build-dist.mjs --production` | lean, 108 MB | seven commands missing |
+
+`--production` swaps to a `--no-dev` vendor, builds, and restores the dev tree in a `finally`, so a
+failed build never leaves the local runtime with a crippled CLI. Both paths print which trade they
+made. Neither is correct. The choice disappears when corex#201 lands.
+
+**Operational consequence today:** run `wp corex migrate` from a dev-vendor checkout, never from a
+`--production` deploy, because on that artifact the command does not exist and says nothing.

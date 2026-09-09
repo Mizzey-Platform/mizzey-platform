@@ -127,6 +127,23 @@ cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizze
 `node tools/corex-sync.mjs --check` reports drift and changes nothing. It fails if a framework link has
 been replaced by a real directory, which is the one mistake that silently shadows the framework source.
 
+### Building the deployable artifact
+
+```bash
+node tools/build-dist.mjs --production
+```
+
+This drives the stock CoreX shared-host builder. `corex-sync.mjs` links this repository into the
+pinned checkout as `sites/mizzey`, which is the shape that builder already packages, so nothing in
+CoreX is patched and no Mizzey path is written into the CoreX repository.
+
+The artifact carries the framework, the client plugin and theme, WordPress core and vendor. It carries
+no `.git`, `node_modules`, tests, `.env`, `wp-config.php` or any document from `docs/`.
+
+**Read the caveat the build prints.** Until [corex#201](https://github.com/MustafaShaaban/corex/issues/201)
+is fixed, a lean artifact and a complete CoreX CLI are mutually exclusive. See
+[COREX-WORKAROUNDS.md](./COREX-WORKAROUNDS.md).
+
 ### Upgrading CoreX
 
 An upgrade is a commit, not an event. On a branch:
