@@ -9,13 +9,15 @@ ships in a tag, bump `corex.lock`, delete the workaround, and delete the row.
 
 | CoreX issue | Since | Delete when |
 |---|---|---|
-| not yet opened | v0.42.0 | php-parser is a declared runtime dependency, or DocsCommand is built lazily |
+| [corex#201](https://github.com/MustafaShaaban/corex/issues/201) | v0.42.0 | php-parser is a declared runtime dependency, or DocsCommand is built lazily |
 
 ---
 
 ## The CLI loses half its commands under `composer install --no-dev`
 
-**Found** 9 September 2026, setting up the Mizzey runtime. **Affects** CoreX v0.42.0.
+**Found** 9 September 2026, setting up the Mizzey runtime. **Affects** CoreX v0.42.0 and main
+(8c1467c); `git diff v0.42.0..main -- packages/cli composer.json` is empty. Reported as
+[corex#201](https://github.com/MustafaShaaban/corex/issues/201).
 
 `Corex\Cli\CliServiceProvider::register()` constructs `DocsCommand` eagerly, around line 363:
 
