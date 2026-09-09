@@ -449,5 +449,28 @@
     },
     "run_at": "2026-09-09",
     "notes": "RPT-10, FIX-04. Raised by P-019, which proved the product-level split for the analytics products report and deliberately did not test the stock path, because the stock report is a different query. Two leads from source reading, neither of them evidence. First, WCML\\Synchronization\\Component\\Stock copies _stock and _stock_status onto every translation, so both posts carry their own stock row holding the same number, which is the shape of a double count. Second, Reports\\Stock\\Controller::get_products runs a WP_Query against the product post type rather than the analytics lookup tables, so WPML's language filter applies to it, which is the shape of the opposite fault: a list scoped to one language that silently omits an Arabic-only product. WCML also removes the All languages option from the analytics language switcher, in classes/Reports/Hooks.php, so there may be no view that shows both. Whichever of the two it is, it is a defect in a contracted operations report. Blocking on acceptance of US-24-04, raised on issue #194."
+  },
+  {
+    "id": "P-021",
+    "question": "Does WooCommerce capture campaign attribution onto the order record natively, so that MKT-09 needs no plugin?",
+    "stories": [
+      "US-25-03"
+    ],
+    "gap_rows": [
+      18
+    ],
+    "script": "P-021-order-attribution-native.php",
+    "method": "wp-cli",
+    "expected": "Technical Design section 7 row 18 groups product feeds and campaign attribution together and classes the pair Plugin plus Extend. PL-06 registers campaign parameter preservation to the order record as a plugin need with no candidate. Section 11 does not list campaign attribution in the cost table at all. The standing assumption is that carrying campaign parameters through to the order takes something beyond WooCommerce.",
+    "observed": "WooCommerce 11.1.0. Order attribution controller present: yes. Feature flag woocommerce_feature_order_attribution_enabled: 'yes'. Fields recorded by the shipped source (16): source_type, referrer, utm_campaign, utm_source, utm_medium, utm_content, utm_id, utm_term, utm_source_platform, utm_creative_format, utm_marketing_tactic, session_entry, session_start_time, session_pages, session_count, device_type. Order 72 written with utm_source, utm_medium and utm_campaign. Re-read from storage: campaign='p021-campaign'. Selecting orders by campaign returned 1 order(s), including this one: yes. Campaign attribution to the order record is native, on by default, and queryable. US-25-03 acceptance criteria 1 and 2 need no plugin, so the PL-06 plugin need does not survive this and the register should record no licence for it. Section 7 row 18 groups feeds and attribution together and classes the pair Plugin plus Extend; the feeds half still needs a plugin, the attribution half does not, so the row is right only about its first half. Section 11 never listed attribution as a cost, so nothing the client has been told changes. What remains for US-25-03 is acceptance criterion 3 and the reporting surface, which is why the story stays extend rather than native.",
+    "verdict": "refuted",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
+    "notes": "MKT-09, INT-09. Asked before a plugin is chosen for PL-06 and a licence figure is put in front of the client, because a plugin that solves a problem nobody has is not a saving. Scope limit stated in the script: the capture itself is browser side, so this tests that the mechanism ships, is enabled, records named fields, and that the values persist and are queryable on a real order. It does not test that a real visitor's parameters survive the journey, and it does not answer US-25-03 acceptance criterion 3, whether attribution survives a sign in during checkout, which needs a browser test."
   }
 ]

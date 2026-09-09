@@ -10,21 +10,33 @@
     ],
     "candidates": [
       {
-        "name": "The plugin behind the Technical Design section 11 figure",
+        "name": "WPML Multilingual CMS",
         "licence": "commercial",
         "cost_annual": 107,
         "currency": "USD",
-        "last_update": null,
+        "last_update": "4.9.7, the version installed on the discovery runtime",
         "installs": null,
-        "maintenance_risk": null,
-        "notes": "This is the figure already in the client's hands. Any candidate has to beat it or justify exceeding it."
+        "maintenance_risk": "low",
+        "notes": "wpml.org/purchase lists this tier at 99 EUR a year and shows it as the lowest tier that includes WooCommerce support, which this build needs. The 107 USD carried here is the figure already in the client's hands from Technical Design section 11 and is a conversion of that 99 EUR. The obligation is EUR denominated and the USD figure will drift with the exchange rate. The renewal price is not stated on the purchase page and is deliberately left unverified rather than guessed. P-006 proved this exact version, with WooCommerce Multilingual 5.5.7, replicates products, variations and attribute taxonomies across languages in one translation group."
+      },
+      {
+        "name": "Polylang free plus Polylang for WooCommerce",
+        "licence": "commercial addon on a free base",
+        "cost_annual": null,
+        "currency": "EUR",
+        "last_update": "Polylang 3.8.9, 8 September 2026",
+        "installs": 800000,
+        "maintenance_risk": "low",
+        "notes": "Polylang itself is free with 800,000 active installs, but its own documentation states that WooCommerce product translation requires the paid Polylang for WooCommerce addon, so there is no free route here for a store. polylang.pro/pricing lists that addon at \"from 99 EUR / year (ex VAT)\" and the Business Pack bundling it with Polylang Pro at \"from 139 EUR / year (ex VAT)\". Level with WPML at the single addon price and dearer as the bundle. cost_annual is left null because \"from\" and \"ex VAT\" mean the real figure is not established. Not chosen: no advantage over an option already proved working, and P-006 was run against WPML rather than this."
       }
     ],
-    "decision": null,
-    "evidence": [],
-    "cost_annual": null,
+    "decision": "WPML Multilingual CMS",
+    "evidence": [
+      "P-006"
+    ],
+    "cost_annual": 107,
     "currency": "USD",
-    "licence": null,
+    "licence": "commercial",
     "owner": "client",
     "acknowledged_over_quote": false
   },
@@ -36,12 +48,33 @@
       "US-06-03",
       "US-06-04"
     ],
-    "candidates": [],
-    "decision": null,
+    "candidates": [
+      {
+        "name": "Nextend Social Login and Register",
+        "licence": "free, with an optional one time Pro addon",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "3.1.26, 28 July 2026",
+        "installs": 200000,
+        "maintenance_risk": "low",
+        "notes": "Free version covers Google and is tested to WordPress 7.0.4. The vendor's own comparison chart marks WooCommerce integration as Pro only: the free version places buttons on the WordPress login page and on forms using the wp_login_form action, while automatic placement on WooCommerce forms is in the Pro addon. That addon is priced at 49 EUR as a one time payment for one site, not an annual licence. Mizzey builds the account templates under SSC-01 regardless, so placing the button by hand is plausible, but it is not verified and it is the risk on this row."
+      },
+      {
+        "name": "Log in with Google, by rtCamp",
+        "licence": "free",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "1.4.4, 13 August 2026",
+        "installs": 6000,
+        "maintenance_risk": "medium",
+        "notes": "No paid tier at all, which removes the upsell risk entirely, and tested to WordPress 7.0.4. Against it: 6,000 active installs against Nextend's 200,000, and the plugin describes itself as ultra minimal with no mention of WooCommerce integration. Kept as the fallback if the Nextend free placement question goes the wrong way."
+      }
+    ],
+    "decision": "Nextend Social Login and Register",
     "evidence": [],
-    "cost_annual": null,
+    "cost_annual": 0,
     "currency": "USD",
-    "licence": null,
+    "licence": "free, with an optional one time Pro addon",
     "owner": "client",
     "acknowledged_over_quote": false
   },
@@ -51,12 +84,33 @@
     "stories": [
       "US-25-05"
     ],
-    "candidates": [],
-    "decision": null,
+    "candidates": [
+      {
+        "name": "Redirection",
+        "licence": "free",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "5.10.0, 29 August 2026",
+        "installs": 2000000,
+        "maintenance_risk": "low",
+        "notes": "Two million active installs, tested to WordPress 7.1 which is the runtime version, and it states plainly that there is no premium version and no paid features. Single purpose: redirects and a 404 log, which is exactly MKT-13 and MKT-14 and nothing else."
+      },
+      {
+        "name": "Rank Math SEO",
+        "licence": "free, with a paid tier",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "1.0.278, 8 September 2026",
+        "installs": 4000000,
+        "maintenance_risk": "low",
+        "notes": "Four million active installs, tested to WordPress 7.1, and its free version includes both a redirection manager and a 404 monitor, so it would satisfy this need on its own. The real argument for it is elsewhere: E23 recorded that no document decides which plugin owns the SEO fields the catalogue migration imports at US-23-12 acceptance criterion 3, and a full SEO suite would answer both questions at once. Not chosen here because that decision has not been made and adopting an SEO suite for its redirect feature is the tail wagging the dog."
+      }
+    ],
+    "decision": "Redirection",
     "evidence": [],
-    "cost_annual": null,
+    "cost_annual": 0,
     "currency": "USD",
-    "licence": null,
+    "licence": "free",
     "owner": "client",
     "acknowledged_over_quote": false
   },
@@ -67,12 +121,33 @@
       "US-21-02",
       "US-27-03"
     ],
-    "candidates": [],
-    "decision": null,
+    "candidates": [
+      {
+        "name": "WP 2FA",
+        "licence": "free, with a paid tier",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "4.1.0, 11 August 2026",
+        "installs": 100000,
+        "maintenance_risk": "low",
+        "notes": "Chosen on maintenance recency. 100,000 active installs, tested to WordPress 7.0.4. A premium edition exists offering extra methods and WooCommerce integration, none of which ADM-131 asks for: the requirement is two factor authentication for admin accounts."
+      },
+      {
+        "name": "Two Factor",
+        "licence": "free",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "0.16.0, 27 March 2026",
+        "installs": 100000,
+        "maintenance_risk": "medium",
+        "notes": "The official WordPress.org plugin with no paid tier and therefore no upsell, which is the better shape for a client owned site. Against it: last updated in March 2026 and tested only to WordPress 6.9.7, two minor versions behind the runtime, and still pre 1.0 at 0.16.0. Kept as the fallback."
+      }
+    ],
+    "decision": "WP 2FA",
     "evidence": [],
-    "cost_annual": null,
+    "cost_annual": 0,
     "currency": "USD",
-    "licence": null,
+    "licence": "free tier",
     "owner": "client",
     "acknowledged_over_quote": false
   },
@@ -82,12 +157,33 @@
     "stories": [
       "US-25-02"
     ],
-    "candidates": [],
-    "decision": null,
+    "candidates": [
+      {
+        "name": "Product Feed Manager for WooCommerce (CTX Feed)",
+        "licence": "free, with a paid tier",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "8.0.17, 9 September 2026",
+        "installs": 80000,
+        "maintenance_risk": "low",
+        "notes": "Chosen on compatibility and recency: tested to WordPress 7.1, which is the runtime, and updated the same day this register was written. The free edition generates Google Merchant Center and Meta catalogue feeds, which is US-25-02 acceptance criteria 1 and 2. A Pro tier exists for scheduled FTP upload, the Content API and advanced filtering, none of which the acceptance criteria require."
+      },
+      {
+        "name": "Product Feed PRO for WooCommerce by AdTribes",
+        "licence": "free, with a paid tier",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "13.5.7, 13 August 2026",
+        "installs": 80000,
+        "maintenance_risk": "low",
+        "notes": "Equally capable on the two criteria that matter, with Google Shopping and Meta feeds in the free version and the same 80,000 install order of magnitude. Tested only to WordPress 7.0.4 against the runtime's 7.1, and last updated a month earlier, which is the only thing separating the two. An Elite tier exists and notably includes WPML support, which bears on the language question recorded against US-25-02."
+      }
+    ],
+    "decision": "Product Feed Manager for WooCommerce (CTX Feed)",
     "evidence": [],
-    "cost_annual": null,
+    "cost_annual": 0,
     "currency": "USD",
-    "licence": null,
+    "licence": "free tier",
     "owner": "client",
     "acknowledged_over_quote": false
   },
@@ -97,12 +193,25 @@
     "stories": [
       "US-25-03"
     ],
-    "candidates": [],
-    "decision": null,
-    "evidence": [],
-    "cost_annual": null,
+    "candidates": [
+      {
+        "name": "WooCommerce native order attribution",
+        "licence": "included with WooCommerce",
+        "cost_annual": 0,
+        "currency": "USD",
+        "last_update": "WooCommerce 11.1.0 on the discovery runtime",
+        "installs": null,
+        "maintenance_risk": "none",
+        "notes": "P-021 proved this need does not exist. WooCommerce 11.1.0 ships an order attribution controller with the feature flag on by default, recording sixteen fields including utm_source, utm_medium, utm_campaign, utm_content, utm_term, utm_id, the referrer, the source type, session data and device type. The probe wrote attribution onto a real order, re-read it from storage and selected orders by campaign, so it is stored and queryable, not merely captured. US-25-03 acceptance criteria 1 and 2 are covered with no licence."
+      }
+    ],
+    "decision": "WooCommerce native order attribution",
+    "evidence": [
+      "P-021"
+    ],
+    "cost_annual": 0,
     "currency": "USD",
-    "licence": null,
+    "licence": "included with WooCommerce",
     "owner": "client",
     "acknowledged_over_quote": false
   }

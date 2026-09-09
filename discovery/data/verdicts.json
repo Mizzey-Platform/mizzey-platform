@@ -1267,8 +1267,10 @@
     "story": "US-25-03",
     "claimed": "partial",
     "actual": "extend",
-    "confidence": "reasoned",
-    "evidence": [],
+    "confidence": "proved",
+    "evidence": [
+      "P-021"
+    ],
     "plugins": [
       "PL-06"
     ],
@@ -1276,10 +1278,11 @@
       18
     ],
     "points_flag": "ok",
-    "risk": "Section 7 row 18 covers campaign parameters preserved to the order record and classes the pair Plugin plus Extend. This is the Extend half: capturing UTM parameters at landing and carrying them onto the order is session plumbing on top of Woo's order meta, not a system. PL-06 exists for it, but a plugin is optional here in a way it is not for feeds.",
+    "risk": "P-021 settles the mechanism and closes the plugin need. WooCommerce 11.1.0 ships order attribution with the feature flag on by default, recording sixteen fields including utm_source, utm_medium, utm_campaign, utm_content, utm_term and utm_id onto the order, and the probe wrote them to a real order, re-read them from storage and selected orders by campaign, so the data is queryable and not merely captured. Acceptance criteria 1 and 2 are therefore native and PL-06 is decided as no licence. The story stays extend rather than native because acceptance criterion 3 is untouched by this and because a reported figure still has to be built on top. Section 7 row 18 groups feeds and attribution and classes the pair Plugin plus Extend; it is right about the feeds half and wrong about this one.",
     "open": [
-      "AC 3 requires attribution to survive a guest checkout AND a sign in during checkout. Sign in mid checkout is the same session transition that P-001 showed silently drops one cart. Whether attribution survives it is the same class of bug and nobody has tested it. Cheap to fold into the US-05-11 merge work rather than discovering it in Stage 5.",
-      "Attribution data on the order record is personal data adjacent and US-25-07 AC 2 limits Marketing role access to customer personal data. Whether attribution counts is not stated."
+      "Acceptance criterion 3 requires attribution to survive a guest checkout AND a sign in during checkout. P-021 could not test it: capture is browser side, and the sign in transition is the same one P-001 showed silently drops one cart. This needs a browser test and it is the only unanswered half of the story.",
+      "WooCommerce records attribution as order meta. Any campaign revenue figure built from it inherits the P-019 problem: with a translated catalogue a product level join reads one product as two. Attribution is order level so revenue by campaign is safe, but revenue by campaign by product is not, and nothing says which is wanted.",
+      "Attribution data sits on the order record and US-25-07 acceptance criterion 2 limits the Marketing role's reach into customer personal data. Whether attribution counts as personal data for that purpose is not stated."
     ]
   },
   {

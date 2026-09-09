@@ -317,3 +317,69 @@ that decided in the block's data model, not in its CSS.
 **Effect on the discovery pass.** The E22 verdict agent was told to classify against the register as it
 stands and to record any story that appears to need a block editor in `open`, which will surface this
 tension as evidence rather than as an assumption. That instruction stays.
+
+## 2026-09-09 - The plugin register closes at 107 USD, and one need did not survive contact
+
+All six plugin needs decided. Every version, date, install count and price below was read from the
+WordPress.org plugin information API, the vendor's own pricing page, or the plugin installed on the
+discovery runtime, on 9 September 2026. Nothing was recalled.
+
+| Need | Decision | Annual |
+|---|---|---|
+| PL-01 translation | WPML Multilingual CMS | 107 USD |
+| PL-02 Google sign in | Nextend Social Login and Register | nil |
+| PL-03 redirects | Redirection | nil |
+| PL-04 admin 2FA | WP 2FA | nil |
+| PL-05 product feeds | Product Feed Manager for WooCommerce (CTX Feed) | nil |
+| PL-06 campaign attribution | No plugin. WooCommerce is native | nil |
+
+**Total 107 USD a year against the about 107 USD in Technical Design section 11.** The register does
+not exceed what the client has been told, and nothing needs acknowledging as an overage.
+
+**PL-06 did not survive being asked about.** P-021: WooCommerce 11.1.0 ships an order attribution
+controller with the feature flag on by default, recording sixteen fields including utm_source,
+utm_medium, utm_campaign, utm_content, utm_term and utm_id onto the order. The probe wrote them to a
+real order, re-read them from storage and selected orders by campaign, so the data is queryable and
+not merely captured. MKT-09 needs no plugin. Section 7 row 18 groups feeds and attribution and
+classes the pair Plugin plus Extend: it is right about the feeds half and wrong about this one.
+Section 11 never listed attribution as a cost, so nothing the client was told changes.
+
+**The one commercial thing worth raising with the client. The 107 USD figure is a conversion, and the
+obligation is in euros.** wpml.org lists Multilingual CMS at 99 EUR a year, and that is the lowest
+tier including WooCommerce support, which this build needs. So what the client actually owes is
+99 EUR annually, and the 107 USD printed in the Technical Design will drift with the exchange rate
+in either direction. It is not wrong today and it was not wrong when written. It is simply not a
+dollar obligation, and a client budgeting in EGP should be told the currency it is really in. The
+renewal price is not stated on the vendor's purchase page and is deliberately left unverified rather
+than guessed.
+
+**Two risks recorded on the free rows rather than smoothed over.**
+
+Nextend's own comparison chart marks WooCommerce integration as Pro only: the free version places
+buttons on the WordPress login page and on forms using the wp_login_form action, while automatic
+placement on WooCommerce forms sits in a Pro addon priced at 49 EUR as a one time payment, not an
+annual licence. Mizzey builds the account templates under SSC-01 anyway, so placing the button by
+hand is plausible, but it is unverified and it is the risk on PL-02. Section 11 promised the client
+"nil, or low" here, and a 49 EUR one off is still inside that phrasing.
+
+Neither two factor candidate declares support for WordPress 7.1, which is the runtime version.
+WP 2FA is tested to 7.0.4 and Two Factor to 6.9.7. WP 2FA was chosen on maintenance recency, and
+compatibility has to be verified before ADM-131 is accepted, which matters more than usual because
+this one is a security control.
+
+**One decision deliberately deferred.** PL-03 went to Redirection, which is single purpose, has two
+million installs, is tested to 7.1 and states plainly that it has no premium version. Rank Math would
+also satisfy MKT-13 and MKT-14 from its free tier, and would additionally answer the question E23
+raised about which plugin owns the SEO fields the catalogue migration imports at US-23-12. That
+question is unanswered, and adopting an SEO suite for its redirect feature is the tail wagging the
+dog. If Rank Math is later chosen for SEO, PL-03 should be revisited and dropped rather than running
+two plugins that both manage redirects.
+
+**Test change, recorded because it was a test change and not a data change.**
+`test_nothing_is_decided_yet` asserted that no plugin need had a decision. That could only pass
+before this pass ran, so it was a seed guard rather than an invariant. It is replaced by two checks
+that outlive the seed and that the gate does not make: a decision must name one of the candidates the
+row actually weighed, and a decided row must have weighed at least two options, with PL-06 exempt
+because researching a second plugin for a problem nobody has is not diligence. The PL-01 candidate
+test was loosened from equality to membership; its intent was never "exactly one candidate", it was
+that the figure already in the client's hands is on the table to be beaten.

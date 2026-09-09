@@ -12,7 +12,7 @@ Validated: 4 of 8.
 |---|---|---|---|---|---|---|---|
 | US-25-01 | Measurement and advertising tags | MKT-01, MKT-02, MKT-03, INT-09, INT-10 | light | partial | not yet validated |  | 5 |
 | US-25-02 | Product feeds | MKT-05, MKT-06, INT-12 | risk | partial | plugin | reasoned | 5 |
-| US-25-03 | Campaign attribution through to the order | MKT-09 | risk | partial | extend | reasoned | 3 |
+| US-25-03 | Campaign attribution through to the order | MKT-09 | risk | partial | extend | proved | 3 |
 | US-25-04 | Consent management | MKT-10, NFR-12, R-04 | light | partial | not yet validated |  | 2 |
 | US-25-05 | Redirect manager | MKT-13, MKT-14 | risk | partial | plugin | reasoned | 3 |
 | US-25-06 | Technical SEO foundations | MKT-12, MKT-15, MKT-16, MKT-17, MKT-18, NFR-03, ADM-38 to ADM-41 | light | partial | not yet validated |  | 5 |
@@ -23,19 +23,26 @@ Validated: 4 of 8.
 
 **US-25-02, Product feeds.** Section 7 row 18 classes product feeds as Plugin plus Extend and sizes it Small, and PL-05 carries the need with decision still null. Feed generation for Meta and Google Merchant is a solved commodity and there is no argument for writing one. Classified plugin on that basis, with the extend half being AC 4, excluding a product from the feed, which is a per product flag Mizzey adds.
 
-**US-25-03, Campaign attribution through to the order.** Section 7 row 18 covers campaign parameters preserved to the order record and classes the pair Plugin plus Extend. This is the Extend half: capturing UTM parameters at landing and carrying them onto the order is session plumbing on top of Woo's order meta, not a system. PL-06 exists for it, but a plugin is optional here in a way it is not for feeds.
+**US-25-03, Campaign attribution through to the order.** P-021 settles the mechanism and closes the plugin need. WooCommerce 11.1.0 ships order attribution with the feature flag on by default, recording sixteen fields including utm_source, utm_medium, utm_campaign, utm_content, utm_term and utm_id onto the order, and the probe wrote them to a real order, re-read them from storage and selected orders by campaign, so the data is queryable and not merely captured. Acceptance criteria 1 and 2 are therefore native and PL-06 is decided as no licence. The story stays extend rather than native because acceptance criterion 3 is untouched by this and because a reported figure still has to be built on top. Section 7 row 18 groups feeds and attribution and classes the pair Plugin plus Extend; it is right about the feeds half and wrong about this one.
 
 **US-25-05, Redirect manager.** Section 7 row 19 classes the redirect manager and missing page log as Plugin and sizes it Small, and PL-03 carries the need. Admin managed permanent redirects with loop detection and a 404 log is a commodity, and the mature options in this space also carry the SEO field handling that E23 flagged as having no named owner.
 
 **US-25-07, Third party access controls.** This is a roles and audit story wearing a marketing title, and both of its foundations are section 7 gaps. Row 15: WooCommerce ships Shop Manager and Customer only, proved by P-013, which also found that report access is a single all-or-nothing capability, so restricting what Marketing can see is not expressible in the capability model. Row 14: there is no audit log at all, so AC 5 has nothing to write to. AC 1 and AC 2 are the Marketing role definition, AC 5 is the audit seam, and AC 4 is an environment, not code.
+
+## Evidence
+
+| Probe | Question | Verdict |
+|---|---|---|
+| P-021 | Does WooCommerce capture campaign attribution onto the order record natively, so that MKT-09 needs no plugin? | refuted |
 
 ## Open questions
 
 - **US-25-02.** AC 1 and AC 2 require the feeds to VALIDATE against each platform's requirements. That is not a code question, it is a data completeness question: Meta and Google both require fields such as GTIN or brand and condition that the catalogue may not carry after migration. This should be checked against the real Amazon export at CR-06, which has not arrived, and it bears on E23 as well.
 - **US-25-02.** No plugin candidate is named for PL-05, and any licence cost counts against the 107 USD a year quoted in Technical Design section 11. Several plugin rows are still undecided and their combined cost has not been totalled against that figure.
 - **US-25-02.** AC 3 says feeds reflect current price and availability. With a translated catalogue there are two product posts per item, and a feed that emits both would advertise one item twice. The P-019 translation group question applies to feeds exactly as it does to reports, and no acceptance criterion mentions language.
-- **US-25-03.** AC 3 requires attribution to survive a guest checkout AND a sign in during checkout. Sign in mid checkout is the same session transition that P-001 showed silently drops one cart. Whether attribution survives it is the same class of bug and nobody has tested it. Cheap to fold into the US-05-11 merge work rather than discovering it in Stage 5.
-- **US-25-03.** Attribution data on the order record is personal data adjacent and US-25-07 AC 2 limits Marketing role access to customer personal data. Whether attribution counts is not stated.
+- **US-25-03.** Acceptance criterion 3 requires attribution to survive a guest checkout AND a sign in during checkout. P-021 could not test it: capture is browser side, and the sign in transition is the same one P-001 showed silently drops one cart. This needs a browser test and it is the only unanswered half of the story.
+- **US-25-03.** WooCommerce records attribution as order meta. Any campaign revenue figure built from it inherits the P-019 problem: with a translated catalogue a product level join reads one product as two. Attribution is order level so revenue by campaign is safe, but revenue by campaign by product is not, and nothing says which is wanted.
+- **US-25-03.** Attribution data sits on the order record and US-25-07 acceptance criterion 2 limits the Marketing role's reach into customer personal data. Whether attribution counts as personal data for that purpose is not stated.
 - **US-25-05.** AC 2 requires a redirect to a missing page to be refused with an explanation. Most redirect plugins detect loops but do not validate that the destination resolves, so this criterion may not be satisfied by the plugin choice and may be the extend half nobody has budgeted.
 - **US-25-05.** E23 recorded that no document decides which plugin owns the SEO fields the migration imports. If the redirect and SEO plugin are the same product, which is common, choosing PL-03 also answers that question, and the two decisions should be made together rather than in different epics.
 - **US-25-05.** With two languages there are two URLs per page. Whether a redirect rule applies per language or across both is not stated in MKT-13 or in the acceptance criteria.
