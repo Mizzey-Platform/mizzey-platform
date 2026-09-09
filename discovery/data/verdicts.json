@@ -783,5 +783,567 @@
     "points_flag": "under",
     "risk": "WordPress revisions cover post content only, so reverting a section, a menu, a footer or term meta rides on the same versioned store as US-22-10, and 1 point does not cover it even though the actor and timestamp come free from the audit log at section 7 row 14.",
     "open": []
+  },
+  {
+    "story": "US-14-01",
+    "claimed": "mixed",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-003",
+      "P-011"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      3
+    ],
+    "points_flag": "under",
+    "risk": "Section 7 row 3 names only stacking and priority. Automatic promotions with no code, the brand, customer group and first order conditions, start date scheduling and the maximum discount cap are all contracted at PROMO-01 to PROMO-19 and are named in no section 7 row, so the engine is larger than section 7 shows.",
+    "open": [
+      "P-003 enumerated the whole 26 field WooCommerce coupon schema. It carries minimum_amount and maximum_amount, product and category limits, usage limits and an expiry date, and it carries no start date, no item count condition, no brand condition, no customer group, no first order condition and no maximum discount cap. P-011 separately confirmed there is no item count condition on free shipping. Those two runs settle the condition set. What they do not settle is the admin configuration surface and the ENT-11 promotion rules table, which are reasoned, not proved.",
+      "OD-03, the welcome discount value, cap, expiry and eligibility, is recorded in the specification as blocking the promotions build. It sits on US-14-02, but US-14-01 builds the engine that rule runs on, so the condition set cannot be closed until it is answered.",
+      "AC 2 offers a customer group condition at P1-L. Which entity holds the group and who assigns it is not settled in the E14 specification text, and no probe touches it.",
+      "13 points is flagged under because Woo contributes only the coupon base. Automatic promotions with no code cannot use the coupon system at all and need their own evaluation against cart totals, and that is on top of seven condition types, scheduling, pause without losing usage history, exclusions, a discount cap and the admin screens for all of it. This lands in sprint 10, Stage 4, which already runs at 68 points a week against a 55 average."
+    ]
+  },
+  {
+    "story": "US-14-04",
+    "claimed": "mixed",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-003"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      3
+    ],
+    "points_flag": "under",
+    "risk": "P-003 found no priority and no stacking field anywhere in the coupon schema, and two percentage coupons applied together for a combined 30 percent with no objection. individual_use is the only exclusivity control and it is all or nothing rather than a priority, so Woo contributes nothing to this story except the stacking that has to be stopped.",
+    "open": [
+      "AC 3 requires the applied promotions to be itemised in the totals breakdown. Whether an automatic promotion that is not a Woo coupon can be itemised there without replacing the Woo totals template has not been probed, and the same question sits on US-14-05 AC 1.",
+      "AC 4 requires the customer to be told which promotion applied and why the other did not. That message is bilingual and appears in cart and checkout, and it is customer facing copy that nobody has drafted.",
+      "5 points is flagged under. Section 7 row 3 sizes the resolver as a Medium build, and this story carries the priority evaluation, the stacking policy, the itemised breakdown and the customer explanation with no native base under any of it. It shares sprint 10 with US-14-01 in Stage 4."
+    ]
+  },
+  {
+    "story": "US-14-05",
+    "claimed": "mixed",
+    "actual": "native",
+    "confidence": "proved",
+    "evidence": [
+      "P-002"
+    ],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "over",
+    "risk": "The price half is proved native: P-002 placed an order for 3 units at 100, raised the product price to 250, re-read the order and got 300 on both the order total and the line total. AC 1 also requires the discount applied to be stored on the line, and once US-14-01 introduces promotions that are not Woo coupons there is nothing native that itemises them onto the order.",
+    "open": [
+      "Does a custom promotion applied outside the coupon system reach the order line as a recorded discount, or does it only reduce the total? P-002 tested price, not discount attribution, and AC 1 asks for both.",
+      "3 points is flagged over. With BR-005 proved native the remaining work is verification tests plus whatever discount attribution US-14-01 leaves behind, and this sits in sprint 10, Stage 4, which is the stage that needs points released."
+    ]
+  },
+  {
+    "story": "US-14-06",
+    "claimed": "mixed",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-014"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      14
+    ],
+    "points_flag": "ok",
+    "risk": "AC 1 and AC 2 are proved native by P-014: a 30 partial refund against a 100 order was accepted, a further 200 against 70 remaining was rejected as an invalid refund amount, and the cumulative ceiling held. AC 3 also requires the refused attempt to be logged, which is not native and lands on the audit log at section 7 row 14, so the story is extend rather than native.",
+    "open": [
+      "P-014 tested the WooCommerce bookkeeping ceiling only. Whether Paymob enforces the same limit gateway side is untested and is a separate probe.",
+      "AC 3 requires the refused attempt to be logged. This story sits in sprint 10 and the audit log at ADM-132 to ADM-134 belongs to the Access module. Whether the audit seam is available by sprint 10 or arrives later is a sequencing question for the plan, not a scope question.",
+      "P-014 lists US-08-06 and US-27-04 in its stories and not US-14-06, yet its question is BR-006 verbatim, which is this story's trace. The probe row's story list is understated rather than wrong."
+    ]
+  },
+  {
+    "story": "US-14-07",
+    "claimed": "mixed",
+    "actual": "native",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "ok",
+    "risk": "No probe tested restore on cancel or restore on failed payment, so native rests on Technical Design section 6 alone. P-009 found the stock write does not refuse to go negative, two sequential decreases of 1 from a stock of 1 leaving minus 1, so a restore after an oversold decrement returns a wrong quantity rather than a correct one.",
+    "open": [
+      "AC 3 refers to the agreed reservation policy, and no agreed hold time for an unpaid order is recorded in anything read here. Who sets it, and whether it is an open decision for the client or a developer default, is unsettled.",
+      "Cash on delivery orders are not paid at placement. Whether the hold stock timer may cancel a valid cash on delivery order has to be decided before the reservation policy can be written.",
+      "Restore on cancel and on failed payment has no probe of its own. It is cheap to test on the discovery runtime and would move this row from reasoned to proved. Recommended as a follow up probe rather than left as an assumption behind a Must story.",
+      "BR-003 concurrency is already booked as a parallel load test in sprint 8, Stage 3, against US-07-06. This story shares the same stock write, so that test bears on it too."
+    ]
+  },
+  {
+    "story": "US-16-02",
+    "claimed": "native",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "ok",
+    "risk": "Woo carries almost all of AC 1 natively, but compare at price, video in the product gallery and the AC 4 badges are not native fields and no section 7 row names any of them. The classification is extend rather than native because those additions exist, and extend rather than build because the product editor Woo ships is a real base.",
+    "open": [
+      "P-016 settles the product cost half of AC 3: WooCommerce 11.1.0 carries a native Cost of Goods Sold field that survives save and reload, but it is off by default. That is evidence for one criterion, not for the story classification, which is why this row is reasoned rather than proved.",
+      "Compare at price is distinct from the Woo regular price struck through by a sale price. Whether the client means a separate reference price or the Woo sale mechanic is not settled by the acceptance criteria and changes whether a new field is needed.",
+      "AC 2 allows video. The Woo product gallery holds images. Where product video lives, in the gallery or in a separate field, is undecided.",
+      "AC 5 requires a saved change to be live on the next storefront reload, which is a caching question. No caching probe has been run.",
+      "Badges in AC 4 also appear in US-14-09 at MER-01 to MER-05. The two stories should not both build them, and this row does not decide which one owns the work."
+    ]
+  },
+  {
+    "story": "US-16-03",
+    "claimed": "native",
+    "actual": "plugin",
+    "confidence": "proved",
+    "evidence": [
+      "P-006"
+    ],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      17
+    ],
+    "points_flag": "under",
+    "risk": "P-006 proves the data model carries translated products, variations and attributes as one translation group, so claimed native is wrong: WordPress is single language and this story exists only because a licensed plugin supplies the capability. AC 3, the missing content report, is not delivered by the plugin, and it must resolve translation groups on icl_translations rather than count posts, because P-019 showed a product level query reads one product as two.",
+    "open": [
+      "P-006 did not measure translation quality and did not test the free alternatives, so the section 11 licence line is justified but not proved to be the cheapest route to FIX-04. If that becomes a commercial question it needs a second probe, not an argument.",
+      "P-006 found the plugin set exhausts the PHP 128M default and dies mid request. That is a hosting sizing question against the Statement of Work monthly figure, not a story question, and it is recorded in the decision log rather than here.",
+      "2 points is flagged under. It assumes the plugin's own translation status screen satisfies AC 3. On the P-019 evidence a report built that way counts one product as two, so the gaps report has to be written against translation groups, and that is a build item this estimate does not appear to contain.",
+      "The plugin decision row PL-01 still has decision null and cost_annual null in plugins.json, while the decision log records the choice as made on 9 September. That is the plugin register agent's row, not this one, and it is noted only so it is not missed at the gate."
+    ]
+  },
+  {
+    "story": "US-16-05",
+    "claimed": "native",
+    "actual": "native",
+    "confidence": "proved",
+    "evidence": [
+      "P-016",
+      "P-017"
+    ],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "ok",
+    "risk": "Both halves are proved native. P-016 found a native Cost of Goods Sold field on products that survives save and reload, and P-017 found the cost frozen onto the order line during calculate_totals, an order for 2 units at cost 100 still reading 200 after the product cost was changed to 999. The whole risk is that the feature is off by default, an order placed while it is off carries no cost at all, and enabling it later does not backfill. That is now a go live gate check rather than a build task.",
+    "open": [
+      "OD-12, the cost basis, is still the client's decision. The recorded recommendation is purchase cost as a single field with a basis label, and the snapshot decision holds either way, so this story is not blocked on the answer.",
+      "AC 2 gates cost visibility on financial permission, which needs the role work at section 7 row 15 and ROLE-06. This story sits in sprint 4, Stage 2, and the Access module is later, so the capability the gate checks may not exist when the field does. That is a sequencing question for the plan.",
+      "AC 3 puts cost in the migration tool. The import mapping is E23, section 7 row 6, so the column has to be in the mapping profile rather than built here.",
+      "Technical Design section 9 calls ADM-27 a new field on product and variation. P-016 shows it is a native field behind a feature flag, so section 9 is wrong. That document is already with the client, so the correction goes through the normal route and is not fixed by editing anything here."
+    ]
+  },
+  {
+    "story": "US-01-01",
+    "claimed": "partial",
+    "actual": "plugin",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      17
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 17 classes this Plugin and sizes it Medium, and it touches everything. That class covers the language half only. The row itself bundles \"the right to left layout system and locale formatting\" into a Plugin classification, and no plugin delivers those: AC 2, AC 3 and AC 5 are theme work on CoreX. The classification is kept at plugin to match section 7 rather than silently disagreeing with a client document, and the understatement is recorded here. P-006 proved the plugin carries translated product data, variations and attributes as one translation group, which supports AC 4, but it says nothing about layout. P-010, which is the probe for the right to left half, has NOT been run and is blocked on a storefront existing, so the CoreX Stable claim for header, mobile navigation, mega menu and footer in right to left is untested at the point this story is pointed at 13 in sprint 3.",
+    "open": [
+      "P-010 is blocked and this is the story it was written for. It needs a storefront with real navigation, a mega menu, a footer and Arabic content at several breakpoints, and the runtime is a bare install. Until it runs, AC 2, AC 3 and AC 5 rest on the CoreX section 4 Stable rating alone.",
+      "AC 6 requires a predictable fallback where content exists in only one language. No fallback rule is stated anywhere: whether the page shows the other language, hides the region, or shows a placeholder is undecided, and it is a content design decision as much as a technical one.",
+      "AC 2 requires mirrored directional patterns \"where direction carries meaning\". Which patterns those are is not enumerated, so there is no list to test against and no way to close the criterion objectively.",
+      "PL-01 in plugins.json still has decision null and cost_annual null, while DECISIONS.md records the choice as made on 9 September 2026. That is the plugin register agent's row to correct, not this one."
+    ]
+  },
+  {
+    "story": "US-05-09",
+    "claimed": "mixed",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-001"
+    ],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "ok",
+    "risk": "P-001 observed the mechanism directly: the test user carried a saved persistent cart holding product 40, which is WooCommerce user meta and is what makes AC 1 and AC 2 native. Cross-device persistence for a signed in customer is therefore not built. What is built is AC 3: Woo revalidates prices when the cart reloads but does not tell the customer that a price moved, so the \"shown as changed rather than applied silently\" half is Mizzey work. Extend rather than native for that reason. No section 7 row covers it, which is correct, because row 1 is about the guest merge and this story is about the signed in cart.",
+    "open": [
+      "The change notice in AC 3 is customer facing and bilingual, and no copy exists for it. It also needs a decision: is a price rise shown and the item kept, or shown and the item removed for re-confirmation?",
+      "AC 1 says the same cart is present on another device. Woo restores the persistent cart into the session on login, but if the second device already has a guest session cart the merge rules of US-05-11 apply. The two stories overlap at that point and neither says which one owns the behaviour."
+    ]
+  },
+  {
+    "story": "US-05-10",
+    "claimed": "mixed",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-001"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      1
+    ],
+    "points_flag": "ok",
+    "risk": "P-001 is direct evidence: guest session cart held product 39, the account had a saved cart holding product 40, and after login exactly one cart survived, the guest one. WooCommerce replaces rather than merges, so every one of CART-13 to CART-18 is Mizzey work and section 7 row 1 is right to flag it. The probe also confirmed woocommerce_cart_loaded_from_session is a real action in 11.1.0, so the hook the Technical Design builds on exists. The registration path is the simplest of the three because the new account has no prior cart to reconcile, which is why 3 points is defensible where US-05-11 is 8.",
+    "open": [
+      "AC 3 requires the behaviour to hold whether registration starts from the cart, the header or the checkout. Those are three entry points with different session states, and the acceptance criteria do not say whether a part-completed checkout counts as a fourth."
+    ]
+  },
+  {
+    "story": "US-05-11",
+    "claimed": "mixed",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-001"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      1
+    ],
+    "points_flag": "ok",
+    "risk": "The same P-001 evidence, and this is the story it bites hardest. Woo replaces rather than merges and, in the probe's words, whichever side is dropped is dropped silently, which is what makes this the delicate one. AC 3, one line for the same product and variant, and AC 4, capping at available stock and telling the customer, are both entirely Mizzey. AC 4 also depends on the stock question in US-07-06: capping needs a trustworthy available figure, and P-009 showed the stock write does not refuse to go negative.",
+    "open": [
+      "AC 4 requires the customer to be told what changed when a quantity is capped. Bilingual copy, and it appears mid sign in, which is a moment with no existing message surface.",
+      "The merge rule itself is undecided: when the same variant is in both carts at quantity 2 and 3, is the result 3 (the greater) or 5 (the sum)? AC 3 says one line and AC 2 says nothing is lost, and those two readings conflict. This needs settling before sprint 6, not during it.",
+      "P-015 established that a guest wishlist faces the identical replace-versus-merge decision, and recommended designing the two together. That is a sequencing note for US-11-04, which is not in this batch."
+    ]
+  },
+  {
+    "story": "US-05-12",
+    "claimed": "mixed",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-02"
+    ],
+    "gap_rows": [
+      1,
+      16
+    ],
+    "points_flag": "ok",
+    "risk": "Rows 1 and 16 together: the merge is Mizzey work and Google sign in is Plugin or Build, still undecided at PL-02. Not marked proved: P-001 tested the ordinary login path by becoming the user and reloading the cart from session, not an OAuth callback. The merge code is shared with US-05-11, so the classification follows, but the thing that could break here is whether the chosen Google sign in plugin fires woocommerce_cart_loaded_from_session at all on its callback. If it signs the user in outside that hook the merge never runs and the guest cart is lost silently, which is the exact failure P-001 describes. 2 points holds only if the plugin behaves; the risk is in the undecided plugin, not in the story.",
+    "open": [
+      "Which plugin satisfies PL-02 is undecided, and this story's estimate depends on it. Worth one probe once a candidate is chosen: does its sign in path fire woocommerce_cart_loaded_from_session? That is cheap and it de-risks US-05-12, US-06-03 and US-06-04 at once.",
+      "AC 2 requires an existing account matched by email to be signed into rather than duplicated. That is the US-06-04 invariant reached through a different door, and the two stories should not both build it."
+    ]
+  },
+  {
+    "story": "US-06-03",
+    "claimed": "partial",
+    "actual": "plugin",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-02"
+    ],
+    "gap_rows": [
+      16
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 16 classes Google sign in as Plugin or Build and sizes it Small, and PL-02 carries the need with decision still null. AC 1, AC 2 and AC 5 are what an OAuth plugin delivers. Classified plugin on that basis. AC 3, no second account for an existing email, is not a plugin behaviour and belongs to US-06-04, and AC 4 is US-05-12. This story is thin once those two are removed, which is why 8 points is left at ok rather than flagged over: the number only makes sense if it is carrying part of the identity resolution, and if it is not, three stories are pointing the same work.",
+    "open": [
+      "AC 3 here and AC 2 of US-06-04 are the same requirement written twice. Which story owns identity resolution has to be settled before sprint 7 or it is built twice or not at all.",
+      "Row 16 leaves Plugin or Build genuinely open and PL-02 has no candidate. Until one is named, neither this estimate nor US-05-12's can be trusted.",
+      "AC 5 excludes social login beyond Google as P2. Nothing here contradicts that, recorded only so the exclusion is visible in the dataset."
+    ]
+  },
+  {
+    "story": "US-06-04",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-02"
+    ],
+    "gap_rows": [
+      16
+    ],
+    "points_flag": "ok",
+    "risk": "The plugin supplies OAuth; nothing supplies identity resolution. AC 4 is the load bearing one and it is an invariant over every route: manual registration, guest checkout linking, and Google sign in. WooCommerce enforces unique user emails at the WordPress level, so a literal duplicate is refused, but that is not what AC 4 asks. It asks that the routes resolve to one account rather than failing, and AC 3 requires the resolution to be explained to the customer instead of erroring. That is build, on top of the plugin.",
+    "open": [
+      "AC 4 cannot be verified story by story. It is a property of the set of routes, and one of those routes, guest checkout linking, is US-06-07 in the same sprint. Acceptance for this story should wait on that one.",
+      "AC 3 requires an explanation to the customer. Merging an anonymous Google identity into an existing password account is a security sensitive moment, and whether it requires proof of ownership of the existing account, such as email verification, is not stated. Resolving silently would let anyone holding a Google account for an address take over the store account for it.",
+      "The account takeover question above is worth deciding with Mustafa rather than at build time. It is the kind of thing that is cheap to specify now and expensive to retrofit."
+    ]
+  },
+  {
+    "story": "US-06-07",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      20
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 20 names AUTH-11 exactly: Woo offers account creation at checkout, not after it from the confirmation with no re entry, and it is classed Build and sized Small. AC 4 is the part that is not small in risk terms even if it is in effort: a guest order must not be claimable by an account that does not own the ordering email. That is the same trust boundary as US-06-04 AC 3, approached from the order side.",
+    "open": [
+      "AC 4 needs a stated mechanism. Claiming on the confirmation page within the session is one thing; a link in the confirmation email is another; allowing it later from an account is a third and is the one that leaks. Nothing says which is intended.",
+      "AC 5 says declining leaves the order reachable through the confirmation email. That implies a guest order lookup route, which no story in this batch owns and which is itself an access control surface.",
+      "BR-008 is in the trace and is not read here. Whether it constrains the linking window, for example claim only within N days, should be checked before sprint 7."
+    ]
+  },
+  {
+    "story": "US-07-06",
+    "claimed": "native",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-009"
+    ],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "under",
+    "risk": "Claimed native, and native is not earned. P-009 established the mechanism: wc_update_product_stock delegates to the data store, the data store issues arithmetic SQL so the write is atomic per statement, but two sequential decreases of 1 from a stock of 1 left the quantity at minus 1. The write does not refuse to go negative. The guard against overselling is a validation step before payment, separate from the write, so a check-then-write gap exists in principle. P-009 could NOT settle the concurrent case, because one PHP process cannot create simultaneity, and it is booked as a parallel load test at issue #233 in sprint 8, the same sprint as this story. Section 6 calls this Native and section 7 has no row for it, so if the load test fails there is no gap row to hang the remedial work on. That absence is the finding.",
+    "open": [
+      "AC 4, no order created in a state that reserves more stock than exists, is exactly what P-009 could not settle. Acceptance of this story should wait on issue #233 rather than being signed off in sprint 8 on the validation step alone.",
+      "Flagged under at 3 points. AC 3 requires the customer to be told exactly which line is affected and what quantity is available, which is per line reporting plus bilingual copy at the checkout failure moment. If #233 shows a real race, a locking or reservation strategy lands on top of that and 3 points is well short.",
+      "No section 7 row covers stock concurrency. If remedial work is needed it has no gap row, and section 6 asserting Native is the only place the claim lives."
+    ]
+  },
+  {
+    "story": "US-07-07",
+    "claimed": "native",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-004"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      12
+    ],
+    "points_flag": "under",
+    "risk": "Claimed native, and P-004 shows native covers one of the two cases. Woo carries a real guard on the order side: payment_complete called twice with the same reference left status processing, date_paid unchanged and stock reduced once from 10 to 9, because _order_stock_reduced is set on the first pass and respected on the second. That is AC 2. What P-004 explicitly did not establish is AC 1: Woo does nothing about a customer submitting checkout twice and creating two separate orders, and nothing about a gateway retrying against an order that was meanwhile cancelled. Both are integrator work, so section 7 row 12 is right that this belongs to Mizzey, and the probe narrows what is left rather than clearing it.",
+    "open": [
+      "Flagged under at 3 points. AC 1 double submission, AC 3 holding across a page refresh and the back button during payment, and AC 4 recording the duplicate attempt are three separate mechanisms, and only AC 2 is native. AC 3 in particular means an idempotency key surviving a browser navigation, not a disabled button.",
+      "AC 4 requires the duplicate attempt to be recorded for diagnosis. That is the audit seam at section 7 row 14, which belongs to E19 and E21. Whether it exists by sprint 8 is a sequencing question, and this story is in Stage 3 while the audit work is later.",
+      "The gateway retry against a cancelled order, named by P-004 and by no acceptance criterion, has no home. It is a real production failure mode and PAY-05 is broad enough to cover it, but no AC says so."
+    ]
+  },
+  {
+    "story": "US-08-01",
+    "claimed": "native",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "ok",
+    "risk": "Claimed native and it is close to right, which is unusual in this set. WooCommerce's WC_Payment_Gateway is genuinely an internal payment interface: checkout talks to the gateway API and not to the provider, which is AC 1, and swapping provider means writing a new gateway class rather than touching checkout, which is AC 3. Extend rather than native because AC 2 asks for retries, logging and webhook handling inside the adapter and AC 4 asks for failures logged with enough detail to diagnose, none of which the base class provides. No section 7 row names payment abstraction, correctly, because the abstraction is not the gap.",
+    "open": [
+      "AC 2 names retries. What is retried, and against what, is not stated: a failed capture must not be retried blindly or it becomes the duplicate charge that PAY-05 exists to prevent. The retry policy and the idempotency work in US-07-07 have to be designed together.",
+      "INT-16 is in the trace and was not read here. Whether it names a second provider, which would make AC 3 testable rather than aspirational, should be checked."
+    ]
+  },
+  {
+    "story": "US-08-03",
+    "claimed": "native",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [],
+    "points_flag": "under",
+    "risk": "Claimed native and that is wrong in a way worth stating plainly. WooCommerce core verifies nothing about a payment callback: signature verification is per gateway, implemented inside whichever adapter is written, so for Paymob it is Mizzey code. AC 1 is the security boundary of the whole payment flow, since without it anyone who can reach the callback URL can mark an order paid. Classified build with NO gap row, and that is the finding: section 7 has twenty rows and none of them covers callback authenticity. Row 12 is adjacent but it is about idempotency, that the same genuine callback twice is harmless, which is a different property from a forged callback being rejected. Section 7 missed this.",
+    "open": [
+      "Section 7 has no row for callback verification. Recorded here per the rule that a build with no gap row means section 7 missed it. The Technical Design is already with the client, so this is a correction to make in the next revision rather than a silent one.",
+      "Flagged under at 2 points. HMAC verification alone is small, but AC 3 requires verification failures to be visible to the team rather than only in a log file, which needs a surface that does not exist. That surface is plausibly the operations console at section 7 row 7, built in E15 in sprint 9, and this story is sprint 11, so the dependency runs the right way but nobody has stated it.",
+      "Paymob's HMAC scheme, which fields are signed and in what order, is an external input nobody has captured. Worth requesting alongside the Bosta legend at issue #234 so the two vendor documentation gaps are chased together."
+    ]
+  },
+  {
+    "story": "US-08-06",
+    "claimed": "native",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-014"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      14,
+      15
+    ],
+    "points_flag": "ok",
+    "risk": "P-014 proved the core of it native: a 30 partial refund against a 100 order was accepted, a further 200 against 70 remaining was rejected as an invalid refund amount, and the cumulative ceiling held. So AC 1, AC 2 and the order level part of AC 3 are WooCommerce. Extend, not native, because three criteria sit outside it: AC 4 permission gating needs the roles at section 7 row 15, AC 5 the audit log at row 14, and AC 6 the analytics event. P-014 tested the Woo bookkeeping ceiling only and explicitly not whether Paymob enforces the same limit gateway side.",
+    "open": [
+      "AC 3 says a refund cannot exceed what was actually paid for that ITEM after discount. P-014 tested the order level ceiling. Item level after discount needs a discount apportionment rule across returned lines, and no document states one. E20 reached the same conclusion independently from the returns side, which makes it a real gap rather than one reader's doubt.",
+      "Whether Paymob enforces or reports its own refund limits and timing is untested and is an input to both this story and US-13-04. One probe against the Paymob sandbox would settle both.",
+      "AC 4 and AC 5 depend on roles and the audit seam. This story is sprint 11 in Stage 4, which already runs at 68 points a week, so a slip in either dependency lands in the worst place."
+    ]
+  },
+  {
+    "story": "US-09-05",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-012"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      10
+    ],
+    "points_flag": "under",
+    "risk": "P-012 is the reason this story exists and it proved the case. The Bosta WooCommerce plugin 4.5.7 ships a mapping table that maps state 45 to completed and state 46 to completed as well, grouped as \"Finished successfully\", while only 45 sets a delivery date. Two distinct terminal outcomes collapse into one Woo status. The plugin ships NO legend for the state codes anywhere in its source, so what 46 means cannot be established from the integration at all. That absence is precisely what SHIP-14 exists to fix, and it makes this story build rather than the claimed partial: there is no carrier mapping to extend, only a dormant one to replace.",
+    "open": [
+      "Flagged under at 3 points. The story is an explicit, documented, admin visible mapping for every carrier status, plus an unrecognised status raising for a human decision, plus AC 3 verification against real carrier responses during Stage 4. The admin surface alone is more than 3 points, and the verification cannot start until the legend arrives.",
+      "AC 3 is blocked on issue #234, the Bosta state code legend, which is scheduled in sprint 2 precisely so the lead time is free. If it has not arrived by sprint 11 this story cannot be accepted.",
+      "AC 2 requires an unrecognised status to be raised for a human decision. Where it is raised is the operations queue at section 7 row 7, which is E15. The dependency is not recorded on either story."
+    ]
+  },
+  {
+    "story": "US-09-06",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-012"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      10
+    ],
+    "points_flag": "ok",
+    "risk": "P-012 settled both halves and refuted the feared one. WooCommerce 11.1.0 ships eight order statuses and none is returned to origin, so the status itself must be registered: build. But the feared silent Delivered does not happen today, because in handle_status_update the call to map_bosta_state_to_wc_status is commented out, so the plugin never changes order status from a webhook and only records meta. Driving the handler with state 46 on a processing order left it processing. The real exposure is the dormant table: whoever enables it inherits 45 and 46 both becoming completed, which is exactly what AC 2 forbids. The direction recorded in DECISIONS.md is to leave the plugin mapping disabled and write the Mizzey mapping explicitly.",
+    "open": [
+      "AC 3 requires payment state to remain correct when a parcel returns. For a cash on delivery order that is the collected versus remitted distinction in US-09-07, so the two stories share a criterion and are both in sprint 11.",
+      "AC 4 puts the case in the operations queue, which is E15 at section 7 row 7, built in sprint 9. The dependency runs the right way but is unrecorded.",
+      "Whether state 46 is in fact a return to origin is still unknown and is issue #234. If it is, the dormant mapping violates AC 2 the moment anyone enables it, which is an argument for removing the mapping rather than leaving it commented out in a plugin that may be updated."
+    ]
+  },
+  {
+    "story": "US-09-07",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      11
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 11 is exact: Woo marks a cash on delivery order paid on completion, so collected and remitted are the same thing and the distinction this story contracts does not exist. Build. The DECISIONS.md entry on ENT-10 already commits a delivered_at column as contractual for exactly this reason, because outstanding remittance cannot be aged or chased without knowing when collection happened. No probe covers this story directly, so reasoned rather than proved; P-018 is adjacent and relevant, since it showed date_paid and date_completed are the only queryable milestones and neither is dispatch or delivery.",
+    "open": [
+      "AC 4 depends on OD-20, the remittance cycle, which is the client's decision and is not recorded as answered. It changes the ageing rule, not the data model, so the build can start without it, but acceptance cannot.",
+      "AC 3 wants the difference between collected and remitted as a figure. That is a reported number, and the P-019 and P-020 findings apply: any figure built from product or order level queries has to resolve translation groups or it double counts. Worth carrying into the reporting query helper rather than discovering it here.",
+      "Nothing states who records a remittance or through what screen. It is an operations console surface, E15, and no acceptance criterion in either epic names it."
+    ]
+  },
+  {
+    "story": "US-25-02",
+    "claimed": "partial",
+    "actual": "plugin",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-05"
+    ],
+    "gap_rows": [
+      18
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 18 classes product feeds as Plugin plus Extend and sizes it Small, and PL-05 carries the need with decision still null. Feed generation for Meta and Google Merchant is a solved commodity and there is no argument for writing one. Classified plugin on that basis, with the extend half being AC 4, excluding a product from the feed, which is a per product flag Mizzey adds.",
+    "open": [
+      "AC 1 and AC 2 require the feeds to VALIDATE against each platform's requirements. That is not a code question, it is a data completeness question: Meta and Google both require fields such as GTIN or brand and condition that the catalogue may not carry after migration. This should be checked against the real Amazon export at CR-06, which has not arrived, and it bears on E23 as well.",
+      "No plugin candidate is named for PL-05, and any licence cost counts against the 107 USD a year quoted in Technical Design section 11. Several plugin rows are still undecided and their combined cost has not been totalled against that figure.",
+      "AC 3 says feeds reflect current price and availability. With a translated catalogue there are two product posts per item, and a feed that emits both would advertise one item twice. The P-019 translation group question applies to feeds exactly as it does to reports, and no acceptance criterion mentions language."
+    ]
+  },
+  {
+    "story": "US-25-03",
+    "claimed": "partial",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-06"
+    ],
+    "gap_rows": [
+      18
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 18 covers campaign parameters preserved to the order record and classes the pair Plugin plus Extend. This is the Extend half: capturing UTM parameters at landing and carrying them onto the order is session plumbing on top of Woo's order meta, not a system. PL-06 exists for it, but a plugin is optional here in a way it is not for feeds.",
+    "open": [
+      "AC 3 requires attribution to survive a guest checkout AND a sign in during checkout. Sign in mid checkout is the same session transition that P-001 showed silently drops one cart. Whether attribution survives it is the same class of bug and nobody has tested it. Cheap to fold into the US-05-11 merge work rather than discovering it in Stage 5.",
+      "Attribution data on the order record is personal data adjacent and US-25-07 AC 2 limits Marketing role access to customer personal data. Whether attribution counts is not stated."
+    ]
+  },
+  {
+    "story": "US-25-05",
+    "claimed": "partial",
+    "actual": "plugin",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-03"
+    ],
+    "gap_rows": [
+      19
+    ],
+    "points_flag": "ok",
+    "risk": "Section 7 row 19 classes the redirect manager and missing page log as Plugin and sizes it Small, and PL-03 carries the need. Admin managed permanent redirects with loop detection and a 404 log is a commodity, and the mature options in this space also carry the SEO field handling that E23 flagged as having no named owner.",
+    "open": [
+      "AC 2 requires a redirect to a missing page to be refused with an explanation. Most redirect plugins detect loops but do not validate that the destination resolves, so this criterion may not be satisfied by the plugin choice and may be the extend half nobody has budgeted.",
+      "E23 recorded that no document decides which plugin owns the SEO fields the migration imports. If the redirect and SEO plugin are the same product, which is common, choosing PL-03 also answers that question, and the two decisions should be made together rather than in different epics.",
+      "With two languages there are two URLs per page. Whether a redirect rule applies per language or across both is not stated in MKT-13 or in the acceptance criteria."
+    ]
+  },
+  {
+    "story": "US-25-07",
+    "claimed": "partial",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      14,
+      15
+    ],
+    "points_flag": "under",
+    "risk": "This is a roles and audit story wearing a marketing title, and both of its foundations are section 7 gaps. Row 15: WooCommerce ships Shop Manager and Customer only, proved by P-013, which also found that report access is a single all-or-nothing capability, so restricting what Marketing can see is not expressible in the capability model. Row 14: there is no audit log at all, so AC 5 has nothing to write to. AC 1 and AC 2 are the Marketing role definition, AC 5 is the audit seam, and AC 4 is an environment, not code.",
+    "open": [
+      "Flagged under at 8 points. AC 4 requires third parties to receive staging access for testing before any production change. That is a staging environment with a deployment path, and whether one is contracted at all is not established here. If it is not, this criterion cannot be met by writing code.",
+      "AC 3 requires tracking scripts to be deployed through Google Tag Manager with no third party editing site code. CLAUDE.md section 8 is clear that the GTM and GA4 configuration is the developer's work, MKT-01, INT-09 and MKT-23, handed over in client owned accounts, so this criterion is Mizzey's to satisfy and not the agency's. Recorded because the story title invites the opposite reading.",
+      "AC 5 depends on the audit log, which is E19 and E21. This story is sprint 13 in Stage 5, which already runs at 92 points a week, so it is the worst possible place for a dependency to slip into.",
+      "P-013 is cited in this note but not in evidence, because its subject is the role model rather than this story. Its finding about all-or-nothing report access bears directly on AC 2."
+    ]
+  },
+  {
+    "story": "US-27-04",
+    "claimed": "partial",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-002",
+      "P-004",
+      "P-014",
+      "P-009"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      12
+    ],
+    "points_flag": "under",
+    "risk": "Four probes bear on this story and three of them landed. P-002: an order for 3 units at 100 still read 300 after the product price was raised to 250, so BR-005 is native. P-014: the refund ceiling held, so BR-006 is native. P-004: a repeated callback against the same order was a genuine no-operation, so half of AC 2 is native. Extend on that basis. The fourth is the problem. P-009 is PARTIAL and it is the one that matters for AC 3: it established that the stock write is atomic per statement but does not refuse to go negative, and it could not test true simultaneity because one PHP process cannot place two checkouts at the same instant. So AC 3, concurrent purchases of the last unit resulting in one sale, is the single criterion in this story that no probe has settled, and it is cited as evidence here only so the gap is visible rather than absent.",
+    "open": [
+      "AC 3 is settled by issue #233, the parallel load test booked in sprint 8, Stage 3. That is six sprints before this story in sprint 14, which is the right order, and this story should be treated as the place where that result is confirmed rather than where the question is first asked.",
+      "Flagged under at 5 points. AC 4 requires automated tests covering pricing, promotions, refunds, stock and duplicate order protection. That is a test suite across five subsystems in Stage 6, and DOD-04 is cited as a reduced scope without saying reduced to what. The reduction needs to be written down or the criterion is unclosable.",
+      "AC 1 says payment, order and inventory operations are transactionally safe. Nothing has tested transaction boundaries, only individual behaviours. If AC 1 is meant literally it is a database transaction audit and that is not 5 points.",
+      "This story is the last line of defence for BR-003, BR-005, BR-006 and BR-007 and it sits in Stage 6, after the operations system and the migration are built on top of those assumptions. Discovering a problem here is discovering it too late, which is the argument for #233 landing in sprint 8 as booked."
+    ]
   }
 ]
