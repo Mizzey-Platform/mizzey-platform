@@ -1,0 +1,787 @@
+[
+  {
+    "story": "US-13-01",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "No probe touches Technical Design row 5 at all, so the claim that WooCommerce has no returns workflow is still analysis rather than evidence, and this is the story that has to create the return entity the customer writes to; the optional photograph upload is a customer facing file write with no constraint stated in the acceptance criteria.",
+    "open": [
+      "Sequencing: E20 is sprinted at 12 and E13 at 13, so the return case queue (US-20-01) is scheduled a week before the only story that can create a case. Which epic carries the return entity, its states and its data model, and does the E20 estimate include it?",
+      "The photograph attachment in acceptance criterion 3 has no stated file type list, size cap, count cap, storage location or view permission. Not editing the criteria: if this needs bounding it is a Functional Specification correction under section 8, and it should be settled before Stage 5.",
+      "Acceptance criterion 5 fires a `return_request` event. Confirm it carries an id in the Event Tracking Plan EVT series, since that plan is held back and can still be corrected free.",
+      "Technical Design row 5 is the second largest Build in the project and has no probe. Recommend one probe establishing that Woo carries no return object, no request capture and no customer visible return status, so the largest custom claim in the epic stops being untested."
+    ]
+  },
+  {
+    "story": "US-13-02",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "OD-08, the return window and any product type exceptions, is recorded in the specification as blocking the returns build and is still open, so this story cannot start even though its own logic is small and explicitly bounded away from a rule engine.",
+    "open": [
+      "OD-08 is unresolved and blocks this story. It needs a named decision date from the client before sprint 13, and it is the cheapest open item in the epic to close.",
+      "Acceptance criterion 3 requires the policy page to state the same window as the configuration value. Is the policy page reading the configured value, or is it hand entered in both languages and therefore free to drift? CMS-07 does not say."
+    ]
+  },
+  {
+    "story": "US-13-03",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [
+      "P-018"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "P-018 refuted the assumption that WooCommerce keeps a structured, queryable status history and found only English prose in order notes, so nothing native can be reused here and the return has to carry its own state; 3 points holds only if the customer is shown the current state and the rejection reason, and is low if a dated stage by stage timeline is expected.",
+    "open": [
+      "Does acceptance criterion 1, status at every stage, mean the current state rendered against an ordered stage list, or a dated history of transitions? P-018 shows there is no native transition record to derive the second from, so if it is a timeline the return needs its own transition table and 3 points is under.",
+      "Acceptance criterion 2 requires the stages shown to match the states the team works through, which are defined in E20 (US-20-03 approve, reject or partially approve). Partial approval has no named customer facing stage anywhere in the specification."
+    ]
+  },
+  {
+    "story": "US-13-04",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-014"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "Reclassed from the epic level custom to extend: P-014 confirmed on WooCommerce 11.1.0 that the refund record, its amount and the ceiling at the amount actually paid are native for both full and partial refunds, so what is built here is the presentation of a native record on the custom return object and the settlement timing wording, not the refund itself; if the epic points were derived with a custom factor of 1.5 to 1.7 this story should not carry it.",
+    "open": [
+      "Acceptance criterion 3 requires settlement timing to be explained rather than left ambiguous. P-014 explicitly did not test whether Paymob enforces or reports the same limits or timing on the gateway side, so the real settlement window is an unanswered input from Paymob and the copy cannot be written without it.",
+      "Acceptance criterion 2 states the destination as the original payment method. Cash on delivery orders have no original payment method to refund to, and neither this story nor RET-08 says what the customer is shown for a COD refund."
+    ]
+  },
+  {
+    "story": "US-20-01",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5,
+      7
+    ],
+    "points_flag": "ok",
+    "risk": "WooCommerce has no return entity at all, so the queue is a Mizzey list over a Mizzey table and the waiting time column needs a case created timestamp that only exists once that table does. AC 3 also lands a pending returns panel on the Operations Console, which is TDD row 7 and sits in the previous delivery stage, so a slip in E15 blocks acceptance of this story rather than merely delaying a nice to have.",
+    "open": [
+      "RESOLVED at the gate, 9 September 2026: the trace \"ADM-120, ADM-13\" is correct and not truncated. ADM-13 is a real Feature Register row, \"Pending returns and refunds\", in the dashboard block at section 10.1. It is not a truncation of ADM-130. No correction needed.",
+      "No story explicitly owns the ENT-12 and ENT-13 return case schema and the case state machine. US-13-01 captures the request and US-20-06 preserves the trail, but neither is pointed for the entity and the state model that all six E20 stories sit on. If it is not inside US-13-01, it is unpointed work in the largest custom epic.",
+      "stories.json puts E20 at stagenum 5 and sprint 12, while the Functional Specification epic table gives E20 delivery stage 4. E13 carries the same mismatch. One of the two is wrong and it moves 29 points across a payment stage boundary."
+    ]
+  },
+  {
+    "story": "US-20-02",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "under",
+    "risk": "AC 2 requires the eligibility result and the window that was used to be shown at review time. The window is a live configuration value, so re-evaluating it when the reviewer opens the case gives a different answer after any policy change and the screen would show a window the customer was never judged against. The result and the window have to be snapshotted onto the case when the request is made, and no story states that.",
+    "open": [
+      "OD-08, the return window and any product type exceptions, is still an open decision and the specification records it as blocking the returns build. Every eligibility criterion in E13 and E20 depends on it.",
+      "Whether the eligibility snapshot is written by US-13-02 at request time or has to be added here is undecided. The 2 point estimate only holds if it already exists, which is why this row is flagged under."
+    ]
+  },
+  {
+    "story": "US-20-03",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5,
+      14,
+      15
+    ],
+    "points_flag": "ok",
+    "risk": "AC 4 needs a returns decision capability that WooCommerce does not have. P-013 confirmed on 9 September that Woo contributes only the customer and shop_manager roles, so the permission this story checks arrives with the E21 role work in the previous stage and this story cannot be accepted before it. The same AC also writes to the audit log of TDD row 14, giving this one story three separate cross epic dependencies.",
+    "open": [
+      "Partial approval is per item and per quantity, and the specification does not say whether a partially approved case can be decided again on the remaining lines or is closed by the first decision. That answer changes the state machine here and the refundable amount in US-20-05.",
+      "NOTF-07 is traced here for the decision notification, while the notification templates live in E12. Whether the 8 points include authoring the Arabic and English return decision template or only firing the event is not stated."
+    ]
+  },
+  {
+    "story": "US-20-04",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "AC 3 excludes disposition, so a received and inspected return never returns to sellable stock automatically. At launch every restock is a manual inventory adjustment in E17. That is contracted, RET-07 is P2, but it is an operational cost worth saying out loud at the Stage 1 walkthrough rather than discovering in week nine.",
+    "open": [
+      "The condition values are not enumerated anywhere in the specification, so the field is contracted without its list. Whether condition is free text or a configured vocabulary is undecided, and a vocabulary that the client can edit would be more than 3 points."
+    ]
+  },
+  {
+    "story": "US-20-05",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-014"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      5
+    ],
+    "points_flag": "ok",
+    "risk": "P-014 proved the Woo refund ceiling on a running install, but it proved an order level ceiling against the total paid, and AC 3 is an item level ceiling after discount apportionment. The native ceiling therefore does not satisfy AC 3 on its own and the post discount line amount is Mizzey work. P-014 also states explicitly that it did not test whether Paymob enforces the same limit gateway side, so the money movement half of AC 2 rests on analysis, not evidence.",
+    "open": [
+      "No probe covers a Paymob API refund to the original payment method, so AC 2 is untested. If the Paymob plugin does not implement process_refund, the refund becomes a manual action in the gateway with the reference keyed back in, which is a materially different story and a different acceptance conversation.",
+      "How an order level discount is apportioned across returned lines is not defined anywhere. A partial return of a multi line order carrying an order level coupon has no stated rule, and AC 3 cannot be tested until there is one."
+    ]
+  },
+  {
+    "story": "US-20-06",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      5,
+      14
+    ],
+    "points_flag": "ok",
+    "risk": "AC 3 requires a trail that cannot be edited, and TDD row 14 puts the audit log on the CoreX audit seam whose state has not been probed. P-018 confirmed that WooCommerce keeps no structured transition record of its own, only an English sentence in an order note, so nothing in this trail can rest on order notes and every one of the five recorded events has to be written deliberately by the E20 stories that raise them.",
+    "open": [
+      "Journey J6 step 10 assigns the return audit trail to US-21-03, while this story carries ADM-125 for the same behaviour. Either the trail is built once in E21 and only surfaced here, in which case 3 points is right, or the two stories overlap and one of them is double counted. The specification does not say which.",
+      "No probe covers the CoreX audit seam that TDD row 14 depends on, so the build size behind both US-20-06 and US-21-03 is analysis only. This is the one remaining untested dependency shared by two epics."
+    ]
+  },
+  {
+    "story": "US-15-01",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-005",
+      "P-013"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      15
+    ],
+    "points_flag": "ok",
+    "risk": "The console has no native equivalent and no CoreX contribution: P-005 confirms corex-kit-woo is inactive scaffolding that registers nothing, so section 7 row 7 is written from zero. Acceptance criterion 4, role aware rendering, cannot be met from the Woo capability model, since P-013 confirms only shop_manager and customer exist and report access is a single all or nothing capability, so this story cannot be accepted before the six roles of gap row 15 exist.",
+    "open": [
+      "Which of the six ROLE-03 to ROLE-09 roles sees which console panel is specified nowhere. The console needs a panel by capability map, and that map is an input from Mustafa or the Stage 1 walkthrough, not a build decision.",
+      "Sequencing: gap row 15 sits in E21 and this story is sprint 9. If the roles land after sprint 9 the console ships role blind and acceptance criterion 4 is deferred."
+    ]
+  },
+  {
+    "story": "US-15-02",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-012"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      10
+    ],
+    "points_flag": "ok",
+    "risk": "The queue itself is section 7 row 7 and has no native equivalent. Acceptance criterion 4 is blocked on gap row 10: P-012 confirms WooCommerce ships eight order statuses and none of them is returned to origin, so an RTO order cannot enter this queue until the two custom statuses are registered. P-012 also found the Bosta 4.5.7 state mapping commented out in handle_status_update, so carrier driven queue entry does not happen at all today.",
+    "open": [
+      "The queue names new, unpaid, ready to dispatch and failed delivery. Only new and unpaid map to shipped Woo statuses. Whether ready to dispatch and failed delivery are two of the statuses gap row 10 registers, or are queue filters over meta, is unresolved and changes the size of this story.",
+      "Bosta state code 46 has no legend in the plugin source, raised as mizzey-platform#234. Until it is known, which carrier states put an order into this queue for a decision cannot be settled."
+    ]
+  },
+  {
+    "story": "US-15-03",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-020"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      17
+    ],
+    "points_flag": "under",
+    "risk": "P-020 refutes the assumption that the native low stock list is a sound base: with WPML active one physical item is stored as two stockable products and the analytics stock query returned the translated pair twice, each showing the full quantity, with no language scoping in that dispatch path. This panel must resolve products to their translation group by joining icl_translations and grouping on trid before the list is built, which is the same correction P-019 and P-020 put on E24. Three points does not cover that plus the missing image and unpublished lists, which have no native report at all.",
+    "open": [
+      "Confirm the trid grouping correction is written once as a shared resolver and used by both this panel and the E24 stock report, so it is not built twice or, worse, built in one place only.",
+      "P-020 did not rule out the opposite fault for a browser admin request, where a language scoped list silently omits an Arabic only product. One manual check in the admin is needed before this panel is accepted.",
+      "Lane two, recorded and not opened as a story: flagging products missing an Arabic translation in this same panel is desirable and has no Annex A id. ADM-142 lists low stock, out of stock, missing image and unpublished only."
+    ]
+  },
+  {
+    "story": "US-15-04",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      11
+    ],
+    "points_flag": "ok",
+    "risk": "The four figure summary is part of section 7 row 7. Acceptance criterion 3 depends on gap row 11, cash on delivery collected and remitted tracked separately, which is itself a build with no probe behind it, so a revenue figure that presents collected as received is the failure mode to watch.",
+    "open": [
+      "Acceptance criterion 2 says revenue is consistent with the sales report, but does not name which report or which basis. Net or gross, and whether uncollected cash on delivery is included, has to be fixed before the figure can be tested. Raise at the Stage 1 walkthrough.",
+      "No probe has tested that a console figure and the WooCommerce Analytics revenue figure agree for the same period. Worth one probe before Stage 4."
+    ]
+  },
+  {
+    "story": "US-15-05",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7
+    ],
+    "points_flag": "ok",
+    "risk": "Saved filtered views for admin lists have no native equivalent in WordPress or WooCommerce and sit inside section 7 row 7. Small and self contained, and the only real work is acceptance criterion 3, a saved filter that has become invalid explaining itself rather than erroring.",
+    "open": []
+  },
+  {
+    "story": "US-15-06",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7
+    ],
+    "points_flag": "over",
+    "risk": "Claimed custom, but this is the Woo product editor plus the native duplicate action, with the work being field trimming, defaults and screen layout rather than a new screen. Five points looks high for that. The flag is contingent on the probe named in open, and acceptance criterion 2 puts the measurement with the client team at the Stage 4 gate, so the risk is a timing failure in their hands, not a build failure.",
+    "open": [
+      "Probe request: confirm on the running install that the native product duplicate action is present in WooCommerce 11.1.0, and that a simple product publishes with title, price, stock, image and category and no other required field. The over flag rests on both being true.",
+      "Freeing points from sprint 9 only helps if the re point is fed back into the Stage 4 plan, which already runs at 68 points a week."
+    ]
+  },
+  {
+    "story": "US-15-07",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      14
+    ],
+    "points_flag": "ok",
+    "risk": "Woo Quick Edit is one product at a time and there is no multi row grid that saves as a set, so this is section 7 row 7 with nothing underneath it. Acceptance criterion 3 is not row 7 work at all: the price and stock change history is the audit log at gap row 14, on the CoreX audit seam, so this story cannot be accepted before that seam is written.",
+    "open": [
+      "Sequencing: gap row 14, the audit log, is E19 and E21 work and this story is sprint 9. Whether the audit seam is available by then is a scheduling question for Mustafa. If it is not, acceptance criterion 3 is what slips.",
+      "Acceptance criterion 2 says changes are saved together and failures listed individually. Whether a partial save is acceptable, or the whole set must roll back, is not stated and decides the transaction design. Raise at the Stage 1 walkthrough."
+    ]
+  },
+  {
+    "story": "US-15-08",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7
+    ],
+    "points_flag": "under",
+    "risk": "Bulk status change has a crude native base, but per order rejection of invalid transitions, bulk carrier dispatch with batched airway bills, bulk packing slips and a retry safe partial failure report have no base at all. Five points against the eight on US-15-09 looks light for that spread, and two of the four criteria depend on components nobody has tested.",
+    "open": [
+      "Does Bosta WooCommerce 4.5.7 expose a bulk dispatch and a batched airway bill call, or must the build loop the single order API and handle rate limiting? P-012 established the plugin version on the runtime but not this. Probe request.",
+      "Bulk packing slip printing, ADM-156, has no candidate named anywhere and no need row in plugins.json. If it becomes a plugin it needs a PL row with licence and annual cost, reconciled against the 107 USD already quoted to the client in Technical Design section 11."
+    ]
+  },
+  {
+    "story": "US-15-09",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7,
+      14
+    ],
+    "points_flag": "over",
+    "risk": "Claimed custom, but the WordPress and Woo bulk edit screen already carries price change by amount or percentage, stock set and adjust, status change and category assignment. The genuine gaps are the archived state, and acceptance criterion 5, one audit log entry per bulk action with its affected set, which is gap row 14. Eight points prices this as a new screen when most of it is a wrapper over an existing one. The flag is contingent on the probe named in open.",
+    "open": [
+      "Probe request: on the running install, confirm the native bulk edit performs a percentage price change, a stock adjustment and a category assignment across a selection. If any of the three is absent the over flag is wrong and this row goes back to build at eight points.",
+      "Same audit log sequencing question as US-15-07: acceptance criterion 5 depends on gap row 14 existing by sprint 9."
+    ]
+  },
+  {
+    "story": "US-15-10",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7
+    ],
+    "points_flag": "ok",
+    "risk": "Admin order search already covers order number, name, email and billing phone, and product admin search already covers SKU, so this is an extension rather than a build: barcode search, the carrier filter and the acceptance of speed are what is left. P-007 is deliberately not cited, since it tested the storefront LIKE query in Arabic and says nothing about admin search. The real exposure is acceptance criterion 4, because meta based admin search degrades on a large catalogue and the client sets the bar at the Stage 4 gate.",
+    "open": [
+      "Probe request: confirm on the running install that order search by customer phone works under the current order storage, that product search reaches SKU and barcode, and time both against a catalogue of realistic size. Acceptance criterion 4 has no numeric target, so the timing figure is the only defence at the gate.",
+      "Barcode is a product field but no requirement states whether admin search must match it exactly or partially. Raise at the Stage 1 walkthrough."
+    ]
+  },
+  {
+    "story": "US-15-11",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      7
+    ],
+    "points_flag": "ok",
+    "risk": "The English admin is configuration rather than build, and the Arabic administrator guide and training session are a handover deliverable, HND-03, not code. What is real is acceptance criterion 2, mobile use of the console for order checks and stock updates, which has to be designed into the row 7 screens rather than retrofitted, and section 7 row 7 does not mention mobile at all.",
+    "open": [
+      "With WPML active for the storefront, confirm the admin locale stays English per user profile and that the language switcher does not change admin chrome. Probe request, small.",
+      "Acceptance criterion 2 names order status checks and stock updates only. Which console panels must work on a phone, and which may be desktop only, needs stating before the wireframes are drawn."
+    ]
+  },
+  {
+    "story": "US-23-01",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-008"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "P-008 proved the native WC_Product_CSV_Importer parses a CSV cleanly, so delimited parsing is reusable, but there is no native Excel reader and no clean refusal path, so file intake still belongs to the written engine.",
+    "open": [
+      "P-008 exercised a comma delimited CSV only. Tab delimited and Excel intake, and the refusal message for an unsupported file, were not probed.",
+      "Which Excel reader is used, and whether it can stream a very large workbook rather than loading it into memory, is undecided and bears on AC 3 and on US-23-08."
+    ]
+  },
+  {
+    "story": "US-23-02",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-008"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "P-008 established that Arabic product text in UTF-8 with a BOM round trips through the native import path intact, so the parsing floor holds and the remaining work is detection plus the operator prompt on top of it, not a parser of our own.",
+    "open": [
+      "P-008 tested UTF-8 with a BOM only. Windows-1256 and UTF-16LE, which Excel and Amazon reports commonly produce for Arabic, were not tested, and neither was AC 1 automatic detection nor AC 3 asking the operator when detection is not confident. A follow up probe on those three encodings is needed before this class is safe to rely on.",
+      "The specification states that the import specification cannot be finalised until CR-06, the real unmodified Amazon sample export, arrives. Until it does, the encoding Amazon actually produces for this seller is an assumption."
+    ]
+  },
+  {
+    "story": "US-23-03",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "The contracted mapping is wider than a column to field screen: it includes source attribute to store attribute mapping and a reusable category mapping table, neither of which has a native counterpart.",
+    "open": [
+      "No probe covered column mapping. The native importer does present a per run column mapping step in admin, and whether any of it is reusable rather than replaced was not established.",
+      "Brand mapping is P1-L, so the quality bound on MIG-12 needs stating at the Stage 1 walkthrough rather than discovered at the Stage 5 gate."
+    ]
+  },
+  {
+    "story": "US-23-04",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-008"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "P-008 inspected WC_Product_CSV_Importer and found no saved mapping method among its 33, so profiles are written from nothing, but they are cheap once US-23-03 exists.",
+    "open": [
+      "AC 2, a saved mapping applied to a file with different columns reporting the mismatch, depends on how strictly the profile records the source header set. Not probed."
+    ]
+  },
+  {
+    "story": "US-23-05",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "Preview shares the row resolution pipeline with the US-23-06 dry run, so if the two are built independently the epic pays for the same interpretation logic twice.",
+    "open": []
+  },
+  {
+    "story": "US-23-06",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "proved",
+    "evidence": [
+      "P-008"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "P-008 found no dry run method on the native importer, confirming section 7 row 6, and a dry run means the whole resolution pipeline must run to completion without writing, which constrains the engine design rather than adding a screen to it.",
+    "open": [
+      "AC 3, per field overwrite control, is P1-L. Whether it is set per import run or per saved profile is not stated in the specification and should be settled with the client at the Stage 1 walkthrough."
+    ]
+  },
+  {
+    "story": "US-23-07",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "under",
+    "risk": "Parent and child conversion into variable products with attributes, SKU, price and stock, plus orphan child detection, is the hardest single behaviour in the epic and is pointed at 5 against 8 for column mapping, in Stage 5 which already runs at 92 points a week, and P-008 tested a simple product only so nothing about variable products has been established.",
+    "open": [
+      "A probe is needed for the variable product path: parent and child rows through the import engine, and the orphan child error case. It should run against the CR-06 sample, since the Amazon parent and child shape is the thing being converted and it has not been seen yet.",
+      "Whether re pointing this story can be absorbed inside Stage 5 or needs one of the two contingency weeks at sprints 12 and 13."
+    ]
+  },
+  {
+    "story": "US-23-08",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "Action Scheduler ships with WooCommerce and provides the queue, the retry and the progress record, so this is a mechanism plus our batching rather than a runner written from nothing, but that leverage is reasoned and not probed.",
+    "open": [
+      "Not probed: whether Action Scheduler holds up for a very large import on the client hosting, and whether an interrupted run can resume from a row offset rather than only being re run under US-23-09.",
+      "AC 1, does not fail on large files, has no number attached to it. The largest file the tool must survive is not stated anywhere and depends on CR-06."
+    ]
+  },
+  {
+    "story": "US-23-09",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "proved",
+    "evidence": [
+      "P-008"
+    ],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "P-008 imported the same file twice with update_existing on and found exactly one product on SKU P008-SKU-1 afterwards, so update by SKU with no duplicate is native behaviour the engine can sit on rather than reimplement, which lowers the risk on AC-17 without removing it, because only a simple product was tested.",
+    "open": [
+      "AC 2 requires the behaviour to hold for variable products and P-008 did not test that. This is the same follow up probe as US-23-07 and it is the one probe in this epic most worth running, because AC-17 is a client run acceptance gate at Stage 5.",
+      "Matching is by SKU. What happens to a source row with an empty or a duplicated SKU, which is common in marketplace exports, is not covered by any acceptance criterion."
+    ]
+  },
+  {
+    "story": "US-23-10",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "The row level error report shares its structure with the US-23-06 dry run report, so the two should be one generator with two entry points.",
+    "open": [
+      "AC 3, the corrected file can be re uploaded and imported, leans on the safe re run semantics proved for simple products in P-008 and inherits the untested variable product case."
+    ]
+  },
+  {
+    "story": "US-23-11",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6,
+      14
+    ],
+    "points_flag": "ok",
+    "risk": "Import history records actor, action, entity and timestamp, which is the same shape as the CoreX audit seam being built for section 7 row 14, so the two should share one store rather than each growing a table; row 14 is listed for that reuse and not because this story is contracted under ADM-132 to ADM-134.",
+    "open": [
+      "Whether the audit seam at row 14 is available by Stage 5 sprint 12, since building import history first and migrating it onto the seam later would be paid for twice."
+    ]
+  },
+  {
+    "story": "US-23-12",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      6
+    ],
+    "points_flag": "ok",
+    "risk": "The 13 points cover six separate behaviours, of which price, stock and image sideloading have native counterparts to lean on while cost, generated alt text and export in the saved mapped format do not; the balance is defensible but this is the largest story in the epic and it sits in Stage 5.",
+    "open": [
+      "AC 1 imports cost. A native product cost field on products and variations is not established, and there is an open probe question on exactly that from the margin work in E16. If cost needs a custom field then importing it is more than a column mapping and this story is under pointed.",
+      "AC 3 imports SEO fields where present. Which SEO plugin owns those fields is not decided in the register or the Technical Design, so the target of the mapping is unknown.",
+      "AC 4 downloads images subject to the rights confirmation at CR-08, which has not been received. The import cannot be signed off against a real catalogue until it is.",
+      "Image download volume is the likeliest cause of a timeout in a large run and it interacts with US-23-08. No probe covers it."
+    ]
+  },
+  {
+    "story": "US-22-01",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "The epic wide guarantee that no customer facing string needs a code change owns the theme level string catalogue that no other E22 story covers, and P-005 confirms CoreX contributes no commerce or content layer to lean on, so 5 points is thin for the sweep plus the AC-20 unaided client test.",
+    "open": [
+      "Which storage layer holds the admin editable strings for theme chrome, labels and error messages. No SSC id names one, and plugins.json registers no need for a field or content framework.",
+      "AC-20 requires the client to edit unaided. No probe or wireframe yet defines the admin surface they would use, and the obvious WordPress answer, a block editor, is lane two per CLAUDE.md section 3 and is not contracted."
+    ]
+  },
+  {
+    "story": "US-22-02",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "A home section manager carrying per section content, media, calls to action, links, ordering and independent language copies has no WooCommerce or WordPress base once the block editor is excluded, so 3 points covers neither the admin surface nor the storefront rendering.",
+    "open": [
+      "The natural WordPress route to editable home sections is the block editor, which CLAUDE.md section 3 records as lane two and not contracted. The contracted route has to be a bespoke section manager, and that should be confirmed with Mustafa before the build rather than discovered in sprint 10."
+    ]
+  },
+  {
+    "story": "US-22-03",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "over",
+    "risk": "Once the section manager from US-22-02 exists, hide and show is a per section flag plus a render guard, so 3 points is more than the work, and Stage 4 already runs at 68 points a week.",
+    "open": []
+  },
+  {
+    "story": "US-22-04",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "ok",
+    "risk": "Category description and image are native term fields and brands are a Woo taxonomy, so this is term meta on existing screens, but no probe covers whether the translation plugin carries term meta such as a banner or hero image as well as it carries the term name.",
+    "open": [
+      "Does the translation plugin translate term meta, not only term name and description. P-006 tested product, variation and attribute taxonomy data and did not test term meta, so a probe is needed before US-22-04 is accepted."
+    ]
+  },
+  {
+    "story": "US-22-05",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "Woo menu_order is a single global catalogue ordering, so a manual product order per collection needs its own storage and its own query layer, and 3 points does not cover the collection entity, the ordering interface and the storefront query together.",
+    "open": [
+      "Whether a collection is a taxonomy or a post type is undecided, and the choice changes both the ordering storage and how the translation plugin registers it."
+    ]
+  },
+  {
+    "story": "US-22-06",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "WordPress menus give a base for the menu itself, but the mega menu structure, the footer column manager and the AC 3 report of a link present in one language and missing in the other have no native equivalent, and the right to left behaviour of the CoreX header, nav and footer is still unproven.",
+    "open": [
+      "P-010 names US-22-06 and has not been run. It is blocked until a storefront with real navigation, a mega menu, a footer and Arabic content exists, so the CoreX Stable claim for the header, nav and footer is untested and this story cannot reach proved until it runs."
+    ]
+  },
+  {
+    "story": "US-22-07",
+    "claimed": "custom",
+    "actual": "extend",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "over",
+    "risk": "Pages, policy pages and the FAQ are editable in WordPress as it ships and the translation plugin covers the per language half, so the only real work is the AC 3 consistency between the return policy page and the return window configured in US-13-02.",
+    "open": [
+      "AC 1 says editable without code. Whether the stock WordPress page editor satisfies that, or whether the client expects a curated component set, matters because a block editor is lane two. Confirm at the Stage 1 walkthrough rather than assuming either reading."
+    ]
+  },
+  {
+    "story": "US-22-08",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "Banner creation with scheduling, page targeting and removal is a build with no Woo base, and AC 2 assembly of a campaign page from existing components has to reuse the US-22-02 section manager, so 5 points in Stage 5, which already runs at 92 points a week, is thin.",
+    "open": [
+      "AC 2 reads as a component assembly editor. The only contracted way to deliver it is the section manager built for SSC-02 pointed at a campaign page template, because a block editor is lane two per CLAUDE.md section 3. If the client expects a block editor at the Stage 1 walkthrough that is Change Control, MS-CHG-2026-014, and not absorbed scope."
+    ]
+  },
+  {
+    "story": "US-22-09",
+    "claimed": "custom",
+    "actual": "plugin",
+    "confidence": "proved",
+    "evidence": [
+      "P-006"
+    ],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      17,
+      8
+    ],
+    "points_flag": "ok",
+    "risk": "P-006 proves the plugin keeps product, variation and attribute data linked as one translation group, which settles the mechanism, but it does not cover the custom content areas this epic creates, and AC 3, a report of content missing in one language, only works once every home section, collection, menu and footer structure is registered with the plugin.",
+    "open": [
+      "P-006 does not measure translation quality and did not test the free alternatives, so it justifies the 107 USD a year line item without proving it is the cheapest way to satisfy FIX-04. PL-01 is still undecided in plugins.json.",
+      "AC 3 needs a definition of what counts as missing content for the bespoke content areas, and no probe covers whether the plugin dashboard reports them once they are registered or whether Mizzey writes that report."
+    ]
+  },
+  {
+    "story": "US-22-10",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [
+      "PL-01"
+    ],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "WordPress preview and the draft state apply to posts and pages only, so previewing home sections, term meta, navigation and footer needs a draft versus published content store that no other story owns, and at 3 points this is the most under pointed item in the epic.",
+    "open": [
+      "The draft versus published content store is architecture shared with US-22-11 and with every editable area in this epic. It should be designed once before US-22-02 is built in sprint 10, or the sections get built twice."
+    ]
+  },
+  {
+    "story": "US-22-11",
+    "claimed": "custom",
+    "actual": "build",
+    "confidence": "reasoned",
+    "evidence": [],
+    "plugins": [],
+    "gap_rows": [
+      8
+    ],
+    "points_flag": "under",
+    "risk": "WordPress revisions cover post content only, so reverting a section, a menu, a footer or term meta rides on the same versioned store as US-22-10, and 1 point does not cover it even though the actor and timestamp come free from the audit log at section 7 row 14.",
+    "open": []
+  }
+]

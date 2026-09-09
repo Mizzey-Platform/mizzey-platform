@@ -259,3 +259,61 @@ reporting layer rather than being written twice.
 
 **Lane one.** RPT-10 and FIX-04 are both contracted. Recorded on the board at
 [#194](https://github.com/MustafaShaaban/mizzey-platform/issues/194).
+
+## 2026-09-09 - Gutenberg is the mechanism for SSC, and the page-builder part is not contracted
+
+Mustafa's instruction, 9 September 2026: the home page and the static pages are built in Gutenberg,
+every component is a block, and the client controls the home page including header, footer and mega
+menus.
+
+**Most of that is already contracted, and it is contracted as an outcome, not as a mechanism.**
+SSC-01 puts every storefront text, image and link under admin control with nothing a customer reads
+locked in code. SSC-02 covers home page sections including their order, SSC-03 show and hide without
+deleting, SSC-07 header navigation and mega menu structure, SSC-08 footer content links and columns,
+SSC-10 static and policy pages, SSC-11 campaign landing pages built without a developer, SSC-12 all of
+it independently in both languages, SSC-13 preview before live. CMS-01 to CMS-10 carry the static
+pages and CMS-09 requires them editable without a developer.
+
+**So choosing Gutenberg blocks to deliver those rows is a build decision, not a scope increase.** No
+Annex A row names a mechanism, so the mechanism is the developer's to pick, and picking blocks costs
+the client nothing extra. Post-Signature-Build-Notes item 1 keeps "a Gutenberg block editor for
+content pages, with colour customisation" out of the register, and that still holds in the sense that
+matters: no story, epic or ticket is opened called Gutenberg. The stories stay the SSC and CMS ids and
+blocks are how they are satisfied. The two-lanes rule is about what is owed, not about how it is built.
+
+**Three things in the instruction do exceed the register, and they are the expensive ones.**
+
+- **Per-block presentation control**: style, rows, column count, limits on a product block. SSC-02
+  contracts section content, images, calls to action and order. It does not contract layout controls.
+- **Layout direction toggles**, for example swapping an image-right text-left section to the reverse.
+  Nothing in Annex A contracts it.
+- **Editor canvas parity with the front end**, "like Elementor and Bricks". This is the big one.
+  SSC-13 contracts **preview before a change goes live**, which WordPress preview satisfies. A live
+  WYSIWYG editing canvas that renders the theme's real output inside the editor is a different and far
+  larger thing, and no row asks for it.
+
+Together those three are a page builder. The register does not price one.
+
+**Why this cannot be absorbed quietly.** Stages 4 and 5 already run at 68 and 92 points a week against
+a 55 average, which is why nine stories were pulled forward into Stage 2. Block work of this grade
+lands in E22, Self Service Storefront Control, which is one of the five custom epics where WooCommerce
+contributes nothing. Absorbing an unpriced page builder into the two stages that are already the worst
+loaded is how a fixed-price engagement loses its schedule.
+
+**Recommendation, not a decision.** Build SSC and CMS in Gutenberg with well-made blocks: that is
+free, it is better than option panels, and it is the right call. Treat the three items above as a
+priced change under MS-CHG-2026-014, or as a deliberate goodwill extra decided once the contracted
+work is under control, which is exactly the position Post-Signature-Build-Notes section 3 takes.
+What must not happen is acceptance criteria quietly appearing for a page builder inside the same
+290,000 EGP.
+
+**One technical warning, recorded now because it is cheap now and expensive later.** A layout direction
+toggle fights the Arabic mirroring. FIX-04 and NFR-04 put the storefront in RTL, where the whole layout
+flips, so an image-right block in English is image-left in Arabic before any toggle is applied. A
+reverse control has to mean "swap the logical order", not "put the image on the right", or every
+toggled section breaks in one of the two languages. Any block built with a direction control needs
+that decided in the block's data model, not in its CSS.
+
+**Effect on the discovery pass.** The E22 verdict agent was told to classify against the register as it
+stands and to record any story that appears to need a block editor in `open`, which will surface this
+tension as evidence rather than as an assumption. That instruction stays.
