@@ -48,3 +48,27 @@ than treated as a build task, because nothing about a working store reveals the 
 Consequences for the register: **US-16-05 `native` is defensible.** **Technical Design section 9 is
 wrong** to call ADM-27 a "New field on product and variation"; it is a native field behind a flag.
 That document is with the client, so the correction goes through the normal route.
+
+## 2026-09-09 - Shipment status timestamps on ENT-10
+
+P-018 run against WooCommerce 11.1.0. **There is no structured record of order status transitions.**
+Checked for a status-history table and found none; the only per-transition record is an English
+sentence in an order note ("Order status changed from On hold to Completed"), timestamped but not
+queryable. `date_paid` and `date_completed` are the only structured milestones and neither is dispatch
+or delivery.
+
+**US-18-02 `native` is right for displaying a timeline and wrong for measuring one.** ADM-86 is
+satisfied by the notes; nothing measurable comes out of them.
+
+**Decided: three timestamp columns on ENT-10, not a transition log.** `dispatched_at`, `delivered_at`,
+`returned_at`. The shipment lifecycle is short and its states are known, so a general history table is
+more machinery than the problem needs.
+
+The grounds differ per column and that is recorded deliberately. **`delivered_at` is contractual**:
+SHIP-16 records collected versus remitted per order, and outstanding remittance cannot be aged or
+chased without knowing when collection happened. **`dispatched_at` and `returned_at` are prudence**,
+nothing contracts them. They are the same trade as the cost flag: near zero to add while the table is
+being designed, permanently unrecoverable for every shipment closed before anyone notices.
+
+Recorded as a choice rather than a requirement so nobody later mistakes them for assumed scope.
+C-RPT-15, which consumes them, stays lane two and is charged.

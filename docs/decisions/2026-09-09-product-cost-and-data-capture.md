@@ -111,21 +111,51 @@ log (ENT-17, append only per ADM-133), the import runs (ENT-19), and COD collect
 
 The capture position is much stronger than I said. The cost snapshot is the real exception.
 
-## 5. Partial gap: shipment status timestamps
+## 5. Shipment status timestamps: decided
 
-ENT-10 Shipment holds "carrier, tracking, rate, status". That is the current status. Average delivery
-time and RTO rate need the transitions: dispatched at, delivered at, returned at.
+**Tested, and the gap is real.** P-018 walked an order through pending, processing, on-hold and
+completed on WooCommerce 11.1.0 and asked what record survives.
 
-SHIP-17 makes returned-to-origin a distinct state and forbids recording it silently as delivered, and
-SHIP-14 requires the carrier-status-to-order-status mapping be visible in admin. Both argue for
-recording transitions rather than overwriting one column. The row-level actor and timestamp pair gives
-when the row last changed, not when each transition happened.
+| What exists | Value |
+|---|---|
+| Structured transition table | **None.** Checked `wc_order_status_history`, `wc_order_status_transitions`, `wc_order_history` |
+| Queryable milestones | `date_created`, `date_modified`, `date_paid`, `date_completed` only |
+| Per-transition record | An English sentence in an order note: "Order status changed from On hold to Completed." Timestamped, not structured |
 
-Recommendation: record shipment status transitions, same as the order timeline in ADM-86. Cheap while
-the table is being designed, expensive to reconstruct afterwards, and never recoverable for shipments
-already closed.
+So `date_paid` and `date_completed` are the only queryable milestones, and **neither is dispatch or
+delivery**. A delivery-time or RTO-rate figure would have to parse note prose.
 
-The reports that consume it (C-RPT-15 carrier performance) remain lane two and are charged.
+**US-18-02 `native` is right for displaying a timeline and wrong for measuring one.** The admin
+timeline renders those notes perfectly well. ADM-86 is satisfied. Nothing measurable comes out of it.
+
+### The decision
+
+**Record dispatched, delivered and returned as timestamp columns on ENT-10 when the table is built.**
+
+Not a transition log. Three columns. The shipment lifecycle is short and its states are known, so a
+general history table would be more machinery than the problem needs, and the three moments that carry
+meaning are the ones anyone will ever ask about.
+
+### Which parts are contracted, honestly
+
+This is a judgment call, and the parts of it rest on different ground:
+
+| Column | Ground |
+|---|---|
+| `delivered_at` | **Contractual.** SHIP-16 records collected versus remitted per order. Outstanding remittance cannot be aged, chased or reconciled without knowing when collection happened, so the pair is not usable without it |
+| `dispatched_at` | **Prudence.** Nothing contracted needs it. It is half of every delivery-time figure |
+| `returned_at` | **Prudence, with a contractual neighbour.** SHIP-17 makes returned-to-origin a distinct state. The state is contracted, the moment is not |
+
+Only `delivered_at` is defensible as delivering a contracted row. The other two are the same trade as
+the cost flag: **near-zero to add while the table is being designed, and permanently unrecoverable for
+every shipment closed before anyone notices.**
+
+Three nullable columns on a table already in the build. Recommend adding all three and recording that
+two of them were a deliberate choice rather than a contracted requirement, so nobody later mistakes
+them for scope that was quietly assumed.
+
+The reports that consume them (**C-RPT-15**, carrier performance, average delivery time, RTO rate)
+stay lane two and are charged.
 
 ## 6. Lane one and lane two
 
@@ -136,7 +166,8 @@ The reports that consume it (C-RPT-15 carrier performance) remain lane two and a
 | Basis label on the cost value | One | Costs nothing, and protects the ADM-27 history if OD-12 is ever revisited |
 | Search term logging | One | SRCH-08, P1 |
 | Order timeline | One | ADM-86, P1 |
-| Shipment status transitions | One, arguable | SHIP-14, SHIP-17. Raise it explicitly rather than assume |
+| `delivered_at` on ENT-10 | One | SHIP-16 collected versus remitted cannot be aged or reconciled without it |
+| `dispatched_at`, `returned_at` on ENT-10 | One by prudence, not by contract | Nothing contracts them. Near zero to add now, unrecoverable later. Recorded as a deliberate choice |
 | Carrier cost per shipment | **Two** | Nothing contracts it. Needed only for contribution margin, which the client marked optional |
 | RPT-02 profitability and margin reports | **Two** | P2. Priced through MS-CHG-2026-014 |
 | RPT-04, RPT-05, RPT-06 customer, promotion, returns reports | **Two** | P2 |
@@ -154,6 +185,7 @@ Both probes have been run against the Mizzey runtime. WordPress 7.1, WooCommerce
 |---|---|---|
 | P-016 | Does WooCommerce provide a native product cost field? | partial. Yes, and off by default |
 | P-017 | Is cost frozen onto the order at sale? | refuted. Yes it is, natively |
+| P-018 | Does Woo keep a structured record of status transitions? | refuted. Prose order notes only, no transition table |
 
 Both scripts create their fixtures, assert, and delete them, and P-017 restores the feature flag to
 the state it found. The site was checked afterwards and carries no probe product, no probe order, and
@@ -172,7 +204,7 @@ update turns them into a regression check rather than a one-off.
    reveals that the flag is off
 3. Correct Technical Design section 9: ADM-27 is a native field behind a feature flag, not a new
    field. The document is with the client, so route the correction properly
-4. Decide the shipment status transitions question in section 5, which is still open
+4. Add `dispatched_at`, `delivered_at` and `returned_at` to the ENT-10 design before the table is built
 
 The basis label in section 2 is still worth keeping. It costs nothing and it is what makes the
 history unambiguous if the client ever revisits OD-12.

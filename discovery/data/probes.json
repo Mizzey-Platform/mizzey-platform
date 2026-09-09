@@ -310,5 +310,27 @@
     },
     "run_at": "2026-09-09",
     "notes": "ADM-27, RPT-11, ENT-08, OD-12. Compare with P-002, which tests the price snapshot: price and cost are different promises and only one of them is in the register."
+  },
+  {
+    "id": "P-018",
+    "question": "Does WooCommerce keep a structured, queryable record of when an order entered each status, or only prose in order notes?",
+    "stories": [
+      "US-18-02",
+      "US-09-04"
+    ],
+    "gap_rows": [],
+    "script": "P-018-order-status-transition-record.php",
+    "method": "wp-cli",
+    "expected": "ADM-86 contracts an order timeline and US-18-02 classifies it native. SHIP-13 reflects carrier status onto the order. If transitions are queryable rows, dispatch and delivery times are derivable and ENT-10 needs no history. If the only per-transition record is an English sentence, a delivery-time or RTO-rate figure would have to parse prose, and the timestamps must be captured while the shipment table is being designed.",
+    "observed": "WooCommerce 11.1.0. After pending to processing to on-hold to completed, the order carries: date_created=2026-09-09T09:49:27+00:00, date_modified=2026-09-09T09:49:29+00:00, date_paid=2026-09-09T09:49:29+00:00, date_completed=2026-09-09T09:49:29+00:00. No status-history table exists. Checked wc_order_status_history, wc_order_status_transitions, wc_order_history. 4 order note(s) recorded, of which 3 describe a status change. Example: \"Order status changed from On hold to Completed.\" The only per-transition record is an English sentence in an order note, timestamped but not structured. date_paid and date_completed are the only queryable milestones, and neither is dispatch or delivery. A delivery-time or RTO-rate figure would have to parse note prose, which is not a foundation for a reported number. US-18-02 native is right for displaying a timeline and wrong for measuring one.",
+    "verdict": "refuted",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
+    "notes": "ADM-86, SHIP-13, SHIP-16, SHIP-17, ENT-10. Asked because ENT-10 is contracted with a single status column and the client's C-RPT-15 wants average delivery time and RTO rate, which need transitions. Same shape as P-016: a story classified native on an assumption nobody tested."
   }
 ]
