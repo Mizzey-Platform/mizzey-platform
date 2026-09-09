@@ -14,12 +14,27 @@ WooCommerce updates, re-run it and find out what changed.
 import datetime
 import json
 import os
+import shutil
 import subprocess
 import sys
 
 from discovery import schema
 
 PROBES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'probes')
+
+
+def executable(name):
+    """Resolve a command to a full path before handing it to subprocess.
+
+    On Windows both `wp` and `node` are .bat or .cmd shims. subprocess.run
+    without shell=True does not apply PATHEXT, so a bare name raises
+    FileNotFoundError even though the command runs fine in the shell.
+    shutil.which does apply PATHEXT, and resolving here keeps shell=True out of
+    the runner, so a path with a space in it cannot be re-split by a shell.
+    Falls back to the bare name so the failure still names the command.
+    """
+    return shutil.which(name) or name
+
 
 # The Mizzey site created in Step 1. Override with MIZZEY_WP when it moves.
 WP_PATH = os.environ.get('MIZZEY_WP', 'C:/wamp64/www/corex/wp')
@@ -88,7 +103,7 @@ def environment():
     """WordPress, WooCommerce and CoreX versions, recorded with every run."""
     def wp(*args):
         try:
-            out = subprocess.run(['wp'] + list(args) + ['--path=' + WP_PATH],
+            out = subprocess.run([executable('wp')] + list(args) + ['--path=' + WP_PATH],
                                  capture_output=True, text=True, timeout=60)
             return out.stdout.strip()
         except Exception as exc:
@@ -108,11 +123,11 @@ def run_one(row, env):
     if not os.path.exists(script):
         return '%s: script %s does not exist' % (row['id'], row['script'])
     if row['method'] == 'playwright':
-        cmd = ['node', script]
+        cmd = [executable('node'), script]
     elif row['method'] == 'php':
-        cmd = ['wp', 'eval-file', script, '--path=' + WP_PATH]
+        cmd = [executable('wp'), 'eval-file', script, '--path=' + WP_PATH]
     else:
-        cmd = ['wp', 'eval-file', script, '--path=' + WP_PATH]
+        cmd = [executable('wp'), 'eval-file', script, '--path=' + WP_PATH]
     try:
         out = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     except Exception as exc:

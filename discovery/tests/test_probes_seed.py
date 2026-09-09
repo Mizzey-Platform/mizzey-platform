@@ -26,10 +26,21 @@ class TestProbeSeed(unittest.TestCase):
         for p in self.probes:
             self.assertTrue(p['expected'].strip(), p['id'] + ' must record expected before running')
 
-    def test_nothing_has_been_observed_yet(self):
+    def test_a_probe_is_either_unrun_or_fully_recorded(self):
+        # Asserting nothing has run was right while the set was only seeded, but
+        # it turns the first real run into a test failure. The invariant that
+        # survives the phase is that a row cannot be half recorded: a verdict
+        # with no evidence, or evidence with no environment, is the state worth
+        # refusing.
         for p in self.probes:
-            self.assertIsNone(p['observed'], p['id'])
-            self.assertIsNone(p['verdict'], p['id'])
+            recorded = [p['observed'], p['verdict'], p['env'], p['run_at']]
+            if all(v is None for v in recorded):
+                continue
+            self.assertTrue(str(p['observed'] or '').strip(),
+                            p['id'] + ' has a result but nothing observed')
+            self.assertIn(p['verdict'], ('confirmed', 'refuted', 'partial'), p['id'])
+            self.assertTrue(p['env'], p['id'] + ' has a result but no environment')
+            self.assertTrue(p['run_at'], p['id'] + ' has a result but no run date')
 
     def test_every_named_story_exists(self):
         for p in self.probes:

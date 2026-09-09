@@ -59,26 +59,41 @@ landed cost, historical rows stay correctly labelled as purchase-basis instead o
 reinterpreted as landed. Without the label, adding a second basis later makes every past margin
 figure ambiguous, and there is no way to tell which rows meant what.
 
-## 3. The one gap that cannot be repaired later
+## 3. Cost at sale: tested, and the answer is better than feared
 
-**Cost is not frozen onto the order line at sale, and nothing contracted says it is.**
+**Superseded by evidence on 9 September 2026.** This section originally said cost was not frozen onto
+the order and that Mizzey had to build the snapshot. P-016 and P-017 were run against WooCommerce
+11.1.0 and that is wrong.
 
-Technical Design section 9, ENT-08: "**Price snapshot native.** Attribution fields added for MKT-09."
-Price. Cost is not mentioned, there or anywhere.
+### What the probes found
 
-ADM-27 is a field on the product and the variation. A field is mutable. So as written:
+| Probe | Verdict | Finding |
+|---|---|---|
+| P-016 | partial | WooCommerce 11.1.0 ships a Cost of Goods Sold feature. `WC_Product::get_cogs_value` and `set_cogs_value` exist and a cost survives save and reload. **The feature is off by default** (`woocommerce_feature_cost_of_goods_sold_enabled = no`) |
+| P-017 | refuted | An order placed with 2 units at cost 100 recorded 200. The product cost was then changed to 999 and the same order, re-read from storage, still read 200. **WooCommerce freezes cost onto the order during `calculate_totals`** |
 
-> Edit a product's cost today, and every historical margin for that product changes retroactively.
+So ADM-27's "accurate history" holds natively. Mizzey does not need to build a snapshot mechanism.
 
-That is not a reporting bug that can be fixed when the report is built. The cost that applied on the
-day the order was placed is simply gone. **No later work recovers it.**
+### What survives, and it still matters
 
-ADM-27's contracted purpose is "so margin reporting can later be built on **accurate history**". A
-design where history rewrites itself does not deliver accurate history. So freezing cost onto the
-order line is not new scope, it is what ADM-27 already promises. That is our position; if the client
-ever disputes it, the fallback is a change request measured in hours, not a lost year of data.
+The unrecoverable risk did not disappear, it moved:
 
-**Cost to build: one value written at order creation. It must exist before the first order.**
+> **The feature is off by default, and an order placed while it is off carries no cost at all.**
+> Enabling it later does not backfill. Those orders have no margin, permanently.
+
+So the action is no longer "build a snapshot". It is **"enable `cost_of_goods_sold` before the first
+order, and prove it is on"**. Far cheaper, and far easier to get wrong by omission, because nothing
+about a working store tells you the flag is off.
+
+Treat it as a go-live gate item, not a build task.
+
+### What this changes in the register
+
+- **US-16-05 `native` is defensible.** Woo does carry the field. The classification is not wrong.
+- **Technical Design section 9 is wrong** where it calls ADM-27 a "New field on product and
+  variation". It is a native field behind a flag. That document has been sent to the client, so the
+  correction goes through the normal route rather than a quiet edit.
+- The flag itself is a real build step that no document currently names.
 
 ## 4. What I previously flagged that is in fact already covered
 
@@ -117,7 +132,7 @@ The reports that consume it (C-RPT-15 carrier performance) remain lane two and a
 | Item | Lane | Grounds |
 |---|---|---|
 | Cost field on product and variation | One | ADM-27, RPT-11, both P1 key |
-| Cost frozen onto the order line at sale | One | ADM-27's "accurate history" is not deliverable without it |
+| Enabling `cost_of_goods_sold` before the first order | One | Native per P-017, but off by default per P-016. Orders placed with it off carry no cost, permanently |
 | Basis label on the cost value | One | Costs nothing, and protects the ADM-27 history if OD-12 is ever revisited |
 | Search term logging | One | SRCH-08, P1 |
 | Order timeline | One | ADM-86, P1 |
@@ -131,30 +146,33 @@ two and are charged.** That is also the strongest commercial position, because i
 is being kept at no extra cost and the reports will have full history from launch whenever they are
 bought.
 
-## 7. What waits on evidence
+## 7. Evidence
 
-Two probes added to the discovery set rather than assumed:
+Both probes have been run against the Mizzey runtime. WordPress 7.1, WooCommerce 11.1.0, CoreX 0.42.0.
 
-| Probe | Question |
-|---|---|
-| P-016 | Does WooCommerce provide a native product cost field, or must ADM-27 be a field we add? |
-| P-017 | Is cost frozen onto the order line at sale the way price is, or does the line read a mutable current cost? |
+| Probe | Question | Verdict |
+|---|---|---|
+| P-016 | Does WooCommerce provide a native product cost field? | partial. Yes, and off by default |
+| P-017 | Is cost frozen onto the order at sale? | refuted. Yes it is, natively |
 
-P-016 exists because US-16-05 is classified `native` while the Technical Design calls ADM-27 a new
-field. One of the two is wrong. WooCommerce has carried no cost-of-goods field for most of its life
-and recent versions have begun to add one, so the answer depends on the version installed and must be
-read off the running site, not from memory.
+Both scripts create their fixtures, assert, and delete them, and P-017 restores the feature flag to
+the state it found. The site was checked afterwards and carries no probe product, no probe order, and
+the flag reads `no` again.
 
-Neither probe can run until WooCommerce is installed on the runtime.
+Recorded in `discovery/data/probes.json` with the environment, so re-running after a WooCommerce
+update turns them into a regression check rather than a one-off.
 
 ## 8. What to do next
 
 1. Put OD-12 to the client: **purchase cost, single field, entered by roles with financial permission
    through the product screen and the import mapping.** Ask them to confirm, and record the written
    definition their reporting document asks for
-2. Run P-016 and P-017 once WooCommerce is on the runtime
-3. Design the cost field and the order-line snapshot together, with the basis label, before the
-   catalogue module is built and well before the first order
+2. **Add "cost_of_goods_sold is enabled" to the go-live gate**, and to the Stage 1 environment
+   checklist. This is the whole of the cost-history risk now, and nothing about a working store
+   reveals that the flag is off
+3. Correct Technical Design section 9: ADM-27 is a native field behind a feature flag, not a new
+   field. The document is with the client, so route the correction properly
+4. Decide the shipment status transitions question in section 5, which is still open
 
-Nothing here is blocked by the client's answer except the wording of the definition. Purchase cost,
-snapshotted, with a basis label, is correct under either outcome.
+The basis label in section 2 is still worth keeping. It costs nothing and it is what makes the
+history unambiguous if the client ever revisits OD-12.

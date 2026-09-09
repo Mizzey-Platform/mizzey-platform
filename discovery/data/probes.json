@@ -278,10 +278,15 @@
     "script": "P-016-product-cost-field-native.php",
     "method": "wp-cli",
     "expected": "US-16-05 is classified Native, and the Technical Design section 9 calls ADM-27 a New field on product and variation. Those two disagree. If Woo core carries no cost field, Native is wrong for this story and the classification, not the design, is the thing to correct.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0 ships a Cost of Goods Sold feature. WC_Product::get_cogs_value and set_cogs_value both exist. Feature enabled by default: no (option woocommerce_feature_cost_of_goods_sold_enabled = no). A cost of 137.5 set on a product survived save and reload (read back 137.5). The field is native but OFF by default, so it must be switched on deliberately as part of the build. `native` on US-16-05 is defensible; the Technical Design \"New field\" row is not, but the feature flag is a real build step. Feature flag restored to disabled after the test.",
+    "verdict": "partial",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "ADM-27, RPT-11, OD-12. US-16-05 is key, so it is in the risk set. Check the installed Woo version for a cost of goods feature before concluding, and record the version in observed: a newer Woo may carry one that older guidance says it does not."
   },
   {
@@ -295,10 +300,15 @@
     "script": "P-017-cost-snapshot-on-order-line.php",
     "method": "wp-cli",
     "expected": "ENT-08 records the price snapshot as native but says nothing about cost. If cost is not frozen at the point of sale, editing a product cost silently rewrites every historical margin, and ADM-27's promise of accurate history does not hold. This is the one gap that cannot be repaired later, because the cost that applied on the day is gone.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "Cost of Goods Sold was off, enabled for the test and restored afterwards. Order 23 placed with 2 units at cost 100. Order cost at sale: 200.0. Product cost then changed to 999. Same order re-read from storage: 200.0. The order kept the cost that applied on the day. WooCommerce snapshots cost onto the order during calculate_totals, so ADM-27 accurate history holds without Mizzey adding anything, provided the feature is enabled before the first order.",
+    "verdict": "refuted",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "ADM-27, RPT-11, ENT-08, OD-12. Compare with P-002, which tests the price snapshot: price and cost are different promises and only one of them is in the register."
   }
 ]

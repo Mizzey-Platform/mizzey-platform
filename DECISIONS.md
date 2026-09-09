@@ -27,3 +27,24 @@ out to be contracted already (SRCH-08, ADM-86, and the actor and timestamp desig
 
 Probes P-016 and P-017 added rather than assuming the answer: US-16-05 is classified `native` while
 the Technical Design calls ADM-27 a new field, and one of the two is wrong.
+
+## 2026-09-09 - Cost snapshot: corrected by evidence
+
+P-016 and P-017 run against WooCommerce 11.1.0. The previous entry's central claim was wrong.
+
+**WooCommerce freezes cost onto the order** during `calculate_totals` (P-017, refuted): an order for
+2 units at cost 100 recorded 200, the product cost was changed to 999, and the same order re-read from
+storage still read 200. Mizzey does not need to build a snapshot. ADM-27 accurate history holds
+natively.
+
+**But the feature is off by default** (P-016, partial): `woocommerce_feature_cost_of_goods_sold_enabled`
+is `no` on a fresh install, and an order placed while it is off carries no cost at all. Enabling it
+later does not backfill.
+
+So the unrecoverable risk moved rather than disappeared, and it is now cheap: **enable
+`cost_of_goods_sold` before the first order, and prove it is on.** Added to the go-live gate rather
+than treated as a build task, because nothing about a working store reveals the flag is off.
+
+Consequences for the register: **US-16-05 `native` is defensible.** **Technical Design section 9 is
+wrong** to call ADM-27 a "New field on product and variation"; it is a native field behind a flag.
+That document is with the client, so the correction goes through the normal route.
