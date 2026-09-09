@@ -383,3 +383,59 @@ row actually weighed, and a decided row must have weighed at least two options, 
 because researching a second plugin for a problem nobody has is not diligence. The PL-01 candidate
 test was loosened from equality to membership; its intent was never "exactly one candidate", it was
 that the figure already in the client's hands is on the table to be beaten.
+
+## 2026-09-09 - Block architecture and the ERP position
+
+Verified against the running install rather than assumed, 9 September 2026.
+
+**The theme is already a block theme.** `wp_is_block_theme()` returns true on the active
+`mizzey-theme`, which carries `theme.json` version 3, a `templates/` directory and a `parts/`
+directory. Full Site Editing is therefore available now. That matters commercially: SSC-02, SSC-03,
+SSC-07 and SSC-08, the home sections, show and hide, header and mega menu, and footer, can be
+delivered through the Site Editor rather than through custom admin screens. The mechanism is free.
+What is not free is the per-block presentation control and the editor canvas parity recorded in the
+Gutenberg entry above.
+
+**`theme.json` is empty.** Version 3, `appearanceTools` on, and then nothing: zero colour palette
+entries, zero font families, no `styles` block. So the site-wide font, the unified colour palette and
+the text colour control are all natively available and none of them is defined yet. Populating
+`theme.json` is the whole job, and it aligns exactly with the contracted deliverable, which is
+working HTML and CSS with design tokens. `theme.json` is the token file. This is cheap work with a
+high return and it should happen before any block is written, because every block then inherits it.
+
+**PHP or JavaScript blocks is not a choice, it is a split.** Every block needs a JavaScript `edit`
+component, because that is the editor interface and there is no other way to provide one. The front
+end should be server rendered PHP. Evidence: all 175 WooCommerce blocks registered on this install
+are dynamic, every one of them carrying a `render_callback`. Server rendering is also what the rest
+of this dataset demands, because saved static markup is not translatable by WPML and not queryable
+for the reporting corrections P-019 and P-020 force.
+
+**Cart and checkout are already blocks, and that is not the same as editable.** WooCommerce ships
+`woocommerce/cart` and `woocommerce/checkout` with granular inner blocks: billing address, contact
+information, fields, order note, order summary and its sub blocks, express payment, actions. They
+extend through a narrow documented API rather than free editing. Checkout is the hardest surface in
+WooCommerce to customise, not the easiest. Nothing should be said to the client that implies the
+checkout is theirs to rearrange.
+
+**ERP. INT-14 is P3 and is not in this release.** The Feature Register puts ERP and accounting
+synchronisation at P3 with no stage, and the exclusions table carries advanced ERP synchronisation
+at 12 and 16.4. Mustafa confirmed on 9 September that a client meeting raised it and that it is
+outside the agreed scope. It does not become a story and it does not get a ticket.
+
+**But the architecture that makes it possible later is contracted, at INT-16, P1 and marked key:**
+every integration behind an adapter with retries, logging and webhook handling. So accounting for the
+ERP now costs nothing extra if INT-16 is honoured properly rather than treated as boilerplate. Two
+concrete build rules follow: keep every stock mutation on one path so a webhook can be attached to it
+later without hunting call sites, and keep the payment and carrier adapters free of provider specific
+assumptions leaking into checkout, which is US-08-01.
+
+**Webhooks are native and broader than expected.** WooCommerce accepts webhook topics of the form
+`action.woocommerce_*` and `action.wc_*`, so any WooCommerce action hook can fire a webhook, on top of
+the resource topics for order, product, customer and coupon. Three hooks are explicitly blocked:
+`woocommerce_login_credentials`, `woocommerce_product_csv_importer_check_import_file_path` and
+`woocommerce_webhook_should_deliver`.
+
+**The risk to record while it is cheap.** Woo webhook delivery is a log plus automatic deactivation
+after repeated failures. It is not a guaranteed delivery queue. An ERP that must never miss a stock
+change needs a durable queue with replay in front of it, and that is a design decision for whenever
+INT-14 is actually commissioned, not something the P1 adapter work silently owes.
