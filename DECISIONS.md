@@ -23,7 +23,7 @@ on the day.
 
 Full reasoning, the lane one and lane two split, and the corrections to three gaps I raised that turn
 out to be contracted already (SRCH-08, ADM-86, and the actor and timestamp design rule):
-[docs/build/2026-09-09-product-cost-and-data-capture.md](docs/build/2026-09-09-product-cost-and-data-capture.md).
+[docs/decisions/2026-09-09-product-cost-and-data-capture.md](docs/decisions/2026-09-09-product-cost-and-data-capture.md).
 
 Probes P-016 and P-017 added rather than assuming the answer: US-16-05 is classified `native` while
 the Technical Design calls ADM-27 a new field, and one of the two is wrong.
