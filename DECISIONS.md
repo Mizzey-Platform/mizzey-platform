@@ -133,3 +133,33 @@ somewhere inert and visible rather than in any terminal state.
 Recorded on the board at [#166](https://github.com/MustafaShaaban/mizzey-platform/issues/166) and
 [#165](https://github.com/MustafaShaaban/mizzey-platform/issues/165). `bosta_delivery_date`, set only
 on state 45, is a candidate source for the `delivered_at` column decided for ENT-10.
+
+## 2026-09-09 - WPML is the translation plugin, and P-006 confirms the licence buys something
+
+**No translation plugin is named in any client document.** The Technical Design section 11 and the
+Statement of Work section 8 both say only "translation plugin", commercial, about 107 USD a year, and
+R-14 has the client buying the licence in their own name. The choice was open. It is now WPML, on
+Mustafa's judgement that it is the most stable and the most compatible with WooCommerce.
+
+**CoreX does not constrain the choice, and its config implies otherwise.** `.env.example` carries
+`MWP_I18N_DRIVER=polylang` and describes it as the "driver behind the I18nHandler abstraction, see
+FRAMEWORK §16". There are **zero references to `I18nHandler` anywhere in `plugins/`, `addons/`,
+`packages/` or `theme/`**. The abstraction does not exist. Unlike the WooCommerce kit, which the
+Technical Design declares honestly as not built, this one reads as a working configuration key with a
+default value.
+
+**P-006, run against WPML 4.9.7 with WooCommerce Multilingual 5.5.7 and String Translation:
+confirmed.** An English variable product with a global attribute and two variations produced a linked
+Arabic product of type variable, carrying both variations and the attribute, with the pair sharing one
+translation group and the attribute taxonomy registered in `icl_translations`.
+
+**What it settles and what it does not.** It shows the data model supports translated product data, so
+the recurring licence buys something real and the section 11 claim is sound. It does **not** measure
+translation quality, and it does **not** test the free alternatives, so it justifies the line item
+without proving it is the cheapest way to satisfy FIX-04. If that ever matters commercially, the
+comparison is a second probe, not an argument.
+
+**Environment finding.** The stack exhausts PHP's 128M default and dies mid-request. `WP_MEMORY_LIMIT`
+and `WP_MAX_MEMORY_LIMIT` are now 512M in the runtime `wp-config.php`, and `run_probes.py` raises the
+limit for every probe process. This bears on hosting sizing: the Statement of Work budgets 28 to 88 USD
+a month, and a 128M PHP limit is not enough to run this plugin set.

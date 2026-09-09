@@ -122,14 +122,19 @@
     "gap_rows": [
       17
     ],
-    "script": "P-006-translation-plugin-product-data.js",
-    "method": "playwright",
+    "script": "P-006-translation-plugin-product-data.php",
+    "method": "wp-cli",
     "expected": "WordPress is single language and Woo provides nothing for multilingual product or content data. The design assumes a commercial translation plugin, at about 107 USD per year, will translate product data reliably where the free options do not. Section 7 row 17 and section 11.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
-    "notes": "FIX-04, NFR-04, SSC-12, SSC-21. NOT RUN 9 September 2026 and deliberately left unrun: the candidate translation plugin is a paid product, about 107 USD a year per Technical Design section 11, and it has been neither chosen nor bought. Testing a different plugin would answer a question nobody asked. Blocked on that purchase decision, which is also a client cost line."
+    "observed": "WPML 4.9.7 with WooCommerce Multilingual 5.5.7 and String Translation, on WooCommerce 11.1.0. Active languages: ar, en. Seeded an English variable product with a global attribute (pa_p006size, 2 terms) and 2 variations. WPML produced Arabic product 49. It is type variable, carries 2 variations, and the pair share translation group '18' holding languages [ar, en]. The attribute taxonomy has 4 row(s) registered in icl_translations as tax_pa_p006size, and the Arabic product carries 1 attribute(s): pa_p006size. Product, variations and attribute taxonomy all cross the language boundary and stay linked as one translation group. The design assumption holds and the recurring licence buys something real. Note what this does and does not settle: it shows the data model supports translated product data. It does not measure translation quality, and it does not test the free alternatives, so it justifies the line item without proving it is the cheapest way to satisfy FIX-04.",
+    "verdict": "confirmed",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
+    "notes": "FIX-04, NFR-04, SSC-12, SSC-21. WPML chosen 9 September 2026 as the translation plugin; no plugin is named in any client document, which says only 'translation plugin, about 107 USD a year', and R-14 has the client buying the licence in their own name. Tested against WPML 4.9.7 with WooCommerce Multilingual and String Translation. Method changed from playwright to wp-cli: the question is about the data layer, and a browser test would only observe the same rows through a template."
   },
   {
     "id": "P-007",

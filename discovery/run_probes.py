@@ -117,6 +117,20 @@ def environment():
     }
 
 
+def probe_env():
+    """Environment for a probe process.
+
+    WordPress plus WooCommerce plus the WPML stack plus CoreX exhausts PHP's
+    128M default and dies mid-probe with a fatal that reaches stdout as an HTML
+    error page, so the runner reports "no JSON object found" and the real cause
+    is only in debug.log. Raising it here keeps every probe on the same footing
+    without depending on whoever runs it having exported the right variable.
+    """
+    child = dict(os.environ)
+    child.setdefault('WP_CLI_PHP_ARGS', '-d memory_limit=512M')
+    return child
+
+
 def run_one(row, env):
     """Execute one probe. Returns None on success, or a message on failure."""
     script = os.path.join(PROBES_DIR, row['script'])
@@ -129,7 +143,7 @@ def run_one(row, env):
     else:
         cmd = [executable('wp'), 'eval-file', script, '--path=' + WP_PATH]
     try:
-        out = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        out = subprocess.run(cmd, capture_output=True, text=True, timeout=300, env=probe_env())
     except Exception as exc:
         return '%s: %s' % (row['id'], exc)
     try:
