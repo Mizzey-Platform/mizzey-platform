@@ -439,10 +439,15 @@
     "script": "P-020-stock-report-language-scope.php",
     "method": "wp-cli",
     "expected": "RPT-10 contracts low stock, out of stock, dead stock and adjustments as one report, and US-24-04 is classified partial on the assumption that the WooCommerce stock report supplies a sound base. The standing assumption is that the report lists the store's stock: one line per physical item, and every item that is low appears.",
-    "observed": null,
-    "verdict": null,
-    "env": null,
-    "run_at": null,
+    "observed": "WooCommerce 11.1.0, WPML 4.9.7, WooCommerce Multilingual 5.5.7. Active languages: ar, en. Site low stock threshold: 2. Seeded: translated pair 68 (en) and 69 (ar), Arabic-only product 70 (WPML reports its language as 'ar'), and English-only control 71. All four carry managed stock of 1 against a low stock amount of 5, so every one of them is low. wc_product_meta_lookup holds 2 stock row(s) for the pair (68='1', 69='1'). The same physical item is stored as two stockable products. GET /wc-analytics/reports/stock?type=lowstock in English returned 4 row(s) in total and named: pair-en, pair-ar, arabic-only, control. In Arabic it returned 4 row(s) and named: pair-en, pair-ar, arabic-only, control. The two language views are identical, so no language scoping ran on this query in this dispatch path. That bounds what follows: the double count below is proved for the query as the controller builds it, and the opposite fault, a language-scoped list that omits an untranslated product, is not ruled out for a browser admin request. WCML removes the All languages option from the analytics switcher in classes/Reports/Hooks.php, which implies the admin is normally scoped, so the browser case is worth one manual check before US-24-04 is accepted. One physical item is listed twice, once per language, each showing the full quantity. A stock report that double counts is not a basis for a purchasing decision, and the duplicate is not marked as one. Note that both faults share one root, proved above: WCML copies the stock onto the translation, so two stockable products describe one physical item. Whether the report then shows both of them or only the one matching the current language, it is wrong, and the difference is only in which way. The correction is the same shape as P-019: resolve the product to its translation group before the list is built, by joining icl_translations and grouping on trid, so one physical item is one row whatever language the operator is in.",
+    "verdict": "refuted",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
     "notes": "RPT-10, FIX-04. Raised by P-019, which proved the product-level split for the analytics products report and deliberately did not test the stock path, because the stock report is a different query. Two leads from source reading, neither of them evidence. First, WCML\\Synchronization\\Component\\Stock copies _stock and _stock_status onto every translation, so both posts carry their own stock row holding the same number, which is the shape of a double count. Second, Reports\\Stock\\Controller::get_products runs a WP_Query against the product post type rather than the analytics lookup tables, so WPML's language filter applies to it, which is the shape of the opposite fault: a list scoped to one language that silently omits an Arabic-only product. WCML also removes the All languages option from the analytics language switcher, in classes/Reports/Hooks.php, so there may be no view that shows both. Whichever of the two it is, it is a defect in a contracted operations report. Blocking on acceptance of US-24-04, raised on issue #194."
   }
 ]

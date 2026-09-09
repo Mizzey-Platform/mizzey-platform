@@ -223,3 +223,39 @@ run against that default returned a valid JSON object with verdict `partial` and
 runtime produces a recorded verdict instead of a failure, which is the exact thing this dataset exists
 to prevent. Re-running with `MIZZEY_WP=C:/wamp64/www/mizzey/app/wp` gave the real verdict, refuted.
 Correcting the default, and making a wrong runtime abort loudly, is booked separately.
+
+## 2026-09-09 - The low stock list counts one physical item twice
+
+P-020, the probe P-019 raised and did not answer. Same runtime: WooCommerce 11.1.0, WPML 4.9.7,
+WooCommerce Multilingual 5.5.7. Verdict refuted.
+
+**The root is in storage, not in the report.** `WCML\Synchronization\Component\Stock` copies `_stock`
+and `_stock_status` onto every translation. The probe seeded one item with a managed stock of 1 and
+`wc_product_meta_lookup` came back holding two rows, 68=1 and 69=1. Two stockable products describe
+one physical item, each claiming the full quantity.
+
+**The report then repeats it.** `GET /wc-analytics/reports/stock?type=lowstock`, dispatched as an
+administrator, returned both halves of the pair as separate rows, with nothing marking them as one
+item. A purchasing decision taken off that list is taken off a double count.
+
+**What the probe could not reach.** The two language views returned identical lists, so no language
+scoping ran on this query in an internal dispatch. That bounds the claim: the double count is proved
+for the query as `Reports\Stock\Controller` builds it, and the opposite fault is not ruled out for a
+browser admin request, where WPML's `posts_where` filter may scope the list to one language and hide
+an Arabic-only product instead. WCML removes the All languages option from the analytics switcher, in
+`classes/Reports/Hooks.php`, which suggests the admin normally is scoped.
+
+**It does not matter which way it falls.** Both branches come off the same root, and the probe proved
+the root. Either the list shows one item as two, or it shows one language and silently omits the rest.
+Both are wrong for a report an operator restocks from, and a silent omission is the worse of the two.
+One manual check in the browser before US-24-04 is accepted will say which failure the client would
+actually have seen, and it changes the wording of the acceptance note, not the work.
+
+**Direction for the build, unchanged from P-019 and now shared by both reports.** Resolve the product
+to its translation group before the list is built, by joining `icl_translations` and grouping on
+`trid`, so one physical item is one row whatever language the operator is in. This is the second
+report to need the same resolution, which settles that it belongs in a shared query helper in the
+reporting layer rather than being written twice.
+
+**Lane one.** RPT-10 and FIX-04 are both contracted. Recorded on the board at
+[#194](https://github.com/MustafaShaaban/mizzey-platform/issues/194).
