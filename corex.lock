@@ -1,0 +1,8 @@
+{
+  "repo": "git@github.com:MustafaShaaban/corex.git",
+  "version": "v0.42.0",
+  "commit": "12dde4967449e5fcf955f33db5d6f61b3b93b575",
+  "wordpress": "7.1",
+  "php": ">=8.3",
+  "note": "The CoreX release this site is built against. Changing this file is how a framework upgrade happens: edit it on a branch, run `node tools/corex-sync.mjs`, run the smoke tests, then merge or revert."
+}

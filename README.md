@@ -90,13 +90,66 @@ criterion was verified. CI must pass before merge.
 | Staging | Every stage gate is reviewed here. Risky changes are never tested on production |
 | Production | Provisioned once the client hosting instruction (CR-10) and any required authorisation are in place |
 
-## Getting started
+## How this repository meets CoreX
 
-The site layer is generated from CoreX and does not exist yet. It arrives in Sprint 3.
+**Mizzey is never inside the CoreX repository, and CoreX is never inside this one.** They are joined
+only on disk, in a runtime directory that is not under version control and can be deleted and rebuilt
+at any moment.
+
+```text
+C:\wamp64\www\corex\          CoreX framework development. Holds no client code, ever.
+
+C:\wamp64\www\mizzey\
+  platform\                   this repository, the committed source
+    corex.lock                the CoreX release the site is built against
+    mizzey-site\              the client plugin
+    mizzey-theme\             the client theme
+    tools\corex-sync.mjs      wires the runtime below to the two sources above
+  app\                        the runtime. Disposable, not committed, rebuildable
+    corex\                    a CoreX checkout pinned to corex.lock
+    wp\                       WordPress, wp-content junctioned back to both sources
+```
+
+`app/` holds nothing original. Delete it and `node tools/corex-sync.mjs` builds it again.
+
+### Local setup
 
 ```bash
-wp corex make:site Mizzey
+node tools/corex-sync.mjs
 ```
+
+Then create the database and install WordPress:
+
+```bash
+cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizzey --admin_user=admin --admin_email=mustafashaaban22@gmail.com --prompt=admin_password
+```
+
+`node tools/corex-sync.mjs --check` reports drift and changes nothing. It fails if a framework link has
+been replaced by a real directory, which is the one mistake that silently shadows the framework source.
+
+### Upgrading CoreX
+
+An upgrade is a commit, not an event. On a branch:
+
+1. Edit `corex.lock` to the new tag and commit hash
+2. `node tools/corex-sync.mjs`
+3. `wp corex migrate`
+4. Run the smoke tests
+5. Merge, or `git revert` the one file and you are back
+
+Never track a moving branch. `corex.lock` is the only thing that decides which CoreX this site runs.
+
+### A framework bug, mid build
+
+CoreX is a separate product and is not patched for one client. When the framework is wrong:
+
+1. Open an issue on [CoreX](https://github.com/MustafaShaaban/corex), describing the defect with no
+   client material in it
+2. Work around it **inside `mizzey-site/`**, through a hook, never by editing `app/corex/`
+3. Record the workaround in `COREX-WORKAROUNDS.md` against the issue number
+4. When the fix ships in a tag, bump `corex.lock` and delete the workaround
+
+Anything edited inside `app/corex/` is lost on the next sync. That is deliberate.
 
 ---
 
