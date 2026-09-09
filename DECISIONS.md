@@ -98,3 +98,33 @@ discovering an overselling store after the operations system and the migration a
 still binds it: #233 cites BR-003, CHK-12, AC-05 and AC-15, so it is lane one. A task that cannot cite
 an Annex A id is still a change request. The issue generator is additive and keeps its state in
 `scripts/issues.json`, so a hand-made issue is not at risk from a regeneration.
+
+## 2026-09-09 - Bosta carrier status mapping, tested
+
+P-012 re-run against the real integration: Bosta WooCommerce 4.5.7, the official plugin SHIP-08 names,
+installed on the discovery runtime.
+
+**The plugin never changes order status from a webhook.** In `handle_status_update` the call to
+`map_bosta_state_to_wc_status` is commented out. Driving the handler with state 46 on a `processing`
+order left it `processing` and wrote only `bosta_state_code` and `bosta_status` meta. So **SHIP-13 is
+not delivered by the plugin as shipped**: carrier status is stored, not reflected in order status.
+
+**The feared failure is refuted.** An unrecognised state falls back to `processing`, not `completed`.
+Nothing is silently marked Delivered today.
+
+**The real exposure is different.** The dormant table maps 45 to `completed` and **46 to `completed`
+as well**, grouped as "Finished successfully", while only 45 sets a delivery date. Two distinct
+terminal outcomes collapse into one Woo status, and whoever enables that mapping inherits it silently.
+
+**The plugin ships no legend for the state codes anywhere in its source.** What 46 means cannot be
+established from the integration and must come from Bosta documentation or an account. That is a
+blocking input for SHIP-14: if 46 is a return-to-origin outcome, enabling the stock mapping records a
+returned parcel as delivered, which SHIP-17 forbids. This absence is the argument for SHIP-14 existing.
+
+**Direction for the build:** do not enable the plugin's mapping. Write the Mizzey mapping explicitly,
+code by code, with a named legend visible in admin per SHIP-14, and an unmapped code must land
+somewhere inert and visible rather than in any terminal state.
+
+Recorded on the board at [#166](https://github.com/MustafaShaaban/mizzey-platform/issues/166) and
+[#165](https://github.com/MustafaShaaban/mizzey-platform/issues/165). `bosta_delivery_date`, set only
+on state 45, is a candidate source for the `delivered_at` column decided for ENT-10.

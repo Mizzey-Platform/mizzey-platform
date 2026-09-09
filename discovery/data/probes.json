@@ -254,8 +254,8 @@
     "script": "P-012-carrier-status-map.php",
     "method": "php",
     "expected": "Woo has no such status, and the carrier integration has reported cases of mapping a returned parcel to Delivered. Section 7 row 10.",
-    "observed": "WooCommerce 11.1.0 ships 8 order statuses: wc-pending, wc-processing, wc-on-hold, wc-completed, wc-cancelled, wc-refunded, wc-failed, wc-checkout-draft. There is no returned-to-origin status. SHIP-17 needs a registered custom status, and every report, filter and role view that enumerates statuses has to know about it. The closest existing terminal states are wc-completed and wc-cancelled and wc-refunded and wc-failed. Nothing in core distinguishes a parcel that came back from one that arrived, so an unmapped carrier status has no correct home and the mapping in SHIP-14 is what prevents it landing on completed. The second half of the question, whether the Bosta integration has mapped a returned parcel to Delivered, is NOT tested here: the carrier plugin is not installed on this runtime. It needs re-running against the integration before SHIP-14 is signed off.",
-    "verdict": "partial",
+    "observed": "WooCommerce 11.1.0 ships 8 order statuses: wc-pending, wc-processing, wc-on-hold, wc-completed, wc-cancelled, wc-refunded, wc-failed, wc-checkout-draft. A returned-to-origin status: none. Bosta plugin 4.5.7 maps state codes to Woo statuses: 45 to completed, 46 to completed, 48 to cancelled, 100 to cancelled, 101 to cancelled, 104 to cancelled, 20 to processing, 999999 to processing. An unrecognised state falls back to 'processing', not completed, so the feared silent Delivered does not come from the fallback. The exposure is elsewhere: states 45 and 46 are grouped as \"Finished successfully\" and BOTH map to completed, while only 45 sets a delivery date. Two different terminal outcomes collapse into one Woo status. The plugin ships no legend for these codes anywhere in its source, so what 46 means cannot be established from the integration itself and must come from Bosta documentation or an account. That absence is exactly what SHIP-14 exists to fix. Driving the webhook handler with state 46 on an order that was processing left it processing, and wrote meta bosta_state_code='46', bosta_status='P-012 probe payload'. The mapping is DORMANT. In handle_status_update the call to map_bosta_state_to_wc_status is commented out, so the plugin never changes order status from a webhook: it only records meta. Nothing is silently marked Delivered today, so the expectation as written is refuted. Two consequences follow. SHIP-13, carrier status reflected on the order, is NOT delivered by this plugin as shipped, which bears on the partial leverage on US-09-04. And the dormant mapping is a trap: whoever enables it inherits 45 and 46 both becoming completed.",
+    "verdict": "refuted",
     "env": {
       "wp": "7.1",
       "woocommerce": "11.1.0",
@@ -263,7 +263,7 @@
       "wp_path": "C:/wamp64/www/mizzey/app/wp"
     },
     "run_at": "2026-09-09",
-    "notes": "ORD-13, SHIP-17, AC-16."
+    "notes": "ORD-13, SHIP-17, AC-16. Re-run 9 September 2026 against the real integration, Bosta WooCommerce 4.5.7, installed on the runtime. Refuted: the mapping is commented out in handle_status_update, so nothing is silently marked Delivered today, and an unknown state falls back to processing rather than completed. The exposure is that states 45 and 46 both map to completed while only 45 sets a delivery date, and the plugin ships no legend for the codes. What state 46 means is a blocking input from Bosta documentation. Recorded on the board at mizzey-platform#166 (SHIP-14) and #165 (SHIP-13)."
   },
   {
     "id": "P-013",
