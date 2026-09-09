@@ -163,3 +163,63 @@ comparison is a second probe, not an argument.
 and `WP_MAX_MEMORY_LIMIT` are now 512M in the runtime `wp-config.php`, and `run_probes.py` raises the
 limit for every probe process. This bears on hosting sizing: the Statement of Work budgets 28 to 88 USD
 a month, and a 128M PHP limit is not enough to run this plugin set.
+
+## 2026-09-09 - Product reporting splits by language, and the licence does not fix it
+
+P-019, run against WooCommerce 11.1.0 with WPML 4.9.7 and WooCommerce Multilingual 5.5.7 on the
+discovery runtime.
+
+WPML gives every product its own post per language and `wc_order_product_lookup` records the id that
+was actually ordered, so one product reaches the analytics layer as two rows. Seeded: an English
+product sold 3, its Arabic translation sold 5, and a single-language control sold 6. The lookup table
+held two rows for the pair, 3 and 5. Aggregated the pair is the best seller at 8. Split, neither half
+beats the control.
+
+**WCML does ship a merge for this**, in `classes/Reports/Products/Query.php`, and it half works. On
+one full page it recovered the pair as a single row carrying 8. Three things then went wrong.
+
+**The ranking does not survive.** The ORDER BY runs in SQL before the merge runs in PHP, so the
+8-unit row sat at position 2 of 2, behind the control's 6. A best sellers list ranks products on split
+figures and then displays merged ones.
+
+**A paginated page reports a wrong number under the right name.** At 2 per page the English original
+fell to page 2, so the Arabic half found nothing to merge into, `translateProductTitles` relabelled it
+with the original's title, and page 1 showed "P-019 probe product" at 5 units. That is not a missing
+figure. It is a plausible wrong one, and nothing on the screen marks it.
+
+**It fires only on `wc-analytics` REST requests**, gated on `WCML\Rest\Functions::isAnalyticsRestRequest`.
+Any query Mizzey writes against the lookup tables gets none of it, and E24 is classified partial
+precisely because Mizzey writes queries on top of the base.
+
+**What this settles, and what it does not.** RPT-03 best sellers cannot be built on the analytics base
+as it stands: the probe drove that exact report and it returned a wrong figure. RPT-01 is order-level and
+is not threatened, so US-24-03 is untouched. RPT-10 is split: its dead stock and adjustment figures read
+the same product-level path and inherit the same fault, but low stock and out of stock read product stock
+rather than the analytics tables, and that query was **not** tested here. Whether WCML's stock
+synchronisation makes a translated pair one stock row or two is a separate question and needs its own
+probe before US-24-04 is accepted.
+
+**Direction for the build.** Correct it in SQL rather than in PHP after the fact: resolve `product_id`
+to its translation group before ordering and paginating, by joining `icl_translations` and grouping on
+`trid`. Do it once, in whatever query helper the reporting layer ends up with, so it covers Mizzey's
+own reports and not only the Woo screens.
+
+**Lane one, not a change request.** RPT-03 and RPT-10 are contracted and FIX-04 is contracted. A
+contracted report that counts one product twice is a defective contracted report, not an extra.
+
+**Not the same trade as RPT-11.** The cost field had to be captured from day one or the history was
+gone for good. This one is recoverable at any time, because `icl_translations` carries the language
+mapping whenever the order was placed, so historical figures recompute. Nothing is lost by building
+the reports in sprints 12 and 16 as planned. What must not happen is the query layer being written as
+though the problem is not there.
+
+Recorded on the board at [#194](https://github.com/MustafaShaaban/mizzey-platform/issues/194)
+US-24-04 and [#232](https://github.com/MustafaShaaban/mizzey-platform/issues/232) US-24-06.
+
+**A second finding, in the toolchain.** `discovery/run_probes.py` defaults `MIZZEY_WP` to
+`C:/wamp64/www/corex/wp`, where WooCommerce is not active and WPML is not installed. The first P-019
+run against that default returned a valid JSON object with verdict `partial` and observed
+"Probe error: WooCommerce is not active on this site", and the runner wrote it to the row. A wrong
+runtime produces a recorded verdict instead of a failure, which is the exact thing this dataset exists
+to prevent. Re-running with `MIZZEY_WP=C:/wamp64/www/mizzey/app/wp` gave the real verdict, refuted.
+Correcting the default, and making a wrong runtime abort loudly, is booked separately.

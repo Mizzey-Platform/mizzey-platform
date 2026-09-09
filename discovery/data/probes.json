@@ -402,5 +402,47 @@
     },
     "run_at": "2026-09-09",
     "notes": "ADM-86, SHIP-13, SHIP-16, SHIP-17, ENT-10. Asked because ENT-10 is contracted with a single status column and the client's C-RPT-15 wants average delivery time and RTO rate, which need transitions. Same shape as P-016: a story classified native on an assumption nobody tested."
+  },
+  {
+    "id": "P-019",
+    "question": "When the same product sells in both languages, does the WooCommerce Analytics product report count it once, and does the WooCommerce Multilingual merge survive ordering and pagination?",
+    "stories": [
+      "US-24-04",
+      "US-24-06"
+    ],
+    "gap_rows": [
+      17
+    ],
+    "script": "P-019-analytics-product-split-by-language.php",
+    "method": "wp-cli",
+    "expected": "Section 7 row 17 puts multilingual product and content at Plugin: a translation plugin and Arabic content, with no Mizzey build behind it. E24 reporting is classified partial, meaning WooCommerce Analytics supplies the base and Mizzey adds date filtering, export and role scoping on top. Neither claim says anything about what the other does to it, so the standing assumption is that a product-level report reports a product. RPT-03 best sellers and RPT-10 stock name one product once, whichever language it was bought in.",
+    "observed": "WooCommerce 11.1.0, WPML 4.9.7, WooCommerce Multilingual 5.5.7. Active languages: ar, en. Current language: en. Seeded English product 58 sold 3, its Arabic translation 59 sold 5, and single-language control 60 sold 6. The pair totals 8, so aggregated it is the best seller and split neither half beats the control. wc_order_product_lookup holds 2 row(s) for the pair (58=3, 59=5), so the split is real at the storage layer. Report unmerged, one page of 100, ordered by units sold: P-019 control product=6, P-019 probe product=5, P-019 probe product=3. The same page through the WCML merge: P-019 control product=6, P-019 probe product=8, reported total 2. After the merge the pair occupies 1 row(s) carrying 8 unit(s), at position 2 of 2, and the row at position 1 carries 6 unit(s). Totals recovered. Ranking did not survive, because the ORDER BY ran in SQL before the merge ran in PHP. Page 1 at 2 per page, merged the same way: P-019 control product=6, P-019 probe product=5. The English original is on page 2, so the Arabic half never finds it and is relabelled with the original title and left at its own number: \"P-019 probe product\" showing 5 unit(s) instead of 8. The figure is wrong and looks legitimate. A paginated product report presents a wrong number under the right product name. The merge is applied after the SQL has already ordered and cut the result set, so it can only join rows that happen to land on the same page, and it fires only on wc-analytics REST requests, which means any query Mizzey writes against the lookup tables gets none of it. RPT-03 and RPT-10 cannot be built on this base as it stands. The correction belongs in SQL: resolve product_id to its translation group before ordering and paginating, by joining icl_translations and grouping on trid. Unlike the cost field in RPT-11, nothing is lost by deciding this later: icl_translations carries the language mapping whenever the order was placed, so historical figures recompute.",
+    "verdict": "refuted",
+    "env": {
+      "wp": "7.1",
+      "woocommerce": "11.1.0",
+      "corex": "0.42.0",
+      "wp_path": "C:/wamp64/www/mizzey/app/wp"
+    },
+    "run_at": "2026-09-09",
+    "notes": "RPT-03, RPT-10, FIX-04, NFR-04. Asked because WPML gives each product its own post per language while wc_order_product_lookup records the id that was actually ordered, so one product can reach the report as two rows. WooCommerce Multilingual 5.5.7 does carry a merge, in classes/Reports/Products/Query.php, but it runs on the already ordered and already paginated result set and only on wc-analytics REST requests. Reading that source is not evidence, which is why this probe exists. RPT-01 sales is order-level and is not threatened by this, so US-24-03 is deliberately not listed."
+  },
+  {
+    "id": "P-020",
+    "question": "In a low stock or out of stock list, does a product that exists in two languages appear once, twice, or only in the language the operator is viewing?",
+    "stories": [
+      "US-24-04"
+    ],
+    "gap_rows": [
+      17
+    ],
+    "script": "P-020-stock-report-language-scope.php",
+    "method": "wp-cli",
+    "expected": "RPT-10 contracts low stock, out of stock, dead stock and adjustments as one report, and US-24-04 is classified partial on the assumption that the WooCommerce stock report supplies a sound base. The standing assumption is that the report lists the store's stock: one line per physical item, and every item that is low appears.",
+    "observed": null,
+    "verdict": null,
+    "env": null,
+    "run_at": null,
+    "notes": "RPT-10, FIX-04. Raised by P-019, which proved the product-level split for the analytics products report and deliberately did not test the stock path, because the stock report is a different query. Two leads from source reading, neither of them evidence. First, WCML\\Synchronization\\Component\\Stock copies _stock and _stock_status onto every translation, so both posts carry their own stock row holding the same number, which is the shape of a double count. Second, Reports\\Stock\\Controller::get_products runs a WP_Query against the product post type rather than the analytics lookup tables, so WPML's language filter applies to it, which is the shape of the opposite fault: a list scoped to one language that silently omits an Arabic-only product. WCML also removes the All languages option from the analytics language switcher, in classes/Reports/Hooks.php, so there may be no view that shows both. Whichever of the two it is, it is a defect in a contracted operations report. Blocking on acceptance of US-24-04, raised on issue #194."
   }
 ]
