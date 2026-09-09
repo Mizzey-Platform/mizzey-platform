@@ -44,3 +44,10 @@ __pycache__/
 
 # Board sync state, local to whoever ran the setup script
 scripts/.board-state.json
+
+# CoreX client-site local state (from the make:site scaffold)
+.corex/docs/
+.corex/cache/
+.corex/local-notes/
+.ai/
+.codex/local/

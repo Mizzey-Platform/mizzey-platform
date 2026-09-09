@@ -1,0 +1,3 @@
+# Mizzey — Decision Log
+
+Record each non-trivial decision (context · decision · why · status).

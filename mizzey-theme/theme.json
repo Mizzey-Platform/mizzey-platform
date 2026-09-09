@@ -1,0 +1,13 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"settings": {
+		"appearanceTools": true,
+		"useRootPaddingAwareAlignments": true,
+		"custom": {
+			"mizzey-theme": {
+				"comment": "Site design tokens are exposed as --wp--custom--mizzey-theme--* and the --mizzey-* convention."
+			}
+		}
+	}
+}

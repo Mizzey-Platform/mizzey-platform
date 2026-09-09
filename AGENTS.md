@@ -1,0 +1,38 @@
+# Mizzey — Agent Entry Point (a Corex client site)
+
+This is a **Corex client site**, not the Corex framework. The framework lives in its own
+repo and is updated separately — **do not edit Corex framework folders here.**
+
+## Role Gate — you are in CLIENT SITE MODE
+> Role Gate decides **where** you work · Spec Kit decides **what** · Guard Gate decides **whether it ships** ·
+> UI/UX ProMax decides **whether visible UI is good enough**.
+
+- Edit **only** this client source (this plugin + theme + this site's `docs/`/`specs/`).
+- **Do not** edit Corex framework internals (`plugins/`, `addons/`, `packages/`, the Corex parent `theme/`, root
+  `specs/`, `ROADMAP.md`, root `PROGRESS.md`).
+- **Do not** edit `wp/wp-content/` or `dist/` as source (runtime/build output; `dist/` is generated, never committed).
+- Keep this site's specs in `specs/`, progress in `PROGRESS.md`, decisions in `DECISIONS.md`.
+- Follow **Spec Kit**, the **Guard Gate**, and **UI/UX ProMax** for all UI work.
+- For a **framework** bug or a reusable block/component, **stop** and open a CoreX Framework Mode task in the
+  framework repo — never patch CoreX internals for one client.
+
+End every working response with the SUMMARY / WORKSPACE / MODE / SPEC KIT STATUS / VERIFICATION / BLOCKERS /
+RECOMMENDED NEXT STEP + the `--- NEXT STEP ---` block (the team's standard handoff format).
+
+## Where code goes
+- **App / business code** → the site plugin `mizzey-site/` (namespace `MizzeySite\`).
+- **Presentation / theme code** → the site theme `mizzey-theme/`.
+- Site docs/specs → `docs/` and `specs/`.
+
+The client uses its own identity, distinct from Corex: namespace `MizzeySite\`, text domain
+`mizzey-site`, REST namespace `mizzey/v1`, CSS prefix `--mizzey-`, option/CPT
+prefix `mizzey_`. Import Corex base classes; never use the `Corex\` namespace for app classes.
+
+## Workflow (every non-trivial change)
+1. Pull `develop`. 2. Branch `feature/<work-item>-<slug>`. 3. Create/update `specs/<work-item>-<slug>`.
+4. Implement **only** in the client plugin/theme. 5. Run the guards/checks. 6. Update docs.
+7. Commit. 8. Open a PR. 9. CI + review. 10. Merge to `develop` (staging) → tag/`main` (production).
+
+**One feature = one branch = one spec folder = one PR.** Run the guard skills before presenting/pushing.
+**Never push directly to `develop`/`main`.** Use the `wp corex make:*` generators (they write into this
+client plugin/theme, not the framework). Update docs after any feature.

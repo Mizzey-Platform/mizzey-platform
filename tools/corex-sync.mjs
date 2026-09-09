@@ -89,8 +89,27 @@ function ensureCorex(lock) {
 		git(['checkout', '--detach', lock.commit], COREX);
 	}
 
+	// Dev dependencies are installed deliberately, not by oversight. CoreX v0.42.0 builds its
+	// DocsCommand eagerly in CliServiceProvider::register(), and that command needs
+	// PhpParser\ParserFactory, which reaches the tree only as a transitive dependency of
+	// pestphp/pest (require-dev) and is declared nowhere in composer.json. Under --no-dev the
+	// construction throws and every command registered after it is lost, silently: migrate,
+	// doctor, reset and version all disappear. `wp corex migrate` is step three of our upgrade
+	// path, so a --no-dev runtime cannot be upgraded. See COREX-WORKAROUNDS.md.
 	if (!existsSync(join(COREX, 'vendor', 'autoload.php'))) {
-		fail(`CoreX has no vendor/. Run: composer install --no-dev in ${COREX}`);
+		if (CHECK_ONLY) {
+			fail(`CoreX has no vendor/. Run without --check to install it.`);
+			return false;
+		}
+		actions.push('composer install (with dev, see COREX-WORKAROUNDS.md)');
+		execFileSync('composer', ['install', '--no-interaction'], { cwd: COREX, stdio: 'inherit', shell: true });
+	}
+
+	if (!existsSync(join(COREX, 'vendor', 'nikic', 'php-parser'))) {
+		fail(
+			'nikic/php-parser is missing, so wp corex migrate / doctor / reset / version will not ' +
+				'register. Run composer install (without --no-dev) in ' + COREX,
+		);
 		return false;
 	}
 	return true;
