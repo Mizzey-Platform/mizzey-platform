@@ -43,7 +43,7 @@ two orders (t04 English, t06 Arabic) plus one for the customer order view in t08
 - [x] M-1 Scope: ADM-27, RPT-11 and MIG-13 are obligation rows, and every behaviour here is supported by their wording
 - [x] M-2 Open items: CX-01 and OD-12 are cited, and AC-6 and AC-7 stay pending. Nothing here resolves them
 - [x] M-3 P1-E: not applicable. No row is P1-E
-- [x] M-4 Native first: no custom component is planned. The only contingent addition (R-4) needs a failing AC-3 test
+- [x] M-4 Native first: one custom class, `MizzeySite\Catalogue\CostTranslationSync`, justified by failing AC-3 cases in t11 (REST, WP-CLI and front-end saves never reach translations). The configuration-only attempt (wpml-config.xml) was tested first and removed as ineffective
 - [x] M-5 Three lists: the spec keeps contract, safeguards (S-1, S-2) and future items apart
 - [x] M-6 Stage: S1 for all three rows, unchanged
 - [x] M-7 Tests: every task in tasks.md names its test. Cost (money) paths are covered by the integration scripts
@@ -75,25 +75,28 @@ specs/001-product-cost-capture/
 
 ```text
 mizzey-site/
-└── tests/
-    └── integration/
-        ├── run.py                      # runs each scenario with wp eval-file, collects JSON verdicts
-        ├── _bootstrap.php              # shared helpers: enable feature (FR-001 check), fixtures, clean up
-        ├── t02-simple-cost.php         # AC-1
-        ├── t03-variation-cost.php      # AC-1, zero vs blank
-        ├── t04-order-line-snapshot.php # AC-2
-        ├── t05-translation-cost.php    # AC-3 (duplicate and separate-translation paths)
-        ├── t06-arabic-order-cost.php   # AC-3
-        ├── t07-csv-import-cost.php     # AC-4
-        ├── t08-no-public-exposure.php  # AC-5
-        ├── t09-staff-visibility.php    # AC-6 fact-finding only, no verdict
-        ├── t10-programmatic-cost-sync.php # AC-3 gap check (WPML-1), expected to fail until decided
-        └── fixtures/products-with-cost.csv
+├── mizzey-site.php                    # registers the sync on plugins_loaded
+├── src/Catalogue/CostTranslationSync.php  # the only production code (AC-3 gap)
+└── tests/integration/
+    ├── run.py                         # runs each scenario with wp eval-file, collects JSON verdicts
+    ├── _bootstrap.php                 # feature flag (FR-001 check), fixtures, cleanup, verdict
+    ├── _workflows.php                 # translation methods and cost channels, each in its real request context
+    ├── baseline/reset-runtime.sh      # scripted clean runtime (destructive, disposable only)
+    ├── baseline/setup.php             # WooCommerce, WPML and WCML configuration for the baseline
+    ├── baseline/admin-visit.php       # one wp-admin visit, which is when WPML parses plugin config files
+    ├── t02-simple-cost.php            # AC-1
+    ├── t03-variation-cost.php         # AC-1, zero vs blank
+    ├── t04-order-line-snapshot.php    # AC-2
+    ├── t07-csv-import-cost.php        # AC-4
+    ├── t08-no-public-exposure.php     # AC-5
+    ├── t09-staff-visibility.php       # AC-6 fact-finding only, no verdict
+    ├── t11-cost-sync-matrix.php       # AC-3: translation methods x product types x channels (replaces t05, t06, t10)
+    └── fixtures/                      # import CSV, and the temporary front-end endpoint used by crud-web
 ```
 
-**Structure Decision**: tests only, inside the site plugin's `tests/` folder (site-tests path class). No `src/`
-change is planned. Each script creates its own fixtures and removes them, and restores the feature flag to its
-value before the run.
+**Structure Decision**: one production class in `src/Catalogue/`, plus integration scenarios in the plugin's
+`tests/` folder. Each script creates its own fixtures and removes them, and restores the feature flag to the value
+it had before the run. The runtime baseline is scripted so a result can be reproduced.
 
 ## Complexity Tracking
 

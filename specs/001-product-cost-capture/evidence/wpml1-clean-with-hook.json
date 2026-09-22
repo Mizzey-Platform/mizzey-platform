@@ -1,0 +1,41 @@
+[
+ {
+  "test": "t11-cost-sync-matrix",
+  "criterion": "AC-3",
+  "pass": true,
+  "observed": [
+   "Cost of Goods Sold before this scenario: off; enabled for the run and restored after.",
+   "WPML setting _cogs_value='unset'; mizzey-site/wpml-config.xml absent",
+   "OK   part1 crud-created simple, duplicate: AR 120",
+   "OK   part1 crud-created variations, duplicate: AR 40/70",
+   "OK   part1 crud-created simple, editor: AR 120",
+   "OK   part1 crud-created variations, editor: AR 40/70",
+   "OK   duplicate simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   duplicate simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   duplicate simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   duplicate simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   duplicate simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   duplicate variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged",
+   "OK   duplicate variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged",
+   "OK   duplicate variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged",
+   "OK   duplicate variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged",
+   "OK   duplicate variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged",
+   "OK   editor simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   editor simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   editor simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   editor simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   editor simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged",
+   "OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 125'->'منتج 125 - S' (generated variation title, rewritten on any save)",
+   "OK   editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 133'->'منتج 133 - S' (generated variation title, rewritten on any save)",
+   "OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 141'->'منتج 141 - S' (generated variation title, rewritten on any save)",
+   "OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 149'->'منتج 149 - S' (generated variation title, rewritten on any save)",
+   "OK   editor variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 157'->'منتج 157 - S' (generated variation title, rewritten on any save)"
+  ],
+  "versions": {
+   "wordpress": "7.1.2",
+   "woocommerce": "11.1.0",
+   "wpml": "4.9.7",
+   "wcml": "5.5.7"
+  }
+ }
+]

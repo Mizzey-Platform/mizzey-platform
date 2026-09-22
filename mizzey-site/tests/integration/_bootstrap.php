@@ -33,6 +33,8 @@ final class Scenario {
 	private array $users = array();
 	/** @var string[] */
 	private array $observed = array();
+	/** @var callable[] */
+	private array $finishers = array();
 
 	public function __construct( string $test, string $criterion ) {
 		$this->test      = $test;
@@ -55,6 +57,11 @@ final class Scenario {
 		$this->note( 'Cost of Goods Sold before this scenario: ' . ( $this->flag_before ? 'on' : 'off' ) . '; enabled for the run and restored after.' );
 	}
 
+	/** Run $fn during finish(), before fixtures are removed (for temporary runtime files). */
+	public function on_finish( callable $fn ): void {
+		$this->finishers[] = $fn;
+	}
+
 	public function note( string $line ): void {
 		$this->observed[] = $line;
 	}
@@ -70,8 +77,11 @@ final class Scenario {
 		return $product;
 	}
 
+	/** Track a fixture for deletion. Only product posts are ever tracked, so a wrong id cannot delete other content. */
 	public function track_post( int $id ): void {
-		$this->posts[] = $id;
+		if ( $id > 0 && in_array( get_post_type( $id ), array( 'product', 'product_variation' ), true ) ) {
+			$this->posts[] = $id;
+		}
 	}
 
 	public function track_order( int $id ): void {
@@ -105,6 +115,9 @@ final class Scenario {
 	 * fact-finding scenario that deliberately gives no verdict.
 	 */
 	public function finish( ?bool $pass ): void {
+		foreach ( $this->finishers as $fn ) {
+			$fn();
+		}
 		foreach ( $this->orders as $id ) {
 			$order = wc_get_order( $id );
 			if ( $order ) {

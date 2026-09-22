@@ -36,6 +36,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--only", help="run only scenarios whose file name starts with this")
     ap.add_argument("--json", type=Path, help="also write all verdicts to this file")
     a = ap.parse_args(argv)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     wp = shutil.which("wp") or "wp"
     scripts = sorted(p for p in HERE.glob("t*.php") if not a.only or p.name.startswith(a.only))
     results = [run_scenario(wp, a.wp.resolve(), s) for s in scripts]

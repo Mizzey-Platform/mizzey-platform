@@ -42,11 +42,13 @@ captured from day one) and US-16-02 (product cost recordable).
 - **CX-01 (pending)**: the register's narrative says the Accountant role exists at launch; its ROLE-06 row says DEF.
   Which staff roles hold "financial permission" (US-16-05 AC2) is therefore unresolved. This spec takes no position.
 - **OD-12 (pending)**: product cost basis (purchase price only, or landed cost) and who enters it. Client decision,
-  due before catalogue load. It decides what the value means, not whether it can be captured.
-- **WPML-1 (open, engineering decision)**: programmatic cost changes (importer updates, REST, WP-CLI) do not reach
-  existing Arabic translations (t10). Options in `verification.md`. AC-3 is met for the admin workflow only.
-- **WPML-2 (open, engineering)**: whether `mizzey-site/wpml-config.xml` is necessary. It needs a run on a fresh
-  runtime database.
+  due before catalogue load. It decides what the value means, not whether it can be captured. Add to that
+  conversation: WooCommerce stores a cost of zero as "no cost", so a deliberate zero cost (a free sample, a gift)
+  cannot be told apart from a product nobody has costed yet. If the client needs that distinction, it is a change
+  request, not a build task.
+- **WPML-1 (closed)**: cost changed by code did not reach translations. Root cause found, fix implemented and
+  verified (see Native coverage and verification.md). No longer open.
+- **WPML-2 (closed)**: `mizzey-site/wpml-config.xml` was shown to be unnecessary on a clean runtime and was removed.
 - **PRE-09**: not relevant. No row here is P1-E; the ERP integration is stock only.
 
 ## Contractual acceptance criteria [checked]
@@ -155,27 +157,37 @@ public or customer-accessible interface, and look for cost.
 
 ## Native coverage
 
-Verified in the disposable runtime on 2026-09-22 (WordPress 7.1.2, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7, PHP
-8.3.6, MySQL 8.3.0). Evidence: `evidence/run-3-after-guard.txt`, and `verification.md`.
+Verified on clean, scripted baselines of the disposable runtime (WordPress 7.1.2, WooCommerce 11.1.0, WPML 4.9.7,
+WCML 5.5.7, PHP 8.3.6, MySQL 8.3.0). Evidence: `evidence/` and `verification.md`.
 
 | Capability | Evidence | Status |
 |---|---|---|
 | Cost on simple products and variations, saved and read back | t02, t03 | VERIFIED |
 | Cost frozen onto the order line; later edits do not change it | t04 (200 kept after 999) | VERIFIED |
-| Arabic copy carries cost: WPML duplicate (simple and variations) and separately authored translation, for edits made through the admin save order | t05 | VERIFIED (admin save simulated; manual admin check in UAT) |
-| Orders for the Arabic product in the Arabic context record cost | t06 (220 and 180) | VERIFIED |
-| Programmatic cost edits (CRUD save: importer updates, REST, WP-CLI) reach existing translations | t10 | **GAP (WPML-1)** |
-| Native CSV import carries "Cost of goods" onto simple products and variations; a blank stays blank | t07 | VERIFIED |
-| No cost to visitors or customers: product pages, Store API, REST v3, My Account order view | t08 | VERIFIED (order emails not tested locally) |
-| Which staff roles see cost | t09: administrator and shop_manager only (edit_products and REST v3); all other roles 403 | FACT for CX-01 |
-| A zero cost is stored as "no cost", like a blank | t02, native `adjust_cogs_value_before_set` | FACT |
-| Setting a cost while the feature is off does nothing, and the importer drops the cost column | source: `set_cogs_value`, importer line 989 | VERIFIED (source) |
+| Cost carried to a translation created after the cost exists, by WPML duplicate or by the WCML translation editor, for simple products and variations | t11 part 1 | VERIFIED |
+| Cost changed later through wp-admin (product form, variations AJAX) or the wp-admin CSV importer, reaching the Arabic copy | t11, all admin-http and import-http cases | VERIFIED (native) |
+| Cost changed later through the REST API, WP-CLI, or code in a front-end request | t11, rest-http, crud-cli, crud-web | **GAP in WooCommerce and WPML** (see below). Closed by `MizzeySite\Catalogue\CostTranslationSync` |
+| Native CSV import carries "Cost of goods"; a blank stays blank | t07 | VERIFIED |
+| No cost to visitors or customers: product pages, Store API, REST v3, My Account order view | t08 | VERIFIED (order emails not tested) |
+| Which staff roles see cost | t09: administrator and shop_manager only; every other role 403 | FACT for CX-01 |
+| A zero cost is stored as "no cost", like a blank | t02, native `adjust_cogs_value_before_set` | FACT, raised under OD-12 |
+| Setting a cost while the feature is off does nothing, and the importer drops the column | source: `set_cogs_value`, importer line 989 | VERIFIED (source) |
 
-Configuration added: `mizzey-site/wpml-config.xml` declares `_cogs_value` and `_cogs_value_is_additive` as copied
-custom fields, the mechanism WCML uses for its own product fields. It was added after t05 and t06 failed. A later
-control run, in the same runtime without the file, also passed the admin-save path. Whether the file is
-**necessary** (and not merely harmless) is therefore not proven: WPML or WCML may keep state after the file was
-first loaded. See open item WPML-2.
+**The gap, and why custom code was needed.** WooCommerce's data store skips `wp_update_post()` when a save changes
+only meta, so `save_post` never fires for a cost-only change. WPML and WCML copy fields to translations on
+`save_post` (and, in wp-admin, on the variations AJAX save and WCML's importer hook, which runs
+`wpml_sync_all_custom_fields`). A cost changed through REST, WP-CLI or other code therefore never reached the
+Arabic copy, and an order for the Arabic product recorded cost 0 with nothing on screen to show it. Tested with and
+without a `wpml-config.xml` declaring the cost fields as copied: the file changed WPML's settings and changed no
+outcome, so it was removed (WPML-2).
+
+`MizzeySite\Catalogue\CostTranslationSync` closes it: after WooCommerce saves a product or variation, the
+source-language original copies its cost to its translations through WooCommerce CRUD, comparing first and writing
+only on a difference. It adds no field and syncs nothing but cost.
+
+Side effect recorded, not caused by this feature: saving a variation makes WooCommerce regenerate that variation's
+title from the parent name and attributes. An Arabic variation authored in the WCML editor is therefore renamed the
+first time any save reaches it, including WCML's own admin sync. Price, stock, SKU and status are untouched (t11).
 
 ## Requirements
 
@@ -203,6 +215,7 @@ first loaded. See open item WPML-2.
 |---|---|---|---|
 | S-1 | Go-live check that cost capture is enabled: a runbook line, plus a scripted assertion in the deploy step | An order placed while it is off loses its cost permanently | Runbook: no. Assertion: a few lines of deploy script, no plugin code |
 | S-2 | Record the enablement date and WooCommerce version in `DECISIONS.md` | Shows which orders can carry cost | No |
+| S-3 | A scripted clean baseline for the disposable runtime (`mizzey-site/tests/integration/baseline/`) | The first WPML results were wrong because the runtime had drifted. A scripted baseline makes a result repeatable | No (test tooling) |
 
 Rejected as unnecessary: a custom cost field, a catalogue service, a cost repository, an admin notice, or a CLI
 command. No contractual criterion needs any of them.

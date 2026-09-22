@@ -2,10 +2,25 @@
 
 ## Prerequisites
 
-- The disposable runtime is built: `node tools/corex-sync.mjs`, with WordPress, WooCommerce, WPML and WCML at the
-  versions in `stack.lock.json`, and languages `en` (default) and `ar`.
-- WP-CLI on the PATH. Python 3.10.
-- Never run against production.
+- The disposable runtime is built: `node tools/corex-sync.mjs`, with the versions in `stack.lock.json`.
+- WP-CLI on the PATH, Python 3.10, and the local site reachable over HTTP (the admin, importer, REST and front-end
+  scenarios drive real requests).
+- Never run any of this against production.
+
+## A clean baseline (recommended before any comparison)
+
+A runtime that has been used for other work is not a baseline: WPML settings, its downloaded configuration and
+WooCommerce options all drift, and the first version of this pilot drew wrong conclusions from that. Rebuild it:
+
+```bash
+MIZZEY_CONFIRM_RESET=yes sh mizzey-site/tests/integration/baseline/reset-runtime.sh ../app/wp
+```
+
+**This drops every table in the runtime database and reinstalls WordPress.** It refuses to run unless the path is
+the disposable runtime, the database is local, and the confirmation variable is set. Take a backup first
+(`wp db export`). It installs and activates the plugins, configures WooCommerce (Egypt, EGP, HPOS), sets up WPML
+(English default, Arabic active, products and variations translatable), and loads the wp-admin Plugins page once,
+which is when WPML parses plugin `wpml-config.xml` files.
 
 ## Configuration (the deliverable for FR-001)
 
@@ -13,26 +28,25 @@
 wp --path=../app/wp option update woocommerce_feature_cost_of_goods_sold_enabled yes
 ```
 
-The same setting goes into the go-live runbook for staging and production, before the first live order (optional
-safeguard S-1 adds a scripted check).
+The same setting goes into the go-live runbook for staging and production, before the first live order (safeguard
+S-1 adds a scripted check).
 
-## Run the integration scenarios
+## Run the scenarios
 
 ```bash
 python mizzey-site/tests/integration/run.py --wp ../app/wp
 ```
 
-Each scenario prints one JSON line (`test`, `criterion`, `pass`, `observed`), and the runner exits non-zero if any
-contract scenario fails. t09 reports facts with `pass: null`. Scripts clean up their fixtures and restore the
-feature flag.
+Each scenario prints one JSON line (`test`, `criterion`, `pass`, `observed`), and the runner exits non-zero if a
+contract scenario fails. Scripts clean up their fixtures, restore the feature flag, and leave no temporary files.
 
 ## Expected outcome
 
 | Scenario | Expect |
 |---|---|
-| t02 to t04 | pass (every scenario also checks FR-001 enablement) |
-| t05, t06 | pass, or a recorded WPML/WCML gap. A gap blocks AC-3 until it is fixed |
-| t07 | pass; blank cost stays blank |
+| t02, t03 | pass. Every scenario also checks FR-001 enablement |
+| t04 | pass: the order keeps the cost it was sold at |
+| t07 | pass: import carries cost; a blank stays blank |
 | t08 | pass: no cost in any visitor or customer response |
 | t09 | facts only, for the CX-01 discussion |
-| t10 | fails until decision WPML-1 is made (programmatic cost edits do not reach translations) |
+| t11 | pass: 24 cases (2 translation methods x 2 product types x 5 channels, plus 4 creation cases). Arabic variation titles are reported as noted facts, because WooCommerce regenerates them on any save |

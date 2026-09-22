@@ -25,7 +25,9 @@ unless stated otherwise.
 
 - **Decision**: WP-CLI integration scripts under `mizzey-site/tests/integration/`, one scenario per file, each
   printing a JSON verdict. A small runner, `mizzey-site/tests/integration/run.py`, runs them against the disposable
-  runtime `../app/wp`.
+  runtime `../app/wp`, and `baseline/reset-runtime.sh` rebuilds that runtime to a known state first. Scenarios that
+  must exercise a real request (wp-admin, the importer, REST, a front-end request) drive it over HTTP rather than
+  simulating it in the CLI process.
 - **Rationale**: `mizzey-site/` is an empty scaffold with no Composer, Pest or WordPress test library. Setting those
   up is test-infrastructure work outside this pilot. The discovery probes already prove the WP-CLI pattern works
   against real WordPress, WooCommerce and WPML. The files sit under `mizzey-site/tests/`, which the path policy
@@ -35,14 +37,18 @@ unless stated otherwise.
 
 ## R-4. Translation behaviour (WPML 4.9.7, WCML 5.5.7)
 
-- **Finding**: neither WCML nor WooCommerce ships a `wpml-config.xml` entry for `_cogs_value`. WPML holds no setting
-  for it on this runtime (`custom_fields_translation['_cogs_value']` is unset). Behaviour on Arabic copies is
-  therefore not declared anywhere, and must be tested.
-- **Decision**: test two creation paths, a WPML duplicate and a separately authored linked translation, plus an order
-  placed on the Arabic product.
-- **If a gap is found**: the smallest fix is to declare `_cogs_value` as a copied custom field in a
-  `wpml-config.xml` shipped with `mizzey-site`. That is configuration read by WPML, not PHP code. It is justified
-  only by a failing AC-3 test.
+- **Finding, confirmed on clean baselines.** Neither WooCommerce nor WCML declares `_cogs_value` in a
+  `wpml-config.xml`; WPML's downloaded remote configuration declares only `_cogs_total_value`. More importantly, the
+  declaration is not what matters: WPML and WCML copy fields to translations on `save_post`, on the wp-admin
+  variations AJAX save, and through WCML's importer hook, and WooCommerce does not fire `save_post` when a save
+  changes only meta. So cost changes made through REST, WP-CLI or other code never reach the Arabic copy.
+- **Decision.** Test every channel in its real request context (this matters: WCML registers its sync only for
+  `is_admin()` or WP-CLI), on a scripted clean baseline, with translations created both ways.
+- **Outcome.** A `wpml-config.xml` declaring the cost fields was tried first and removed: it changed WPML's settings
+  and changed no outcome. The gap is closed by `MizzeySite\Catalogue\CostTranslationSync`, justified by the
+  failing cases. See verification.md.
+- **Environment lesson.** A runtime that has been used for months is not a test baseline. The first conclusions in
+  this pilot were wrong because of runtime drift and harness faults, not because of the product.
 
 ## R-5. Public and customer exposure
 

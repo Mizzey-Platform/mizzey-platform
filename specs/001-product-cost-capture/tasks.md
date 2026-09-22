@@ -33,8 +33,8 @@ t05 or t06 fails.
 **Goal**: AC-2 and AC-3. **Independent test**: t04 to t06 pass.
 
 - [x] T008 [US2] t04 `mizzey-site/tests/integration/t04-order-line-snapshot.php`: an order for 2 units at cost 100 records 200, and still records 200 after the product cost changes to 999 (AC-2)
-- [x] T009 [P] [US2] t05 `mizzey-site/tests/integration/t05-translation-cost.php`: after an English product gets a cost, does the Arabic copy carry it, (a) as a WPML duplicate and (b) as a separately authored linked translation, both at creation and after a later cost edit on the English product (AC-3)
-- [x] T010 [US2] t06 `mizzey-site/tests/integration/t06-arabic-order-cost.php`: an order for the Arabic product, placed in the Arabic language context, records a line cost (AC-3)
+- [x] T009 [P] [US2] Superseded by T022. t05 was replaced: its "separately authored translation" was not how WCML creates one, and it only tested a simulated admin save
+- [x] T010 [US2] Superseded by T022. Arabic-language orders are now placed inside every matrix case (AC-3)
 
 ## Phase 5: User Story 3 - Cost arrives with the catalogue (Priority: Medium)
 
@@ -58,11 +58,19 @@ t05 or t06 fails.
 - [ ] T018 Report the three states separately in the PR: workflow complete, technically verified (AC-1 to AC-5), contractually accepted (no: AC-6 pending CX-01, AC-7 pending OD-12)
 - [x] T019 Record the new facts for later governance PRs, without changing governance files here: MySQL 8.3.0 for `stack.lock.json`, and any version or behaviour finding for ADR-0001
 
-## Contingent (only if t05 or t06 fails): triggered, see verification.md
+## Corrective investigation (authorised 22 September 2026, after the first pilot report)
 
-- [x] T020 [US2] If an Arabic copy or an Arabic order lacks cost: add `mizzey-site/wpml-config.xml` declaring `_cogs_value` (and `_cogs_value_is_additive`) as copied custom fields, justify it in the spec's Native coverage table, re-run t05 and t06, and run woo-guard and wp-guard on it. If the XML does not fix it, stop and report; do not write PHP
+- [x] T022 [US2] Replace t05, t06 and t10 with `mizzey-site/tests/integration/t11-cost-sync-matrix.php`: 2 translation methods (WPML duplicate, WCML translation editor) x 2 product types (simple, variation) x 5 channels (admin-http, import-http, rest-http, crud-cli, crud-web), each in its real request context, plus 4 creation cases; every case also checks Arabic and English orders and that price, stock, SKU and status are untouched (AC-3)
+- [x] T023 Script a clean, repeatable runtime baseline in `mizzey-site/tests/integration/baseline/` (destructive, disposable runtime only, guarded by MIZZEY_CONFIRM_RESET), including the wp-admin visit that makes WPML parse plugin config files
+- [x] T024 Compare the same matrix with and without `wpml-config.xml` on fresh baselines; record both runs in `evidence/`
+- [x] T025 [US2] Implement the minimum correction, `MizzeySite\Catalogue\CostTranslationSync`, answering the design questions in verification.md before writing it; re-run the matrix (24 of 24 pass)
+- [x] T026 Re-run the full suite on a clean baseline, confirm the runtime is left as found, and run woo-guard on the new class (two findings, both fixed)
 
-- [x] T021 [US2] t10 `mizzey-site/tests/integration/t10-programmatic-cost-sync.php`: programmatic (CRUD-only) cost edits reach existing translations (AC-3, WPML-1). Added after the T020 diagnosis. Fails until WPML-1 is decided
+## Contingent (only if t05 or t06 fails): triggered, see T020
+
+- [x] T020 [US2] Tried and rejected. `mizzey-site/wpml-config.xml` was added, tested on a clean baseline with and without it (identical results in all 24 cases), and removed. Configuration alone does not close the gap (verification.md, WPML-2)
+
+- [x] T021 [US2] Superseded by T022. t10 became the crud-cli, crud-web and rest-http columns of the matrix
 
 ## Dependencies
 
