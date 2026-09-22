@@ -72,11 +72,29 @@ t05 or t06 fails.
 
 - [x] T021 [US2] Superseded by T022. t10 became the crud-cli, crud-web and rest-http columns of the matrix
 
+## Review round (requested 22 September 2026, before merge)
+
+- [x] T027 [US2] t12 `mizzey-site/tests/integration/t12-cost-sync-identity.php`: the original, the translation
+  relationship, simple products, variation to matching variation, a missing translation, a deleted translation, and
+  a cost written on the translation (AC-3)
+- [x] T028 [US2] t13 `mizzey-site/tests/integration/t13-cost-sync-semantics.php`: first cost, increase, decrease,
+  no change, repeated saves, clearing, zero, the number of writes each causes, a forced failure with its log and
+  its repair, and re-entrancy (AC-3)
+- [x] T029 [US2] t14 `mizzey-site/tests/integration/t14-arabic-content-after-sync.php`: every authored field, the
+  translation relationship, an unrelated custom field, and what an Arabic customer reads, before and after (AC-3,
+  AC-5)
+- [x] T030 [US2] t15 `mizzey-site/tests/integration/t15-cost-sync-entrypoints.php`: the hook that carries the copy
+  in each of the five channels, recorded inside the request that does the work, for simple products and variations
+  (AC-3)
+- [x] T031 [US2] Correct what T027 to T030 found: identity resolved from the WPML translation rows rather than the
+  separately cached `wpml_original_element_id`, and the storage key corrected to `_cogs_total_value` in the spec,
+  plan, research and data model (verification.md, review round)
+
 ## Dependencies
 
 - T001 to T004 before every story. US1 (T005 to T007) before US2, because the orders need products with cost.
   US3 and US4 depend only on Phase 2.
-- T014 needs every scenario script. T020 depends on the T014 result.
+- T014 needs every scenario script. T020 depends on the T014 result. T031 depends on T027 to T030.
 
 ## Parallel opportunities
 

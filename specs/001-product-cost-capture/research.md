@@ -7,9 +7,11 @@ unless stated otherwise.
 
 - **Decision**: WooCommerce 11.1.0 native Cost of Goods Sold (ADR-0001, Proposed).
 - **Rationale**: P-016 and P-017 (9 Sep) showed the field exists and the order line keeps the cost at sale. The
-  source is stable: `CostOfGoodsSoldController` has `is_experimental => false`. Storage: product meta
-  `_cogs_value`, variation flag `_cogs_value_is_additive`, order line meta `_cogs_total_value` (grep of
-  `includes/` and `src/`).
+  source is stable: `CostOfGoodsSoldController` has `is_experimental => false`. Storage: post meta
+  `_cogs_total_value` on the product or variation, the variation flag `_cogs_value_is_additive`, and order line
+  meta `_cogs_total_value` (`WC_Product_Data_Store_CPT::read_product_data` and `update_post_meta_fields`, confirmed
+  against the database). `_cogs_value` is the name of the admin form field and the CRUD accessor, not a stored key:
+  the earlier records in this folder named it as the storage key and were wrong.
 - **Alternatives**: a custom meta field. Rejected in ADR-0001: it duplicates native behaviour and loses the native
   order-line snapshot.
 
@@ -37,18 +39,22 @@ unless stated otherwise.
 
 ## R-4. Translation behaviour (WPML 4.9.7, WCML 5.5.7)
 
-- **Finding, confirmed on clean baselines.** Neither WooCommerce nor WCML declares `_cogs_value` in a
-  `wpml-config.xml`; WPML's downloaded remote configuration declares only `_cogs_total_value`. More importantly, the
-  declaration is not what matters: WPML and WCML copy fields to translations on `save_post`, on the wp-admin
-  variations AJAX save, and through WCML's importer hook, and WooCommerce does not fire `save_post` when a save
-  changes only meta. So cost changes made through REST, WP-CLI or other code never reach the Arabic copy.
+- **Finding, confirmed on clean baselines.** WPML's downloaded configuration already declares the cost field
+  `_cogs_total_value` as copied, and locks it (baseline output: `_cogs_total_value=1 locked=true`). Configuration
+  was therefore never missing. What matters is the event: WPML and WCML copy fields to translations on `save_post`,
+  on the wp-admin variations AJAX save, and through WCML's importer hook, and WooCommerce does not fire `save_post`
+  when a save changes only meta. So cost changes made through REST, WP-CLI or other code never reach the Arabic
+  copy, whatever any configuration file says. Which hook each channel does fire is measured per channel in t15.
 - **Decision.** Test every channel in its real request context (this matters: WCML registers its sync only for
   `is_admin()` or WP-CLI), on a scripted clean baseline, with translations created both ways.
-- **Outcome.** A `wpml-config.xml` declaring the cost fields was tried first and removed: it changed WPML's settings
-  and changed no outcome. The gap is closed by `MizzeySite\Catalogue\CostTranslationSync`, justified by the
-  failing cases. See verification.md.
+- **Outcome.** A `wpml-config.xml` was tried first and removed: it changed WPML's settings and changed no outcome.
+  It declared `_cogs_value`, which is not a stored key at all, which explains why it could not have helped. The gap
+  is closed by `MizzeySite\Catalogue\CostTranslationSync`, justified by the failing cases. See verification.md.
 - **Environment lesson.** A runtime that has been used for months is not a test baseline. The first conclusions in
   this pilot were wrong because of runtime drift and harness faults, not because of the product.
+- **Identity, added in the review round.** WPML answers `wpml_original_element_id` from a cache of its own that can
+  go stale inside one long-running process, while `wpml_get_element_translations` stays correct. Identity is
+  therefore read from the translation rows, not from the cached answer (verification.md, review round).
 
 ## R-5. Public and customer exposure
 

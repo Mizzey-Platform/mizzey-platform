@@ -23,7 +23,7 @@ Never production.
 ## Results (T014)
 
 `python mizzey-site/tests/integration/run.py --wp ../app/wp`, on a clean baseline, with the fix in place:
-`evidence/final-suite.txt` and `.json`.
+`evidence/final-suite.txt` and `.json`. 11 scenarios, 0 failed (t09 gives facts, not a verdict).
 
 | Scenario | Criterion | Result | Key observation |
 |---|---|---|---|
@@ -34,9 +34,14 @@ Never production.
 | t08 exposure | AC-5 | PASS | No cost in visitor pages, Store API, REST v3, or the customer's order view |
 | t09 staff visibility | AC-6 | FACT | administrator and shop_manager only; every other role 403 |
 | t11 cost sync matrix | AC-3 | PASS | 24 cases: 2 translation methods x 2 product types x 5 channels, plus 4 creation cases |
+| t12 identity | AC-3 | PASS | 7 cases: the copy reaches the WPML original's translations, the matching variation, and nothing else |
+| t13 semantics and failure | AC-3 | PASS | 8 update steps with the write count each causes, a forced failure with its log and repair, re-entrancy |
+| t14 side effects and Arabic content | AC-3, AC-5 | PASS | 4 cases: no authored field, relationship, unrelated field or customer-visible string moved |
+| t15 entry points | AC-3 | PASS | 10 cases: the hook that carries the copy, recorded inside each channel's own request |
 
-After the run: feature flag `no`, 0 products, 0 orders, no test users, no temporary must-use plugin, no leftover
-import files (T015).
+After the run: feature flag `no`, 0 products, 0 orders, no test users beyond the baseline administrator, no
+temporary must-use plugin, no leftover import files, no scenario options, and no cost-sync log files or rows
+(T015).
 
 ## The WPML investigation
 
@@ -74,13 +79,18 @@ that, and each was corrected before any conclusion was drawn:
 
 Same clean baseline, same 24 cases, run twice:
 
-| | `_cogs_value` setting | admin-http, import-http | rest-http, crud-cli, crud-web |
+| | `_cogs_value` declared | admin-http, import-http | rest-http, crud-cli, crud-web |
 |---|---|---|---|
 | Without `wpml-config.xml` (`evidence/wpml1-clean-no-xml.txt`) | unset | pass | fail |
 | With `wpml-config.xml` (`evidence/wpml1-clean-with-xml.txt`) | 1 (copy), locked by config | pass | fail |
 
-The file changed WPML's settings and changed no outcome. It was removed (WPML-2 closed). WPML's own remote
-configuration already marks `_cogs_total_value` as copied; neither it nor WCML declares `_cogs_value`.
+The file changed WPML's settings and changed no outcome. It was removed (WPML-2 closed).
+
+Two facts found in the review round explain that result completely. `_cogs_total_value` is the meta key WooCommerce
+actually stores a product's cost in; `_cogs_value` is the name of the admin form field and the CRUD accessor, not a
+stored key. So the file declared a field that does not exist in the database. And WPML's own downloaded
+configuration already declares `_cogs_total_value` as copied, and locks it (`_cogs_total_value=1 locked=true` in the
+baseline output). Configuration was never the missing piece: the event was.
 
 ### The minimum correction
 
@@ -108,6 +118,119 @@ Saving a variation makes WooCommerce regenerate that variation's title from the 
 save reaches it. This happens with WCML's own admin sync too, before and without this fix. Price, stock, SKU and
 status are unchanged in every case, which the matrix checks.
 
+## Review round, 22 September 2026: identity, semantics, side effects, entry points
+
+Asked for before merge: prove the synchronisation reaches the right posts, behaves correctly on every kind of cost
+change, leaves everything else alone, fails safely, and runs on the hook each channel actually fires. Four scenarios
+were added, t12 to t15. They found one defect in the implementation and two errors in this folder's records.
+
+### The defect, and the correction
+
+t13 created a second English product and its translation in the same process and changed its cost. The Arabic copy
+did not follow. The cause was how identity was read, not the feature. WPML answers `wpml_original_element_id` from
+a cache of its own (`SitePress::get_original_element_translation`, cache group `original_element`), and inside a
+single long-running process that had just created another translation it named an earlier product, so the sync saw
+the original as "not an original" and declined to copy. At that same moment `wpml_get_element_translations`, which
+the class already called for the list of translations, returned the correct rows, and the rows in
+`icl_translations` were correct throughout (`evidence/wpml-identity-cache.txt`: the database rows, the stale answer,
+and the same answer after `wp_cache_flush()`).
+
+The correction is smaller than what it replaced. Identity and the translation list now come from one call to
+`wpml_get_element_translations`: the element WPML flags as `original`, with no source language of its own, is the
+one that copies outwards. The class no longer calls `wpml_original_element_id`, so the two answers cannot disagree.
+t12 keeps a regression case (a pair created second in the same process, with no cache flush) and t13 exercises the
+same condition.
+
+Stated plainly: the failure mode was a copy that did not happen, never a copy to the wrong product, and a copy that
+did not happen is repaired by the next save of the original (t13). A long-running import or migration script is the
+realistic place to meet it, which matters for MIG-13; WCML's own synchronisation reads identity through the same
+WPML caches.
+
+### Two record corrections
+
+- **The storage key.** WooCommerce 11.1.0 stores a product's or variation's own cost in post meta
+  `_cogs_total_value` (`WC_Product_Data_Store_CPT` lines 513 and 813, confirmed against the database).
+  `_cogs_value` is the admin form field and the CRUD accessor. The spec, plan, research and data model said
+  `_cogs_value` was the stored key and are corrected. The class itself was never affected: it reads and writes
+  through CRUD.
+- **What WPML declares.** WPML's downloaded configuration already declares `_cogs_total_value` as copied and locks
+  it. The earlier record said the cost field was undeclared. It was not: the copy simply runs on events that a
+  cost-only save never fires.
+
+### Identity (t12)
+
+| Case | Result |
+|---|---|
+| The original and the translation, read as the class reads them: one trid, the English row flagged original with no source language, the Arabic row sourced from `en` | PASS |
+| A simple product: the cost reaches its own translation, and the only products written are those two | PASS |
+| Variations: changing the cost of variation S moves S in Arabic and leaves the L sibling untouched | PASS |
+| A product with no translation: written once, nothing else touched | PASS |
+| A translation that has been deleted: the English variation is still saved, nothing else is written, no error | PASS |
+| A cost written directly on the translation does not reach the original, and the next save of the original restores the translation | PASS |
+| A pair created second in the same process, the condition that exposed the defect above | PASS |
+| Creating a translation when a cost already exists | covered by t11 part 1, both methods, both product types |
+
+### Update semantics and failure handling (t13)
+
+Each step records how many times the translation was actually written, so compare-before-write is measured.
+
+| Step | Arabic value | Writes to the translation |
+|---|---|---|
+| First cost, 100 | 100 | 1 |
+| Increase to 150 | 150 | 1 |
+| Decrease to 80 | 80 | 1 |
+| Saved again at 80 | 80 | 0 |
+| Saved three more times at 80 | 80 | 0 |
+| Cleared | none | 1 |
+| Set again to 60 | 60 | 1 |
+| Zero | none, as WooCommerce stores zero | 1 |
+
+Failure: the save of one Arabic product was forced to throw. The English product was still saved, the unrelated
+pair was still synchronised, the failure was logged to the WooCommerce log under `mizzey-cost-sync` naming both
+products, and an ordinary save of the original afterwards repaired the gap. Nothing polls and nothing queues: the
+repair happens on the next supported save, which is stated here because it is a limit of the design, not a feature.
+
+Re-entrancy: one save of an original produced exactly two writes, the translation (nested inside the save of the
+original) and the original, and stopped.
+
+### Side effects, including what an Arabic customer reads (t14)
+
+For both translation methods and both product types, the Arabic post was photographed before and after a cost
+change on the English original. Nothing an editor authored moved: price, sale price, price index, SKU, stock,
+stock management and status, attributes, post status, slug, content, excerpt, product terms, the WPML language and
+trid, and a custom field written by hand to stand for unrelated third-party data. The cost fields moved, which is
+the point.
+
+What a customer reads was measured, not assumed: the product name and a variation's attribute summary in the
+Arabic context, what the Store API serves for the Arabic product, and the name and meta an Arabic order records for
+the line. All identical before and after, in Arabic where the translation was authored in Arabic, with no cost in
+the Store API response.
+
+The variation title reported earlier is explained. Measured at three points for a variation translated in the WCML
+editor: `منتج 363` as WCML created it, `منتج 363 - S` after an ordinary save, and unchanged by the cost sync. The
+regeneration is caused by any save, WCML's own included, and the name the customer reads was already the
+regenerated form at every point, because WooCommerce composes it from the parent name and the attributes. It is a
+stored title catching up with what was already displayed, not an Arabic content regression. WooCommerce also writes
+its own bookkeeping fields on any CRUD save (product version, rating and review counters); those are recorded as
+facts.
+
+### The hook that carries the copy, per channel (t15)
+
+Recorded inside the request that does the work, with a temporary recorder installed in the disposable runtime, for
+a simple product and for a variation in each channel. Ten cases, all passing.
+
+| Channel | Request context | Hook that carries the copy | Does `save_post` fire, so WPML and WCML can run? |
+|---|---|---|---|
+| wp-admin product form | admin | `woocommerce_update_product` | yes |
+| wp-admin variations AJAX | admin, ajax | `woocommerce_update_product_variation`, after `woocommerce_ajax_save_product_variations` | yes |
+| wp-admin CSV importer, simple | admin, ajax | `woocommerce_update_product` | no, and WCML's own importer hook fires instead |
+| wp-admin CSV importer, variation | admin, ajax | `woocommerce_update_product_variation` | yes |
+| REST API | rest | `woocommerce_update_product(_variation)` | no |
+| WooCommerce CRUD under WP-CLI | cli | `woocommerce_update_product(_variation)` | no |
+| Front-end application code, webhooks, cron | front | `woocommerce_update_product(_variation)` | no |
+
+The three channels where `save_post` never fires are exactly the three that failed before this feature existed.
+
 ## Open items after the pilot
 
 | Id | Question | Owner |
@@ -127,10 +250,36 @@ status are unchanged in every case, which the matrix checks.
   verified). No order data is touched, no direct meta writes, no template overrides, no checkout code.
 - The removed `wpml-config.xml` needed no code review.
 
+### Guard Gate, review round
+
+- **woo-guard** on the corrected `CostTranslationSync.php`. No order data is read or written, so the HPOS rules do
+  not apply (Rule 1); every write goes through a CRUD object and `save()`, so lookup tables and hooks stay correct
+  (Rule 2); no checkout code (Rule 4); costs are compared through `wc_format_decimal` at the store's precision and
+  no arithmetic is done on them (Rule 5); no cart or session is touched and the hook names are the ones WooCommerce
+  11.1.0 fires, which t15 confirms in the admin, AJAX, REST, CLI and front-end contexts (Rule 6); no templates
+  (Rule 7); no background jobs, and the absence of a queue is a recorded design decision rather than an oversight
+  (Rule 8). One change came out of the pass: each row from WPML is cast to an object, so a filter that returned
+  arrays could not turn a product save into a fatal error. Follow-up for later work, not for this feature: the
+  plugin will need `FeaturesUtil::declare_compatibility` for `custom_order_tables` when it first touches orders.
+- **test-guard** on t12 to t15. No mocks anywhere: real WordPress, WooCommerce, WPML, MySQL and real HTTP requests
+  (Rules 2, 8, 9). The forced failure in t13 injects a fault through a real WooCommerce hook, which is the only way
+  to exercise a translation that cannot be saved. Variants are data-driven rather than copied (Rule 3). Two
+  deliberate exceptions, both recorded rather than waved through:
+  - Rule 7, framework behaviour: t12 asserts the shape of WPML's own translation rows and t13 asserts WooCommerce's
+    conversion of a zero cost. Both are the project's deliverable under M-4 and M-8, proven native coverage, and
+    the zero conversion is a contractual fact raised under OD-12.
+  - Rule 1, implementation detail: t15 asserts which hook fired. That is the point of the scenario, and the cost
+    outcome is still asserted alongside it, so t11 and t15 cannot pass on the strength of the hook alone.
+  The regression cases for the identity defect found in this round are marked as such in t12 and t13 (Rule 6).
+
 ## Not verified
 
 - A human using wp-admin in a browser. The admin channel drives the real admin form and the real variations AJAX
   endpoint over HTTP, which is closer than a simulation, but it is not a browser session. That belongs to UAT.
+- The rendered Arabic storefront page. WPML serves Arabic from `/ar/` URLs, which need the web server rewrite
+  configuration that the disposable runtime does not have, and the id-based URL quietly serves the English
+  translation instead. t14 measures the Arabic catalogue data through the Store API and the Arabic order line
+  instead, and t08 covers public exposure of cost over HTTP. The rendered page belongs to UAT.
 - Order emails.
 - Staging and production enablement of the feature flag (runbook, safeguard S-1).
 - Other WooCommerce, WPML or WCML versions. Re-run this suite on any upgrade (`docs/stack-and-upgrades.md`).

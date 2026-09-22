@@ -61,7 +61,12 @@ final class CostTranslationSync
         }
 
         $elementType = self::ELEMENT_TYPES[get_post_type($productId)] ?? null;
-        if (null === $elementType || !self::isOriginal($productId, $elementType)) {
+        if (null === $elementType) {
+            return;
+        }
+
+        $group = self::translationGroup($productId, $elementType);
+        if ($productId !== $group['original'] || !$group['others']) {
             return;
         }
 
@@ -73,7 +78,7 @@ final class CostTranslationSync
         self::$running = true;
 
         try {
-            foreach (self::translationIds($productId, $elementType) as $translationId) {
+            foreach ($group['others'] as $translationId) {
                 self::copyTo($product, $translationId);
             }
         } finally {
@@ -95,35 +100,51 @@ final class CostTranslationSync
     }
 
     /**
-     * True when this post is the source-language original. Translations never push cost back: the original is the
-     * one copy an editor maintains, and WPML locks the field on the others.
+     * Which element of this translation group WPML records as the source-language original, and the other language
+     * versions. Only the original copies its cost outwards: it is the copy an editor maintains, and WPML locks the
+     * field on the others.
+     *
+     * Both answers come from one call to wpml_get_element_translations, deliberately. WPML also offers
+     * wpml_original_element_id, but that answer is cached separately (SitePress::get_original_element_translation,
+     * cache group original_element), and inside one long-running process that had just created a translation it was
+     * observed naming another product entirely, while the rows read here were correct at that same moment (see the
+     * verification record). Reading both facts from the same rows means they cannot disagree.
+     *
+     * @return array{original:int,others:int[]}
      */
-    private static function isOriginal(int $productId, string $elementType): bool
-    {
-        $original = apply_filters('wpml_original_element_id', null, $productId, $elementType);
-
-        return null !== $original && (int) $original === $productId;
-    }
-
-    /**
-     * @return int[] The other language versions of this product or variation.
-     */
-    private static function translationIds(int $productId, string $elementType): array
+    private static function translationGroup(int $productId, string $elementType): array
     {
         $trid = apply_filters('wpml_element_trid', null, $productId, $elementType);
         if (!$trid) {
-            return [];
+            return ['original' => 0, 'others' => []];
         }
 
-        $ids = [];
-        foreach ((array) apply_filters('wpml_get_element_translations', null, $trid, $elementType) as $translation) {
-            $id = (int) ($translation->element_id ?? 0);
-            if ($id > 0 && $id !== $productId) {
-                $ids[] = $id;
+        $original = 0;
+        $others = [];
+        foreach ((array) apply_filters('wpml_get_element_translations', null, $trid, $elementType) as $row) {
+            $row = (object) $row; // WPML returns objects. A filter that returns arrays must not break a product save.
+            $id = (int) ($row->element_id ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+            if (self::isSourceLanguage($row)) {
+                $original = $id;
+            } elseif ($id !== $productId) {
+                $others[] = $id;
             }
         }
 
-        return $ids;
+        return ['original' => $original, 'others' => $others];
+    }
+
+    /** WPML marks the source-language element of a group: it is flagged, and it has no source language of its own. */
+    private static function isSourceLanguage(object $row): bool
+    {
+        if (isset($row->original)) {
+            return (bool) (int) $row->original;
+        }
+
+        return empty($row->source_language_code);
     }
 
     /**

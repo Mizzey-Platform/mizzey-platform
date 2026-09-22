@@ -154,6 +154,9 @@ public or customer-accessible interface, and look for cost.
 - While cost capture is off, setting a cost does nothing (`set_cogs_value` checks the flag). Edits or imports made
   before enablement lose their cost silently. Safeguard S-1 addresses this.
 - A variation with no cost of its own: record whether it falls back to anything or stays empty.
+- Saving a translation makes WooCommerce write its own bookkeeping fields (product version, rating and review
+  counters) and regenerate a variation's `post_title` from the parent name and attributes. Measured in t14: it
+  happens on any save, including WCML's own, and changes nothing an Arabic customer reads.
 
 ## Native coverage
 
@@ -167,6 +170,11 @@ WCML 5.5.7, PHP 8.3.6, MySQL 8.3.0). Evidence: `evidence/` and `verification.md`
 | Cost carried to a translation created after the cost exists, by WPML duplicate or by the WCML translation editor, for simple products and variations | t11 part 1 | VERIFIED |
 | Cost changed later through wp-admin (product form, variations AJAX) or the wp-admin CSV importer, reaching the Arabic copy | t11, all admin-http and import-http cases | VERIFIED (native) |
 | Cost changed later through the REST API, WP-CLI, or code in a front-end request | t11, rest-http, crud-cli, crud-web | **GAP in WooCommerce and WPML** (see below). Closed by `MizzeySite\Catalogue\CostTranslationSync` |
+| The hook that carries the copy in each channel, recorded inside the request that does the work | t15, ten cases | VERIFIED |
+| The copy reaches the right post and only that post: the WPML original, the matching variation, never a sibling or an unrelated product, never back onto the original | t12 | VERIFIED |
+| First cost, increase, decrease, no change, repeated saves, clearing, zero; and the number of writes each causes | t13 | VERIFIED |
+| A translation that cannot be saved: other products still copied, the gap logged, repaired by the next save of the original | t13 | VERIFIED |
+| The copy changes no authored field, no translation relationship, no unrelated custom field, and nothing an Arabic customer reads | t14, both translation methods, simple and variation | VERIFIED |
 | Native CSV import carries "Cost of goods"; a blank stays blank | t07 | VERIFIED |
 | No cost to visitors or customers: product pages, Store API, REST v3, My Account order view | t08 | VERIFIED (order emails not tested) |
 | Which staff roles see cost | t09: administrator and shop_manager only; every other role 403 | FACT for CX-01 |
@@ -179,7 +187,8 @@ only meta, so `save_post` never fires for a cost-only change. WPML and WCML copy
 `wpml_sync_all_custom_fields`). A cost changed through REST, WP-CLI or other code therefore never reached the
 Arabic copy, and an order for the Arabic product recorded cost 0 with nothing on screen to show it. Tested with and
 without a `wpml-config.xml` declaring the cost fields as copied: the file changed WPML's settings and changed no
-outcome, so it was removed (WPML-2).
+outcome, so it was removed (WPML-2). WPML's own downloaded configuration already declares the real cost field,
+`_cogs_total_value`, as copied and locked, which confirms that the missing piece was never the declaration.
 
 `MizzeySite\Catalogue\CostTranslationSync` closes it: after WooCommerce saves a product or variation, the
 source-language original copies its cost to its translations through WooCommerce CRUD, comparing first and writing

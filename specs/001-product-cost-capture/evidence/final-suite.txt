@@ -30,11 +30,11 @@ PASS  t08-no-public-exposure       AC-5
       visitor Store API list: HTTP 200, cost absent
       visitor REST v3 product: HTTP 401, cost absent
       visitor REST v3 variations: HTTP 401, cost absent
-      customer /wc/store/v1/products/34: status 200, cost absent
-      customer /wc/store/v1/products/35: status 200, cost absent
-      customer /wc/v3/products/34: status 403, cost absent
-      customer /wc/v3/products/35/variations: status 403, cost absent
-      customer My Account order view (1590 bytes): cost absent
+      customer /wc/store/v1/products/289: status 200, cost absent
+      customer /wc/store/v1/products/290: status 200, cost absent
+      customer /wc/v3/products/289: status 403, cost absent
+      customer /wc/v3/products/290/variations: status 403, cost absent
+      customer My Account order view (1589 bytes): cost absent
       Not tested: order emails (not sent in the local runtime).
 FACT  t09-staff-visibility         AC-6 (pending CX-01)
       Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
@@ -67,10 +67,73 @@ PASS  t11-cost-sync-matrix         AC-3
       OK   editor simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
       OK   editor simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
       OK   editor simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
-      OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 145'->'منتج 145 - S' (generated variation title, rewritten on any save)
-      OK   editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 153'->'منتج 153 - S' (generated variation title, rewritten on any save)
-      OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 161'->'منتج 161 - S' (generated variation title, rewritten on any save)
-      OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 169'->'منتج 169 - S' (generated variation title, rewritten on any save)
-      OK   editor variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 177'->'منتج 177 - S' (generated variation title, rewritten on any save)
+      OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 400'->'منتج 400 - S' (generated variation title, rewritten on any save)
+      OK   editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 408'->'منتج 408 - S' (generated variation title, rewritten on any save)
+      OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 416'->'منتج 416 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 424'->'منتج 424 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 432'->'منتج 432 - S' (generated variation title, rewritten on any save)
+PASS  t12-cost-sync-identity       AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   identity: trid 68/68; EN 440 original='1' source=NULL; AR 441 original='0' source='en'. The sync copies outwards only from the element WPML flags as the original
+           for comparison, the separately cached wpml_original_element_id says EN '440' and AR '440'. It can be stale inside one long-running process, which is why the sync does not use it
+      OK   simple: EN 100 AR 100; products written 440,441 (expected 440,441); unrelated pair 55/55 and untranslated 77 unchanged
+      OK   variations: changed EN S only. AR S 33 (want 33), AR L 22 (want 22, the sibling must not move); written 446,449 (expected 446,449)
+      OK   untranslated product: cost 88, written 444 (expected 444, and nothing else)
+      OK   deleted Arabic variation 450: EN L cost 44, written 447 (expected 447 only); AR S still 33, unrelated product still 88
+      OK   saving the translation with cost 999: EN 100 (must stay 100, translations never push back), AR 999
+      OK   the next save of the original restores the translation: EN 105 AR 105
+      OK   second pair created in the same process, with no cache flush: EN 250 AR 250
+      Creating a translation when a cost already exists is covered by t11 part 1 (WPML duplicate and WCML editor, simple and variations).
+PASS  t13-cost-sync-semantics      AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   first cost: set 100 x1 -> EN 100 (want 100), AR 100 (want 100), translation written 1 time(s) (want 1)
+      OK   increase: set 150 x1 -> EN 150 (want 150), AR 150 (want 150), translation written 1 time(s) (want 1)
+      OK   decrease: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 1 time(s) (want 1)
+      OK   unchanged: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   saved three times: set 80 x3 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   cleared: set none x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      OK   set again: set 60 x1 -> EN 60 (want 60), AR 60 (want 60), translation written 1 time(s) (want 1)
+      OK   zero: set 0 x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      Zero is stored by WooCommerce as no cost, on the original and therefore on the translation. A deliberate zero cannot be told from an uncosted product: recorded for OD-12, not worked around here.
+      OK   forced failure on translation 458: EN1 500 AR1 10 (stale, as expected); the unrelated pair EN2 600 AR2 600 still synchronised; logged to mizzey-cost-sync: yes (1 line(s))
+      OK   retry after the failure was removed: saving the original again repaired the translation, EN1 500 AR1 500. Nothing polls: the repair happens on the next supported save
+      OK   re-entrancy: one save of the original produced the writes [456,455] and stopped (expected [456,455]: the translation, nested inside the save of the original, then the original). Neither write started another pass
+PASS  t14-arabic-content-after-sync AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   duplicate simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T141", attributes "", order line "t11 T141" (), Store API HTTP 200, name "t11 T141", price 30000, cost absent
+           stored post_title: "t11 T141" as WCML created it, "t11 T141" after an ordinary save, "t11 T141" after the cost sync
+      OK   duplicate variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T142 - S", attributes "Size: S", order line "t11 T142 - S" (), Store API HTTP 200, name "t11 T142", price 20000, cost absent
+           stored post_title: "t11 T142 - S" as WCML created it, "t11 T142 - S" after an ordinary save, "t11 T142 - S" after the cost sync
+      OK   editor simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 473", attributes "", order line "منتج 473" (), Store API HTTP 200, name "منتج 473", price 30000, cost absent
+           stored post_title: "منتج 473" as WCML created it, "منتج 473" after an ordinary save, "منتج 473" after the cost sync
+      OK   editor variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 477 - S", attributes "Size: S", order line "منتج 477 - S" (), Store API HTTP 200, name "منتج 477", price 20000, cost absent
+           stored post_title: "منتج 477" as WCML created it, "منتج 477 - S" after an ordinary save, "منتج 477 - S" after the cost sync
+PASS  t15-cost-sync-entrypoints    AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   admin-http simple: woocommerce_update_product fired for the English post in context "admin"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: save_post_product(EN)@admin, woocommerce_update_product(EN)@admin x2, woocommerce_update_product(AR)@admin, save_post_product(AR)@admin
+      OK   admin-http variation: woocommerce_update_product_variation fired for the English post in context "admin+ajax"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN parent)@admin+ajax x2, save_post_product_variation(EN sibling)@admin+ajax, woocommerce_update_product_variation(EN sibling)@admin+ajax, save_post_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_ajax_save_product_variations(EN parent)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax
+      OK   import-http simple: woocommerce_update_product fired for the English post in context "admin+ajax"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@admin+ajax, woocommerce_update_product(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(EN)@admin+ajax
+      OK   import-http variation: woocommerce_update_product_variation fired for the English post in context "admin+ajax"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: save_post_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(EN)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax, woocommerce_update_product(EN parent)@admin+ajax
+      OK   rest-http simple: woocommerce_update_product fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@rest, woocommerce_update_product(AR)@rest
+      OK   rest-http variation: woocommerce_update_product_variation fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@rest, woocommerce_update_product_variation(AR)@rest, woocommerce_update_product(AR parent)@rest, woocommerce_update_product(EN parent)@rest
+      OK   crud-cli simple: woocommerce_update_product fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@cli, woocommerce_update_product(AR)@cli
+      OK   crud-cli variation: woocommerce_update_product_variation fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@cli, woocommerce_update_product_variation(AR)@cli
+      OK   crud-web simple: woocommerce_update_product fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@front, woocommerce_update_product(AR)@front
+      OK   crud-web variation: woocommerce_update_product_variation fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@front, woocommerce_update_product_variation(AR)@front, woocommerce_update_product(AR parent)@front, woocommerce_update_product(EN parent)@front
+      crud-cli covers WooCommerce CRUD and WP-CLI; crud-web covers front-end application code, webhooks and cron, which run in the same context.
 versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
-7 scenarios, 0 failed
+11 scenarios, 0 failed

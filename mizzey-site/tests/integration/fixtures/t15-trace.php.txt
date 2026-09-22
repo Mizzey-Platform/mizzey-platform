@@ -1,0 +1,70 @@
+<?php
+// Temporary hook recorder for mizzey-site/tests/integration t15. It is copied into the DISPOSABLE runtime's
+// mu-plugins so that it also runs inside the wp-admin, importer, REST and front-end requests the scenario drives,
+// and included directly by the scenario for the WP-CLI channel. Removed at the end of the run. Never deploy it.
+//
+// It records which product hooks fire, for which post, in which request context, and writes nothing else.
+
+if ( ! function_exists( 'mizzey_t15_context' ) ) {
+
+	function mizzey_t15_context() {
+		$context = array();
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$context[] = 'cli';
+		}
+		if ( function_exists( 'is_admin' ) && is_admin() ) {
+			$context[] = 'admin';
+		}
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			$context[] = 'ajax';
+		}
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$context[] = 'rest';
+		}
+		return $context ? implode( '+', $context ) : 'front';
+	}
+
+	function mizzey_t15_record( $hook, $id ) {
+		$rows = get_option( 't15_trace', array() );
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+		$rows[] = array(
+			'hook'    => (string) $hook,
+			'id'      => (int) $id,
+			'context' => mizzey_t15_context(),
+		);
+		update_option( 't15_trace', $rows, false );
+	}
+
+	function mizzey_t15_register() {
+		$hooks = array(
+			'save_post_product',
+			'save_post_product_variation',
+			'woocommerce_update_product',
+			'woocommerce_update_product_variation',
+			'woocommerce_ajax_save_product_variations',
+		);
+		foreach ( $hooks as $hook ) {
+			add_action(
+				$hook,
+				function ( $id = 0 ) use ( $hook ) {
+					mizzey_t15_record( $hook, $id );
+				},
+				1,
+				1
+			);
+		}
+		// WooCommerce Multilingual's own importer entry point, registered for the backend only.
+		add_action(
+			'woocommerce_product_import_inserted_product_object',
+			function ( $object = null ) {
+				mizzey_t15_record( 'woocommerce_product_import_inserted_product_object', is_object( $object ) ? $object->get_id() : 0 );
+			},
+			1,
+			1
+		);
+	}
+
+	mizzey_t15_register();
+}

@@ -1,0 +1,23 @@
+WPML identity cache, one-off diagnostic, 22 September 2026, clean baseline of the disposable runtime.
+
+Why: t13 found that a product created second in one process was not synchronised. This checks whether the rows in
+icl_translations are wrong, or only WPML's cached answer.
+
+Method: create an English product and an Arabic duplicate, twice in the same WP-CLI process, then read the database
+rows directly and compare three ways of asking WPML which element is the original.
+
+Result: the database is correct throughout. wpml_original_element_id names an earlier product for the second pair
+until the object cache is flushed. wpml_get_element_translations, which the sync already called, is correct at the
+same moment, so identity is now read from those rows (see CostTranslationSync::translationGroup).
+
+Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+ids 270,271,272,273
+  DB 270: trid=68 lang=en source=NULL type=post_product
+  DB 271: trid=68 lang=ar source='en' type=post_product
+  DB 272: trid=69 lang=en source=NULL type=post_product
+  DB 273: trid=69 lang=ar source='en' type=post_product
+  as the process sees it: 270->'270'/trid'68' 271->'270'/trid'68' 272->'271'/trid'69' 273->'271'/trid'69'
+  after wp_cache_flush: 270->'270'/trid'68' 271->'270'/trid'68' 272->'272'/trid'69' 273->'272'/trid'69'
+  with skip_cache=true: 270->'270' 271->'270' 272->'272' 273->'272'
+
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}

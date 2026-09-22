@@ -49,4 +49,8 @@ contract scenario fails. Scripts clean up their fixtures, restore the feature fl
 | t07 | pass: import carries cost; a blank stays blank |
 | t08 | pass: no cost in any visitor or customer response |
 | t09 | facts only, for the CX-01 discussion |
-| t11 | pass: 24 cases (2 translation methods x 2 product types x 5 channels, plus 4 creation cases). Arabic variation titles are reported as noted facts, because WooCommerce regenerates them on any save |
+| t11 | pass: 24 cases (2 translation methods x 2 product types x 5 channels, plus 4 creation cases) |
+| t12 | pass: identity. The copy reaches the WPML original's translations, the matching variation, and nothing else |
+| t13 | pass: every kind of cost change, the number of writes each causes, a forced failure, its repair, and re-entrancy |
+| t14 | pass: nothing else on the Arabic post moves, including what the customer reads. Variation titles are reported as facts, because WooCommerce regenerates them on any save |
+| t15 | pass: the hook that carries the copy in each channel, recorded inside the request that does the work |
