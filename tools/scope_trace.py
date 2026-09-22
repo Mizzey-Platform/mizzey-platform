@@ -365,6 +365,13 @@ def git_changes(repo: Path, base: str) -> list[tuple[str, str, str | None]]:
     return changes
 
 
+def current_branch(repo: Path) -> str | None:
+    """The checked-out branch, for local runs without a GitHub event. None when detached (as in CI checkouts)."""
+    out = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=repo, capture_output=True, text=True)
+    name = out.stdout.strip()
+    return name if out.returncode == 0 and name and name != "HEAD" else None
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--base", required=True)
@@ -393,7 +400,7 @@ def main(argv: list[str] | None = None) -> int:
         body = a.body_file.read_text(encoding="utf-8")
     if body is not None:
         errs += check_pr(body, changes, ids, spec_trace_ids(repo, ids))
-        errs += check_spec_branch(changes, head_ref)
+        errs += check_spec_branch(changes, head_ref or current_branch(repo))
 
     gh = "GITHUB_ACTIONS" in os.environ
     for path, pc in sensitive_report(changes):
