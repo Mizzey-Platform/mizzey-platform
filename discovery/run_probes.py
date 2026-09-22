@@ -36,8 +36,10 @@ def executable(name):
     return shutil.which(name) or name
 
 
-# The Mizzey site created in Step 1. Override with MIZZEY_WP when it moves.
-WP_PATH = os.environ.get('MIZZEY_WP', 'C:/wamp64/www/corex/wp')
+# The disposable Mizzey runtime built by tools/corex-sync.mjs (../app/wp beside this repository). The old default
+# pointed at the CoreX development site, where WooCommerce is not active. Override with MIZZEY_WP.
+WP_PATH = os.environ.get(
+    'MIZZEY_WP', os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'app', 'wp'))
 
 
 def parse_result(stdout):

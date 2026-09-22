@@ -2,6 +2,11 @@
 
 Record each non-trivial decision (context · decision · why · status).
 
+> **Entries dated before 21 September 2026 were made under Option C**, the Operations Platform, which was never
+> signed. They are kept as engineering history and evidence. They are not Option B obligations, and where they
+> cite register ids or scope values those are the Option C register's (MS-ANX-2026-001). The Option B register is
+> MS-ANX-2026-006 v1.5. Architecture decisions from 22 September 2026 on are also recorded as ADRs in `docs/adr/`.
+
 ## 2026-09-09 - Product cost basis and the cost snapshot
 
 **OD-12 is the client's decision.** Recommendation to put to them: **purchase cost, a single field**,
@@ -439,3 +444,30 @@ the resource topics for order, product, customer and coupon. Three hooks are exp
 after repeated failures. It is not a guaranteed delivery queue. An ERP that must never miss a stock
 change needs a durable queue with replay in front of it, and that is a design decision for whenever
 INT-14 is actually commissioned, not something the P1 adapter work silently owes.
+
+## 2026-09-22 - Option B engineering governance foundation
+
+**Context.** The client chose Option B, the Launch Platform, on 21 September 2026. The repository still described
+Option C. Its agent instructions pointed at a `develop` branch that does not exist, and its PR template promised an
+audit trail that Option B excludes (ROLE-10). The repository was transferred to `Mizzey-Platform/mizzey-platform`
+the same day, with history intact.
+
+**Decided (approved by Mustafa as G-1, G-2 and G-3):**
+
+- Spec Kit 0.10.1 is the only system for specs, plans and tasks. The constitution is at
+  `.specify/memory/constitution.md` and inherits CoreX v1.2.2. Task-to-issue generation is disabled, and so are the
+  agent-context hooks.
+- Scope traceability: `docs/scope/register-ids.json` is generated from register v1.5 (754 ids), and its source hash
+  is recorded. A register id is necessary but not sufficient.
+- Work categories: `requirement`, or internal (`governance`, `ci`, `test-infrastructure`, `tooling`,
+  `security-maintenance`, `documentation`). Internal work needs no register id and may not add client-facing
+  behaviour.
+- Contradictions are recorded in `docs/scope/open-items.json`, never resolved in code. CX-01 (the Accountant role)
+  is open.
+- Versions are recorded in `stack.lock.json`, with an upgrade regression path in `docs/stack-and-upgrades.md`.
+- CI reports on every PR. On the free plan it cannot block a merge. The local pre-push hook is advisory.
+- ADR-0001 (native Cost of Goods Sold) and ADR-0002 (minimum shipment record) are proposed, not accepted.
+- The Option C board scripts are retired behind a guard. The 9 Sep entries above stay as history.
+
+**Not decided here:** D-03 (removing `docs/engagement/`) is a separate PR. D-07 (the 232 legacy issues), the Option B
+Project, the backlog and a paid plan are deferred.

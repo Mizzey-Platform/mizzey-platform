@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Is it in scope?
-    url: https://github.com/MustafaShaaban/mizzey-platform/blob/main/docs/engagement/Mizzey-Feature-Register.md
-    about: The Feature Register defines scope, and only the Feature Register.
-  - name: What are the acceptance criteria?
-    url: https://github.com/MustafaShaaban/mizzey-platform/blob/main/docs/engagement/Mizzey-Operations-Platform-Functional-Specification.md
-    about: The Functional Specification holds every story and its criteria.
+    url: https://github.com/Mizzey-Platform/mizzey-platform/blob/main/README.md#the-rule-that-matters
+    about: Scope is the Feature Register MS-ANX-2026-006 v1.5 only. Ids and scope values are in docs/scope/register-ids.json.
+  - name: How is work classified?
+    url: https://github.com/Mizzey-Platform/mizzey-platform/blob/main/.specify/memory/constitution.md
+    about: Requirement work needs an obligation id and a spec. Internal work never adds client-facing behaviour.

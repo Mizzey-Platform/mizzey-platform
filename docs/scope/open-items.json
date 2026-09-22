@@ -1,0 +1,29 @@
+{
+ "about": "Open contract items that specs must cite and must not resolve. Maintained by hand through internal:governance PRs. Read by tools/scope_trace.py.",
+ "gates": {
+  "PRE-09": {
+   "title": "ERP Integration Specification",
+   "approved": false,
+   "governs_scope": "P1-E",
+   "note": "Not yet written. Until approved, no P1-E criterion may be marked final (constitution M-3)."
+  }
+ },
+ "contradictions": {
+  "CX-01": {
+   "title": "Accountant role: narrative says it exists at launch, the row says DEF",
+   "status": "open",
+   "ids": ["ROLE-06", "ROLE-06a"],
+   "related_ids": ["ADM-27", "RPT-11", "PAY-06", "PAY-07", "PAY-08", "ADM-86", "ADM-92", "RPT-01"],
+   "evidence": [
+    "Register v1.5 line 224 (Part One 1.3, ROLE-06a): 'The Accountant role itself exists at launch (ROLE-06)'",
+    "Register v1.5 lines 774-779 (blockquote 'On the Accountant role'): 'the role and its permission profile exist at launch (ROLE-06)'",
+    "Register v1.5 line 767 (ROLE-06 row): scope DEF, stage '-'",
+    "Register v1.5 line 358 (Part One 1.6): ROLE-06 replaced by 'The standard commerce role set' (ROLE-09)",
+    "Client Scope Summary lines 194 and 319: Accountant profile listed as not included",
+    "Functional Specification v1.2: stories written 'As the accountant' (lines 1143, 1165, 2584, 3141) while carrying ROLE-06 as DEF"
+   ],
+   "affects": "Which staff roles hold 'financial permission', for example US-16-05 AC2 (product cost visibility).",
+   "route": "Stage 1 review with the client. Raised by Mustafa. Not resolved in code, criteria or governance."
+  }
+ }
+}

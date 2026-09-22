@@ -1,5 +1,9 @@
 # Product cost and what must be captured from day one
 
+> **Status, 22 September 2026: Option C history.** Written for the Option C engagement. Under Option B, ROLE-06 is DEF
+> (register MS-ANX-2026-006 v1.5), and the cost-basis label proposed below is a future item, not part of the pilot.
+> The current direction is ADR-0001 (`docs/adr/0001-native-cost-of-goods-sold.md`) and the pilot spec.
+
 9 September 2026. Prepared for the OD-12 answer and for the catalogue module design.
 
 **OD-12 is the client's decision, not ours.** It sits in the Feature Register open-decisions table,

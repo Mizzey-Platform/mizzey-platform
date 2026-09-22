@@ -1,5 +1,10 @@
 import json, io, collections, os
 
+# Retired 22 Sep 2026: an Option C board and backlog generator. It writes to GitHub or to client documents,
+# and scripts/issues.json is missing, so a rerun would duplicate issues. See scripts/README.md.
+if os.environ.get('MIZZEY_LEGACY_BOARD_SCRIPTS') != '1':
+    raise SystemExit('Retired Option C script. Not for Option B use. See scripts/README.md.')
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 S = json.load(io.open(os.path.join(HERE, 'stories.json'), encoding='utf-8'))
 O = io.StringIO(); W = O.write

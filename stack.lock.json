@@ -1,0 +1,19 @@
+{
+ "about": "Tested versions of the Mizzey stack. Evidence for these versions only, not a production compatibility guarantee. Change only through the regression path in docs/stack-and-upgrades.md. corex.lock remains the file tools/corex-sync.mjs reads; the corex entry here must match it (checked by tools/repo_checks.py).",
+ "verified_on": "2026-09-22",
+ "verified_in": "local disposable runtime ../app/wp built by tools/corex-sync.mjs (WAMP, Windows)",
+ "components": {
+  "php": {"version": "8.3.6", "status": "tested", "source": "C:/wamp64/bin/php/php8.3.6; CI runner ubuntu-24.04 also 8.3.6"},
+  "database": {"version": null, "status": "unverified", "source": "Local WAMP ships MySQL 8.3.0 and MariaDB 11.3.2; which one the runtime uses is not yet recorded. Production engine to be set with hosting (OD-27)"},
+  "wordpress": {"version": "7.1", "status": "tested", "source": "wp-includes/version.php; corex.lock"},
+  "woocommerce": {"version": "11.1.0", "status": "tested", "source": "plugin header; discovery probes P-001 to P-021 ran against it", "notes": "HPOS and Cost of Goods Sold behaviour recorded against this version (P-016, P-017)"},
+  "corex": {"version": "v0.42.0", "commit": "12dde4967449e5fcf955f33db5d6f61b3b93b575", "status": "tested", "source": "corex.lock", "notes": "corex#201 open: CLI loses 7 commands under --no-dev"},
+  "wpml": {"plugin": "sitepress-multilingual-cms", "version": "4.9.7", "status": "tested", "source": "plugin header", "notes": "Local test copy. Production licence is held by the client (SOW, about 99 EUR a year)"},
+  "wpml-string-translation": {"plugin": "wpml-string-translation", "version": "3.5.4", "status": "tested", "source": "plugin header"},
+  "wpml-media-translation": {"plugin": "wpml-media-translation", "version": "3.1.2", "status": "installed-untested", "source": "plugin header"},
+  "wpml-cms-nav": {"plugin": "wpml-cms-nav", "version": "1.5.8", "status": "installed-untested", "source": "plugin header"},
+  "wcml": {"plugin": "woocommerce-multilingual", "version": "5.5.7", "status": "tested", "source": "plugin header; probes P-006, P-019, P-020"},
+  "bosta": {"plugin": "bosta-woocommerce", "version": "4.5.7", "status": "tested", "source": "plugin header; probe P-012", "notes": "Status mapping dormant in this version (P-012). Carrier status legend not yet obtained"},
+  "paymob": {"plugin": null, "version": null, "status": "not-selected", "source": "No payment plugin installed. Selected and tested under PAY-* work"}
+ }
+}

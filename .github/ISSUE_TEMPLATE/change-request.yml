@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **No work starts on this until it is agreed in writing under MS-CHG-2026-014**,
+        **No work starts on this until it is agreed in writing under MS-CHG-2026-028**,
         with its cost and its effect on the timeline stated first. Raising it here records it.
   - type: textarea
     id: want

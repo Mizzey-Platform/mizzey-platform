@@ -7,6 +7,11 @@ two endpoints.
 """
 import json, io, os, re, subprocess, collections, time, sys
 
+# Retired 22 Sep 2026: an Option C board and backlog generator. It writes to GitHub or to client documents,
+# and scripts/issues.json is missing, so a rerun would duplicate issues. See scripts/README.md.
+if os.environ.get('MIZZEY_LEGACY_BOARD_SCRIPTS') != '1':
+    raise SystemExit('Retired Option C script. Not for Option B use. See scripts/README.md.')
+
 REPO = 'MustafaShaaban/mizzey-platform'
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = r'C:\wamp64\www\mizzey\final docs\Client\Branded\Mizzey-Operations-Platform-Functional-Specification.md'
