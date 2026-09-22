@@ -1,0 +1,15 @@
+<wpml-config>
+	<!--
+		Product cost (ADM-27, RPT-11) must follow a product into its translations, or orders for the Arabic
+		version record no cost. Neither WooCommerce 11.1.0 nor WooCommerce Multilingual 5.5.7 declares the Cost of
+		Goods Sold fields, so WPML leaves them untranslated. Evidence: specs/001-product-cost-capture, scenarios t05
+		and t06 before this file (Arabic order cost 0 instead of 180).
+
+		"copy" keeps each translation's cost equal to the original's, as WooCommerce Multilingual does for its own
+		product fields. Cost is a single number per product, not language content.
+	-->
+	<custom-fields>
+		<custom-field action="copy">_cogs_value</custom-field>
+		<custom-field action="copy">_cogs_value_is_additive</custom-field>
+	</custom-fields>
+</wpml-config>

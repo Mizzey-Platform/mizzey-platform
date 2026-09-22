@@ -1,0 +1,64 @@
+PASS  t02-simple-cost              AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Set 137.5, read back 137.5
+      Set 0, read back NULL
+      Set blank (null), read back NULL
+      Fact: zero is stored as no cost (native zero-to-null conversion). Not a contract criterion.
+PASS  t03-variation-cost           AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      50ml: set 40.0, read 40.0, additive false, effective 40.0
+      100ml: set 70.0, read 70.0, additive false, effective 70.0
+      200ml: set NULL, read NULL, additive false, effective 0.0
+PASS  t04-order-line-snapshot      AC-2
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Order cost at sale: 200.0; line cost 200.0
+      After product cost changed to 999: order 200.0; line 200.0
+PASS  t05-translation-cost         AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      WPML setting for _cogs_value: 1
+      (a) duplicate: EN 120 -> AR 120.0 at creation; EN edited to 130 -> AR 130.0
+      (a) duplicate of variable product: AR variation costs [40,70] (EN 40, 70)
+      (b) separate translation (linked: yes): EN 150 -> AR NULL after linking, 150.0 after the English product is next saved; EN edited to 160 -> AR 160.0
+      Path (a) carries cost; path (b) carries cost
+PASS  t06-arabic-order-cost        AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Current language for the orders: ar
+      duplicate: order for 2 of the Arabic product (id 266) records cost 220.0; expected 220.0
+      separate: order for 2 of the Arabic product (id 268) records cost 180.0; expected 180.0
+PASS  t07-csv-import-cost          AC-4
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Import: 4 imported, 0 failed, 0 skipped
+      T07-S1: expected 111.25, imported 111.25
+      T07-S2: expected 95.0, imported 95.0
+      T07-S3: expected NULL, imported NULL
+      T07-V-50: expected 40.0, imported 40.0
+      T07-V-100: expected 70.0, imported 70.0
+PASS  t08-no-public-exposure       AC-5
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      visitor product page (simple): HTTP 200, cost absent
+      visitor product page (variable): HTTP 200, cost absent
+      visitor Store API product: HTTP 200, cost absent
+      visitor Store API variable: HTTP 200, cost absent
+      visitor Store API list: HTTP 200, cost absent
+      visitor REST v3 product: HTTP 401, cost absent
+      visitor REST v3 variations: HTTP 401, cost absent
+      customer /wc/store/v1/products/277: status 200, cost absent
+      customer /wc/store/v1/products/278: status 200, cost absent
+      customer /wc/v3/products/277: status 403, cost absent
+      customer /wc/v3/products/278/variations: status 403, cost absent
+      customer My Account order view (1588 bytes): cost absent
+      Not tested: order emails (not sent in the local runtime).
+FACT  t09-staff-visibility         AC-6 (pending CX-01)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      administrator: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      shop_manager: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      editor: edit_products=no, REST v3 status 403, cost not returned
+      author: edit_products=no, REST v3 status 403, cost not returned
+      contributor: edit_products=no, REST v3 status 403, cost not returned
+      subscriber: edit_products=no, REST v3 status 403, cost not returned
+      customer: edit_products=no, REST v3 status 403, cost not returned
+FAIL  t10-programmatic-cost-sync   AC-3 (WPML-1)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      AR at creation 100.0; EN changed to 125 by CRUD save only -> AR 100.0
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+9 scenarios, 1 failed
