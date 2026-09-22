@@ -54,7 +54,7 @@ t05 or t06 fails.
 - [x] T014 Run `python mizzey-site/tests/integration/run.py --wp ../app/wp` and save the full output and the verdict table in `specs/001-product-cost-capture/verification.md`
 - [x] T015 Confirm the runtime is left as found: feature flag restored, no fixture products, orders or users left (checked in the verification record)
 - [x] T016 [P] Run test-guard on `mizzey-site/tests/integration/` and record the result in `specs/001-product-cost-capture/verification.md`
-- [ ] T017 Run the repository checks (`discovery.check`, both unit suites, `tools/repo_checks.py`, `tools/run_trusted.py` with the PR body) before opening the PR
+- [x] T017 Run the repository checks (`discovery.check`, both unit suites, `tools/repo_checks.py`, `tools/run_trusted.py` with the PR body) before opening the PR
 - [ ] T018 Report the three states separately in the PR: workflow complete, technically verified (AC-1 to AC-5), contractually accepted (no: AC-6 pending CX-01, AC-7 pending OD-12)
 - [x] T019 Record the new facts for later governance PRs, without changing governance files here: MySQL 8.3.0 for `stack.lock.json`, and any version or behaviour finding for ADR-0001
 
