@@ -1,6 +1,7 @@
 """Whole-tree consistency checks for the engineering configuration.
 
 - Task-to-issue generation stays disabled: no speckit-taskstoissues skill, no enabled taskstoissues hook.
+- The agent-context skill and extension stay removed, and CLAUDE.md carries no Spec Kit managed block.
 - stack.lock.json is well formed, and its CoreX entry matches corex.lock.
 - docs/scope/register-ids.json matches its recorded source (docs/scope/SOURCE.md hash and count).
 - docs/scope/open-items.json cites only ids that exist in the register.
@@ -30,6 +31,18 @@ def check_taskstoissues(root: Path) -> list[str]:
         for block in re.split(r"\n\s*-\s+extension:", text):
             if "taskstoissues" in block and re.search(r"enabled:\s*true", block):
                 errs.append(".specify/extensions.yml enables a taskstoissues hook")
+    return errs
+
+
+def check_agent_context(root: Path) -> list[str]:
+    errs = []
+    if (root / ".claude" / "skills" / "speckit-agent-context-update").exists():
+        errs.append(".claude/skills/speckit-agent-context-update exists; it rewrites CLAUDE.md and must stay removed")
+    if (root / ".specify" / "extensions" / "agent-context").exists():
+        errs.append(".specify/extensions/agent-context exists; the agent-context extension must stay removed")
+    claude = root / "CLAUDE.md"
+    if claude.exists() and "SPECKIT START" in claude.read_text(encoding="utf-8"):
+        errs.append("CLAUDE.md contains a Spec Kit managed block; it must stay a plain pointer to AGENTS.md")
     return errs
 
 
@@ -75,7 +88,7 @@ def check_scope(root: Path) -> list[str]:
 
 
 def main() -> int:
-    errs = check_taskstoissues(ROOT) + check_stack(ROOT) + check_scope(ROOT)
+    errs = check_taskstoissues(ROOT) + check_agent_context(ROOT) + check_stack(ROOT) + check_scope(ROOT)
     for e in errs:
         print(e)
     print(f"repo-checks: {len(errs)} problems")

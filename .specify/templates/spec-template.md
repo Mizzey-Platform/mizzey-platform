@@ -51,10 +51,16 @@
 ## Contractual acceptance criteria [checked]
 
 <!--
-  Every row cites at least one id from the Register trace table, and only ids from it. Criteria come from the
-  Functional Specification MS-SPC-2026-032 story or the register row, quoted or closely restated. A criterion that
-  waits on an open item says so in Status (for example "pending CX-01"). For P1-E ids, Status is "provisional"
-  until PRE-09 is approved.
+  Traces: register ids only, separated by commas. Every id must be in the Register trace table above.
+  Criteria come from the Functional Specification MS-SPC-2026-032 story or the register row, quoted or closely
+  restated.
+  Status: exactly one of
+    final                       the criterion is settled
+    provisional                 the criterion may change (required for P1-E ids until PRE-09 is approved)
+    pending CX-nn               waits on an open contradiction in docs/scope/open-items.json
+    pending PRE-09              waits on the ERP Integration Specification
+    pending OD-nn               waits on an open client decision in the register
+  Any other wording ("approved", "done", "finalized") fails the scope check.
 -->
 
 | # | Criterion | Traces | Status |

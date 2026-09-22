@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class RepoChecks(unittest.TestCase):
     def test_current_tree_passes(self):
-        self.assertEqual(rc.check_taskstoissues(ROOT) + rc.check_stack(ROOT) + rc.check_scope(ROOT), [])
+        self.assertEqual(rc.check_taskstoissues(ROOT) + rc.check_agent_context(ROOT) + rc.check_stack(ROOT)
+                         + rc.check_scope(ROOT), [])
 
     def test_taskstoissues_skill_fails(self):
         with tempfile.TemporaryDirectory() as d:
@@ -25,6 +26,12 @@ class RepoChecks(unittest.TestCase):
                 "hooks:\n  after_tasks:\n  - extension: git\n    command: speckit.taskstoissues\n    enabled: true\n",
                 encoding="utf-8")
             self.assertTrue(rc.check_taskstoissues(Path(d)))
+
+    def test_agent_context_skill_or_managed_block_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, ".claude", "skills", "speckit-agent-context-update").mkdir(parents=True)
+            Path(d, "CLAUDE.md").write_text("<!-- SPECKIT START -->\nx\n<!-- SPECKIT END -->\n", encoding="utf-8")
+            self.assertEqual(len(rc.check_agent_context(Path(d))), 2)
 
     def test_corex_mismatch_fails(self):
         with tempfile.TemporaryDirectory() as d:

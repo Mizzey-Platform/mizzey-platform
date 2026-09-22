@@ -5,20 +5,37 @@
 ## Classification
 
 <!--
-Keep exactly one of the two blocks below, uncommented, and delete the other. tools/scope_trace.py reads these lines.
+Keep exactly one of the blocks below, uncommented, and delete the others. tools/scope_trace.py reads these lines,
+and each line may appear only once.
 
 Requirement work: behaviour a customer, client or staff user sees or relies on.
 Internal work: governance, ci, test-infrastructure, tooling, security-maintenance, documentation.
-Internal work never adds client-facing functionality. Only security-maintenance may state a behaviour change.
+Internal work never adds client-facing functionality, and may touch only the paths its category allows
+(PATH_POLICY in tools/scope_trace.py; table in CONTRIBUTING.md).
 -->
 
 Classification: requirement
 Requirement ids: <!-- obligation ids from the Feature Register, e.g. ADM-27, RPT-11 -->
-Spec: <!-- specs/NNN-slug/spec.md -->
+Spec: <!-- specs/NNN-slug/spec.md; a new spec's directory must match this branch name -->
 
 <!--
 Classification: internal:governance
 Client-facing behaviour change: none
+-->
+
+<!--
+Classification: internal:security-maintenance
+Client-facing behaviour change: <what changes for users, or none>
+Security evidence: <CVE-/GHSA- id, advisory or upgrade URL, or "local: <defect and how it was found>" plus a regression test>
+Security change: <what the change does, and for whom>
+-->
+
+<!--
+Add when the PR touches governance-sensitive paths (checkers, CI, hooks, constitution, docs/scope, stack.lock.json,
+AGENTS, CLAUDE, CONTRIBUTING, .gitignore) or build, deployment or version-lock paths:
+Sensitive changes: <each sensitive file, and why>
+Add when the PR touches tools/build-dist.mjs, tools/corex-sync.mjs, corex.lock, composer.* or package*.json:
+Delivery impact: <what changes in the deployed artifact, or why nothing does>
 -->
 
 ## Scope check (requirement work)

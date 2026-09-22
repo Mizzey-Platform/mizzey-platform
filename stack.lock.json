@@ -3,7 +3,7 @@
  "verified_on": "2026-09-22",
  "verified_in": "local disposable runtime ../app/wp built by tools/corex-sync.mjs (WAMP, Windows)",
  "components": {
-  "php": {"version": "8.3.6", "status": "tested", "source": "C:/wamp64/bin/php/php8.3.6; CI runner ubuntu-24.04 also 8.3.6"},
+  "php": {"version": "8.3.6", "status": "tested", "source": "local WAMP runtime (Windows) PHP 8.3.6 CLI; CI runner ubuntu-24.04 PHP 8.3.6"},
   "database": {"version": null, "status": "unverified", "source": "Local WAMP ships MySQL 8.3.0 and MariaDB 11.3.2; which one the runtime uses is not yet recorded. Production engine to be set with hosting (OD-27)"},
   "wordpress": {"version": "7.1", "status": "tested", "source": "wp-includes/version.php; corex.lock"},
   "woocommerce": {"version": "11.1.0", "status": "tested", "source": "plugin header; discovery probes P-001 to P-021 ran against it", "notes": "HPOS and Cost of Goods Sold behaviour recorded against this version (P-016, P-017)"},

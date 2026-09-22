@@ -1,6 +1,6 @@
 # Mizzey Launch Platform Constitution
 
-**Version**: 1.0.0 | **Ratified**: pending (governance PR) | **Last Amended**: 2026-09-22
+**Version**: 1.0.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-09-22
 
 This constitution governs every specification, plan, task and pull request in this repository. Spec Kit reads it
 through `/speckit-plan` (Constitution Check) and `/speckit-analyze`.
@@ -12,17 +12,24 @@ at the commit pinned in `corex.lock`) applies in full to code written here: prin
 the Environment Gate and the Pre-Implementation Confirmation Rule. This document adds the Mizzey rules. Where the
 two conflict for client-site work, this document wins. Nothing here authorises editing CoreX internals.
 
-## Source-of-truth hierarchy
+## Authority model
 
-1. **Feature Register MS-ANX-2026-006 v1.5**, Annex A to Services Agreement MS-AGR-2026-023. The only definition
-   of scope. Held outside this repository; its ids, scope values and stages are mirrored in
-   `docs/scope/register-ids.json`, generated with a recorded source hash (`docs/scope/SOURCE.md`).
-2. Services Agreement MS-AGR-2026-023 and Statement of Work MS-SOW-2026-024.
-3. Functional Specification MS-SPC-2026-032 v1.2: acceptance criteria per story.
-4. Technical Design MS-TDD-2026-033 v1.2: architecture intent, refined by accepted ADRs in `docs/adr/`.
-5. ERP Integration Specification (PRE-09): not yet written. Governs every P1-E row once approved.
-6. This constitution, then `AGENTS.md`, then `CONTRIBUTING.md`.
-7. Specs, plans and tasks in `specs/`. They implement the documents above and never override them.
+The contract documents are held outside this repository. Their order of priority is set by the Services Agreement
+MS-AGR-2026-023 v1.4, section 2.1, and is not restated or changed here:
+
+1. **The Services Agreement** governs the contractual terms and the precedence between the documents.
+2. **Annex A, the Feature Register MS-ANX-2026-006 v1.5**, is the authoritative definition of contracted feature
+   scope ("for anything about scope"). Its ids, scope values and stages are mirrored in
+   `docs/scope/register-ids.json`, with the source hash recorded in `docs/scope/SOURCE.md`.
+3. **Annex B, the Statement of Work MS-SOW-2026-024**, for anything about money or dates.
+4. **The remaining annexes**, including the Functional Specification MS-SPC-2026-032 v1.2 (acceptance criteria
+   per story), the Technical Design MS-TDD-2026-033 v1.2, and, once approved, the ERP Integration Specification
+   (PRE-09), which governs every P1-E row.
+
+Inside this repository, approved specifications (`specs/`) and accepted ADRs (`docs/adr/`) **implement** those
+obligations. They cannot expand, reduce or override them. Where an ADR refines the Technical Design, a correction
+the client should see goes through the document route. This constitution, `AGENTS.md` and `CONTRIBUTING.md` govern
+how engineering work is done. They create no contractual obligation.
 
 ## Mizzey Principles
 
@@ -66,8 +73,9 @@ that timing is noted in the spec. It never moves the contractual stage.
 ### M-7. Evidence and tests
 
 Nothing is reported done without a verification someone else can repeat. Every task names its test. Money, stock,
-permission, refund, payment and shipment-state paths always have automated tests. Three states are reported
-separately and never merged: **workflow complete**, **technically verified**, and **contractually accepted**.
+permission, refund, payment and shipment-state paths always have automated tests. Acceptance-criterion statuses
+are exactly `final`, `provisional`, or `pending <CX-nn | PRE-09 | OD-nn>`; no other wording is accepted. Three
+states are reported separately and never merged: **workflow complete**, **technically verified**, and **contractually accepted**.
 Contractual acceptance happens only through the Acceptance and UAT Plan MS-UAT-2026-027.
 
 ### M-8. Versions are pinned, upgrades are regression-tested
@@ -91,12 +99,29 @@ Arabic fully supported, right to left. The admin interface is English only (ADM-
 | `internal:ci` | No | No |
 | `internal:test-infrastructure` | No | No |
 | `internal:tooling` | No | No |
-| `internal:security-maintenance` | No | Only to fix a vulnerability or keep a dependency supported. States the behaviour change, if any |
+| `internal:security-maintenance` | No | Only to fix a vulnerability or keep a dependency supported, with evidence |
 | `internal:documentation` | No | No |
 
 Internal work items are not client change requests, and they are not a route to new functionality. An internal
-PR that adds or changes behaviour a user can see is misclassified, and must be re-raised as `requirement` with a
-register id, or as a Change Request.
+PR that adds or changes behaviour a user can see is misclassified. It is re-raised as `requirement` with a register
+id, or as a Change Request.
+
+**Path policy.** Every changed path (added, modified, renamed from or to, deleted) is classified by the explicit
+allow-list `PATH_POLICY` in `tools/scope_trace.py`. Each category may touch only its permitted path classes. A path
+the policy does not cover, including any new top-level application directory, is rejected for every category until
+the policy is extended by an `internal:governance` PR. Feature specs are never deleted or moved.
+
+**Extra declarations.** Governance-sensitive paths (checkers, CI, hooks, constitution, scope records, stack lock,
+agent instructions) need a `Sensitive changes:` line. Build, deployment and dependency or version-lock paths also
+need a `Delivery impact:` line. `security-maintenance` needs `Security evidence:` (a CVE or GHSA id, an advisory or
+upgrade URL, or `local:` with the defect and how it was found, plus a regression test in the same PR) and
+`Security change:`. A declaration makes a change reviewable. It does not prove the change is safe; the reviewer
+decides.
+
+**Trusted checker.** Once the checker is on `main` (after PR #235), CI runs the base branch's checker against every
+PR, as well as the PR's own copy. PR #235 itself is the bootstrap: only its proposed checker exists. This does not
+stop a PR from editing the workflow itself, and on the free plan nothing blocks a merge server-side. Changes to the
+checker, CI, hooks, constitution and scope records are listed in the CI output for explicit review.
 
 ## Operating rules
 
@@ -105,7 +130,8 @@ register id, or as a Change Request.
   debugging or TDD techniques) support engineering and verification. They never produce a competing plan, spec or
   task list.
 - **Task-to-issue generation is disabled** until the backlog workflow is approved. The `speckit-taskstoissues`
-  skill is not installed, and CI fails if it appears.
+  skill is not installed, and CI fails if it appears. The agent-context extension and skill are removed, so
+  nothing rewrites `CLAUDE.md`.
 - **Approval gates.** No force-push, history rewrite, issue bulk-creation or closure, Project change, paid plan,
   production probe, engagement-document edit or CoreX-internal change without Mustafa's explicit approval, recorded
   in `DECISIONS.md`.

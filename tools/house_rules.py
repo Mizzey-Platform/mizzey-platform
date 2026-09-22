@@ -3,7 +3,7 @@
 Checks the lines a PR adds, never whole files, so history written before the rules existed is not re-judged:
 
 - Markdown: no emoji, no em dash (the client-document house style, applied to engineering docs from 22 Sep 2026).
-- Files added: no contract PDFs or office documents, no archives, no key or certificate files, no env files, and
+- Files added or renamed into place: no contract PDFs or office documents, no archives, no key or certificate files, no env files, and
   nothing new under docs/engagement/ (confidential contract copies, being removed under D-03).
 
 Vendored and generated paths are excluded. See EXCLUDED.
@@ -83,18 +83,20 @@ def check_added_files(files: list[str]) -> list[str]:
     return errs
 
 
-def git(*args: str) -> str:
-    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True,
+def git(repo: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, check=True,
                           encoding="utf-8").stdout
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--base", required=True)
+    ap.add_argument("--repo", type=Path, default=None, help="checkout to judge (default: this script's repository)")
     a = ap.parse_args(argv)
+    repo = (a.repo or ROOT).resolve()
     rng = f"{a.base}...HEAD"
-    added_files = [f for f in git("diff", "--name-only", "--diff-filter=A", rng).splitlines() if f]
-    diff = git("diff", "-U0", "--diff-filter=ACMR", "--no-color", rng, "--", "*.md")
+    added_files = [f for f in git(repo, "diff", "--name-only", "-M", "--diff-filter=ACR", rng).splitlines() if f]
+    diff = git(repo, "diff", "-U0", "-M", "--diff-filter=ACMR", "--no-color", rng, "--", "*.md")
     added = parse_added_lines(diff)
     errs = check_added_files(added_files) + check_lines(added)
     for e in errs:

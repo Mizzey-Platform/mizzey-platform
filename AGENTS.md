@@ -2,8 +2,8 @@
 
 This is the authoritative instruction file for any agent or developer in this repository. `CLAUDE.md` points here.
 
-This is a **CoreX client site** for **Option B, the Launch Platform**. The engagement, scope authority and current
-phase are in [README.md](README.md). The rules are in the
+This is a **CoreX client site** for **Option B, the Launch Platform**. The engagement, the contract authority model
+and the current phase are in [README.md](README.md). The rules are in the
 [constitution](.specify/memory/constitution.md). Read both before changing anything.
 
 ## Role Gate: CLIENT SITE MODE
@@ -29,20 +29,29 @@ A valid register id does not make every behaviour in scope. Check each criterion
 ## Workflow for requirement work (Spec Kit owns it)
 
 1. `git switch main && git pull`.
-2. `/speckit-specify` creates `specs/NNN-<slug>/spec.md` and the branch `NNN-<slug>`. Fill the Register trace,
-   Contractual acceptance criteria, Native coverage, Optional safeguards and Future or Option C sections.
-3. `/speckit-clarify` for open questions, then `/speckit-plan` (Constitution Check), then `/speckit-tasks`, then
+2. **Create the branch first.** In this setup Spec Kit 0.10.1 creates the spec directory but not the git branch
+   (branch creation belongs to an optional git extension, which is not installed). Ask Spec Kit for the next name,
+   then create the branch with exactly that name:
+   `./.specify/scripts/powershell/create-new-feature.ps1 -Json -DryRun -ShortName <slug> "<description>"`
+   returns `BRANCH_NAME` (for example `001-product-cost-capture`); then `git switch -c <BRANCH_NAME>`.
+3. Run `/speckit-specify` and state `SPECIFY_FEATURE_DIRECTORY=specs/<BRANCH_NAME>` in the request. Without it,
+   the skill picks its own short name, and the directory can differ from the branch. It copies the Mizzey template
+   to `specs/<BRANCH_NAME>/spec.md`. The scope check fails a PR that adds a spec whose directory does not match the
+   branch name. Fill the Register trace, Contractual acceptance criteria, Native coverage, Optional safeguards and
+   Future or Option C sections.
+4. `/speckit-clarify` for open questions, then `/speckit-plan` (Constitution Check), then `/speckit-tasks`, then
    `/speckit-analyze`.
-4. `/speckit-implement`, only in `mizzey-site/` or `mizzey-theme/`, with tests for every task.
-5. Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
-6. Run the local checks (see [CONTRIBUTING.md](CONTRIBUTING.md)). Open a PR from the template. Squash-merge after
+5. `/speckit-implement`, only in `mizzey-site/` or `mizzey-theme/`, with tests for every task.
+6. Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
+7. Run the local checks (see [CONTRIBUTING.md](CONTRIBUTING.md)). Open a PR from the template. Squash-merge after
    CI passes and the PR is reviewed.
 
-Internal work skips steps 2 to 4 and uses a branch named `<category>/<slug>`.
+Internal work skips steps 2 to 5 and uses a branch named `<category>/<slug>`. It may touch only the paths its
+category allows (`PATH_POLICY` in `tools/scope_trace.py`). A new top-level directory is never internal work.
 
 **Spec Kit is the only planning system.** The guard skills and other technique skills (debugging, TDD,
 verification) support the work. They must not write their own plan, spec or task documents. Task-to-issue
-generation is disabled.
+generation is disabled, and the agent-context skill is removed.
 
 ## Hard rules
 

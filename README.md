@@ -14,7 +14,8 @@ collaborators without the client's agreement.
 |---|---|
 | **Engagement** | Option B, the Launch Platform, chosen by the client on 21 September 2026 |
 | **Contract pack** | MZ-02 REV4 (22 September 2026) |
-| **Scope authority** | Feature Register MS-ANX-2026-006 v1.5. **Only this defines scope** |
+| **Contract** | Services Agreement MS-AGR-2026-023 v1.4. It governs the terms and the precedence between documents (section 2.1) |
+| **Scope authority** | Annex A, the Feature Register MS-ANX-2026-006 v1.5: the authoritative definition of contracted feature scope |
 | **Acceptance** | Functional Specification MS-SPC-2026-032 v1.2 and Acceptance and UAT Plan MS-UAT-2026-027 |
 | **Architecture** | Technical Design MS-TDD-2026-033 v1.2, refined by accepted ADRs in [`docs/adr/`](docs/adr/) |
 | **ERP** | Stock integration included. ERP-dependent (P1-E) rows wait for the ERP Integration Specification (PRE-09) |
@@ -30,11 +31,13 @@ None of it is an Option B obligation.
 
 ## The rule that matters
 
-Only register rows marked **P1, P1-L, P1-E or DLV** create a delivery obligation. Functional work cites at least one
-such id. A valid id is necessary but not sufficient: the behaviour must be supported by that row's wording.
-Anything else is a Change Request under MS-CHG-2026-028. Governance, CI, tooling, test infrastructure, security
-maintenance and documentation are internal work items. They need no register id, and they may not add
-client-facing behaviour. The full rules are in the [constitution](.specify/memory/constitution.md).
+The Services Agreement governs; within it, the Feature Register defines contracted scope. Specs and ADRs here
+implement those obligations and cannot expand or override them. Only register rows marked **P1, P1-L, P1-E or DLV**
+create a delivery obligation. Functional work cites at least one such id. A valid id is necessary but not
+sufficient: the behaviour must be supported by that row's wording. Anything else is a Change Request under
+MS-CHG-2026-028. Governance, CI, tooling, test infrastructure, security maintenance and documentation are internal
+work items. They need no register id, may touch only the paths their category allows, and may not add client-facing
+behaviour. The full rules are in the [constitution](.specify/memory/constitution.md).
 
 ## Where to start
 

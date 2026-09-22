@@ -7,10 +7,12 @@ What is installed in this repository, where it came from, and what each check do
 | | |
 |---|---|
 | Version | Spec Kit 0.10.1, integration `claude`, PowerShell scripts, sequential feature numbering (`.specify/init-options.json`) |
-| Owns | Specifications, clarification, plans, tasks, consistency analysis and implementation (`/speckit-specify`, `/speckit-clarify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-analyze`, `/speckit-implement`, `/speckit-checklist`) |
+| Owns | Specifications, clarification, plans, tasks, consistency analysis and implementation (`/speckit-specify`, `/speckit-clarify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-analyze`, `/speckit-implement`, `/speckit-checklist`, `/speckit-constitution`) |
+| Branches | Spec Kit 0.10.1 creates the spec directory, not the git branch. Branch creation belongs to its optional git extension, which is not installed. Get the name from `create-new-feature.ps1 -Json -DryRun`, run `git switch -c <name>`, then `/speckit-specify` with `SPECIFY_FEATURE_DIRECTORY=specs/<name>`. Verified in a disposable export on 22 Sep 2026 |
 | Constitution | `.specify/memory/constitution.md` (Mizzey, inherits CoreX v1.2.2) |
 | Templates | `.specify/templates/`. The spec template adds Register trace, Contractual acceptance criteria, Native coverage, Optional safeguards and Future or Option C sections. User-story priority is High/Medium/Low, because P1 to P3 are register scope values |
-| Disabled | `speckit-taskstoissues` is not installed (removed from `.specify/integrations/claude.manifest.json`); `tools/repo_checks.py` fails if it returns. The agent-context hooks in `.specify/extensions.yml` are disabled because they rewrite `CLAUDE.md` |
+| Not installed | `speckit-taskstoissues` (removed from `.specify/integrations/claude.manifest.json`). The agent-context extension and its `speckit-agent-context-update` skill were removed with `specify extension remove agent-context`, because they rewrite `CLAUDE.md`. `tools/repo_checks.py` fails if either returns, or if `CLAUDE.md` gains a Spec Kit managed block |
+| Session state | `.specify/feature.json` (the current feature directory) is per-session and git-ignored |
 
 An upgrade of Spec Kit (`specify` re-init) may reinstall removed skills or re-enable hooks. Do it on a branch,
 and check the diff against this page.
@@ -19,7 +21,7 @@ and check the diff against this page.
 
 | Skill | Source | Pinned at | Licence |
 |---|---|---|---|
-| `speckit-*` (9) | [github/spec-kit](https://github.com/github/spec-kit) 0.10.1 scaffold | as installed 22 Sep 2026 | MIT |
+| `speckit-*` (8) | [github/spec-kit](https://github.com/github/spec-kit) 0.10.1 scaffold | as installed 22 Sep 2026 | MIT |
 | `wp-guard`, `woo-guard`, `test-guard`, `clean-code-guard`, `docs-guard` | [amElnagdy/guard-skills](https://github.com/amElnagdy/guard-skills) | `ffa26036b7b5e77b20b5d679304a703b6fd1a43d` | MIT, copy in each skill folder |
 
 The guard skills are byte-identical to upstream at that commit, plus the upstream LICENSE file in each folder. The CoreX copies differ from upstream only in line endings.
@@ -33,13 +35,15 @@ credentials, and machine-specific paths.
 | Tool | Scope | Fails when |
 |---|---|---|
 | `python -m discovery.check` | whole tree | the discovery datasets break their schema or gate rules |
-| `tools/repo_checks.py` | whole tree | task-to-issue generation is re-enabled; `stack.lock.json` is malformed or disagrees with `corex.lock`; `register-ids.json` disagrees with `docs/scope/SOURCE.md`; `open-items.json` cites an unknown id |
-| `tools/scope_trace.py` | changed specs and the PR body | no or invalid classification; requirement PR without obligation ids, or with ids not traced in a spec; internal PR changing behaviour, site code or feature specs; spec trace ids that are unknown, non-obligation, or have the wrong scope or stage; criteria citing untraced ids; P1-E criteria marked final before PRE-09; an open contradiction not cited |
-| `tools/house_rules.py` | added lines and added files | em dash or emoji on an added markdown line; an added contract document, archive, key or env file; anything new under `docs/engagement/` |
+| `tools/repo_checks.py` | whole tree | task-to-issue generation or agent-context returns; `CLAUDE.md` gains a managed block; `stack.lock.json` is malformed or disagrees with `corex.lock`; `register-ids.json` disagrees with `docs/scope/SOURCE.md`; `open-items.json` cites an unknown id |
+| `tools/scope_trace.py` | every added, modified, renamed and deleted path; changed specs; the PR body | classification missing, invalid or duplicated; a path outside the category's allowed classes, or not covered by `PATH_POLICY`; missing `Sensitive changes:`, `Delivery impact:`, `Security evidence:` or `Security change:` lines; requirement ids unknown, non-obligation or untraced; a spec deleted or moved; a new spec directory not matching the branch; trace ids unknown, non-obligation, or with the wrong scope or stage; any Traces token that is not a traced register id; a criterion status outside `final`, `provisional`, `pending CX-nn / PRE-09 / OD-nn`; P1-E criteria `final` before PRE-09; an open contradiction not cited |
+| `tools/house_rules.py` | added lines and added or renamed files | em dash or emoji on an added markdown line; an added contract document, archive, key or env file; anything new under `docs/engagement/` |
+| `tools/run_trusted.py` | the PR | runs the base branch's `scope_trace.py` and `house_rules.py` (trusted) and the PR's own copies (proposed), and fails if any run fails. Lists changed checker, CI, hook, constitution, scope-record and deployment files |
 | `tools/extract_register_ids.py --check` | local only (needs the register) | `register-ids.json` is stale against a given register |
 
-What the scope check cannot do: judge whether a criterion's behaviour is really supported by the wording of the row
-it cites. That is the reviewer's job, made reviewable by the per-criterion Traces column.
+What the checks cannot do: judge whether a criterion's behaviour is really supported by its row's wording, or
+whether a declared delivery impact or security change is true. Those are review judgements. The checks make them
+explicit.
 
 Historical files are never re-judged. The house rules look only at added lines, and the paths listed in
 `tools/house_rules.py` `EXCLUDED` are skipped entirely.
@@ -49,9 +53,21 @@ Historical files are never re-judged. The house rules look only at added lines, 
 - Runner `ubuntu-24.04` (PHP 8.3.6, matching local). Python 3.10 via `actions/setup-python`.
 - Actions pinned to commit SHAs: `actions/checkout` v7.0.1, `actions/setup-python` v7.0.0. Only GitHub-owned
   actions are used.
+- `baseline` (every event): discovery gate and tests, tooling tests (including the abuse regression tests), repo
+  checks, PHP lint.
+- `changes` (pull requests): `tools/run_trusted.py`.
+  - **Bootstrap:** PR #235 introduces the checker, so `main` has none. The runner says so, runs the proposed
+    checker only, and the checker and CI diff are reviewed by hand.
+  - **Afterwards:** the base branch's checker is exported with `git archive` and run against the PR, alongside the
+    PR's own copy, whose unit tests run in `baseline`.
+- `main-push` (pushes to `main`): spec, deletion and house-rule checks on what reached `main`. There is no PR body
+  on a push, so classification cannot be checked there.
 - `GITHUB_TOKEN` is read-only. No secrets are used. No artifacts are uploaded, so nothing from the checkout
   (including the historical contract copies still in `docs/engagement/` until D-03) leaves the runner.
-- On the free plan, CI cannot be made a required check on this private repository. It reports and does not block.
+- **Limits.** On the free plan, CI cannot be made a required check on this private repository. It reports and does
+  not block. A PR can edit `ci.yml` itself to skip the trusted run; that edit is listed as governance-sensitive and
+  needs a `Sensitive changes:` line, but it is not prevented. Running the checker from `main` does not make CI
+  tamper-proof.
 
 ## Local push guard (`.githooks/pre-push`)
 
