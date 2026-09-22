@@ -62,8 +62,9 @@ Historical files are never re-judged. The house rules look only at added lines, 
     PR's own copy, whose unit tests run in `baseline`.
 - `main-push` (pushes to `main`): spec, deletion and house-rule checks on what reached `main`. There is no PR body
   on a push, so classification cannot be checked there.
-- `GITHUB_TOKEN` is read-only. No secrets are used. No artifacts are uploaded, so nothing from the checkout
-  (including the historical contract copies still in `docs/engagement/` until D-03) leaves the runner.
+- `GITHUB_TOKEN` is read-only. No secrets are used. No artifacts are uploaded, so nothing from the checkout leaves
+  the runner. The historical Option C contract copies in `docs/engagement/` were removed from the tree under D-03;
+  git history keeps them, and `tools/house_rules.py` blocks anything new being added there.
 - **Limits.** On the free plan, CI cannot be made a required check on this private repository. It reports and does
   not block. A PR can edit `ci.yml` itself to skip the trusted run; that edit is listed as governance-sensitive and
   needs a `Sensitive changes:` line, but it is not prevented. Running the checker from `main` does not make CI

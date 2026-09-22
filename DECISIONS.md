@@ -502,3 +502,15 @@ single corrective pass on the same branch.
   Register) defines contracted scope; specs and ADRs implement and cannot override.
 
 **Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01 and PRE-09 remain open.
+
+## 2026-09-22 - D-03: Option C contract copies removed from the tree
+
+**Decided (approved by Mustafa):** the 35 files in `docs/engagement/` are removed from the current tree: 17
+markdown sources and 18 PDFs of the unsigned Option C pack, about 14 MB. Git history is not rewritten. The files
+stay in every commit before this one, and in the full-history bundle at
+`C:\Mizzey-Backups\mizzey-platform\2026-09-22\`.
+
+**Checked first:** no script, tool, test or CI step reads those files. The remaining mentions are historical text
+(this log, `scripts/README.md`, and a string inside the retired `scripts/make_issues.py`) and are left as written.
+The 232 Option C issues and Project #4 still name the old paths. They are not edited. `tools/house_rules.py`
+still blocks anything new under `docs/engagement/`.

@@ -6,13 +6,14 @@ Live status. First action each session: read this, then continue from **Next**.
 
 - Engagement: Option B, the Launch Platform. Contract pack MZ-02 REV4, register MS-ANX-2026-006 v1.5.
 - Repository transferred to `Mizzey-Platform/mizzey-platform` (private), history intact.
-- Governance foundation in review: constitution, Spec Kit, skills, scope traceability, CI, push guard.
+- Governance foundation merged (PR #235, 22 Sep 2026): constitution, Spec Kit, skills, scope traceability, CI,
+  trusted-checker runner, push guard.
 
 ## Next
 
-1. Governance PR reviewed and merged.
-2. D-03: separate PR removing the Option C contract copies in `docs/engagement/` from the tree (history keeps them).
-3. Pilot `specs/001-product-cost-capture` (ADM-27, RPT-11, MIG-13; contractual stage S1). Technical verification of
+1. D-03 cleanup PR reviewed and merged (removes the Option C contract copies in `docs/engagement/` from the tree;
+   history keeps them). The governance foundation (PR #235) is merged.
+2. Pilot `specs/001-product-cost-capture` (ADM-27, RPT-11, MIG-13; contractual stage S1). Technical verification of
    native Cost of Goods Sold in the disposable local runtime. Staff visibility stays pending CX-01.
 
 ## Blocked or waiting
