@@ -2,6 +2,11 @@
 
 Record each non-trivial decision (context · decision · why · status).
 
+> **Entries dated before 21 September 2026 were made under Option C**, the Operations Platform, which was never
+> signed. They are kept as engineering history and evidence. They are not Option B obligations, and where they
+> cite register ids or scope values those are the Option C register's (MS-ANX-2026-001). The Option B register is
+> MS-ANX-2026-006 v1.5. Architecture decisions from 22 September 2026 on are also recorded as ADRs in `docs/adr/`.
+
 ## 2026-09-09 - Product cost basis and the cost snapshot
 
 **OD-12 is the client's decision.** Recommendation to put to them: **purchase cost, a single field**,
@@ -439,3 +444,61 @@ the resource topics for order, product, customer and coupon. Three hooks are exp
 after repeated failures. It is not a guaranteed delivery queue. An ERP that must never miss a stock
 change needs a durable queue with replay in front of it, and that is a design decision for whenever
 INT-14 is actually commissioned, not something the P1 adapter work silently owes.
+
+## 2026-09-22 - Option B engineering governance foundation
+
+**Context.** The client chose Option B, the Launch Platform, on 21 September 2026. The repository still described
+Option C. Its agent instructions pointed at a `develop` branch that does not exist, and its PR template promised an
+audit trail that Option B excludes (ROLE-10). The repository was transferred to `Mizzey-Platform/mizzey-platform`
+the same day, with history intact.
+
+**Decided (approved by Mustafa as G-1, G-2 and G-3):**
+
+- Spec Kit 0.10.1 is the only system for specs, plans and tasks. The constitution is at
+  `.specify/memory/constitution.md` and inherits CoreX v1.2.2. Task-to-issue generation is disabled, and so are the
+  agent-context hooks.
+- Scope traceability: `docs/scope/register-ids.json` is generated from register v1.5 (754 ids), and its source hash
+  is recorded. A register id is necessary but not sufficient.
+- Work categories: `requirement`, or internal (`governance`, `ci`, `test-infrastructure`, `tooling`,
+  `security-maintenance`, `documentation`). Internal work needs no register id and may not add client-facing
+  behaviour.
+- Contradictions are recorded in `docs/scope/open-items.json`, never resolved in code. CX-01 (the Accountant role)
+  is open.
+- Versions are recorded in `stack.lock.json`, with an upgrade regression path in `docs/stack-and-upgrades.md`.
+- CI reports on every PR. On the free plan it cannot block a merge. The local pre-push hook is advisory.
+- ADR-0001 (native Cost of Goods Sold) and ADR-0002 (minimum shipment record) are proposed, not accepted.
+- The Option C board scripts are retired behind a guard. The 9 Sep entries above stay as history.
+
+**Not decided here:** D-03 (removing `docs/engagement/`) is a separate PR. D-07 (the 232 legacy issues), the Option B
+Project, the backlog and a paid plan are deferred.
+
+## 2026-09-22 - PR #235 corrective pass: the governance exception is closed by path policy
+
+**Context.** The PR #235 review package (REVIEW.md, findings F-1 to F-12) and ChatGPT's independent test of the
+checker showed that internal work could add client-facing code outside `mizzey-site/` and `mizzey-theme/`. It could
+also change build tooling or version locks, and use free-text security claims. The checker accepted an invented id
+next to a real one in a criterion, and P1-E criteria marked `approved` or `finalized` before PRE-09. Approved as a
+single corrective pass on the same branch.
+
+**Decided:**
+
+- Every added, modified, renamed and deleted path is classified by an explicit allow-list (`PATH_POLICY`), and
+  each work category may touch only its path classes. Unlisted paths, including new top-level directories, fail
+  for everyone until the policy is extended by an `internal:governance` PR.
+- Governance-sensitive paths need `Sensitive changes:`. Delivery-affecting paths need `Delivery impact:`.
+  `security-maintenance` needs `Security evidence:` (CVE, GHSA, advisory URL, or a local defect with a regression
+  test) and `Security change:`. A declaration makes a change reviewable. It does not prove it safe.
+- Every token in a criterion's Traces must be a traced register id. Statuses are exactly `final`, `provisional`,
+  or `pending CX-nn / PRE-09 / OD-nn`. P1-E criteria are never `final` while PRE-09 is open.
+- A duplicated PR field fails. Feature specs are never deleted or moved. A new spec's directory must match the
+  branch name.
+- `tools/run_trusted.py` runs the base branch's checker next to the PR's own. PR #235 is the bootstrap, because
+  `main` has no checker yet. This does not prevent a PR from editing the workflow, and the free plan still enforces
+  nothing server-side.
+- Spec Kit 0.10.1 does not create git branches here. The branch comes first, from the dry-run name, and
+  `SPECIFY_FEATURE_DIRECTORY` is passed explicitly. `.specify/feature.json` is ignored. The agent-context
+  extension and skill are removed.
+- The authority model follows Agreement MS-AGR-2026-023 section 2.1. The Agreement governs; Annex A (the Feature
+  Register) defines contracted scope; specs and ADRs implement and cannot override.
+
+**Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01 and PRE-09 remain open.

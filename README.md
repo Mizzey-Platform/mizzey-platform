@@ -1,100 +1,74 @@
-# Mizzey Operations Platform
+# Mizzey Launch Platform
 
-A premium single vendor store for Mizzey.com. English primary, Arabic fully supported at launch with
-right to left throughout. Built on WordPress and WooCommerce with the CoreX framework layer.
+A bilingual (English primary, Arabic fully supported, right to left) single-vendor store for Mizzey.com, built on
+WordPress and WooCommerce with the CoreX framework layer.
 
-**This repository is private and holds client confidential material.** Do not make it public, and do not
-add collaborators without the client agreement.
+**This repository is private and holds client confidential material.** Do not make it public, and do not add
+collaborators without the client's agreement.
 
 ---
 
-## What this is
+## Status
 
 | | |
 |---|---|
-| **Client** | Mizzey.com |
-| **Engagement** | Mizzey Operations Platform, the package selected on 5 September 2026 |
-| **Contract** | Services Agreement MS-AGR-2026-010, Statement of Work MS-SOW-2026-009 |
-| **Scope authority** | Feature Register MS-ANX-2026-001. **Only this defines scope** |
-| **Acceptance authority** | Functional Specification MS-SPC-2026-018 and Acceptance Plan MS-UAT-2026-013 |
-| **Schedule** | 14 weeks planned, 16 week band. Six payment stages |
-| **Market** | Egypt only, Egyptian Pounds |
+| **Engagement** | Option B, the Launch Platform, chosen by the client on 21 September 2026 |
+| **Contract pack** | MZ-02 REV4 (22 September 2026) |
+| **Contract** | Services Agreement MS-AGR-2026-023 v1.4. It governs the terms and the precedence between documents (section 2.1) |
+| **Scope authority** | Annex A, the Feature Register MS-ANX-2026-006 v1.5: the authoritative definition of contracted feature scope |
+| **Acceptance** | Functional Specification MS-SPC-2026-032 v1.2 and Acceptance and UAT Plan MS-UAT-2026-027 |
+| **Architecture** | Technical Design MS-TDD-2026-033 v1.2, refined by accepted ADRs in [`docs/adr/`](docs/adr/) |
+| **ERP** | Stock integration included. ERP-dependent (P1-E) rows wait for the ERP Integration Specification (PRE-09) |
+| **Current phase** | Engineering governance and the product-cost pilot. See [PROGRESS.md](PROGRESS.md) |
+
+The contract documents live outside this repository. The repository carries only what building needs: the register
+ids, scope values and stages in [`docs/scope/register-ids.json`](docs/scope/register-ids.json), generated from the
+signed register with its hash recorded in [`docs/scope/SOURCE.md`](docs/scope/SOURCE.md).
+
+Before 21 September 2026 this repository was built for Option C, the Operations Platform, which was never signed.
+That history is kept in git, in [DECISIONS.md](DECISIONS.md), in `discovery/`, and on the archived GitHub Project #4.
+None of it is an Option B obligation.
 
 ## The rule that matters
 
-**Scope is defined by the Feature Register, and only by the Feature Register.** Only rows marked P1, P1-L
-or DLV create a delivery obligation. Anything else is recorded for completeness and creates none.
+The Services Agreement governs; within it, the Feature Register defines contracted scope. Specs and ADRs here
+implement those obligations and cannot expand or override them. Only register rows marked **P1, P1-L, P1-E or DLV**
+create a delivery obligation. Functional work cites at least one such id. A valid id is necessary but not
+sufficient: the behaviour must be supported by that row's wording. Anything else is a Change Request under
+MS-CHG-2026-028. Governance, CI, tooling, test infrastructure, security maintenance and documentation are internal
+work items. They need no register id, may touch only the paths their category allows, and may not add client-facing
+behaviour. The full rules are in the [constitution](.specify/memory/constitution.md).
 
-Every issue in this repository traces to a requirement id in that register. **An issue that cannot cite
-one is not work, it is a Change Request** and goes through MS-CHG-2026-014 before any code is written.
+## Where to start
 
-## Documents
-
-Everything lives in [`docs/engagement/`](docs/engagement/), as markdown source beside the rendered PDF.
-
-| Read this | When |
+| Read | For |
 |---|---|
-| [Feature Register](docs/engagement/Mizzey-Feature-Register.md) | You need to know whether something is in scope |
-| [Functional Specification](docs/engagement/Mizzey-Operations-Platform-Functional-Specification.md) | You need the acceptance criteria for a story |
-| [Delivery Backlog](docs/engagement/Mizzey-Operations-Platform-Delivery-Backlog.md) | You need to know which sprint something is in, and why |
-| [Project Plan](docs/engagement/Mizzey-Operations-Platform-Project-Plan.md) | You need the stage gates and what the client owes before each |
-| [Acceptance and UAT Plan](docs/engagement/Mizzey-Operations-Platform-Acceptance-and-UAT-Plan.md) | You need to know how something gets accepted |
-| [Change Control](docs/engagement/Mizzey-Operations-Platform-Change-Control.md) | Someone wants something that is not in the register |
-
-Signed contracts are in [`docs/engagement/signed/`](docs/engagement/signed/).
-
-## How the board works
-
-| Object | Meaning |
-|---|---|
-| **Milestone** | One payment stage. Closing it is what releases a payment |
-| **`sprint-NN` label** | One week. Sixteen of them, 1 to 14 planned and 15 to 16 contingency |
-| **`epic:ENN` label** | One epic from the Functional Specification |
-| **Epic issue** | Lists its stories. Closed when they all are |
-| **Story issue** | Carries its acceptance criteria as a checklist. Every box ticked is the definition of done |
-
-A story issue is **generated from the Functional Specification and is not edited on the board**. If a
-criterion is wrong, the specification is corrected and the issue regenerated, so the board and the
-contract cannot drift apart.
+| [AGENTS.md](AGENTS.md) | How any agent or developer works here. Start here |
+| [.specify/memory/constitution.md](.specify/memory/constitution.md) | The rules every spec, plan and PR is checked against |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branches, commits, PR classification, checks |
+| [docs/tooling.md](docs/tooling.md) | Spec Kit, skills, CI, the push guard, and what each check does |
+| [docs/stack-and-upgrades.md](docs/stack-and-upgrades.md) | Tested versions and the upgrade regression path |
+| [docs/scope/open-items.json](docs/scope/open-items.json) | Contract contradictions and gates that specs must cite |
 
 ## Stack
 
-| Layer | Choice | Why |
+| Layer | Choice | Tested version |
 |---|---|---|
-| CMS | WordPress | Client requirements section 19.1 left the stack to the developer |
-| Commerce | WooCommerce | Products, stock, cart, orders, coupons, refunds are mature rather than written from scratch |
-| Framework | [CoreX](https://github.com/MustafaShaaban/corex) | Container, config, routing, admin shell, forms, blocks, CLI, mail, media |
-| Site layer | `wp corex make:site Mizzey` | Client plugin and theme in their own namespace |
-| Payments | Paymob, behind a payment abstraction | Recommended, pending client approval (OD-06) |
-| Shipping | Bosta, behind a carrier abstraction | Recommended, pending client approval (OD-07) |
+| CMS | WordPress | 7.1 |
+| Commerce | WooCommerce | 11.1.0 |
+| Framework | [CoreX](https://github.com/MustafaShaaban/corex), pinned in `corex.lock` | v0.42.0 |
+| Translation | WPML with WooCommerce Multilingual (client-held licence) | 4.9.7 / WCML 5.5.7 |
+| Shipping | Bosta (register §2.2, recommended) | 4.5.7 |
+| Payments | Paymob (register §2.1, recommended). Not yet installed | not selected |
 
-**CoreX supplies the framework, not a store.** `corex-kit-woo` is a reserved seam, not a commerce kit
-(CoreX ROADMAP M9). The commerce modules in this repository are written for Mizzey.
-
-## Branching
-
-| Branch | Purpose |
-|---|---|
-| `main` | Always deployable. Protected. Merges arrive by pull request only |
-| `feature/<issue>-<slug>` | One issue. Example: `feature/42-guest-cart-merge` |
-| `fix/<issue>-<slug>` | A defect against an accepted story |
-
-A pull request closes its issue, cites the requirement ids it delivers, and states how each acceptance
-criterion was verified. CI must pass before merge.
-
-## Environments
-
-| Environment | Purpose |
-|---|---|
-| Local | WAMP. `C:\wamp64\www\mizzey` |
-| Staging | Every stage gate is reviewed here. Risky changes are never tested on production |
-| Production | Provisioned once the client hosting instruction (CR-10) and any required authorisation are in place |
+Exact versions and their test status are in [`stack.lock.json`](stack.lock.json). **CoreX supplies the framework,
+not a store.** `corex-kit-woo` is a reserved seam, not a commerce kit. Commerce behaviour comes from WooCommerce
+first, and from code in `mizzey-site/` only where a recorded gap requires it.
 
 ## How this repository meets CoreX
 
-**Mizzey is never inside the CoreX repository, and CoreX is never inside this one.** They are joined
-only on disk, in a runtime directory that is not under version control and can be deleted and rebuilt
-at any moment.
+**Mizzey is never inside the CoreX repository, and CoreX is never inside this one.** They are joined only on disk,
+in a runtime directory that is not under version control and can be deleted and rebuilt at any moment.
 
 ```text
 C:\wamp64\www\corex\          CoreX framework development. Holds no client code, ever.
@@ -102,7 +76,8 @@ C:\wamp64\www\corex\          CoreX framework development. Holds no client code,
 C:\wamp64\www\mizzey\
   platform\                   this repository, the committed source
     corex.lock                the CoreX release the site is built against
-    mizzey-site\              the client plugin
+    stack.lock.json           tested versions of the whole stack
+    mizzey-site\              the client plugin (namespace MizzeySite\)
     mizzey-theme\             the client theme
     tools\corex-sync.mjs      wires the runtime below to the two sources above
   app\                        the runtime. Disposable, not committed, rebuildable
@@ -110,22 +85,16 @@ C:\wamp64\www\mizzey\
     wp\                       WordPress, wp-content junctioned back to both sources
 ```
 
-`app/` holds nothing original. Delete it and `node tools/corex-sync.mjs` builds it again.
-
 ### Local setup
 
 ```bash
 node tools/corex-sync.mjs
+cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizzey --admin_user=<user> --admin_email=<email> --prompt=admin_password
+git config core.hooksPath .githooks
 ```
 
-Then create the database and install WordPress:
-
-```bash
-cd ../app/wp && wp db create && wp core install --url=mizzey.local --title=Mizzey --admin_user=mustafa --admin_email=mustafashaaban22@gmail.com --prompt=admin_password
-```
-
-`node tools/corex-sync.mjs --check` reports drift and changes nothing. It fails if a framework link has
-been replaced by a real directory, which is the one mistake that silently shadows the framework source.
+`node tools/corex-sync.mjs --check` reports drift and changes nothing. It fails if a framework link has been replaced
+by a real directory, which is the one mistake that silently shadows the framework source.
 
 ### Building the deployable artifact
 
@@ -133,41 +102,22 @@ been replaced by a real directory, which is the one mistake that silently shadow
 node tools/build-dist.mjs --production
 ```
 
-This drives the stock CoreX shared-host builder. `corex-sync.mjs` links this repository into the
-pinned checkout as `sites/mizzey`, which is the shape that builder already packages, so nothing in
-CoreX is patched and no Mizzey path is written into the CoreX repository.
-
-The artifact carries the framework, the client plugin and theme, WordPress core and vendor. It carries
-no `.git`, `node_modules`, tests, `.env`, `wp-config.php` or any document from `docs/`.
-
-**Read the caveat the build prints.** Until [corex#201](https://github.com/MustafaShaaban/corex/issues/201)
+This drives the stock CoreX shared-host builder. The artifact carries no `.git`, `node_modules`, tests, `.env`,
+`wp-config.php` or any document from `docs/`. Until [corex#201](https://github.com/MustafaShaaban/corex/issues/201)
 is fixed, a lean artifact and a complete CoreX CLI are mutually exclusive. See
-[COREX-WORKAROUNDS.md](./COREX-WORKAROUNDS.md).
+[COREX-WORKAROUNDS.md](COREX-WORKAROUNDS.md).
 
-### Upgrading CoreX
+### Upgrading CoreX or any other component
 
-An upgrade is a commit, not an event. On a branch:
-
-1. Edit `corex.lock` to the new tag and commit hash
-2. `node tools/corex-sync.mjs`
-3. `wp corex migrate`
-4. Run the smoke tests
-5. Merge, or `git revert` the one file and you are back
-
-Never track a moving branch. `corex.lock` is the only thing that decides which CoreX this site runs.
+Follow [docs/stack-and-upgrades.md](docs/stack-and-upgrades.md). For CoreX, the change is one edit to `corex.lock`
+on a branch, `node tools/corex-sync.mjs`, `wp corex migrate`, the regression path, then merge or revert.
 
 ### A framework bug, mid build
 
-CoreX is a separate product and is not patched for one client. When the framework is wrong:
-
-1. Open an issue on [CoreX](https://github.com/MustafaShaaban/corex), describing the defect with no
-   client material in it
-2. Work around it **inside `mizzey-site/`**, through a hook, never by editing `app/corex/`
-3. Record the workaround in `COREX-WORKAROUNDS.md` against the issue number
-4. When the fix ships in a tag, bump `corex.lock` and delete the workaround
-
-Anything edited inside `app/corex/` is lost on the next sync. That is deliberate.
+CoreX is a separate product and is not patched for one client. Open a CoreX issue with no client material in it,
+work around it inside `mizzey-site/` through a hook, record the workaround in `COREX-WORKAROUNDS.md`, and remove it
+when the fix ships in a pinned tag.
 
 ---
 
-*Client confidential. Prepared by Mustafa Shaaban, Software Engineering Lead.*
+*Client confidential. Prepared by Mustafa Shaaban.*

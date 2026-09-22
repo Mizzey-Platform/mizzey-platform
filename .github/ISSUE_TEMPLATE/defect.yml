@@ -8,7 +8,7 @@ body:
       value: |
         A defect is where the system does not do what the Feature Register says it does.
         If the system does what the register says and something else is now wanted,
-        that is a Change Request, not a defect. See MS-UAT-2026-013 section 3.
+        that is a Change Request, not a defect. See the Acceptance and UAT Plan MS-UAT-2026-027.
   - type: input
     id: story
     attributes:

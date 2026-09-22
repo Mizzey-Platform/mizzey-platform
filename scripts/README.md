@@ -1,4 +1,13 @@
-# Scripts
+# Scripts (retired, Option C)
+
+**Retired on 22 September 2026.** These generated the Option C board (GitHub Project #4 and its 232 issues)
+from the Option C Functional Specification. They are kept as history. Each exits immediately unless
+`MIZZEY_LEGACY_BOARD_SCRIPTS=1` is set, because `make_issues.py`, `fix_blockers.py` and `setup-project-board.py`
+write to GitHub, `gen_backlog.py` writes into the client document folder, and `issues.json` is missing, so a
+rerun would duplicate issues. Option B work items come from Spec Kit specs (see `AGENTS.md`), and no backlog
+generator is approved yet.
+
+---
 
 The board is generated from the Functional Specification, not typed. These are what generate it.
 

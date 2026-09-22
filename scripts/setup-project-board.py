@@ -20,6 +20,11 @@ settings and copy the Sprint values across; nothing else here depends on it.
 """
 import json, io, os, subprocess, sys, time
 
+# Retired 22 Sep 2026: an Option C board and backlog generator. It writes to GitHub or to client documents,
+# and scripts/issues.json is missing, so a rerun would duplicate issues. See scripts/README.md.
+if os.environ.get('MIZZEY_LEGACY_BOARD_SCRIPTS') != '1':
+    raise SystemExit('Retired Option C script. Not for Option B use. See scripts/README.md.')
+
 OWNER = 'MustafaShaaban'
 REPO = 'MustafaShaaban/mizzey-platform'
 TITLE = 'Mizzey Operations Platform delivery'

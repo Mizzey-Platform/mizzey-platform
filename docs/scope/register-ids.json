@@ -1,0 +1,4542 @@
+{
+ "generated_by": "tools/extract_register_ids.py",
+ "source": {
+  "document": "MS-ANX-2026-006",
+  "version": "1.5",
+  "file": "Mizzey-Launch-Platform-Feature-Register.md",
+  "sha256": "6624a6dcbc351e5437bc8aedf7008de8cae5e332acf694f328380fb58322204f"
+ },
+ "obligation_scopes": [
+  "DLV",
+  "P1",
+  "P1-E",
+  "P1-L"
+ ],
+ "count": 754,
+ "ids": {
+  "AC-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AC-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AC-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AC-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AC-20": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AC-21": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-22": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-23": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-24": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AC-25": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-09": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ACCT-11": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ACCT-13": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-04": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-05": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-06": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-07": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-100": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-101": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-102": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-103": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-104": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-105": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-110": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-111": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-112": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-113": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-114": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-115": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-120": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-121": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-122": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-123": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-124": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ADM-125": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-126": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-130": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-131": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-132": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-133": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-134": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-14": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-140": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-141": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-142": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-143": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-144": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-145": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-146": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-147": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-148": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-149": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-150": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-151": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-152": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-153": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-154": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-155": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-156": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-157": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ADM-158": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-159": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-159a": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-160": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-161": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-20": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-22": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-23": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-24": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-25": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-26": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-27": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ADM-28": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-29": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-30": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-31": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-32": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-33": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-34": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-35": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-36": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-37": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-38": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-39": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-40": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-41": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-42": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-43": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-44": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-45": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-46": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-47": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-48": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-49": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-50": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-55": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-56": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-57": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-58": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-59": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-60": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-61": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-62": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-63": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-70": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-71": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-72": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-73": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-74": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-75": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-76": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-77": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-78": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-79": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-80": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ADM-85": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-86": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-87": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-88": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-89": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-90": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-91": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-92": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-93": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ADM-94": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "AUTH-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-02": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AUTH-10a": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "AUTH-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AUTH-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AUTH-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "AUTH-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "AUTH-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "BR-001": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "BR-002": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "BR-003": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "BR-004": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "BR-005": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "BR-006": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "BR-007": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "BR-008": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "BR-009": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "BR-010": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "CART-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "CART-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "CART-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CART-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CHK-13": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "CMS-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "CMS-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-04": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "DOD-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-04": {
+   "scope": "P1-E",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ENT-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-12": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ENT-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-15": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-18": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ENT-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ENT-20": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ENT-21": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ERP-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ERP-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ERP-03": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ERP-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ERP-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ERP-06": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ERP-07": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ERP-08": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ERP-09": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ERP-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-15": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-17": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "EVT-18": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "EVT-19": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "EVT-20": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "FIX-04a": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "FIX-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "FIX-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-01": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-02": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-03": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-04": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-05": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-06": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-07": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-08": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-09": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-10": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-11": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HND-12": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-11": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "HOME-12": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "HOME-13": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "IA-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-11": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-12": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "IA-13": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "IA-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-17": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-20": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-22": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "IA-23": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "IA-24": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-25": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-26": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-27": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-28": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-29": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-30": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-31": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-32": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-33": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "IA-34": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "IA-35": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "IA-36": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-02": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-03": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-04": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-06": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-07": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-08": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-11": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "INT-13": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-14": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-15": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "INT-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "INT-17": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "JRN-01": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-02": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-03": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-04": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-05": {
+   "scope": "P1-L",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-06": {
+   "scope": "P1",
+   "stage": "-",
+   "key": true,
+   "obligation": true
+  },
+  "JRN-07": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-08": {
+   "scope": "P1-L",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-09": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-10": {
+   "scope": "P1",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-11": {
+   "scope": "P1-L",
+   "stage": "-",
+   "key": false,
+   "obligation": true
+  },
+  "JRN-12": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-01": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-02": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-03": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-04": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-05": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-06": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-07": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-08": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-09": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-10": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-11": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-12": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-13": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-14": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-15": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-16": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-17": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-18": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-19": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-20": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-21": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-22": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-23": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-24": {
+   "scope": "P2",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-25": {
+   "scope": "P2",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "LOY-26": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-27": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "LOY-28": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MER-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MER-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-01": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-02": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-03": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-04": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-05": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-06": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-07": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-08": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-11": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-13": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-14": {
+   "scope": "P1-E",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-15": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-16": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-18": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-19": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-20": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MIG-21": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-22": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-23": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-24": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MIG-25": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-04": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MKT-05": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-06": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-07": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MKT-08": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MKT-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-11": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MKT-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-17": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-19": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "MKT-20": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-22": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-23": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "MKT-24": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-25": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "MKT-26": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NAV-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "NFR-04a": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-04b": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "NFR-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-11": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-12a": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-13": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NFR-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-05": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "NOTF-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-07": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "NOTF-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-09": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "NOTF-10": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "NOTF-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-14": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "NOTF-15": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "OBJ-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "OBJ-02": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "OBJ-03": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "OBJ-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "OBJ-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "OBJ-06": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "OBJ-07": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-09": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ORD-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ORD-11": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ORD-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ORD-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "ORD-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "PAY-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "PAY-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-10": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PAY-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "PAY-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PAY-20": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PAY-21": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PAY-22": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PDP-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-17": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-20": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PDP-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-22": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PDP-23": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PDP-24": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-11": {
+   "scope": "P1-L",
+   "stage": "S2",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-16": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-17": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-20": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLP-22": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLT-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLT-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLT-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLT-04": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PLT-05": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PLT-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PLT-07": {
+   "scope": "OUT",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PLT-08": {
+   "scope": "P3",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PLT-09": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PRE-01": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-02": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-03a": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-03b": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-04": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-05": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-06": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-07": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "PRE-08": {
+   "scope": "DLV",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PRE-09": {
+   "scope": "DLV",
+   "stage": "-",
+   "key": true,
+   "obligation": true
+  },
+  "PROMO-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-09": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-16": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-17": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-18": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-19": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "PROMO-20": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-21": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-22": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "PROMO-23": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "RET-01": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-02": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-03": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-04": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-05": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-06": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-07": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "RET-09": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RET-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "REV-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "REV-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "REV-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "REV-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "REV-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "REV-06": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "REV-07": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "REV-08": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "REV-09": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ROLE-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ROLE-03": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-04": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-05": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-06": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-06a": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ROLE-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ROLE-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "ROLE-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "ROLE-11": {
+   "scope": "P3",
+   "stage": "-",
+   "key": true,
+   "obligation": false
+  },
+  "RPT-01": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "RPT-02": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-03": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-04": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-05": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-06": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-07": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "RPT-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "RPT-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "RPT-10": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "RPT-11": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SHIP-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-02": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SHIP-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-04": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-06": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SHIP-07": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SHIP-08": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-10": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SHIP-11": {
+   "scope": "DEF",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SHIP-12": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-13": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-14": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SHIP-15": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SHIP-16": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SHIP-17": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SHIP-18": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SRCH-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-06": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-06a": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SRCH-09": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "SSC-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SSC-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-08": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-09": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-10": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-11": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-12": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SSC-13": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-14": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-20": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SSC-21": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": true,
+   "obligation": true
+  },
+  "SSC-22": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-23": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-24": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-25": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-26": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-27": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-28": {
+   "scope": "P1-L",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "SSC-29": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-05": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "VIS-06": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-01": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-02": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-03": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-04": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-05": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "WISH-06": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  },
+  "WISH-07": {
+   "scope": "P1",
+   "stage": "S1",
+   "key": false,
+   "obligation": true
+  },
+  "WISH-08": {
+   "scope": "P2",
+   "stage": "-",
+   "key": false,
+   "obligation": false
+  }
+ }
+}

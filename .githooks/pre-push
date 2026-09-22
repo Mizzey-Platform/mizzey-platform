@@ -1,0 +1,21 @@
+#!/bin/sh
+# Mizzey local push guard. Enable per clone with: git config core.hooksPath .githooks
+# Blocks direct pushes to main and any non-fast-forward push. This is a local safeguard, not branch protection:
+# --no-verify bypasses it and it does not exist on other machines. An approved exception sets
+# MIZZEY_ALLOW_MAIN_PUSH=1 for that one command and is recorded in DECISIONS.md.
+zero=0000000000000000000000000000000000000000
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ] && [ "${MIZZEY_ALLOW_MAIN_PUSH:-}" != "1" ]; then
+    echo "pre-push: direct push to main is blocked. Open a pull request." >&2
+    exit 1
+  fi
+  if [ "$local_sha" = "$zero" ]; then
+    echo "pre-push: deleting $remote_ref is blocked." >&2
+    exit 1
+  fi
+  if [ "$remote_sha" != "$zero" ] && ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+    echo "pre-push: non-fast-forward push to $remote_ref is blocked (no force-push)." >&2
+    exit 1
+  fi
+done
+exit 0

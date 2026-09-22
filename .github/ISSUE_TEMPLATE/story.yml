@@ -6,9 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Stories are generated from the Functional Specification MS-SPC-2026-018.
+        Stories come from the Functional Specification MS-SPC-2026-032 through a Spec Kit spec.
         Use this form only to recreate one that was lost, never to invent a new one.
-        Anything not in the Feature Register is a Change Request under MS-CHG-2026-014.
+        Anything not in the Feature Register is a Change Request under MS-CHG-2026-028.
   - type: input
     id: narrative
     attributes:

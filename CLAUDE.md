@@ -1,14 +1,8 @@
-# Mizzey — Claude Code entry point (a Corex client site)
+# Mizzey: Claude Code entry point
 
-This file mirrors `AGENTS.md`. Read it first.
+Read [AGENTS.md](AGENTS.md). It is the authoritative instruction file for this repository, and this file adds
+nothing to it.
 
-You are working on the **Mizzey** website, a **Corex client site**. **Do not edit Corex
-framework folders** — app code goes in `mizzey-site/` (`MizzeySite\`), presentation
-in `mizzey-theme/`. Site identity: `MizzeySite\`, `mizzey-site`, `mizzey/v1`,
-`--mizzey-`, `mizzey_` (all distinct from Corex). One feature = one branch = one spec =
-one PR; run guards before pushing; never push directly to `develop`/`main`. Use `wp corex make:*`.
-
-**Role Gate — CLIENT SITE MODE.** Edit only this client source; do not edit Corex framework internals, nor
-`wp/wp-content/` or `dist/` as source. Keep specs in `specs/`, progress in `PROGRESS.md`, decisions in
-`DECISIONS.md`. Follow Spec Kit, the Guard Gate, and UI/UX ProMax. For a framework bug, stop and open a CoreX
-Framework Mode task.
+- Rules: [.specify/memory/constitution.md](.specify/memory/constitution.md)
+- Current engagement: Option B, the Launch Platform (see [README.md](README.md)). Option C material is history.
+- Reply to Mustafa in English, even when he writes in Arabic, unless he asks for Arabic.

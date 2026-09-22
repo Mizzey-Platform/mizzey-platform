@@ -1,0 +1,6 @@
+# Mizzey: no Spec Kit extensions are installed. agent-context was removed on 22 Sep 2026 because it rewrites
+# CLAUDE.md, which is a fixed pointer to AGENTS.md. tools/repo_checks.py fails if it returns. See docs/tooling.md.
+installed: []
+settings:
+  auto_execute_hooks: false
+hooks: {}

@@ -37,10 +37,16 @@ Thumbs.db
 __pycache__/
 *.pyc
 
-# AI working files, per the working contract
-.specify/
-.claude/
+# AI working files. The approved project configuration IS versioned: .specify/ (Spec Kit templates, scripts,
+# constitution) and .claude/skills/ (Spec Kit and guard skills). Personal and machine-specific state is not.
+.claude/*
+!.claude/skills/
+.claude/settings.local.json
 .agents/
+.specify/extensions/.cache/
+.specify/extensions/.backup/
+.specify/feature.json
+.specify/**/*.local.*
 
 # Board sync state, local to whoever ran the setup script
 scripts/.board-state.json
