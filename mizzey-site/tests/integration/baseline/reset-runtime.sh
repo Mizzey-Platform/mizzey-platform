@@ -27,5 +27,32 @@ for p in woocommerce sitepress-multilingual-cms wpml-string-translation woocomme
   $WP plugin activate "$p" >/dev/null
 done
 $WP theme activate mizzey-theme >/dev/null
+# Pretty permalinks and the rewrite rules, before setup.php: WPML negotiates language by directory, so the
+# language segment has to sit at the root of the path and `/ar/` cannot resolve without them.
+#
+# The .htaccess is written here rather than by `wp rewrite flush --hard`. WordPress will not write it in this
+# runtime: PHP runs as CGI, so apache_get_modules() is unavailable, got_mod_rewrite() returns false, and the hard
+# flush reports success while writing nothing. That produces a baseline that looks configured and is not.
+# Set the structure from PHP, not as a command argument. A leading-slash argument is rewritten into a Windows
+# path by Git Bash's MSYS path conversion, which stored `/C:/Program Files/Git/%postname%/` the first time this
+# was tried. Inside `wp eval` the value is PHP source, so no shell touches it, and this works the same on any
+# platform. The read-back below is kept even so: it is what caught the mangling.
+$WP eval 'update_option("permalink_structure", "/%postname%/");' >/dev/null
+STRUCTURE="$($WP eval 'echo get_option("permalink_structure");')"
+[ "$STRUCTURE" = '/%postname%/' ] || { echo "refusing: permalink_structure is $STRUCTURE" >&2; exit 2; }
+cat > "$WP_PATH/.htaccess" <<'HTACCESS'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+HTACCESS
+$WP rewrite flush >/dev/null
+
 $WP eval-file "$HERE/setup.php"
 $WP eval-file "$HERE/admin-visit.php"

@@ -78,6 +78,15 @@ final class Scenario {
 	}
 
 	/** Track a fixture for deletion. Only product posts are ever tracked, so a wrong id cannot delete other content. */
+	/**
+	 * Track a product or variation for deletion when the scenario finishes.
+	 *
+	 * **Products and variations only, by design.** Anything else is ignored, silently, so a scenario that needs
+	 * another post type cleaned up must register it with on_finish() instead. t21 lost two pages this way before
+	 * the behaviour was written down here.
+	 *
+	 * @param int $id Post id.
+	 */
 	public function track_post( int $id ): void {
 		if ( $id > 0 && in_array( get_post_type( $id ), array( 'product', 'product_variation' ), true ) ) {
 			$this->posts[] = $id;
