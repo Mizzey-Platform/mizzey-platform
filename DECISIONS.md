@@ -652,3 +652,92 @@ B1 has measured the actual behaviour**, and no fix is created for a field A12 fi
 **Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. No P1-E row receives
 final acceptance criteria while PRE-09 is unapproved. No GitHub Project, no bulk issues, no Option C issue
 closures, no ERP implementation.
+
+## 2026-10-04 - D-06: repository private again, and what B1 and A12 measured
+
+**Decided:** the repository is **private** again. It had been made public for external review; that is complete,
+and the visibility was reversed before any further delivery work. Confirmed by two independent reads. 0 forks,
+0 stars, network count 0.
+
+**Not decided, and deliberately not done: the history purge.** `docs/engagement/` was removed from the tree by
+D-03 but remains in 57 of the repository's 60 commits, so the engagement pack was reachable while the repository
+was public. Nothing has been rewritten, nothing force-pushed, and the backup bundle is intact. The assessment is
+`docs/2026-10-04-public-exposure-assessment.md`, and it was measured rather than assumed:
+
+- 35 files, 13.7 MB, of which 8 are commercial or signed.
+- The two SIGNED PDFs each hold exactly one embedded image, the same signature graphic, and three counterparty
+  form fields (`name`, `title`, `date`) that are **empty in both**. The client never signed; Option C was never
+  executed.
+- No national ID, passport number, phone number, email address, account number, IBAN or SWIFT reference appears in
+  any text layer of the Agreement, Statement of Work or Invoice.
+- No private key, certificate or credential was ever committed, in any commit.
+- **The one genuine sensitivity is the developer's own signature image.** Everything else is a superseded,
+  unsigned engagement's commercial terms and the client's specification material.
+
+A purge would rewrite 57 commits, break the commit links in 232 historical Option C issues and in five merged PR
+records, require every clone to be re-cloned, and still not un-publish what was already fetched. The D-03
+"preserve history" position is therefore **reconsidered and left open for a separate explicit approval**, with a
+narrow option (the two signed PDFs only) recorded beside the full one. **Recommended regardless of that decision:
+rotate the signature asset**, since a publicly reachable signature graphic should be treated as compromised for
+future use.
+
+**Measured, probe B1 (`t17-multilingual-stock.php`): the hypothesis was refuted, and a different defect found.**
+
+The pre-probe hypothesis was that stock shared the cost gap. It does not. `WCML\Synchronization\Hooks::syncProductStock`
+is registered on `woocommerce_product_set_stock` and `woocommerce_variation_set_stock`, which fire on the
+arithmetic stock write itself, so stock never depended on `save_post`. **Simple products hold one effective
+balance**: either language's order reduces both records, a cancellation restores both, and the last unit cannot be
+sold twice. **Variations behave the same while their translation group is intact**, verified in eight sequences.
+
+What was found instead: **creating any new product after a WCML translation of a variable product, in the same
+process, corrupts the Arabic variations.** Reproduced deterministically. WPML associates the new post with the
+Arabic variations' group, WCML copies the new product's title onto them (visible Arabic content corruption), and
+the first save of such a variation **rewrites its `icl_translations` row** into the neighbouring trid, read
+directly from the database as `db=71` before and `db=70` after. From then on stock does not synchronise in either
+direction, and **overselling becomes possible**, for variations only.
+
+This is the same defect class the cost pilot found, and `CostTranslationSync::noteCreation()` is the guard that
+protects cost from it. WCML's own synchronisation has no equivalent guard. **Production relevance:** the trigger
+needs several product creations in one process, which a human in wp-admin does not do but **a catalogue migration
+or CSV import does**. It therefore blocks **E-MIG** and is a second, more serious reason for the MIG-13
+precondition than cost was.
+
+**Measured, probe A12 (`t18-synced-fields.php`): the cost gap is not unique, and price is in it.**
+
+One field at a time on the `crud-cli` channel, 14 fields, both product types. **Nine of fourteen do not reach the
+Arabic record**: `regular_price`, `sale_price`, `sku`, `manage_stock`, `weight`, `length`, `catalog_visibility`, a
+custom field, and `product_cat`. Three do: `cost` (only because `CostTranslationSync` exists), `stock_quantity`
+(WCML hooks the write, not `save_post`), and `status` and `name` for products (a post field changed, so `save_post`
+fired). For variations, `status` did **not** follow even though `save_post` fired. A SKU change on a translated
+variation is **refused** by WooCommerce, because the duplicate holds the same SKU.
+
+Thirteen of WCML's fourteen synchronisation components run from `save_post`; only Stock does not. That is the
+shape of the problem, and it is now bounded rather than suspected.
+
+**The highest-severity finding is `regular_price`.** It is the same mechanism as cost, on the field the customer
+pays: an Arabic customer would be shown, and charged, a stale price after a code-level price change.
+
+**Decided: no fix is implemented from either probe in this checkpoint**, and no general multilingual
+synchronisation framework is built. Each finding attaches to the PBI that owns the behaviour: price to the pricing
+slices, the group corruption to E-MIG and the translation workflow (US-16-03, A10, A11), dimensions to shipping,
+visibility to the catalogue admin. `manage_stock` is recorded for PRE-09 because ERP-07 is P1-E. `product_cat`
+needs interpretation before it is called anything, since WPML translates taxonomies as their own elements, and a
+custom field not being copied is a configuration rule rather than a defect. Neither created work.
+
+**Decided: three questions are added to the ERP meeting's must-answer list** (M16 to M18), from these results: how
+a SKU change is handled at all if the SKU is the ERP key, given it is refused on a translated variation and does
+not propagate on a simple product; whether the ERP holds stock per variant, which is the level where the
+translation group was measured to detach; and what the ERP expects when `manage_stock` differs between language
+versions. The invariant is unchanged: one commercial item resolves to one ERP stock item, and the meeting
+determines the external key, not the invariant.
+
+**Decided: the delivery board stays a proposal.** `docs/2026-10-04-github-project-proposal.md` sets out the
+fields, views, two issue templates and the first fifteen PBIs with every field filled, and records what B1 and A12
+changed in the backlog: a new first PBI for the price gap, a data-integrity dependency and a new PBI on E-MIG,
+A11 promoted ahead of the migration, and the removal of anticipated work on the stock mechanism, which needs no
+fix. No Project, no fields, no views, no templates and no issues are created. Project #4 and the 232 historical
+Option C issues are untouched.
+
+**Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. ADM-27 and RPT-11 are
+technically verified and not contractually accepted. No P1-E row receives final acceptance criteria. No ERP
+implementation.

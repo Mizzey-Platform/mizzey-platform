@@ -78,6 +78,14 @@ appendix to work through once these are settled.
 | M14 | **Reversal and restoration mechanism**: compensating increment, credit document, or cancellation of the original; and is a double reversal refused? | Decides ERP-06 and the second half of criterion 11.5 | 7.1, 7.2, 7.3 |
 | M15 | **Who owns reconciliation** when the two sides disagree, how is it detected, and what happens to an order caught in the middle? | ERP-01 makes the ERP authoritative, so the store corrects itself from it. Who notices, and how fast, has to be agreed | 10.6, 10.7 |
 
+**Added 4 October 2026, from the B1 and A12 probe results** (`docs/2026-10-04-multilingual-data-integrity-workstream.md`):
+
+| # | Decision | If the answer is unfavourable | Full question |
+|---|---|---|---|
+| M16 | **If the key is the SKU, how is a SKU change handled at all?** The store cannot change a SKU cleanly on a translated catalogue: WooCommerce **refuses** a SKU change on a translated variation, because the duplicate holds the same SKU, and a SKU change on a simple product does not reach its translation | The SKU cannot be the mapping key, or SKU changes become a manual operational procedure | 3.1, 3.4 |
+| M17 | **Does the ERP hold stock per variant?** If it does, the mapping sits at the variation level, which is exactly the level where a translation group was measured to detach, leaving a mapping pointing at a record no longer linked to its counterpart | The mapping needs its own integrity check, independent of WPML's rows | 3.2, 4.2 |
+| M18 | **What does the ERP expect when the store's own `manage_stock` setting differs between language versions?** It was measured not to synchronise | ERP-07 has to say which record the admin's stock view is authoritative over | 4.2, 12.x (ERP-07) |
+
 Anything not on this list can be answered in writing afterwards. Anything on it that is left open gets a named
 owner and a date, because PRE-09 cannot be written without it.
 
