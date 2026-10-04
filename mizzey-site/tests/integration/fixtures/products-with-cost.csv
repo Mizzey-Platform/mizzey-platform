@@ -1,0 +1,7 @@
+Type,SKU,Name,Published,Regular price,Cost of goods,Parent,Attribute 1 name,Attribute 1 value(s),Attribute 1 visible,Attribute 1 global
+simple,T07-S1,t07 simple one,1,300,111.25,,,,,
+simple,T07-S2,t07 simple two,1,300,95,,,,,
+simple,T07-S3,t07 simple without cost,1,300,,,,,,
+variable,T07-V,t07 variable,1,,,,Size,"50ml, 100ml",1,0
+variation,T07-V-50,,1,200,40,T07-V,Size,50ml,,0
+variation,T07-V-100,,1,200,70,T07-V,Size,100ml,,0

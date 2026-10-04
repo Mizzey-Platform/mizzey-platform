@@ -1,0 +1,24 @@
+<?php
+// Temporary test endpoint copied into the DISPOSABLE runtime's mu-plugins by mizzey-site/tests/integration t11,
+// and removed at the end of the run. It changes a product cost through WooCommerce CRUD inside a front-end
+// request (not admin, not CLI), guarded by a random per-run secret. Never deploy this file.
+add_action(
+	'init',
+	function () {
+		$secret = (string) get_option( 't11_crud_web_secret' );
+		if ( '' === $secret || empty( $_GET['t11_crud'] ) || ! hash_equals( $secret, (string) $_GET['t11_crud'] ) ) {
+			return;
+		}
+		$product = wc_get_product( (int) ( $_GET['id'] ?? 0 ) );
+		if ( ! $product ) {
+			echo 'no product';
+			exit;
+		}
+		$cost = (string) ( $_GET['cost'] ?? '' );
+		$product->set_cogs_value( '' === $cost ? null : (float) $cost );
+		$product->save();
+		echo 'ok:', is_admin() ? 'admin' : 'front', ':', ( defined( 'WP_CLI' ) && WP_CLI ) ? 'cli' : 'web';
+		exit;
+	},
+	99
+);

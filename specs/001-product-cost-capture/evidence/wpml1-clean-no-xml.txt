@@ -1,0 +1,29 @@
+FAIL  t11-cost-sync-matrix         AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      WPML setting _cogs_value='unset'; mizzey-site/wpml-config.xml absent
+      OK   part1 crud-created simple, duplicate: AR 120
+      OK   part1 crud-created variations, duplicate: AR 40/70
+      OK   part1 crud-created simple, editor: AR 120
+      OK   part1 crud-created variations, editor: AR 40/70
+      OK   duplicate simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/title unchanged
+      OK   duplicate simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/title unchanged
+      FAIL duplicate simple rest-http: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      FAIL duplicate simple crud-cli: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      FAIL duplicate simple crud-web: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      OK   duplicate variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/title unchanged
+      OK   duplicate variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/title unchanged
+      FAIL duplicate variation rest-http: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | price/stock/sku/title unchanged
+      FAIL duplicate variation crud-cli: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | price/stock/sku/title unchanged
+      FAIL duplicate variation crud-web: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | price/stock/sku/title unchanged
+      OK   editor simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/title unchanged
+      OK   editor simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/title unchanged
+      FAIL editor simple rest-http: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      FAIL editor simple crud-cli: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      FAIL editor simple crud-web: set 100: EN 100 AR none; change 111: EN 111 AR none | orders EN 111 AR 0 | price/stock/sku/title unchanged
+      FAIL editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | CHANGED AR post_title 'منتج 125'->'منتج 125 - S'
+      FAIL editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | CHANGED AR post_title 'منتج 133'->'منتج 133 - S'
+      FAIL editor variation rest-http: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | CHANGED AR post_title 'منتج 141'->'منتج 141 - S'
+      FAIL editor variation crud-cli: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | CHANGED AR post_title 'منتج 149'->'منتج 149 - S'
+      FAIL editor variation crud-web: set 40: EN 40 AR none; change 44: EN 44 AR none | orders EN 44 AR 0 | CHANGED AR post_title 'منتج 157'->'منتج 157 - S'
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
