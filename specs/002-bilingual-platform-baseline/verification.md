@@ -80,6 +80,18 @@ Evidence, committed beside this record:
 | `evidence/final-suite.json` | The same verdicts, machine readable |
 | `evidence/probe-ac8-loader-removed.txt` | The negative proof described below |
 
+**The runtime is left clean, measured rather than asserted.** After the run: 0 products, 0 orders, and 11 pages,
+which is exactly the baseline (7 WordPress and WooCommerce pages, two of them drafts, plus the 4 Arabic
+translations). No scenario page survives. The count is recorded at the end of `evidence/clean-baseline.txt`.
+
+That claim had to be earned. The first authoritative run left **two pages behind**, and the cause was in the
+shared harness: `Scenario::track_post()` ignores any post type other than `product` and `product_variation`,
+silently, and t21 is the first scenario to create pages. Deletion itself works, which an isolated reproduction
+confirmed. t21 now registers its page deletions through `on_finish()`, the hook it already uses for the temporary
+catalogue. `track_post()` was **not** widened, because twelve merged pilot scenarios depend on it; its docblock
+now states that it is product-only by design. The evidence above was then regenerated from the corrected code,
+because evidence that does not match the committed code is not evidence.
+
 **Read the figure precisely.** It is from a single run preceded by a reset. An earlier run of mine was not, and
 four pilot scenarios failed in it; those scenarios require a clean baseline, so that was a defect in my method,
 not in the code, and it is not evidence of anything. No isolated scenario pass and no dirty-runtime rerun is

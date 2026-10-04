@@ -200,7 +200,14 @@ run(
 			$s->note( 'FAIL AC-5: could not create the English record: ' . $source->get_error_message() );
 			return false;
 		}
-		$s->track_post( (int) $source );
+		// Cleaned up through on_finish, not track_post: that helper silently ignores anything that is not a
+		// product or a variation, so tracking a page there leaves it behind. Measured, after the first
+		// authoritative run left these two pages in the runtime.
+		$s->on_finish(
+			static function () use ( $source ) {
+				wp_delete_post( (int) $source, true );
+			}
+		);
 		$source_trid = $sitepress->get_element_trid( (int) $source, 'post_page' );
 
 		$counterpart = wp_insert_post(
@@ -215,7 +222,11 @@ run(
 			$s->note( 'FAIL AC-5: could not create the Arabic record: ' . $counterpart->get_error_message() );
 			return false;
 		}
-		$s->track_post( (int) $counterpart );
+		$s->on_finish(
+			static function () use ( $counterpart ) {
+				wp_delete_post( (int) $counterpart, true );
+			}
+		);
 		$sitepress->set_element_language_details( (int) $counterpart, 'post_page', $source_trid, 'ar', 'en' );
 
 		$group = $sitepress->get_element_translations( $source_trid, 'post_page', false, true );
