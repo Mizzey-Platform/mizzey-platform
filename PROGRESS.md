@@ -21,12 +21,13 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
-- **`main` is `b158a1c506d5a4e6d0b5e3cede34283416274998`**: the pilot (#237, squash `93d647b`), its close-out
+- **`main` is `405a113ac90c6ae880d7e17b0f53abbab45e59fc`**: the pilot (#237, squash `93d647b`), its close-out
   and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
   probes with the exposure assessment (#240, `eadd254`), the A11 and price-matrix probes with three rounds of
-  record corrections (#256, squash `7e39c4b`, from the reviewed head `e5c1e95`), and the backlog-template
-  reconciliation (**#257, squash `b158a1c`, merged 4 October 2026**). Each merged with green CI; `main-push` and
-  `baseline` pass at `b158a1c`.
+  record corrections (#256, `7e39c4b`), the backlog-template reconciliation (#257, `b158a1c`), the
+  one-accepting-owner board correction (#258, `e291ce6`), and **the bilingual platform baseline, the first real
+  Option B feature (#259, squash `405a113`, merged 4 October 2026)**. Each merged with green CI; `main-push` and
+  `baseline` pass at `405a113`.
 - **t17, t18, t19 and t20 are fact-finding scenarios**: they return no pass or fail verdict and record defects as
   findings. A suite line reading `0 failed` means the harness held and the contract scenarios t02 to t16 passed,
   **not** that every measured behaviour was correct.
@@ -66,16 +67,22 @@ Live status. First action each session: read this, then continue from **Next**.
   - `docs/2026-10-04-github-project-proposal.md`, now the **record of the board that exists**: its fields, views,
     issue templates, and the fifteen seeded PBIs exactly as the live Project holds them.
   - `docs/2026-10-04-public-exposure-assessment.md`, the exposure and purge-impact assessment.
+- **The first implemented feature's records** are `specs/002-bilingual-platform-baseline/`: spec, clarification
+  outcome, research (including the measured WordPress 7.1.2 lazy translation loading, evidence for 7.1.2 only),
+  plan, checklist, tasks, implementation analysis, verification record, and the committed suite evidence. Two
+  checks came with it: `tools/tests/test_storefront_strings.py`, which fails on hard-coded user-facing storefront
+  text, and `tools/tests/test_spec_consistency.py`, which fails when the feature's artifacts contradict each
+  other or when a browser row is marked verified.
 
 ## Next
 
-1. **#241, the bilingual platform baseline, is the work in progress.** FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14.
-   P1, S1, no ERP, design or client-decision dependency, and the only PBI in `Ready`. It is the first normal
-   implementation feature after the pilot, and it follows the full Spec Kit workflow.
-2. **The backlog template is reconciled and merged** (#257). The unseeded decomposition now carries the live
-   board's field model, the exact delivery ids per register section, and an ownership map over all 595 delivery
-   rows, so the remaining 45 to 55 PBIs cannot be generated from range shorthand. **Every delivery row has
-   exactly one accepting owner**, the three shared citations having been corrected on the board.
+1. **#241 is merged and `Verified`, with one item open.** The three states are kept apart, per M-7:
+   **workflow complete**; **AC-1 to AC-8 technically verified** on a clean baseline (17 scenarios, 0 failed, t21
+   PASS over 13 assertions, evidence under `specs/002-bilingual-platform-baseline/evidence/`); **no criterion
+   contractually accepted**, which happens only through MS-UAT-2026-027. **AC-9, the browser matrix, is
+   UNEXERCISED and blocked on #244**: a command-line runtime has no browsers and nothing was substituted for
+   one. The issue stays open for that reason, and a CI case fails if any browser row is ever marked otherwise.
+2. **Nothing else is started.** #242 is the next PBI in delivery order and is not begun.
 3. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
@@ -100,6 +107,7 @@ Live status. First action each session: read this, then continue from **Next**.
 | CR-06 a real, unmodified Amazon sample export; CR-08 / OD-26 image and content rights in writing | Client. Blocks the import specification and the image load |
 | Bosta status code legend (SHIP-14, ADR-0002) | Client or Bosta |
 | COD remittance cycle OD-20 (SHIP-16, ADR-0002) | Client |
+| **AC-9 of #241**, the six-browser matrix in both reading directions | **#244**, staging. The only open item on an otherwise verified PBI |
 | The end of the external review period, which is when repository visibility is reconsidered | Mustafa, explicitly |
 
 The full decision list to group into the next Stage 1 review is in
