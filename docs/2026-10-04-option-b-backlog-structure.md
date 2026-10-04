@@ -15,8 +15,9 @@ created from it yet**: no GitHub Project, no issues, no specs.
 
 **Option C is history.** `scripts/stories.json` (205 stories, 27 epics, stages S1 to S6) and Project #4 were
 written against the unsigned Option C pack. They are kept as reference for wording and for the leverage
-classification, and they are not the Option B backlog. Option B has two stages, S1 and S2, a 185,000 EGP fee, 9 to
-11 weeks, and includes an ERP stock integration that Option C did not.
+classification, and they are not the Option B backlog. Option B has two stages, S1 and S2, a 9 to 11 week
+timeline, and includes an ERP stock integration that Option C did not. Commercial terms are not recorded here:
+this document covers scope, stages, dependencies and acceptance only.
 
 ## Scope included, and scope excluded
 
@@ -27,7 +28,7 @@ Delivery rows only: **P1, P1-L, P1-E, DLV**.
 | P1 | 435 | Live at launch, full specification |
 | P1-L | 117 | Live at launch, reduced specification. The reduction is in the row's own wording |
 | P1-E | 19 | Contracted as an outcome; the method is pending PRE-09. **No final acceptance criteria before PRE-09 is approved** (constitution M-3) |
-| DLV | 24 | Deliverables: 9 pre-development (PRE), 12 handover (HND), plus EVT-20 and MKT-26 |
+| DLV | 24 | Deliverables: **10** pre-development (PRE-01, PRE-02, PRE-03a, PRE-03b, PRE-04 to PRE-09), 12 handover (HND-01 to HND-12), plus EVT-20 and MKT-26 |
 | **Total** | **595** | Of which 61 are marked `[key]` in the register |
 
 Not delivery items, and not in this backlog unless separately approved: **DEF** (44), **P2** (74), **P3** (32),
@@ -36,6 +37,39 @@ that nobody builds it by accident.
 
 Stage distribution of the delivery rows: **S1** 562, **S2** 14 (all P1-L), and 19 rows carrying `-` or
 `Per PRE-09` because their stage follows the ERP specification.
+
+## Where the delivery-row total comes from, and how it is kept honest
+
+**The authoritative total is 595**, recomputed from `docs/scope/register-ids.json`:
+P1 435, P1-L 117, P1-E 19, DLV 24.
+
+An earlier draft of this document gave the epic table a DLV column of 23 and a grand total of 594, against a
+summary that said 595. **The cause was a single hand-counted series.** The pre-development deliverables are
+labelled PRE-01 to PRE-09, which reads as nine rows, but the register splits PRE-03 into **PRE-03a** and
+**PRE-03b**, so the series holds ten ids. The epic table and the DLV composition sentence both inherited the
+nine, and nothing compared either of them with the extraction. Verified against the data rather than reasoned
+about: the 24 DLV ids are 10 PRE, 12 HND, EVT-20 and MKT-26.
+
+Nothing else was wrong. The Part Three sections account for 573 delivery rows (435 + 117 + 19 + 2) and Part Seven
+for the remaining 22 (10 PRE + 12 HND), which is 595.
+
+**`tools/tests/test_backlog_totals.py` now checks it**, through the tooling unit-test step CI already runs. It
+recomputes the per-scope delivery totals from `register-ids.json` and fails if the scope summary, any epic row,
+the epic column sums or the Total row disagree with it or with each other. Eight cases, including the exact drift
+that occurred, a row whose columns do not sum, a wrong scope summary and a reissued register. It reproduced the
+594-against-595 drift before the correction, which is how it was confirmed to work:
+
+```
+docs/2026-10-04-option-b-backlog-structure.md: epic rows sum to 23 for DLV, extraction says 24
+docs/2026-10-04-option-b-backlog-structure.md: epic rows sum to 594 delivery rows, extraction says 595
+docs/2026-10-04-option-b-backlog-structure.md: epic table Total row says 594, extraction says 595
+backlog-totals: 3 problems
+```
+
+When the register is reissued, `tools/extract_register_ids.py` regenerates `register-ids.json`, this test fails
+until the tables here are brought into line, and the failure names each disagreement. The check lives in the test
+rather than in `tools/` because a `requirement` PR may touch `tools/tests/` and not `tools/*.py`, which the path
+policy enforces and which was verified against the checker.
 
 ## Epic structure
 
@@ -61,9 +95,9 @@ contractual unit, which means an epic maps to something the client can recognise
 | E-ACC | N. Acceptance scenarios | 18 | 2 | 5 | 0 | 25 | 5 |
 | E-MIG | U. Data migration and catalogue import | 0 | 16 | 1 | 0 | 17 | 0 |
 | E-MKT | V. Marketing team enablement (measurement, SEO, third-party access) | 11 | 9 | 0 | 1 | 21 | 7 |
-| E-PRE | Part Seven, pre-development deliverables (PRE-01 to PRE-09) | 0 | 0 | 0 | 9 | 9 | - |
+| E-PRE | Part Seven, pre-development deliverables (PRE-01 to PRE-09, ten rows: PRE-03 is split into PRE-03a and PRE-03b) | 0 | 0 | 0 | 10 | 10 | - |
 | E-HND | Part Seven, handover deliverables (HND-01 to HND-12) | 0 | 0 | 0 | 12 | 12 | - |
-| **Total** | | **435** | **117** | **19** | **23** | **594** | 51 |
+| **Total** | | **435** | **117** | **19** | **24** | **595** | 51 |
 
 E-ACC and E-DOD are not build epics. They carry the acceptance scenarios and the definition of done, and they
 become the evidence requirement attached to every other slice. E-PRE and E-HND are deliverables with dates, not
@@ -159,7 +193,7 @@ Sliced by customer-facing surface, each independently acceptable:
 | PBI | Register ids | ERP blocked | Notes |
 |---|---|---|---|
 | E-ADM-1 Dashboard | ADM-01 to ADM-10 approx | No | |
-| E-ADM-2 Product management, including cost | ADM-27 and the G2 rows | No | **ADM-27 is delivered** by the cost pilot. AC-6 pending CX-01, AC-7 pending OD-12 |
+| E-ADM-2 Product management, including cost | ADM-27 and the G2 rows | No | ADM-27 cost capture is **technically verified by the product-cost pilot; contractual acceptance remains pending CX-01 and OD-12**. The code is merged and complete; the criteria are not closed. The other G2 rows are not started |
 | E-ADM-3 Categories, brands, collections, content | G3 rows | No | |
 | E-ADM-4 Inventory | ADM-70 to ADM-77 | **Yes, all 8 are P1-E** | Nothing here gets final criteria before PRE-09. ADM-76 and ADM-78 to ADM-80 are P2 or P3 |
 | E-ADM-5 Order management | ADM-85 to ADM-93 | No | ADM-94 manual order creation is P2 |
@@ -203,7 +237,7 @@ Not built: MIG-05, MIG-07, MIG-08, MIG-18 (DEF), MIG-21, MIG-22 (P2), MIG-23, MI
 |---|---|---|---|
 | E-RPT-1 Sales report | RPT-01 (P1-L) | E (low risk) | Order level, so not exposed to the product split |
 | E-RPT-2 Inventory report | RPT-10 (P1-L) | **B10, B11, verified defect** | P-020: one physical item listed twice. Blocking on acceptance. Needs a translation-group-aware query |
-| E-RPT-3 Product cost captured | **RPT-11** | - | **Delivered** by the pilot |
+| E-RPT-3 Product cost captured | **RPT-11** | - | **Technically verified by the product-cost pilot; contractual acceptance remains pending CX-01 and OD-12** |
 | E-RPT-4 Funnel and traffic via GA4 | RPT-08, RPT-09 (P1-L) | E (GA4 identity) | Delivered through GA4 configuration, not a built report |
 
 Not built: RPT-02 (P2, profitability and margin), RPT-03 and RPT-07 (DEF), RPT-04 to RPT-06 (P2).
@@ -252,7 +286,7 @@ get more expensive with time.
 | 4 | **E-FND-1 and E-FND-2**: bilingual baseline and information architecture | Everything on the storefront sits on them, and they need no client decision | Nothing |
 | 5 | **E-ERP-1**: the adapter seam (ERP-01, ERP-02, ERP-10, INT-16) | P1, not P1-E. Designing the seam now means PRE-09 fills in a known shape instead of starting a design | Items 1 and 2, which tell the seam what the store does with stock |
 | 6 | **E-RPT-2**: the inventory report, translation-group-aware | A contracted P1-L row with a measured defect (P-020). Fixing it needs the same identity helper as item 1 | Items 1 and 2 |
-| 7 | **E-MIG-1 and E-MIG-3**: import specification and the catalogue load, with the MIG-13 precondition and its test | MIG-13 is already half-delivered by the pilot, and the precondition is recorded. The real Amazon sample (CR-06) is the gate | **CR-06** |
+| 7 | **E-MIG-1 and E-MIG-3**: import specification and the catalogue load, with the MIG-13 precondition and its test | The cost half of MIG-13 is technically verified by the pilot and the precondition is recorded; the migration itself is not built. The real Amazon sample (CR-06) is the gate | **CR-06** |
 | 8 | **E-PRE-5**: design system and interface design | Gates every storefront slice | **OD-01** (brand identity) |
 
 Items 1, 2 and 3 are days of work, not weeks, and all three are unblocked today. Items 4 and 5 follow immediately.

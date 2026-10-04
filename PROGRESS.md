@@ -8,11 +8,13 @@ Live status. First action each session: read this, then continue from **Next**.
 - Repository `Mizzey-Platform/mizzey-platform` (private), history intact.
 - Governance foundation merged (PR #235, 22 Sep 2026): constitution, Spec Kit, skills, scope traceability, CI,
   trusted-checker runner, push guard.
-- **The product-cost pilot is complete and approved** at head `4068b32`
-  (`specs/001-product-cost-capture`; ADM-27, RPT-11, MIG-13; contractual stage S1). Workflow pilot: completed.
-  Unblocked technical functionality: verified. Contractual acceptance: pending CX-01 and OD-12. The closure record,
-  with the twelve findings it preserves, is the "Pilot closed" section of
-  `specs/001-product-cost-capture/verification.md`. **The feature is not reopened.**
+- **The product-cost pilot is merged.** PR #237 squash-merged on 4 October 2026 as `93d647b`
+  (`specs/001-product-cost-capture`; ADM-27, RPT-11, MIG-13; contractual stage S1), from the reviewed head
+  `4068b32`, whose tree the squash commit matches exactly. CI on `main` green (`main-push` and `baseline` pass).
+  Workflow pilot: completed. Unblocked technical functionality: verified. Contractual acceptance: pending CX-01 and
+  OD-12. **ADM-27 and RPT-11 are technically verified, not contractually accepted**, and must not be described as
+  fully delivered while AC-6 and AC-7 are open. The closure record, with the twelve findings it preserves, is the
+  "Pilot closed" section of `specs/001-product-cost-capture/verification.md`. **The feature is not reopened.**
 - Phase change: out of the pilot, into controlled Option B delivery planning. Three planning records exist and are
   awaiting review:
   - `docs/2026-10-04-option-b-backlog-structure.md`, the proposed epic and PBI structure, built from the 595
@@ -23,21 +25,22 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-1. **Merge PR #237** (product-cost pilot). Approved at head
-   `4068b322908bbadb4260a4482ede85039c8c4afc`, CI green, mergeable, scope unchanged since review. The squash-merge
-   was blocked by the local permission classifier and needs Mustafa to allow it or run it. Then verify the `main`
-   commit and its CI, sync the local checkout, and confirm the runtime is clean.
-2. **Pilot close-out PR** (this branch): the Store API wording correction, MIG-13 promoted from a note to a
-   required migration precondition, and the pilot closure record. Opens after #237 merges.
-3. **Data-integrity probe B1**: does an order against the Arabic product reduce stock on the English original, or
-   only on the Arabic post? Same mechanism as the cost defect, worse consequence. Highest-priority unblocked work.
-4. **Data-integrity inventory A12**: which fields WPML copies on `save_post`, and which of them a meta-only save
-   can leave stale. Bounds the whole problem.
-5. **Governance follow-up** (separate `internal:governance` PR): record WordPress 7.1.2 and MySQL 8.3.0 in
-   `stack.lock.json`. Prepared on branch `governance/environment-version-record`.
-6. Then the first real Option B features, in the order recommended in the backlog structure document: the ERP
+1. **Probe B1, multilingual stock reduction.** The first technical measurement after the pilot. Does an order
+   against the Arabic product reduce stock on the English original, or only on the Arabic post, and can one
+   physical unit be sold in both languages? Same mechanism as the cost defect, worse consequence. The full
+   specification (fixtures, ten steps, what is measured from four sources) is in
+   `docs/2026-10-04-multilingual-data-integrity-workstream.md`. **Measure first: no stock fix is implemented until
+   this probe has established the behaviour.**
+2. **Probe A12** after it: which product and variation fields WPML and WCML synchronise on `save_post`, and which
+   meta-only update paths bypass that. Each result classified measured working, measured defect or hypothesis. No
+   fix is created for a field outside Option B.
+3. **Governance PR #238**: the observed runtime versions (MySQL 8.3.0, WordPress 7.1.2 as `observed_runtime`
+   beside `compatibility_pin`). Open, CI green, `corex.lock` untouched.
+4. Then the first real Option B features, in the order recommended in the backlog structure document: the ERP
    adapter seam (E-ERP-1, which is P1 and not P1-E), the bilingual foundation (E-FND-1, E-FND-2), and the
    translation-group-aware inventory report (E-RPT-2, a contracted P1-L row with a measured defect).
+5. Prepare for the ERP meeting from the fifteen "Must answer in the meeting" decisions in
+   `docs/2026-10-04-erp-technical-meeting-questions.md`.
 
 ## Blocked or waiting
 

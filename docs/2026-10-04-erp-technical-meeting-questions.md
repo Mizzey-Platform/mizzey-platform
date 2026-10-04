@@ -26,15 +26,66 @@ accounting synchronisation, it is noted and routed to Change Control (MS-CHG-202
 ## One constraint we bring, rather than ask about
 
 The store holds each product in two languages, as two WordPress records with their own metadata. The product-cost
-pilot established that identity must be resolved through the translation relationship and that a SKU can match
+pilot established that identity must be resolved through the translation relationship, and that a SKU can match
 either language version.
 
-**Therefore: the Arabic and English versions of a product are one ERP stock item, never two.** The mapping to the
-ERP's identity is held once, against the source-language product or variation, and the translated record resolves
-to it. This follows from ERP-01 and is settled before the meeting. What we need from the ERP side is which key to
-map to, not whether to map once.
+### The invariant (mandatory, not negotiable at the meeting)
+
+> **The Arabic and English translations of one commercial item must resolve to the same single ERP stock item.
+> They must never become two ERP stock balances.**
+
+This follows from **ERP-01**, which makes the ERP the source of truth for stock and forbids the store from
+operating a balance that can disagree with it. Two ERP balances for one physical item is precisely that
+disagreement. **The meeting determines the external key. It does not get to redefine this invariant.**
+
+### The proposal (our architecture position, which is not the invariant)
+
+1. Resolve the canonical commercial item through WPML translation identity, never by SKU alone, and never by title
+   or list position.
+2. Maintain **one** canonical ERP mapping per commercial item.
+3. Translations resolve to that mapping rather than carrying their own.
+4. **Where the canonical mapping is stored, and by what mechanism, is an architecture decision to finalise with
+   PRE-09 and the implementation design.** Holding it on the source-language record is the obvious candidate and
+   not the only one: a mapping table keyed by translation group satisfies the invariant equally, and may behave
+   better when a source-language record is deleted or re-pointed.
+
+ERP-01 requires the single balance. It does not require any particular storage location, and nothing here claims
+it does. What we need from the ERP side is **which key to map to**, not whether one balance is required.
 
 ---
+
+## Must answer in the meeting
+
+Fifteen decisions. Each one can change the architecture or the schedule, which is why they come before the
+checklist rather than inside it. The numbered sections below remain the complete questionnaire, and are the
+appendix to work through once these are settled.
+
+| # | Decision | If the answer is unfavourable | Full question |
+|---|---|---|---|
+| M1 | **Is ERP-side development required** to satisfy ERP-01 to ERP-05? If so, whose, and on what timeline? | Schedule change, and a Change Control item if it affects scope, cost or time | 2.6 |
+| M2 | **Authentication and connectivity**: what method, and is the API reachable from a host outside the client's network and outside Egypt? | Can force the hosting decision (**OD-27**) or require a tunnel and a static outbound IP | 1.1, 1.4, 1.5 |
+| M3 | **Is there a test environment** with data we can safely decrement? | ERP-10 contractually requires one. Without it the integration cannot be built and tested as contracted | 10.1 |
+| M4 | **The canonical ERP item and variant key**: SKU, internal product id, variant id, barcode, or another external key? Which level carries the balance? | Decides the mapping, the migration and the adapter | 3.1, 3.2 |
+| M5 | **Key uniqueness and stability**: is it unique, enforced rather than conventional, and stable across ERP edits? | If only conventional, that key cannot be the mapping key at all | 3.3, 3.4, 3.5 |
+| M6 | **What the stock value means**: physical on hand, available to sell, net of reservations, net of a safety buffer? One location or several? | Changes what the storefront may show and what ADM-70 and ADM-72 mean | 4.2, 4.3 |
+| M7 | **Lookup mechanism, freshness and caching**: one call per item, batch, snapshot, delta feed; push or poll; and how long a figure may be treated as current | Decides whether ERP-02 is satisfiable without a call per page view | 4.1, 4.5, 4.6, 4.7 |
+| M8 | **Is reservation supported at all?** | If not, there is a window between validating stock and completing payment, and ERP-05 has to say what the store does in it | 5.1, 5.5 |
+| M9 | **Decrement mechanism and timing**: what call, and at which point (authorisation, capture, confirmation, dispatch)? | Decides the checkout flow and makes criterion 11.5 concrete | 6.1, 6.4 |
+| M10 | **Partial success on a multi-line order**: what is returned when line 2 fails after line 1 succeeded? | Decides whether the store needs its own compensation logic | 6.3 |
+| M11 | **Idempotency**: is there an idempotency key or client reference that makes a repeated call safe? | Without it, no retry is safe, and that becomes a recorded risk with an operational control | 8.1, 8.2 |
+| M12 | **Timeout outcome lookup**: after a timeout, can we ask whether the call actually landed? | Without it, a timeout is unresolvable and reconciliation becomes manual | 8.3 |
+| M13 | **Concurrent last-unit behaviour**: two simultaneous decrements of the last unit, and is the write transactional? | Decides whether overselling is possible at the ERP boundary | 8.4 |
+| M14 | **Reversal and restoration mechanism**: compensating increment, credit document, or cancellation of the original; and is a double reversal refused? | Decides ERP-06 and the second half of criterion 11.5 | 7.1, 7.2, 7.3 |
+| M15 | **Who owns reconciliation** when the two sides disagree, how is it detected, and what happens to an order caught in the middle? | ERP-01 makes the ERP authoritative, so the store corrects itself from it. Who notices, and how fast, has to be agreed | 10.6, 10.7 |
+
+Anything not on this list can be answered in writing afterwards. Anything on it that is left open gets a named
+owner and a date, because PRE-09 cannot be written without it.
+
+---
+
+## Appendix: the complete question set
+
+The sections below are the full technical checklist. They remain the working document for the specification.
 
 ## 1. Authentication and access
 
@@ -182,15 +233,21 @@ The specification needs its own acceptance criteria. Proposed shape, to agree at
 | 11.2 | A completed sale reduces the ERP balance by exactly the quantity sold, once, verifiably | ERP-04 |
 | 11.3 | A repeated or retried write-back does not decrement twice | ERP-04, NFR-07 |
 | 11.4 | An order is not confirmed when the ERP cannot validate availability, and the customer sees the agreed message | ERP-05, OD-41 |
-| 11.5 | A failed payment or cancellation restores the balance, once | ERP-06 |
+| 11.5 | **If** stock has already been reserved or decremented, a failed payment or cancellation releases or reverses that effect **exactly once**, and the reversal is linked to the original so a repeat is refused. **If no stock mutation has occurred**, no compensating mutation is sent. Either way the outcome is reconcilable: the store can state, per order, whether a mutation happened and whether it was reversed | ERP-06, NFR-07 |
 | 11.6 | A returned parcel is received in the ERP by the agreed route | ERP-06 |
 | 11.7 | An Arabic order and an English order against the same item decrement the same single ERP stock item | ERP-08, NFR-04, NFR-07 |
 | 11.8 | Stock fields in the store admin behave as the specification states, and the admin cannot create a figure that contradicts the ERP | ERP-07 |
 | 11.9 | The initial stock load lands in the agreed destination with a reconciliation report | MIG-14 |
 | 11.10 | Every criterion is demonstrated against the test environment, not live stock | ERP-10 |
 
-Criterion 11.7 is the one that comes from our side of the table, and it is the reason the identity constraint above
-is settled before the meeting.
+Criterion 11.5 is deliberately conditional. PRE-09 has not chosen whether stock is reserved, decremented at
+authorisation, decremented at capture or decremented at dispatch, so a criterion that assumed a decrement always
+precedes a failure would be asserting a decision nobody has made. What does not change with the timing is the
+pair of obligations: a mutation that happened is reversed exactly once, a mutation that never happened is not
+compensated, and in both cases the state is reconcilable per order.
+
+Criterion 11.7 is the one that comes from our side of the table, and it is the reason the invariant above is
+settled before the meeting rather than at it.
 
 ## What a good meeting produces
 

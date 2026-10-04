@@ -517,8 +517,11 @@ still blocks anything new under `docs/engagement/`.
 
 ## 2026-10-04 - D-04: the product-cost pilot is closed, and the identity risk becomes a workstream
 
-**Decided:** the pilot `specs/001-product-cost-capture` is complete and closed at head `4068b32`. It is not
-reopened. No margin or profitability reporting is built under it (RPT-02 is P2), and no general catalogue
+**Decided:** the pilot `specs/001-product-cost-capture` is complete and closed. PR #237 was squash-merged on
+4 October 2026 as `93d647b`, from the reviewed head `4068b32`, whose tree it matches exactly. It is not
+reopened. **ADM-27 and RPT-11 are technically verified by the pilot; contractual acceptance remains pending CX-01
+and OD-12.** Neither is described as fully delivered anywhere while those criteria are open: merged code can be
+complete while acceptance is not. No margin or profitability reporting is built under it (RPT-02 is P2), and no general catalogue
 synchronisation infrastructure is added. Later work that touches product cost cites the closure record in
 `specs/001-product-cost-capture/verification.md` instead of rediscovering it.
 
@@ -576,3 +579,76 @@ the table.
 
 **Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01 and PRE-09 remain open. No P1-E row receives final
 acceptance criteria while PRE-09 is unapproved.
+
+## 2026-10-04 - D-05: correction pass on the Option B planning package
+
+**Decided (from review of the three planning documents):** the package is corrected before it becomes the
+authoritative delivery plan. Five corrections, all of them to records rather than to code.
+
+**The delivery-row total is 595, and one hand count caused the contradiction.** The first draft of the backlog
+gave a scope summary of 595 and an epic table totalling 594, with a DLV column of 23. Recomputed from
+`docs/scope/register-ids.json`: P1 435, P1-L 117, P1-E 19, DLV 24, which is 595. The cause is a single series:
+the pre-development deliverables are labelled PRE-01 to PRE-09, which reads as nine rows, but the register splits
+PRE-03 into **PRE-03a** and **PRE-03b**, so the series holds ten ids. The epic table and the DLV composition
+sentence both inherited the nine. Nothing else was wrong: the Part Three sections account for 573 delivery rows
+and Part Seven for the remaining 22. The total was not chosen between 594 and 595; it was recomputed.
+
+**A check now stops it recurring.** `tools/tests/test_backlog_totals.py` recomputes the per-scope delivery totals
+from `register-ids.json` and fails if the scope summary, any epic row, the epic column sums or the Total row
+disagree with it or with each other. Eight cases, including the exact drift that occurred, a row whose columns do
+not sum, a wrong scope summary and a reissued register. It runs through the tooling unit-test step CI already has,
+and it reproduced the 594-against-595 failure before the correction, which is how it was confirmed to work. It
+lives in the test rather than in a `tools/` script because a `requirement` PR may touch `tools/tests/` and not
+`tools/*.py`; that was verified against the checker, not assumed.
+
+**Commercial pricing is out of the engineering backlog.** The sentence naming Option B's fee is removed and not
+replaced with another figure. Fees, invoices and signatures are not needed to build the software, and the backlog
+covers scope, stages, dependencies and acceptance only.
+
+**Three wording corrections, each one a distinction worth keeping:**
+
+- **Technically verified is not contractually accepted.** Every place the backlog called ADM-27, RPT-11 or the
+  product-cost feature "delivered" now reads: technically verified by the product-cost pilot, contractual
+  acceptance pending CX-01 and OD-12. Merged code can be complete while acceptance is open.
+- **Stock integrity is partly measured, not wholly unverified.** The workstream had opened that area by saying
+  nothing in it is verified, which was wrong in both directions. Corrected to state the three things separately:
+  translated records hold separate stock rows (measured, P-020), the low-stock report double-counts one physical
+  item (measured defect, B10), and reduction and restoration across translations are not yet verified (B1, B7 to
+  B9, the largest unverified risk).
+- **A10 is a measured anomaly in the path that was tested, not a contracted storefront defect.** The Arabic parent
+  of a translated variable product was observed registered `simple` with no variations, with translations created
+  from WP-CLI, which is the only path tested. The wp-admin translation workflow has not been tested (A11), and
+  that is what decides the final classification. The finding is not softened or hidden; it is scoped to the path
+  it was measured in.
+
+**Decided:** the ERP identity rule separates an invariant from a proposal. The invariant is mandatory and follows
+from ERP-01: the Arabic and English translations of one commercial item must resolve to the same single ERP stock
+item, and must never become two ERP stock balances. The meeting determines the external key; it does not get to
+redefine the invariant. The proposal, which is an architecture position and not a contractual requirement, is to
+resolve the canonical commercial item through WPML translation identity, maintain one canonical ERP mapping per
+commercial item, and have translations resolve to it. **Where that mapping is physically stored is an architecture
+decision to finalise with PRE-09 and the implementation design**; holding it on the source-language record is a
+candidate, and a mapping table keyed by translation group would satisfy the invariant equally. ERP-01 requires the
+single balance, not a storage location, and the earlier draft overstated it.
+
+**Decided:** ERP acceptance criterion 11.5 is conditional, because PRE-09 has not chosen the reservation and
+decrement timing. If stock has already been reserved or decremented, a failed payment or cancellation releases or
+reverses that effect exactly once, linked to the original so a repeat is refused. If no stock mutation has
+occurred, no compensating mutation is sent. Either way the state is reconcilable per order. Writing it
+unconditionally would have asserted a decision nobody has made.
+
+**Decided:** the ERP question set gains a fifteen-item "Must answer in the meeting" section, ahead of the full
+questionnaire, which stays as the appendix and working checklist. The fifteen are the decisions that can change
+the architecture or the schedule: ERP-side development, authentication and connectivity, test environment, the
+canonical item and variant key, key uniqueness and stability, stock value semantics, lookup mechanism and
+freshness, reservation support, decrement mechanism and timing, partial success, idempotency, timeout outcome
+lookup, concurrent last-unit behaviour, reversal mechanism, and ownership of reconciliation.
+
+**Next technical work, in this order and no other:** probe **B1** (multilingual stock reduction), then **A12**
+(which fields WPML and WCML synchronise on `save_post`). Both are specified in
+`docs/2026-10-04-multilingual-data-integrity-workstream.md`. **No stock synchronisation fix is implemented until
+B1 has measured the actual behaviour**, and no fix is created for a field A12 finds outside Option B.
+
+**Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. No P1-E row receives
+final acceptance criteria while PRE-09 is unapproved. No GitHub Project, no bulk issues, no Option C issue
+closures, no ERP implementation.

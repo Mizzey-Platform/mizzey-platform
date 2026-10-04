@@ -56,8 +56,8 @@ disposable runtime produces a classification.
 | A7 | Missing or deleted translation causes no write to an unrelated product | NFR-07 | **Verified working** | t12: deleted Arabic variation, and an untranslated product, each write only themselves |
 | A8 | Separately authored versus duplicated translations behave the same for identity | FIX-04, SSC-12 | **Verified working** | t11, t14: WPML duplicate retains the source-language name until translated; the WCML editor produces an Arabic name. Identity is the same in both |
 | A9 | WPML's cached `wpml_original_element_id` can name an unrelated product inside one process | - | **Verified defect** in WPML, worked around | `evidence/wpml-identity-cache.txt`. Never use it. Read identity from the translation rows |
-| A10 | The Arabic parent of a translated variable product is registered `simple` and carries no variations | ADM-54, SSC-12, NFR-04 | **Verified defect**, unowned | Observed in t16 with WP-CLI-created translations. Cost is unaffected. It blocks nothing in the pilot and needs an owner before the Arabic storefront is accepted |
-| A11 | Does the wp-admin translation flow build the Arabic variable parent correctly? | ADM-54, SSC-12 | **Not yet tested** | A10 was observed only with WP-CLI-created translations |
+| A10 | The Arabic parent of a translated variable product is registered `simple` and carries no variations | ADM-54, SSC-12, NFR-04 | **Verified anomaly in the tested programmatic translation path.** Production relevance pending A11 | Measured, in t16, with translations created from WP-CLI, which is the only path tested. Not called a contracted storefront defect, because the path a human editor actually uses has not been tested: if the wp-admin flow builds the Arabic parent correctly, this is an artefact of programmatic creation and not a storefront fault. Cost correctness is unaffected either way, because variations are WPML elements in their own right and each one synchronises individually. Needs an answer before the Arabic storefront is accepted, and it belongs to the translation workflow (US-16-03) |
+| A11 | Does the **wp-admin** translation workflow build the Arabic variable parent correctly? | ADM-54, SSC-12 | **Not yet tested** | This is what decides how A10 is finally classified. Until it runs, A10 stays a measured anomaly in the programmatic path and nothing more |
 | A12 | Which other fields WPML copies on `save_post`, and which of them a meta-only save can therefore leave stale | NFR-07, FIX-04 | **Not yet tested** | Hypothesis: the gap is field-independent, so price, stock status, SKU, visibility and any copied custom field share it. Cost was the one field with a contracted financial consequence, so it was fixed first. **This is the inventory that tells us how large the problem is** |
 
 **Rule, now binding:** never assume a SKU uniquely identifies the canonical WooCommerce record. Resolve the
@@ -67,9 +67,21 @@ source-language element through WPML translation identity before any write addre
 
 ## B. Stock integrity
 
-Nothing in this area is verified. It is the largest untested risk in Option B, and it sits under `ERP-01`, which
-makes the ERP the source of truth for stock. That changes what must be verified, but it does not remove the
-WooCommerce-side question: the store still holds stockable product records in two languages.
+Two things here are measured, and the one that matters most is not. Stated precisely:
+
+- **Measured.** A translated pair holds **separate stock rows**: P-020 found `wc_product_meta_lookup` carrying one
+  stock row per language version, each holding the same number, so the same physical item is stored as two
+  stockable products. That is mirroring, not sharing.
+- **Measured defect.** The contracted low-stock report lists one physical item twice, each line showing the full
+  quantity (B10, P-020). That is a defect in a delivery row, not a hypothesis.
+- **Not yet verified.** Whether stock **reduction and restoration** behave correctly across translations. Nothing
+  measures what an Arabic order does to the English original's quantity, and nothing measures what a
+  cancellation, failed payment or return does. That is B1 and B7 to B9, and it is the largest unverified risk in
+  Option B.
+
+The area sits under `ERP-01`, which makes the ERP the source of truth for stock. That changes what has to be
+verified, and it does not remove the WooCommerce-side question: the store still holds stockable product records in
+two languages, and what it does with them decides what the ERP adapter has to guarantee.
 
 | # | Verification | Register ids | Classification | Evidence or note |
 |---|---|---|---|---|
@@ -98,8 +110,8 @@ Nothing here is built, and no ERP behaviour is invented. This is the seam and th
 |---|---|---|---|
 | C1 | What identity does the ERP use: SKU, ERP product id, ERP variant id, barcode, or another external key? | ERP-08, ADM-33 | **Requires ERP clarification** |
 | C2 | Is that identity unique per physical item, and is it stable across ERP edits? | ERP-08 | **Requires ERP clarification** |
-| C3 | How is a WooCommerce product or variation mapped to it, in both languages, so that the Arabic and English records are **one** ERP stock item and not two? | ERP-08, FIX-04, NFR-04 | **Requires ERP clarification.** The non-negotiable: the mapping is held once, on the source-language element, and the translation resolves to it through WPML identity (area A). This follows from `ERP-01` and does not need the ERP's input |
-| C4 | Where does the mapping live, and who owns it when a translation is created or deleted? | ERP-08, ADM-27-style ownership | **Not yet tested** / design |
+| C3 | How is a WooCommerce product or variation mapped to it, in both languages, so that the Arabic and English records resolve to **one** ERP stock item and not two? | ERP-08, FIX-04, NFR-04 | **Requires ERP clarification** for the key. The one-commercial-item invariant below is not theirs to redefine |
+| C4 | Where the canonical mapping is stored, and who owns it when a translation is created or deleted | ERP-08 | **Architecture decision**, to finalise with PRE-09 and implementation design |
 | C5 | Stock lookup: interface, granularity, latency, caching allowed | ERP-02, ERP-03 | **Requires ERP clarification** |
 | C6 | Availability check at the contracted steps | ERP-02, ERP-03, ERP-05 | **Requires ERP clarification** |
 | C7 | Reservation, if the ERP supports one at all | ERP-03, ADM-71 | **Requires ERP clarification** |
@@ -111,9 +123,30 @@ Nothing here is built, and no ERP behaviour is invented. This is the seam and th
 | C13 | Restoration on cancel, failed payment and return | ERP-06 | **Requires ERP clarification** |
 | C14 | Initial stock load destination | MIG-14 | **Requires ERP clarification** |
 
-**The identity constraint is ours, not theirs.** Whatever key the ERP uses, the integration must not treat the
-Arabic and English translations as separate ERP stock items. That is a direct consequence of ERP-01 and is settled
-here, before the meeting, so the meeting is about the ERP's interface rather than about our data model.
+### The invariant, and the proposal that is not the invariant
+
+**The invariant (mandatory).**
+
+> The Arabic and English translations of one commercial item must resolve to the same single ERP stock item. They
+> must never become two ERP stock balances.
+
+This follows from `ERP-01`, which makes the ERP the source of truth for stock and forbids the store from operating
+a balance that can disagree with it. Two ERP balances for one physical item is exactly that disagreement. The ERP
+meeting determines the external key; it does not get to redefine this invariant.
+
+**The current proposal (an architecture position, not a contractual requirement).**
+
+1. Resolve the canonical commercial item through WPML translation identity, never by SKU alone and never by title
+   or list position (area A).
+2. Maintain **one** canonical ERP mapping per commercial item.
+3. Translations resolve to that mapping rather than carrying their own.
+4. **Where the mapping is physically stored, and by what mechanism, is an architecture decision to finalise with
+   PRE-09 and the implementation design.** Holding it on the source-language record is the obvious candidate and
+   is not the only one: a separate mapping table keyed by translation group would satisfy the invariant equally,
+   and may be better when a source-language record is deleted or re-pointed.
+
+`ERP-01` requires the single balance. It does not require any particular storage location, and this document does
+not claim it does.
 
 ---
 
@@ -209,10 +242,104 @@ existing slice that owns it rather than becoming a parallel workstream of its ow
 |---|---|---|
 | 1 | **B1**, Arabic order stock decrement | Same mechanism as the cost defect, worse consequence (overselling one physical unit). Blocks the ERP adapter design, because what the store does with stock decides what the adapter must guarantee |
 | 2 | **A12**, which fields WPML copies on `save_post` | Bounds the whole problem. Until it exists, every field is a suspected B1 |
-| 3 | **C3**, one ERP stock item per commercial item | Must be settled before the ERP meeting, because it is our constraint, not a question for them |
+| 3 | **C3**, the one-commercial-item invariant | The invariant is settled before the meeting because it follows from ERP-01. What the meeting settles is the external key. How the canonical mapping is stored is an architecture decision for PRE-09 and the implementation design |
 | 4 | **D6**, the language context on the order | Cheap now, expensive to backfill. RPT-02 and reconciliation both need it |
 | 5 | **B11** and **RPT-10** | A contracted report with a measured defect, blocking acceptance of its row |
 | 6 | **B6**, concurrency | Needs staging and a parallel load test, so it cannot be done on the disposable runtime. Book it, do not block on it |
+
+## Probe specification: B1, multilingual stock reduction
+
+**Measure first. No fix is implemented until this probe has established the behaviour.** If it finds a defect, the
+fix is scoped from the measurement, not from the hypothesis.
+
+**Question.** When an order is placed against the Arabic product, is stock reduced on the English original, on the
+Arabic translation, or on both? Can one physical unit be represented as independently sellable in both languages?
+
+**Hypothesis, to be confirmed or refuted.** `WCML\Synchronization\Component\Stock` copies `_stock` and
+`_stock_status` to translations on `save_post`. Order stock reduction goes through `wc_update_product_stock()`,
+which the data store implements as arithmetic SQL (`meta_value +/- operand`, established in P-009). If that write
+does not fire `save_post`, each language version keeps its own quantity, which is the same mechanism as the cost
+gap with a worse consequence.
+
+**Environment.** The disposable local runtime `../app/wp`, reset to the scripted clean baseline
+(`mizzey-site/tests/integration/baseline/reset-runtime.sh`). Never production. Cost of Goods Sold is irrelevant
+here and stays off.
+
+**Fixtures.** Built through the existing harness (`_workflows.php`), so the translation methods match what the
+pilot used:
+
+| Fixture | Shape |
+|---|---|
+| F1 | Simple product, managed stock, quantity 5, with a WPML duplicate translation |
+| F2 | Simple product, managed stock, quantity **1**, with a duplicate translation (the last-unit case) |
+| F3 | Variable product with two variations, each managed with quantity 5, translated by the WCML editor |
+| F4 | Simple product, managed stock, quantity 5, **untranslated** (control: isolates WPML from WooCommerce) |
+
+**Measurements.** For every step, record the quantity and stock status of **both** language records, read from
+both sources, because they can disagree:
+
+- post meta `_stock` and `_stock_status` on each post id;
+- `wc_product_meta_lookup` rows for each post id;
+- `wc_get_product( $id )->get_stock_quantity()` for each;
+- whether `save_post` fired for either post during the step, using the same in-request hook recorder t15 uses.
+
+**Steps.**
+
+| # | Action | What it establishes |
+|---|---|---|
+| 1 | Baseline read of all fixtures | The starting equality, and whether the two rows agree before anything happens |
+| 2 | Place an **English** order for 1 unit of F1 | Does the English record reduce? Does the Arabic record follow? |
+| 3 | Place an **Arabic** order for 1 unit of F1 | **The core question.** Does the English original reduce? |
+| 4 | Place an Arabic order for 1 unit of F3's first variation | The same, per variation, and whether the sibling variation moves |
+| 5 | Place an English order for 1 unit of F3's first variation | The mirror case for variations |
+| 6 | Place an Arabic order for the **last unit** of F2, then attempt an English order for 1 unit of F2 | **Whether one physical unit is independently sellable in both languages.** The decisive step |
+| 7 | Reverse step 6: English order for the last unit of F2 (fresh fixture), then attempt an Arabic order | The same question in the other direction |
+| 8 | Cancel the order from step 3 | Restoration: which record is restored, and by how much (no ERP involved) |
+| 9 | Repeat step 3 three times | Whether the behaviour is stable, or depends on cache state within one process |
+| 10 | Control: place an order against F4 | That any divergence found is a translation effect, not a WooCommerce stock bug |
+
+**Expected outputs.** A per-step table of both records from all four sources, a statement of which hooks fired, and
+one of three verdicts: *measured working* (both language versions reflect one balance, and the last unit cannot be
+sold twice), *measured defect* (they diverge, with the exact divergence recorded), or *partial* (with what could
+not be measured in one process, as P-009 had to say about simultaneity).
+
+**Deliberately out of scope.** True simultaneity (that is B6, and needs staging and a parallel load test), any ERP
+call (B7 to B9 depend on PRE-09 for the ERP half), and any fix.
+
+**Classification.** `internal:test-infrastructure`, as an integration scenario under `mizzey-site/tests/` beside
+the pilot's scenarios, or a `discovery/` probe if it turns out to need the probe runner's isolation. It changes no
+behaviour.
+
+## Probe plan: A12, which fields WPML and WCML synchronise on `save_post`
+
+Run after B1, because B1's answer tells us how much the rest of the inventory matters.
+
+**Question.** Which product and variation fields do WPML and WCML copy to translations, through which hook, and
+which meta-only update paths bypass that synchronisation?
+
+**Method.**
+
+1. **Enumerate the copied fields** from the running installation rather than from documentation: the WPML
+   `translate-independently` and custom-field settings, WCML's synchronisation components (it registers one per
+   concern, which is how `Component\Stock` was found), and the WPML configuration the plugins ship for
+   WooCommerce. Record which hook each registration listens on.
+2. **For each field, establish the write paths** WooCommerce itself uses: a CRUD setter plus `save()`, a post-field
+   change, and any arithmetic or direct data-store write (as stock has). The pilot's root cause applies to any
+   field whose write does not change a post field, because `WC_Product_Data_Store_CPT::update()` then skips
+   `wp_update_post()` and `save_post` never fires.
+3. **Measure, per field**: change it on the English original through each path, in a real request context for each
+   channel the pilot already models (`admin-http`, `import-http`, `rest-http`, `crud-cli`, `crud-web`), and record
+   whether the Arabic record followed and whether `save_post` fired.
+4. **Classify each result** as *measured working*, *measured defect*, or *hypothesis* where a path could not be
+   exercised. A field is never recorded as working because source reading suggests it should be.
+
+**Output.** A field-by-field table: field, which plugin copies it, the hook, the channels where it follows, the
+channels where it does not, and the classification. That table is what bounds the problem: it says how many
+fields share the cost defect's shape, and therefore whether this is a handful of cases or a systemic one.
+
+**Scope discipline.** **No fix is created for a field outside Option B.** A field that is only used by DEF, P2 or
+P3 behaviour is recorded in the table and nothing more. A field inside a delivery row gets a fix scoped under that
+row's own feature, not under this workstream, and not automatically.
 
 ## Evidence already in this repository
 
