@@ -21,10 +21,11 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
-- **`main` is `eadd2544393988aede311277ab57c64430a26953`**: the pilot (#237, squash `93d647b`), its close-out and
-  corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), and the B1 and A12
-  probes with the exposure assessment (#240, `eadd254`). Each merged with green CI. **PR #256 is open and not
-  merged**, so no merge SHA for it is recorded here.
+- **`main` is `7e39c4b03a908d1a3a345ce737bf827b0eb14aa1`**: the pilot (#237, squash `93d647b`), its close-out and
+  corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
+  probes with the exposure assessment (#240, `eadd254`), and the A11 and price-matrix probes with three rounds of
+  record corrections (**#256, squash `7e39c4b`, merged 4 October 2026** from the reviewed head `e5c1e95`). Each
+  merged with green CI; `main-push` and `baseline` pass at `7e39c4b`.
 - **t17, t18, t19 and t20 are fact-finding scenarios**: they return no pass or fail verdict and record defects as
   findings. A suite line reading `0 failed` means the harness held and the contract scenarios t02 to t16 passed,
   **not** that every measured behaviour was correct.
@@ -38,8 +39,8 @@ Live status. First action each session: read this, then continue from **Next**.
   #241 to #255**. The remaining 45 to 55 PBIs are **not** created. Status separates **Verified** from
   **Accepted**; #252 is the reference case, Verified and not Accepted. Only **#241** is `Ready`. Project #4 and
   the 232 historical Option C issues are untouched.
-- **Probes A11 and the price matrix have run** (`t19`, `t20`), and **both questions are closed as probes, with no
-  fix built from either.** A11: the translation-group corruption needs the WCML translation editor **plus** product
+- **Probes A11 and the price matrix have run** (`t19`, `t20`), are **merged**, and **both questions are closed as
+  probes, with no fix built from either.** None of A11, A12, B1 or the price matrix is reopened. A11: the translation-group corruption needs the WCML translation editor **plus** product
   creation in the same process; wp-admin one-save-per-request, the WPML duplicate method and the native CSV
   importer do **not** reproduce it, and creating all sources first and translating second prevents it entirely.
   The correction is therefore a **migration sequencing invariant, not runtime code**, and it is the contracted
@@ -53,8 +54,10 @@ Live status. First action each session: read this, then continue from **Next**.
   and not reused in future signing packs. The purge stays a future explicit decision only. **Only D-07's
   visibility clause is superseded**, by D-08.
 - Phase change: out of the pilot, into controlled Option B delivery. The planning records:
-  - `docs/2026-10-04-option-b-backlog-structure.md`, the proposed epic and PBI structure, built from the 595
-    delivery rows (P1, P1-L, P1-E, DLV) and their sequencing.
+  - `docs/2026-10-04-option-b-backlog-structure.md`, the epic and slice structure over the 595 delivery rows
+    (P1, P1-L, P1-E, DLV), with the live board's field model, the exact delivery ids per register section, and an
+    **ownership map assigning every one of the 595 rows to the slice that would own it**. Range shorthand is
+    section context only and is never a scope citation.
   - `docs/2026-10-04-multilingual-data-integrity-workstream.md`, the cross-feature risk matrix the pilot exposed,
     classified per area and mapped to register ids.
   - `docs/2026-10-04-erp-technical-meeting-questions.md`, eighteen "Must answer" decisions plus the full
@@ -65,12 +68,15 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-1. **PR #256** (the A11 and price-matrix probes, plus the record corrections) is open, CI green, and awaiting
-   external review. Do not merge it until that review is complete.
-2. **One browser pass on the board**: the six view filters and groupings listed in
+1. **#241, the bilingual platform baseline, is the work in progress.** FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14.
+   P1, S1, no ERP, design or client-decision dependency, and the only PBI in `Ready`. It is the first normal
+   implementation feature after the pilot, and it follows the full Spec Kit workflow.
+2. **The backlog-template reconciliation PR** is open: it corrects the unseeded decomposition so the remaining
+   45 to 55 PBIs cannot be generated from range shorthand or the superseded field model. **No further PBI is
+   seeded until it merges.**
+3. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
-3. **Start #241**, the bilingual platform baseline, once #256 is merged. It is the only PBI in `Ready`.
 4. **Obtain the client decisions**, in this order of value: **OD-01** brand identity (blocks all 152 storefront
    rows), **OD-27** hosting in writing (blocks all infrastructure), **CR-06** the real Amazon export (blocks the
    import specification), **CX-01** and **OD-12** (close the product-cost pilot contractually).
