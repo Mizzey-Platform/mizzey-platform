@@ -810,7 +810,9 @@ because MIG-02 and SSC-21 independently oblige it. The price gap creates **no** 
 defective and inventing one would be inventing scope.
 
 **Decided: the Option B delivery board is created**, organisation-owned and private, at
-https://github.com/orgs/Mizzey-Platform/projects/1. Eleven custom fields and six views. **Status separates
+https://github.com/orgs/Mizzey-Platform/projects/1, titled **Mizzey Option B Delivery**. The suggested title
+carried an em dash; `tools/house_rules.py` forbids one in added markdown, and CI caught it on the first push, so
+the board is named plainly rather than having the document describe one name and the board use another. Eleven custom fields and six views. **Status separates
 Verified from Accepted** in its own option descriptions, and #252 (product cost) is the reference case: Verified,
 not Accepted, carrying CX-01 and OD-12 to the Stage 1 gate. The first **15** PBIs are seeded, #241 to #255, and no
 more; the remaining 45 to 55 wait for review. Project #4 and the 232 Option C issues are untouched, verified after

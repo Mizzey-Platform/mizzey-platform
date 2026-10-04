@@ -3,8 +3,10 @@
 Written 4 October 2026 after B1 and A12 as a proposal; **created on 4 October after A11 and the price matrix**,
 with the classification correction applied.
 
-- **Board: https://github.com/orgs/Mizzey-Platform/projects/1**, "Mizzey — Option B Delivery",
-  organisation-owned and private.
+- **Board: https://github.com/orgs/Mizzey-Platform/projects/1**, "Mizzey Option B Delivery",
+  organisation-owned and private. The suggested title carried an em dash; this repository's house rules
+  forbid one in markdown (`tools/house_rules.py`), so the board is named plainly and the document and the
+  board agree rather than describing one name and using another.
 - 11 custom fields and 6 views created; **Status carries the Verified and Accepted distinction** in its own
   option descriptions.
 - **The first 15 PBIs are seeded** (#241 to #255) and no more. The remaining 45 to 55 wait for review.
