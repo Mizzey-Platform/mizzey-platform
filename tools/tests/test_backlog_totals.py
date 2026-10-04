@@ -48,9 +48,10 @@ OWNED = re.compile(r"^- \*\*([^*]+)\*\*(?:\s*\(#(\d+)\))?\s*\((\d+) ids?\):\s*`(
 BOARD = re.compile(r"^- \*\*#(\d+)\*\*\s*\((\d+) ids?\):\s*`([^`]+)`")
 BOARD_GLOB = "docs/*-github-project-proposal.md"
 SINGLE_ID = re.compile(r"^[A-Z]{2,6}-\d{1,3}[a-z]?$")
-# Recorded on purpose: each is cited by the PBI that delivers it and by one that depends on it. The ownership
-# map names the recommended accepting owner for each. A fourth duplicate is an error, not a decision.
-CITED_TWICE = {"FIX-04", "NFR-04", "ERP-10"}
+# One row, one accepting owner, with no exception. FIX-04, NFR-04 and ERP-10 were each cited by two PBIs until
+# 4 October 2026, when the second citation became a Dependencies entry on the live board. Nothing is exempt now,
+# and the empty set is the point: a row with two owners leaves the board unable to say which acceptance closed it.
+CITED_TWICE: set[str] = set()
 
 
 def authoritative(repo: Path) -> dict:

@@ -862,3 +862,46 @@ D-07 remains readable as written; this entry is what supersedes its visibility c
 signature, no client personal identity data, no banking data, no credentials, no private keys and no certificates.
 The material sensitivity is the reusable developer signature graphic, which is deprecated above. Being public
 again does not add a category of exposure that was not already assessed.
+
+## 2026-10-04 - D-09: one accepting owner per register row, and the #241 planning decisions
+
+Four decisions taken together by Mustafa at the #241 planning checkpoint.
+
+**1. One accepting owner per register row. Approved and applied to the live board.** Three delivery rows were
+cited by two PBIs each, which left the board unable to say which acceptance closed them:
+
+| Row | Accepting owner | Second citation moved to the Dependencies field of |
+|---|---|---|
+| FIX-04 | #241, which delivers the bilingual baseline | #246 |
+| NFR-04 | #241 | #246 |
+| ERP-10 | #245, the adapter seam | #243 |
+
+Applied to the Project, not only to the document. Two field values recompute as a consequence, and are recorded
+because they are visible on the board: **#246** moves from Scope class `mixed` to `P1-L`, RPT-10 being its only
+row, and **#243** from `mixed` to `DLV` with Stage `per PRE-09`, PRE-09 being unstaged in the register. The
+exact-id total moved from 129 to **126**.
+
+**No row left the backlog.** A citation became a dependency, and the ownership map still accounts for all 595
+delivery rows. `tools/tests/test_backlog_totals.py` now fails on any duplicate and asserts that its exception set
+is empty, so the allowance cannot creep back. `tools/tests/test_board_metadata.py` gained a declared one-value
+spelling, the board's `per PRE-09` for the register's `-`, with a case proving a real stage cannot hide behind it.
+Done as its own change, deliberately kept out of the #241 implementation.
+
+**2. AC-5 is technical acceptance, not a restatement of FIX-04.** Translation identity stays an acceptance
+criterion of the bilingual baseline, because later bilingual slices need a deterministic English-to-Arabic record
+relationship. FIX-04 does not mention it, so AC-5 is **not** presented as that row's wording and is **not** a
+client deliverable. The need is measured rather than argued: a WPML duplicate shares its original's SKU, so one
+SKU addresses two products, and A11 showed a translation group can detach an Arabic record from its source.
+
+**3. The NFR-14 browser matrix is approved**: current Chrome, Safari, Edge and Firefox on desktop, current Chrome
+on Android and current Safari on iOS, each tested in both reading directions. Internet Explorer, Opera Mini,
+in-app browsers and named device models are excluded by the same decision, and none is added unless separately
+required.
+
+**4. Safeguards S-1 and S-2 are approved**, and stay classified as engineering safeguards and evidence. Neither is
+presented to the client as a deliverable. S-1 is the continuous-integration form of the FR-007 check, so the
+contractual obligation is FR-007 and the safeguard is only that it runs on every pull request rather than on
+demand. S-2 is a test assertion and changes no behaviour.
+
+**Status:** applied. The board edits are live, the records follow in this pull request, and #241 implementation
+proceeds from `tasks.md`.
