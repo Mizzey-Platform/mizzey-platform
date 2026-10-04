@@ -87,25 +87,31 @@ twenty-nine times, with the rows that need their own criterion given one.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Every contracted page exists as a reachable URL in **English**, returning 200, and serves the page it names | IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35 | final |
-| AC-2 | Every contracted page is reachable in **Arabic** under the Arabic language prefix, returning 200, and serves the Arabic record or the Arabic rendering of that page, never the English counterpart | IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35 | final |
-| AC-3 | Each page's English and Arabic records form **one translation group** with the English record as source, so a later slice resolves the pair by translation identity | IA-01, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32 | final |
-| AC-4 | **The account URLs are endpoints under the account page, not separate pages**, and each resolves in both languages. No second route to the same screen exists | IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20 | final |
-| AC-5 | The storefront's **product, category, collection and brand URLs** follow one documented pattern per language, and a URL that names a term serves that term's archive | IA-02, IA-03, IA-04, IA-05, IA-07, IA-35 | final |
-| AC-6 | **Order confirmation** is reachable only as the post-checkout endpoint and is not a publicly listed page | IA-10 | final |
-| AC-7 | **Search results** have a stable URL carrying the query, in both languages | IA-06 | final |
-| AC-8 | **Clean URLs**: every contracted URL is human readable, carries no query string for its identity, and no contracted page is reachable only by `?page_id=` | NFR-03 | final |
-| AC-9 | **A canonical link is emitted on every contracted URL**, pointing at that URL's own canonical form, including archive URLs where WordPress core emits none | NFR-03 | final |
-| AC-10 | **The sitemap includes both languages**: every contracted page appears for English and for Arabic | NFR-03 | final |
-| AC-11 | **`robots.txt` is served** and does not disallow any contracted page | NFR-03 | final |
-| AC-12 | **Breadcrumbs** are available on the storefront pages whose position in the hierarchy they describe | NFR-03 | final |
-| AC-13 | **Structured data** is emitted for a product and for the organisation, valid against the vocabulary | NFR-03 | final |
-| AC-14 | **A meta description is emitted** on every contracted page, and a page without one does not fall back to repeating another page's | NFR-03 | final |
-| AC-15 | **Alt text is supported and used** on the images this feature introduces, and the mechanism is available for later content | NFR-03 | final |
-| AC-16 | **No duplicate or accidental URL** exists for a contracted page: no sluggified duplicate, no second record serving the same screen, and a trailing-slash variant resolves to one canonical form rather than serving twice | NFR-03 | final |
+| AC-242-01 | Every contracted page exists as a reachable URL in **English**, returning 200, and serves the page it names | IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35 | final |
+| AC-242-02 | Every contracted page is reachable in **Arabic** under the Arabic language prefix, returning 200, and serves the Arabic record or the Arabic rendering of that page, never the English counterpart | IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35 | final |
+| AC-242-03 | Each page's English and Arabic records form **one translation group** with the English record as source, so a later slice resolves the pair by translation identity | IA-01, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32 | final |
+| AC-242-04 | **The account URLs are endpoints under the account page, not separate pages**, and each resolves in both languages. No second route to the same screen exists | IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20 | final |
+| AC-242-05 | The storefront's **product, category, collection and brand URLs** follow one documented pattern per language, and a URL that names a term serves that term's archive | IA-02, IA-03, IA-04, IA-05, IA-07, IA-35 | final |
+| AC-242-06 | **Order confirmation** is reachable only as the post-checkout endpoint and is not a publicly listed page | IA-10 | final |
+| AC-242-07 | **Search results** have a stable URL carrying the query, in both languages | IA-06 | final |
+| AC-242-08 | **Clean URLs**: every contracted URL is human readable, carries no query string for its identity, and no contracted page is reachable only by `?page_id=` | NFR-03 | final |
+| AC-242-09 | **A canonical link is emitted on every contracted URL**, pointing at that URL's own canonical form, including archive URLs where WordPress core emits none | NFR-03 | final |
+| AC-242-10 | **The sitemap includes both languages**: every contracted page appears for English and for Arabic | NFR-03 | final |
+| AC-242-11 | **`robots.txt` is served** and does not disallow any contracted page | NFR-03 | final |
+| AC-242-12 | **Breadcrumbs** are available on the storefront pages whose position in the hierarchy they describe | NFR-03 | final |
+| AC-242-13 | **Structured data** is emitted for a product and for the organisation, valid against the vocabulary | NFR-03 | final |
+| AC-242-14 | **A meta description is emitted** on every contracted page, and a page without one does not fall back to repeating another page's | NFR-03 | final |
+| AC-242-15 | **Alt text is supported and used** on the images this feature introduces, and the mechanism is available for later content | NFR-03 | final |
+| AC-242-16 | **No duplicate or accidental URL** exists for a contracted page: no sluggified duplicate, no second record serving the same screen, and a trailing-slash variant resolves to one canonical form rather than serving twice | NFR-03 | final |
 
-**Sixteen criteria, every one traced to a row in the Register trace.** AC-1 to AC-7 carry the page rows; AC-8 to
-AC-16 decompose NFR-03's eight obligations, which is why there are nine of them: "clean URLs" and the
+**The labels are `AC-242-nn`, not `AC-nn`, deliberately.** The register's Section N holds contracted acceptance
+scenarios **AC-01 to AC-25**, owned by E-ACC-1, and a criterion labelled `AC-12` in this document would be
+textually identical to register row AC-12, which this PBI does not own. The pilot and #241 used `AC-1` to `AC-9`
+and never crossed the collision, so this is the first spec where it bites. Found by this feature's own
+cross-artifact analysis, because `tools/scope_trace.py` inspects the criterion text and not the label column.
+
+**Sixteen criteria, every one traced to a row in the Register trace.** AC-242-01 to AC-242-07 carry the page rows; AC-242-08 to
+AC-242-16 decompose NFR-03's eight obligations, which is why there are nine of them: "clean URLs" and the
 duplicate-URL risk it implies are separated, because a URL can be clean and still be duplicated.
 
 **Nothing here is a "URL structure" criterion in the abstract.** Each criterion names the behaviour it asserts.
@@ -120,7 +126,7 @@ trailing-slash decision. The register mirrors it with the columns `ID | Page | G
 
 So the page rows oblige **existence, position and reachability in both languages**. Everything about URLs that
 this feature owes comes from **NFR-03**, and from one of its eight obligations, "Clean URLs". A documented URL map
-is the obvious way to evidence AC-5 and AC-8; it is not itself a contracted deliverable, and it is produced as
+is the obvious way to evidence AC-242-05 and AC-242-08; it is not itself a contracted deliverable, and it is produced as
 evidence rather than claimed as a row.
 
 ### C-2. Eight of the rows are endpoints, not pages. Does that change what is owed?
@@ -129,9 +135,9 @@ evidence rather than claimed as a row.
 and IA-10 as the checkout `order-received` endpoint. All ten endpoint query vars exist at their defaults, and
 **WPML String Translation already registers all fifteen endpoint slugs** under context `WP Endpoints`.
 
-So the Arabic URL for those rows is a **string-translation configuration task**, not a page to create. AC-4 states
+So the Arabic URL for those rows is a **string-translation configuration task**, not a page to create. AC-242-04 states
 this positively and asserts the negative that matters: **no second route to the same screen**. Creating pages for
-them would satisfy a naive reading of "the page exists" and produce duplicate URLs, which AC-16 forbids.
+them would satisfy a naive reading of "the page exists" and produce duplicate URLs, which AC-242-16 forbids.
 
 ### C-3. NFR-03 overlaps six rows owned by other slices. What does #242 owe?
 
@@ -192,11 +198,11 @@ of the served document, and that the served record is the one the URL names.
 **Acceptance Scenarios**:
 
 1. **Given** the contracted URL map, **When** each English URL is requested, **Then** each returns 200 and serves
-   its own page (AC-1)
+   its own page (AC-242-01)
 2. **Given** the same map, **When** each Arabic URL is requested, **Then** each returns 200, serves Arabic, and is
-   not the English record (AC-2)
+   not the English record (AC-242-02)
 3. **Given** a page with both records, **When** the pair is read, **Then** they share one translation group with
-   English as source (AC-3)
+   English as source (AC-242-03)
 
 ---
 
@@ -215,9 +221,9 @@ no page record exists whose slug duplicates an endpoint.
 **Acceptance Scenarios**:
 
 1. **Given** the account endpoints, **When** each is requested in both languages, **Then** each resolves to its
-   screen (AC-4)
+   screen (AC-242-04)
 2. **Given** the page inventory, **When** it is searched for a page duplicating an endpoint, **Then** none exists
-   (AC-4, AC-16)
+   (AC-242-04, AC-242-16)
 
 ---
 
@@ -237,20 +243,20 @@ page, structured data parsing as valid JSON with the expected types.
 **Acceptance Scenarios**:
 
 1. **Given** an archive URL such as the shop, **When** it is fetched, **Then** a canonical link is present and
-   points at that URL's canonical form (AC-9)
+   points at that URL's canonical form (AC-242-09)
 2. **Given** the sitemap, **When** it is fetched, **Then** both the English and the Arabic URL of each contracted
-   page appear (AC-10)
+   page appear (AC-242-10)
 3. **Given** a product, **When** its page is fetched, **Then** product and organisation structured data are
-   emitted and parse (AC-13)
+   emitted and parse (AC-242-13)
 4. **Given** any contracted page, **When** it is fetched, **Then** a meta description is present and is not a
-   copy of another page's (AC-14)
+   copy of another page's (AC-242-14)
 
 ---
 
 ### Edge Cases
 
 - **A trailing-slash variant of a contracted URL is requested.** It must resolve to one canonical form rather
-  than serving the same content at two addresses (AC-16).
+  than serving the same content at two addresses (AC-242-16).
 - **An Arabic URL is requested for a page that has no Arabic record yet.** It must not silently serve the English
   record under the Arabic prefix, which would be a bilingual URL serving the wrong language record.
 - **Two pages are given the same slug in different languages.** WPML permits this when the language is known at
@@ -258,7 +264,7 @@ page, structured data parsing as valid JSON with the expected types.
   and a 301. The same invariant applies to every page this feature creates.
 - **An endpoint slug is translated to a value that collides with an existing page slug.** The collision must be
   detected rather than producing an ambiguous URL.
-- **A contracted page is reachable only by `?page_id=`.** That is a clean-URL failure (AC-8). Two drafts are in
+- **A contracted page is reachable only by `?page_id=`.** That is a clean-URL failure (AC-242-08). Two drafts are in
   that state today, `privacy-policy` and `refund_returns`.
 - **The sitemap lists author pages.** Measured: `wp-sitemap-users-1.xml` is in the index. A configuration decision
   under NFR-03's sitemap obligation, recorded rather than silently changed.
@@ -299,16 +305,16 @@ specific and small, and only three of them are code.
 
 ### Functional Requirements
 
-- **FR-001**: Every contracted page MUST exist as a reachable URL in both languages, serving its own record. (AC-1, AC-2)
-- **FR-002**: Each page created here MUST form one translation group with the English record as source, and MUST be created with the target language set **before** insert, so its slug is not suffixed. (AC-3)
-- **FR-003**: The account and confirmation URLs MUST remain WooCommerce endpoints, with their Arabic slugs supplied through string translation, and no page record may duplicate an endpoint. (AC-4, AC-16)
-- **FR-004**: The storefront's product, category, collection and brand URL patterns MUST be documented per language, and a URL naming a term MUST serve that term's archive. (AC-5)
-- **FR-005**: A canonical link MUST be emitted on every contracted URL, including archive URLs where core emits none. (AC-9)
-- **FR-006**: The sitemap MUST include both languages for every contracted page. (AC-10)
-- **FR-007**: A meta description MUST be emitted per contracted page, without one page's description leaking onto another. (AC-14)
-- **FR-008**: No contracted page may be reachable only by a query-string identity, and no contracted page may have a duplicate URL. (AC-8, AC-16)
-- **FR-009**: `robots.txt` MUST remain served and MUST NOT disallow a contracted page. (AC-11)
-- **FR-010**: Breadcrumbs and structured data MUST be available on the pages whose hierarchy and content they describe. (AC-12, AC-13)
+- **FR-001**: Every contracted page MUST exist as a reachable URL in both languages, serving its own record. (AC-242-01, AC-242-02)
+- **FR-002**: Each page created here MUST form one translation group with the English record as source, and MUST be created with the target language set **before** insert, so its slug is not suffixed. (AC-242-03)
+- **FR-003**: The account and confirmation URLs MUST remain WooCommerce endpoints, with their Arabic slugs supplied through string translation, and no page record may duplicate an endpoint. (AC-242-04, AC-242-16)
+- **FR-004**: The storefront's product, category, collection and brand URL patterns MUST be documented per language, and a URL naming a term MUST serve that term's archive. (AC-242-05)
+- **FR-005**: A canonical link MUST be emitted on every contracted URL, including archive URLs where core emits none. (AC-242-09)
+- **FR-006**: The sitemap MUST include both languages for every contracted page. (AC-242-10)
+- **FR-007**: A meta description MUST be emitted per contracted page, without one page's description leaking onto another. (AC-242-14)
+- **FR-008**: No contracted page may be reachable only by a query-string identity, and no contracted page may have a duplicate URL. (AC-242-08, AC-242-16)
+- **FR-009**: `robots.txt` MUST remain served and MUST NOT disallow a contracted page. (AC-242-11)
+- **FR-010**: Breadcrumbs and structured data MUST be available on the pages whose hierarchy and content they describe. (AC-242-12, AC-242-13)
 - **FR-011**: No admin control, override field or management screen for any SEO output may be built here. (C-3)
 - **FR-012**: No visual design, layout, navigation styling, component or design token may be introduced. (Design boundary)
 
@@ -318,14 +324,14 @@ specific and small, and only three of them are code.
   a position in a group, and one URL per language.
 - **Account endpoint**: a WooCommerce query var under the account or checkout page, whose slug is translatable as
   a string. Not a page.
-- **URL map**: the documented pattern per page type and language. Evidence for AC-5 and AC-8, not a contracted
+- **URL map**: the documented pattern per page type and language. Evidence for AC-242-05 and AC-242-08, not a contracted
   deliverable.
 
 ## Optional safeguards (not owed)
 
 | Id | Safeguard | Why | Custom code? |
 |---|---|---|---|
-| S-1 | A test that fails if any contracted page becomes reachable at two URLs, or at a `?page_id=` URL only | AC-16 is the criterion most likely to regress silently as later slices add pages. A duplicate URL is invisible until a crawler finds it | No, test only |
+| S-1 | A test that fails if any contracted page becomes reachable at two URLs, or at a `?page_id=` URL only | AC-242-16 is the criterion most likely to regress silently as later slices add pages. A duplicate URL is invisible until a crawler finds it | No, test only |
 | S-2 | A test that fails if an Arabic URL serves the English record | The specific bilingual failure that looks like success: a 200 in the right place with the wrong content | No, test only |
 
 Both need Mustafa's approval and neither is presented to the client as a deliverable.
@@ -377,7 +383,7 @@ delivery order 2 on the board and changes no contractual stage.
 - The disposable local runtime is evidence for the recorded versions only (M-8).
 - No production URL, domain or hosting arrangement is assumed. **OD-27** is open, and nothing here decides it.
 - #241's capability is a satisfied dependency: English at the root, Arabic under `/ar/`, direction from the
-  locale, one template set, translation identity. **It is not rebuilt here.** #241's own AC-9 remaining open does
+  locale, one template set, translation identity. **It is not rebuilt here.** #241's own AC-242-09 remaining open does
   not block this feature.
 - Arabic page copy, category names, collection names and SEO text are content, and arrive with their own slices.
 - CoreX is not modified.
