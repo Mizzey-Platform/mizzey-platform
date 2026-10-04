@@ -142,7 +142,7 @@ because this is where the remaining 45 to 55 PBIs will be drafted.**
 | Depends on | Real GitHub issue numbers | Never a delivery-order number: on GitHub `#1` is a historical Option C issue |
 
 **`ERP blocked` is not inferred from P1-E.** Scope class already records scope. A PBI citing no P1-E row can still
-be fully ERP blocked, and #243 is the live proof: it is `yes` while citing a DLV row and a P1 row, because the
+be fully ERP blocked, and #243 is the live proof: it is `yes` while citing a **single DLV row, PRE-09**, because the
 specification is what the ERP meeting produces.
 
 Three of those rules are written the way they are because the first fifteen PBIs got them wrong, and external
