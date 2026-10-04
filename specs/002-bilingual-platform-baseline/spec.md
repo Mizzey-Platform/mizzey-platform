@@ -53,13 +53,76 @@ this feature. Each is a contracted row owned by another slice, except where mark
 | AC-4 | In English the platform resolves to the `en_US` locale and reports left to right, and the rendered storefront document carries `lang="en-US"` and no right-to-left direction | NFR-04 | final |
 | AC-5 | An English record and its Arabic counterpart form one valid translation relationship, with the English record as the source, so later slices address the pair by translation identity and never by SKU or title | FIX-04 | final |
 | AC-6 | The same templates render both languages. Reading direction and locale come from the active language, and no separate Arabic template is required at the baseline | FIX-04, NFR-04 | final |
-| AC-7 | Every user-facing string this engagement adds to the storefront is emitted through a translation function bound to the site text domain. The baseline contains no hard-coded user-facing text, and a repeatable check proves it | NFR-04a | final |
+| AC-7 | The storefront interface this engagement builds contains no hard-coded user-facing text: every such string is emitted through a translation function bound to the site text domain | NFR-04a | final |
 | AC-8 | An Arabic storefront string resolves from the registered translation source without editing a template per language, so a later slice adds strings rather than language variants | NFR-04a | final |
 | AC-9 | The bilingual storefront renders correctly, in both directions, on current Chrome, Safari, Edge and Firefox and on representative mobile browsers | NFR-14 | final |
 
 **AC-9 is final as a criterion and unverified as a fact.** Its evidence is a browser matrix on staging, which does
 not exist yet (#244). Nothing in this feature may report AC-9 as verified from the command-line runtime. The three
 states stay separate, per constitution M-7.
+
+## Clarifications
+
+Five questions were open after the first draft. Four are settled here, from the register wording and the measured
+configuration. The fifth is a confirmation that does not block the work.
+
+### C-1. Does "fully delivered at launch" mean every Arabic string exists at the baseline?
+
+**No.** FIX-04a contracts Arabic as a **supported language**, fully delivered, not as a body of translated content
+delivered by this feature. This feature delivers the capability: Arabic active, right to left, from the same
+templates, with the mechanism by which a string becomes translatable. The Arabic text of each later surface
+arrives with that surface, and the Arabic text of the catalogue arrives with the migration. Recorded so that
+"fully delivered" is not later read as "this feature owed every translation".
+
+### C-2. Does the baseline own the Arabic counterparts of the WooCommerce system pages?
+
+**Yes, as configuration, and only those pages.** The runtime has five pages, all English only: shop, cart,
+checkout, my account and a sample page. Without an Arabic counterpart for the first four, an Arabic storefront
+cannot resolve its own cart or checkout address at all, so AC-2 would be unmeetable. Creating those translated
+page records and the per-language page assignment is platform configuration, which is this feature.
+
+**The boundary**: the page *records and their assignment* are here. The page *content and interface* belong to
+their own slices, which are #255 for checkout, #253 for navigation and the remaining storefront PBIs for the
+rest. This feature does not design, lay out or populate any of them.
+
+### C-3. Which mechanism makes storefront strings translatable?
+
+Standard WordPress localisation is the primary mechanism, and WPML String Translation covers what it cannot reach.
+Native first, per M-4:
+
+| String kind | Mechanism | Why |
+|---|---|---|
+| A string written in this engagement's theme or site-plugin code | A translation function bound to the `mizzey-site` text domain, with a `.pot` and per-language `.mo` | The platform's own mechanism. It needs no plugin, works in tests, and is what a static check can enforce |
+| A string an operator types into a setting or a page | WPML String Translation, which is already active and already holds 29 registered strings across 12 contexts | These never pass through a translation function, so the code mechanism cannot reach them |
+| A string shipped by the platform or by WooCommerce | Already translated: the core `ar` pack, `woocommerce-ar.mo` and the Arabic script translations are installed | Nothing to build |
+
+The decision is therefore **not** to pick one mechanism but to bind each kind of string to the one that can carry
+it, and to enforce only the first kind in code, because it is the only kind code can enforce.
+
+### C-4. Is the hard-coded-text check part of the obligation or evidence for it?
+
+**Evidence.** NFR-04a obliges the absence of hard-coded text; it does not name a check. AC-7 now states the
+obligation alone. The repeatable check stays as FR-007 because constitution M-7 requires a verification someone
+else can repeat, and running it in CI on every pull request is S-1, a safeguard that needs approval and is not a
+client deliverable.
+
+### C-5. What counts as a "representative mobile browser" for NFR-14? Confirmation wanted, not blocking
+
+NFR-14 reads "Current Chrome, Safari, Edge, Firefox plus mobile browsers" and does not enumerate the mobile ones.
+The matrix below is the ordinary reading of that wording for an Egyptian storefront, and the work proceeds on it.
+It is flagged for confirmation at the Stage 1 review because the acceptance evidence is sized by it, and because
+confirming it costs nothing now and an argument later costs a day.
+
+| Browser | Reading direction tested | Why it is in the list |
+|---|---|---|
+| Chrome, current | both | The desktop majority |
+| Safari, current | both | The only engine on iOS, and the one that breaks right-to-left layout differently |
+| Edge, current | both | Named in the row |
+| Firefox, current | both | Named in the row |
+| Chrome on Android, current | both | The mobile majority in the market |
+| Safari on iOS, current | both | The other half of mobile, and the stricter of the two |
+
+Not in the list, and not contracted: Internet Explorer, Opera Mini, in-app browsers and any named device model.
 
 ## User Scenarios and Testing *(mandatory)*
 
@@ -157,6 +220,8 @@ source, and that resolution by translation identity returns the counterpart.
   language must not change the administrative interface language.
 - **A clean `/ar/` URL is requested in an environment with no rewrite configuration.** The language resolution
   still has to be correct; only the URL shape depends on the web server. See the Native coverage table.
+- **The Arabic storefront resolves its cart or checkout address.** It must find an Arabic page record, not fall
+  back to the English one and not fail. This is why C-2 puts the translated system-page records in this feature.
 
 ## Native coverage
 
