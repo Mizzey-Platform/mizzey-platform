@@ -1,28 +1,42 @@
 # Stack versions and the upgrade regression path
 
-## Open: the patch level of WordPress cannot be recorded here
+## Governance-model limitation: the compatibility pin and the tested runtime are one field
 
-Observed 4 October 2026. `tools/repo_checks.py` requires `stack.lock.json`'s WordPress version to equal
-`corex.lock`'s exactly. `corex.lock` pins `7.1`, which is the line `tools/corex-sync.mjs` installs; the runtime
-reports `7.1.2`, WordPress having applied its own patch update. Recording `7.1.2` therefore needs both files to
-change together, and `corex.lock` is a `version-lock` path, which `PATH_POLICY` does not allow the `governance`
-category to touch. Verified against the checker rather than read from it: a governance PR changing `corex.lock`
-is rejected with `internal:governance may not change corex.lock (version-lock)`.
+Recorded 4 October 2026. The model has no single place to say "we pin the 7.1 line, and what we actually tested
+was 7.1.2".
 
-So the patch level is recorded as a note on the WordPress component, and the `version` field still matches
-`corex.lock`. Three ways to close it properly, for Mustafa to choose:
+`tools/repo_checks.py` requires `stack.lock.json`'s `components.wordpress.version` to equal `corex.lock`'s
+`wordpress` entry exactly. `corex.lock` pins `7.1`, which is the line `tools/corex-sync.mjs` installs. The runtime
+reached `7.1.2` by WordPress's own patch update, and every probe and every integration scenario ran against
+`7.1.2`. The equality constraint means that for WordPress alone, `version` carries the **compatibility pin**,
+while for every other component `version` carries the **exact tested version**. One field, two meanings,
+component-dependent.
 
-1. **Pin the patch in `corex.lock`** (`7.1.2`) in a PR classified `internal:security-maintenance`, which the
-   policy does allow for `version-lock`, with the WordPress 7.1.2 release notes as the security evidence. This is
-   the honest reading: a WordPress patch release is a security release, and the pin should follow it.
-2. **Extend `PATH_POLICY`** so `governance` may change `version-lock`. That is a governance-control change, and it
-   widens what every future governance PR can touch, which is why it is not done here on one component's behalf.
-3. **Separate the two facts in the checker**: let `corex.lock` carry the pinned line and `stack.lock.json` carry
-   the observed version, comparing only the pinned part. This is the smallest honest fix if the patch level is
-   expected to drift again, which for WordPress it is.
+**What was done instead of changing anything.** The WordPress component now carries `compatibility_pin` (`7.1`,
+equal to `corex.lock`) and `observed_runtime` (`7.1.2`), so both facts are recorded and neither is misstated.
+`version` is unchanged, so `repo_checks.py` stays green and `corex.lock` is untouched.
 
-Escalated, not resolved. Nothing in the delivery depends on it: every probe and every integration scenario ran on
-the runtime that reports 7.1.2, and that is recorded in the component note and in each verification record.
+**`corex.lock` was deliberately not changed.** Changing it would make the checker green by moving the pin, which
+is a different decision from recording an observation, and it is not this file's job to make. The separate point
+that `corex.lock` is a `version-lock` path the `governance` category may not touch is true, and it was verified
+against the checker rather than read from it:
+
+```
+SENSITIVE corex.lock (version-lock)
+PR: internal:governance may not change corex.lock (version-lock)
+```
+
+That is a path-policy fact, not a reason to reclassify the work. A category is chosen for what the change *is*,
+never for the paths it would unlock.
+
+**How to close it properly, when it matters.** Separate the two facts in the checker: compare `corex.lock` with
+`compatibility_pin`, and let `version` mean the exact tested version for every component including WordPress.
+That is a small change to `tools/repo_checks.py` and a `governance-control` path, so it belongs in its own
+`internal:governance` PR with its own test. It is worth doing when the patch level next drifts, which for
+WordPress it will. Deliberately not bundled here, because this PR exists to record an observation.
+
+Nothing in the delivery depends on it. The versions the tests ran against are recorded in each verification
+record, and now in `observed_runtime`.
 
 ## The two lock files
 
