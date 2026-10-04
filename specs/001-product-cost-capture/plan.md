@@ -15,7 +15,8 @@ contract test fails. AC-6 (staff visibility) waits on CX-01, and AC-7 (cost basi
 
 **Language/Version**: PHP 8.3.6 (WordPress 7.1), Python 3.10 for the test runner
 
-**Primary Dependencies**: WooCommerce 11.1.0 (Cost of Goods Sold, CSV importer, REST v3, Store API), WPML 4.9.7,
+**Primary Dependencies**: WooCommerce 11.1.0 (Cost of Goods Sold, CSV importer, REST v3 as a product write
+channel, Store API as a public read surface only), WPML 4.9.7,
 WCML 5.5.7
 
 **Storage**: WordPress post meta (`_cogs_total_value`, `_cogs_value_is_additive`), HPOS order item meta

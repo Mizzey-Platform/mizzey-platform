@@ -162,8 +162,8 @@ public or customer-accessible interface, and look for cost.
   operator choosing which: on the original it updates the cost, which then flows outwards; on the translation the
   ownership rule refuses the value and logs the attempt, so the import appears to do nothing. Either way the two
   language versions still agree, and the importer is not a way to give a translation a different cost. Operational
-  consequence for MIG-13: import costs before creating translations, or check that the SKU resolves to the
-  source-language product before relying on an import to change a cost.
+  consequence for MIG-13: this is a **required migration precondition**, recorded in "Migration precondition
+  for MIG-13" below, not an informational note.
 - Saving a translation makes WooCommerce write its own bookkeeping fields (product version, rating and review
   counters) and regenerate a variation's `post_title` from the parent name and attributes. Measured in t14: it
   happens on any save, including WCML's own, and changes nothing an Arabic customer reads.
@@ -176,11 +176,45 @@ The English original is the one copy of a product that owns its cost. Every othe
 |---|---|---|
 | Cost changed on the English original, in any channel | Copied to every translation | `CostTranslationSync::sync()` on `woocommerce_update_product(_variation)` |
 | Cost typed onto a translated product in wp-admin | Replaced by the original's value on save | WooCommerce Multilingual, natively, on `save_post` |
-| Cost written onto a translation through REST, WP-CLI, the Store API, a webhook, cron or any other code | Replaced by the original's value as it is stored, and the attempt logged under `mizzey-cost-sync` | `CostTranslationSync::keepOriginalCost()` on `woocommerce_save_product_cogs_value`, and the same for the additive flag |
+| Cost written onto a translation through the WooCommerce REST API (`/wc/v3`), WP-CLI, WooCommerce CRUD in a front-end request, a webhook, cron or any other code | Replaced by the original's value as it is stored, and the attempt logged under `mizzey-cost-sync` | `CostTranslationSync::keepOriginalCost()` on `woocommerce_save_product_cogs_value`, and the same for the additive flag |
 | A CSV import row aimed at a translation | Cannot name one: rows match by SKU, and a duplicate shares its original's SKU, so the row reaches whichever of the two the SKU lookup returns. On the original the cost changes and flows outwards; on the translation it is refused and logged. The two always agree afterwards | WooCommerce's own importer, plus `keepOriginalCost()` when the row lands on the translation |
 | A direct database write, or `update_post_meta()` | Not supported, and not detectable: it bypasses the WooCommerce data store, so no filter can see it. Direct meta writes on products are forbidden by the project's WooCommerce guard (rule 2) | Code review |
 
 Synchronisation is never bidirectional: nothing lets a translation become the source of a cost.
+
+**The two WooCommerce APIs are not interchangeable, and only one of them writes cost.**
+
+| API | What it is here | Role in this feature |
+|---|---|---|
+| WooCommerce REST API, `/wc/v3` | The administrative product API, authenticated, `edit_products` required | A **supported write channel** for cost. Tested as a cost update channel in t11, t15 and t16, and as a read channel for exposure in t08 (a visitor gets 401, a customer 403) |
+| Store API, `/wc/store/v1` | The customer-facing storefront API behind the cart and the product blocks, public and read-oriented | **Never a cost write channel.** It is used here only to verify that cost is not exposed: t08 reads products as a visitor and as a customer, and t14 inspects the decoded Arabic product response for cost-sensitive fields |
+
+No cost write path through the Store API was tested, because none exists: it serves no cost field and accepts no product write. Do not describe it as a cost update channel.
+
+## Migration precondition for MIG-13
+
+**Required.** Product costs are imported **before** translations are created, unless the migration implementation
+explicitly resolves the canonical source-language product or variation when duplicate SKUs exist.
+
+Why it is required rather than advisory: a WPML duplicate is created carrying its original's SKU, so after
+translation one SKU identifies two products. A generic SKU lookup (`wc_get_product_id_by_sku()`, and therefore the
+native CSV importer, which matches rows by SKU) returns whichever of the two the query reaches first. In this
+runtime that was sometimes the Arabic duplicate. A cost import run after translations exist can therefore address
+the translation, where the cost ownership rule refuses the value and logs the attempt, so the import reports
+success and the cost does not change. Measured in t11 and t16, which resolve the SKU before asserting.
+
+This cannot corrupt data: the two language versions agree either way, and no Arabic order can record a cost the
+original never had. What it breaks is the *expectation* that an import changes a cost.
+
+| Obligation | What the precondition requires |
+|---|---|
+| MIG-13 (price, sale price and cost migrated) | Either load costs before any translation exists, or resolve the source-language element explicitly (WPML translation identity, not SKU alone) before writing |
+| MIG-01, MIG-03, MIG-06 (one agreed export, previewed and validated before the live load) | The validation pass reports, per row, which product id a SKU resolved to and whether it is the source-language original |
+| MIG-09 (variations converted correctly) | The same rule applies per variation: a translated variation shares its original's SKU |
+
+Carried into the delivery backlog as a migration-runbook obligation and a migration test, not as a comment in a
+spec. See `docs/2026-10-04-option-b-backlog-structure.md` (E-MIG) and
+`docs/2026-10-04-multilingual-data-integrity-workstream.md` (area A).
 
 ## Native coverage
 

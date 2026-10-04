@@ -514,3 +514,65 @@ stay in every commit before this one, and in the full-history bundle at
 (this log, `scripts/README.md`, and a string inside the retired `scripts/make_issues.py`) and are left as written.
 The 232 Option C issues and Project #4 still name the old paths. They are not edited. `tools/house_rules.py`
 still blocks anything new under `docs/engagement/`.
+
+## 2026-10-04 - D-04: the product-cost pilot is closed, and the identity risk becomes a workstream
+
+**Decided:** the pilot `specs/001-product-cost-capture` is complete and closed at head `4068b32`. It is not
+reopened. No margin or profitability reporting is built under it (RPT-02 is P2), and no general catalogue
+synchronisation infrastructure is added. Later work that touches product cost cites the closure record in
+`specs/001-product-cost-capture/verification.md` instead of rediscovering it.
+
+Three states, reported separately as the constitution requires: **workflow pilot completed**, **unblocked
+technical functionality verified** (AC-1 to AC-5, clean baseline, 12 scenarios, 0 failed), **contractual
+acceptance pending client decisions** (CX-01 for AC-6, OD-12 for AC-7).
+
+**Two corrections recorded with the closure:**
+
+- **MIG-13 carries a required migration precondition, not a note.** Product costs are imported before translations
+  are created, unless the migration implementation explicitly resolves the canonical source-language product or
+  variation when duplicate SKUs exist. A WPML duplicate is created with its original's SKU, so one SKU identifies
+  two products and `wc_get_product_id_by_sku()` returns whichever the query reaches first. A cost import run after
+  translations exist can therefore address the translation, where the ownership rule refuses the value: the import
+  reports success and the cost does not change. It cannot corrupt data, because the pair agrees either way. It
+  breaks the expectation that an import changes a cost. Carried into the migration runbook and a migration test,
+  not left in a spec.
+- **The Store API is not a cost write channel.** The WooCommerce REST API (`/wc/v3`) is the administrative product
+  write channel and was tested as one. The Store API (`/wc/store/v1`) is the customer-facing read surface and was
+  used only to verify that cost is not exposed. One sentence in `spec.md` had listed them together. Corrected, with
+  an explicit table, so no later feature treats the two as interchangeable.
+
+**Decided:** the multilingual identity risk the pilot exposed is handled as a cross-feature workstream rather than
+as an extension of the cost feature. `docs/2026-10-04-multilingual-data-integrity-workstream.md` classifies six
+areas (identity, stock, ERP identity, orders, reporting, returns) as verified working, verified defect, not yet
+tested, requires ERP clarification, requires client clarification, or future and Option C only, and maps each item
+to register ids and to one of five kinds: contractual functionality, developer-quality safeguard, verification or
+probe, client or ERP decision, future capability. **A risk does not create a feature**: where the behaviour behind
+a risk is outside Option B (RPT-02, RPT-03), the risk is recorded and nothing is built.
+
+**The reason it is a workstream and not a second cost fix.** The cost defect had two causes, and neither is
+specific to cost. First, `WC_Product_Data_Store_CPT::update()` skips `wp_update_post()` on a meta-only save, so
+`save_post` never fires and WPML and WCML never copy the field; any copied field is exposed through the same
+channels. Second, one commercial item is two WordPress posts with their own meta rows, which already splits a
+product report (P-019) and double-counts a stock report (P-020). The highest-priority consequence is untested and
+is recorded as a hypothesis, not a finding: `WCML\Synchronization\Component\Stock` copies `_stock` on `save_post`
+while order stock reduction goes through `wc_update_product_stock()`, which issues arithmetic SQL. If that write
+does not fire `save_post`, each language version holds its own quantity and one physical unit could be sold twice.
+That probe (item B1) is the first work after the merge.
+
+**Decided:** planning moves to Option B delivery, built from the register's 595 delivery rows (P1 435, P1-L 117,
+P1-E 19, DLV 24) grouped into epics that follow the register's own sections, with vertical PBI slices.
+`docs/2026-10-04-option-b-backlog-structure.md` is a proposal for review. Nothing is created from it: no Project,
+no issues, no specs. DEF, P2, P3 and OUT are not delivery items. Option C material is historical reference.
+
+**Decided:** the ERP identity constraint is settled by us, before the ERP meeting, because it follows from ERP-01
+rather than from the ERP's interface: the Arabic and English versions of a product are **one** ERP stock item,
+never two, and the mapping is held once against the source-language element and resolved through WPML identity.
+What the meeting decides is which key to map to. The question set is
+`docs/2026-10-04-erp-technical-meeting-questions.md`, covering authentication, API availability, identifiers,
+lookup, availability, reservation, decrement, restoration, idempotency, errors, limits, downtime, environments,
+logging, reconciliation ownership and acceptance criteria. The integration is not expanded beyond stock: a
+proposal to add order, customer, price or accounting synchronisation is routed to Change Control, not agreed at
+the table.
+
+**Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01 and PRE-09 remain open. No P1-E row receives final
+acceptance criteria while PRE-09 is unapproved.

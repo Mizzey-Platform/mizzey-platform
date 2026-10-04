@@ -352,6 +352,8 @@ and which is therefore not tested and not claimed.
 | CX-01 | Which staff roles hold financial permission (AC-6). t09 facts attached: administrator and shop_manager today | Client, Stage 1 review |
 | OD-12 | Cost basis and who enters it (AC-7), plus whether a deliberate zero cost must be distinguishable from an uncosted product | Client |
 | Governance | Record WordPress 7.1.2 and MySQL 8.3.0 in `stack.lock.json` | Separate `internal:governance` PR |
+| MIG-13 | The migration precondition on duplicate SKUs is carried into the migration runbook and a migration test, not left in this spec | Catalogue migration work (Section U, E-MIG) |
+| Cross-feature | Multilingual identity for stock, orders, reports and the ERP integration: classified, largely not yet tested | `docs/2026-10-04-multilingual-data-integrity-workstream.md` |
 
 ## Guard Gate (T016)
 
@@ -428,3 +430,42 @@ and which is therefore not tested and not claimed.
 - **Technically verified**: AC-1 to AC-5 verified on a clean baseline, with the sync fix in place.
 - **Contractually accepted**: **no**. AC-6 is pending CX-01 and AC-7 pending OD-12. Acceptance happens at the
   Stage 1 gate under MS-UAT-2026-027.
+
+## Pilot closed, 4 October 2026
+
+Approved at head `4068b322908bbadb4260a4482ede85039c8c4afc` and closed. The feature is not reopened for further
+work: no margin or profitability reporting is built under it (RPT-02 is P2), and no general catalogue
+synchronisation infrastructure is added. Later work that touches product cost cites this record rather than
+rediscovering it.
+
+**Final status, the three states reported separately:**
+
+| State | Value |
+|---|---|
+| Workflow pilot | **Completed** |
+| Unblocked technical functionality | **Verified** (AC-1 to AC-5, clean baseline, 12 scenarios, 0 failed) |
+| Contractual acceptance | **Pending client decisions** (CX-01 for AC-6, OD-12 for AC-7) |
+
+**Findings this record preserves.** Each one is a measured fact, not a design preference, and each is the reason a
+later feature does not need to re-derive it.
+
+| # | Finding | Where it was established |
+|---|---|---|
+| 1 | WooCommerce native Cost of Goods Sold remains the source of truth for product cost storage. No Mizzey field, no parallel store | ADR-0001, t02, t03, research R-1 |
+| 2 | `_cogs_total_value` is the native stored product-cost meta, on products and on variations, and the same key carries the frozen cost on an order line. `_cogs_value` is the admin form field and the CRUD accessor name, not the storage key | Source read at `class-wc-product-data-store-cpt.php` (read 513, write 813) plus the database; research R-1 |
+| 3 | WPML already declares the native cost field as copied and locked for translations. No `wpml-config.xml` of our own is needed, and the one tried earlier changed no outcome | research R-4, the with-and-without runs in `evidence/` |
+| 4 | The custom Mizzey code exists **only** to cover the update paths where normal WPML and WCML save synchronisation does not execute, because `WC_Product_Data_Store_CPT::update()` skips `wp_update_post()` on a meta-only save and `save_post` never fires | t11, t15, the root-cause section above |
+| 5 | The English (source-language) original is canonical for cost | the cost ownership section of `spec.md`, t12, t16 |
+| 6 | A translation must never become a second source of truth. A cost written onto a translation is replaced by the original's value and the attempt logged; synchronisation is never bidirectional | t12 case 5, t16 (ten cases) |
+| 7 | Product and variation relationships are resolved by WPML translation identity (`trid` and the translation rows), never by list position, title, or SKU alone. WPML's separately cached `wpml_original_element_id` was observed naming an unrelated product and is not used | the defect section above, `evidence/wpml-identity-cache.txt`, t12 |
+| 8 | One SKU identifies both members of a duplicated pair, so a SKU lookup can return either. This is why SKU is not an identity and why MIG-13 carries a precondition | the SKU section above, t11, t16, `spec.md` migration precondition |
+| 9 | A zero cost is stored by WooCommerce as "no cost", identical to a blank. Whether a deliberate zero must be distinguishable is a business decision | t02, t13, **OD-12**, unresolved |
+| 10 | Staff financial visibility is unresolved. Today administrator and shop_manager see cost and every other role is refused; no position was taken | t09 facts, **CX-01**, unresolved |
+| 11 | Rendered Arabic storefront verification is not possible in the disposable runtime and remains a staging and UAT check. Arabic catalogue data is verified through the Store API instead | t14, the Not verified section below |
+| 12 | The WooCommerce REST API (`/wc/v3`) is the administrative product write channel. The Store API (`/wc/store/v1`) is the customer-facing read surface and is never a cost write channel. The two are not interchangeable | t08, t11, t15, t16; the API table in `spec.md` |
+
+**What this pilot deliberately did not deliver, and where it went instead.** The multilingual identity risk it
+exposed is wider than cost: the same mechanism (a write that does not fire `save_post`, and an identity that is
+not a SKU) can affect stock, orders, reports and the ERP integration. That is carried as a cross-feature
+workstream, not as an extension of this feature. See
+`docs/2026-10-04-multilingual-data-integrity-workstream.md`.
