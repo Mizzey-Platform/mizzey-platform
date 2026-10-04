@@ -154,9 +154,33 @@ public or customer-accessible interface, and look for cost.
 - While cost capture is off, setting a cost does nothing (`set_cogs_value` checks the flag). Edits or imports made
   before enablement lose their cost silently. Safeguard S-1 addresses this.
 - A variation with no cost of its own: record whether it falls back to anything or stays empty.
+- A cost written straight onto an Arabic product: the English original owns the cost, so the original's value is
+  stored instead and the attempt is written to the WooCommerce log. See "Cost ownership" below.
+- The native CSV importer matches rows by SKU, and a WPML duplicate shares the SKU of its original, so a single SKU
+  resolves to two products. `wc_get_product_id_by_sku()` returns whichever of the two the query reaches first, which
+  in this runtime was sometimes the Arabic duplicate. An import row therefore lands on one of them without the
+  operator choosing which: on the original it updates the cost, which then flows outwards; on the translation the
+  ownership rule refuses the value and logs the attempt, so the import appears to do nothing. Either way the two
+  language versions still agree, and the importer is not a way to give a translation a different cost. Operational
+  consequence for MIG-13: import costs before creating translations, or check that the SKU resolves to the
+  source-language product before relying on an import to change a cost.
 - Saving a translation makes WooCommerce write its own bookkeeping fields (product version, rating and review
   counters) and regenerate a variation's `post_title` from the parent name and attributes. Measured in t14: it
   happens on any save, including WCML's own, and changes nothing an Arabic customer reads.
+
+## Cost ownership
+
+The English original is the one copy of a product that owns its cost. Every other language version mirrors it.
+
+| Operation | What happens | Enforced by |
+|---|---|---|
+| Cost changed on the English original, in any channel | Copied to every translation | `CostTranslationSync::sync()` on `woocommerce_update_product(_variation)` |
+| Cost typed onto a translated product in wp-admin | Replaced by the original's value on save | WooCommerce Multilingual, natively, on `save_post` |
+| Cost written onto a translation through REST, WP-CLI, the Store API, a webhook, cron or any other code | Replaced by the original's value as it is stored, and the attempt logged under `mizzey-cost-sync` | `CostTranslationSync::keepOriginalCost()` on `woocommerce_save_product_cogs_value`, and the same for the additive flag |
+| A CSV import row aimed at a translation | Cannot name one: rows match by SKU, and a duplicate shares its original's SKU, so the row reaches whichever of the two the SKU lookup returns. On the original the cost changes and flows outwards; on the translation it is refused and logged. The two always agree afterwards | WooCommerce's own importer, plus `keepOriginalCost()` when the row lands on the translation |
+| A direct database write, or `update_post_meta()` | Not supported, and not detectable: it bypasses the WooCommerce data store, so no filter can see it. Direct meta writes on products are forbidden by the project's WooCommerce guard (rule 2) | Code review |
+
+Synchronisation is never bidirectional: nothing lets a translation become the source of a cost.
 
 ## Native coverage
 
@@ -175,6 +199,7 @@ WCML 5.5.7, PHP 8.3.6, MySQL 8.3.0). Evidence: `evidence/` and `verification.md`
 | First cost, increase, decrease, no change, repeated saves, clearing, zero; and the number of writes each causes | t13 | VERIFIED |
 | A translation that cannot be saved: other products still copied, the gap logged, repaired by the next save of the original | t13 | VERIFIED |
 | The copy changes no authored field, no translation relationship, no unrelated custom field, and nothing an Arabic customer reads | t14, both translation methods, simple and variation | VERIFIED |
+| A cost written straight onto a translation through a supported channel: the original's value is stored instead, the Arabic order records the original's cost, and the override is logged | t16, ten cases | VERIFIED |
 | Native CSV import carries "Cost of goods"; a blank stays blank | t07 | VERIFIED |
 | No cost to visitors or customers: product pages, Store API, REST v3, My Account order view | t08 | VERIFIED (order emails not tested) |
 | Which staff roles see cost | t09: administrator and shop_manager only; every other role 403 | FACT for CX-01 |

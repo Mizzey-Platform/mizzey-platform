@@ -14,7 +14,10 @@ Live status. First action each session: read this, then continue from **Next**.
 1. Pilot `specs/001-product-cost-capture` (ADM-27, RPT-11, MIG-13; contractual stage S1) is in review on branch
    `001-product-cost-capture`. Verification: `specs/001-product-cost-capture/verification.md`. A review round on
    22 September added the identity, semantics, side-effect and entry-point scenarios (t12 to t15), found and fixed
-   one defect in how the synchronisation read WPML identity, and corrected the recorded cost storage key.
+   one defect in how the synchronisation read WPML identity, and corrected the recorded cost storage key. A second
+   round (t16) established the cost ownership rule for writes made directly to a translation, rebuilt a Store API
+   assertion that could never have failed, and recorded that one SKU addresses both members of a duplicated pair,
+   which limits what a CSV cost import can be relied on to do (an operational note for MIG-13).
 2. Governance follow-up (separate PR): record WordPress 7.1.2 and MySQL 8.3.0 in `stack.lock.json`.
 
 ## Blocked or waiting

@@ -26,36 +26,6 @@ function t13_fmt( ?float $v ): string {
 	return null === $v ? 'none' : rtrim( rtrim( number_format( $v, 2, '.', '' ), '0' ), '.' );
 }
 
-/** Every line the sync has logged, from whichever handler this runtime uses. */
-function t13_log_lines(): array {
-	global $wpdb;
-	$out   = array();
-	$table = $wpdb->prefix . 'woocommerce_log';
-	if ( $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
-		foreach ( (array) $wpdb->get_col( $wpdb->prepare( "SELECT message FROM {$table} WHERE source = %s", 'mizzey-cost-sync' ) ) as $m ) {
-			$out[] = 'db: ' . $m;
-		}
-	}
-	foreach ( (array) glob( trailingslashit( defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : WP_CONTENT_DIR . '/uploads/wc-logs/' ) . 'mizzey-cost-sync*.log' ) as $file ) {
-		foreach ( (array) file( $file ) as $line ) {
-			$out[] = 'file: ' . trim( $line );
-		}
-	}
-	return $out;
-}
-
-/** Remove everything this scenario logged, so the runtime is left as it was found. */
-function t13_clear_log(): void {
-	global $wpdb;
-	$table = $wpdb->prefix . 'woocommerce_log';
-	if ( $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
-		$wpdb->delete( $table, array( 'source' => 'mizzey-cost-sync' ) );
-	}
-	foreach ( (array) glob( trailingslashit( defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : WP_CONTENT_DIR . '/uploads/wc-logs/' ) . 'mizzey-cost-sync*.log' ) as $file ) {
-		@unlink( $file );
-	}
-}
-
 run(
 	new Scenario( 't13-cost-sync-semantics', 'AC-3' ),
 	function ( Scenario $s ): bool {
@@ -63,8 +33,8 @@ run(
 		$w      = new Workflows( $s );
 		$ok_all = true;
 
-		t13_clear_log();
-		$s->on_finish( __NAMESPACE__ . '\t13_clear_log' );
+		Workflows::clear_sync_log();
+		$s->on_finish( array( Workflows::class, 'clear_sync_log' ) );
 
 		$written  = array();
 		$recorder = function ( $id ) use ( &$written ) {
@@ -142,7 +112,7 @@ run(
 		$r2 = $w->set_cost( 'crud-cli', $en2, 600.0 );
 		remove_action( 'woocommerce_before_product_object_save', $boom, 5 );
 
-		$log     = t13_log_lines();
+		$log     = Workflows::sync_log_lines();
 		$logged  = (bool) array_filter( $log, fn( $line ) => false !== strpos( $line, (string) $ar1 ) && false !== strpos( $line, 'forced failure for t13' ) );
 		$ok      = ( 'ok' === $r1 && 'ok' === $r2
 			&& 500.0 === Workflows::cost( $en1 ) && 10.0 === Workflows::cost( $ar1 )

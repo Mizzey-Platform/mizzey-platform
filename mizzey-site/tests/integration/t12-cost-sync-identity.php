@@ -8,8 +8,8 @@
  *   2. a simple product's cost reaches its own translation, and nothing else is written;
  *   3. each variation's cost reaches its corresponding variation, not another variation of the same product;
  *   4. a product with no translation, and a translation that has been deleted, write nothing anywhere;
- *   5. a cost written on the translation does not overwrite the original, and the next save of the original
- *      restores the translation.
+ *   5. a cost written on the translation does not overwrite the original: the original owns the cost, so the
+ *      write is replaced by the original's value as it is saved, and recorded in the log.
  * Creating a translation after a cost already exists is covered by t11 part 1 (both methods, both product types).
  *
  * Every write is observed through woocommerce_update_product(_variation), so "nothing else is written" is a
@@ -178,25 +178,31 @@ run(
 		) );
 		$ok_all = $ok_all && $ok;
 
-		// --- 5. The original is canonical -----------------------------------------------------------------------
+		// --- 5. The original owns the cost ------------------------------------------------------------------------
+		// A cost written straight onto the translation is replaced by the original's as it is saved, which is what
+		// wp-admin already does through WCML. t16 proves the same in every supported channel.
+		Workflows::clear_sync_log();
+		$s->on_finish( array( Workflows::class, 'clear_sync_log' ) );
 		$translation = wc_get_product( $ar );
 		$translation->set_cogs_value( 999.0 );
 		$translation->save();
 		$en_after = Workflows::cost( $en );
 		$ar_after = Workflows::cost( $ar );
-		$ok       = ( 100.0 === $en_after && 999.0 === $ar_after );
+		$logged   = (bool) array_filter( Workflows::sync_log_lines(), fn( $line ) => false !== strpos( $line, (string) $ar ) && false !== strpos( $line, '999' ) );
+		$ok       = ( 100.0 === $en_after && 100.0 === $ar_after && $logged );
 		$s->note( sprintf(
-			'%s saving the translation with cost 999: EN %s (must stay 100, translations never push back), AR %s',
+			'%s writing 999 onto the translation: EN %s (must stay 100, translations never push back), AR %s (the original owns it), override %s',
 			$ok ? 'OK  ' : 'FAIL',
 			t12_fmt( $en_after ),
-			t12_fmt( $ar_after )
+			t12_fmt( $ar_after ),
+			$logged ? 'logged' : 'NOT LOGGED (it would be silent)'
 		) );
 		$ok_all = $ok_all && $ok;
 
 		$w->set_cost( 'crud-cli', $en, 105.0 );
 		$ok = ( 105.0 === Workflows::cost( $en ) && 105.0 === Workflows::cost( $ar ) );
 		$s->note( sprintf(
-			'%s the next save of the original restores the translation: EN %s AR %s',
+			'%s a later change on the original still reaches the translation: EN %s AR %s',
 			$ok ? 'OK  ' : 'FAIL',
 			t12_fmt( Workflows::cost( $en ) ),
 			t12_fmt( Workflows::cost( $ar ) )

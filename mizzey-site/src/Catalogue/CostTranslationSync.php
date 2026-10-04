@@ -43,10 +43,123 @@ final class CostTranslationSync
     /** Guard against re-entry: saving a translation below must not start another sync pass. */
     private static bool $running = false;
 
+    /** True while WooCommerce is saving a product for the first time. See noteCreation(). */
+    private static bool $creating = false;
+
     public static function register(): void
     {
+        add_action('woocommerce_before_product_object_save', [self::class, 'noteCreation'], 1, 1);
         add_action('woocommerce_update_product', [self::class, 'sync'], 20, 1);
         add_action('woocommerce_update_product_variation', [self::class, 'sync'], 20, 1);
+        add_filter('woocommerce_save_product_cogs_value', [self::class, 'keepOriginalCost'], 20, 2);
+        add_filter('woocommerce_save_product_cogs_is_additive_flag', [self::class, 'keepOriginalAdditiveFlag'], 20, 2);
+    }
+
+    /**
+     * Record whether this save is creating the product, because nothing here may act on the identity of a post
+     * that is being created.
+     *
+     * WPML registers a new post as it is inserted, using whatever language is current, and that first answer can
+     * be wrong: a product created while the current language is Arabic is registered as an Arabic translation of
+     * an unrelated product, and only becomes itself once its language is set. A rule that writes a cost on the
+     * strength of that answer copies a stranger's cost into a new product. Observed in this project, which is why
+     * both the copy outwards and the ownership rule stand down until a product exists.
+     *
+     * @param WC_Product $product The product about to be saved, with no id yet when it is being created.
+     */
+    public static function noteCreation($product): void
+    {
+        self::$creating = $product instanceof WC_Product && 0 === $product->get_id();
+    }
+
+    /**
+     * The original owns the cost, in every channel.
+     *
+     * wp-admin already works this way: a cost typed onto a translated product is replaced by the original's cost
+     * when WooCommerce Multilingual runs on save_post. Code does not go through save_post (see sync() above), so a
+     * cost written straight onto a translation through REST, WP-CLI or a front-end request used to stick, leaving
+     * the two language versions disagreeing and an Arabic order recording a cost the original never had.
+     *
+     * This closes that at WooCommerce's own write point. Whatever value reaches the data store for a translation,
+     * the original's value is what gets stored, so the two cannot diverge. It is not bidirectional: a translation
+     * never becomes the source. Nothing is saved here, so nothing recurses, and no other field is touched.
+     *
+     * @param float|null|false $value   The cost WooCommerce is about to store, or false if something suppressed it.
+     * @param WC_Product       $product The product being saved.
+     * @return float|null|false
+     */
+    public static function keepOriginalCost($value, $product)
+    {
+        // false means another extension has taken over storing the cost. That is its decision to make, not ours.
+        if (false === $value) {
+            return $value;
+        }
+
+        $original = self::originalOf($product);
+        if (!$original instanceof WC_Product) {
+            return $value;
+        }
+
+        $owned = $original->get_cogs_value();
+        $given = is_numeric($value) ? (float) $value : null;
+        if (!self::sameAmount($given, $owned)) {
+            self::log(sprintf(
+                'Cost %s was written to product %d, which is a translation of %d. The original owns the cost, so %s was stored instead.',
+                null === $given ? 'none' : (string) $given,
+                $product->get_id(),
+                $original->get_id(),
+                null === $owned ? 'none' : (string) $owned
+            ));
+        }
+
+        return $owned;
+    }
+
+    /**
+     * The same rule for a variation's additive flag, which is part of how its cost is defined.
+     *
+     * @param bool|null        $flag    The flag WooCommerce is about to store.
+     * @param WC_Product       $product The variation being saved.
+     * @return bool|null
+     */
+    public static function keepOriginalAdditiveFlag($flag, $product)
+    {
+        $original = self::originalOf($product);
+
+        return $original instanceof WC_Product_Variation && $product instanceof WC_Product_Variation
+            ? $original->get_cogs_value_is_additive()
+            : $flag;
+    }
+
+    /**
+     * The source-language original of a product that is a translation, or null when this product is the original
+     * itself, is not translated, cannot be resolved, or when there is nothing to own because cost capture is off.
+     */
+    private static function originalOf($product): ?WC_Product
+    {
+        // Inside sync() the value being written is already the original's, so there is nothing to correct.
+        if (self::$running || self::$creating || !$product instanceof WC_Product || !self::costCaptureIsOn()) {
+            return null;
+        }
+
+        $productId = $product->get_id();
+        $elementType = $productId > 0 ? (self::ELEMENT_TYPES[get_post_type($productId)] ?? null) : null;
+        if (null === $elementType) {
+            return null;
+        }
+
+        $group = self::translationGroup($productId, $elementType);
+
+        // Only correct a post WPML actually lists in its own translation group, and lists as a translation.
+        // A post being created is not registered yet, and asking about it can return another group's rows
+        // altogether, so anything less certain than "WPML says this is a translation of that" is left alone.
+        if (false !== $group['self'] || !$group['original'] || $group['original'] === $productId) {
+            return null;
+        }
+
+        $original = wc_get_product($group['original']);
+
+        return $original instanceof WC_Product ? $original : null;
     }
 
     /**
@@ -56,7 +169,7 @@ final class CostTranslationSync
      */
     public static function sync(int $productId): void
     {
-        if (self::$running || $productId <= 0 || !self::costCaptureIsOn()) {
+        if (self::$running || self::$creating || $productId <= 0 || !self::costCaptureIsOn()) {
             return;
         }
 
@@ -66,7 +179,7 @@ final class CostTranslationSync
         }
 
         $group = self::translationGroup($productId, $elementType);
-        if ($productId !== $group['original'] || !$group['others']) {
+        if (true !== $group['self'] || $productId !== $group['original'] || !$group['others']) {
             return;
         }
 
@@ -110,31 +223,41 @@ final class CostTranslationSync
      * observed naming another product entirely, while the rows read here were correct at that same moment (see the
      * verification record). Reading both facts from the same rows means they cannot disagree.
      *
-     * @return array{original:int,others:int[]}
+     * `self` says what the group has to say about the saved post itself: true when it is the original, false when
+     * it is one of the translations, and null when the group does not mention it at all. That last case is not
+     * theoretical. A post being saved for the first time is not registered yet, and WPML can answer with a
+     * neighbouring group's rows, so a caller that intends to write must insist on a definite answer.
+     *
+     * @return array{original:int,others:int[],self:bool|null}
      */
     private static function translationGroup(int $productId, string $elementType): array
     {
         $trid = apply_filters('wpml_element_trid', null, $productId, $elementType);
         if (!$trid) {
-            return ['original' => 0, 'others' => []];
+            return ['original' => 0, 'others' => [], 'self' => null];
         }
 
         $original = 0;
         $others = [];
+        $self = null;
         foreach ((array) apply_filters('wpml_get_element_translations', null, $trid, $elementType) as $row) {
             $row = (object) $row; // WPML returns objects. A filter that returns arrays must not break a product save.
             $id = (int) ($row->element_id ?? 0);
             if ($id <= 0) {
                 continue;
             }
-            if (self::isSourceLanguage($row)) {
+            $isOriginal = self::isSourceLanguage($row);
+            if ($id === $productId) {
+                $self = $isOriginal;
+            }
+            if ($isOriginal) {
                 $original = $id;
             } elseif ($id !== $productId) {
                 $others[] = $id;
             }
         }
 
-        return ['original' => $original, 'others' => $others];
+        return ['original' => $original, 'others' => $others, 'self' => $self];
     }
 
     /** WPML marks the source-language element of a group: it is flagged, and it has no source language of its own. */
@@ -191,15 +314,20 @@ final class CostTranslationSync
             }
             $translation->save();
         } catch (Throwable $e) {
-            wc_get_logger()->error(
-                sprintf(
-                    'Could not copy the cost of product %d to its translation %d: %s',
-                    $original->get_id(),
-                    $translationId,
-                    $e->getMessage()
-                ),
-                ['source' => 'mizzey-cost-sync']
-            );
+            self::log(sprintf(
+                'Could not copy the cost of product %d to its translation %d: %s',
+                $original->get_id(),
+                $translationId,
+                $e->getMessage()
+            ));
+        }
+    }
+
+    /** One place for anything worth investigating later, under a source an administrator can filter the log by. */
+    private static function log(string $message): void
+    {
+        if (function_exists('wc_get_logger')) {
+            wc_get_logger()->error($message, ['source' => 'mizzey-cost-sync']);
         }
     }
 }

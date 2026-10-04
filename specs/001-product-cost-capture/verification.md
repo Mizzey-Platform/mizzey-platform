@@ -23,7 +23,7 @@ Never production.
 ## Results (T014)
 
 `python mizzey-site/tests/integration/run.py --wp ../app/wp`, on a clean baseline, with the fix in place:
-`evidence/final-suite.txt` and `.json`. 11 scenarios, 0 failed (t09 gives facts, not a verdict).
+`evidence/final-suite.txt` and `.json`. 12 scenarios, 0 failed (t09 gives facts, not a verdict).
 
 | Scenario | Criterion | Result | Key observation |
 |---|---|---|---|
@@ -34,14 +34,21 @@ Never production.
 | t08 exposure | AC-5 | PASS | No cost in visitor pages, Store API, REST v3, or the customer's order view |
 | t09 staff visibility | AC-6 | FACT | administrator and shop_manager only; every other role 403 |
 | t11 cost sync matrix | AC-3 | PASS | 24 cases: 2 translation methods x 2 product types x 5 channels, plus 4 creation cases |
-| t12 identity | AC-3 | PASS | 7 cases: the copy reaches the WPML original's translations, the matching variation, and nothing else |
+| t12 identity | AC-3 | PASS | 8 cases: the copy reaches the WPML original's translations, the matching variation, and nothing else |
 | t13 semantics and failure | AC-3 | PASS | 8 update steps with the write count each causes, a forced failure with its log and repair, re-entrancy |
 | t14 side effects and Arabic content | AC-3, AC-5 | PASS | 4 cases: no authored field, relationship, unrelated field or customer-visible string moved |
 | t15 entry points | AC-3 | PASS | 10 cases: the hook that carries the copy, recorded inside each channel's own request |
+| t16 cost ownership | AC-3 | PASS | 10 cases: a cost written straight onto a translation is replaced by the original's |
 
 After the run: feature flag `no`, 0 products, 0 orders, no test users beyond the baseline administrator, no
 temporary must-use plugin, no leftover import files, no scenario options, and no cost-sync log files or rows
 (T015).
+
+Alongside the suite, on the final state of the branch: PHP lint clean across `mizzey-site` and `mizzey-theme`;
+the discovery dataset gate clean; 126 discovery tests and 71 tooling tests passing; `tools/repo_checks.py` 0
+problems; `tools/scope_trace.py` 0 problems over 39 changed files; `tools/house_rules.py` 0 problems over 983
+added markdown lines; and `tools/run_trusted.py` passing all four of its checks, the trusted base copy and the
+proposed copy of each checker.
 
 ## The WPML investigation
 
@@ -231,6 +238,113 @@ a simple product and for a variation in each channel. Ten cases, all passing.
 
 The three channels where `save_post` never fires are exactly the three that failed before this feature existed.
 
+## Second review round, 22 September 2026: cost ownership, and a broken assertion
+
+Two findings came back from the review of the package. Both are answered below. Nothing else was changed: the
+architecture, the identity model and the class stay as they were.
+
+### 1. A cost written straight onto a translation
+
+t12 had recorded, without treating it as a problem, that a programmatic write could move an Arabic product's cost
+to 999 while the English original stayed at 100. That is a reachable path to a wrong Arabic order cost, so it was
+investigated before anything was decided.
+
+**What each channel did, before the correction** (probe on the clean baseline, writing 999 onto the Arabic
+product of a pair whose English cost is 100):
+
+| Channel | Arabic cost after | English cost | Cost recorded by an Arabic order |
+|---|---|---|---|
+| WooCommerce CRUD under WP-CLI | 999 | 100 | **999** |
+| REST API | 999 | 100 | **999** |
+| Front-end code, webhook, cron | 999 | 100 | **999** |
+| wp-admin product form | 100, the write did not stick | 100 | 100 |
+| Native CSV importer | 999, but so did the original | 999 | 999 |
+
+Two facts decided the mechanism. First, **wp-admin already enforces the rule**: WooCommerce Multilingual replaces
+the value from the original when it runs on `save_post`, so a cost typed onto a translated product never sticks.
+The gap is only in the channels that do not fire `save_post`, which is the same root cause as the outward gap.
+Second, **WooCommerce provides a filter at exactly the write point**, `woocommerce_save_product_cogs_value`, with
+`woocommerce_save_product_cogs_is_additive_flag` beside it, and the probe confirmed both fire for products and for
+variations in every channel.
+
+**The policy: the original owns the cost, and a write to a translation is corrected from the original.** Whatever
+value reaches the data store for a translation, the original's value is what gets stored. The attempt is written
+to the WooCommerce log under `mizzey-cost-sync`, naming both products and both values, so it is not silent.
+Rejecting the write with an exception was considered and rejected: it would break supported integrations with hard
+failures over a value the caller should not be setting, and it would not match what wp-admin already does.
+Two-way synchronisation was never on the table; it would destroy the ownership rule the contract needs.
+
+Nothing is saved inside a filter, so there is no second write, no recursion and no other field touched. Inside the
+outward copy the filter returns the same value it is given, so the two halves cannot fight.
+
+**After the correction**, all five channels behave: the Arabic cost stays at the original's value and the Arabic
+order records the original's cost. t16 holds ten cases, and t12 keeps the single-product version of the same case.
+
+**Operations that are deliberately not supported, and how each is bounded:**
+
+| Operation | Status |
+|---|---|
+| Setting a different cost on a translation, through any supported channel | Not possible: the original's value is stored instead, and the attempt is logged |
+| Importing a different Arabic cost by CSV | Not possible: rows match by SKU, which a duplicate shares with its original, so the row cannot name one of the two. It reaches whichever the SKU lookup returns, and both outcomes leave the pair in agreement. See "One SKU, two products" below |
+| Editing an Arabic variation's cost in wp-admin | Not reachable in this runtime, for a reason unrelated to cost: see the catalogue fact below |
+| A direct database or `update_post_meta()` write | Not supported and not detectable, because it bypasses the WooCommerce data store where every filter lives. The project forbids direct meta writes on products (woo-guard rule 2), which is a code-review control, not a runtime one |
+
+**A catalogue fact found on the way, outside this feature.** The Arabic parent of a translated variable product is
+registered as a `simple` product with no variations attached, with both translation methods, even though each
+Arabic variation exists and points at that parent. That is why wp-admin has no variations panel for it. It does
+not affect cost correctness, because variations are WPML elements in their own right and are synchronised
+individually, and every Arabic variation order in t11 and t16 records the right cost. It does need answering
+before the Arabic storefront is accepted, and it belongs to the translation workflow (US-16-03), not here. The
+observation was made with translations created from WP-CLI; whether the wp-admin translation flow builds the
+Arabic parent correctly is not established.
+
+### One SKU, two products: what a CSV import row actually addresses
+
+Found while making t16 and t11 assert the importer honestly, and recorded because it changes an operational
+instruction rather than any code.
+
+A WPML duplicate is created with its original's SKU, so after translation one SKU belongs to two products.
+`wc_get_product_id_by_sku()` answers with whichever of them the query returns first, and in this runtime that was
+sometimes the Arabic duplicate. The importer matches rows by SKU, so an import row lands on one of the pair
+without the operator choosing which:
+
+| The row reaches | What happens | The pair afterwards |
+|---|---|---|
+| The English original | The cost changes, and `sync()` copies it to the translation | Agree, at the new value |
+| The Arabic translation | `keepOriginalCost()` stores the original's value instead and logs the attempt, so the import appears to have done nothing to the cost | Agree, at the old value |
+
+Neither outcome can produce a wrong Arabic order cost, which is why this is not a defect in the feature. It is a
+limit on what an import can be relied on to do: a cost import after translations exist is not guaranteed to change
+the cost. The tests assert it as it is, by resolving the SKU first (`Workflows::sku_target()`) and expecting the
+outcome that follows, rather than assuming the row reaches the original.
+
+**Operational note for MIG-13.** Import costs before creating translations, or verify that the SKU resolves to the
+source-language product before relying on an import to change a cost. Changing a cost on the original through
+wp-admin, REST or WP-CLI is unaffected and always flows outwards.
+
+### 2. A test assertion that could never fail
+
+The Store API check added to t14 in the previous round searched the response text for the cost as a number, using
+a pattern that had been mangled into literal backspace characters. It could not match anything, so "cost absent"
+was meaningless. The exposure evidence for AC-5 was never affected: t08 is the AC-5 scenario, and its detection
+uses plain string comparison against several number formats plus a scan for `cogs` and `cost_of_goods` field
+names, which was checked and is sound.
+
+The check is rebuilt on field names rather than digits, because a price of 123.5 is legitimate and a cost of 123.5
+is not, and only the field they sit in tells them apart. It walks the decoded response, reports any key whose name
+contains `cogs`, `cost_of_goods` or `cost`, and reads WooCommerce's custom-field pairs, where the field name is a
+value rather than a key. It also verifies that the response is the product that was asked for, by id.
+
+A negative control runs beside it: a cost field and a `_cogs_total_value` custom field are planted in a copy of a
+real response and the check must report both, a cost field nested three levels down must be reported, and the real
+response must still come back clean. If the check ever breaks again, the control fails and the scenario fails.
+
+t14 now also distinguishes the things the review asked to keep apart: a **WPML duplicate**, whose Arabic product
+keeps the source-language name until somebody translates it, and is asserted to do so; a **separately authored
+translation** through the WCML editor, asserted to carry the Arabic name; the **Arabic catalogue data**, read
+through the Store API by product id; and the **rendered Arabic storefront page**, which this runtime cannot serve
+and which is therefore not tested and not claimed.
+
 ## Open items after the pilot
 
 | Id | Question | Owner |
@@ -271,6 +385,29 @@ The three channels where `save_post` never fires are exactly the three that fail
   - Rule 1, implementation detail: t15 asserts which hook fired. That is the point of the scenario, and the cost
     outcome is still asserted alongside it, so t11 and t15 cannot pass on the strength of the hook alone.
   The regression cases for the identity defect found in this round are marked as such in t12 and t13 (Rule 6).
+
+### Guard Gate, second review round
+
+- **woo-guard** on the ownership rule. The two new methods are filters: they read and return a value and save
+  nothing, so there is no write to review, no recursion and no other field touched (Rules 1, 2, 8). The value
+  returned is the original's own `get_cogs_value()`, compared through `wc_format_decimal` at store precision
+  (Rule 5). The filter names are WooCommerce 11.1.0's own, and the probe confirmed both fire for products and for
+  variations in every channel (Rule 6). One change came out of the pass: when another extension has already
+  suppressed the write by returning `false`, that decision is now left alone instead of being overridden, since
+  `false` means something else is storing the cost.
+- **test-guard** on t16: real products, real HTTP, no mocks (Rules 2, 8, 9); ten cases driven from a channel and
+  type table rather than copied (Rule 3); it is the regression test for a reviewed finding and is marked as such
+  (Rule 6). Two notes rather than silent choices. The importer case asserts WooCommerce's own SKU matching, which
+  is framework behaviour under Rule 7, and is kept because it is the evidence for a contractual limitation: an
+  Arabic cost import is not possible and nobody should plan one. Its expectation is derived from the SKU lookup
+  rather than assumed, which is also what stopped the ambiguity recorded above from being read as a defect: the
+  assertion states what the channel does, not what it was hoped to do. And t12's single-product version of the
+  same case overlaps t16's `crud-cli` row; it is kept because it carries the sequence t16 does not, a write on the
+  translation followed by a later change on the original that still propagates.
+- **woo-guard and test-guard on the final state of the branch**, re-read after the SKU correction: no new findings.
+  The correction is confined to test expectations (`Workflows::sku_target()`, a thin wrapper over
+  `wc_get_product_id_by_sku()`); no production code changed with it, and `CostTranslationSync` still writes only
+  through CRUD, declares nothing about orders, and touches no template, checkout or order code.
 
 ## Not verified
 

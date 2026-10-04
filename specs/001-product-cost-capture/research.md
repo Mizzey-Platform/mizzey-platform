@@ -56,6 +56,25 @@ unless stated otherwise.
   go stale inside one long-running process, while `wpml_get_element_translations` stays correct. Identity is
   therefore read from the translation rows, not from the cached answer (verification.md, review round).
 
+## R-8. A cost written straight onto a translation
+
+- **Finding.** Before this decision, a cost written onto the Arabic product through REST, WP-CLI or a front-end
+  request stuck: the two language versions disagreed, and an Arabic order recorded a cost the original never had
+  (probe across all five channels, both product types). wp-admin never allowed it, because WooCommerce
+  Multilingual replaces the value from the original when it runs on `save_post`. The programmatic channels do not
+  fire `save_post` for a cost-only save, which is the same root cause as the outward gap.
+- **Decision.** Correct the value from the original, at WooCommerce's own write filters,
+  `woocommerce_save_product_cogs_value` and `woocommerce_save_product_cogs_is_additive_flag`. Both fire for
+  products and for variations, in every channel, at the point the value is about to be stored. The attempt is
+  logged under `mizzey-cost-sync` so it is not silent.
+- **Rationale.** It makes code behave exactly as wp-admin already does, which is the smallest rule that keeps the
+  original canonical. Nothing is saved inside a filter, so nothing recurses and no second write happens; no other
+  field is touched; and a divergent value cannot survive a save.
+- **Alternatives.** Rejecting the write with an exception: breaks supported integrations and importers with hard
+  failures, for a value the caller has no business setting. Two-way synchronisation: breaks the ownership rule the
+  contract needs, and makes the authoritative cost ambiguous. Doing nothing: leaves a reachable path to a wrong
+  Arabic order cost, which is a data-integrity defect, not a preference.
+
 ## R-5. Public and customer exposure
 
 - **Decision**: test the Store API product endpoints as a visitor, REST v3 products as a visitor and as a customer,

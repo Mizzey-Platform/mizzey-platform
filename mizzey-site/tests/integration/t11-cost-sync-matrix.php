@@ -80,15 +80,24 @@ run(
 						$ok_all = false;
 						continue;
 					}
+					// The importer addresses products by SKU, and a WPML duplicate carries the SKU of its
+					// original, so a row can reach either of them. When it reaches the translation the cost is
+					// not applied at all, because the original owns it (t16): the two language versions still
+					// agree, which is what AC-3 asks, and the attempt is recorded in the log. Reported either way.
+					$addressed = 'import-http' === $channel ? Workflows::sku_target( $en ) : $en;
+					$reaches_original = $addressed === $en;
+
 					$before = array( Workflows::snapshot( $en ), Workflows::snapshot( $ar ) );
 					$steps  = array();
 					$ok     = true;
 					foreach ( $target as $i => $value ) {
+						$was     = Workflows::cost( $en );
 						$res     = $w->set_cost( $channel, $en, $value );
 						$en_cost = Workflows::cost( $en );
 						$ar_cost = Workflows::cost( $ar );
+						$want    = $reaches_original ? $value : $was;
 						$steps[] = sprintf( '%s %s: EN %s AR %s%s', 0 === $i ? 'set' : 'change', fmt( $value ), fmt( $en_cost ), fmt( $ar_cost ), 'ok' === $res ? '' : " [$res]" );
-						$ok      = $ok && 'ok' === $res && $value === $en_cost && $value === $ar_cost;
+						$ok      = $ok && 'ok' === $res && $want === $en_cost && $want === $ar_cost;
 					}
 					$after   = array( Workflows::snapshot( $en ), Workflows::snapshot( $ar ) );
 					$changed = array();
@@ -113,9 +122,11 @@ run(
 					}
 					$order_en = $w->order_cost( $en, 'en' );
 					$order_ar = $w->order_cost( $ar, 'ar' );
-					$want     = end( $target );
+					$want     = $reaches_original ? end( $target ) : Workflows::cost( $en );
 					$ok       = $ok && ! $changed && ! is_nan( $order_en ) && ! is_nan( $order_ar ) && abs( $order_en - $want ) < 0.001 && abs( $order_ar - $want ) < 0.001;
-					$s->note( sprintf( '%s %s %s %s: %s | orders EN %s AR %s | %s%s', $ok ? 'OK  ' : 'FAIL', $method, $type, $channel, implode( '; ', $steps ),
+					$s->note( sprintf( '%s %s %s %s%s: %s | orders EN %s AR %s | %s%s', $ok ? 'OK  ' : 'FAIL', $method, $type, $channel,
+						$reaches_original ? '' : ' (the SKU reached the translation, so the cost is unchanged and the two still agree)',
+						implode( '; ', $steps ),
 						fmt( $order_en ), fmt( $order_ar ),
 						$changed ? 'CHANGED ' . implode( ', ', $changed ) : 'price/stock/sku/status unchanged',
 						$facts ? ' | noted: ' . implode( ', ', $facts ) : '' ) );

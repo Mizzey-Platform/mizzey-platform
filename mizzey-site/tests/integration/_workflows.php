@@ -20,6 +20,12 @@ namespace MizzeySite\Tests\Integration;
 
 const CORE_FIELDS = array( '_regular_price', '_sale_price', '_price', '_manage_stock', '_stock', '_stock_status', '_sku' );
 
+/** The cost fields this feature is allowed to change. */
+const COST_FIELDS = array( '_cogs_total_value', '_cogs_value_is_additive' );
+
+/** Fields WooCommerce maintains itself and writes on any CRUD save. Recorded, never treated as a failure. */
+const BOOKKEEPING_FIELDS = array( '_product_version', '_wc_average_rating', '_wc_review_count', '_thumbnail_id', '_variation_description', '_edit_lock', '_edit_last', '_wp_old_slug' );
+
 final class Workflows {
 
 	private Scenario $s;
@@ -359,6 +365,124 @@ final class Workflows {
 			$out[ $k ] = get_post_meta( $id, $k, true );
 		}
 		return $out;
+	}
+
+	/**
+	 * The product a SKU resolves to, which is not always the one you meant: a WPML duplicate carries the SKU of
+	 * its original, so a CSV import row can reach either of them.
+	 */
+	public static function sku_target( int $id ): int {
+		wp_cache_flush();
+		$product = wc_get_product( $id );
+		return $product && $product->get_sku() ? (int) wc_get_product_id_by_sku( $product->get_sku() ) : 0;
+	}
+
+	/** Everything stored about a post: fields, custom fields, language, translation group, product terms. */
+	public static function stored( int $id ): array {
+		wp_cache_flush();
+		$post = get_post( $id );
+		$meta = get_post_meta( $id );
+		ksort( $meta );
+		$terms = array();
+		foreach ( array( 'product_type', 'product_cat', 'product_tag', 'product_visibility' ) as $tax ) {
+			$got           = wp_get_object_terms( $id, $tax, array( 'fields' => 'slugs' ) );
+			$terms[ $tax ] = is_wp_error( $got ) ? 'error' : implode( ',', $got );
+		}
+		return array(
+			'post'  => array(
+				'title'      => $post ? $post->post_title : null,
+				'name'       => $post ? $post->post_name : null,
+				'status'     => $post ? $post->post_status : null,
+				'parent'     => $post ? (int) $post->post_parent : 0,
+				'menu_order' => $post ? (int) $post->menu_order : 0,
+				'content'    => $post ? $post->post_content : null,
+				'excerpt'    => $post ? $post->post_excerpt : null,
+			),
+			'meta'  => $meta,
+			'lang'  => apply_filters( 'wpml_post_language_details', null, $id )['language_code'] ?? 'unknown',
+			'trid'  => (int) apply_filters( 'wpml_element_trid', null, $id, 'post_' . get_post_type( $id ) ),
+			'terms' => $terms,
+		);
+	}
+
+	/**
+	 * Differences between two stored snapshots, split into what must not move and what WooCommerce maintains
+	 * itself on any CRUD save.
+	 *
+	 * @return array{authored:string[],generated:string[]}
+	 */
+	public static function differences( array $before, array $after, bool $is_variation ): array {
+		$authored  = array();
+		$generated = array();
+		foreach ( array( 'post', 'terms' ) as $group ) {
+			foreach ( $before[ $group ] as $key => $value ) {
+				if ( $after[ $group ][ $key ] === $value ) {
+					continue;
+				}
+				$line = sprintf( '%s %s: %s -> %s', $group, $key, var_export( $value, true ), var_export( $after[ $group ][ $key ], true ) );
+				if ( $is_variation && 'title' === $key ) {
+					$generated[] = $line . ' (WooCommerce regenerates a variation title on any save)';
+				} else {
+					$authored[] = $line;
+				}
+			}
+		}
+		foreach ( array( 'lang', 'trid' ) as $key ) {
+			if ( $before[ $key ] !== $after[ $key ] ) {
+				$authored[] = sprintf( '%s: %s -> %s', $key, var_export( $before[ $key ], true ), var_export( $after[ $key ], true ) );
+			}
+		}
+		foreach ( array_unique( array_merge( array_keys( $before['meta'] ), array_keys( $after['meta'] ) ) ) as $key ) {
+			if ( in_array( $key, COST_FIELDS, true ) ) {
+				continue;
+			}
+			$was = $before['meta'][ $key ] ?? null;
+			$now = $after['meta'][ $key ] ?? null;
+			if ( $was === $now ) {
+				continue;
+			}
+			$line = sprintf( '%s: %s -> %s', $key, wp_json_encode( $was ), wp_json_encode( $now ) );
+			if ( in_array( $key, BOOKKEEPING_FIELDS, true ) ) {
+				$generated[] = $line;
+			} else {
+				$authored[] = $line;
+			}
+		}
+		return array( 'authored' => $authored, 'generated' => $generated );
+	}
+
+	/** Every line the synchronisation has logged, from whichever handler this runtime uses. */
+	public static function sync_log_lines(): array {
+		global $wpdb;
+		$out   = array();
+		$table = $wpdb->prefix . 'woocommerce_log';
+		if ( $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+			foreach ( (array) $wpdb->get_col( $wpdb->prepare( "SELECT message FROM {$table} WHERE source = %s", 'mizzey-cost-sync' ) ) as $m ) {
+				$out[] = 'db: ' . $m;
+			}
+		}
+		foreach ( (array) glob( self::log_dir() . 'mizzey-cost-sync*.log' ) as $file ) {
+			foreach ( (array) file( $file ) as $line ) {
+				$out[] = 'file: ' . trim( $line );
+			}
+		}
+		return $out;
+	}
+
+	/** Remove everything the synchronisation logged, so the runtime is left as it was found. */
+	public static function clear_sync_log(): void {
+		global $wpdb;
+		$table = $wpdb->prefix . 'woocommerce_log';
+		if ( $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+			$wpdb->delete( $table, array( 'source' => 'mizzey-cost-sync' ) );
+		}
+		foreach ( (array) glob( self::log_dir() . 'mizzey-cost-sync*.log' ) as $file ) {
+			@unlink( $file );
+		}
+	}
+
+	private static function log_dir(): string {
+		return trailingslashit( defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : WP_CONTENT_DIR . '/uploads/wc-logs/' );
 	}
 
 	/** Cost recorded by an order for one unit, placed in $lang; NAN when the product cannot be loaded. */

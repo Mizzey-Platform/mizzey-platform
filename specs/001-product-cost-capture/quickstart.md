@@ -54,3 +54,4 @@ contract scenario fails. Scripts clean up their fixtures, restore the feature fl
 | t13 | pass: every kind of cost change, the number of writes each causes, a forced failure, its repair, and re-entrancy |
 | t14 | pass: nothing else on the Arabic post moves, including what the customer reads. Variation titles are reported as facts, because WooCommerce regenerates them on any save |
 | t15 | pass: the hook that carries the copy in each channel, recorded inside the request that does the work |
+| t16 | pass: a cost written straight onto a translation is replaced by the original's, in every channel |

@@ -90,11 +90,32 @@ t05 or t06 fails.
   separately cached `wpml_original_element_id`, and the storage key corrected to `_cogs_total_value` in the spec,
   plan, research and data model (verification.md, review round)
 
+## Second review round (requested 22 September 2026, before merge)
+
+- [x] T032 [US2] Establish what each supported channel does today when a cost is written directly onto a
+  translation (REST, the importer, WooCommerce CRUD, wp-admin, a front-end request), and what wp-admin and WPML
+  already do about it, before choosing a mechanism (research R-8, verification.md)
+- [x] T033 [US2] Implement the smallest rule consistent with the original owning the cost:
+  `CostTranslationSync::keepOriginalCost()` and `keepOriginalAdditiveFlag()` on WooCommerce's own write filters,
+  with the attempt logged. Not bidirectional, no extra save, no other field touched (AC-3)
+- [x] T034 [US2] t16 `mizzey-site/tests/integration/t16-translation-cost-ownership.php`: five channels x two
+  product types, each with the authoritative English cost, the direct write attempt, the resulting ownership, an
+  Arabic order, and everything else on the Arabic post held still (AC-3)
+- [x] T035 Correct the Store API exposure check in t14: it looked for a number with a broken pattern and could
+  never have failed. It now inspects the decoded response for cost-sensitive fields by name, verifies the product
+  id, distinguishes a duplicate from an authored translation, and carries a negative control that proves the check
+  reports a planted cost field (AC-5)
+- [x] T036 Record the SKU ambiguity T034 exposed: one SKU belongs to both members of a duplicated pair, so an
+  import row reaches whichever the lookup returns. t11 and t16 resolve the SKU and assert the outcome that
+  follows; spec.md, verification.md and the MIG-13 operational note say what an import can and cannot be relied
+  on to do (AC-3, AC-4)
+
 ## Dependencies
 
 - T001 to T004 before every story. US1 (T005 to T007) before US2, because the orders need products with cost.
   US3 and US4 depend only on Phase 2.
 - T014 needs every scenario script. T020 depends on the T014 result. T031 depends on T027 to T030.
+  T033 depends on T032, and T034 on T033. T036 came out of T034.
 
 ## Parallel opportunities
 
