@@ -24,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[2]
 FEATURE = "specs/002-bilingual-platform-baseline"
 ARTIFACTS = ("spec.md", "research.md", "plan.md", "tasks.md", "analysis.md", "checklists/requirements.md",
              "verification.md")
+# The scenario that produces the evidence. An artifact can state a requirement correctly while the test meant to
+# prove it does something weaker, which is how AC-1's same-session requirement was asserted with no session.
+SCENARIO = "mizzey-site/tests/integration/t21-bilingual-baseline.php" 
 
 # Each claim: (name, [stale phrases that must not appear anywhere], {artifact: [phrases that must appear]})
 CLAIMS: tuple[tuple[str, list[str], dict[str, list[str]]], ...] = (
@@ -72,6 +75,20 @@ CLAIMS: tuple[tuple[str, list[str], dict[str, list[str]]], ...] = (
         {
             "spec.md": ["not a multilingual\nplatform defect", "VERIFIED as\na baseline prerequisite"],
             "tasks.md": ["Do not use\n`wp rewrite flush --hard`"],
+        },
+    ),
+    (
+        "is_textdomain_loaded is not acceptance evidence on WordPress 7.1",
+        [
+            "`is_textdomain_loaded('mizzey-site')` is true on a storefront request",
+            "Gate**: `is_textdomain_loaded",
+            "Gate: `is_textdomain_loaded",
+        ],
+        {
+            "tasks.md": ["**`is_textdomain_loaded()` is not acceptance evidence.**",
+                         "resolves in Arabic through that loader"],
+            "research.md": ["The loader registers the file; the catalogue is materialised on first use."],
+            "verification.md": ["AC-8 asserts **the resolved string**"],
         },
     ),
     (
@@ -203,6 +220,48 @@ class SpecConsistency(unittest.TestCase):
             with self.subTest(row=row[:48]):
                 self.assertTrue("Not exercised" in row or "LTR" in row,
                                 f"a browser row claims a state other than unexercised: {row!r}")
+
+    def test_is_textdomain_loaded_is_never_stated_as_a_gate(self) -> None:
+        """The flag reads false on WordPress 7.1 while the mechanism works, so it cannot gate anything.
+
+        Broader than the phrase list in CLAIMS: this refuses any line that states the flag as a gate or an
+        assertion, however it is worded, while allowing the lines that explain why it is not evidence.
+        """
+        allowed = ("not acceptance evidence", "is misleading", "reads false", "materialised",
+                   "immediately after", "after that call", "reports", "asserts **the resolved string**",
+                   "Measured:", "no .mo yet")
+        for artifact in ARTIFACTS:
+            for n, line in enumerate(self.text[artifact].splitlines(), start=1):
+                if "is_textdomain_loaded" not in line:
+                    continue
+                states_a_gate = any(w in line for w in ("Gate", "gate:", "must be true", "MUST be",
+                                                        "acceptance evidence is", "evidence:"))
+                excused = any(w in line for w in allowed)
+                with self.subTest(artifact=artifact, line=n):
+                    self.assertFalse(
+                        states_a_gate and not excused,
+                        f"{artifact}:{n} states is_textdomain_loaded as a gate or acceptance evidence, which "
+                        f"contradicts the measurement in research.md: {line.strip()!r}")
+
+    def test_ac1_same_session_evidence_is_a_real_session(self) -> None:
+        """AC-1's second half needs one carried cookie session, not three independent requests.
+
+        External review found the scenario sending an empty jar on every request, which proved only that a second
+        clean request defaults to English. This refuses a return to that.
+        """
+        src = (ROOT / SCENARIO).read_text(encoding="utf-8")
+        self.assertTrue("function t21_carry(" in src,
+                        "the scenario has no helper for carrying cookies between requests")
+        self.assertTrue("'cookies'     => $cookies," in src,
+                        "the request helper does not send the jar it was given")
+        self.assertFalse("'cookies'     => array()," in src,
+                         "the request helper still sends an empty cookie jar unconditionally, so a "
+                         "same-session assertion would carry nothing forward")
+        for marker in ("[one session] 1. GET /", "[one session] 2. GET /ar/", "[one session] 3. GET /"):
+            with self.subTest(marker=marker):
+                self.assertTrue(marker in src, f"the scenario does not record {marker!r}")
+        self.assertTrue("[clean session] GET /" in src,
+                        "the independent clean-session assertion was dropped; both halves are required")
 
     def test_the_probe_boundaries_are_still_stated(self) -> None:
         """What the pilot and the probes bought must not quietly drop out of the spec."""

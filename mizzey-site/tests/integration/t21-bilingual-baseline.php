@@ -19,20 +19,24 @@ namespace MizzeySite\Tests\Integration;
 require_once __DIR__ . '/_bootstrap.php';
 
 /**
- * Fetch a storefront URL as a visitor would, following no redirect, and return status plus the <html> element.
+ * Fetch a storefront URL as a visitor would, following no redirect.
  *
- * @param string $path Path relative to the site root, for example '/ar/'.
- * @return array{status:int,html:string,title:string,body_classes:string,error:string}
+ * Takes a cookie jar and returns the cookies the response set, so a caller can carry real session state across
+ * requests. AC-1 has two halves that need different jars: a **clean session** must default to English, and a
+ * session that has just viewed Arabic must **still** default to English. Passing an empty jar every time, which
+ * this helper used to do, only ever tested the first half.
+ *
+ * @param string                $path    Path relative to the site root, for example '/ar/'.
+ * @param array<int,\WP_Http_Cookie> $cookies Jar to send. Empty for a clean session.
+ * @return array{status:int,html:string,title:string,body_classes:string,error:string,set_cookies:array<int,\WP_Http_Cookie>,cookie_names:string}
  */
-function t21_get( string $path ): array {
+function t21_get( string $path, array $cookies = array() ): array {
 	$response = wp_remote_get(
 		home_url( $path ),
 		array(
 			'timeout'     => 20,
 			'redirection' => 0,
-			// A fresh cookie jar every time: AC-1 is about a request carrying no language hint, and a shared
-			// session would hide a default that drifts.
-			'cookies'     => array(),
+			'cookies'     => $cookies,
 			'headers'     => array( 'Accept-Language' => 'en-US,en;q=0.9' ),
 		)
 	);
@@ -43,19 +47,50 @@ function t21_get( string $path ): array {
 			'title'        => '',
 			'body_classes' => '',
 			'error'        => $response->get_error_message(),
+			'set_cookies'  => array(),
+			'cookie_names' => '',
 		);
 	}
 	$body = (string) wp_remote_retrieve_body( $response );
 	preg_match( '/<html[^>]*>/i', $body, $html );
 	preg_match( '#<title>(.*?)</title>#is', $body, $title );
 	preg_match( '/<body[^>]+class="([^"]*)"/i', $body, $classes );
+	$set = wp_remote_retrieve_cookies( $response );
+	$set = is_array( $set ) ? $set : array();
+	$names = array();
+	foreach ( $set as $cookie ) {
+		$names[] = $cookie->name;
+	}
 	return array(
 		'status'       => (int) wp_remote_retrieve_response_code( $response ),
 		'html'         => $html[0] ?? '',
 		'title'        => trim( $title[1] ?? '' ),
 		'body_classes' => $classes[1] ?? '',
 		'error'        => '',
+		'set_cookies'  => $set,
+		'cookie_names' => $names ? implode( ', ', $names ) : 'none',
 	);
+}
+
+/**
+ * Merge the cookies a response set into a jar, so the next request carries the session forward.
+ *
+ * Real cookies only. Nothing here invents a language cookie or reaches into plugin state: if the Arabic request
+ * sets nothing, the jar stays as it was and that is the measured fact.
+ *
+ * @param array<int,\WP_Http_Cookie> $jar The jar so far.
+ * @param array<int,\WP_Http_Cookie> $set Cookies the last response set.
+ * @return array<int,\WP_Http_Cookie>
+ */
+function t21_carry( array $jar, array $set ): array {
+	$by_name = array();
+	foreach ( $jar as $cookie ) {
+		$by_name[ $cookie->name ] = $cookie;
+	}
+	foreach ( $set as $cookie ) {
+		$by_name[ $cookie->name ] = $cookie;
+	}
+	return array_values( $by_name );
 }
 
 /**
@@ -130,10 +165,11 @@ run(
 		$s->note( 'enabled languages: ' . implode( ', ', $languages ) );
 		$s->note( 'default language: ' . $sitepress->get_default_language() );
 
-		// ---- AC-1 and AC-4: English at the root, left to right ----------------------------------------
+		// ---- AC-1 and AC-4, first half: a CLEAN session defaults to English, left to right -------------
 		$root = t21_get( '/' );
 		$en   = t21_document_language( $root['html'] );
-		$s->note( "GET / -> {$root['status']} {$root['html']}" );
+		$s->note( "[clean session] GET / -> {$root['status']} {$root['html']}" );
+		$s->note( "[clean session] cookies set by / : {$root['cookie_names']}" );
 		if ( 200 !== $root['status'] || 'en-US' !== $en['lang'] || $en['rtl'] ) {
 			$s->note( 'FAIL AC-1/AC-4: the root did not serve English left to right.' );
 			$ok = false;
@@ -146,7 +182,7 @@ run(
 		// ---- AC-2 and AC-3: Arabic under its prefix, right to left ------------------------------------
 		$ar_home = t21_get( '/ar/' );
 		$ar      = t21_document_language( $ar_home['html'] );
-		$s->note( "GET /ar/ -> {$ar_home['status']} {$ar_home['html']}" );
+		$s->note( "[clean session] GET /ar/ -> {$ar_home['status']} {$ar_home['html']}" );
 		if ( 200 !== $ar_home['status'] || 'ar' !== $ar['lang'] || ! $ar['rtl'] ) {
 			$s->note( 'FAIL AC-2/AC-3: the Arabic prefix did not serve Arabic right to left.' );
 			$ok = false;
@@ -154,18 +190,52 @@ run(
 
 		$ar_shop = t21_get( '/ar/shop/' );
 		$ar_s    = t21_document_language( $ar_shop['html'] );
-		$s->note( "GET /ar/shop/ -> {$ar_shop['status']} {$ar_shop['html']}" );
+		$s->note( "[clean session] GET /ar/shop/ -> {$ar_shop['status']} {$ar_shop['html']}" );
 		if ( 200 !== $ar_shop['status'] || 'ar' !== $ar_s['lang'] || ! $ar_s['rtl'] ) {
 			$s->note( 'FAIL AC-2: an Arabic storefront page did not serve Arabic right to left.' );
 			$ok = false;
 		}
 
-		// ---- AC-1 again: the default must not drift after an Arabic request ---------------------------
-		$root_again = t21_get( '/' );
-		$en_again   = t21_document_language( $root_again['html'] );
-		$s->note( "GET / after Arabic -> {$root_again['status']} {$root_again['html']}" );
-		if ( 'en-US' !== $en_again['lang'] || $en_again['rtl'] ) {
-			$s->note( 'FAIL AC-1: the root defaulted away from English after an Arabic request.' );
+		// ---- AC-1, second half: ONE session, three requests, English still the default ----------------
+		//
+		// This is the requirement the spec actually states and FR-001 turns into "no dependence on stored or
+		// session state". An earlier version of this scenario sent an empty cookie jar on every request, so
+		// "after Arabic" carried nothing forward and proved only that a second clean request defaults to
+		// English. External review caught it.
+		//
+		// Real cookies only: whatever each response sets is carried into the next request. No language cookie is
+		// invented and no plugin state is touched. If the Arabic request sets nothing, that is recorded and the
+		// third request is still made through the same carried session.
+		$jar = array();
+
+		$s1 = t21_get( '/', $jar );
+		$jar = t21_carry( $jar, $s1['set_cookies'] );
+		$s->note( "[one session] 1. GET / -> {$s1['status']} {$s1['html']}" );
+		$s->note( "[one session] 1. set-cookie: {$s1['cookie_names']}" );
+
+		$s2 = t21_get( '/ar/', $jar );
+		$jar = t21_carry( $jar, $s2['set_cookies'] );
+		$s->note( "[one session] 2. GET /ar/ -> {$s2['status']} {$s2['html']}" );
+		$s->note( "[one session] 2. set-cookie: {$s2['cookie_names']}" );
+
+		$carried = array();
+		foreach ( $jar as $cookie ) {
+			$carried[] = $cookie->name;
+		}
+		$s->note( '[one session] cookies carried into request 3: '
+			. ( $carried ? implode( ', ', $carried ) : 'none' ) );
+
+		$s3       = t21_get( '/', $jar );
+		$en_again = t21_document_language( $s3['html'] );
+		$s->note( "[one session] 3. GET / -> {$s3['status']} {$s3['html']}" );
+
+		if ( 200 !== $s3['status'] || 'en-US' !== $en_again['lang'] || $en_again['rtl'] ) {
+			$s->note( 'FAIL AC-1: in one session, the root defaulted away from English after viewing Arabic.' );
+			$ok = false;
+		}
+		if ( 200 !== $s2['status'] || 'ar' !== t21_document_language( $s2['html'] )['lang'] ) {
+			$s->note( 'FAIL AC-1: the Arabic request in the carried session did not serve Arabic, so the '
+				. 'same-session assertion proves nothing.' );
 			$ok = false;
 		}
 

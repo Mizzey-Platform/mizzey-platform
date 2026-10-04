@@ -46,8 +46,9 @@ only a served request can tell a correct document from an artifact.
 
 | # | Criterion | Assertion | Result |
 |---|---|---|---|
-| 1 | AC-1, AC-4 | `GET /` returns 200 with `<html lang="en-US">` and no direction attribute | **PASS** |
-| 2 | AC-1 | `GET /` after an Arabic request is still English | **PASS** |
+| 1 | AC-1, AC-4 | **Clean session.** `GET /` returns 200 with `<html lang="en-US">` and no direction attribute | **PASS** |
+| 2 | AC-1 | **One carried session, three requests.** `GET /`, then `GET /ar/`, then `GET /` again, each carrying the cookies the previous response set. The third request is still `lang="en-US"` and not right to left | **PASS** |
+| 2a | AC-1 | The middle request of that session genuinely served Arabic, so the sequence cannot pass vacuously | **PASS** |
 | 3 | AC-1 | The default language is `en` | **PASS** |
 | 4 | AC-2, AC-3 | `GET /ar/` returns 200 with `<html dir="rtl" lang="ar">` | **PASS** |
 | 5 | AC-2 | `GET /ar/shop/` returns 200 with `<html dir="rtl" lang="ar">` | **PASS** |
@@ -119,7 +120,35 @@ clone.
 for AC-7. It passes on the tree, fails on a deliberately hard-coded string with the file and line, ignores
 identifiers, and fails closed on a file it cannot read.
 
-### Three findings the first run produced, each fixed at its cause
+### AC-1's same-session evidence, and what the cookies measured
+
+The requirement is that after a customer has viewed Arabic, requesting the English root **in the same session**
+still resolves to English. Proving that needs one carried session, and an earlier version of this scenario did
+not have one: `t21_get()` sent an empty cookie jar on every request, so "after Arabic" proved only that a second
+clean request defaults to English. **External review caught it.**
+
+The method now, with real cookies only and nothing invented:
+
+| Step | Request | Jar sent | Result | Set-Cookie |
+|---|---|---|---|---|
+| 1 | `GET /` | empty, clean session | 200, `<html lang="en-US">` | **none** |
+| 2 | `GET /ar/` | whatever step 1 set | 200, `<html dir="rtl" lang="ar">` | **none** |
+| 3 | `GET /` | whatever steps 1 and 2 set | 200, `<html lang="en-US">` | - |
+
+**The measured fact is that neither request sets any cookie**, so the jar carried into step 3 was empty. That is
+recorded rather than worked around: the jar was still carried, the sequence was still one session, and the
+absence is the result.
+
+**It is also the strongest evidence FR-001 could have.** FR-001 asks that the language resolve from the URL with
+no dependence on stored or session state. A storefront that set a language cookie would make that a question of
+cookie precedence; one that sets none cannot drift, because there is no stored state to drift from. WPML is
+configured for directory negotiation, so the path *is* the language, and the measurement confirms the
+configuration behaves that way for an anonymous visitor.
+
+**Both halves are kept and labelled** in the scenario output, `[clean session]` and `[one session]`, because they
+test different things and only one of them is the contractual requirement.
+
+### Findings the runs produced, each fixed at its cause
 
 The scenario earned its place by failing first.
 
@@ -128,6 +157,8 @@ The scenario earned its place by failing first.
 | `/ar/shop/` answered **301**, not 200 | The Arabic page was inserted while English was the current language, so WordPress's slug-uniqueness check did not know it was a translation and suffixed the slug to `shop-2`. The request then redirected to the canonical URL | The language is switched **before** the insert. WPML registers a new post under the current language at insert time, which is the same behaviour the product-cost pilot recorded |
 | The translation probe returned Arabic **in English too** | The scenario's `gettext` filter replaced the string unconditionally, which made the English half of the assertion worthless | The filter is language aware, and the English control is now asserted |
 | `is_textdomain_loaded` read **false** | Measured: `load_plugin_textdomain()` returns **true** and works, but WordPress 7.1 materialises a catalogue only when a string is first requested, so the flag reads false in between while `__()` translates correctly | AC-8 asserts **the resolved string**, which is what NFR-04a is about and what holds across versions. The lazy-loading behaviour is recorded in research.md under M-8 |
+| T-03's gate still asserted **`is_textdomain_loaded()`** | **External review.** It contradicted the lazy-loading measurement already recorded here and in research.md | Replaced with the measured behavioural requirement: the loader registers, and a real string resolves in Arabic through it with the English source as control. `test_spec_consistency.py` now refuses the stale sentence and any line stating the flag as a gate, proved by restoring it |
+| AC-1's same-session assertion **carried no session** | **External review.** `t21_get()` sent an empty cookie jar on every request | The helper carries a jar; AC-1's second half is one session across three requests, and both halves are labelled. Measured: neither request sets a cookie |
 | The AC-8 probe would have passed with `Localisation.php` deleted | Found by **test-guard**. It asserted a `gettext` filter changed a string under Arabic, which is WordPress's own behaviour | The probe writes a real `.mo`, calls the production loader, asserts resolution with the English source as control, and removes the file. Nothing test-shaped is shipped |
 | The text domain reached `load_plugin_textdomain()` as a class constant | Found by **wp-guard**. String-extraction tools read that argument statically | Passed as a literal; the constant stays for PHP callers |
 

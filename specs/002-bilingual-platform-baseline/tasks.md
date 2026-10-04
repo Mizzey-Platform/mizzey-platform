@@ -70,7 +70,14 @@ the Arabic text when the language is Arabic. Guard: **wp-guard** and **clean-cod
 **Criteria**: AC-7 and AC-8. Without a loaded domain, a wrapped string cannot resolve to Arabic, so the
 mechanism is the criterion's substance and T-06 is only its guard.
 
-**Gate**: `is_textdomain_loaded('mizzey-site')` is true on a storefront request in both languages.
+**Gate**, measured behaviour rather than a flag: the production loader **registers successfully**, and a real
+string bound to `mizzey-site` **resolves in Arabic through that loader** while the English source string remains
+the control.
+
+**`is_textdomain_loaded()` is not acceptance evidence.** On WordPress 7.1.2 `load_plugin_textdomain()` returns
+true and the catalogue is materialised lazily, on the first lookup, so the flag can read false while the
+mechanism works. An earlier version of this gate asserted the flag and failed a working feature. See
+`research.md` section 6; it is evidence for 7.1.2 and not a general platform guarantee.
 
 ---
 
