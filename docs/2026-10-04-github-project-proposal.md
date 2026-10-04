@@ -115,9 +115,9 @@ Regenerated 4 October 2026.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14 | **P1** | **S1** | **Ready** | **no** | none | - | - | - |
 | 2 | #242 | Information architecture and URL structure, in both languages | E-FND | 30 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | - | #241 bilingual platform baseline |
-| 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | PRE-09, ERP-10 | **mixed** | **mixed** | **Blocked** | **yes** | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | - |
+| 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | PRE-09 | **DLV** | **per PRE-09** | **Blocked** | **yes** | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | #245 owns ERP-10, the adapter rule, which this specification is context for |
 | 4 | #244 | Infrastructure provisioned for development, staging and production | E-PRE | 6 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | OD-27 hosting outside Egypt, in writing; OD-15 volumes; OD-14 operating budget | - |
-| 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | RPT-10, FIX-04, NFR-04 | **mixed** | **S1** | **Blocked** | **partial** | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline |
+| 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | RPT-10 | **P1-L** | **S1** | **Blocked** | **partial** | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline, which owns FIX-04 and NFR-04 |
 | 6 | #247 | The catalogue migration does not corrupt Arabic product or variation content | E-MIG | MIG-02, MIG-09, MIG-13, SSC-21 | **mixed** | **S1** | **Blocked** | **no** | none | B1 trigger measured; A11 measured (t19) | CR-06 a real, unmodified Amazon sample export | #249 catalogue import specification |
 | 7 | #249 | Catalogue import specification, validated against the real source file | E-MIG | 7 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | A5 duplicate SKU resolution | CR-06 a real, unmodified Amazon sample export; CR-07 Professional Seller account and Category Listings Report | - |
 | 8 | #245 | ERP adapter seam: one commercial item resolves to one ERP stock item | E-ERP | ERP-01, ERP-02, ERP-10, INT-16 | **P1** | **S1** | **Blocked** | **partial** | none | B1 measured (closed); M17 open | - | #243 the ERP Integration Specification, for the behaviour behind the seam; #241 bilingual platform baseline |
@@ -137,9 +137,9 @@ validation.** Both are generated from the live Project in the same pass, so ther
 
 - **#241** (5 ids): `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14`
 - **#242** (30 ids): `IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35, NFR-03`
-- **#243** (2 ids): `PRE-09, ERP-10`
+- **#243** (1 ids): `PRE-09`
 - **#244** (6 ids): `PRE-01, PRE-02, PRE-03a, PRE-03b, NFR-09, NFR-08`
-- **#246** (3 ids): `RPT-10, FIX-04, NFR-04`
+- **#246** (1 ids): `RPT-10`
 - **#247** (4 ids): `MIG-02, MIG-09, MIG-13, SSC-21`
 - **#249** (7 ids): `PRE-05, PRE-06, MIG-01, MIG-03, MIG-04, MIG-06, MIG-19`
 - **#245** (4 ids): `ERP-01, ERP-02, ERP-10, INT-16`
@@ -151,7 +151,7 @@ validation.** Both are generated from the live Project in the same pass, so ther
 - **#254** (22 ids): `PDP-01, PDP-02, PDP-03, PDP-04, PDP-05, PDP-06, PDP-07, PDP-08, PDP-09, PDP-10, PDP-11, PDP-12, PDP-13, PDP-14, PDP-15, PDP-16, PDP-17, PDP-18, PDP-19, PDP-21, PDP-22, PDP-24`
 - **#255** (14 ids): `CHK-01, CHK-02, CHK-03, CHK-04, CHK-05, CHK-06, CHK-07, CHK-08, CHK-09, CHK-10, CHK-11, CHK-12, BR-005, ENT-08`
 
-**129 exact delivery ids across the fifteen PBIs.**
+**126 exact delivery ids across the fifteen PBIs.**
 
 ### How Scope class and Stage are set
 
