@@ -135,7 +135,7 @@ Dependencies are written as "after X". Everything after E-FND-1 assumes the envi
 | E-PRE-3 Repository, CI and governance | PRE-04 | S1 | - | **Done** in substance: the governance foundation landed 22 September; CI runs `baseline` and `changes` |
 | E-PRE-4 Import specification | PRE-05, PRE-06 | S1 | **CR-06** (real Amazon sample export), CR-07 | Cannot be finalised without the real file |
 | E-PRE-5 Design system and interface design | PRE-07, PRE-08 | S1 | **OD-01** (brand identity) | Delivered as HTML and CSS, not Figma |
-| E-PRE-6 **ERP Integration Specification** | **PRE-09** | S1 | ERP technical meeting, targeted week 4 | Gates every P1-E row. See `docs/2026-10-04-erp-technical-meeting-questions.md` |
+| E-PRE-6 **ERP Integration Specification** | **PRE-09** | **`-`** | ERP technical meeting, targeted week 4 | Gates every P1-E row. **The register assigns PRE-09 no stage**: PRE-01 to PRE-08 are S1 and PRE-09 alone carries `-`. Needing it early is delivery scheduling, not a contractual stage. See `docs/2026-10-04-erp-technical-meeting-questions.md` |
 
 ### E-FND, foundation (70 rows)
 

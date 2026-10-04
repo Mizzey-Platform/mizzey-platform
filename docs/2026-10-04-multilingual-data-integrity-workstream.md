@@ -256,6 +256,25 @@ nothing to prioritise.
 Both ran on a scripted clean baseline. Scenarios `t19-translation-group-integrity.php` and
 `t20-price-integrity.php`. **No fix was implemented from either.**
 
+**16 integration scenarios executed with no harness or test failure.** That is a runner statement, and it is
+not a claim that every measured behaviour was correct. **t17, t18, t19 and t20 are fact-finding scenarios**: they
+return no pass or fail verdict, and they deliberately record defects and unsupported-path behaviour as findings
+rather than as failures. `0 failed` therefore means the harness held and every contract scenario (t02 to t16)
+passed, not that nothing is wrong.
+
+What those four actually recorded:
+
+| Scenario | What it found |
+|---|---|
+| t17 (B1) | Stock shares one effective balance for simple products and for intact variation groups. A corrupted variation group **diverges and permits overselling** |
+| t18 (A12) | **Nine of fourteen fields do not reach the Arabic record** on a code-level save |
+| t19 (A11) | The corruption needs the WCML editor plus same-process product creation. **Three workflows corrupt; four do not.** Sequencing prevents it |
+| t20 (price) | Every contracted price-maintenance path is correct. **REST, WP-CLI and custom code leave a stale Arabic price and charge the old amount** |
+
+The evidence that matters is unchanged: A11 identified and bounded the sequencing defect, the price matrix proved
+the contracted price-maintenance paths work, and the unsupported programmatic price paths remain documented
+safeguards rather than built code.
+
 ### A11 verdict: a same-process sequencing defect, and sequencing alone prevents it
 
 Seven workflows, each building a translated variable product and then doing further work in the same process. The

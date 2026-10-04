@@ -25,6 +25,9 @@ Live status. First action each session: read this, then continue from **Next**.
   corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), and the B1 and A12
   probes with the exposure assessment (#240, `eadd254`). Each merged with green CI. **PR #256 is open and not
   merged**, so no merge SHA for it is recorded here.
+- **t17, t18, t19 and t20 are fact-finding scenarios**: they return no pass or fail verdict and record defects as
+  findings. A suite line reading `0 failed` means the harness held and the contract scenarios t02 to t16 passed,
+  **not** that every measured behaviour was correct.
 - **Probes B1 and A12 have run** (`t17-multilingual-stock.php`, `t18-synced-fields.php`). Results and
   classifications are in `docs/2026-10-04-multilingual-data-integrity-workstream.md`. B1: stock is **not** a
   second cost defect, because WCML hooks the WooCommerce stock write directly, so stock never depended on

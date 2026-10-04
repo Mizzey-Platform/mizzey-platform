@@ -84,40 +84,103 @@ none.
 
 Neither template invents acceptance criteria. Criteria come from the spec, which comes from the register.
 
-## The fifteen seeded PBIs, as they exist on the board
+## The fifteen seeded PBIs, as the live board holds them
 
-Read from the live Project on 4 October 2026, after A11 and the price matrix, and after the classification
-correction. **This table describes what exists.** The earlier proposal table, written before those probes ran, is
-gone: it promised a price-integrity PBI and a standalone A11 PBI, and neither exists, because neither should.
+**Read from the live Project, which is the operational state; this document records it, never the reverse.**
+Regenerated 4 October 2026 after the metadata reconciliation.
 
-| Order | Issue | PBI | Epic | Register ids | Scope | Stage | Status | ERP | Design | Data-integrity | Client decision | Depends on |
+| Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14` | P1 | S1 | **Ready** | no | none | - | - | - |
-| 2 | #242 | Information architecture and URL structure, in both languages | E-FND | `IA-01 and 31 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | - | - | #241 bilingual platform baseline |
-| 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | `PRE-09, ERP-10` | DLV | S1 | **Blocked** | yes (P1-E) | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | - |
-| 4 | #244 | Infrastructure provisioned for development, staging and production | E-PRE | `PRE-01 and 5 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | - | OD-27 hosting outside Egypt, in writing; OD-15 volumes; OD-14 operating budget | - |
-| 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | `RPT-10, FIX-04, NFR-04` | P1-L | S1 | **Blocked** | partial | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline |
-| 6 | #247 | The catalogue migration does not corrupt Arabic product or variation content | E-MIG | `MIG-02, MIG-09, MIG-13, SSC-21` | P1-L | S1 | **Blocked** | no | none | B1 trigger measured; A11 measured (t19) | CR-06 a real, unmodified Amazon sample export | #249 catalogue import specification |
-| 7 | #249 | Catalogue import specification, validated against the real source file | E-MIG | `PRE-05 and 6 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | A5 duplicate SKU resolution | CR-06 a real, unmodified Amazon sample export; CR-07 Professional Seller account and Category Listings Report | - |
-| 8 | #245 | ERP adapter seam: one commercial item resolves to one ERP stock item | E-ERP | `ERP-01, ERP-02, ERP-10, INT-16` | P1 | S1 | **Blocked** | partial | none | B1 measured (closed); M17 open | - | #243 the ERP Integration Specification, for the behaviour behind the seam; #241 bilingual platform baseline |
-| 9 | #248 | Order status model with a queryable status history | E-ORD | `ORD-01 and 12 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | D6 order language context; D7 shipment status history | - | #241 bilingual platform baseline |
-| 10 | #250 | Design system and interface design delivered as working HTML and CSS | E-PRE | `PRE-07, PRE-08` | DLV | S1 | **Blocked** | no | needs design | - | OD-01 brand name, logo and visual identity | - |
-| 11 | #251 | Launch staff roles and permissions | E-ROLE | `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09` | mixed | S1 | **Blocked** | no | none | - | CX-01 which staff roles hold financial permission | #241 bilingual platform baseline |
-| 12 | #252 | Product cost: carry CX-01 and OD-12 to the Stage 1 gate | E-ADM | `ADM-27, RPT-11` | P1 | S1 | **Verified** | no | none | - | CX-01 staff financial permission (AC-6); OD-12 cost basis, who enters it, and zero versus missing (AC-7) | - |
-| 13 | #253 | Header, navigation and footer, mirrored right to left | E-SF | `NAV-01 and 9 more, listed in the issue` | mixed | S1 | **Blocked** | no | needs design | - | OD-01 brand identity | #250 design system; #241 bilingual platform baseline; #242 information architecture |
-| 14 | #254 | Product details page, in both languages | E-SF | `PDP-01 and 21 more, listed in the issue` | mixed | S1 | **Blocked** | partial | needs design | A3 variation identity (measured working) | OD-01 brand identity; OD-13 authenticity and warranty policy | #250 design system; #253 header and navigation; #241 bilingual platform baseline |
-| 15 | #255 | Checkout and order placement, in both languages | E-SF | `CHK-01 and 13 more, listed in the issue` | mixed | S1 | **Blocked** | yes (P1-E) | needs design | B6 concurrency (needs staging); D6 order language context | OD-05 COD; OD-09 VAT and invoicing; OD-19 payment methods at launch; OD-29 COD verification | #250 design system; #254 product details page; #245 ERP adapter seam |
+| 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14 | **P1** | **S1** | **Ready** | **no** | none | - | - | - |
+| 2 | #242 | Information architecture and URL structure, in both languages | E-FND | 30 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | - | #241 bilingual platform baseline |
+| 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | PRE-09, ERP-10 | **mixed** | **mixed** | **Blocked** | **yes** | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | - |
+| 4 | #244 | Infrastructure provisioned for development, staging and production | E-PRE | 6 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | OD-27 hosting outside Egypt, in writing; OD-15 volumes; OD-14 operating budget | - |
+| 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | RPT-10, FIX-04, NFR-04 | **mixed** | **S1** | **Blocked** | **partial** | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline |
+| 6 | #247 | The catalogue migration does not corrupt Arabic product or variation content | E-MIG | MIG-02, MIG-09, MIG-13, SSC-21 | **mixed** | **S1** | **Blocked** | **no** | none | B1 trigger measured; A11 measured (t19) | CR-06 a real, unmodified Amazon sample export | #249 catalogue import specification |
+| 7 | #249 | Catalogue import specification, validated against the real source file | E-MIG | 7 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | A5 duplicate SKU resolution | CR-06 a real, unmodified Amazon sample export; CR-07 Professional Seller account and Category Listings Report | - |
+| 8 | #245 | ERP adapter seam: one commercial item resolves to one ERP stock item | E-ERP | ERP-01, ERP-02, ERP-10, INT-16 | **P1** | **S1** | **Blocked** | **partial** | none | B1 measured (closed); M17 open | - | #243 the ERP Integration Specification, for the behaviour behind the seam; #241 bilingual platform baseline |
+| 9 | #248 | Order status model with a queryable status history | E-ORD | 13 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | D6 order language context; D7 shipment status history | - | #241 bilingual platform baseline |
+| 10 | #250 | Design system and interface design delivered as working HTML and CSS | E-PRE | PRE-07, PRE-08 | **DLV** | **S1** | **Blocked** | **no** | needs design | - | OD-01 brand name, logo and visual identity | - |
+| 11 | #251 | Launch staff roles and permissions | E-ROLE | 5 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | CX-01 which staff roles hold financial permission | #241 bilingual platform baseline |
+| 12 | #252 | Product cost: carry CX-01 and OD-12 to the Stage 1 gate | E-ADM | ADM-27, RPT-11 | **P1** | **S1** | **Verified** | **no** | none | - | CX-01 staff financial permission (AC-6); OD-12 cost basis, who enters it, and zero versus missing (AC-7) | - |
+| 13 | #253 | Header, navigation and footer, mirrored right to left | E-SF | 10 ids, listed in the issue | **P1** | **S1** | **Blocked** | **no** | needs design | - | OD-01 brand identity | #250 design system; #241 bilingual platform baseline; #242 information architecture |
+| 14 | #254 | Product details page, in both languages | E-SF | 22 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **partial** | needs design | A3 variation identity (measured working) | OD-01 brand identity; OD-13 authenticity and warranty policy | #250 design system; #253 header and navigation; #241 bilingual platform baseline |
+| 15 | #255 | Checkout and order placement, in both languages | E-SF | 14 ids, listed in the issue | **P1** | **S1** | **Blocked** | **partial** | needs design | B6 concurrency (needs staging); D6 order language context | OD-05 COD; OD-09 VAT and invoicing; OD-19 payment methods at launch; OD-29 COD verification | #250 design system; #254 product details page; #245 ERP adapter seam |
 
-Every `Depends on` value is a real GitHub issue number. They were delivery-order numbers at first, which on
-GitHub resolve to historical Option C issues, and that was corrected: the shorthand is never used in an issue
-body or a board field.
+### How Scope class and Stage are set
 
-Each PBI's body cites its exact delivery ids and names the non-delivery rows of the surrounding register section
-that it excludes. **131 cited ids across the fifteen PBIs were validated against `docs/scope/register-ids.json`:
-all real, all delivery scope, no ranges.**
+Both are **computed from the exact cited register ids** and from nothing else. Neither is inferred from the PBI's
+purpose, and **Stage is never derived from Scope class**:
 
-Only **#241** is `Ready`. Everything else waits on a client decision, on PRE-09, or on a predecessor. **#252 is
-`Verified`, not `Accepted`**, and is the reference case for that distinction.
+| Field | Rule |
+|---|---|
+| Scope class | One distinct delivery scope among the cited ids, that scope. More than one, `mixed` |
+| Stage | One distinct register stage among the cited ids, that stage. More than one, `mixed`, and the issue then lists the literal stage per row |
+
+`tools/tests/test_board_metadata.py` enforces both rules over this table in CI.
+
+The reconciliation changed five Scope class values, because the stored value had been chosen from the PBI's
+primary purpose rather than computed: **#243** DLV to mixed (PRE-09 is DLV, ERP-10 is P1), **#246** P1-L to mixed
+(RPT-10 is P1-L, FIX-04 and NFR-04 are P1), **#247** P1-L to mixed (three MIG rows are P1-L, SSC-21 is P1),
+**#253** mixed to P1 (all ten NAV rows are P1), **#255** mixed to P1 (CHK-01 to CHK-12, BR-005 and ENT-08 are all
+P1).
+
+**#243 is the only PBI whose Stage is `mixed`.** The register's stage column for PRE-09 is literally `-`, while
+ERP-10 is S1. PRE-01 to PRE-08 are all S1; PRE-09 alone is unstaged, and nothing in this repository stages it.
+The issue states the literal per-row stages and keeps the PBI's delivery scheduling separate from them.
+
+### The board audit, and how to run it
+
+Two checks, because they catch different things.
+
+**1. In CI, on every push:** `tools/tests/test_board_metadata.py` validates the snapshot table above against
+`docs/scope/register-ids.json`. Eleven cases: Scope class computed from the cited ids, Stage computed from the
+register's own stage column, every cited id real and delivery scope, no S1 PBI citing an S2 row, `ERP blocked`
+restricted to the dependency vocabulary and proved independent of Scope class, a contiguous delivery order, and
+the Status vocabulary keeping Verified and Accepted apart. It was confirmed to bite by reintroducing the #243
+`DLV` mislabel, which it rejected with `'DLV' != 'mixed'` and named the offending ids.
+
+**2. By hand, whenever the live board changes:** regenerate this table from the Project and commit the result, so
+the document keeps recording the board rather than drifting from it. The GitHub Project API is not reachable from
+CI, so this step is deliberate rather than automated:
+
+```bash
+gh project item-list 1 --owner Mizzey-Platform --format json --limit 40
+```
+
+Read the Project, write the document. **Never the reverse**: the Project is the live operational state. If the two
+disagree, the Project is right and the document is stale.
+
+### ERP blocked means dependency, and only dependency
+
+The option set was `no / partial / yes (P1-E)`. The `(P1-E)` conflated a contractual scope classification with a
+dependency, and Scope class already records whether a cited row is P1-E. The options are now:
+
+| Option | Meaning |
+|---|---|
+| `no` | Can be implemented and accepted without PRE-09 or any ERP decision |
+| `partial` | Part of the PBI can proceed; some behaviour or final acceptance waits on PRE-09 or the ERP |
+| `yes` | Cannot materially complete until the ERP or PRE-09 provides the required decisions |
+
+**#243 is `yes`** even though its cited scopes are DLV and P1 rather than P1-E: the specification itself is what
+the ERP meeting produces. That is the clearest demonstration that the field is a dependency and not a scope
+restatement. **#245, #246, #254 and #255 are `partial`.** **#255 is `partial`, not `yes`:** its cited rows are all
+P1 and its non-stock checkout behaviour can be built and accepted while stock validation waits.
+
+No P1-E id was added to any PBI in order to justify a board field.
+
+### Ownership boundaries, stated rather than assumed
+
+**#255 does not own ERP-03 or ERP-05.** They belong to E-ERP-3 (ERP-05) and E-ERP-4 (ERP-03) in
+`docs/2026-10-04-option-b-backlog-structure.md`, neither of which is seeded yet. #255 names them as dependencies
+and boundaries, and does not cite them, so there is one owner each and no duplicate ownership.
+
+### The one citation change this reconciliation made
+
+**#242 dropped IA-23 and IA-33**, so the exact-id total across the fifteen PBIs went from **131 to 129**. Both are
+delivery rows (P1-L), so both are contracted, but the register stages them **S2**. A Stage 1 PBI must not claim a
+second-release row, so they are left to a future S2 PBI in the same epic and are named in #242 as deferred. No row
+was added anywhere to make a board field easier to classify.
 
 ## What the probes changed in the backlog
 
