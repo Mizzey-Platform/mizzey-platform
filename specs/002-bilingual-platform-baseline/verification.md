@@ -58,13 +58,50 @@ only a served request can tell a correct document from an artifact.
 | 10 | AC-8 | A string bound to the domain resolves in Arabic, and the English source survives as a control | **PASS** |
 | 11 | boundary | The administrative interface language is unchanged | **PASS** |
 
-**Full suite on a clean baseline: 17 scenarios, 0 failed.** The twelve pilot contract scenarios t02 to t16 all
-pass, t09 remains `FACT (pending CX-01)`, the four probes t17 to t20 remain fact-finding, and t21 passes. The
-shared baseline changes in T-01 and T-02 regressed nothing.
+### The authoritative run
 
-**Read that number carefully.** It is from a run preceded by `reset-runtime.sh`. An earlier run of mine was not,
-and four pilot scenarios failed in it: these scenarios require a clean baseline, so that was a defect in my
-method and not in the code. The figure above is the one that counts.
+**One run, on a genuinely clean baseline: 17 scenarios, 17 accounted for, 0 failed.**
+
+| | |
+|---|---|
+| Baseline | `reset-runtime.sh`, exit 0, with `permalink_structure` `/%postname%/`, `.htaccess` present, and the four Arabic system pages created |
+| Contract scenarios | **12 pass**, t02 to t16 |
+| Open on a client decision | **1**, t09 `FACT (pending CX-01)` |
+| Fact-finding probes | **4**, t17 to t20, which return no verdict by design |
+| This feature | **t21 PASS**, AC-1 to AC-8 |
+| Failed | **0** |
+
+Evidence, committed beside this record:
+
+| File | What it holds |
+|---|---|
+| `evidence/clean-baseline.txt` | The reset that preceded the run, with its configuration summary and exit code |
+| `evidence/final-suite.txt` | The complete suite output, every scenario's notes included |
+| `evidence/final-suite.json` | The same verdicts, machine readable |
+| `evidence/probe-ac8-loader-removed.txt` | The negative proof described below |
+
+**Read the figure precisely.** It is from a single run preceded by a reset. An earlier run of mine was not, and
+four pilot scenarios failed in it; those scenarios require a clean baseline, so that was a defect in my method,
+not in the code, and it is not evidence of anything. No isolated scenario pass and no dirty-runtime rerun is
+mixed into the number above.
+
+### Two negative proofs, because a check that cannot be shown to fail is not evidence
+
+**AC-8 fails without the production loader.** The body of `Localisation::loadPluginTextdomain()` was removed and
+t21 re-run on a clean baseline: `FAIL AC-8: a string bound to the site text domain did not resolve in Arabic`,
+with the probe returning its English source in both languages. The loader was then restored byte-identical, which
+`git diff` confirmed as empty. Recorded in `evidence/probe-ac8-loader-removed.txt`.
+
+That run also showed something worth keeping: with the loader gone, **just-in-time loading did not rescue the
+translation either**. The `.mo` sits in the plugin's own `languages/` directory, which the just-in-time path does
+not search without the registration `load_plugin_textdomain()` performs. So AC-8 depends on this feature's code
+specifically, and not on WordPress happening to find the file.
+
+**A fresh checkout carries the theme's `languages/` directory.** Git does not track an empty directory, and t21
+asserts the directory exists, so the feature would have passed locally and failed on a clean clone. Resolved with
+a tracked `mizzey-theme/languages/.gitkeep` that states why it is there, and **verified by cloning the branch at
+its head into a new directory**: the file is tracked, the directory exists, and `is_dir()` returns true in the
+clone.
 
 `tools/tests/test_storefront_strings.py`, 8 cases, in CI through the existing tooling-test step: the FR-007 check
 for AC-7. It passes on the tree, fails on a deliberately hard-coded string with the file and line, ignores

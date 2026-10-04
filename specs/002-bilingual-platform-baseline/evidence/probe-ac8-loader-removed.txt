@@ -1,0 +1,26 @@
+FAIL  t21-bilingual-baseline       AC-1 to AC-8
+      permalink_structure: /%postname%/
+      htaccess present: yes
+      enabled languages: ar, en
+      default language: en
+      GET / -> 200 <html lang="en-US">
+      GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      GET /ar/shop/ -> 200 <html dir="rtl" lang="ar">
+      GET / after Arabic -> 200 <html lang="en-US">
+      shop: en=5 ar=19
+      cart: en=6 ar=20
+      myaccount: en=8 ar=22
+      translation group: ar, en
+      resolved Arabic counterpart: 24, source language: en
+      theme templates: 2, Arabic-specific: 0
+      plugin text domain loader hooked on init: yes
+      fact: the storefront ships no .mo of its own yet, because it has no strings of its own. The mechanism is asserted below through a temporary catalogue.
+      theme languages directory: present
+      translation template: present
+      probe in Arabic: Mizzey t21 translation probe
+      probe in English: Mizzey t21 translation probe
+      fact: WordPress 7.1 loads translations lazily, so is_textdomain_loaded() reads false until a string is requested even though the loader returned true
+      FAIL AC-8: a string bound to the site text domain did not resolve in Arabic.
+      admin locale (WPLANG): en_US
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

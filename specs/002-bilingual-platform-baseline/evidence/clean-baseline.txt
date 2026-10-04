@@ -1,0 +1,9 @@
+Success: Database reset.
+Success: WordPress installed successfully.
+Warning: Some rewrite rules may be missing because themes weren't loaded by WP-CLI.
+{"wpml_setup_complete":true,"default_language":"en","product_translatable":true,"variation_translatable":true,"active_languages":["ar","en"],"cogs_value_setting":"unset","mizzey_wpml_config":false,"remote_config_index":"2026-10-04T16:53:29+00:00","wc_currency":"EGP","hpos":"yes","permalink_structure":"\/%postname%\/","htaccess":true,"system_pages_en":{"shop":5,"cart":6,"checkout":7,"myaccount":8},"system_pages_ar":{"shop":19,"cart":20,"checkout":21,"myaccount":22}}
+wp-admin plugins.php: HTTP 200
+_cogs_value='unset' locked=false
+_cogs_value_is_additive='unset' locked=false
+_cogs_total_value=1 locked=true
+reset exit=0
