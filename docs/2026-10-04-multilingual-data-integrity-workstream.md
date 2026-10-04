@@ -56,9 +56,9 @@ disposable runtime produces a classification.
 | A7 | Missing or deleted translation causes no write to an unrelated product | NFR-07 | **Verified working** | t12: deleted Arabic variation, and an untranslated product, each write only themselves |
 | A8 | Separately authored versus duplicated translations behave the same for identity | FIX-04, SSC-12 | **Verified working** | t11, t14: WPML duplicate retains the source-language name until translated; the WCML editor produces an Arabic name. Identity is the same in both |
 | A9 | WPML's cached `wpml_original_element_id` can name an unrelated product inside one process | - | **Verified defect** in WPML, worked around | `evidence/wpml-identity-cache.txt`. Never use it. Read identity from the translation rows |
-| A10 | The Arabic parent of a translated variable product is registered `simple` and carries no variations | ADM-54, SSC-12, NFR-04 | **Verified anomaly in the tested programmatic translation path.** Production relevance pending A11 | Measured, in t16, with translations created from WP-CLI, which is the only path tested. Not called a contracted storefront defect, because the path a human editor actually uses has not been tested: if the wp-admin flow builds the Arabic parent correctly, this is an artefact of programmatic creation and not a storefront fault. Cost correctness is unaffected either way, because variations are WPML elements in their own right and each one synchronises individually. Needs an answer before the Arabic storefront is accepted, and it belongs to the translation workflow (US-16-03) |
+| A10 | The Arabic parent of a translated variable product is registered `simple` and carries no variations | ADM-54, SSC-12, NFR-04 | **Verified anomaly in the tested programmatic translation path.** Production relevance pending A11, and now **raised in priority**: B1 found a second, worse consequence of a corruptible Arabic variation registration | Measured, in t16, with translations created from WP-CLI, which is the only path tested. Not called a contracted storefront defect, because the path a human editor actually uses has not been tested: if the wp-admin flow builds the Arabic parent correctly, this is an artefact of programmatic creation and not a storefront fault. Cost correctness is unaffected either way, because variations are WPML elements in their own right and each one synchronises individually. Needs an answer before the Arabic storefront is accepted, and it belongs to the translation workflow (US-16-03) |
 | A11 | Does the **wp-admin** translation workflow build the Arabic variable parent correctly? | ADM-54, SSC-12 | **Not yet tested** | This is what decides how A10 is finally classified. Until it runs, A10 stays a measured anomaly in the programmatic path and nothing more |
-| A12 | Which other fields WPML copies on `save_post`, and which of them a meta-only save can therefore leave stale | NFR-07, FIX-04 | **Not yet tested** | Hypothesis: the gap is field-independent, so price, stock status, SKU, visibility and any copied custom field share it. Cost was the one field with a contracted financial consequence, so it was fixed first. **This is the inventory that tells us how large the problem is** |
+| A12 | Which other fields WPML copies on `save_post`, and which of them a meta-only save can therefore leave stale | NFR-07, FIX-04 | **Measured**, 4 Oct 2026. The hypothesis holds for most fields: **9 of 14 do not follow** a code-level save, including **`regular_price` and `sale_price`**. Stock and cost are the exceptions, each for its own reason | t18. Thirteen of WCML's fourteen synchronisation components run on `save_post`; only Stock does not. See "B1 and A12: measured" below |
 
 **Rule, now binding:** never assume a SKU uniquely identifies the canonical WooCommerce record. Resolve the
 source-language element through WPML translation identity before any write addressed by SKU.
@@ -85,16 +85,16 @@ two languages, and what it does with them decides what the ERP adapter has to gu
 
 | # | Verification | Register ids | Classification | Evidence or note |
 |---|---|---|---|---|
-| B1 | **Does an order against the Arabic product reduce stock on the English original, or only on the Arabic post?** | ERP-01, ERP-04, BR-007, CHK-12, ADM-70, ADM-72 | **Not yet tested** | Hypothesis, from the pilot's root cause plus P-020: `WCML\Synchronization\Component\Stock` copies `_stock` and `_stock_status` to translations on `save_post`, while `wc_update_product_stock()` issues arithmetic SQL. If that write does not fire `save_post`, each language version holds its own quantity and one physical unit can be sold twice. **Highest priority probe in this workstream.** It is the same mechanism as the cost gap, with a worse consequence |
-| B2 | Whether translated products share or mirror stock, and which | ERP-01, ADM-70 | **Not yet tested** | P-020 established that both posts carry their own `wc_product_meta_lookup` stock row holding the same number, which is mirroring, not sharing. What keeps them equal, and when, is unknown |
-| B3 | Variation stock behaviour across languages | ADM-70, ADM-72, MIG-09 | **Not yet tested** | Variations are separate WPML elements, so B1 and B2 apply per variation |
-| B4 | Stock reduction from an Arabic order | ERP-04, BR-007 | **Not yet tested** | Covered by the B1 probe |
-| B5 | Stock reduction from an English order | ERP-04, BR-007 | **Not yet tested** | Covered by the B1 probe |
+| B1 | **Does an order against the Arabic product reduce stock on the English original, or only on the Arabic post?** | ERP-01, ERP-04, BR-007, CHK-12, ADM-70, ADM-72 | **Measured**, 4 Oct 2026: **working** for simple products and for variations whose translation group is intact; **measured defect** for variations once the group is corrupted, and that permits overselling | t17. The hypothesis that stock shared the cost gap was **refuted**: WCML hooks `woocommerce_product_set_stock` and `woocommerce_variation_set_stock` directly, so stock does not depend on `save_post`. See "B1 and A12: measured" below |
+| B2 | Whether translated products share or mirror stock, and which | ERP-01, ADM-70 | **Measured working** | Mirroring, not sharing: each language version holds its own `_stock` and `wc_product_meta_lookup` row (P-020), and `WCML\Synchronization\Hooks::syncProductStock` on the stock write keeps them equal (t17) |
+| B3 | Variation stock behaviour across languages | ADM-70, ADM-72, MIG-09 | **Measured defect**, conditional on group integrity | t17: correct in eight sequences; silently divergent once the variation's `icl_translations` row is rewritten. The sibling variation is never affected |
+| B4 | Stock reduction from an Arabic order | ERP-04, BR-007 | **Measured working** for simple products and intact variations | t17 steps 3, 4, 9 |
+| B5 | Stock reduction from an English order | ERP-04, BR-007 | **Measured working** for simple products and intact variations | t17 steps 2, 5 |
 | B6 | Concurrent Arabic and English orders against the same physical SKU | BR-003, CHK-12, AC-05, NFR-07 | **Not yet tested** | P-009 is `partial`: WooCommerce's stock write is atomic per statement, but validation and decrement are separate steps, and one PHP process cannot create simultaneity. The multilingual case is strictly worse, because the two checkouts may validate against two different rows. Needs a parallel load test against staging |
-| B7 | Cancellation and stock restoration, both languages | ERP-06, BR-007, ADM-90 | **Not yet tested** | ERP-06 is P1-E, so the ERP half waits for PRE-09. The WooCommerce half does not |
+| B7 | Cancellation and stock restoration, both languages | ERP-06, BR-007, ADM-90 | **Measured working** on the WooCommerce side | t17 step 8: an Arabic order of 2 reduced both records to 8, cancelling it restored both to 10. The ERP half is still PRE-09 |
 | B8 | Failed payment: stock restored, both languages | ERP-06, PAY-04, BR-007 | **Not yet tested** | Same split as B7 |
 | B9 | Return and restock | ERP-06, RET-07, ADM-123 | **Not yet tested** | Same split as B7 |
-| B10 | Can any translation double-count physical inventory in a store-side figure? | RPT-10, ADM-70, NFR-07 | **Verified defect** for reporting | P-020: the low-stock report lists one physical item twice, once per language, each showing the full quantity. Whether the *sellable* balance double-counts is B1 |
+| B10 | Can any translation double-count physical inventory in a store-side figure? | RPT-10, ADM-70, NFR-07 | **Verified defect** for reporting; **not** for the sellable balance | P-020: the low-stock report lists one physical item twice. The sellable balance is B1, and it does not double-count for simple products or intact variations |
 | B11 | Whether a language-scoped admin stock view silently omits an Arabic-only product | RPT-10, ADM-159 | **Not yet tested** | P-020 found the REST dispatch path unscoped and explicitly did not rule out the opposite fault in a browser admin request. WCML removes the "All languages" option from the analytics switcher |
 
 No ERP behaviour is implemented under this workstream. B1 to B6 and B10 to B11 are WooCommerce-side questions that
@@ -236,16 +236,19 @@ behaviour and only the first can create a feature.
 risk is recorded and nothing is built. Where the behaviour is contracted, the verification attaches to the
 existing slice that owns it rather than becoming a parallel workstream of its own.
 
-## Priority order
+## Priority order, revised after B1 and A12
 
-| Rank | Item | Why first |
+| Rank | Item | Why, now that the probes have run |
 |---|---|---|
-| 1 | **B1**, Arabic order stock decrement | Same mechanism as the cost defect, worse consequence (overselling one physical unit). Blocks the ERP adapter design, because what the store does with stock decides what the adapter must guarantee |
-| 2 | **A12**, which fields WPML copies on `save_post` | Bounds the whole problem. Until it exists, every field is a suspected B1 |
-| 3 | **C3**, the one-commercial-item invariant | The invariant is settled before the meeting because it follows from ERP-01. What the meeting settles is the external key. How the canonical mapping is stored is an architecture decision for PRE-09 and the implementation design |
-| 4 | **D6**, the language context on the order | Cheap now, expensive to backfill. RPT-02 and reconciliation both need it |
+| 1 | **`regular_price` and `sale_price` do not follow a code-level save** | A12's highest-severity finding. Same mechanism as cost, on the field the customer pays. Belongs to the pricing PBI, not to this workstream |
+| 2 | **Variation translation-group corruption** (the B1 trigger, A10, A11) | It permits overselling and it corrupts visible Arabic content. The batch trigger makes it a migration concern, so it blocks **E-MIG** rather than the stock mechanism |
+| 3 | **A11**, the wp-admin translation workflow | Decides how much of rank 2 is a production concern rather than a WP-CLI artefact. Cheap, and it gates the scoping of rank 2 |
+| 4 | **D6**, the language context on the order | Unchanged. Cheap now, expensive to backfill |
 | 5 | **B11** and **RPT-10** | A contracted report with a measured defect, blocking acceptance of its row |
-| 6 | **B6**, concurrency | Needs staging and a parallel load test, so it cannot be done on the disposable runtime. Book it, do not block on it |
+| 6 | **The channel matrix for the A12 fields that did not follow** | Confirms per field what is currently a reasoned hypothesis from t15's channel pattern. Belongs to each owning PBI |
+| 7 | **B6**, concurrency | Needs staging and a parallel load test. Book it, do not block on it |
+
+Items the probes closed: B1's core question, B2, B4, B5, B7 on the WooCommerce side, and the bulk of A12.
 
 ## Probe specification: B1, multilingual stock reduction
 
