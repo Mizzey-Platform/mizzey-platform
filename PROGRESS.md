@@ -24,7 +24,20 @@ Live status. First action each session: read this, then continue from **Next**.
   classifications, are in `docs/2026-10-04-multilingual-data-integrity-workstream.md`. Headline: stock is **not** a
   second cost defect, because WCML hooks the stock write itself; but **price is**, and a variation translation
   group can be corrupted by a batch in one process, which permits overselling. No fix implemented.
-- Phase change: out of the pilot, into controlled Option B delivery planning. The planning records:
+- **The Option B delivery board exists**: https://github.com/orgs/Mizzey-Platform/projects/1, organisation-owned
+  and private, with 11 fields, 6 views and the first 15 PBIs (#241 to #255). Status separates **Verified** from
+  **Accepted**; #252 is the reference case, Verified and not Accepted. Project #4 and the 232 Option C issues are
+  untouched.
+- **Probes A11 and the price matrix have run** (`t19`, `t20`). **No fix was built from either, correctly.** A11:
+  the translation-group corruption needs the WCML editor plus product creation in the same process; wp-admin,
+  the WPML duplicate method and the native importer do not reproduce it, and sources-first sequencing prevents it,
+  so the correction is a migration runbook invariant rather than runtime code. Price: **every launch-supported
+  path already keeps the Arabic price correct**, including the scheduled-sales cron, so the native-first rule
+  applies and no price synchronisation is built.
+- **Git history is not rewritten** and will not be. The exposure decision is recorded as D-07: keep the history,
+  keep the backup bundle, keep the repository private, and treat the old embedded signature image as exposed and
+  deprecated. The purge stays documented as a future explicit decision only.
+- Phase change: out of the pilot, into controlled Option B delivery. The planning records:
   - `docs/2026-10-04-option-b-backlog-structure.md`, the proposed epic and PBI structure, built from the 595
     delivery rows (P1, P1-L, P1-E, DLV) and their sequencing.
   - `docs/2026-10-04-multilingual-data-integrity-workstream.md`, the cross-feature risk matrix the pilot exposed,
@@ -37,22 +50,17 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-1. **Decide on the history purge.** The repository was public for a period and the removed `docs/engagement/`
-   files were reachable from old commits. It is private again. The assessment is
-   `docs/2026-10-04-public-exposure-assessment.md`: no client personal data, no counterparty signature, no payment
-   details, 0 forks; the one genuine sensitivity is the developer's own signature image in two PDFs. **Nothing has
-   been rewritten.** Recommended first step regardless of the purge decision: rotate the signature asset.
-2. **The price gap**, from probe A12: `regular_price` and `sale_price` do not reach the Arabic record on a
-   code-level save. Same mechanism as the cost gap, on the field a customer pays. Proposed as the first PBI.
-3. **A11**: does the wp-admin translation workflow produce a correct Arabic variable parent? It decides how much of
-   the B1 corruption is a production concern rather than a WP-CLI artefact.
-4. **The migration guard**, from probe B1: a batch that creates products in one process corrupts an existing
-   translation group, which breaks variation stock synchronisation and overwrites Arabic variation titles. The
-   catalogue migration is that batch.
-5. ERP meeting preparation from the eighteen "Must answer" items in
-   `docs/2026-10-04-erp-technical-meeting-questions.md`.
-6. Then E-FND-1 and E-FND-2, the ERP adapter seam (E-ERP-1, P1 and not P1-E), and the translation-group-aware
-   inventory report (E-RPT-2).
+1. **One browser pass on the board**: apply the six view filters and groupings listed in
+   `docs/2026-10-04-github-project-proposal.md`. The API cannot set them.
+2. **Start #241**, the bilingual platform baseline. It is the only PBI in `Ready`: everything else waits on a
+   client decision, on PRE-09, or on a predecessor.
+3. **Obtain the client decisions**, in this order of value: **OD-01** brand identity (blocks all 152 storefront
+   rows), **OD-27** hosting in writing (blocks all infrastructure), **CR-06** the real Amazon export (blocks the
+   import specification), **CX-01** and **OD-12** (close the product-cost pilot contractually).
+4. **The ERP meeting**, from the eighteen must-answer decisions in
+   `docs/2026-10-04-erp-technical-meeting-questions.md`. It gates 19 P1-E rows plus MIG-14.
+5. Then the seeded order: #242 information architecture, #245 the ERP adapter seam (P1, not P1-E), #246 the
+   inventory report correction, #247 the migration sequencing invariant.
 
 ## Blocked or waiting
 

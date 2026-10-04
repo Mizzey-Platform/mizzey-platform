@@ -14,8 +14,19 @@ add_action(
 			echo 'no product';
 			exit;
 		}
-		$cost = (string) ( $_GET['cost'] ?? '' );
-		$product->set_cogs_value( '' === $cost ? null : (float) $cost );
+		// Either a cost change (t11 to t16) or a price change (t20), through WooCommerce CRUD.
+		$price_field = isset( $_GET['price_field'] ) ? sanitize_key( (string) $_GET['price_field'] ) : '';
+		if ( in_array( $price_field, array( 'regular_price', 'sale_price' ), true ) ) {
+			$value = (string) ( $_GET['price'] ?? '' );
+			if ( 'sale_price' === $price_field ) {
+				$product->set_sale_price( $value );
+			} else {
+				$product->set_regular_price( $value );
+			}
+		} else {
+			$cost = (string) ( $_GET['cost'] ?? '' );
+			$product->set_cogs_value( '' === $cost ? null : (float) $cost );
+		}
 		$product->save();
 		echo 'ok:', is_admin() ? 'admin' : 'front', ':', ( defined( 'WP_CLI' ) && WP_CLI ) ? 'cli' : 'web';
 		exit;

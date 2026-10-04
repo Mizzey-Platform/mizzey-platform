@@ -1,8 +1,28 @@
-# Option B delivery board: proposal
+# Option B delivery board
 
-Written 4 October 2026, after B1 and A12. **A proposal for review. Nothing is created from it**: no GitHub
-Project, no issues, no fields, no views, no templates. The historical Option C Project #4 is untouched and stays
-archival.
+Written 4 October 2026 after B1 and A12 as a proposal; **created on 4 October after A11 and the price matrix**,
+with the classification correction applied.
+
+- **Board: https://github.com/orgs/Mizzey-Platform/projects/1**, "Mizzey — Option B Delivery",
+  organisation-owned and private.
+- 11 custom fields and 6 views created; **Status carries the Verified and Accepted distinction** in its own
+  option descriptions.
+- **The first 15 PBIs are seeded** (#241 to #255) and no more. The remaining 45 to 55 wait for review.
+- **Project #4 and the 232 historical Option C issues are untouched**, verified after creation: 232 items, still
+  open, under its original owner, and every issue up to #234 still open and unmodified.
+
+**Filters and grouping are the one manual step.** `createProjectV2View` accepts a name, a layout and the visible
+fields; the public GraphQL schema has no input for a filter or a grouping, so those six settings are applied once
+in the browser:
+
+| View | Setting to apply |
+|---|---|
+| Delivery order | sort by `Delivery order` ascending |
+| By epic | group by `Epic` |
+| Blocked | filter `status:Blocked` |
+| ERP-gated | filter `-"ERP blocked":no` |
+| Needs a client decision | filter `has:"Client decision"` |
+| Acceptance | filter `status:Verified,Accepted` |
 
 ## The model
 
@@ -101,10 +121,30 @@ is Verified rather than Accepted.
 | **E-ADM-3 gains one** | `catalog_visibility` does not follow |
 | **Nothing was added for a non-Option-B field** | `product_cat` needs interpretation before it is called anything, and custom fields are a configuration rule, not a defect. Neither created a PBI |
 
-## What this proposal deliberately does not do
+## Range citations, and the error they caused
 
-- It does not create the Project, any field, any view, any template or any issue.
-- It does not close, relabel or migrate the 232 Option C issues, or touch Project #4.
+The first seeding cited register rows as ranges, and a range quietly includes non-delivery rows. A check against
+`docs/scope/register-ids.json` found two: **IA-36 (P2)** inside "IA-01 to IA-36", and **CHK-13 (P2)** inside
+"CHK-01 to CHK-13". Both were corrected, and so were three more ranges the same check exposed once the ids were
+expanded:
+
+| PBI | Range cited | Delivery rows actually cited | Excluded, and named in the issue |
+|---|---|---|---|
+| #242 | IA-01 to IA-36 | 31 | IA-12, IA-13, IA-34, IA-36 (P2), IA-22 (DEF) |
+| #248 | ORD-01 to ORD-14 | 11 | ORD-09, ORD-10, ORD-11 (DEF) |
+| #251 | "ROLE rows (Section B)" | 5 | ROLE-03, ROLE-04, ROLE-05, ROLE-06, ROLE-10 (DEF), ROLE-06a (P2), ROLE-11 (P3) |
+| #254 | PDP-01 to PDP-24 | 22 | PDP-20, PDP-23 (P2) |
+| #255 | CHK-01 to CHK-13 | 12 | CHK-13 (P2) |
+
+Every PBI now cites exact ids, and each issue body names the excluded neighbours with their scope, so nobody
+builds one by mistake. **131 cited ids were re-validated: all real, all delivery scope, no ranges left.**
+
+**Cite exact ids, never a range.** A range is how non-delivery scope gets into a delivery board.
+
+## What was deliberately not done
+
+- The remaining 45 to 55 PBIs are not created.
+- The 232 Option C issues are not closed, relabelled or migrated, and Project #4 is not touched.
 - It does not give any P1-E row acceptance criteria, because PRE-09 is unapproved.
 - It does not turn a measured defect outside Option B into work.
 - It does not build a general multilingual synchronisation framework. Each finding attaches to the PBI that owns

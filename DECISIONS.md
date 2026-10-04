@@ -741,3 +741,88 @@ Option C issues are untouched.
 **Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. ADM-27 and RPT-11 are
 technically verified and not contractually accepted. No P1-E row receives final acceptance criteria. No ERP
 implementation.
+
+## 2026-10-04 - D-07: the exposure decision, A11, the price verdict, and the delivery board
+
+**Decided (approved by Mustafa): the Git history is not rewritten.** No force-push, no purge of historical blobs.
+The backup bundle stays intact and the repository stays private. The reasoning is the assessment in
+`docs/2026-10-04-public-exposure-assessment.md`: no client signature, no client personal identity data, no banking
+data, no credentials, no private keys and no certificates were in the historical engagement material. A rewrite
+would change most of the repository's commits, break historical links and clones, and could not undo any copy
+already fetched during the public window. **The purge stays documented as a future explicit decision only**, to be
+revisited if legal or business requirements change.
+
+**Decided: the old embedded developer signature image is exposed and deprecated.** It is not reused in any future
+generated signing pack. No replacement signature is generated or imitated; when a new signature asset is needed,
+Mustafa supplies it separately. The brand-render signing step must not reuse the deprecated asset.
+
+**Measured, A11 (`t19-translation-group-integrity.php`): a same-process sequencing defect, and sequencing alone
+prevents it.** Seven workflows compared, with the translation group read from `icl_translations` directly:
+
+| Workflow | Result |
+|---|---|
+| WCML editor translation, then a product created in the same process | **CORRUPTED** |
+| The same with nothing created afterwards | intact |
+| A migration-shaped batch of ten products afterwards | **CORRUPTED** |
+| Interleaved create and translate | **CORRUPTED** |
+| **All sources created first, translations second** | **intact** |
+| **WPML duplicate** instead of the WCML editor | **intact** |
+| **The native CSV importer** creating the later products | **intact** |
+
+Four conclusions. It is **not** a general wp-admin defect, because the admin is one request per save and the
+nothing-afterwards case is intact; the classification stays **Partial / workflow-dependent** and is not
+generalised. It needs the **WCML translation editor** specifically. The **native importer does not reproduce it**,
+so the contracted import path is not the danger; a scripted migration using WooCommerce CRUD is. And **sequencing
+alone prevents it**, so the correction is a **migration runbook invariant, not runtime code**.
+
+The damage is wider than B1 could see: the Arabic parent loses its `icl_translations` registration entirely, the
+Arabic variations' titles are overwritten with the later product's name, **their attributes are wiped** so the
+variation can no longer be selected, variations detach from the English parent, and stock stops synchronising in
+both directions. That is a direct failure of **MIG-02** ("Arabic content is not corrupted" by the import) and
+**SSC-21** ("product content maintained separately in English and Arabic"), which is why the outcome owns a
+requirement PBI (#247) while the probe itself stays `internal:test-infrastructure`.
+
+**Measured, the price matrix (`t20-price-integrity.php`): every launch-supported path is already correct, so no
+custom code is justified.** Six channels, both price fields, both product types, including the amount an Arabic
+order actually charges:
+
+- **wp-admin product form (ADM-25, ADM-26), wp-admin variations AJAX (ADM-33), the native CSV importer
+  (MIG-13): all FOLLOWED**, both regular and sale price, and the Arabic order charges the new price.
+- **The scheduled-sales cron: no divergence.** Tested specifically, because it is the one price write a store
+  makes without anybody scripting anything. A sale and both dates were set in one wp-admin submission, the end
+  date was then moved into the past by a raw meta write on both records so the cron was the only product-object
+  save, and afterwards both agreed. The expiry is evaluated per record at read time from each record's own
+  `_sale_price_dates_to`, which WCML copies on the admin save.
+- **REST `/wc/v3`, WP-CLI CRUD and front-end or cron code: stale Arabic price, and the Arabic order charges the
+  old amount.** None of these is a contracted price-maintenance path, and **ADM-28, scheduled price changes, is
+  P2**, so no contracted feature performs programmatic bulk price updates either.
+
+**Decided: no price synchronisation is built, and no price requirement PBI is created.** The native-first rule
+applies as written. The residual risk is recorded as a development rule instead: any code that writes a product
+price must go through a path that fires `save_post` or synchronise the translation explicitly. That attaches to
+whichever slice ever writes a price programmatically; it is not a PBI and not a class built for a caller that does
+not exist. `CostTranslationSync` is not reused, and no general multilingual metadata synchronisation framework is
+created.
+
+**Decided: a risk or a probe does not create a contractual PBI.** Applied in both directions this round. A11 the
+probe is verification, attached to the catalogue and migration work; the outcome it protects is a requirement PBI
+because MIG-02 and SSC-21 independently oblige it. The price gap creates **no** PBI, because no contracted path is
+defective and inventing one would be inventing scope.
+
+**Decided: the Option B delivery board is created**, organisation-owned and private, at
+https://github.com/orgs/Mizzey-Platform/projects/1. Eleven custom fields and six views. **Status separates
+Verified from Accepted** in its own option descriptions, and #252 (product cost) is the reference case: Verified,
+not Accepted, carrying CX-01 and OD-12 to the Stage 1 gate. The first **15** PBIs are seeded, #241 to #255, and no
+more; the remaining 45 to 55 wait for review. Project #4 and the 232 Option C issues are untouched, verified after
+creation.
+
+**A governance lesson worth keeping: cite exact register ids, never a range.** The first seeding used ranges, and
+a check against `docs/scope/register-ids.json` caught **IA-36 (P2)** and **CHK-13 (P2)** inside them. Expanding
+the ranges exposed three more leaks: ORD-09 to ORD-11 (DEF), ROLE-03 to ROLE-06 and ROLE-10 (DEF) with ROLE-06a
+(P2) and ROLE-11 (P3), and PDP-20 with PDP-23 (P2). All corrected; each issue now names its excluded neighbours
+and their scope. 131 cited ids were re-validated: all real, all delivery scope, no ranges left. A range is how
+non-delivery scope gets into a delivery board.
+
+**Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. ADM-27 and RPT-11 are
+technically verified and not contractually accepted. No P1-E row receives final acceptance criteria. OD-41, OD-42
+and OD-11 stay settled and are not reopened. No ERP implementation.
