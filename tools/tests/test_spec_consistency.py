@@ -22,7 +22,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FEATURE = "specs/002-bilingual-platform-baseline"
-ARTIFACTS = ("spec.md", "research.md", "plan.md", "tasks.md", "analysis.md", "checklists/requirements.md")
+ARTIFACTS = ("spec.md", "research.md", "plan.md", "tasks.md", "analysis.md", "checklists/requirements.md",
+             "verification.md")
 
 # Each claim: (name, [stale phrases that must not appear anywhere], {artifact: [phrases that must appear]})
 CLAIMS: tuple[tuple[str, list[str], dict[str, list[str]]], ...] = (
@@ -182,6 +183,26 @@ class SpecConsistency(unittest.TestCase):
                         "spec.md no longer classifies S-1 and S-2 as safeguards and evidence")
         self.assertTrue(squash("not\nclient deliverables") in flat,
                         "spec.md no longer says the safeguards are not client deliverables")
+
+    def test_the_verification_record_keeps_the_three_states_apart(self) -> None:
+        flat = self.flat["verification.md"]
+        for phrase in ("Workflow complete", "Technically verified", "Contractually accepted"):
+            with self.subTest(state=phrase):
+                self.assertTrue(phrase in flat, f"the verification record no longer reports {phrase!r}")
+        self.assertTrue(squash("**No criterion.**") in flat,
+                        "the verification record no longer says that no criterion is contractually accepted")
+
+    def test_no_browser_row_is_reported_as_exercised(self) -> None:
+        """AC-9 needs staging. A row marked anything but unexercised would be a false claim."""
+        text = self.text["verification.md"]
+        rows = [ln for ln in text.splitlines()
+                if ln.startswith("| ") and ("Chrome" in ln or "Safari" in ln or "Edge" in ln
+                                            or "Firefox" in ln) and "|" in ln[2:]]
+        self.assertTrue(rows, "the browser matrix has no rows")
+        for row in rows:
+            with self.subTest(row=row[:48]):
+                self.assertTrue("Not exercised" in row or "LTR" in row,
+                                f"a browser row claims a state other than unexercised: {row!r}")
 
     def test_the_probe_boundaries_are_still_stated(self) -> None:
         """What the pilot and the probes bought must not quietly drop out of the spec."""

@@ -1,0 +1,4 @@
+The theme's translations live here, under the shared `mizzey-site` text domain, loaded by functions.php.
+
+This file exists because git does not track an empty directory, and t21-bilingual-baseline.php asserts the
+directory is present: without it the scenario would pass locally and fail on a fresh checkout.

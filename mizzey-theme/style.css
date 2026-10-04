@@ -1,6 +1,6 @@
 /*
 Theme Name: Mizzey
-Description: The Mizzey site theme (a Corex client skin) — presentation only.
+Description: The Mizzey site theme, a Corex client skin. Presentation only.
 Version: 0.1.0
 Author: Mizzey
 Requires at least: 7.0
@@ -9,4 +9,6 @@ Requires PHP: 8.3
 Text Domain: mizzey-site
 */
 
-/* Presentation only. Business logic belongs in the Mizzey Site plugin, never here. */
+/* Presentation only. Business logic belongs in the Mizzey Site plugin, never here.
+   Reading direction follows the active language at the platform level, so no separate
+   right-to-left stylesheet is needed here. Use CSS logical properties. */

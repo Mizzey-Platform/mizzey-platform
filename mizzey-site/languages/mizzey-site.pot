@@ -1,0 +1,26 @@
+# Translation template for the Mizzey storefront, domain mizzey-site (NFR-04a). Regenerate with the command in specs/002-bilingual-platform-baseline/tasks.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: Mizzey Site 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/Mizzey-Platform/mizzey-platform/issues\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Mizzey\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-04T14:08:46+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: mizzey-site\n"
+
+#. Theme Name of the theme
+#. Author of the theme
+#: mizzey-theme:2
+#: mizzey-theme:5
+msgid "Mizzey"
+msgstr ""
+
+#. Description of the theme
+#: mizzey-theme:3
+msgid "The Mizzey site theme, a Corex client skin. Presentation only."
+msgstr ""

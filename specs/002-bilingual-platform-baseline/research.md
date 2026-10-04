@@ -169,7 +169,32 @@ There is currently **no hard-coded storefront text, because there is no storefro
 possible moment to put the mechanism and the check in place, and the most expensive moment to skip it: NFR-04a is
 violated one string at a time across every later slice.
 
-## 6. Arabic translations that already exist
+## 6. Translation loading on WordPress 7.1 is lazy, and `is_textdomain_loaded` is misleading
+
+Measured while building the AC-8 evidence, because an assertion failed while the mechanism worked:
+
+| Step, with a real `mizzey-site-ar.mo` in place and Arabic current | Result |
+|---|---|
+| `determine_locale()` | `ar` |
+| `apply_filters('plugin_locale', 'ar', 'mizzey-site')` | `ar`, so WPML does not redirect the plugin locale |
+| `load_plugin_textdomain('mizzey-site', false, 'mizzey-site/languages')` | **`true`**, the loader succeeded |
+| `is_textdomain_loaded('mizzey-site')` immediately after | **`false`** |
+| `WP_Translation_Controller::is_textdomain_loaded('mizzey-site', 'ar')` | **`false`** |
+| `__('Mizzey t21 translation probe', 'mizzey-site')` | **`مزي t21`**, translated correctly |
+| `is_textdomain_loaded('mizzey-site')` after that call | `true` |
+
+**The loader registers the file; the catalogue is materialised on first use.** So `is_textdomain_loaded()` reports
+materialisation, not registration, and is the wrong signal for "are translations available". A scenario that
+asserts it fails while the feature works, which is how this was found.
+
+The consequence for this feature: AC-8 is asserted on **the resolved string**, which is what the contract is
+about and what holds across versions. `load_textdomain()` called directly on the same path does return `true` and
+does set the flag, which is the detail that made the behaviour look inconsistent until the lazy path was
+identified.
+
+**Recorded under M-8**: this is evidence for WordPress 7.1.2 and nothing else.
+
+## 7. Arabic translations that already exist
 
 | Source | State |
 |---|---|
@@ -182,7 +207,7 @@ violated one string at a time across every later slice.
 So the strings a customer sees from the platform and from WooCommerce are already Arabic. What is missing is only
 the mechanism for strings this engagement writes.
 
-## 7. What this feature will not do, and why each was considered
+## 8. What this feature will not do, and why each was considered
 
 | Not doing | Reason |
 |---|---|

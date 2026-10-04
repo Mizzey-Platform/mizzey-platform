@@ -20,7 +20,12 @@ defined('ABSPATH') || exit;
 // Mizzey site app code lives here under the MizzeySite\ namespace — never edit the
 // Corex framework. Register the service provider with Corex's container on boot.
 
+require_once __DIR__ . '/src/I18n/Localisation.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
+
+// The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
+// `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
+MizzeySite\I18n\Localisation::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
