@@ -68,7 +68,8 @@ holds; the document does not describe a field model the board does not have.
 | `yes` | The PBI materially depends on the ERP meeting or PRE-09 before it can complete |
 
 **P1-E is never encoded here.** Scope class records scope; this field records a dependency. `#243` is the proof:
-it is `yes` while citing a DLV row and a P1 row, because the specification is what the ERP meeting produces.
+it is `yes` while citing a **single DLV row, PRE-09**, because the ERP meeting and the specification it produces
+are its dependency. ERP-10 is owned by #245 and is context for this PBI, not a row its acceptance closes.
 
 ### Stage and Delivery order are different concepts
 
