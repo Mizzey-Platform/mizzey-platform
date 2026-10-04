@@ -57,7 +57,7 @@ disposable runtime produces a classification.
 | A8 | Separately authored versus duplicated translations behave the same for identity | FIX-04, SSC-12 | **Verified working** | t11, t14: WPML duplicate retains the source-language name until translated; the WCML editor produces an Arabic name. Identity is the same in both |
 | A9 | WPML's cached `wpml_original_element_id` can name an unrelated product inside one process | - | **Verified defect** in WPML, worked around | `evidence/wpml-identity-cache.txt`. Never use it. Read identity from the translation rows |
 | A10 | The Arabic parent of a translated variable product is registered `simple` and carries no variations | ADM-54, SSC-12, NFR-04 | **Verified anomaly in the tested programmatic translation path.** Production relevance pending A11, and now **raised in priority**: B1 found a second, worse consequence of a corruptible Arabic variation registration | Measured, in t16, with translations created from WP-CLI, which is the only path tested. Not called a contracted storefront defect, because the path a human editor actually uses has not been tested: if the wp-admin flow builds the Arabic parent correctly, this is an artefact of programmatic creation and not a storefront fault. Cost correctness is unaffected either way, because variations are WPML elements in their own right and each one synchronises individually. Needs an answer before the Arabic storefront is accepted, and it belongs to the translation workflow (US-16-03) |
-| A11 | Does the **wp-admin** translation workflow build the Arabic variable parent correctly? | ADM-54, SSC-12 | **Not yet tested** | This is what decides how A10 is finally classified. Until it runs, A10 stays a measured anomaly in the programmatic path and nothing more |
+| A11 | Does the **wp-admin** translation workflow build the Arabic variable parent correctly? | ADM-54, SSC-12, MIG-02, SSC-21 | **Measured**, 4 Oct 2026 (t19): the corruption needs the **WCML editor translation plus product creation in the same process**. wp-admin one-save-per-request does not reach it, the WPML duplicate method does not, and the **native importer does not**. Sources-first sequencing prevents it entirely | The browser translation screen itself remains a staging check. See "A11 and the price matrix: measured" below |
 | A12 | Which other fields WPML copies on `save_post`, and which of them a meta-only save can therefore leave stale | NFR-07, FIX-04 | **Measured**, 4 Oct 2026. The hypothesis holds for most fields: **9 of 14 do not follow** a code-level save, including **`regular_price` and `sale_price`**. Stock and cost are the exceptions, each for its own reason | t18. Thirteen of WCML's fourteen synchronisation components run on `save_post`; only Stock does not. See "B1 and A12: measured" below |
 
 **Rule, now binding:** never assume a SKU uniquely identifies the canonical WooCommerce record. Resolve the
@@ -240,15 +240,130 @@ existing slice that owns it rather than becoming a parallel workstream of its ow
 
 | Rank | Item | Why, now that the probes have run |
 |---|---|---|
-| 1 | **`regular_price` and `sale_price` do not follow a code-level save** | A12's highest-severity finding. Same mechanism as cost, on the field the customer pays. Belongs to the pricing PBI, not to this workstream |
-| 2 | **Variation translation-group corruption** (the B1 trigger, A10, A11) | It permits overselling and it corrupts visible Arabic content. The batch trigger makes it a migration concern, so it blocks **E-MIG** rather than the stock mechanism |
-| 3 | **A11**, the wp-admin translation workflow | Decides how much of rank 2 is a production concern rather than a WP-CLI artefact. Cheap, and it gates the scoping of rank 2 |
-| 4 | **D6**, the language context on the order | Unchanged. Cheap now, expensive to backfill |
-| 5 | **B11** and **RPT-10** | A contracted report with a measured defect, blocking acceptance of its row |
-| 6 | **The channel matrix for the A12 fields that did not follow** | Confirms per field what is currently a reasoned hypothesis from t15's channel pattern. Belongs to each owning PBI |
-| 7 | **B6**, concurrency | Needs staging and a parallel load test. Book it, do not block on it |
+| 1 | **The migration sequencing invariant** (B1's trigger, characterised by A11) | It is the one measured path to overselling and to corrupted Arabic content, and it owns a requirement PBI through MIG-02 and SSC-21. The correction is sequencing, not code |
+| 2 | **B11** and **RPT-10** | A contracted P1-L report with a measured defect (P-020), blocking acceptance of its row |
+| 3 | **D6**, the language context on the order | Cheap now, expensive to backfill. Reconciliation and any later margin reporting both need it |
+| 4 | **A10**, the Arabic variable parent | A11 narrowed its trigger but did not settle the browser translation flow, which stays a staging check |
+| 5 | **The channel matrix for the other A12 fields that did not follow** | `weight`, dimensions, `catalog_visibility`, `manage_stock`. Each belongs to its owning slice, and each is currently a reasoned hypothesis from t15's channel pattern rather than a measurement |
+| 6 | **B6**, concurrency | Needs staging and a parallel load test. Book it, do not block on it |
 
-Items the probes closed: B1's core question, B2, B4, B5, B7 on the WooCommerce side, and the bulk of A12.
+**Closed by the probes:** B1's core question, B2, B4, B5, B7 on the WooCommerce side, the bulk of A12, A11, and
+the price question. **The price gap dropped off this list entirely**: no contracted path is defective, so there is
+nothing to prioritise.
+
+## A11 and the price matrix: measured, 4 October 2026
+
+Both ran on a scripted clean baseline. Scenarios `t19-translation-group-integrity.php` and
+`t20-price-integrity.php`. **No fix was implemented from either.**
+
+**16 integration scenarios executed with no harness or test failure.** That is a runner statement, and it is
+not a claim that every measured behaviour was correct. **t17, t18, t19 and t20 are fact-finding scenarios**: they
+return no pass or fail verdict, and they deliberately record defects and unsupported-path behaviour as findings
+rather than as failures. `0 failed` therefore means the harness held and every contract scenario (t02 to t16)
+passed, not that nothing is wrong.
+
+What those four actually recorded:
+
+| Scenario | What it found |
+|---|---|
+| t17 (B1) | Stock shares one effective balance for simple products and for intact variation groups. A corrupted variation group **diverges and permits overselling** |
+| t18 (A12) | **Nine of fourteen fields do not reach the Arabic record** on a code-level save |
+| t19 (A11) | The corruption needs the WCML editor plus same-process product creation. **Three workflows corrupt; four do not.** Sequencing prevents it |
+| t20 (price) | Every contracted price-maintenance path is correct. **REST, WP-CLI and custom code leave a stale Arabic price and charge the old amount** |
+
+The evidence that matters is unchanged: A11 identified and bounded the sequencing defect, the price matrix proved
+the contracted price-maintenance paths work, and the unsupported programmatic price paths remain documented
+safeguards rather than built code.
+
+### A11 verdict: a same-process sequencing defect, and sequencing alone prevents it
+
+Seven workflows, each building a translated variable product and then doing further work in the same process. The
+translation group was read from `icl_translations` directly, before and after.
+
+| # | Workflow | Result |
+|---|---|---|
+| 1 | WP-CLI, WCML editor translation, one product created afterwards | **CORRUPTED** |
+| 2 | WP-CLI, WCML editor translation, nothing afterwards | intact |
+| 3 | A migration-shaped batch: ten products created afterwards | **CORRUPTED** |
+| 4 | **All source products created first, translations only afterwards** | **intact** |
+| 5 | Interleaved create, translate, create, translate | **CORRUPTED** |
+| 6 | **WPML duplicate** instead of the WCML editor, one product afterwards | **intact** |
+| 7 | **The native CSV importer** creating the later products | **intact** |
+
+**Four things this settles.**
+
+1. **It is not a general wp-admin defect.** Case 2 is intact, and wp-admin is one request per save, so an operator
+   editing or translating products one at a time never reaches the trigger. The classification stays
+   **Partial / workflow-dependent** and is not generalised.
+2. **It needs the WCML translation editor.** Case 6 shows the WPML duplicate method does not corrupt. The trigger
+   is specific to editor-authored translations.
+3. **The native importer does not reproduce it.** Case 7 is intact, even though one import request creates several
+   products. So the contracted import path is not the danger; a scripted migration using WooCommerce CRUD is.
+4. **Sequencing alone prevents it.** Case 4 is intact with the same ten products created, simply in a different
+   order. **Therefore the correction is a migration runbook invariant, not runtime code**, which is the standing
+   preference when sequencing suffices.
+
+**The damage, measured in full.** More than B1 could see:
+
+- the **Arabic parent loses its `icl_translations` registration entirely** (trid, element type, language and
+  source language all become NULL);
+- the Arabic variations' **titles are overwritten** with the later product's name;
+- the Arabic variations' **attributes are wiped** (`size=S` becomes empty), so the variation can no longer be
+  selected;
+- the English parent's child count changes, because variations detach;
+- stock stops synchronising in both directions, and overselling becomes possible.
+
+That is a direct failure of **MIG-02** ("Arabic content is not corrupted" by the import) and **SSC-21** ("product
+content maintained separately in English and Arabic"), which is why it owns a requirement PBI rather than only a
+probe.
+
+**Still a staging check:** the wp-admin translation screen is a browser flow this runtime cannot drive. Case 2 and
+the per-request nature of the admin cover the single-request case, and the browser flow itself is verified on
+staging.
+
+### Price verdict: every launch-supported path is correct, so no custom code is justified
+
+Six channels, both price fields, both product types, with the amount an Arabic order actually charges.
+
+| Channel | Contracted as a price-maintenance path? | regular_price | sale_price | Arabic order charged | Classification |
+|---|---|---|---|---|---|
+| wp-admin product form | **Yes**, ADM-25, ADM-26 | **FOLLOWED** | **FOLLOWED** | the new price | **Measured working** |
+| wp-admin variations AJAX | **Yes**, ADM-33 | **FOLLOWED** | **FOLLOWED** | the new price | **Measured working** |
+| Native CSV importer | **Yes**, MIG-13 | **FOLLOWED** | **FOLLOWED** | the new price | **Measured working** |
+| Scheduled-sales cron | native behaviour | no divergence | no divergence | correct | **Measured working** |
+| WooCommerce REST `/wc/v3` | **No contracted price row** | stale | stale | **the old price** | **Measured defect, unsupported path** |
+| WP-CLI CRUD | **No contracted price row** | stale | stale | **the old price** | **Measured defect, unsupported path** |
+| Front-end, webhook, cron code | **No contracted price row** | stale | stale | **the old price** | **Measured defect, unsupported path** |
+
+**The native-first rule therefore applies: no price synchronisation is built.** Every path the register contracts
+for price maintenance already keeps the Arabic price correct, and an Arabic order charges the synchronised amount.
+
+**The scheduled-sales cron was tested specifically**, because it is the one price write a store makes without
+anybody scripting anything. A sale and both its dates were set in a single wp-admin submission, leaving the pair
+synchronised and on sale; the end date was then moved into the past by a raw meta write on **both** records, so
+the only product-object save under test was the cron's. Afterwards both records agreed and the Arabic order
+charged the correct amount. The expiry is evaluated per record at read time from each record's own
+`_sale_price_dates_to`, which WCML copies on the admin save, so the two expire together.
+
+**The residual risk, recorded as a development rule rather than a feature.** A price written through REST, WP-CLI
+or custom code does not reach the Arabic record, and an Arabic order then charges the stale amount. No contracted
+Option B path does that, and **ADM-28, scheduled price changes, is P2**, so no contracted feature performs
+programmatic bulk price updates either. The rule that follows:
+
+> Any code that writes a product price must either go through a path that fires `save_post`, or synchronise the
+> translation explicitly. It is not safe to write `_regular_price` or `_sale_price` through CRUD alone.
+
+That belongs to whichever slice ever writes a price programmatically, as a safeguard inside it. It is not a PBI,
+and it is not a class built in advance for a caller that does not exist.
+
+### Classification correction applied to both
+
+| Finding | Classification | Why |
+|---|---|---|
+| A11, the probe | **internal:test-infrastructure / verification** | A probe is evidence. It is not a contractual PBI, and it is attached to the catalogue and migration work that owns the behaviour |
+| The outcome A11 protects | **requirement PBI**, citing MIG-02, MIG-09, MIG-13, SSC-21 | The register independently obliges that the import does not corrupt Arabic content and that product content is maintained separately in both languages. The outcome is contracted; the probe is not |
+| The price gap | **no requirement PBI** | No contracted price-maintenance path is defective. Inventing a PBI because a probe found something on an unsupported channel would be inventing scope |
+| The price development rule | **developer-quality safeguard** | Attached to the slice that would need it, recorded here, built nowhere |
 
 ## Probe specification: B1, multilingual stock reduction
 

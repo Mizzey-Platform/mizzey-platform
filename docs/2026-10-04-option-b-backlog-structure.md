@@ -1,7 +1,19 @@
-# Option B delivery backlog: proposed structure
+# Option B delivery backlog: the structure
 
-Created 4 October 2026, at the close of the product-cost pilot. **This is a proposal for review. Nothing is
-created from it yet**: no GitHub Project, no issues, no specs.
+Created 4 October 2026 at the close of the product-cost pilot as a proposal, and still the full proposed
+decomposition of Option B. Its **status has moved on**, and only that has changed here:
+
+| | State |
+|---|---|
+| This document | The **full proposed decomposition** of Option B, over the 595 delivery rows. Unchanged in substance |
+| The delivery board | **Active**: https://github.com/orgs/Mizzey-Platform/projects/1, "Mizzey Option B Delivery" |
+| PBIs created | **The first 15 only**, #241 to #255, recorded in `docs/2026-10-04-github-project-proposal.md` |
+| PBIs still uncreated | The remaining **45 to 55**, which await review before any are seeded |
+| Specs created | **None.** A Spec Kit feature is opened per PBI when its work starts |
+
+So the epics and slices below are not all live work: most of them are still a plan. Where this document and the
+board disagree about a seeded PBI, **the board is right**, and the board's own record is the project document
+named above.
 
 ## What this is built from
 
@@ -135,7 +147,7 @@ Dependencies are written as "after X". Everything after E-FND-1 assumes the envi
 | E-PRE-3 Repository, CI and governance | PRE-04 | S1 | - | **Done** in substance: the governance foundation landed 22 September; CI runs `baseline` and `changes` |
 | E-PRE-4 Import specification | PRE-05, PRE-06 | S1 | **CR-06** (real Amazon sample export), CR-07 | Cannot be finalised without the real file |
 | E-PRE-5 Design system and interface design | PRE-07, PRE-08 | S1 | **OD-01** (brand identity) | Delivered as HTML and CSS, not Figma |
-| E-PRE-6 **ERP Integration Specification** | **PRE-09** | S1 | ERP technical meeting, targeted week 4 | Gates every P1-E row. See `docs/2026-10-04-erp-technical-meeting-questions.md` |
+| E-PRE-6 **ERP Integration Specification** | **PRE-09** | **`-`** | ERP technical meeting, targeted week 4 | Gates every P1-E row. **The register assigns PRE-09 no stage**: PRE-01 to PRE-08 are S1 and PRE-09 alone carries `-`. Needing it early is delivery scheduling, not a contractual stage. See `docs/2026-10-04-erp-technical-meeting-questions.md` |
 
 ### E-FND, foundation (70 rows)
 
@@ -316,9 +328,10 @@ Already settled, recorded so they are not reopened: **OD-41** (the store does no
 cannot be reached), **OD-42** (no interim separately maintained stock balance), **OD-11** (email-only
 notifications at launch).
 
-## What this proposal deliberately does not do
+## What this document deliberately does not do
 
-- It does not create the GitHub Project, any issue, or any spec.
+- It does not create any further issue or any spec. The Project exists and **15** PBIs are seeded; the remaining
+  45 to 55 are not created.
 - It does not close the 232 historical Option C issues or Project #4.
 - It does not give any P1-E row acceptance criteria, because PRE-09 is not approved.
 - It does not build margin or profitability reporting (RPT-02 is P2), the Operations Console (DEF), the dedicated

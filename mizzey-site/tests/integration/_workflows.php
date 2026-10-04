@@ -197,6 +197,152 @@ final class Workflows {
 		return substr( wp_hash( $i . '|' . $action . '|' . $this->admin_id . '|' . $this->token, 'nonce' ), -12, 10 );
 	}
 
+	/**
+	 * Change a price field through one supported channel, mirroring set_cost() so the channel set is identical.
+	 *
+	 * @param string $channel admin-http, admin-variation, import-http, rest-http, crud-cli or crud-web.
+	 * @param string $field   regular_price or sale_price.
+	 * @return string 'ok', or a description of why the channel did not complete.
+	 */
+	public function set_price( string $channel, int $id, string $field, string $value ): string {
+		$is_variation = 'product_variation' === get_post_type( $id );
+		switch ( $channel ) {
+			case 'crud-cli':
+				$p = wc_get_product( $id );
+				if ( 'sale_price' === $field ) {
+					$p->set_sale_price( $value );
+				} else {
+					$p->set_regular_price( $value );
+				}
+				$p->save();
+				return 'ok';
+			case 'crud-web':
+				return $this->crud_web_price( $id, $field, $value );
+			case 'rest-http':
+				$route = $is_variation ? '/wc/v3/products/' . wp_get_post_parent_id( $id ) . "/variations/$id" : "/wc/v3/products/$id";
+				$r     = wp_remote_request( add_query_arg( 'rest_route', $route, home_url( '/' ) ), array(
+					'method'  => 'PUT',
+					'timeout' => 60,
+					'headers' => array( 'Authorization' => 'Basic ' . base64_encode( $this->admin_login . ':' . $this->app_password ), 'Content-Type' => 'application/json' ),
+					'body'    => wp_json_encode( array( $field => $value ) ),
+				) );
+				$code = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
+				return 200 === $code ? 'ok' : "REST HTTP $code";
+			case 'import-http':
+				return $this->import_price( wc_get_product( $id )->get_sku(), $is_variation, $field, $value );
+			case 'admin-http':
+				return $this->admin_product_price( $id, $field, $value );
+			case 'admin-variation':
+				return $this->admin_variation_price( $id, $field, $value );
+		}
+		return 'unknown channel';
+	}
+
+	/** The native CSV importer, updating a price column by SKU. */
+	private function import_price( string $sku, bool $is_variation, string $field, string $value ): string {
+		$column = 'sale_price' === $field ? 'Sale price' : 'Regular price';
+		$upload = wp_upload_dir();
+		$file   = trailingslashit( $upload['basedir'] ) . 't20-import-' . wp_generate_password( 8, false ) . '.csv';
+		$fh     = fopen( $file, 'w' );
+		fputcsv( $fh, array( 'SKU', 'Type', $column ) );
+		fputcsv( $fh, array( $sku, $is_variation ? 'variation' : 'simple', $value ) );
+		fclose( $fh );
+		$r = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 120, 'body' => array(
+			'action'          => 'woocommerce_do_ajax_product_import',
+			'security'        => $this->session_nonce( 'wc-product-import' ),
+			'file'            => $file,
+			'position'        => 0,
+			'update_existing' => 1,
+			'mapping'         => array( 'from' => array( 'SKU', 'Type', $column ), 'to' => array( 'sku', 'type', $field ) ),
+		) ) );
+		if ( file_exists( $file ) ) {
+			unlink( $file );
+		}
+		$json = is_wp_error( $r ) ? null : json_decode( wp_remote_retrieve_body( $r ), true );
+		if ( empty( $json['success'] ) ) {
+			return 'import HTTP ' . ( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r ) );
+		}
+		return ( (int) ( $json['data']['updated'] ?? 0 ) ) > 0 ? 'ok' : 'import updated 0';
+	}
+
+	/** The wp-admin product form, submitted as a browser submits it. */
+	private function admin_product_price( int $id, string $field, string $value ): string {
+		$input = 'sale_price' === $field ? '_sale_price' : '_regular_price';
+		list( $code, $html ) = $this->http( 'GET', admin_url( "post.php?post=$id&action=edit" ) );
+		if ( 200 !== $code ) {
+			return "admin GET $code";
+		}
+		$fields = self::form_fields( $html, 'post' );
+		if ( ! array_filter( $fields, fn( $pair ) => $input === $pair[0] ) ) {
+			return "admin form has no $input field";
+		}
+		$fields   = self::replace( $fields, $input, $value );
+		$fields[] = array( 'save', 'Update' );
+		$r        = wp_remote_post( admin_url( 'post.php' ), array( 'cookies' => $this->cookies, 'timeout' => 60, 'redirection' => 0, 'body' => self::encode( $fields ), 'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ) ) );
+		$code     = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
+		return 302 === $code ? 'ok' : "admin POST $code";
+	}
+
+	/**
+	 * Submit several wp-admin product-form fields in one save, as an operator does.
+	 *
+	 * t20 needs a scheduled sale set the way a store actually sets one: the sale price and both dates in a single
+	 * admin submission, so the starting state is synchronised and only the later cron write is under test.
+	 *
+	 * @param array<string,string> $values Input name to value.
+	 */
+	public function admin_product_fields( int $id, array $values ): string {
+		list( $code, $html ) = $this->http( 'GET', admin_url( "post.php?post=$id&action=edit" ) );
+		if ( 200 !== $code ) {
+			return "admin GET $code";
+		}
+		$fields = self::form_fields( $html, 'post' );
+		foreach ( $values as $name => $value ) {
+			$present = (bool) array_filter( $fields, fn( $pair ) => $name === $pair[0] );
+			$fields  = $present ? self::replace( $fields, $name, $value ) : array_merge( $fields, array( array( $name, $value ) ) );
+		}
+		$fields[] = array( 'save', 'Update' );
+		$r        = wp_remote_post( admin_url( 'post.php' ), array( 'cookies' => $this->cookies, 'timeout' => 60, 'redirection' => 0, 'body' => self::encode( $fields ), 'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ) ) );
+		$code     = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
+		return 302 === $code ? 'ok' : "admin POST $code";
+	}
+
+	/** The wp-admin variations AJAX save. */
+	private function admin_variation_price( int $variation_id, string $field, string $value ): string {
+		$input  = 'sale_price' === $field ? 'variable_sale_price' : 'variable_regular_price';
+		$parent = wp_get_post_parent_id( $variation_id );
+		list( $code, $html ) = $this->http( 'GET', admin_url( "post.php?post=$parent&action=edit" ) );
+		if ( 200 !== $code || ! preg_match( '/"load_variations_nonce":"([a-z0-9]+)"/', $html, $load ) || ! preg_match( '/"save_variations_nonce":"([a-z0-9]+)"/', $html, $save ) ) {
+			return "admin variations page $code, nonces missing";
+		}
+		$r      = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 60, 'body' => array( 'action' => 'woocommerce_load_variations', 'security' => $load[1], 'product_id' => $parent, 'attributes' => array(), 'page' => 1, 'per_page' => 50 ) ) );
+		$fields = self::form_fields( '<form id="v">' . wp_remote_retrieve_body( $r ) . '</form>', 'v' );
+		$loop   = null;
+		foreach ( $fields as $pair ) {
+			if ( preg_match( '/^variable_post_id\[(\d+)\]$/', $pair[0], $m ) && (int) $pair[1] === $variation_id ) {
+				$loop = $m[1];
+			}
+		}
+		if ( null === $loop ) {
+			return 'variation not in the loaded admin panel';
+		}
+		$fields = self::replace( $fields, "{$input}[$loop]", $value );
+		$fields = array_merge( array( array( 'action', 'woocommerce_save_variations' ), array( 'security', $save[1] ), array( 'product_id', $parent ), array( 'product-type', 'variable' ) ), $fields );
+		$r      = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 60, 'body' => self::encode( $fields ), 'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ) ) );
+		$code   = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
+		return 200 === $code ? 'ok' : "admin AJAX $code";
+	}
+
+	/** CRUD inside a front-end request, standing for custom code, webhooks and cron. */
+	private function crud_web_price( int $id, string $field, string $value ): string {
+		if ( ! $this->web_secret ) {
+			$this->crud_web( $id, null ); // installs the must-use plugin and the secret
+		}
+		$r    = wp_remote_get( add_query_arg( array( 't11_crud' => $this->web_secret, 'id' => $id, 'price_field' => $field, 'price' => $value ), home_url( '/' ) ), array( 'timeout' => 60 ) );
+		$body = is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_body( $r );
+		return 'ok:front:web' === $body ? 'ok' : 'crud-web: ' . substr( $body, 0, 120 );
+	}
+
 	private function import_http( string $sku, bool $is_variation, ?float $cost ): string {
 		$upload = wp_upload_dir();
 		$file   = trailingslashit( $upload['basedir'] ) . 't11-import-' . wp_generate_password( 8, false ) . '.csv';
@@ -220,6 +366,52 @@ final class Workflows {
 			return 'import HTTP ' . ( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r ) . ' ' . substr( wp_remote_retrieve_body( $r ), 0, 160 ) );
 		}
 		return ( (int) ( $json['data']['updated'] ?? 0 ) ) > 0 ? 'ok' : 'import updated 0: ' . wp_json_encode( $json['data'] ?? null );
+	}
+
+	/**
+	 * Create new products through the native CSV importer, in one importer request.
+	 *
+	 * The importer is the creation channel a catalogue migration uses, and one import request creates many
+	 * products inside one process. A11 needs that shape, not an update, so this is a create rather than the
+	 * update import_http() performs.
+	 *
+	 * @param string[] $skus SKUs that do not exist yet.
+	 * @return string 'ok: created N' or a description of the failure.
+	 */
+	public function import_create( array $skus ): string {
+		$upload = wp_upload_dir();
+		$file   = trailingslashit( $upload['basedir'] ) . 'a11-import-' . wp_generate_password( 8, false ) . '.csv';
+		$fh     = fopen( $file, 'w' );
+		fputcsv( $fh, array( 'SKU', 'Name', 'Type', 'Published', 'Regular price' ) );
+		foreach ( $skus as $sku ) {
+			fputcsv( $fh, array( $sku, 'A11 ' . $sku, 'simple', '1', '150' ) );
+		}
+		fclose( $fh );
+		$r = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 120, 'body' => array(
+			'action'          => 'woocommerce_do_ajax_product_import',
+			'security'        => $this->session_nonce( 'wc-product-import' ),
+			'file'            => $file,
+			'position'        => 0,
+			'update_existing' => 0,
+			'mapping'         => array(
+				'from' => array( 'SKU', 'Name', 'Type', 'Published', 'Regular price' ),
+				'to'   => array( 'sku', 'name', 'type', 'published', 'regular_price' ),
+			),
+		) ) );
+		if ( file_exists( $file ) ) {
+			unlink( $file );
+		}
+		$json = is_wp_error( $r ) ? null : json_decode( wp_remote_retrieve_body( $r ), true );
+		if ( empty( $json['success'] ) ) {
+			return 'import HTTP ' . ( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r ) . ' ' . substr( wp_remote_retrieve_body( $r ), 0, 160 ) );
+		}
+		foreach ( $skus as $sku ) {
+			$id = wc_get_product_id_by_sku( $sku );
+			if ( $id ) {
+				$this->s->track_post( $id );
+			}
+		}
+		return sprintf( 'ok: imported %d', (int) ( $json['data']['imported'] ?? 0 ) );
 	}
 
 	private function crud_web( int $id, ?float $cost ): string {
