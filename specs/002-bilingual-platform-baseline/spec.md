@@ -61,6 +61,11 @@ this feature. Each is a contracted row owned by another slice, except where mark
 not exist yet (#244). Nothing in this feature may report AC-9 as verified from the command-line runtime. The three
 states stay separate, per constitution M-7.
 
+**AC-9 is the only criterion that needs staging.** The measured facts in the Native coverage table below show the
+local Apache has `mod_rewrite` loaded and `AllowOverride All`, so AC-1 to AC-8 are verifiable here by **serving
+real requests**, including a real Arabic URL. The requirement is not weakened to suit the runtime: the runtime is
+configured to meet it.
+
 ## Clarifications
 
 Five questions were open after the first draft. Four are settled here, from the register wording and the measured
@@ -231,21 +236,36 @@ Translation 3.5.4, WCML 5.5.7, CoreX 0.42.0, PHP 8.3.6, theme `mizzey-theme` act
 | Capability | Evidence | Status |
 |---|---|---|
 | Language framework, with `en` as default and directory-based language URLs | `icl_sitepress_settings`: `default_language=en`, `language_negotiation_type=1` (directories), `urls.directory_for_default_language=0`, `setup_complete=1` | VERIFIED |
-| Arabic registered as a language, with its own URL and locale | `wpml_active_languages` returns `ar`, native name, locale `ar`, url `/ar/` | VERIFIED |
-| Arabic **not active** | the same filter reports `active: 0` for `ar` while `en` is `active: 1`. **This is the gap this feature closes** | VERIFIED as a gap |
+| Arabic **enabled** as a second language, with its own URL and locale | `SitePress::get_active_languages()` returns both `ar` and `en`; `wp_icl_languages` records `active=1` for both. The `active` flag inside `wpml_active_languages` marks the **current** language, not whether a language is enabled, which is why `ar` reads `active: 0` while English is the current language. Measured twice, two ways | VERIFIED |
+| Arabic storefront **reachable over HTTP** | **not today, and the cause is the web server, not WPML.** See the rewrite row below | VERIFIED as a gap |
+| No Arabic page records exist | all five pages (shop, cart, checkout, my account, sample) have a translation group containing `en` only. **A gap this feature closes**, per clarification C-2 | VERIFIED as a gap |
 | Right-to-left direction from the locale, with no custom code | switching to `ar` gives locale `ar`, `is_rtl()` true and `$wp_locale->text_direction` `rtl`; switching back to `en` gives `en_US`, false and `ltr` | VERIFIED |
-| Document `lang` and direction attributes emitted by the platform | the served storefront root returns `<html lang="en-US">` with no direction attribute, which is correct for left to right | VERIFIED |
+| Document direction attribute emitted by the platform | the served storefront root returns `<html lang="en-US">` with no direction attribute, correct for left to right. After switching the language in process, `language_attributes()` emits `dir="rtl"` | VERIFIED |
+| Document `lang` attribute **in Arabic** | **unresolved.** After an in-process switch to Arabic, `language_attributes()` emits `dir="rtl" lang="en-US"`: the direction follows but the language tag does not. An in-process switch is not a real Arabic request, so this is **a measurement to repeat against a served Arabic URL**, not yet a defect. AC-3 requires `lang="ar"`, so the plan has to settle it | UNVERIFIED |
 | Arabic translations of the platform's own storefront strings | core `ar` language pack installed; `woocommerce-ar.mo` and `woocommerce-multilingual-ar.mo` present, plus the Arabic JSON translations WooCommerce needs for its scripts | VERIFIED |
 | Translation identity for a record pair | `wpml_element_trid` and `wpml_get_element_translations`, used throughout `specs/001-product-cost-capture` and its scenarios t12 and t19 | VERIFIED |
 | String translation for strings that are not in a `.mo` file | WPML String Translation active, `wp_icl_strings` present with 29 registered strings across 12 contexts | VERIFIED |
 | A text domain loaded for the theme or the site plugin | **neither exists.** No `languages/` directory in `mizzey-theme` or `mizzey-site`, no `load_theme_textdomain` or `load_plugin_textdomain` call, and no `.pot`. **Gap** | VERIFIED as a gap |
 | Any translatable string in this engagement's own code | **none.** No `__()`, `_e()` or `esc_html__()` call exists in `mizzey-theme` or `mizzey-site`, so there is no hard-coded storefront text to remove either. The work is to establish the mechanism and the check before the strings arrive | VERIFIED |
-| A clean `/ar/` URL served by the runtime | **not available.** The runtime has no `.htaccess` and serves PATHINFO permalinks: `/index.php/shop/` returns 200 while `/shop/` returns an Apache 404. `/ar/` returns an Apache 404 today, for that reason as well as Arabic being inactive. **Web-server rewrite configuration, which OD-27 and #244 settle** | VERIFIED as an environment limit |
-| Browser rendering across Chrome, Safari, Edge, Firefox and mobile | **not available from a command-line runtime.** Staging acceptance item, blocked on #244 | UNVERIFIED |
+| A real `/ar/` URL served by the runtime | **achievable here, and not yet configured.** The runtime has no `.htaccess` and serves PATHINFO permalinks, so `/index.php/shop/` returns 200 while `/shop/` and `/ar/` return an Apache 404, and `/index.php/ar/` returns a WordPress 404 because WPML's directory negotiation expects the language segment at the root of the path. `?lang=ar` does not switch either, correctly, because the negotiation type is directories and not parameters. **But `mod_rewrite` is loaded in the local Apache and the vhost sets `AllowOverride All`**, so pretty permalinks plus a generated `.htaccess` make a real `/ar/` request serveable in this runtime. **The rendered-URL check is therefore automatable here and is not deferred to staging** | VERIFIED as a configuration gap |
+| Browser rendering across Chrome, Safari, Edge, Firefox and mobile | **not available from a command-line runtime, at all.** This is the one acceptance item that genuinely needs staging and real browsers, and it is blocked on #244 | UNVERIFIED |
 
-**Native first, per constitution M-4.** Eight of the capabilities above are already provided. The gaps are narrow:
-Arabic is inactive, and no text domain is loaded for this engagement's own code. Custom code is justified only for
-those two, and the plan must show it cannot be configuration alone.
+**Native first, per constitution M-4.** Most of the capability is already provided, including the part that is
+hardest to build: direction follows the locale with no custom code at all. The gaps are narrow and three of the
+four are **configuration, not code**:
+
+| Gap | Kind |
+|---|---|
+| The runtime serves PATHINFO permalinks with no `.htaccess`, so no language-prefixed URL can resolve | Runtime and test-harness configuration |
+| No Arabic page records exist for the WooCommerce system pages | Platform configuration (C-2) |
+| Neither the theme nor the site plugin loads a text domain, and there is no `.pot` | A small amount of code, plus a build step |
+| The `lang` attribute in Arabic is unresolved | To be measured against a served Arabic URL before anything is written |
+
+**A first draft of this section claimed Arabic was inactive.** It was wrong: it read the `active` flag of
+`wpml_active_languages`, which marks the current language rather than whether a language is enabled. The claim was
+corrected after checking `SitePress::get_active_languages()` and the `wp_icl_languages` table, which both report
+Arabic enabled. It is recorded because the same misreading would have produced a feature that "activates" a
+language that was never off.
 
 ## Requirements
 
@@ -253,8 +273,9 @@ those two, and the plan must show it cannot be configuration alone.
 
 - **FR-001**: The platform MUST resolve English as the default and primary storefront language, from the URL, with
   no dependence on stored or session state. (AC-1)
-- **FR-002**: Arabic MUST be an active storefront language, served under its own language prefix, with English at
-  the root. (AC-2)
+- **FR-002**: The Arabic storefront MUST be served under its own language prefix, with English at the root, which
+  requires the environment's rewrite configuration and an Arabic record for each page the storefront addresses.
+  (AC-2)
 - **FR-003**: The platform MUST derive reading direction and locale from the active language, so that Arabic
   renders right to left and English left to right, without per-language templates. (AC-3, AC-4, AC-6)
 - **FR-004**: The rendered storefront document MUST carry the correct `lang` attribute, and the direction
@@ -300,8 +321,11 @@ Both need Mustafa's approval and neither is presented to the client as a deliver
 
 ## Success Criteria
 
-- **SC-001**: On a clean runtime, the storefront serves English at the root and Arabic under its language prefix,
-  and the resolved language, locale and direction are correct for both. Repeatable from a scripted baseline.
+- **SC-001**: On a clean runtime, an **HTTP request** to the root serves English and an HTTP request to the Arabic
+  prefix serves Arabic, each with the correct language tag and reading direction in the rendered document.
+  Repeatable from a scripted baseline. This is a served-request assertion, not an in-process one, because an
+  in-process language switch has already been shown to report the direction correctly while the language tag
+  lagged.
 - **SC-002**: A record pair created through a supported workflow forms one translation group with the English
   record as source, asserted programmatically.
 - **SC-003**: The automated hard-coded-text check passes on the baseline and fails on a deliberately introduced
