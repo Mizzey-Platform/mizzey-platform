@@ -84,44 +84,59 @@ none.
 
 Neither template invents acceptance criteria. Criteria come from the spec, which comes from the register.
 
-## The first fifteen PBIs, with every field filled
+## The fifteen seeded PBIs, as they exist on the board
 
-Ordered as proposed. Later PBIs follow the epic structure in
-`docs/2026-10-04-option-b-backlog-structure.md`; the point of listing these is that the shape is reviewable.
+Read from the live Project on 4 October 2026, after A11 and the price matrix, and after the classification
+correction. **This table describes what exists.** The earlier proposal table, written before those probes ran, is
+gone: it promised a price-integrity PBI and a standalone A11 PBI, and neither exists, because neither should.
 
-| # | PBI | Epic | Register ids | Scope | Stage | Depends on | ERP | Design | Data-integrity | Client decision | Acceptance evidence |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Arabic and English price agree after any supported save | E-SF | PDP-05, PLP-08, BR-005 | P1 | S1 | - | no | none | **A12 price** (measured defect) | - | A new scenario in the pilot's pattern, all five channels, plus an Arabic order at the changed price |
-| 2 | wp-admin translation of a variable product produces a correct Arabic parent and variations | E-ADM | ADM-54, SSC-12, NFR-04 | P1 | S1 | - | no | none | **A11**, then A10 | - | A probe through the real wp-admin flow, not WP-CLI |
-| 3 | A batch that creates products cannot corrupt an existing translation group | E-MIG | MIG-01, MIG-03, MIG-06, MIG-09, MIG-13 | P1-L | S1 | 2 | no | none | **B1 trigger** | - | The t17 trigger sequence, asserted not to corrupt; plus the MIG-13 precondition test |
-| 4 | Infrastructure provisioned | E-PRE | PRE-01, PRE-02 | DLV | S1 | - | no | none | - | **OD-27**, OD-15, OD-14 | The environment exists and is reachable |
-| 5 | Development, staging and production environments | E-PRE | PRE-03a, PRE-03b, NFR-09 | DLV, P1 | S1 | 4 | no | none | - | OD-27 | Staging serves Arabic `/ar/` URLs, which unblocks the rendered-Arabic checks the pilot could not run |
-| 6 | ERP Integration Specification approved | E-PRE | **PRE-09** | DLV | S1 | - | **n/a** | none | B1, A12 (M16 to M18) | the ERP meeting | The approved specification, with its own acceptance criteria |
-| 7 | Bilingual platform baseline | E-FND | A4 rows, FIX-01 to FIX-10, NFR-04, NFR-04a | P1 | S1 | 5 | no | none | - | - | Arabic right-to-left storefront, English-only admin (ADM-159) |
-| 8 | Information architecture and URL structure | E-FND | IA-01 to IA-36 | P1, P1-L | S1 | 7 | no | none | - | - | The agreed URL map, in both languages |
-| 9 | ERP adapter seam | E-ERP | **ERP-01**, ERP-02, ERP-10, INT-16 | P1 | S1 | 1, 3 | **partial** | none | B1 (closed), M17 | - | The seam exists, is behind an adapter with retries and logging, and resolves one commercial item to one mapping |
-| 10 | Inventory report counts one physical item once | E-RPT | **RPT-10** | P1-L | S1 | 7 | partial | none | B10 (measured defect), B11 | - | A translation-group-aware query; P-020's double count gone |
-| 11 | Catalogue import specification | E-MIG | MIG-01, MIG-03, MIG-06, MIG-19 | P1-L | S1 | - | no | none | - | **CR-06**, CR-07 | A validation pass over the real sample file, reporting creates, updates and rejects |
-| 12 | Design system and interface design | E-PRE | PRE-07, PRE-08 | DLV | S1 | - | no | **is the design** | - | **OD-01** | HTML and CSS with tokens, two revision rounds |
-| 13 | Launch roles and permissions | E-ROLE | ROLE rows (P1, P1-L) | P1, P1-L | S1 | 7 | no | none | - | **CX-01** | Dependent criteria stay `pending CX-01` until the client answers |
-| 14 | Product cost, contractual closure | E-ADM, E-RPT | ADM-27, RPT-11 | P1 | S1 | - | no | none | - | **CX-01**, **OD-12** | **Technically verified by the product-cost pilot; contractual acceptance remains pending CX-01 and OD-12.** No code work: this PBI exists only to carry the two decisions to the Stage 1 gate |
-| 15 | Order status model and history | E-ORD | ORD-01 to ORD-14 | P1, P1-L | S1 | 7 | no | none | D6, D7 | - | ADR-0002's minimum shipment state record; P-018's gap closed |
+| Order | Issue | PBI | Epic | Register ids | Scope | Stage | Status | ERP | Design | Data-integrity | Client decision | Depends on |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14` | P1 | S1 | **Ready** | no | none | - | - | - |
+| 2 | #242 | Information architecture and URL structure, in both languages | E-FND | `IA-01 and 31 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | - | - | #241 bilingual platform baseline |
+| 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | `PRE-09, ERP-10` | DLV | S1 | **Blocked** | yes (P1-E) | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | - |
+| 4 | #244 | Infrastructure provisioned for development, staging and production | E-PRE | `PRE-01 and 5 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | - | OD-27 hosting outside Egypt, in writing; OD-15 volumes; OD-14 operating budget | - |
+| 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | `RPT-10, FIX-04, NFR-04` | P1-L | S1 | **Blocked** | partial | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline |
+| 6 | #247 | The catalogue migration does not corrupt Arabic product or variation content | E-MIG | `MIG-02, MIG-09, MIG-13, SSC-21` | P1-L | S1 | **Blocked** | no | none | B1 trigger measured; A11 measured (t19) | CR-06 a real, unmodified Amazon sample export | #249 catalogue import specification |
+| 7 | #249 | Catalogue import specification, validated against the real source file | E-MIG | `PRE-05 and 6 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | A5 duplicate SKU resolution | CR-06 a real, unmodified Amazon sample export; CR-07 Professional Seller account and Category Listings Report | - |
+| 8 | #245 | ERP adapter seam: one commercial item resolves to one ERP stock item | E-ERP | `ERP-01, ERP-02, ERP-10, INT-16` | P1 | S1 | **Blocked** | partial | none | B1 measured (closed); M17 open | - | #243 the ERP Integration Specification, for the behaviour behind the seam; #241 bilingual platform baseline |
+| 9 | #248 | Order status model with a queryable status history | E-ORD | `ORD-01 and 12 more, listed in the issue` | mixed | S1 | **Blocked** | no | none | D6 order language context; D7 shipment status history | - | #241 bilingual platform baseline |
+| 10 | #250 | Design system and interface design delivered as working HTML and CSS | E-PRE | `PRE-07, PRE-08` | DLV | S1 | **Blocked** | no | needs design | - | OD-01 brand name, logo and visual identity | - |
+| 11 | #251 | Launch staff roles and permissions | E-ROLE | `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09` | mixed | S1 | **Blocked** | no | none | - | CX-01 which staff roles hold financial permission | #241 bilingual platform baseline |
+| 12 | #252 | Product cost: carry CX-01 and OD-12 to the Stage 1 gate | E-ADM | `ADM-27, RPT-11` | P1 | S1 | **Verified** | no | none | - | CX-01 staff financial permission (AC-6); OD-12 cost basis, who enters it, and zero versus missing (AC-7) | - |
+| 13 | #253 | Header, navigation and footer, mirrored right to left | E-SF | `NAV-01 and 9 more, listed in the issue` | mixed | S1 | **Blocked** | no | needs design | - | OD-01 brand identity | #250 design system; #241 bilingual platform baseline; #242 information architecture |
+| 14 | #254 | Product details page, in both languages | E-SF | `PDP-01 and 21 more, listed in the issue` | mixed | S1 | **Blocked** | partial | needs design | A3 variation identity (measured working) | OD-01 brand identity; OD-13 authenticity and warranty policy | #250 design system; #253 header and navigation; #241 bilingual platform baseline |
+| 15 | #255 | Checkout and order placement, in both languages | E-SF | `CHK-01 and 13 more, listed in the issue` | mixed | S1 | **Blocked** | yes (P1-E) | needs design | B6 concurrency (needs staging); D6 order language context | OD-05 COD; OD-09 VAT and invoicing; OD-19 payment methods at launch; OD-29 COD verification | #250 design system; #254 product details page; #245 ERP adapter seam |
 
-PBI 14 is the pattern for anything already built but not accepted: it carries decisions, not work, and its Status
-is Verified rather than Accepted.
+Every `Depends on` value is a real GitHub issue number. They were delivery-order numbers at first, which on
+GitHub resolve to historical Option C issues, and that was corrected: the shorthand is never used in an issue
+body or a board field.
 
-## What changed in the backlog because of B1 and A12
+Each PBI's body cites its exact delivery ids and names the non-delivery rows of the surrounding register section
+that it excludes. **131 cited ids across the fifteen PBIs were validated against `docs/scope/register-ids.json`:
+all real, all delivery scope, no ranges.**
+
+Only **#241** is `Ready`. Everything else waits on a client decision, on PRE-09, or on a predecessor. **#252 is
+`Verified`, not `Accepted`**, and is the reference case for that distinction.
+
+## What the probes changed in the backlog
+
+All four probes have now run: B1 and A12 (t17, t18), then A11 and the price matrix (t19, t20). The consequences
+below are the settled ones, and they replace the interim list written between the two pairs.
 
 | Change | Reason |
 |---|---|
-| **A new PBI, now first**: Arabic and English price agree after any supported save | A12 measured `regular_price` and `sale_price` not reaching the Arabic record on a code-level save. Customer-facing and financial. It did not exist in the pre-probe backlog |
-| **E-MIG gains a data-integrity dependency and a new PBI** | B1 measured that a batch creating products in one process corrupts an existing translation group, breaks variation stock sync and overwrites Arabic variation titles. The migration is the batch, so this is now an E-MIG blocker, not a theoretical risk |
-| **A11 is promoted to a PBI of its own, ahead of E-MIG** | It decides how much of the B1 corruption is a production concern rather than a WP-CLI artefact, and therefore how much work PBI 3 is |
-| **E-ERP-1 keeps its position but gains M17** | B1 settled the store-side question the seam was waiting on, which is why it did not move further forward. M17 (per-variant ERP stock) is new |
-| **The stock mechanism needs no fix** | The pre-probe backlog carried B1 as a suspected second cost defect. It is not: WCML hooks the stock write directly. That removed anticipated work rather than adding it |
-| **E-ORD-3 gains a data-integrity dependency** | A12 measured `weight` and dimensions not following, so an Arabic order could be rated on stale shipping dimensions |
-| **E-ADM-3 gains one** | `catalog_visibility` does not follow |
-| **Nothing was added for a non-Option-B field** | `product_cat` needs interpretation before it is called anything, and custom fields are a configuration rule, not a defect. Neither created a PBI |
+| **No price PBI exists, and none will be created from this evidence** | The price matrix measured every contracted price-maintenance path as working: the wp-admin product form (ADM-25, ADM-26), the wp-admin variations AJAX save (ADM-33), the native CSV importer (MIG-13), and WooCommerce's scheduled-sales cron. Only REST, WP-CLI and custom code leave a stale Arabic price, and none of those is a contracted price-maintenance path; ADM-28, scheduled price changes, is **P2**. The residual risk is a **developer-quality safeguard** for any future slice that chooses to write prices programmatically, recorded in the workstream document and in #254. It is not a PBI and not a class |
+| **No standalone A11 PBI exists** | A11 is a probe: `internal:test-infrastructure / verification`. It has run, and what it produced is evidence, not scope |
+| **The contracted outcome A11 exposed belongs to #247** | MIG-02, MIG-09, MIG-13 and SSC-21 independently require migration and Arabic content integrity, so the outcome is contracted and owns a requirement PBI. A11's result also decided the correction: sequencing, not runtime code, because creating all sources first and translating second avoids the defect entirely |
+| **No stock-mechanism fix** | B1 refuted the hypothesis that stock shared the cost gap. WCML hooks `woocommerce_product_set_stock` and `woocommerce_variation_set_stock` directly, so stock never depended on `save_post`. This removed anticipated work rather than adding it |
+| **#245 records the one-commercial-item identity constraint** | It follows from ERP-01 and is settled before the ERP meeting. Where the canonical mapping is stored stays an architecture decision for PRE-09 and the implementation design |
+| **#246 remains a contracted inventory-report defect** | P-020 measured the double count on RPT-10, a P1-L row |
+| **The other A12 field findings attach to their owning slices** | `weight` and dimensions to shipping, `catalog_visibility` to the catalogue admin, `manage_stock` to PRE-09 because ERP-07 is P1-E. None became a PBI of its own |
+| **Nothing was created for a non-Option-B finding** | `product_cat` needs interpretation first, since WPML translates taxonomies as their own elements; a custom field not being copied is a configuration rule. Verification defects outside current scope are evidence, not new scope |
+
+**The rule this round enforced in both directions:** only contracted behaviours produce requirement PBIs. A risk or
+a probe does not, however real the finding.
 
 ## Range citations, and the error they caused
 

@@ -828,3 +828,37 @@ non-delivery scope gets into a delivery board.
 **Unchanged:** ADR-0001 and ADR-0002 remain Proposed. CX-01, OD-12 and PRE-09 remain open. ADM-27 and RPT-11 are
 technically verified and not contractually accepted. No P1-E row receives final acceptance criteria. OD-41, OD-42
 and OD-11 stay settled and are not reopened. No ERP implementation.
+
+## 2026-10-04 - D-08: the repository is public for an authorized external review period
+
+**Amends D-07 on one point only: visibility.** Every substantive security decision in D-07 stands unchanged and is
+restated here so the amendment cannot be read as weakening it:
+
+- **no Git history rewrite**;
+- **no force-push**;
+- **no blob purge**;
+- the **backup bundle is retained** (`C:\Mizzey-Backups\mizzey-platform\2026-09-22\`);
+- the **old embedded developer signature image remains exposed and deprecated**;
+- the **deprecated signature must not be reused** in any future generated signing pack, and no replacement is
+  generated or imitated: when a new signature asset is needed, Mustafa supplies it separately;
+- the **purge remains a future explicit decision only**, to be revisited if legal or business requirements change.
+
+**Decided (by Mustafa, superseding only D-07's visibility clause):** the repository
+`Mizzey-Platform/mizzey-platform` is **public** for the duration of an external review period, so the live
+repository, its pull requests and its issues can be inspected independently.
+
+- **Public visibility during this period is intentional and authorized.** It is not a defect, not an incident, and
+  not something to be corrected.
+- **Claude must not change the repository's visibility**, in either direction, and must not ask for it to be
+  changed back. No warning to that effect belongs in `PROGRESS.md` or anywhere else.
+- **Visibility is reconsidered only when Mustafa explicitly declares the external review period complete.**
+
+Why this is recorded as an amendment rather than an edit: D-07 was the right decision on the facts at the time it
+was taken, and the log is append-only by practice. Rewriting it would hide that the position changed and why.
+D-07 remains readable as written; this entry is what supersedes its visibility clause.
+
+**What has not changed about the exposure itself.** The assessment in
+`docs/2026-10-04-public-exposure-assessment.md` still holds: the historical engagement material contains no client
+signature, no client personal identity data, no banking data, no credentials, no private keys and no certificates.
+The material sensitivity is the reusable developer signature graphic, which is deprecated above. Being public
+again does not add a category of exposure that was not already assessed.
