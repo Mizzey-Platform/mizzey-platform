@@ -51,7 +51,7 @@ this feature. Each is a contracted row owned by another slice, except where mark
 | AC-2 | Arabic is an **active** second storefront language, reachable under its own language prefix while English stays at the root | FIX-04, FIX-04a | final |
 | AC-3 | In Arabic the platform resolves to the `ar` locale and reports right to left, and the rendered storefront document carries `lang="ar"` and `dir="rtl"` | FIX-04, NFR-04 | final |
 | AC-4 | In English the platform resolves to the `en_US` locale and reports left to right, and the rendered storefront document carries `lang="en-US"` and no right-to-left direction | NFR-04 | final |
-| AC-5 | An English record and its Arabic counterpart form one valid translation relationship, with the English record as the source, so later slices address the pair by translation identity and never by SKU or title | FIX-04 | final |
+| AC-5 | An English record and its Arabic counterpart form one valid translation relationship, with the English record as the source, so later slices address the pair by translation identity and never by SKU or title. **Technical acceptance, not a restatement of the row: see the note below** | FIX-04 | final |
 | AC-6 | The same templates render both languages. Reading direction and locale come from the active language, and no separate Arabic template is required at the baseline | FIX-04, NFR-04 | final |
 | AC-7 | The storefront interface this engagement builds contains no hard-coded user-facing text: every such string is emitted through a translation function bound to the site text domain | NFR-04a | final |
 | AC-8 | An Arabic storefront string resolves from the registered translation source without editing a template per language, so a later slice adds strings rather than language variants | NFR-04a | final |
@@ -60,6 +60,16 @@ this feature. Each is a contracted row owned by another slice, except where mark
 **AC-9 is final as a criterion and unverified as a fact.** Its evidence is a browser matrix on staging, which does
 not exist yet (#244). Nothing in this feature may report AC-9 as verified from the command-line runtime. The three
 states stay separate, per constitution M-7.
+
+**AC-5 is technical acceptance, and is labelled as such.** FIX-04 reads "Multilingual storefront: English
+and Arabic with full LTR/RTL support" and **does not mention translation identity**. AC-5 is therefore not a
+restatement of that row. It is **the engineering and data-integrity acceptance required to deliver the row
+safely**, approved on that basis, and the need for it is measured rather than theoretical: the product-cost pilot
+found that a WPML duplicate shares its original's SKU, so one SKU addresses two products, and A11 found that a
+translation group can be corrupted so an Arabic record detaches from its English source. A bilingual storefront
+whose later slices cannot deterministically pair a record with its counterpart cannot deliver FIX-04 safely.
+**It is not presented to the client as an additional deliverable** and it adds no behaviour beyond what FIX-04
+already obliges.
 
 **AC-9 is the only criterion that needs staging.** The measured facts in the Native coverage table below show the
 local Apache has `mod_rewrite` loaded and `AllowOverride All`, so AC-1 to AC-8 are verifiable here by **serving
@@ -111,12 +121,11 @@ obligation alone. The repeatable check stays as FR-007 because constitution M-7 
 else can repeat, and running it in CI on every pull request is S-1, a safeguard that needs approval and is not a
 client deliverable.
 
-### C-5. What counts as a "representative mobile browser" for NFR-14? Confirmation wanted, not blocking
+### C-5. What counts as a "representative mobile browser" for NFR-14? Settled, approved 4 October 2026
 
-NFR-14 reads "Current Chrome, Safari, Edge, Firefox plus mobile browsers" and does not enumerate the mobile ones.
-The matrix below is the ordinary reading of that wording for an Egyptian storefront, and the work proceeds on it.
-It is flagged for confirmation at the Stage 1 review because the acceptance evidence is sized by it, and because
-confirming it costs nothing now and an argument later costs a day.
+NFR-14 reads "Current Chrome, Safari, Edge, Firefox plus mobile browsers" and does not enumerate the mobile
+ones. **Mustafa approved the matrix below on 4 October 2026**, so it is the acceptance matrix for NFR-14 and no
+longer a proposal. Both reading directions are tested on every row.
 
 | Browser | Reading direction tested | Why it is in the list |
 |---|---|---|
@@ -127,7 +136,8 @@ confirming it costs nothing now and an argument later costs a day.
 | Chrome on Android, current | both | The mobile majority in the market |
 | Safari on iOS, current | both | The other half of mobile, and the stricter of the two |
 
-Not in the list, and not contracted: Internet Explorer, Opera Mini, in-app browsers and any named device model.
+**Explicitly excluded by the same decision**: Internet Explorer, Opera Mini, in-app browsers and any named
+device model. None is added unless separately required.
 
 ## User Scenarios and Testing *(mandatory)*
 
@@ -237,35 +247,42 @@ Translation 3.5.4, WCML 5.5.7, CoreX 0.42.0, PHP 8.3.6, theme `mizzey-theme` act
 |---|---|---|
 | Language framework, with `en` as default and directory-based language URLs | `icl_sitepress_settings`: `default_language=en`, `language_negotiation_type=1` (directories), `urls.directory_for_default_language=0`, `setup_complete=1` | VERIFIED |
 | Arabic **enabled** as a second language, with its own URL and locale | `SitePress::get_active_languages()` returns both `ar` and `en`; `wp_icl_languages` records `active=1` for both. The `active` flag inside `wpml_active_languages` marks the **current** language, not whether a language is enabled, which is why `ar` reads `active: 0` while English is the current language. Measured twice, two ways | VERIFIED |
-| Arabic storefront **reachable over HTTP** | **not today, and the cause is the web server, not WPML.** See the rewrite row below | VERIFIED as a gap |
+| Arabic storefront **served over HTTP, right to left** | **Yes.** `/ar/` returns 200 with `<html dir="rtl" lang="ar">` and `/ar/shop/` the same, while `/` returns 200 with `<html lang="en-US">` and no direction attribute. Measured by served request, once the baseline carries pretty permalinks and the standard rewrite rules | VERIFIED |
 | No Arabic page records exist | all five pages (shop, cart, checkout, my account, sample) have a translation group containing `en` only. **A gap this feature closes**, per clarification C-2 | VERIFIED as a gap |
 | Right-to-left direction from the locale, with no custom code | switching to `ar` gives locale `ar`, `is_rtl()` true and `$wp_locale->text_direction` `rtl`; switching back to `en` gives `en_US`, false and `ltr` | VERIFIED |
 | Document direction attribute emitted by the platform | the served storefront root returns `<html lang="en-US">` with no direction attribute, correct for left to right. After switching the language in process, `language_attributes()` emits `dir="rtl"` | VERIFIED |
-| Document `lang` attribute **in Arabic** | **unresolved.** After an in-process switch to Arabic, `language_attributes()` emits `dir="rtl" lang="en-US"`: the direction follows but the language tag does not. An in-process switch is not a real Arabic request, so this is **a measurement to repeat against a served Arabic URL**, not yet a defect. AC-3 requires `lang="ar"`, so the plan has to settle it | UNVERIFIED |
+| Document `lang` attribute **in Arabic** | **Resolved: `lang="ar"` is emitted correctly** on a served Arabic request. The earlier `dir="rtl" lang="en-US"` came from an **in-process** `wpml_switch_language`, where the direction follows immediately and the cached language tag does not. That was an artifact of switching mid-request, not a platform defect, which is why it was recorded as a measurement to repeat rather than as a finding. AC-3 is met natively | VERIFIED |
 | Arabic translations of the platform's own storefront strings | core `ar` language pack installed; `woocommerce-ar.mo` and `woocommerce-multilingual-ar.mo` present, plus the Arabic JSON translations WooCommerce needs for its scripts | VERIFIED |
 | Translation identity for a record pair | `wpml_element_trid` and `wpml_get_element_translations`, used throughout `specs/001-product-cost-capture` and its scenarios t12 and t19 | VERIFIED |
 | String translation for strings that are not in a `.mo` file | WPML String Translation active, `wp_icl_strings` present with 29 registered strings across 12 contexts | VERIFIED |
 | A text domain loaded for the theme or the site plugin | **neither exists.** No `languages/` directory in `mizzey-theme` or `mizzey-site`, no `load_theme_textdomain` or `load_plugin_textdomain` call, and no `.pot`. **Gap** | VERIFIED as a gap |
 | Any translatable string in this engagement's own code | **none.** No `__()`, `_e()` or `esc_html__()` call exists in `mizzey-theme` or `mizzey-site`, so there is no hard-coded storefront text to remove either. The work is to establish the mechanism and the check before the strings arrive | VERIFIED |
-| A real `/ar/` URL served by the runtime | **achievable here, and not yet configured.** The runtime has no `.htaccess` and serves PATHINFO permalinks, so `/index.php/shop/` returns 200 while `/shop/` and `/ar/` return an Apache 404, and `/index.php/ar/` returns a WordPress 404 because WPML's directory negotiation expects the language segment at the root of the path. `?lang=ar` does not switch either, correctly, because the negotiation type is directories and not parameters. **But `mod_rewrite` is loaded in the local Apache and the vhost sets `AllowOverride All`**, so pretty permalinks plus a generated `.htaccess` make a real `/ar/` request serveable in this runtime. **The rendered-URL check is therefore automatable here and is not deferred to staging** | VERIFIED as a configuration gap |
+| Permalink and rewrite configuration | **A deterministic environment prerequisite, not a multilingual platform defect.** WPML uses directory negotiation, so the language segment sits at the root of the path. Before configuration the runtime served PATHINFO permalinks with no `.htaccess`, so `/shop/` and `/ar/` reached Apache as missing directories and `/index.php/ar/` reached WordPress as a missing post; `?lang=ar` correctly does nothing, the negotiation type being directories and not parameters. `mod_rewrite` is loaded and the vhost sets `AllowOverride All`, so pretty permalinks plus the standard rewrite rules make the Arabic URL serve, which is how the rows above were measured. **One wrinkle the baseline script carries**: `got_mod_rewrite()` is false under this runtime's CGI PHP, so `wp rewrite flush --hard` reports success and writes no `.htaccess`, so T-01 writes the file. **Nothing here is deferred to staging** | VERIFIED as a baseline prerequisite |
 | Browser rendering across Chrome, Safari, Edge, Firefox and mobile | **not available from a command-line runtime, at all.** This is the one acceptance item that genuinely needs staging and real browsers, and it is blocked on #244 | UNVERIFIED |
 
 **Native first, per constitution M-4.** Most of the capability is already provided, including the part that is
 hardest to build: direction follows the locale with no custom code at all. The gaps are narrow and three of the
 four are **configuration, not code**:
 
-| Gap | Kind |
-|---|---|
-| The runtime serves PATHINFO permalinks with no `.htaccess`, so no language-prefixed URL can resolve | Runtime and test-harness configuration |
-| No Arabic page records exist for the WooCommerce system pages | Platform configuration (C-2) |
-| Neither the theme nor the site plugin loads a text domain, and there is no `.pot` | A small amount of code, plus a build step |
-| The `lang` attribute in Arabic is unresolved | To be measured against a served Arabic URL before anything is written |
+| Gap | Kind | Task |
+|---|---|---|
+| The baseline needs pretty permalinks and the standard rewrite rules before any language-prefixed URL resolves | Test-harness configuration. Deterministic, and not a platform defect | T-01 |
+| No Arabic page records exist for the WooCommerce system pages | Platform configuration (C-2) | T-02 |
+| Neither the theme nor the site plugin loads a text domain, and there is no `.pot` | A small amount of code, plus a generated file | T-03, T-04, T-05 |
 
-**A first draft of this section claimed Arabic was inactive.** It was wrong: it read the `active` flag of
-`wpml_active_languages`, which marks the current language rather than whether a language is enabled. The claim was
-corrected after checking `SitePress::get_active_languages()` and the `wp_icl_languages` table, which both report
-Arabic enabled. It is recorded because the same misreading would have produced a feature that "activates" a
-language that was never off.
+**Nothing else is missing.** AC-3, AC-4 and AC-6 are met natively, by measurement, and receive tests rather than
+an implementation. This feature found no multilingual platform defect.
+
+**Two first-draft readings of this section were wrong, and both are recorded rather than quietly replaced.**
+
+1. It claimed **Arabic was inactive**, reading the `active` flag of `wpml_active_languages`, which marks the
+   current language rather than whether a language is enabled. `SitePress::get_active_languages()` and the
+   `wp_icl_languages` table both report Arabic enabled. The same misreading would have produced a feature that
+   "activates" a language that was never off.
+2. It treated **`lang="ar"` as unresolved and the Arabic URL as unreachable**, on the strength of an in-process
+   language switch and an unconfigured web server. A served request settled both: `/ar/` returns
+   `dir="rtl" lang="ar"`. The lesson is the one the probes kept teaching. An in-process measurement is not a
+   request, and an environment limit is not a platform defect.
 
 ## Requirements
 
@@ -306,7 +323,11 @@ language that was never off.
 | S-1 | A static check in CI that rejects a user-facing string in this engagement's storefront code that is not wrapped in a translation function | NFR-04a is a one-line obligation that is violated one string at a time, across every later slice. A check is the only thing that holds it. FR-007 makes it contractual, so S-1 is the part that goes beyond: running it in CI on every PR rather than on demand | Yes, a checker under `tools/`, no production code |
 | S-2 | An assertion that the storefront default language cannot be changed by session state, run on every suite | Guards AC-1 against a regression introduced by a later slice that stores a language preference | No, test only |
 
-Both need Mustafa's approval and neither is presented to the client as a deliverable.
+**Both approved by Mustafa on 4 October 2026.** They remain **engineering safeguards and evidence**, not
+client deliverables, and nothing in this spec, the verification record or the pull request may present them as
+separate deliverables. S-1 is the continuous-integration form of the FR-007 check, so the contractual obligation
+is FR-007 and the safeguard is only that it runs on every pull request rather than on demand. S-2 is a test
+assertion and changes no behaviour.
 
 ## Future or Option C items (not built)
 
@@ -318,6 +339,8 @@ Both need Mustafa's approval and neither is presented to the client as a deliver
 | Header language switcher as a storefront component | NAV rows, owned by #253, behind OD-01 |
 | Arabic translations of the catalogue content | the MIG rows and SSC-21, owned by #247 and #249 |
 | A general multilingual metadata synchronisation framework | Deliberately not built. The product-cost pilot, A11, A12, B1 and the price matrix each concluded against it |
+| Any stock synchronisation between a record and its translation | Deliberately not built. B1 measured that stock already shares one balance while the translation group is intact, because WCML hooks the stock write directly and stock never depended on `save_post`. The dangerous case is translation-group corruption, which AC-5 guards and a migration invariant owns |
+| Any price synchronisation between a record and its translation | Deliberately not built. The price matrix measured every contracted launch price-maintenance path as already correct, including the scheduled-sales cron, so the native-first rule applies. This feature writes no product data of any kind |
 
 ## Success Criteria
 

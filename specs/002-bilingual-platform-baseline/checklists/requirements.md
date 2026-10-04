@@ -17,12 +17,13 @@ The point of this checklist is not to agree with the spec. It is to try to break
 - [x] **No criterion traces an id outside the five.** Nine criteria, all tracing within the trace table.
 - [x] **No row outside the five is built.** ADM-159, NFR-04b and NFR-03 are named as Context rows with their
       owning slice, and no criterion or task touches them.
-- [ ] **Does any criterion quietly expand a row?** Reviewed, and one is worth naming: AC-5 requires a valid
-      translation relationship with the English record as source. FIX-04 says "Multilingual storefront: English
-      and Arabic with full LTR/RTL support" and does not mention translation identity. **Judgement**: a
-      multilingual storefront that cannot reliably pair a record with its counterpart is not a multilingual
-      storefront, and the pilot measured two ways that pairing fails. Kept, and flagged here so a reviewer can
-      disagree with it on the record rather than discovering it later.
+- [x] **Does any criterion quietly expand a row? One did, and it is now labelled rather than implied.** AC-5
+      requires a valid translation relationship with the English record as source. FIX-04 says "Multilingual
+      storefront: English and Arabic with full LTR/RTL support" and does not mention translation identity.
+      **Decided 4 October 2026**: AC-5 is kept, and is classified in the spec as **technical acceptance needed to
+      deliver FIX-04 safely, explicitly not a restatement of the row**. It is not a client deliverable and adds no
+      behaviour beyond FIX-04. The need is measured: a WPML duplicate shares its original's SKU, and A11 showed a
+      translation group can detach an Arabic record from its English source.
 
 ## Clarity and testability
 
@@ -43,7 +44,8 @@ The point of this checklist is not to agree with the spec. It is to try to break
       separate, and this feature can reach the second at most.
 - [x] **No staging claim is made from a command-line runtime.** The opposite problem was found and fixed: the
       first draft deferred the `/ar/` rendered-URL check to staging when the runtime can in fact serve it. The
-      requirement was not weakened to suit the runtime; the runtime was configured to meet it.
+      requirement was not weakened to suit the runtime; the runtime was configured to meet it, and a served
+      request then returned `<html dir="rtl" lang="ar">`. **Only AC-9 needs staging.**
 - [x] **Every "VERIFIED" row in Native coverage names its evidence.** Each cites the option, filter, table, file or
       request that produced it.
 - [x] **Every measurement that is not yet a conclusion is marked as such.** The in-process `lang` attribute lag
@@ -85,17 +87,22 @@ The point of this checklist is not to agree with the spec. It is to try to break
 - [x] **Could the check pass by doing nothing?** Its own tests include a deliberately hard-coded string, so a
       check that never fires fails its own suite.
 
-## Open, and not blocking
+## Decided since the first pass
 
-- [ ] **C-5, the mobile browser list.** NFR-14 says "plus mobile browsers" and names none. The matrix proposes
-      Chrome on Android and Safari on iOS. Work proceeds on it; confirmation is wanted at the Stage 1 review
-      because the acceptance evidence is sized by it.
-- [ ] **AC-5 as a reading of FIX-04**, noted under Scope discipline above.
-- [ ] **AC-9 cannot be completed in this feature.** Staging does not exist. The browser matrix will be written
-      with every row unexercised, and the feature will report AC-9 as not verified rather than quietly dropping
-      it.
+- [x] **C-5, the mobile browser list.** **Approved 4 October 2026**: current Chrome, Safari, Edge and Firefox on
+      desktop, current Chrome on Android, current Safari on iOS, both reading directions on every row. Internet
+      Explorer, Opera Mini, in-app browsers and named device models are excluded by the same decision.
+- [x] **AC-5's classification.** Decided, and recorded under Scope discipline above.
+- [x] **S-1 and S-2.** **Approved**, and kept classified as engineering safeguards and evidence rather than
+      client deliverables.
+
+## Still open, and not blocking
+
+- [ ] **AC-9 cannot be completed in this feature.** Staging does not exist, and it is owned by #244. The browser
+      matrix is written with every row unexercised, and the feature reports AC-9 as not verified rather than
+      quietly dropping it. **This is the only item this feature cannot close.**
 
 ## Result
 
-**Pass, with three items open and none blocking.** Two are confirmations wanted from Mustafa and one is a
-dependency on #244 that is recorded rather than worked around.
+**Pass.** Everything that was open at the first pass is decided. One item remains, a dependency on #244 that is
+recorded rather than worked around.

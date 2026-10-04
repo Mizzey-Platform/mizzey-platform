@@ -53,22 +53,45 @@ written nowhere.
   C-2, and it lands in the baseline fixture. A reviewer may disagree with that classification; the checklist
   records it so the disagreement is on the record.
 
-## One scope reading a reviewer should see
+## The one scope reading, now decided
 
-The checklist flags it and so does this analysis, because it is the only criterion that is a reading rather than
-a restatement.
+This analysis surfaced AC-5 as the only criterion that was a reading rather than a restatement, and it was put to
+Mustafa rather than kept on judgement.
 
-**AC-5** requires a valid translation relationship with the English record as source. FIX-04 reads "Multilingual
-storefront: English and Arabic with full LTR/RTL support" and says nothing about translation identity.
+**Decided 4 October 2026.** AC-5 is kept, and **classified as technical acceptance needed to deliver FIX-04
+safely, not as a restatement of FIX-04.** The spec now says so in both the criteria table and a note beneath it.
+The distinction is the whole point of the decision: FIX-04 does not mention translation identity, so AC-5 may not
+be presented as its wording, and it may not be presented to the client as an additional deliverable either. It
+adds no behaviour beyond what FIX-04 already obliges.
 
-The argument for keeping it: a multilingual storefront that cannot reliably pair a record with its counterpart is
-not a multilingual storefront, and the product-cost pilot measured two distinct ways that pairing fails in this
-exact stack. The argument against: the row does not say it, and M-1 says a valid id is not a licence.
+The need is measured rather than theoretical. A WPML duplicate shares its original's SKU, so one SKU addresses two
+products; and A11 showed that a translation group can be corrupted so an Arabic record detaches from its English
+source. Later bilingual slices need a deterministic English-to-Arabic record relationship, and that is what AC-5
+accepts.
 
-It is kept, and flagged, so that it can be disagreed with on the record rather than discovered later.
+## Second pass, 4 October 2026, after review
+
+External review found a cross-artifact inconsistency this analysis had missed: **`spec.md`'s Native coverage was
+stale**. It still said the Arabic storefront was not reachable over HTTP, that `lang="ar"` was unresolved, and
+that the missing `.htaccess` was an open runtime gap, while `research.md`, `plan.md` and `tasks.md` all recorded
+the final served measurement. The first pass checked criteria coverage, requirement citations, register ids and
+path classes, and **did not compare factual claims across artifacts**, which is exactly the class of error it
+existed to catch.
+
+The analysis now does, mechanically. Five claims are compared across all five artifacts and the run must prove
+each is stated the same way everywhere:
+
+| Claim | Required state |
+|---|---|
+| Is `/ar/` reachable | Served, 200 |
+| Is `lang="ar"` verified | Verified on a served request; the in-process result is an artifact |
+| Are AC-3, AC-4 and AC-6 native | Yes, tests rather than implementation |
+| What is rewrite configuration responsible for | A deterministic baseline prerequisite, not a platform defect |
+| AC-5's classification | Technical acceptance, explicitly not a restatement of FIX-04 |
 
 ## Result
 
-**Pass.** Two inconsistencies found and fixed, one scope reading surfaced for review, and no task scheduled
-against a path this work type may not touch. Implementation is unblocked, and stops at the checkpoint by
-instruction rather than by obstacle.
+**Pass.** Three inconsistencies found and fixed in total: a criterion with no task, a dangling file reference, and
+a stale Native coverage section that contradicted three other artifacts. Three decisions recorded (AC-5's
+classification, the NFR-14 matrix, S-1 and S-2). No task is scheduled against a path this work type may not touch.
+One item cannot be closed by this feature: AC-9, which needs staging and is owned by #244.
