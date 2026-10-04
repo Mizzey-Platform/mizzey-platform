@@ -39,21 +39,43 @@ in the browser:
 Roughly **60 to 70 PBIs** across 19 epics, against 595 rows. That ratio is the point: an issue per row would be a
 filing system, not a plan.
 
-## Board fields
+## Board fields, as the live Project defines them
 
-| Field | Type | Values | Why |
+**Read from the live Project.** Where a field is a single-select, the option set below is exactly what the Project
+holds; the document does not describe a field model the board does not have.
+
+| Field | Type | Options, live | Why |
 |---|---|---|---|
-| Epic | single-select | E-PRE, E-FND, E-ROLE, E-SF, E-RULES, E-ORD, E-ADM, E-MIG, E-ERP, E-RPT, E-INT, E-NOTF, E-NFR, E-DATA, E-EVT, E-DOD, E-ACC, E-MKT, E-HND | Follows the register's own sections, so an epic is something the client can recognise |
-| Register ids | text | e.g. `ADM-27, RPT-11` | The scope citation. Free text because a PBI can cite many rows |
-| Scope class | single-select | P1, P1-L, P1-E, DLV, mixed | P1-L bounds what "done" means; P1-E cannot be finalised before PRE-09 |
-| Stage | single-select | S1, S2, per PRE-09 | **The contractual stage never moves for engineering convenience** |
-| Status | single-select | Blocked, Ready, In progress, In review, Verified, Accepted | "Verified" and "Accepted" are deliberately separate: the cost pilot is Verified and not Accepted |
-| ERP blocked | single-select | no, yes (P1-E), partial | Set to yes when any cited row is P1-E |
-| Design dependency | single-select | none, needs design, design approved | Every storefront slice is behind OD-01 |
-| Data-integrity dependency | text | e.g. `A11`, `B6`, `A12 price` | The workstream item that must be measured first |
+| Epic | single-select | `E-PRE` / `E-FND` / `E-ROLE` / `E-SF` / `E-RULES` / `E-ORD` / `E-ADM` / `E-MIG` / `E-ERP` / `E-RPT` / `E-INT` / `E-NOTF` / `E-NFR` / `E-DATA` / `E-EVT` / `E-DOD` / `E-ACC` / `E-MKT` / `E-HND` | Follows the register's own sections, so an epic is something the client can recognise |
+| Register ids | text | the exact delivery ids, listed in full | The scope citation. Never a range: a range quietly includes non-delivery rows |
+| Scope class | single-select | `P1` / `P1-L` / `P1-E` / `DLV` / `mixed` | **Computed from the cited ids**: one distinct delivery scope, that scope; more than one, `mixed`. Never chosen from the PBI's purpose |
+| Stage | single-select | `S1` / `S2` / `mixed` / `per PRE-09` | **The exact stages of the cited register rows.** One distinct stage, that stage; more than one, `mixed`. `per PRE-09` exists for a row the register defers to the ERP specification. **Not** engineering scheduling, and never derived from Scope class |
+| Status | single-select | `Blocked` / `Ready` / `In progress` / `In review` / `Verified` / `Accepted` | `Verified` and `Accepted` are deliberately separate: the product-cost pilot is Verified and not Accepted |
+| ERP blocked | single-select | `no` / `partial` / `yes` | **A dependency, and only a dependency.** See the definitions below |
+| Design dependency | single-select | `none` / `needs design` / `design approved` | Every storefront slice is behind OD-01 |
+| Data-integrity dependency | text | e.g. `A11`, `B6` | The workstream item that must be measured first |
 | Client decision | text | e.g. `CX-01`, `OD-12` | Empty for most PBIs |
-| Acceptance evidence | text | e.g. `AC-05, t17` | The Section N rows plus the local scenario or probe |
-| Delivery order | number | 1 to n | The proposed sequence, so the board carries it rather than a separate document |
+| Acceptance evidence | text | e.g. the verification record | What will show the outcome was reached |
+| Delivery order | number | 1 to n | **Engineering scheduling**, which is a different concept from Stage and never changes a contractual stage |
+| Dependencies | text | real GitHub issue numbers | Never a delivery-order number: on GitHub `#1` is a historical Option C issue |
+
+### `ERP blocked`, defined
+
+| Option | Meaning |
+|---|---|
+| `no` | No unresolved ERP or PRE-09 dependency prevents this PBI |
+| `partial` | Part of the PBI can proceed, but some behaviour or final acceptance waits on the ERP or PRE-09 |
+| `yes` | The PBI materially depends on the ERP meeting or PRE-09 before it can complete |
+
+**P1-E is never encoded here.** Scope class records scope; this field records a dependency. `#243` is the proof:
+it is `yes` while citing a DLV row and a P1 row, because the specification is what the ERP meeting produces.
+
+### Stage and Delivery order are different concepts
+
+| | Represents | Authority |
+|---|---|---|
+| **Stage** | The exact stages of the cited register rows | The Feature Register, through `docs/scope/register-ids.json` |
+| **Delivery order** | When the work is scheduled | Engineering sequencing, which never moves a contractual stage |
 
 No iteration field: GitHub will not create one through the API, so Sprint stays a single-select if it is wanted at
 all. That trap cost time on Project #4 and is recorded so it is not rediscovered.
@@ -87,7 +109,7 @@ Neither template invents acceptance criteria. Criteria come from the spec, which
 ## The fifteen seeded PBIs, as the live board holds them
 
 **Read from the live Project, which is the operational state; this document records it, never the reverse.**
-Regenerated 4 October 2026 after the metadata reconciliation.
+Regenerated 4 October 2026.
 
 | Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -106,6 +128,30 @@ Regenerated 4 October 2026 after the metadata reconciliation.
 | 13 | #253 | Header, navigation and footer, mirrored right to left | E-SF | 10 ids, listed in the issue | **P1** | **S1** | **Blocked** | **no** | needs design | - | OD-01 brand identity | #250 design system; #241 bilingual platform baseline; #242 information architecture |
 | 14 | #254 | Product details page, in both languages | E-SF | 22 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **partial** | needs design | A3 variation identity (measured working) | OD-01 brand identity; OD-13 authenticity and warranty policy | #250 design system; #253 header and navigation; #241 bilingual platform baseline |
 | 15 | #255 | Checkout and order placement, in both languages | E-SF | 14 ids, listed in the issue | **P1** | **S1** | **Blocked** | **partial** | needs design | B6 concurrency (needs staging); D6 order language context | OD-05 COD; OD-09 VAT and invoicing; OD-19 payment methods at launch; OD-29 COD verification | #250 design system; #254 product details page; #245 ERP adapter seam |
+
+### Exact register ids, every PBI in full
+
+The table above abbreviates a long id list for readability. **This appendix is the complete citation**, and
+it is what `tools/tests/test_board_metadata.py` reads, so **no PBI escapes Scope class and Stage
+validation.** Both are generated from the live Project in the same pass, so there is one truth and not two.
+
+- **#241** (5 ids): `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14`
+- **#242** (30 ids): `IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35, NFR-03`
+- **#243** (2 ids): `PRE-09, ERP-10`
+- **#244** (6 ids): `PRE-01, PRE-02, PRE-03a, PRE-03b, NFR-09, NFR-08`
+- **#246** (3 ids): `RPT-10, FIX-04, NFR-04`
+- **#247** (4 ids): `MIG-02, MIG-09, MIG-13, SSC-21`
+- **#249** (7 ids): `PRE-05, PRE-06, MIG-01, MIG-03, MIG-04, MIG-06, MIG-19`
+- **#245** (4 ids): `ERP-01, ERP-02, ERP-10, INT-16`
+- **#248** (13 ids): `ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-12, ORD-13, ORD-14, ADM-86, ADM-87`
+- **#250** (2 ids): `PRE-07, PRE-08`
+- **#251** (5 ids): `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09`
+- **#252** (2 ids): `ADM-27, RPT-11`
+- **#253** (10 ids): `NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10`
+- **#254** (22 ids): `PDP-01, PDP-02, PDP-03, PDP-04, PDP-05, PDP-06, PDP-07, PDP-08, PDP-09, PDP-10, PDP-11, PDP-12, PDP-13, PDP-14, PDP-15, PDP-16, PDP-17, PDP-18, PDP-19, PDP-21, PDP-22, PDP-24`
+- **#255** (14 ids): `CHK-01, CHK-02, CHK-03, CHK-04, CHK-05, CHK-06, CHK-07, CHK-08, CHK-09, CHK-10, CHK-11, CHK-12, BR-005, ENT-08`
+
+**129 exact delivery ids across the fifteen PBIs.**
 
 ### How Scope class and Stage are set
 
