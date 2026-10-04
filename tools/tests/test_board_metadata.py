@@ -16,8 +16,14 @@ Stage is the same function over the register's stage column, and is **never** de
 be mixed scope and S1 stage, or P1 scope and mixed stage.
 
 `ERP blocked` is deliberately **not** computed from the ids. It records a dependency on PRE-09 or the ERP, which no
-scope value implies: #243 is `yes` while citing DLV and P1 rows, because the specification is what the ERP meeting
+scope value implies: #243 is `yes` while citing a single DLV row, because the specification is what the ERP meeting
 produces. What is enforced is that its vocabulary stays a dependency vocabulary and never encodes a scope class.
+
+One row, one accepting owner. Three rows were once cited by two PBIs each: FIX-04 and NFR-04 on #241 and #246, and
+ERP-10 on #245 and #243. They were corrected on the board on 4 October 2026, each second citation becoming a
+Dependencies entry, and the exact-id total moved 131 to 129 to 126. Citation uniqueness is enforced by
+`test_backlog_totals.py`, which reads the ownership map; this file enforces that whatever is cited is classified
+correctly.
 
 The GitHub Project API is not reachable from CI, so this validates the generated snapshot. The step that compares
 the document with the live board is by hand, and is recorded beside the table.
@@ -63,6 +69,18 @@ def stage_of(ids, reg):
     """The Stage the cited ids imply, read from the register's own stage column."""
     found = sorted({reg[i]['stage'] for i in ids if i in reg})
     return found[0] if len(found) == 1 else 'mixed'
+
+
+# The register writes an unstaged row as a literal '-'. The board's Stage field has no '-' option; it has
+# 'per PRE-09', which the field definition records as existing for a row the register defers to the ERP
+# specification. Adding '-' to the field would replace its option set and clear every stored value, so the one
+# spelling difference is declared here. One value, one direction: nothing else is mapped.
+STAGE_SPELLING = {'-': 'per PRE-09'}
+
+
+def stage_accepts(computed, on_board):
+    """Does the board's Stage value state the computed register stage?"""
+    return on_board == computed or on_board == STAGE_SPELLING.get(computed)
 
 
 def exact_ids():
@@ -144,10 +162,25 @@ class BoardMetadata(unittest.TestCase):
 
     def test_stage_is_computed_from_the_register_and_not_from_scope(self):
         for r in self.rows:
+            computed = stage_of(r['ids'], self.reg)
             with self.subTest(issue=r['issue']):
-                self.assertEqual(r['stage'], stage_of(r['ids'], self.reg),
-                                 f"#{r['issue']} Stage does not match the register stages of its cited ids "
-                                 f"({sorted({(i, self.reg[i]['stage']) for i in r['ids'] if i in self.reg})})")
+                self.assertTrue(
+                    stage_accepts(computed, r['stage']),
+                    f"#{r['issue']} Stage reads {r['stage']!r}; the register stages of its cited ids give "
+                    f"{computed!r} "
+                    f"({sorted({(i, self.reg[i]['stage']) for i in r['ids'] if i in self.reg})})")
+
+    def test_the_stage_spelling_is_one_value_and_not_a_loophole(self):
+        # 'per PRE-09' may stand for an unstaged row and for nothing else. If this fails, a real stage can hide
+        # behind it, which is the error the row table was corrected for in the first place.
+        self.assertEqual(STAGE_SPELLING, {'-': 'per PRE-09'})
+        self.assertTrue(stage_accepts('-', 'per PRE-09'))
+        self.assertTrue(stage_accepts('-', '-'))
+        self.assertTrue(stage_accepts('S1', 'S1'))
+        self.assertFalse(stage_accepts('S1', 'per PRE-09'), 'an S1 PBI must not be spelled per PRE-09')
+        self.assertFalse(stage_accepts('S2', 'per PRE-09'), 'an S2 PBI must not be spelled per PRE-09')
+        self.assertFalse(stage_accepts('mixed', 'per PRE-09'))
+        self.assertFalse(stage_accepts('-', 'S1'), 'an unstaged row must not be promoted to S1')
 
     def test_every_cited_id_is_a_real_delivery_row(self):
         for r in self.rows:

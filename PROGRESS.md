@@ -21,11 +21,12 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
-- **`main` is `7e39c4b03a908d1a3a345ce737bf827b0eb14aa1`**: the pilot (#237, squash `93d647b`), its close-out and
-  corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
-  probes with the exposure assessment (#240, `eadd254`), and the A11 and price-matrix probes with three rounds of
-  record corrections (**#256, squash `7e39c4b`, merged 4 October 2026** from the reviewed head `e5c1e95`). Each
-  merged with green CI; `main-push` and `baseline` pass at `7e39c4b`.
+- **`main` is `b158a1c506d5a4e6d0b5e3cede34283416274998`**: the pilot (#237, squash `93d647b`), its close-out
+  and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
+  probes with the exposure assessment (#240, `eadd254`), the A11 and price-matrix probes with three rounds of
+  record corrections (#256, squash `7e39c4b`, from the reviewed head `e5c1e95`), and the backlog-template
+  reconciliation (**#257, squash `b158a1c`, merged 4 October 2026**). Each merged with green CI; `main-push` and
+  `baseline` pass at `b158a1c`.
 - **t17, t18, t19 and t20 are fact-finding scenarios**: they return no pass or fail verdict and record defects as
   findings. A suite line reading `0 failed` means the harness held and the contract scenarios t02 to t16 passed,
   **not** that every measured behaviour was correct.
@@ -71,9 +72,10 @@ Live status. First action each session: read this, then continue from **Next**.
 1. **#241, the bilingual platform baseline, is the work in progress.** FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14.
    P1, S1, no ERP, design or client-decision dependency, and the only PBI in `Ready`. It is the first normal
    implementation feature after the pilot, and it follows the full Spec Kit workflow.
-2. **The backlog-template reconciliation PR** is open: it corrects the unseeded decomposition so the remaining
-   45 to 55 PBIs cannot be generated from range shorthand or the superseded field model. **No further PBI is
-   seeded until it merges.**
+2. **The backlog template is reconciled and merged** (#257). The unseeded decomposition now carries the live
+   board's field model, the exact delivery ids per register section, and an ownership map over all 595 delivery
+   rows, so the remaining 45 to 55 PBIs cannot be generated from range shorthand. **Every delivery row has
+   exactly one accepting owner**, the three shared citations having been corrected on the board.
 3. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.

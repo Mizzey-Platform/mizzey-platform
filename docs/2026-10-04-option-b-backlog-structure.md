@@ -366,7 +366,7 @@ Both account for the same 595 rows.
 | E-PRE-3 Repository, CI and governance | - | `PRE-04` | `DLV` | `S1` | Done in substance: the governance foundation landed 22 September. Not seeded as a PBI |
 | E-PRE-4 Import specification | #249 | 7 ids, in the ownership map | `mixed` | `S1` | Seeded. Absorbed the old E-MIG-1 and E-MIG-2 source and mapping rows |
 | E-PRE-5 Design system and interface design | #250 | `PRE-07, PRE-08` | `DLV` | `S1` | Seeded. Blocked by OD-01 |
-| E-PRE-6 ERP Integration Specification | #243 | `PRE-09, ERP-10` | `mixed` | `mixed` | Seeded. PRE-09 is the only register row carrying no stage |
+| E-PRE-6 ERP Integration Specification | #243 | `PRE-09` | `DLV` | `-` | Seeded. PRE-09 is the only register row carrying no stage, which the board spells `per PRE-09`. ERP-10 is named as a boundary and owned by #245 |
 
 ### E-FND (74 delivery rows over 7 slices)
 
@@ -461,7 +461,7 @@ Both account for the same 595 rows.
 
 | Slice | Seeded | Owns | Scope class | Stage | Notes |
 |---|---|---|---|---|---|
-| E-ERP-1 Stock source of truth and adapter seam | #245 | `ERP-01, ERP-02, ERP-10, INT-16` | `P1` | `S1` | Seeded. ERP-10 is cited by #243 as well: see the three rows cited by two PBIs |
+| E-ERP-1 Stock source of truth and adapter seam | #245 | `ERP-01, ERP-02, ERP-10, INT-16` | `P1` | `S1` | Seeded. It owns ERP-10, the adapter rule. #243 names it as context and does not cite it |
 | E-ERP-2 Sale reduces ERP stock | - | `ERP-04` | `P1` | `S1` | P1, and unbuildable before PRE-09 defines the call |
 | E-ERP-3 No sale against unvalidated stock | - | `ERP-05` | `P1` | `S1` | P1 and key. OD-41 settled the business rule: the store does not confirm the sale |
 | E-ERP-4 Cart and view stock awareness | - | `ERP-03` | `P1-E` | `S1` | P1-E, PRE-09 |
@@ -474,7 +474,7 @@ Both account for the same 595 rows.
 | Slice | Seeded | Owns | Scope class | Stage | Notes |
 |---|---|---|---|---|---|
 | E-RPT-1 Sales report | - | `RPT-01` | `P1-L` | `S1` | Order level, so not exposed to the product split |
-| E-RPT-2 Inventory report counts one item once | #246 | `RPT-10, FIX-04, NFR-04` | `mixed` | `S1` | Seeded, exactly as the board holds it. P-020: one physical item listed twice. FIX-04 and NFR-04 are the bilingual baseline it needs, and #241 delivers them: see the three rows cited by two PBIs |
+| E-RPT-2 Inventory report counts one item once | #246 | `RPT-10` | `P1-L` | `S1` | Seeded. P-020: one physical item listed twice. It needs the bilingual baseline, which #241 delivers and owns, so FIX-04 and NFR-04 are in its Dependencies field and not cited here |
 | E-RPT-3 Product cost captured | #252 | `RPT-11, ADM-27` | `P1` | `S1` | Seeded. Technically verified by the pilot; acceptance pending CX-01 and OD-12 |
 | E-RPT-4 Funnel and traffic through GA4 | - | `RPT-08, RPT-09` | `P1-L` | `S1` | Delivered through GA4 configuration, not a built report |
 
@@ -608,12 +608,11 @@ notifications at launch).
 
 **Generated, and checked in CI.** `tools/tests/test_backlog_totals.py` reads this list and fails if any id is not
 a register delivery row, if any delivery row has no owner, if a range appears where an id should be, if a seeded
-slice disagrees with the live board, or if a row gains a second owner beyond the three recorded below. That is the
-mechanism that stops this document recreating the errors corrected on #241 to #255.
+slice disagrees with the live board, or if **any** row gains a second owner. That is the mechanism that stops this
+document recreating the errors corrected on #241 to #255.
 
-**A seeded slice records exactly what the live board holds**, duplicate citations included, so the document and
-the Project cannot drift. Where the board and the one-owner rule disagree, the disagreement is written down
-rather than smoothed over.
+**A seeded slice records exactly what the live board holds**, so the document and the Project cannot drift. Every
+delivery row has **exactly one accepting owner**: see the resolution note at the end of this map.
 
 Format: slice, live PBI where one exists, count, then the exact ids.
 
@@ -623,7 +622,7 @@ Format: slice, live PBI where one exists, count, then the exact ids.
 - **E-PRE-3 Repository, CI and governance** (1 ids): `PRE-04`
 - **E-PRE-4 Import specification** (#249) (7 ids): `PRE-05, PRE-06, MIG-01, MIG-03, MIG-04, MIG-06, MIG-19`
 - **E-PRE-5 Design system and interface design** (#250) (2 ids): `PRE-07, PRE-08`
-- **E-PRE-6 ERP Integration Specification** (#243) (2 ids): `PRE-09, ERP-10`
+- **E-PRE-6 ERP Integration Specification** (#243) (1 ids): `PRE-09`
 
 **E-FND**
 
@@ -711,7 +710,7 @@ Format: slice, live PBI where one exists, count, then the exact ids.
 **E-RPT**
 
 - **E-RPT-1 Sales report** (1 ids): `RPT-01`
-- **E-RPT-2 Inventory report counts one item once** (#246) (3 ids): `RPT-10, FIX-04, NFR-04`
+- **E-RPT-2 Inventory report counts one item once** (#246) (1 ids): `RPT-10`
 - **E-RPT-3 Product cost captured** (#252) (2 ids): `RPT-11, ADM-27`
 - **E-RPT-4 Funnel and traffic through GA4** (2 ids): `RPT-08, RPT-09`
 
@@ -754,23 +753,30 @@ Format: slice, live PBI where one exists, count, then the exact ids.
 
 - **E-HND Handover** (12 ids): `HND-01, HND-02, HND-03, HND-04, HND-05, HND-06, HND-07, HND-08, HND-09, HND-10, HND-11, HND-12`
 
-**598 citations over 595 distinct delivery rows**, which is every delivery row in the register. Three rows are cited twice, and only those three.
+**595 citations over 595 distinct delivery rows**, which is every delivery row in the register, each owned exactly once.
 
-### The three rows cited by two PBIs
+### One row, one accepting owner: how the three shared citations were resolved
 
-Three delivery rows are cited by two PBIs each. This predates the one-owner rule, and it is recorded rather
-than silently corrected. The **accepting owner** column is the recommendation, not the current board state:
+Three delivery rows were once cited by two PBIs each, which left the board unable to say which acceptance closed
+them. **Corrected on the live board on 4 October 2026**, each second citation becoming a Dependencies entry:
 
-| Row | Accepting owner | Also cited by | What should happen |
+| Row | Accepting owner | Was also cited by | Now |
 |---|---|---|---|
-| FIX-04 | **#241**, the bilingual baseline that delivers it | #246 | #246 needs the baseline as a **dependency**. The citation should move to its Dependencies field |
+| FIX-04 | **#241**, which delivers the bilingual baseline | #246 | #246 names #241 in Dependencies and cites only RPT-10 |
 | NFR-04 | **#241** | #246 | The same |
-| ERP-10 | **#245**, the adapter seam slice | #243 | #243 is the PRE-09 specification deliverable. ERP-10 is context for it, not a row its acceptance closes |
+| ERP-10 | **#245**, the adapter seam | #243 | #243 names #245 in Dependencies and cites only PRE-09 |
 
-**Not changed here.** Removing ERP-10 from #243 would change that PBI's Scope class from `mixed` to `DLV` and its
-Stage from `mixed` to `-`, and #243 is the worked example in the board document for why `ERP blocked` is not a
-restatement of scope. These are three field edits on reviewed records, so they are reported for a decision rather
-than made inside a documentation change. The test accepts exactly these three and fails on a fourth.
+Two consequences, both visible on the board and recorded for that reason. **#246** recomputes from `mixed` to
+**`P1-L`**, RPT-10 being its only row. **#243** recomputes from `mixed` to **`DLV`**, and its Stage from `mixed` to
+the board's `per PRE-09`, PRE-09 being unstaged in the register. The exact-id total moved from 131 to 129 when the
+two S2 rows left #242, and from 129 to **126** here. The map above still accounts for all 595 delivery rows,
+because nothing left the backlog: a citation became a dependency.
+
+**#243 remains the proof that `ERP blocked` is not a restatement of scope**, and a cleaner one than before: it is
+`ERP blocked: yes` while citing a single **DLV** row, because the specification is what the ERP meeting produces.
+
+`tools/tests/test_backlog_totals.py` now fails on **any** row with two owners. There is no allowed exception, and
+the empty exception set is itself asserted, so the allowance cannot creep back.
 
 ## What this document deliberately does not do
 
