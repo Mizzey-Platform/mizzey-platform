@@ -1,0 +1,35 @@
+<?php
+// Temporary test endpoint copied into the DISPOSABLE runtime's mu-plugins by mizzey-site/tests/integration t26,
+// and removed at the end of the run. It runs the stock report's own exporter, and one ordinary product query,
+// inside a front-end request (not admin, not CLI): a context a scheduled export can run in. It reads and
+// changes nothing, and is guarded by a random per-run secret. Never deploy this file.
+add_action(
+	'init',
+	function () {
+		$secret = (string) get_option( 't26_front_probe_secret' );
+		if ( '' === $secret || empty( $_GET['t26_probe'] ) || ! hash_equals( $secret, (string) $_GET['t26_probe'] ) ) {
+			return;
+		}
+		$exporter = new \Automattic\WooCommerce\Admin\ReportCSVExporter( 'stock', array( 'type' => 'lowstock' ) );
+		$exporter->prepare_data_to_export();
+		$rows = \Closure::bind( fn() => $this->row_data, $exporter, \Automattic\WooCommerce\Admin\ReportCSVExporter::class )();
+		$skus = array();
+		foreach ( (array) $rows as $row ) {
+			$skus[] = (string) ( $row['sku'] ?? '' );
+		}
+		$ids   = array_filter( array_map( 'intval', explode( ',', (string) ( $_GET['ids'] ?? '' ) ) ) );
+		$plain = new \WP_Query( array( 'post_type' => 'product', 'post__in' => $ids ? $ids : array( 0 ), 'posts_per_page' => -1, 'fields' => 'ids' ) );
+		echo wp_json_encode(
+			array(
+				'admin'    => is_admin(),
+				'cli'      => defined( 'WP_CLI' ) && WP_CLI,
+				'language' => apply_filters( 'wpml_current_language', null ),
+				'skus'     => $skus,
+				'total'    => (int) $exporter->get_total_rows(),
+				'plain'    => array_map( 'intval', $plain->posts ),
+			)
+		);
+		exit;
+	},
+	99
+);

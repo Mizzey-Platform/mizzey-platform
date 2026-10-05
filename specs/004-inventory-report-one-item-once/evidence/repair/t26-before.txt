@@ -1,0 +1,90 @@
+# #246 repair, BEFORE the correction: production code as on main at 1de55d767a5d7f7c9673893807bf67a6c870b007
+# t24 is the earlier in-process scenario; t26 reads the report through the signed-in HTTP request the screen makes.
+# Run 2026-10-05T16:08:49Z on the disposable runtime.
+
+PASS  t24-stock-report-physical-items AC-246-01 to AC-246-08
+      Stored state: the pair holds lookup stock 2 (en) and 2 (ar): two records, one item.
+      PASS  [en] the report answers
+      PASS  [en] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [en] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [en] no line is repeated
+      PASS  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [en] the session language is unchanged after the report: 'en'
+      PASS  [ar] the report answers
+      PASS  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [ar] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [ar] no line is repeated
+      PASS  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [ar] the session language is unchanged after the report: 'ar'
+      PASS  [all] the report answers
+      PASS  [all] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [all] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [all] the session language is unchanged after the report: 'all'
+      PASS  AC-246-04 the three language contexts return the same list and the same totals
+      PASS  AC-246-06 two per page gives 3 pages for 5 items
+      PASS  AC-246-06 walking every page yields 5 distinct lines for a total of 5
+      PASS  AC-246-06 no fixture is lost or repeated at a page boundary
+      PASS  sorted by stock_quantity asc: one line per item, total 5, order kept
+      PASS  sorted by stock_quantity desc: one line per item, total 5, order kept
+      PASS  sorted by sku asc: one line per item, total 5, order kept
+      PASS  sorted by stock_status asc: one line per item, total 5, order kept
+      PASS  [en] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [en] AC-246-08 the export total is 5, the screen total 5
+      PASS  [ar] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [ar] AC-246-08 the export total is 5, the screen total 5
+      PASS  with no stock filter, each fixture item is still one line: parent(en), arabic, orphan(ar), size(en), pair(en), english, roomy(en), out(en)
+      PASS  FR-010 reading the report changed no stored stock value on any record
+      PASS  FR-010 an ordinary product query in an English session is still scoped to English: pair(en), english
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+
+FAIL  t26-stock-report-real-request AC-246-01 to AC-246-08, through the signed-in HTTP request the screen makes
+      PASS  [en] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [en] the report answers over HTTP
+      FAIL  [en] AC-246-01, 03, 07 low-stock lists each physical item once: size(en), english, pair(en)
+      FAIL  [en] AC-246-02, 03 out-of-stock lists each physical item once: out(en)
+      PASS  [en] no line is repeated
+      FAIL  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 3 of 3, out 1 of 1
+      FAIL  [en] AC-246-06 the summary under the table counts physical items: summary {"lowstock":7,"instock":11,"outofstock":3,"onbackorder":0,"products":6}, lists {"products":6,"lowstock":3,"outofstock":1,"instock":5,"onbackorder":0}
+      FAIL  [en] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, size(en)
+      PASS  [ar] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/ar/wp-json/
+      PASS  [ar] the report answers over HTTP
+      FAIL  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), arabic
+      FAIL  [ar] AC-246-02, 03 out-of-stock lists each physical item once: out-arabic
+      PASS  [ar] no line is repeated
+      FAIL  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 2 of 2, out 1 of 1
+      FAIL  [ar] AC-246-06 the summary under the table counts physical items: summary {"lowstock":7,"instock":11,"outofstock":3,"onbackorder":0,"products":6}, lists {"products":3,"lowstock":2,"outofstock":1,"instock":2,"onbackorder":0}
+      FAIL  [ar] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP arabic, orphan(ar)
+      PASS  [all] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [all] the report answers over HTTP
+      FAIL  [all] AC-246-01, 03, 07 low-stock lists each physical item once: size(en), english, pair(en)
+      FAIL  [all] AC-246-02, 03 out-of-stock lists each physical item once: out(en)
+      PASS  [all] no line is repeated
+      FAIL  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 3 of 3, out 1 of 1
+      FAIL  [all] AC-246-06 the summary under the table counts physical items: summary {"lowstock":7,"instock":11,"outofstock":3,"onbackorder":0,"products":6}, lists {"products":6,"lowstock":3,"outofstock":1,"instock":5,"onbackorder":0}
+      FAIL  [all] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, size(en)
+      FAIL  AC-246-04 the three admin language contexts return the same lists, the same totals and the same summary
+      PASS  [ar] AC-246-06 two per page gives 1 pages for 2 items
+      PASS  [ar] AC-246-06 walking every page yields 2 distinct lines for a total of 2
+      FAIL  [ar] AC-246-06 no fixture is lost or repeated at a page boundary
+      FAIL  [ar] sorted by stock_quantity asc: one line per item, total 2, order kept
+      FAIL  [ar] sorted by stock_quantity desc: one line per item, total 2, order kept
+      FAIL  [ar] sorted by sku asc: one line per item, total 2, order kept
+      PASS  [en] the probe ran in a front-end request: wp-admin false, WP-CLI false, language en
+      FAIL  [en] AC-246-08 the export holds each physical item once: T26-ENGLISH, T26-PAIR, T26-VAR-S
+      FAIL  [en] AC-246-08 the export total is 3, the screen total 2
+      PASS  [en] FR-010 an ordinary product query in the same request is still scoped to its language: english, pair(en)
+      PASS  [ar] the probe ran in a front-end request: wp-admin false, WP-CLI false, language ar
+      FAIL  [ar] AC-246-08 the export holds each physical item once: T26-ARABIC, T26-ORPHAN
+      PASS  [ar] AC-246-08 the export total is 2, the screen total 2
+      PASS  [ar] FR-010 an ordinary product query in the same request is still scoped to its language: arabic, pair(ar)
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

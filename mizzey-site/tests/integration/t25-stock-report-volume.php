@@ -12,9 +12,14 @@
  * the report's query, and ten thousand API saves would measure something else and take many minutes. Nothing but
  * the three tables the query reads is touched, and every row is removed on finish.
  *
- * Verdict. Pass or fail on correctness only: the total, and one page of distinct originals. The elapsed time is a
- * note, not a threshold: this runtime is a developer machine, and a number measured here is evidence for this
- * machine alone.
+ * Two readings. The endpoint dispatched inside this process, in three session languages, and the report as the
+ * screen reads it: over HTTP, signed in, in the Arabic admin context, which is the context that was wrong on
+ * staging. The second is there because the first alone once passed while the screen failed (see t26). The summary
+ * under the table is read the same way, because it is counted from the lists and so costs what they cost.
+ *
+ * Verdict. Pass or fail on correctness only: the total, one page of distinct originals, and the summary's low
+ * stock figure. The elapsed time is a note, not a threshold: this runtime is a developer machine, and a number
+ * measured here is evidence for this machine alone.
  *
  * @package MizzeySite\Tests\Integration
  */
@@ -22,6 +27,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_workflows.php';
 
 const T25_ITEMS = 5000;
 
@@ -117,6 +123,30 @@ run(
 		$expected  = ( $before_total + T25_ITEMS ) % 25 ?: 25;
 		$ok        = $ok && $last_rows === $expected && (int) ( $last->get_headers()['X-WP-TotalPages'] ?? -1 ) === $last_page;
 		$s->note( sprintf( '%s  the last page, %d, holds %d lines (expected %d)', $last_rows === $expected ? 'PASS' : 'FAIL', $last_page, $last_rows, $expected ) );
+
+		// ---- The same, as the screen reads it: over HTTP, signed in, in the Arabic admin context ----------
+		$w      = new Workflows( $s );
+		$screen = $w->analytics_screen( 'stock', 'ar' );
+		// What any signed-in REST request costs on this machine, so the two figures below can be read against it.
+		$started = microtime( true );
+		$w->screen_get( $screen, 'wp/v2/types/page' );
+		$s->note( sprintf( 'NOTE  a signed-in REST request that reads no product takes %.0f ms here', ( microtime( true ) - $started ) * 1000 ) );
+		$started = microtime( true );
+		$answer  = $w->screen_get( $screen, 'wc-analytics/reports/stock', array( 'type' => 'lowstock', 'orderby' => 'stock_quantity', 'order' => 'asc', 'page' => 1, 'per_page' => 25 ) );
+		$elapsed = ( microtime( true ) - $started ) * 1000;
+		$page    = array_map( fn( $row ) => (int) $row['id'], (array) json_decode( $answer['body'], true ) );
+		$total   = (int) ( $answer['headers']['x-wp-total'] ?? -1 );
+		$right   = 200 === $answer['status'] && $total === $before_total + T25_ITEMS && 25 === count( array_unique( $page ) ) && 25 === count( array_intersect( $page, $ids['en'] ) );
+		$ok      = $ok && $right;
+		$s->note( sprintf( '%s  [ar, over HTTP at %s] status %d, total %d (expected %d), first page %d distinct lines of which %d are source-language records, %.0f ms for the whole request', $right ? 'PASS' : 'FAIL', $screen['root'], $answer['status'], $total, $before_total + T25_ITEMS, count( array_unique( $page ) ), count( array_intersect( $page, $ids['en'] ) ), $elapsed ) );
+
+		$started = microtime( true );
+		$answer  = $w->screen_get( $screen, 'wc-analytics/reports/stock/stats' );
+		$elapsed = ( microtime( true ) - $started ) * 1000;
+		$summary = (array) ( json_decode( $answer['body'], true )['totals'] ?? array() );
+		$right   = 200 === $answer['status'] && (int) ( $summary['lowstock'] ?? -1 ) === $before_total + T25_ITEMS;
+		$ok      = $ok && $right;
+		$s->note( sprintf( '%s  [ar, over HTTP] the summary under the table: %s (low stock expected %d), %.0f ms for the whole request', $right ? 'PASS' : 'FAIL', wp_json_encode( $summary ), $before_total + T25_ITEMS, $elapsed ) );
 
 		// The plan, as a fact. Which index serves the representative lookup is what decides the cost.
 		if ( '' !== $sql ) {

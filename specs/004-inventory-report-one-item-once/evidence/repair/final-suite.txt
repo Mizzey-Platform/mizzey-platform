@@ -1,0 +1,592 @@
+PASS  t02-simple-cost              AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Set 137.5, read back 137.5
+      Set 0, read back NULL
+      Set blank (null), read back NULL
+      Fact: zero is stored as no cost (native zero-to-null conversion). Not a contract criterion.
+PASS  t03-variation-cost           AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      50ml: set 40.0, read 40.0, additive false, effective 40.0
+      100ml: set 70.0, read 70.0, additive false, effective 70.0
+      200ml: set NULL, read NULL, additive false, effective 0.0
+PASS  t04-order-line-snapshot      AC-2
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Order cost at sale: 200.0; line cost 200.0
+      After product cost changed to 999: order 200.0; line 200.0
+PASS  t07-csv-import-cost          AC-4
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Import: 4 imported, 0 failed, 0 skipped
+      T07-S1: expected 111.25, imported 111.25
+      T07-S2: expected 95.0, imported 95.0
+      T07-S3: expected NULL, imported NULL
+      T07-V-50: expected 40.0, imported 40.0
+      T07-V-100: expected 70.0, imported 70.0
+PASS  t08-no-public-exposure       AC-5
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      visitor product page (simple): HTTP 200, cost absent
+      visitor product page (variable): HTTP 200, cost absent
+      visitor Store API product: HTTP 200, cost absent
+      visitor Store API variable: HTTP 200, cost absent
+      visitor Store API list: HTTP 200, cost absent
+      visitor REST v3 product: HTTP 401, cost absent
+      visitor REST v3 variations: HTTP 401, cost absent
+      customer /wc/store/v1/products/63: status 200, cost absent
+      customer /wc/store/v1/products/64: status 200, cost absent
+      customer /wc/v3/products/63: status 403, cost absent
+      customer /wc/v3/products/64/variations: status 403, cost absent
+      customer My Account order view (1580 bytes): cost absent
+      Not tested: order emails (not sent in the local runtime).
+FACT  t09-staff-visibility         AC-6 (pending CX-01)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      administrator: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      shop_manager: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      editor: edit_products=no, REST v3 status 403, cost not returned
+      author: edit_products=no, REST v3 status 403, cost not returned
+      contributor: edit_products=no, REST v3 status 403, cost not returned
+      subscriber: edit_products=no, REST v3 status 403, cost not returned
+      customer: edit_products=no, REST v3 status 403, cost not returned
+PASS  t11-cost-sync-matrix         AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      WPML setting _cogs_value='unset'; mizzey-site/wpml-config.xml absent
+      OK   part1 crud-created simple, duplicate: AR 120
+      OK   part1 crud-created variations, duplicate: AR 40/70
+      OK   part1 crud-created simple, editor: AR 120
+      OK   part1 crud-created variations, editor: AR 40/70
+      OK   duplicate simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation import-http (the SKU reached the translation, so the cost is unchanged and the two still agree): set 40: EN none AR none; change 44: EN none AR none | orders EN 0 AR 0 | price/stock/sku/status unchanged
+      OK   duplicate variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   editor simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 174'->'منتج 174 - S' (generated variation title, rewritten on any save)
+      OK   editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 182'->'منتج 182 - S' (generated variation title, rewritten on any save)
+      OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 190'->'منتج 190 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 198'->'منتج 198 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 206'->'منتج 206 - S' (generated variation title, rewritten on any save)
+PASS  t12-cost-sync-identity       AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   identity: trid 79/79; EN 214 original='1' source=NULL; AR 215 original='0' source='en'. The sync copies outwards only from the element WPML flags as the original
+           for comparison, the separately cached wpml_original_element_id says EN '214' and AR '214'. It can be stale inside one long-running process, which is why the sync does not use it
+      OK   simple: EN 100 AR 100; products written 214,215 (expected 214,215); unrelated pair 55/55 and untranslated 77 unchanged
+      OK   variations: changed EN S only. AR S 33 (want 33), AR L 22 (want 22, the sibling must not move); written 220,223 (expected 220,223)
+      OK   untranslated product: cost 88, written 218 (expected 218, and nothing else)
+      OK   deleted Arabic variation 224: EN L cost 44, written 221 (expected 221 only); AR S still 33, unrelated product still 88
+      OK   writing 999 onto the translation: EN 100 (must stay 100, translations never push back), AR 100 (the original owns it), override logged
+      OK   a later change on the original still reaches the translation: EN 105 AR 105
+      OK   second pair created in the same process, with no cache flush: EN 250 AR 250
+      Creating a translation when a cost already exists is covered by t11 part 1 (WPML duplicate and WCML editor, simple and variations).
+PASS  t13-cost-sync-semantics      AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   first cost: set 100 x1 -> EN 100 (want 100), AR 100 (want 100), translation written 1 time(s) (want 1)
+      OK   increase: set 150 x1 -> EN 150 (want 150), AR 150 (want 150), translation written 1 time(s) (want 1)
+      OK   decrease: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 1 time(s) (want 1)
+      OK   unchanged: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   saved three times: set 80 x3 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   cleared: set none x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      OK   set again: set 60 x1 -> EN 60 (want 60), AR 60 (want 60), translation written 1 time(s) (want 1)
+      OK   zero: set 0 x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      Zero is stored by WooCommerce as no cost, on the original and therefore on the translation. A deliberate zero cannot be told from an uncosted product: recorded for OD-12, not worked around here.
+      OK   forced failure on translation 232: EN1 500 AR1 10 (stale, as expected); the unrelated pair EN2 600 AR2 600 still synchronised; logged to mizzey-cost-sync: yes (1 line(s))
+      OK   retry after the failure was removed: saving the original again repaired the translation, EN1 500 AR1 500. Nothing polls: the repair happens on the next supported save
+      OK   re-entrancy: one save of the original produced the writes [230,229] and stopped (expected [230,229]: the translation, nested inside the save of the original, then the original). Neither write started another pass
+PASS  t14-arabic-content-after-sync AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   duplicate simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name source-language, as a duplicate keeps it | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T141", attributes "", order line "t11 T141" (), Store API HTTP 200, id 236 (asked for 236), name "t11 T141", price 30000, cost fields none
+           stored post_title: "t11 T141" as it was created, "t11 T141" after an ordinary save, "t11 T141" after the cost sync
+      OK   duplicate variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name source-language, as a duplicate keeps it | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T142 - S", attributes "Size: S", order line "t11 T142 - S" (), Store API HTTP 200, id 242 (asked for 242), name "t11 T142", price 20000, cost fields none
+           stored post_title: "t11 T142 - S" as it was created, "t11 T142 - S" after an ordinary save, "t11 T142 - S" after the cost sync
+      OK   editor simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name authored in Arabic | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 247", attributes "", order line "منتج 247" (), Store API HTTP 200, id 248 (asked for 248), name "منتج 247", price 30000, cost fields none
+           stored post_title: "منتج 247" as it was created, "منتج 247" after an ordinary save, "منتج 247" after the cost sync
+      OK   editor variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name authored in Arabic | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 251 - S", attributes "Size: S", order line "منتج 251 - S" (), Store API HTTP 200, id 254 (asked for 254), name "منتج 251", price 20000, cost fields none
+           stored post_title: "منتج 251" as it was created, "منتج 251 - S" after an ordinary save, "منتج 251 - S" after the cost sync
+      Store API check, negative control: control passes: a planted cogs_value and a planted _cogs_total_value custom field are both reported (cogs_value=123.5, meta_data.0.key=_cogs_total_value); a cost field nested three levels down is reported (product.extensions.0.cost_of_goods=7); the real response is still clean
+      The rendered Arabic storefront page is not tested here: WPML serves Arabic from /ar/ URLs, which need web server rewrite configuration this runtime does not have. It stays a staging and UAT check.
+PASS  t15-cost-sync-entrypoints    AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   admin-http simple: woocommerce_update_product fired for the English post in context "admin"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: save_post_product(EN)@admin, woocommerce_update_product(EN)@admin x2, woocommerce_update_product(AR)@admin, save_post_product(AR)@admin
+      OK   admin-http variation: woocommerce_update_product_variation fired for the English post in context "admin+ajax"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN parent)@admin+ajax x2, save_post_product_variation(EN sibling)@admin+ajax, woocommerce_update_product_variation(EN sibling)@admin+ajax, save_post_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_ajax_save_product_variations(EN parent)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax
+      OK   import-http simple: woocommerce_update_product fired for the English post in context "admin+ajax"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@admin+ajax, woocommerce_update_product(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(EN)@admin+ajax
+      OK   import-http variation: woocommerce_update_product_variation fired for the English post in context "admin+ajax"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: save_post_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(EN)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax, woocommerce_update_product(EN parent)@admin+ajax
+      OK   rest-http simple: woocommerce_update_product fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@rest, woocommerce_update_product(AR)@rest
+      OK   rest-http variation: woocommerce_update_product_variation fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@rest, woocommerce_update_product_variation(AR)@rest, woocommerce_update_product(AR parent)@rest, woocommerce_update_product(EN parent)@rest
+      OK   crud-cli simple: woocommerce_update_product fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@cli, woocommerce_update_product(AR)@cli
+      OK   crud-cli variation: woocommerce_update_product_variation fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@cli, woocommerce_update_product_variation(AR)@cli
+      OK   crud-web simple: woocommerce_update_product fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@front, woocommerce_update_product(AR)@front
+      OK   crud-web variation: woocommerce_update_product_variation fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@front, woocommerce_update_product_variation(AR)@front, woocommerce_update_product(AR parent)@front, woocommerce_update_product(EN parent)@front
+      crud-cli covers WooCommerce CRUD and WP-CLI; crud-web covers front-end application code, webhooks and cron, which run in the same context.
+PASS  t16-translation-cost-ownership AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   crud-cli simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-cli variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   rest-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   rest-http variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-web simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-web variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   admin-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+           also written by the channel itself, not by the cost rule: _bosta_sku: null -> [""]; _last_translation_edit_mode: null -> ["native-editor"]; _wpml_word_count: null -> ["0"]
+      OK   admin-http variation: the channel cannot reach the translation (variation not in the loaded admin panel). AR 100 EN 100, unchanged
+      OK   import-http simple: wrote 999 to the translation -> AR 999, EN 999 (want 999 for both), Arabic order recorded 999; language and translation group unchanged: yes; authored fields changed: none; override logged: no | the importer matches by SKU, and the row reached the English original, so the change flowed outwards
+      OK   import-http variation: wrote 999 to the translation -> AR 999, EN 999 (want 999 for both), Arabic order recorded 999; language and translation group unchanged: yes; authored fields changed: none; override logged: no | the importer matches by SKU, and the row reached the English original, so the change flowed outwards
+      Unsupported by design, and not detectable: a direct database or update_post_meta() write bypasses the WooCommerce data store, so no filter can see it. The project forbids direct meta writes on products (woo-guard rule 2).
+      Not bidirectional: nothing here lets a translation become the source of a cost. The original is the only copy that can change it.
+FACT  t17-multilingual-stock       B1 (probe, no criterion)
+      Fixtures: F1 simple stock 5 (EN 349 / AR 350), F2 simple stock 1 (EN 351 / AR 352), F3 variable (EN 353, variations EN 354,355 / AR 357,358), F4 untranslated control (359)
+      --- step 1: baseline, before any order ---
+        F1 EN       id=349 lang=en trid=79/db=79 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        F1 AR       id=350 lang=ar trid=79/db=79 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        F2 EN       id=351 lang=en trid=80/db=80 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        F2 AR       id=352 lang=ar trid=80/db=80 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        F3 EN S     id=354 lang=en trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        F3 AR S     id=357 lang=ar trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        F3 EN L     id=355 lang=en trid=83/db=83 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - L" type=post_product_variation
+        F3 AR L     id=358 lang=ar trid=83/db=83 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        F4 control  id=359 lang=en trid=84/db=84 sku=B1-CONTROL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CONTROL" type=post_product
+      --- step 2, English order on F1: ordered 1 of id=349 in en  ---
+        EN before  id=349 lang=en trid=79/db=79 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        EN after   id=349 lang=en trid=79/db=79 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR before  id=350 lang=ar trid=79/db=79 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR after   id=350 lang=ar trid=79/db=79 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        moved: EN 10 -> 9, AR 10 -> 9
+        hooks:  woocommerce_update_product(349), woocommerce_product_set_stock(349)
+      --- step 3, Arabic order on F1 (the core question): ordered 1 of id=350 in ar  ---
+        EN before  id=349 lang=en trid=79/db=79 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        EN after   id=349 lang=en trid=79/db=79 sku=B1-FIVE | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR before  id=350 lang=ar trid=79/db=79 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR after   id=350 lang=ar trid=79/db=79 sku=B1-FIVE | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-FIVE" type=post_product
+        moved: EN 9 -> 8, AR 9 -> 8
+        hooks:  woocommerce_update_product(350), woocommerce_product_set_stock(350)
+      --- step 4, Arabic order on F3 variation S: ordered 1 of id=357 in ar  ---
+        EN before  id=354 lang=en trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        EN after   id=354 lang=en trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        AR before  id=357 lang=ar trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        AR after   id=357 lang=ar trid=81/db=81 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        moved: EN 5 -> 5, AR 5 -> 4
+        hooks:  save_post_product_variation(357), save_post(357), woocommerce_update_product_variation(357), woocommerce_variation_set_stock(357)
+        sibling check, F3 L: EN id=355 lang=en trid=83/db=83 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - L" type=post_product_variation / AR id=358 lang=ar trid=83/db=83 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+      --- step 5, English order on F3 variation S: ordered 1 of id=354 in en  ---
+        EN before  id=354 lang=en trid=82/db=82 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        EN after   id=354 lang=en trid=82/db=82 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        AR before  id=357 lang=ar trid=81/db=81 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        AR after   id=357 lang=ar trid=81/db=81 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        moved: EN 5 -> 4, AR 4 -> 4
+        hooks:  woocommerce_update_product_variation(354), woocommerce_variation_set_stock(354)
+      --- step 6: the last unit of F2, Arabic first then English ---
+      --- step 6a, Arabic order on F2 (stock 1): ordered 1 of id=352 in ar  ---
+        EN before  id=351 lang=en trid=80/db=80 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        EN after   id=351 lang=en trid=80/db=80 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR before  id=352 lang=ar trid=80/db=80 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR after   id=352 lang=ar trid=80/db=80 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        moved: EN 1 -> 0, AR 1 -> 0
+        hooks:  woocommerce_update_product(352), woocommerce_product_set_stock(352)
+        after the Arabic sale, the ENGLISH record reports: in_stock=no, has_enough_stock(1)=no, quantity=0
+      --- step 6b, English order on the same item: ordered 1 of id=351 in en  ---
+        EN before  id=351 lang=en trid=80/db=80 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        EN after   id=351 lang=en trid=80/db=80 sku=B1-ONE | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR before  id=352 lang=ar trid=80/db=80 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR after   id=352 lang=ar trid=80/db=80 sku=B1-ONE | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE" type=post_product
+        moved: EN 0 -> -1, AR 0 -> -1
+        hooks:  woocommerce_update_product(351), woocommerce_product_set_stock(351)
+      --- step 7: the last unit, English first then Arabic, on a fresh pair ---
+      --- step 7a, English order on F5 (stock 1): ordered 1 of id=366 in en  ---
+        EN before  id=366 lang=en trid=85/db=85 sku=B1-ONE2 | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        EN after   id=366 lang=en trid=85/db=85 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR before  id=368 lang=ar trid=85/db=85 sku=B1-ONE2 | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR after   id=368 lang=ar trid=85/db=85 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        moved: EN 1 -> 0, AR 1 -> 0
+        hooks:  woocommerce_update_product(366), woocommerce_product_set_stock(366)
+        after the English sale, the ARABIC record reports: in_stock=no, has_enough_stock(1)=no, quantity=0
+      --- step 7b, Arabic order on the same item: ordered 1 of id=368 in ar  ---
+        EN before  id=366 lang=en trid=85/db=85 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        EN after   id=366 lang=en trid=85/db=85 sku=B1-ONE2 | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR before  id=368 lang=ar trid=85/db=85 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR after   id=368 lang=ar trid=85/db=85 sku=B1-ONE2 | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        moved: EN 0 -> -1, AR 0 -> -1
+        hooks:  woocommerce_update_product(368), woocommerce_product_set_stock(368)
+      --- step 8: cancellation and restoration (WooCommerce only, no ERP) ---
+        after an Arabic order of 2: EN id=371 lang=en trid=86/db=86 sku=B1-CANCEL | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-CANCEL" type=post_product
+                                    AR id=372 lang=ar trid=86/db=86 sku=B1-CANCEL | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-CANCEL" type=post_product
+        after cancelling it:        EN id=371 lang=en trid=86/db=86 sku=B1-CANCEL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CANCEL" type=post_product
+                                    AR id=372 lang=ar trid=86/db=86 sku=B1-CANCEL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CANCEL" type=post_product
+        hooks:  woocommerce_update_product(372), woocommerce_product_set_stock(372)
+      --- step 9: three more Arabic orders on F1, looking for cache-dependent behaviour ---
+        run 1: EN crud=7 lookup='7' | AR crud=7 lookup='7'
+        run 2: EN crud=6 lookup='6' | AR crud=6 lookup='6'
+        run 3: EN crud=5 lookup='5' | AR crud=5 lookup='5'
+      --- step 10: untranslated control, to separate WPML from WooCommerce ---
+        before id=359 lang=en trid=84/db=84 sku=B1-CONTROL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CONTROL" type=post_product
+        after  id=359 lang=en trid=84/db=84 sku=B1-CONTROL | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-CONTROL" type=post_product
+      --- which WPML and WCML callbacks are registered on the stock-relevant hooks ---
+        save_post@10 WPML_Gutenberg_Integration::clear_translations_cache_on_post_save
+        save_post@100 WPML_Media_Attachments_Duplication::save_post_actions
+        save_post@100 WPML_Admin_Post_Actions::save_post_actions
+        save_post@9223372036854775806 WCML_Downloadable_Products::saveProductMode
+        save_post@9223372036854775807 WCML\Synchronization\Hooks::synchronizeProductTranslationsOnSave
+        save_post@9223372036854775807 WPML_PB_Integration::queue_save_post_actions
+        woocommerce_product_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+        woocommerce_variation_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+      This scenario measures and does not judge. No stock synchronisation fix is implemented here.
+FACT  t18-synced-fields            A12 (probe, no criterion)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      === simple products: one field at a time on the English original, through WooCommerce CRUD ===
+        regular_price       EN 300 -> 321 | AR 300 -> 300 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PDP-05, PLP-08, BR-005]
+        sale_price          EN  -> 299 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PROMO rows, BR-005]
+        cost                EN (none) -> 77.5 | AR (none) -> 77.5 | save_post: did NOT fire | FOLLOWED  [ADM-27, RPT-11]
+        sku                 EN A12-F8C461 -> A12-CHANGED-42314 | AR A12-F8C461 -> A12-F8C461 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-33, MIG-13, ERP-08]
+        stock_quantity      EN 10 -> 6 | AR 10 -> 6 | save_post: did NOT fire | FOLLOWED  [ERP-01, ADM-70, RPT-10]
+        stock_status        EN instock -> instock | AR instock -> instock | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [ERP-02, PDP-12, RPT-10]
+        manage_stock        EN yes -> no | AR yes -> yes | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-70, ERP-07]
+        weight              EN  -> 2.5 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        length              EN  -> 12 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        status              EN publish -> draft | AR publish -> draft | save_post: fired | FOLLOWED  [ADM-30, SSC rows]
+        catalog_visibility  EN visible -> hidden | AR visible -> visible | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-30, PLP rows]
+        name                EN t11 A12-B06893 -> A12 renamed in English | AR t11 A12-B06893 -> A12 renamed in English | save_post: fired | FOLLOWED  [NFR-04, SSC-12]
+        custom_field        EN  -> changed-by-t18 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ENT rows, developer-owned meta]
+        category            EN uncategorized -> a12-category | AR uncategorized -> (none) | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-60, PLP-03]
+      === variation products: one field at a time on the English original, through WooCommerce CRUD ===
+        regular_price       EN 200 -> 321 | AR 200 -> 200 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PDP-05, PLP-08, BR-005]
+        sale_price          EN  ->  | AR  ->  | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [PROMO rows, BR-005]
+        cost                EN (none) -> 77.5 | AR (none) -> 77.5 | save_post: did NOT fire | FOLLOWED  [ADM-27, RPT-11]
+        sku                 REFUSED by WooCommerce: Invalid or duplicated SKU.  [ADM-33, MIG-13, ERP-08]
+        stock_quantity      EN 5 -> 6 | AR 5 -> 6 | save_post: did NOT fire | FOLLOWED  [ERP-01, ADM-70, RPT-10]
+        stock_status        EN instock -> instock | AR instock -> instock | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [ERP-02, PDP-12, RPT-10]
+        manage_stock        EN yes -> no | AR yes -> yes | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-70, ERP-07]
+        weight              EN  -> 2.5 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        length              EN  -> 12 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        status              EN publish -> draft | AR publish -> publish | save_post: fired | *** DID NOT FOLLOW ***  [ADM-30, SSC rows]
+        catalog_visibility  not a variation field in WooCommerce, not measured  [ADM-30, PLP rows]
+        name                EN t11 A12V-B06893 - S -> t11 A12V-B06893 - S | AR t11 A12V-B06893 - S -> t11 A12V-B06893 - S | save_post: fired | NOT APPLIED on the original, nothing to measure  [NFR-04, SSC-12]
+        custom_field        EN  -> changed-by-t18 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ENT rows, developer-owned meta]
+        category            not a variation field in WooCommerce, not measured  [ADM-60, PLP-03]
+      === WCML synchronisation components present in this version ===
+        Attachments, Attributes, DownloadableFiles, Linked, Meta, Post, Stock, Synchronizer, SynchronizerForMeta, Taxonomies, VariationAttachments, VariationMeta, VariationTaxonomies, Variations
+      === which WPML and WCML callbacks sit on the hooks a product save can fire ===
+        save_post@10 WPML_Gutenberg_Integration::clear_translations_cache_on_post_save
+        save_post@100 WPML_Media_Attachments_Duplication::save_post_actions
+        save_post@100 WPML_Admin_Post_Actions::save_post_actions
+        save_post@9223372036854775806 WCML_Downloadable_Products::saveProductMode
+        save_post@9223372036854775807 WCML\Synchronization\Hooks::synchronizeProductTranslationsOnSave
+        save_post@9223372036854775807 WPML_PB_Integration::queue_save_post_actions
+        woocommerce_product_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+        woocommerce_variation_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+      Measured on the crud-cli channel only. wp-admin and the wp-admin importer fire save_post (t15), so a field WCML synchronises on save_post is expected to follow there: recorded as a hypothesis, not a measurement.
+FACT  t19-translation-group-integrity A11 (probe, no criterion)
+      === 1. WP-CLI long-running process, one product created afterwards (the known reproducer) ===
+        --- wpcli-create-after ---
+          before EN parent  id=490 type=variable trid=94 el='post_product' lang='en' src=NULL | title="t11 A11-1" sku=A11-1 stock=NULL price=(none) attrs=(none) children=2
+          before EN var S   id=491 type=variation trid=95 el='post_product_variation' lang='en' src=NULL | title="t11 A11-1 - S" sku=A11-1-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=493 type=variable trid=94 el='post_product' lang='ar' src='en' | title="منتج 490" sku=A11-1 stock=NULL price=(none) attrs=(none) children=2
+          before AR var S   id=494 type=variation trid=95 el='post_product_variation' lang='ar' src='en' | title="منتج 490 - S" sku=A11-1-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=495 type=variation trid=96 el='post_product_variation' lang='ar' src='en' | title="منتج 490 - L" sku=A11-1-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10
+          MOVED  AR parent  trid 94 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 490 - S' -> 't11 A11-1-AFTER'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 490 - L' -> 't11 A11-1-AFTER'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 2. WP-CLI, nothing created afterwards (negative control) ===
+        --- wpcli-nothing-after ---
+          before EN parent  id=498 type=variable trid=98 el='post_product' lang='en' src=NULL | title="t11 A11-2" sku=A11-2 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=500 type=variation trid=99 el='post_product_variation' lang='en' src=NULL | title="t11 A11-2 - S" sku=A11-2-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=502 type=variable trid=98 el='post_product' lang='ar' src='en' | title="منتج 498" sku=A11-2 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=503 type=variation trid=99 el='post_product_variation' lang='ar' src='en' | title="منتج 498 - S" sku=A11-2-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=504 type=variation trid=100 el='post_product_variation' lang='ar' src='en' | title="منتج 498 - L" sku=A11-2-L stock=5 price=200 attrs=size=L children=NULL
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === 3. A migration-shaped batch: ten products created after the translation, one process ===
+        --- batch-ten-after ---
+          before EN parent  id=506 type=variable trid=101 el='post_product' lang='en' src=NULL | title="t11 A11-3" sku=A11-3 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=507 type=variation trid=102 el='post_product_variation' lang='en' src=NULL | title="t11 A11-3 - S" sku=A11-3-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=509 type=variable trid=101 el='post_product' lang='ar' src='en' | title="منتج 506" sku=A11-3 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=510 type=variation trid=102 el='post_product_variation' lang='ar' src='en' | title="منتج 506 - S" sku=A11-3-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=511 type=variation trid=103 el='post_product_variation' lang='ar' src='en' | title="منتج 506 - L" sku=A11-3-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10; children 4 -> 2
+          MOVED  AR parent  trid 101 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 506 - S' -> 't11 A11-3-B10'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 506 - L' -> 't11 A11-3-B10'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 4. All source products created first, translations only afterwards ===
+          AR var S after the whole batch: id=538 type=variation trid=115 el='post_product_variation' lang='ar' src='en' | title="منتج 523 - S" sku=A11-4-S stock=5 price=200 attrs=size=S children=NULL
+          consequence: EN 5 -> 4 ==> group intact
+      === 5. Interleaved: create, translate, create, translate ===
+        (the second pair is the one measured, after a translation already happened in this process)
+        --- interleaved ---
+          before EN parent  id=547 type=variable trid=130 el='post_product' lang='en' src=NULL | title="t11 A11-5B" sku=A11-5B stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=548 type=variation trid=131 el='post_product_variation' lang='en' src=NULL | title="t11 A11-5B - S" sku=A11-5B-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=550 type=variable trid=130 el='post_product' lang='ar' src='en' | title="منتج 547" sku=A11-5B stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=551 type=variation trid=131 el='post_product_variation' lang='ar' src='en' | title="منتج 547 - S" sku=A11-5B-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=552 type=variation trid=132 el='post_product_variation' lang='ar' src='en' | title="منتج 547 - L" sku=A11-5B-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10; children 4 -> 2
+          MOVED  AR parent  trid 130 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 547 - S' -> 't11 A11-5-AFTER'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 547 - L' -> 't11 A11-5-AFTER'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 6. WPML duplicate instead of the WCML editor, one product created afterwards ===
+        --- duplicate-create-after ---
+          before EN parent  id=555 type=variable trid=134 el='post_product' lang='en' src=NULL | title="t11 A11-6" sku=A11-6 stock=NULL price=(none) attrs=(none) children=2
+          before EN var S   id=557 type=variation trid=135 el='post_product_variation' lang='en' src=NULL | title="t11 A11-6 - S" sku=A11-6-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=559 type=variable trid=134 el='post_product' lang='ar' src='en' | title="t11 A11-6" sku=A11-6 stock=5 price=(none) attrs=(none) children=2
+          before AR var S   id=560 type=variation trid=135 el='post_product_variation' lang='ar' src='en' | title="t11 A11-6 - S" sku=A11-6-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=561 type=variation trid=136 el='post_product_variation' lang='ar' src='en' | title="t11 A11-6 - L" sku=A11-6-L stock=5 price=200 attrs=size=L children=NULL
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === 7. The native CSV importer creates the later products ===
+        --- importer-create-after ---
+          before EN parent  id=566 type=variable trid=138 el='post_product' lang='en' src=NULL | title="t11 A11-7" sku=A11-7 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=567 type=variation trid=139 el='post_product_variation' lang='en' src=NULL | title="t11 A11-7 - S" sku=A11-7-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=569 type=variable trid=138 el='post_product' lang='ar' src='en' | title="منتج 566" sku=A11-7 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=570 type=variation trid=139 el='post_product_variation' lang='ar' src='en' | title="منتج 566 - S" sku=A11-7-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=571 type=variation trid=140 el='post_product_variation' lang='ar' src='en' | title="منتج 566 - L" sku=A11-7-L stock=5 price=200 attrs=size=L children=NULL
+          native CSV importer: ok: imported 3
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === A11 summary ===
+        wpcli-create-after               CORRUPTED
+        wpcli-nothing-after              intact
+        batch-ten-after                  CORRUPTED
+        sources-first-then-translate     intact
+        interleaved                      CORRUPTED
+        duplicate-create-after           intact
+        importer-create-after            intact
+      wp-admin itself is one request per save, so the single-request case is covered by case 2 and by the per-request nature of the admin channel; the wp-admin translation screen is a browser flow this runtime cannot drive and stays a staging check.
+      No fix is implemented here. If sequencing alone prevents the defect, a migration runbook invariant is preferred over runtime code.
+FACT  t20-price-integrity          price matrix (probe, no criterion)
+      admin-http, admin-variation and import-http fire save_post, so WPML and WCML can run. rest-http, crud-cli and crud-web do not, for a meta-only change (t15).
+      === channel: admin-http ===
+        admin-http       simple    regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        admin-http       simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: admin-variation ===
+        admin-variation  variation regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        admin-variation  variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: import-http ===
+        import-http      simple    regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        import-http      simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+        import-http      variation regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        import-http      variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: rest-http ===
+        rest-http        simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === channel: crud-cli ===
+        crud-cli         simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === channel: crud-web ===
+        crud-web         simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === a price written directly onto the Arabic record (ownership question) ===
+        crud-cli         wrote 999 to the translation -> EN reg=300 sale=- price=300 | AR reg=999 sale=- price=999 | Arabic order charged 999.00 | the translation kept its own price
+        rest-http        wrote 999 to the translation -> EN reg=300 sale=- price=300 | AR reg=999 sale=- price=999 | Arabic order charged 999.00 | the translation kept its own price
+      === the scheduled-sales cron in WooCommerce (wc_scheduled_sales) ===
+        active sale 150 from 2026-10-04 to 2026-10-07, set in one wp-admin save (ok)
+        both on sale after that admin save: EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150
+        end date moved to 2026-10-04 on both records, by raw meta write, nothing else changed
+        still on sale, still agreeing:      EN reg=300 sale=150 price=300 | AR reg=300 sale=150 price=300
+        after wc_scheduled_sales(): EN reg=300 sale=150 price=300 | AR reg=300 sale=150 price=300 | Arabic order charged 300.00 | the two agree
+      The rendered Arabic storefront page is not served by this runtime, so what the customer is served is measured as the effective price on the product the Arabic context resolves, plus the amount an Arabic order charges. The rendered page stays a staging check.
+PASS  t21-bilingual-baseline       AC-1 to AC-8
+      permalink_structure: /%postname%/
+      htaccess present: yes
+      enabled languages: ar, en
+      default language: en
+      [clean session] GET / -> 200 <html lang="en-US">
+      [clean session] cookies set by / : none
+      [clean session] GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [clean session] GET /ar/shop/ -> 200 <html dir="rtl" lang="ar">
+      [one session] 1. GET / -> 200 <html lang="en-US">
+      [one session] 1. set-cookie: none
+      [one session] 2. GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [one session] 2. set-cookie: none
+      [one session] cookies carried into request 3: none
+      [one session] 3. GET / -> 200 <html lang="en-US">
+      shop: en=5 ar=19
+      cart: en=6 ar=20
+      myaccount: en=8 ar=22
+      translation group: ar, en
+      resolved Arabic counterpart: 686, source language: en
+      theme templates: 2, Arabic-specific: 0
+      plugin text domain loader hooked on init: yes
+      fact: the storefront ships no .mo of its own yet, because it has no strings of its own. The mechanism is asserted below through a temporary catalogue.
+      theme languages directory: present
+      translation template: present
+      probe in Arabic: مزي t21
+      probe in English: Mizzey t21 translation probe
+      fact: WordPress 7.1 loads translations lazily, so is_textdomain_loaded() reads false until a string is requested even though the loader returned true
+      admin locale (WPLANG): en_US
+PASS  t22-information-architecture AC-242-01 to AC-242-07, G-1
+      ok   IA-01 home             en=200/en-US  ar=200/ar rtl
+      ok   IA-08 cart             en=200/en-US  ar=200/ar rtl
+      ok   IA-09 checkout         en=302/-  ar=302/- (empty-cart redirect)
+           IA-09 redirect targets: en -> http://mizzey.local/cart/ | ar -> http://mizzey.local/ar/cart/
+      ok   IA-11 wishlist         en=200/en-US  ar=200/ar rtl
+      ok   IA-17 my-account       en=200/en-US  ar=200/ar rtl
+      ok   IA-21 track-your-order en=200/en-US  ar=200/ar rtl
+      ok   IA-24 about            en=200/en-US  ar=200/ar rtl
+      ok   IA-25 contact-us       en=200/en-US  ar=200/ar rtl
+      ok   IA-26 help             en=200/en-US  ar=200/ar rtl
+      ok   IA-27 authenticity-guarantee en=200/en-US  ar=200/ar rtl
+      ok   IA-28 shipping-policy  en=200/en-US  ar=200/ar rtl
+      ok   IA-29 returns-and-refunds en=200/en-US  ar=200/ar rtl
+      ok   IA-30 privacy-policy   en=200/en-US  ar=200/ar rtl
+      ok   IA-31 terms-and-conditions en=200/en-US  ar=200/ar rtl
+      ok   IA-32 offers           en=200/en-US  ar=200/ar rtl
+      ok   IA-02 shop             en=200/en-US  ar=200/ar rtl
+      ok   IA-16 lost-password    en=200  ar=200 (lost-password-ar)
+      ok   IA-18 edit-address     en=200  ar=200 (edit-address-ar)
+      ok   IA-19 orders           en=200  ar=200 (orders-ar)
+      G-1 page records duplicating an endpoint slug: none
+      ok   IA-03 product_cat      translatable=yes archive=200 http://mizzey.local/product-category/t22-fixture-product_cat/
+      ok   IA-05 product_brand    translatable=yes archive=200 http://mizzey.local/brand/t22-fixture-product_brand/
+      ok   IA-04 product_collection translatable=yes archive=200 http://mizzey.local/collection/t22-fixture-product_collection/
+      ok   IA-06 search          en=200  ar=200 (http://mizzey.local/ar/?s=mizzey)
+      AC-242-06 order-received as a page record: none, correct
+      AC-242-06 order-received endpoint query var: order-received
+PASS  t23-seo-fundamentals         AC-242-08 to AC-242-15
+      AC-242-08 permalink_structure: /%postname%/
+      AC-242-08 pages reachable only by ?page_id=: none
+      ok   AC-242-09 front page     <link rel="canonical" href="http://mizzey.local/" /> (count=1)
+      ok   AC-242-09 Arabic root    <link rel="canonical" href="http://mizzey.local/ar/" /> (count=1)
+      ok   AC-242-09 shop archive   <link rel="canonical" href="http://mizzey.local/shop/" /> (count=1)
+      ok   AC-242-09 singular page  <link rel="canonical" href="http://mizzey.local/about/" /> (count=1)
+      AC-242-10 sitemap status=200, 18 English and 16 Arabic page URLs
+      AC-242-10 Arabic pages published: 16
+      AC-242-11 robots.txt status=200, sitemap line=present, contracted paths disallowed: none
+      AC-242-13 structured-data types on the product page: none yet
+      AC-242-13 WC_Structured_Data present: yes, product generator wired: yes, breadcrumb generator wired: yes
+      AC-242-13 emission depends on a product template, which is PDP-01 to PDP-24 (#254); the structured-data row itself is MKT-16 (E-MKT-2). Not built here.
+      AC-242-12 woocommerce_breadcrumb available: yes, core/breadcrumbs block registered: yes
+      AC-242-12 emission depends on a storefront template: the header and navigation are NAV rows (#253) and the product page is PDP (#254). The mechanism is present and unsuppressed here.
+      AC-242-14 about                  description present
+      AC-242-14 contact-us             description present
+      AC-242-14 terms-and-conditions   description present
+      AC-242-14 a page with no content emits: nothing, correct
+      AC-242-15 alt-text mechanism: core attachment meta _wp_attachment_image_alt, and wp_get_attachment_image emits the attribute. This feature introduces no images, so there is no image of its own to carry alt text; the mechanism is available for the content slices.
+      FR-013 emitted under the probe filters: <meta name="description" content="t23 override probe" /> <link rel="canonical" href="http://mizzey.local/t23-override-probe/" />
+      FR-013 meta description overridable by filter: yes
+      FR-013 canonical overridable by filter: yes
+      FR-014 metadata storage introduced by this feature: none. Each value is derived from the record WordPress already holds, so a later override field becomes the source rather than a second store.
+      fact: wp-sitemap-users in the index: yes, a configuration decision
+PASS  t24-stock-report-physical-items AC-246-01 to AC-246-08
+      Stored state: the pair holds lookup stock 2 (en) and 2 (ar): two records, one item.
+      PASS  [en] the report answers
+      PASS  [en] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [en] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [en] no line is repeated
+      PASS  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [en] the session language is unchanged after the report: 'en'
+      PASS  [ar] the report answers
+      PASS  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [ar] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [ar] no line is repeated
+      PASS  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [ar] the session language is unchanged after the report: 'ar'
+      PASS  [all] the report answers
+      PASS  [all] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [all] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [all] the session language is unchanged after the report: 'all'
+      PASS  AC-246-04 the three language contexts return the same list and the same totals
+      PASS  AC-246-06 two per page gives 3 pages for 5 items
+      PASS  AC-246-06 walking every page yields 5 distinct lines for a total of 5
+      PASS  AC-246-06 no fixture is lost or repeated at a page boundary
+      PASS  sorted by stock_quantity asc: one line per item, total 5, order kept
+      PASS  sorted by stock_quantity desc: one line per item, total 5, order kept
+      PASS  sorted by sku asc: one line per item, total 5, order kept
+      PASS  sorted by stock_status asc: one line per item, total 5, order kept
+      PASS  [en] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [en] AC-246-08 the export total is 5, the screen total 5
+      PASS  [ar] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [ar] AC-246-08 the export total is 5, the screen total 5
+      PASS  with no stock filter, each fixture item is still one line: parent(en), arabic, orphan(ar), size(en), pair(en), english, roomy(en), out(en)
+      PASS  FR-010 reading the report changed no stored stock value on any record
+      PASS  FR-010 an ordinary product query in an English session is still scoped to English: pair(en), english
+PASS  t25-stock-report-volume      AC-246-06 at the 5,000 item sizing baseline
+      Seeded 5000 physical items as 10000 product records, each language record holding its own stock row of 1.
+      PASS  [en] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 588 ms
+      PASS  [ar] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 295 ms
+      PASS  [all] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 19 ms
+      PASS  the last page, 200, holds 25 lines (expected 25)
+      NOTE  a signed-in REST request that reads no product takes 1661 ms here
+      PASS  [ar, over HTTP at http://mizzey.local/ar/wp-json/] status 200, total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 1631 ms for the whole request
+      PASS  [ar, over HTTP] the summary under the table: {"lowstock":5000,"instock":5000,"outofstock":0,"onbackorder":0,"products":5000} (low stock expected 5000), 2801 ms for the whole request
+      PLAN  SIMPLE wc_product_meta_lookup: type ALL, key none, rows 10000
+      PLAN  SIMPLE mz_posts: type eq_ref, key PRIMARY, rows 1
+      PLAN  SIMPLE low_stock_amount_meta: type ref, key meta_key, rows 1
+      PLAN  SIMPLE <subquery2>: type eq_ref, key <auto_distinct_key>, rows 1
+      PLAN  MATERIALIZED mizzey_rival: type ALL, key none, rows 10070
+      PLAN  MATERIALIZED mizzey_rival_post: type eq_ref, key PRIMARY, rows 1
+      PLAN  MATERIALIZED mizzey_self: type ref, key trid, rows 19
+PASS  t26-stock-report-real-request AC-246-01 to AC-246-08, through the signed-in HTTP request the screen makes
+      PASS  [en] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [en] the report answers over HTTP
+      PASS  [en] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [en] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [en] no line is repeated
+      PASS  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [en] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [en] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  [ar] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/ar/wp-json/
+      PASS  [ar] the report answers over HTTP
+      PASS  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [ar] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [ar] no line is repeated
+      PASS  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [ar] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [ar] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  [all] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [all] the report answers over HTTP
+      PASS  [all] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), size(en), arabic, english, pair(en)
+      PASS  [all] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [all] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [all] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  AC-246-04 the three admin language contexts return the same lists, the same totals and the same summary
+      PASS  [ar] AC-246-06 two per page gives 3 pages for 5 items
+      PASS  [ar] AC-246-06 walking every page yields 5 distinct lines for a total of 5
+      PASS  [ar] AC-246-06 no fixture is lost or repeated at a page boundary
+      PASS  [ar] sorted by stock_quantity asc: one line per item, total 5, order kept
+      PASS  [ar] sorted by stock_quantity desc: one line per item, total 5, order kept
+      PASS  [ar] sorted by sku asc: one line per item, total 5, order kept
+      PASS  [en] the probe ran in a front-end request: wp-admin false, WP-CLI false, language en
+      PASS  [en] AC-246-08 the export holds each physical item once: T26-ARABIC, T26-ENGLISH, T26-ORPHAN, T26-PAIR, T26-VAR-S
+      PASS  [en] AC-246-08 the export total is 5, the screen total 5
+      PASS  [en] FR-010 an ordinary product query in the same request is still scoped to its language: english, pair(en)
+      PASS  [ar] the probe ran in a front-end request: wp-admin false, WP-CLI false, language ar
+      PASS  [ar] AC-246-08 the export holds each physical item once: T26-ARABIC, T26-ENGLISH, T26-ORPHAN, T26-PAIR, T26-VAR-S
+      PASS  [ar] AC-246-08 the export total is 5, the screen total 5
+      PASS  [ar] FR-010 an ordinary product query in the same request is still scoped to its language: pair(ar), arabic
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+22 scenarios, 0 failed

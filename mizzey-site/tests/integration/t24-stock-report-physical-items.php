@@ -9,8 +9,10 @@
  * REST dispatch: that path is exercised separately because it is a different entry into the same query.
  *
  * Language context. Each list is read three times, with the session language set to English, to Arabic and to
- * all languages. What a browser request adds is only how that session language is first chosen; the correction
- * widens the scope inside the report's own query whatever it was, so the three contexts are the whole input.
+ * all languages, inside this one WP-CLI process. That is NOT the whole input, as staging showed on 5 October 2026:
+ * the multilingual plugin treats a WP-CLI process differently from the REST request the screen makes, and this
+ * scenario passed while the screen was wrong. It is kept for what it does measure, the controller and its query
+ * in process. The report as it is actually read, over HTTP, signed in, in each admin language context, is t26.
  *
  * Fixtures, six physical items:
  *   pair      a simple product in both languages, low
