@@ -121,6 +121,157 @@ if ( $translated ) {
 	}
 }
 
+// ---------------------------------------------------------------------------------------------------------
+// #242 information architecture: the contracted page inventory, the endpoint slugs and the taxonomies.
+//
+// Only the rows that genuinely need a page record get one. IA-02, IA-03, IA-06 and IA-07 are WooCommerce
+// archives and singulars; IA-10 and IA-14 to IA-20 are the account and checkout experience, which is endpoints
+// plus the My Account base page. Creating pages for those would give one screen two managed routes, which
+// guardrail G-1 forbids.
+//
+// Page bodies are placeholders. Copy, category names, collection names and marketing content are client input
+// and are not invented here.
+//
+// A11's invariant throughout: every source record is created first, and the Arabic counterparts afterwards in
+// their own pass, with the language switched BEFORE insert so WPML does not suffix the slug.
+// ---------------------------------------------------------------------------------------------------------
+
+/**
+ * The pages #242 creates, slug => array( title, register id ).
+ *
+ * Reusing an existing record where WordPress or WooCommerce already made one, rather than adding a duplicate.
+ */
+$ia_pages = array(
+	'home'                   => array( 'Home', 'IA-01' ),
+	'wishlist'               => array( 'Wishlist', 'IA-11' ),
+	'track-your-order'       => array( 'Track your order', 'IA-21' ),
+	'about'                  => array( 'About', 'IA-24' ),
+	'contact-us'             => array( 'Contact us', 'IA-25' ),
+	'help'                   => array( 'Help and FAQ', 'IA-26' ),
+	'authenticity-guarantee' => array( 'Authenticity guarantee', 'IA-27' ),
+	'shipping-policy'        => array( 'Shipping policy', 'IA-28' ),
+	'returns-and-refunds'    => array( 'Return and refund policy', 'IA-29' ),
+	'privacy-policy'         => array( 'Privacy policy', 'IA-30' ),
+	'terms-and-conditions'   => array( 'Terms and conditions', 'IA-31' ),
+	'offers'                 => array( 'Offers', 'IA-32' ),
+);
+
+/** IA-21: the native order-tracking form, which looks an order up by number and email. */
+$ia_body = function ( $slug ) {
+	if ( 'track-your-order' === $slug ) {
+		return '<!-- wp:shortcode -->[woocommerce_order_tracking]<!-- /wp:shortcode -->';
+	}
+	return '<!-- wp:paragraph --><p>Placeholder. Content for this page is a client input and is not written here.</p><!-- /wp:paragraph -->';
+};
+
+$ia_en = array();
+foreach ( $ia_pages as $slug => $meta ) {
+	$existing = get_page_by_path( $slug, OBJECT, 'page' );
+	if ( $existing instanceof WP_Post ) {
+		// Two WordPress defaults, privacy-policy and refund_returns, exist as drafts reachable only by
+		// ?page_id=, which is a clean-URL failure. Publish and reuse rather than duplicate.
+		if ( 'publish' !== $existing->post_status ) {
+			wp_update_post( array( 'ID' => $existing->ID, 'post_status' => 'publish' ) );
+		}
+		$ia_en[ $slug ] = (int) $existing->ID;
+		continue;
+	}
+	$id = wp_insert_post(
+		array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => $meta[0],
+			'post_name'    => $slug,
+			'post_content' => $ia_body( $slug ),
+		),
+		true
+	);
+	if ( is_wp_error( $id ) ) {
+		continue;
+	}
+	// Register the language explicitly. WPML attaches a post to a language on save_post, which a page inserted
+	// inside this script never reaches, so without this the record has trid NULL and language NULL and belongs
+	// to neither language. Measured on the first run: eleven of twelve pages were in that state.
+	$sitepress->set_element_language_details( (int) $id, 'post_page', null, 'en' );
+	$ia_en[ $slug ] = (int) $id;
+}
+
+// The pre-existing WordPress drafts were registered by WPML when WordPress created them; the pages above were
+// not, so make sure every source record now has a group before the Arabic pass reads it.
+foreach ( $ia_en as $slug => $source_id ) {
+	if ( ! $sitepress->get_element_trid( $source_id, 'post_page' ) ) {
+		$sitepress->set_element_language_details( $source_id, 'post_page', null, 'en' );
+	}
+}
+
+// The existing WordPress refund draft covers IA-29; keep one record, not two.
+$refund_draft = get_page_by_path( 'refund_returns', OBJECT, 'page' );
+if ( $refund_draft instanceof WP_Post && 'publish' !== $refund_draft->post_status ) {
+	wp_update_post( array( 'ID' => $refund_draft->ID, 'post_status' => 'publish' ) );
+}
+
+// Arabic counterparts, second pass, language set before insert.
+$ia_ar = array();
+foreach ( $ia_en as $slug => $source_id ) {
+	$trid = $sitepress->get_element_trid( $source_id, 'post_page' );
+	if ( ! $trid ) {
+		continue;
+	}
+	$group = $sitepress->get_element_translations( $trid, 'post_page' );
+	if ( isset( $group['ar'] ) ) {
+		$ia_ar[ $slug ] = (int) $group['ar']->element_id;
+		continue;
+	}
+	$previous = $sitepress->get_current_language();
+	$sitepress->switch_lang( 'ar', true );
+	$ar_id = wp_insert_post(
+		array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => get_the_title( $source_id ),
+			'post_name'    => $slug,
+			'post_content' => get_post_field( 'post_content', $source_id ),
+		),
+		true
+	);
+	$sitepress->switch_lang( $previous, true );
+	if ( is_wp_error( $ar_id ) ) {
+		continue;
+	}
+	$sitepress->set_element_language_details( (int) $ar_id, 'post_page', $trid, 'ar', 'en' );
+	$ia_ar[ $slug ] = (int) $ar_id;
+}
+
+// IA-01: a static front page. The storefront's home is a page, not the blog index.
+if ( isset( $ia_en['home'] ) ) {
+	update_option( 'show_on_front', 'page' );
+	update_option( 'page_on_front', $ia_en['home'] );
+}
+
+// IA-31: WooCommerce's terms page assignment, which was unset.
+if ( isset( $ia_en['terms-and-conditions'] ) ) {
+	update_option( 'woocommerce_terms_page_id', $ia_en['terms-and-conditions'] );
+}
+
+// IA-05: product_brand ships with WooCommerce 11.1.0 and is not registered translatable in WPML. A P1 row needs
+// its Arabic archive, so register it. IA-04 and IA-35: the collection taxonomy the site plugin registers.
+$ia_taxonomies = array();
+foreach ( array( 'product_brand', 'product_collection' ) as $tax ) {
+	if ( ! taxonomy_exists( $tax ) ) {
+		continue;
+	}
+	$helper->set_taxonomy_translatable( $tax );
+	$helper->set_taxonomy_translation_unlocked_option( $tax, false );
+	$ia_taxonomies[ $tax ] = (bool) $sitepress->is_translated_taxonomy( $tax );
+}
+
+// IA-10 and the account endpoints are translated in ia-endpoints.php, which runs after admin-visit.php.
+// WooCommerce registers its endpoint slugs under context "WP Endpoints" only when it runs in an admin context,
+// so at this point in the reset the strings do not exist yet. Measured on the first run: every lookup returned
+// no id and nothing was translated.
+
+flush_rewrite_rules( false );
+
 $tm = $sitepress->get_setting( 'translation-management' );
 echo wp_json_encode(
 	array(
@@ -138,5 +289,10 @@ echo wp_json_encode(
 		'htaccess'            => file_exists( ABSPATH . '.htaccess' ),
 		'system_pages_en'     => $system_pages,
 		'system_pages_ar'     => $translated,
+		'ia_pages_en'         => $ia_en,
+		'ia_pages_ar'         => $ia_ar,
+		'ia_front_page'       => array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ) ),
+		'ia_terms_page'       => (int) get_option( 'woocommerce_terms_page_id' ),
+		'ia_taxonomies'       => $ia_taxonomies,
 	)
 ), "\n";

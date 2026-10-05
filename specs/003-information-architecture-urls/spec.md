@@ -98,8 +98,8 @@ twenty-nine times, with the rows that need their own criterion given one.
 | AC-242-09 | **A canonical link is emitted on every contracted URL**, pointing at that URL's own canonical form, including archive URLs where WordPress core emits none | NFR-03 | final |
 | AC-242-10 | **The sitemap includes both languages**: every contracted page appears for English and for Arabic | NFR-03 | final |
 | AC-242-11 | **`robots.txt` is served** and does not disallow any contracted page | NFR-03 | final |
-| AC-242-12 | **Breadcrumbs** are available on the storefront pages whose position in the hierarchy they describe | NFR-03 | final |
-| AC-242-13 | **Structured data** is emitted for a product and for the organisation, valid against the vocabulary | NFR-03 | final |
+| AC-242-12 | A **breadcrumb mechanism** is present and not suppressed, so a storefront template can emit breadcrumbs for a page's position in the hierarchy | NFR-03 | final |
+| AC-242-13 | A **structured-data mechanism** is present and correctly wired for product and breadcrumb data, so a storefront template emits it without further work here | NFR-03 | final |
 | AC-242-14 | **A meta description is emitted** on every contracted page, and a page without one does not fall back to repeating another page's | NFR-03 | final |
 | AC-242-15 | **Alt text is supported and used** on the images this feature introduces, and the mechanism is available for later content | NFR-03 | final |
 
@@ -112,6 +112,19 @@ cross-artifact analysis, because `tools/scope_trace.py` inspects the criterion t
 
 **Fifteen contracted criteria, every one traced to a row in the Register trace.** AC-242-01 to AC-242-07
 carry the page rows; AC-242-08 to AC-242-15 are NFR-03's eight obligations, one criterion each.
+
+**AC-242-12 and AC-242-13 assert the mechanism, not the emission, and that is an ownership boundary rather
+than a convenience.** Measured: `WC_Structured_Data::generate_product_data` is hooked on
+`woocommerce_single_product_summary` at priority 60 and `generate_breadcrumblist_data` on
+`woocommerce_breadcrumb`, so the stack is wired correctly. Neither hook fires yet, because the theme has no
+product template: it holds `front-page.html` and `index.html` only. **The product template is PDP-01 to PDP-24,
+owned by #254**, and **MKT-16 contracts "Structured data: product, organisation, breadcrumbs" and is owned by
+E-MKT-2**. Building a product template here would take #254's rows and breach the design boundary this PBI holds
+at `Design dependency = none`.
+
+So #242 verifies that nothing it does suppresses the mechanism, and records that emission arrives with the
+storefront templates. An earlier draft of these two criteria claimed the output, which over-claimed against both
+#254 and MKT-16.
 
 ### Derived architecture invariant, not contracted acceptance
 
