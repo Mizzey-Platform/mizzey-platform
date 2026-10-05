@@ -84,7 +84,10 @@ async function head(page) {
 			hreflang: Object.fromEntries(link('alternate').filter((l) => l.hreflang).map((l) => [l.hreflang, l.href])),
 			description: (document.querySelector('meta[name="description"]') || {}).content || null,
 			banner: Boolean(document.getElementById('mizzey-staging-banner')),
-			comingSoon: /Great things are on the horizon/.test(document.body.innerText),
+			// A placeholder standing in front of the page: the commerce "coming soon" page, marked by its meta tag in
+			// any language, or a WordPress error or maintenance page, whose body carries the id error-page.
+			comingSoon: Boolean(document.querySelector('meta[name="woo-coming-soon-page"]')) || /Great things are on the horizon/.test(document.body.innerText),
+			errorPage: document.body.id === 'error-page',
 			h1: (document.querySelector('h1') || {}).innerText || null,
 		};
 	});
@@ -129,6 +132,7 @@ async function passIa(browser, record) {
 			if (!String(entry.lang || '').toLowerCase().startsWith(lang)) problems.push(`lang is ${entry.lang}`);
 			if (entry.dir !== dir) problems.push(`dir is ${entry.dir}`);
 			if (entry.comingSoon) problems.push('the "coming soon" screen is showing');
+			if (entry.errorPage) problems.push('a WordPress error or maintenance page is showing');
 			if (!entry.banner) problems.push('no staging banner');
 			const isSearch = address.includes('?s=');
 			// An account endpoint is a view of the account page, and its canonical form is that page.

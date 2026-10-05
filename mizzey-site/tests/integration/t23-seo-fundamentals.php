@@ -16,6 +16,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_storefront.php';
 
 /**
  * @return array{status:int,body:string,type:string}
@@ -25,6 +26,7 @@ function t23_get( string $url ): array {
 	if ( is_wp_error( $r ) ) {
 		return array( 'status' => 0, 'body' => '', 'type' => '' );
 	}
+	storefront_refuse_shell( $url, (int) wp_remote_retrieve_response_code( $r ), (string) wp_remote_retrieve_body( $r ) );
 	return array(
 		'status' => (int) wp_remote_retrieve_response_code( $r ),
 		'body'   => (string) wp_remote_retrieve_body( $r ),
@@ -135,6 +137,10 @@ run(
 		// Needs a product, which the clean baseline has none of. Created here and cleaned up.
 		$product = $s->simple_product( 't23 structured data probe', '250', null );
 		$pdp = t23_get( (string) get_permalink( $product->get_id() ) );
+		if ( ! storefront_shows( $pdp['body'], 't23 structured data probe' ) ) {
+			$s->note( 'FAIL AC-242-13: the product address did not render the product page' );
+			$ok = false;
+		}
 		preg_match_all( '#<script type="application/ld\+json">(.*?)</script>#s', $pdp['body'], $blocks );
 		$types = array();
 		foreach ( $blocks[1] ?? array() as $json ) {

@@ -368,7 +368,13 @@ def cmd_up(a) -> None:
     if test.returncode:
         raise SystemExit(f"Apache refuses the staging configuration:\n{test.stderr}")
     flags = 0x00000008 | 0x00000200 if os.name == "nt" else 0  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
-    subprocess.Popen([str(APACHE / "bin" / "httpd.exe"), "-f", str(conf)], env=env(), creationflags=flags,
+    # The machine's PHP loads Xdebug in development mode, which writes a stack trace with every argument's value
+    # under each warning in the PHP error log. One of those arguments is the database object, so the staging
+    # database password was written to logs/php-error.log thousands of times (found on 5 October 2026). Staging
+    # runs without Xdebug: the variable overrides the setting for this process and its children only.
+    server_env = env()
+    server_env["XDEBUG_MODE"] = "off"
+    subprocess.Popen([str(APACHE / "bin" / "httpd.exe"), "-f", str(conf)], env=server_env, creationflags=flags,
                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
     for _ in range(40):
         time.sleep(0.5)
