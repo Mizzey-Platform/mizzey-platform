@@ -15,7 +15,7 @@ Feature `004-inventory-report-one-item-once`, PBI #246. One register row: RPT-10
 | Item | Wording | State |
 |---|---|---|
 | **AC-246-11** | "The figures the report shows are the figures the ERP supplies" | **Open, `pending PRE-09`.** The ERP Integration Specification is not approved. Nothing here chooses where those figures are stored |
-| **DOD-04** | "Tests written and executed per system layer, **plus manual testing on staging**" | **Outstanding.** No staging environment exists yet; #244 is `Ready` and not delivered |
+| **DOD-04** | "Tests written and executed per system layer, **plus manual testing on staging**" | **Run on staging on 5 October 2026 as a scripted pass in a real browser, and it found three faults.** The report is right in the English admin context and wrong outside it. **AC-246-03 and AC-246-04 do not hold in the signed-in browser session**, although the scenario passes. See "Staging pass" below |
 | DOD-09 | "Client approval of acceptance criteria before a feature moves to production" | Outstanding, a client gate rather than an engineering one |
 
 **No staging result is claimed.** The rendered report in a browser has not been looked at by a person on a
@@ -100,7 +100,37 @@ machine and are not a production figure.** The scenario passes or fails on corre
 
 ## What is not verified
 
-- **The rendered report in a browser**, by a person. DOD-04, on staging.
+- **The rendered report in a browser**, by a person. DOD-04, on staging. A scripted pass in a real browser has
+  now been run, and its findings are below; a person has still not looked.
+
+## Staging pass, 5 October 2026
+
+Run on the staging environment of #244, on the code of `main`, in the installed Chrome, signed in as the invented
+staging administrator. The seed holds four physical items low on stock and four out of stock; one low item
+exists in English only and one out-of-stock item in Arabic only. The record holds the request the screen itself
+made and the answer it was given.
+
+| Admin language context | Low stock, expected 4 | Out of stock, expected 4 |
+|---|---|---|
+| English | 4 lines, each item once | **3 lines**: the Arabic-only item is missing |
+| Arabic | **0 lines** | **1 line**: only the Arabic-only item |
+| All languages | 4 lines, by the same request as English | **3 lines**: the Arabic-only item is missing |
+
+| Finding | Criterion |
+|---|---|
+| **F-246-1.** An item that exists only in Arabic is left out in the English and all-languages contexts | AC-246-03 |
+| **F-246-2.** The list differs by admin language context: in Arabic it holds none of the items that exist in both languages | AC-246-04 |
+| **F-246-3.** The summary under the table reads "7 Low stock" and "7 Out of stock" beside lists of 4 and 3 lines: it counts language records | AC-246-06 as a reader meets it. The list's own total is right; the summary is a second figure the scenario does not read |
+
+What held: in the English context each physical item is one line (AC-246-01, AC-246-02), and the downloaded
+export matches the screen (AC-246-08).
+
+**The scenario and the screen disagree.** `t24` was run against the staging runtime the same day and passed, 0
+failed. It calls the report inside one process. The screen calls it over HTTP, signed in, under the address
+prefix of the admin's language, and is given a different list. **AC-246-03 and AC-246-04 are therefore not
+verified for the way the report is used.** The feature needs a correction and a scenario that goes through the
+real signed-in request. The cause is not diagnosed here. Full record: `docs/2026-10-05-staging-verification.md`;
+evidence: `specs/005-local-staging-environment/evidence/`.
 - **AC-246-11**, the ERP's figures. `pending PRE-09`.
 - **The older stock report screen** in an admin request. Out of scope by D-246-1, and recorded as a finding by
   source reading only.

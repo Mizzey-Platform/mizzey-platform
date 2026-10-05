@@ -1,0 +1,148 @@
+{
+ "measured": "2026-10-05T13:56:32Z",
+ "what": "N buyers ordering the last K units at the same instant",
+ "item": "DEMO-LOAD-001",
+ "records": {
+  "en": 104,
+  "ar": 105
+ },
+ "languages": [
+  "en",
+  "ar"
+ ],
+ "payment_method": "cod",
+ "buyers": 12,
+ "buyers_with_a_cart": 12,
+ "stock_before": {
+  "en": 3,
+  "ar": 3
+ },
+ "stock_after": {
+  "en": -1,
+  "ar": -1
+ },
+ "release_spread_ms": 0.89,
+ "orders_confirmed": 6,
+ "orders_refused": 6,
+ "units_oversold": 3,
+ "confirmed_by_language": {
+  "en": 4,
+  "ar": 2
+ },
+ "language_records_agree_after": true,
+ "refusal_messages": [
+  "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order.",
+  "لا يتوافر عدد كافٍ من وحدات منتج تجريبي 99 في المخزون لتنفيذ هذا الطلب."
+ ],
+ "cart_errors": [],
+ "rows": [
+  {
+   "buyer": 1,
+   "lang": "en",
+   "status": 200,
+   "seconds": 2.36,
+   "order_id": 117,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 2,
+   "lang": "ar",
+   "status": 200,
+   "seconds": 2.38,
+   "order_id": 121,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 3,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.82,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 4,
+   "lang": "ar",
+   "status": 403,
+   "seconds": 1.86,
+   "order_id": null,
+   "order_status": null,
+   "message": "لا يتوافر عدد كافٍ من وحدات منتج تجريبي 99 في المخزون لتنفيذ هذا الطلب."
+  },
+  {
+   "buyer": 5,
+   "lang": "en",
+   "status": 403,
+   "seconds": 2.0,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 6,
+   "lang": "ar",
+   "status": 403,
+   "seconds": 1.86,
+   "order_id": null,
+   "order_status": null,
+   "message": "لا يتوافر عدد كافٍ من وحدات منتج تجريبي 99 في المخزون لتنفيذ هذا الطلب."
+  },
+  {
+   "buyer": 7,
+   "lang": "en",
+   "status": 200,
+   "seconds": 2.44,
+   "order_id": 123,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 8,
+   "lang": "ar",
+   "status": 403,
+   "seconds": 1.88,
+   "order_id": null,
+   "order_status": null,
+   "message": "لا يتوافر عدد كافٍ من وحدات منتج تجريبي 99 في المخزون لتنفيذ هذا الطلب."
+  },
+  {
+   "buyer": 9,
+   "lang": "en",
+   "status": 200,
+   "seconds": 2.44,
+   "order_id": 118,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 10,
+   "lang": "ar",
+   "status": 403,
+   "seconds": 1.98,
+   "order_id": null,
+   "order_status": null,
+   "message": "لا يتوافر عدد كافٍ من وحدات منتج تجريبي 99 في المخزون لتنفيذ هذا الطلب."
+  },
+  {
+   "buyer": 11,
+   "lang": "en",
+   "status": 200,
+   "seconds": 2.17,
+   "order_id": 115,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 12,
+   "lang": "ar",
+   "status": 200,
+   "seconds": 2.28,
+   "order_id": 120,
+   "order_status": "processing",
+   "message": null
+  }
+ ]
+}

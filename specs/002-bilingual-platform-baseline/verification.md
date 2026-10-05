@@ -169,24 +169,38 @@ from checkout, identically in both languages. It is standard behaviour, not mult
 scenario deliberately does not request it, because the response would say nothing about language resolution.
 Recorded so the checkout slice does not rediscover it as a bug.
 
-## Staging and browser evidence: AC-9, not verified
+## Staging and browser evidence: AC-9 is not verified
+
+**Staging exists since #244, and part of the matrix was run on it on 5 October 2026.** AC-9 is not verified: three
+of the six approved rows cannot be run on the developer's Windows machine, and a partly exercised matrix is not
+a verified criterion.
 
 **Approved matrix** (D-09, 4 October 2026). Both reading directions on every row.
 
 | Browser | LTR | RTL | State |
 |---|---|---|---|
-| Chrome, current, desktop | - | - | **Not exercised** |
-| Safari, current, desktop | - | - | **Not exercised** |
-| Edge, current, desktop | - | - | **Not exercised** |
-| Firefox, current, desktop | - | - | **Not exercised** |
-| Chrome on Android, current | - | - | **Not exercised** |
-| Safari on iOS, current | - | - | **Not exercised** |
+| Chrome, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the installed Chrome 154, with finding F-241-1 |
+| Safari, current, desktop | - | - | **Not exercised.** Needs a Mac |
+| Edge, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the installed Edge 154, with finding F-241-1 |
+| Firefox, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the Firefox 155 build Playwright ships, not the release channel, with finding F-241-1 |
+| Chrome on Android, current | - | - | **Not exercised.** Needs an Android phone |
+| Safari on iOS, current | - | - | **Not exercised.** Needs an iPhone or iPad |
 
-**Every row is unexercised, and none may be marked otherwise until it is run on staging.** A command-line runtime
-has no browsers. Nothing was substituted for one: no user-agent string, no headless approximation and no CSS
-inspection is offered as browser acceptance.
+What ran is real browser windows driven by a script against the local staging address, not a person looking,
+and not a user-agent string or a headless approximation. A WebKit build and a phone-sized Chrome window were also
+run and are **not** offered as the Safari or Android rows: they are indications and are recorded as such in
+`docs/2026-10-05-staging-verification.md`.
 
-**Blocked on #244**, the environments PBI (PRE-03a, PRE-03b). This is the only item this feature cannot close.
+On the rows that ran, each of seven pages was opened in English and in Arabic. Every page answered, computed the
+right direction and language, held its own content in its own language, and showed nothing a visitor can see
+past either edge of the window, with one exception.
+
+**Finding F-241-1.** The cart page with an empty cart is 8 pixels wider than the window, in every engine and in
+both directions: the "New in store" product grid. It is not a mirroring fault. The cart page is owned by #306,
+and the theme is still the bare baseline.
+
+**To complete AC-9:** the three device rows, run through the tunnel on a Mac, an iPhone or iPad and an Android
+phone. Evidence for what ran: `specs/005-local-staging-environment/evidence/`.
 
 Excluded by the same decision, and not added unless separately required: Internet Explorer, Opera Mini, in-app
 browsers and any named device model.
@@ -221,6 +235,6 @@ browsers and any named device model.
 
 | Item | Owner |
 |---|---|
-| AC-9, the browser matrix | **#244**, staging |
+| AC-9, the browser matrix | Staging exists (#244). **Three device rows remain**: a Mac, an iPhone or iPad, an Android phone, through the tunnel |
 | The production URL and rewrite configuration | **OD-27**, hosting in writing. The rewrite configuration here is the test environment's and decides nothing about production |
 | Arabic page copy for the system pages | The storefront slices. This feature created the records, deliberately not their content |

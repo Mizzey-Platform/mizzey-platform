@@ -1,0 +1,145 @@
+{
+ "measured": "2026-10-05T14:50:37Z",
+ "what": "N buyers ordering the last K units at the same instant",
+ "item": "DEMO-LOAD-001",
+ "records": {
+  "en": 69,
+  "ar": 92
+ },
+ "languages": [
+  "en"
+ ],
+ "payment_method": "cod",
+ "buyers": 12,
+ "buyers_with_a_cart": 12,
+ "stock_before": {
+  "en": 3,
+  "ar": 3
+ },
+ "stock_after": {
+  "en": -3,
+  "ar": -3
+ },
+ "release_spread_ms": 0.88,
+ "orders_confirmed": 6,
+ "orders_refused": 6,
+ "units_oversold": 3,
+ "confirmed_by_language": {
+  "en": 6
+ },
+ "language_records_agree_after": true,
+ "refusal_messages": [
+  "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+ ],
+ "cart_errors": [],
+ "rows": [
+  {
+   "buyer": 1,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.13,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 2,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.62,
+   "order_id": 109,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 3,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.85,
+   "order_id": 114,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 4,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.15,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 5,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.17,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 6,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.81,
+   "order_id": 115,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 7,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.18,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 8,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.61,
+   "order_id": 111,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 9,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.6,
+   "order_id": 108,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 10,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.83,
+   "order_id": 117,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 11,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.15,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  },
+  {
+   "buyer": 12,
+   "lang": "en",
+   "status": 403,
+   "seconds": 1.17,
+   "order_id": null,
+   "order_status": null,
+   "message": "Not enough units of Sample Product 99, concurrency test item are available in stock to fulfil this order."
+  }
+ ]
+}
