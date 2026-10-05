@@ -7,7 +7,7 @@ Feature `003-information-architecture-urls`, PBI #242. Thirty register rows: 28 
 | State | Where this stands |
 |---|---|
 | **Workflow complete** | Yes. Spec, clarification, research, plan, checklist, tasks, analysis, implementation, verification |
-| **Technically verified** | **AC-242-01 to AC-242-15 and guardrail G-1**, on the disposable runtime at the recorded versions |
+| **Technically verified** | **AC-242-01 to AC-242-15 and guardrail G-1 on the disposable runtime, with AC-242-05 and AC-242-09 now verified by fetching each term archive as a visitor and following every address it points at**, after the repair of 5 October 2026. The first verification of those two was disproved the same day. **The staging re-run on the repaired `main` is owed before the board status returns to Verified** |
 | **Contractually accepted** | **No criterion.** Acceptance happens only through the Acceptance and UAT Plan MS-UAT-2026-027 |
 
 **Closure still owes the project Definition of Done**, which this record does not weaken:
@@ -37,6 +37,73 @@ demonstration customer, the order list, the addresses and one order.
 **AC-242-09 is therefore technically verified except on the Arabic brand archive**, where it fails. The feature
 needs a correction and a scenario that fetches the archive as a visitor does. Full record:
 `docs/2026-10-05-staging-verification.md`; evidence: `specs/005-local-staging-environment/evidence/`.
+**Diagnosed and corrected the same day: see "Repair" below.**
+
+## Repair, 5 October 2026
+
+**How to read this record.** The sections after this one, from "What the audit changed" on, are the first
+verification, kept as written. Two of its results did not hold in use, AC-242-05 on the collection archive and
+AC-242-09 on the Arabic brand archive, and one of its notes was false. This section is where those stand now.
+
+### What was wrong, and why
+
+| Defect | Criterion | Cause | Found by |
+|---|---|---|---|
+| The Arabic brand archive's canonical link and all three language links answer 404 | AC-242-09, and NFR-03's language links | WooCommerce's default address word for the brand taxonomy is a translatable string, read in the language of each request. The stored routing rules know the English word only. `research.md` section 11 | Staging, F-242-1 |
+| The collection archive answers 200 and shows neither the collection nor a product | AC-242-05 | The theme has no template for the taxonomy, and WooCommerce applies its product archive template to its own taxonomies only. `research.md` section 12 | The storefront guard, F-GUARD-1, once the development baseline stopped serving the "coming soon" page |
+
+Neither is a fixture fault or a staging-only setting: both reproduce on a clean development baseline.
+
+### The corrections
+
+| Correction | Where |
+|---|---|
+| The brand archive's address word is the documented `brand` in every language. A word saved in the permalink settings is still honoured | `mizzey-site/src/Catalogue/Brands.php` |
+| A collection archive is served with the platform's product archive template, as a category and a brand archive are. A template the theme later supplies takes precedence | `Collections::useProductArchiveTemplate()` |
+
+No SEO plugin, no second set of addresses, no rewriting of links on output, no new template.
+
+### The regression, written first
+
+`t28-archive-language-links.php`, for the category, the brand and the collection archive, in English and in
+Arabic: the documented address is fetched as a visitor and must show the term and a product assigned to it; the
+canonical link must be that address; the language links must be exactly English, Arabic and x-default at their
+counterparts' documented addresses; and **every one of those addresses is fetched and must answer 200 with the
+term of its own language**. The routing rules are then rebuilt from inside an Arabic request and everything is
+read again.
+
+| | t28 |
+|---|---|
+| On the code of `main` before the repair (`evidence/repair/t28-before.txt`) | **FAIL: 32 assertions fail, 65 pass.** The brand rows fail in Arabic, the collection rows in both languages, the category rows pass |
+| After the repair (`evidence/repair/final-suite.txt`) | **PASS: 97 assertions, none failing** |
+
+| # | Criterion | Verified by | Result |
+|---|---|---|---|
+| AC-242-05 | Product, category, collection and brand URLs follow one documented pattern per language, and a URL that names a term serves that term's archive | t28: each of the three archives at its documented address in both languages, showing its term and its product. t22: an archive must show its term | **PASS** |
+| AC-242-09 | A canonical link on every contracted URL, pointing at that URL's own canonical form, including archives | t28: one canonical link per archive, equal to the archive's own address, and that address answers 200 with the right term, in both languages, before and after a rebuild of the routing rules in an Arabic request. t23 for the other page types, as before | **PASS** |
+| NFR-03, language links | Each archive's English, Arabic and x-default links | t28: each points at its counterpart's documented address, and each is fetched and answers 200 with the term of its own language. No language link answers 404 | **PASS** |
+
+### The note the placeholder made false
+
+This record and the specification say that the structured-data generators do not fire because the theme has no
+product template. That was read from the store's "coming soon" page. **On the real product page the platform's
+own template runs them, and the page emits: BreadcrumbList, Product.** AC-242-12 and AC-242-13 assert the mechanism, not the
+emission, so their results stand, and MKT-16 still owns the structured-data row. The statement is corrected where
+it is made below and in `spec.md`.
+
+### The suite after the repair
+
+**One run, on a clean baseline with the store open to visitors, serially: 24 scenarios, 0 failed.**
+Nineteen contract scenarios pass and 5 are fact-finding scenarios that give no verdict.
+`evidence/repair/clean-baseline.txt` is the reset that preceded it.
+
+### What the repair does not claim
+
+- **Staging.** The staging pass is repeated on the repaired `main`, on a reseeded staging that now holds a
+  collection. Until it passes there, the board status stays In progress.
+- **A person's look.** Still owed under DOD-04.
+- **What a collection page says and looks like.** SSC-06 and the design. Not touched.
+- **Contractual acceptance.** Pending DOD-09, through MS-UAT-2026-027.
 
 Versions this is evidence for, and no others (M-8): WordPress 7.1.2, WooCommerce 11.1.0, WPML 4.9.7, WPML String
 Translation 3.5.4, WCML 5.5.7, CoreX 0.42.0, PHP 8.3.6, MySQL 8.3.0.
@@ -120,6 +187,9 @@ make a screen look like a register row.
 | AC-242-13 | A structured-data mechanism present and correctly wired | **PASS** |
 | AC-242-14 | A meta description per page, never shared | **PASS** |
 | AC-242-15 | Alt text supported, mechanism available | **PASS** |
+
+> **Corrected on 5 October 2026.** "Neither fires yet because the theme has no product template", below, was
+> measured on the store's "coming soon" page. On the real product page both generators run. See "Repair".
 
 **AC-242-12 and AC-242-13 assert the mechanism, not the emission, and that is an ownership boundary.** Measured:
 `WC_Structured_Data::generate_product_data` is wired to `woocommerce_single_product_summary` at priority 60 and

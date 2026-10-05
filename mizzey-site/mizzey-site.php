@@ -22,6 +22,7 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/src/I18n/Localisation.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
+require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
 require_once __DIR__ . '/src/Seo/ArchiveCanonical.php';
 require_once __DIR__ . '/src/Seo/MetaDescription.php';
@@ -40,6 +41,10 @@ add_action('plugins_loaded', [MizzeySite\Catalogue\CostTranslationSync::class, '
 // The collection taxonomy, which gives IA-04 and IA-35 their archive route. The register settles the model:
 // ADM-57 makes manually curated collections P1, ADM-58 defers rules-based membership to P2.
 MizzeySite\Catalogue\Collections::register();
+
+// IA-05: the brand archive's address word is `brand` in every language. WooCommerce's default is a translatable
+// string, which gave an Arabic request links that no routing rule answered.
+MizzeySite\Catalogue\Brands::register();
 
 // NFR-03's three measured output gaps. Each emits only, through a documented filter, with no storage of its own,
 // so MKT-12, MKT-15, ADM-41 and SSC-27 can override it later without this code changing.

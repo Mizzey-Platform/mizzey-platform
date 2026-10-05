@@ -6,6 +6,7 @@
  * is the client's. The set is shaped by what a review has to exercise, not by what the client sells:
  *
  *  - twelve simple products and two products with variants, across three categories and two brands;
+ *  - one curated collection holding three of them, so the collection archive of IA-04 has something to show;
  *  - a barcode on some and none on others, for the search row of the store operations list (ADM-152);
  *  - stock that is healthy, low and exhausted, so the stock report of #246 has every case to show;
  *  - a product cost on most and none on two (ADM-27: zero and missing are different things);
@@ -50,6 +51,10 @@ $brands     = array(
 	'north' => $term( 'product_brand', 'Sample Brand North', 'sample-brand-north' ),
 	'south' => $term( 'product_brand', 'Sample Brand South', 'sample-brand-south' ),
 );
+
+$collection = $term( 'product_collection', 'Sample Collection', 'sample-collection' );
+// The simple products placed in it, by number. A collection is curated by hand (ADM-57), so membership is a list.
+$in_collection = array( 1, 5, 9 );
 
 // number, category, brand, price, stock, cost (null is "not entered"), barcode or null.
 $simple = array(
@@ -99,6 +104,9 @@ foreach ( $simple as list( $n, $category, $brand, $price, $stock, $cost, $barcod
 	$p->save();
 	$as_original( $p->get_id(), 'post_product', 'en' );
 	$place( $p->get_id(), $categories[ $category ], $brands[ $brand ] );
+	if ( in_array( $n, $in_collection, true ) ) {
+		wp_set_object_terms( $p->get_id(), array( $collection ), 'product_collection' );
+	}
 	update_post_meta( $p->get_id(), '_mizzey_seed', 'translate' );
 	++$made['simple'];
 }

@@ -235,8 +235,11 @@ run(
 				);
 			}
 			$link = $term_id ? get_term_link( $term_id, $tax ) : '';
-			$res = is_string( $link ) ? t22_get( $link ) : array( 'status' => 0, 'lang' => '-' );
-			$good = $translatable && 200 === $res['status'];
+			$res = is_string( $link ) ? t22_get( $link ) : array( 'status' => 0, 'lang' => '-', 'body' => '' );
+			// The archive must be the term's own: its name on the page, not only a 200. The collection archive
+			// answered 200 with nothing on it until 5 October 2026, and this line read "archive=200" and passed.
+			// Both languages, a product on the page and every link the archive points at are t28.
+			$good = $translatable && 200 === $res['status'] && storefront_shows( $res['body'], "t22 fixture {$tax}" );
 			$s->note( sprintf( '%s %-22s translatable=%s archive=%d %s', $good ? 'ok  ' : 'FAIL',
 				$row . ' ' . $tax, $translatable ? 'yes' : 'NO', $res['status'],
 				is_string( $link ) ? $link : '(no link)' ) );

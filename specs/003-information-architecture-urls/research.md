@@ -202,3 +202,81 @@ can have an IA identity and no design.
 | Metadata, stock or price synchronisation | Settled by the pilot, A11, A12, B1 and the price matrix |
 | Anything for IA-12, IA-13, IA-22, IA-34, IA-36 | P2 or DEF |
 | IA-23, IA-33 | Contracted P1-L rows the register stages **S2**, owned by the future E-FND-2b slice. Not removed from scope; simply not owned here |
+
+## 11. Why the Arabic brand archive pointed at addresses that do not exist. Added by the repair of 5 October 2026
+
+**What staging showed.** `/ar/brand/{term}/`, the documented address, answers 200. Its canonical link and its
+`ar`, `en` and `x-default` language links carry a translated form of the word "brand", and all four answer 404
+(`docs/2026-10-05-staging-verification.md`, F-242-1).
+
+**Reproduced first, on the development runtime, over HTTP.** Scenario t28 fetches each term archive as a visitor
+and follows every address it points at. On the code of `main` it fails as staging did:
+`evidence/repair/t28-before.txt`. So this is not a staging-only fault and not a fixture fault.
+
+**The cause, measured.**
+
+| Fact | Where |
+|---|---|
+| No brand address is saved: the option `woocommerce_brand_permalink` is unset | Read on staging and on the development runtime |
+| With none saved, WooCommerce takes the address word from `__( 'brand', 'woocommerce' )`, a translatable string, in the language of the request it runs in | `WC_Brands::init_taxonomy()`, WooCommerce 11.1.0 |
+| The Arabic language pack translates that string to the Arabic for "the brand", two words with a space | Read under the Arabic locale |
+| The routing rules are built once and stored. They were built in an English request, so they route `brand/...` and nothing else | The stored rules: five route to the brand taxonomy, all under `brand/` |
+| In an Arabic request the taxonomy is therefore registered under the Arabic word, and every link built from it carries that word | The canonical link, the three language links and the feed link of the Arabic archive |
+
+The candidates, each ruled in or out:
+
+| Candidate | Verdict |
+|---|---|
+| Taxonomy rewrite configuration | **This one, in part**: the address word is left at a default that is not a fixed word |
+| A translated taxonomy slug | **This one**: the default is translated by the language pack, per request |
+| WPML taxonomy-language registration | No. The taxonomy is registered translatable and its Arabic term resolves at the documented address |
+| Rewrite rules not flushed or rebuilt | No. The rules are present and correct for the English word. A rebuild inside an Arabic request is the same fault from the other side, and t28 exercises it |
+| A fixture or setup defect | No. A fresh term on a clean baseline reproduces it |
+| Production code of this site | No code of the site is wrong. The site did not pin the word, which the URL map documents as `brand` in both languages |
+| Staging-only configuration | No. The development runtime reproduces it |
+
+WooCommerce avoids the same fault for categories, tags and products: `wc_get_permalink_structure()` reads their
+default words in the site language. The brand taxonomy does not go through it.
+
+**The correction.** `MizzeySite\Catalogue\Brands` supplies the documented word, `brand`, as the default, through
+`register_taxonomy_product_brand`, the filter WooCommerce applies to the taxonomy's arguments. A word saved in the
+permalink settings is a stored literal, identical in every language, and is left alone.
+
+| Alternative | Why not |
+|---|---|
+| Save `brand` in the option, in the baseline and the seed | A setting that lives only in test fixtures does not reach production, and an administrator who saves the permalink screen with the field empty brings the fault back silently |
+| Make the Arabic word resolve too, with a second set of routing rules | A second URL system, and the URL map documents `/ar/brand/{term}/` |
+| Rewrite the canonical and language links on output | It hides the 404 and leaves every other link built from the taxonomy wrong, the feed link among them |
+| An SEO plugin | Not needed, and ruled out |
+
+## 12. The collection archive answered 200 with nothing on it. Added by the repair of 5 October 2026
+
+**How it was found.** Not by staging: the staging seed held no collection and the browser pass visited none. It
+was found when the development baseline stopped serving the store's "coming soon" page and t22 was made to check
+that an archive shows its term (`docs/2026-10-05-storefront-placeholder-guard.md`, F-GUARD-1).
+
+**What was measured.** `/collection/{term}/` resolves to the collection term and answers 200. The page holds the
+site title and nothing else: no collection name, no product. The category and brand archives show the term and
+its products.
+
+**The cause.** A block theme renders an archive with the first template it finds for the query. The theme holds
+`front-page.html` and `index.html` only. WooCommerce supplies its product archive template for its own
+taxonomies and not for one a site registers, so the collection archive fell through to the theme's `index.html`,
+which has no list of posts in it.
+
+**The correction.** `Collections::useProductArchiveTemplate()` offers WooCommerce's product archive template,
+`archive-product`, for a collection archive, through WordPress's `taxonomy_template_hierarchy` filter, in the
+position WooCommerce uses for its own product taxonomies. A template the theme later supplies for this taxonomy
+comes earlier in the list and wins, so the design work of #250 and the page work that follows are not pre-empted.
+No template is added to the theme and none is copied.
+
+**Why this is AC-242-05 and not a new feature.** The criterion reads "a URL that names a term serves that term's
+archive". An address that answers 200 and shows neither the term nor its products does not serve the archive.
+What a collection page should look like and say is still SSC-06 and the design, and is not touched.
+
+## 13. A note the placeholder made false. Added by the repair of 5 October 2026
+
+The specification and the verification record say that the structured-data generators do not fire because the theme has
+no product template. That was read from the store's "coming soon" page. On the real product page WooCommerce's
+own template runs them, and the page emits `Product` and `BreadcrumbList`. AC-242-12 and AC-242-13 assert the
+mechanism and are unaffected. The emission is recorded as a measured fact, and MKT-16 still owns the row.

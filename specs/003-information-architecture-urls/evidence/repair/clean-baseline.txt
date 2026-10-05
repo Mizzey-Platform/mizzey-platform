@@ -1,0 +1,10 @@
+Success: Database reset.
+Success: WordPress installed successfully.
+Warning: Some rewrite rules may be missing because themes weren't loaded by WP-CLI.
+{"wpml_setup_complete":true,"default_language":"en","product_translatable":true,"variation_translatable":true,"active_languages":["ar","en"],"cogs_value_setting":"unset","mizzey_wpml_config":false,"remote_config_index":"2026-10-05T17:20:17+00:00","wc_currency":"EGP","hpos":"yes","permalink_structure":"\/%postname%\/","htaccess":true,"system_pages_en":{"shop":5,"cart":6,"checkout":7,"myaccount":8},"system_pages_ar":{"shop":19,"cart":20,"checkout":21,"myaccount":22},"ia_pages_en":{"home":23,"wishlist":24,"track-your-order":25,"about":26,"contact-us":27,"help":28,"authenticity-guarantee":29,"shipping-policy":30,"returns-and-refunds":31,"privacy-policy":3,"terms-and-conditions":33,"offers":34},"ia_pages_ar":{"home":36,"wishlist":37,"track-your-order":38,"about":39,"contact-us":40,"help":41,"authenticity-guarantee":42,"shipping-policy":43,"returns-and-refunds":44,"privacy-policy":45,"terms-and-conditions":46,"offers":47},"ia_front_page":["page",23],"ia_terms_page":33,"ia_taxonomies":{"product_brand":true,"product_collection":true},"coming_soon":"no"}
+wp-admin plugins.php: HTTP 200
+_cogs_value='unset' locked=false
+_cogs_value_is_additive='unset' locked=false
+_cogs_total_value=1 locked=true
+{"ia_endpoints_ar":{"order-received":"order-received-ar","orders":"orders-ar","view-order":"view-order-ar","edit-address":"edit-address-ar","lost-password":"lost-password-ar","edit-account":"edit-account-ar","payment-methods":"payment-methods-ar","customer-logout":"customer-logout-ar","downloads":"downloads-ar","order-pay":"order-pay-ar"},"ia_endpoints_missing":[]}
+reset exit=0

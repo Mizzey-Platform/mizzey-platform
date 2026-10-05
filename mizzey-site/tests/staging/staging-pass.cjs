@@ -96,7 +96,9 @@ async function head(page) {
 async function passIa(browser, record) {
 	const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
 	const page = await context.newPage();
-	// row, page, English address, Arabic address. From specs/003-information-architecture-urls/url-map.md.
+	// row, page, English address, Arabic address, and for an archive the term it must show in each language. From
+	// specs/003-information-architecture-urls/url-map.md. An archive that answers 200 is not yet the term's archive:
+	// the collection archive answered 200 with nothing on it until 5 October 2026.
 	const pages = [
 		['IA-01', 'Home', '/', '/ar/'],
 		['IA-02', 'Products', '/shop/', '/ar/shop/'],
@@ -114,13 +116,14 @@ async function passIa(browser, record) {
 		['IA-31', 'Terms and conditions', '/terms-and-conditions/', '/ar/terms-and-conditions/'],
 		['IA-32', 'Offers and campaigns', '/offers/', '/ar/offers/'],
 		['IA-07', 'Product', '/product/sample-product-01/', '/ar/product/sample-product-01/'],
-		['IA-03', 'Category', '/product-category/sample-care/', '/ar/product-category/sample-care-ar/'],
-		['IA-05', 'Brand', '/brand/sample-brand-north/', '/ar/brand/sample-brand-north-ar/'],
+		['IA-03', 'Category', '/product-category/sample-care/', '/ar/product-category/sample-care-ar/', 'Sample Care', 'عناية تجريبية'],
+		['IA-05', 'Brand', '/brand/sample-brand-north/', '/ar/brand/sample-brand-north-ar/', 'Sample Brand North', 'علامة تجريبية شمال'],
+		['IA-04', 'Collection', '/collection/sample-collection/', '/ar/collection/sample-collection-ar/', 'Sample Collection', 'مجموعة تجريبية'],
 		['IA-06', 'Search results', '/?s=Sample', '/ar/?s=Sample'],
 		['IA-16', 'Lost password', '/my-account/lost-password/', '/ar/my-account/lost-password-ar/'],
 	];
-	for (const [row, name, en, ar] of pages) {
-		for (const [lang, dir, address] of [['en', 'ltr', en], ['ar', 'rtl', ar]]) {
+	for (const [row, name, en, ar, termEn, termAr] of pages) {
+		for (const [lang, dir, address, term] of [['en', 'ltr', en, termEn], ['ar', 'rtl', ar, termAr]]) {
 			const entry = { row, page: name, language: lang, address };
 			const response = await page.goto(BASE + address, { waitUntil: 'load', timeout: 90000 });
 			entry.status = response.status();
@@ -134,6 +137,12 @@ async function passIa(browser, record) {
 			if (entry.comingSoon) problems.push('the "coming soon" screen is showing');
 			if (entry.errorPage) problems.push('a WordPress error or maintenance page is showing');
 			if (!entry.banner) problems.push('no staging banner');
+			if (term) {
+				entry.showsTerm = await page.evaluate((text) => document.body.innerText.includes(text), term);
+				entry.productsListed = await page.locator('li.product, .wc-block-product, .wp-block-post.product').count();
+				if (!entry.showsTerm) problems.push(`the archive does not show its term, "${term}"`);
+				if (!entry.productsListed) problems.push('the archive lists no product');
+			}
 			const isSearch = address.includes('?s=');
 			// An account endpoint is a view of the account page, and its canonical form is that page.
 			const canonicalWanted = BASE + (row === 'IA-16' ? address.replace(/lost-password(-ar)?\/$/, '') : address);

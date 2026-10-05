@@ -1,0 +1,104 @@
+# #242 repair, BEFORE the correction: production code as on main at c0a523f5d236e0d3c39e7b224fed01dc8217a859
+# t22 and t23 are the earlier scenarios; t28 fetches each term archive as a visitor and follows every address it points at.
+# Run 2026-10-05T17:12:57Z on the disposable runtime, store open to visitors.
+
+FAIL  t28-archive-language-links   AC-242-05, AC-242-09: term archives and the addresses they point at, over HTTP
+      PASS  [product-category, en] AC-242-05 the documented address /product-category/t28-product-category/ answers 200
+      PASS  [product-category, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [product-category, en] AC-242-09 one canonical link, and it is the archive's own address: /product-category/t28-product-category/
+      PASS  [product-category, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  [product-category, en] canonical leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, en] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, en] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, en] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, ar] AC-242-05 the documented address /ar/product-category/t28-product-category-ar/ answers 200
+      PASS  [product-category, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [product-category, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/product-category/t28-product-category-ar/
+      PASS  [product-category, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  [product-category, ar] canonical leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, ar] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, ar] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, ar] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [brand, en] AC-242-05 the documented address /brand/t28-brand/ answers 200
+      PASS  [brand, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [brand, en] AC-242-09 one canonical link, and it is the archive's own address: /brand/t28-brand/
+      PASS  [brand, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  [brand, en] canonical leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, en] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  [brand, en] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, en] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, ar] AC-242-05 the documented address /ar/brand/t28-brand-ar/ answers 200
+      PASS  [brand, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      FAIL  [brand, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/العلامة التجارية/t28-brand-ar/
+      FAIL  [brand, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/العلامة التجارية/t28-brand-ar/","en":"/العلامة التجارية/t28-brand/","x-default":"/العلامة التجارية/t28-brand/"}
+      FAIL  [brand, ar] canonical leads to /ar/العلامة التجارية/t28-brand-ar/, which answers 404
+      FAIL  [brand, ar] hreflang ar leads to /ar/العلامة التجارية/t28-brand-ar/, which answers 404
+      FAIL  [brand, ar] hreflang en leads to /العلامة التجارية/t28-brand/, which answers 404
+      FAIL  [brand, ar] hreflang x-default leads to /العلامة التجارية/t28-brand/, which answers 404
+      PASS  [collection, en] AC-242-05 the documented address /collection/t28-collection/ answers 200
+      FAIL  [collection, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [collection, en] AC-242-09 one canonical link, and it is the archive's own address: /collection/t28-collection/
+      PASS  [collection, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      FAIL  [collection, en] canonical leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, en] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, en] hreflang en leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, en] hreflang x-default leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      PASS  [collection, ar] AC-242-05 the documented address /ar/collection/t28-collection-ar/ answers 200
+      FAIL  [collection, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [collection, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/collection/t28-collection-ar/
+      PASS  [collection, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      FAIL  [collection, ar] canonical leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, ar] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, ar] hreflang en leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  [collection, ar] hreflang x-default leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      PASS  the queued rebuild of the routing rules ran inside an Arabic request
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-05 the documented address /product-category/t28-product-category/ answers 200
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-09 one canonical link, and it is the archive's own address: /product-category/t28-product-category/
+      PASS  after an Arabic-request rebuild [product-category, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  after an Arabic-request rebuild [product-category, en] canonical leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-05 the documented address /ar/product-category/t28-product-category-ar/ answers 200
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/product-category/t28-product-category-ar/
+      PASS  after an Arabic-request rebuild [product-category, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  after an Arabic-request rebuild [product-category, ar] canonical leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-05 the documented address /brand/t28-brand/ answers 200
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-09 one canonical link, and it is the archive's own address: /brand/t28-brand/
+      PASS  after an Arabic-request rebuild [brand, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  after an Arabic-request rebuild [brand, en] canonical leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, ar] AC-242-05 the documented address /ar/brand/t28-brand-ar/ answers 200
+      PASS  after an Arabic-request rebuild [brand, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      FAIL  after an Arabic-request rebuild [brand, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/العلامة التجارية/t28-brand-ar/
+      FAIL  after an Arabic-request rebuild [brand, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/العلامة التجارية/t28-brand-ar/","en":"/العلامة التجارية/t28-brand/","x-default":"/العلامة التجارية/t28-brand/"}
+      FAIL  after an Arabic-request rebuild [brand, ar] canonical leads to /ar/العلامة التجارية/t28-brand-ar/, which answers 404
+      FAIL  after an Arabic-request rebuild [brand, ar] hreflang ar leads to /ar/العلامة التجارية/t28-brand-ar/, which answers 404
+      FAIL  after an Arabic-request rebuild [brand, ar] hreflang en leads to /العلامة التجارية/t28-brand/, which answers 404
+      FAIL  after an Arabic-request rebuild [brand, ar] hreflang x-default leads to /العلامة التجارية/t28-brand/, which answers 404
+      PASS  after an Arabic-request rebuild [collection, en] AC-242-05 the documented address /collection/t28-collection/ answers 200
+      FAIL  after an Arabic-request rebuild [collection, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [collection, en] AC-242-09 one canonical link, and it is the archive's own address: /collection/t28-collection/
+      PASS  after an Arabic-request rebuild [collection, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      FAIL  after an Arabic-request rebuild [collection, en] canonical leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, en] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, en] hreflang en leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, en] hreflang x-default leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      PASS  after an Arabic-request rebuild [collection, ar] AC-242-05 the documented address /ar/collection/t28-collection-ar/ answers 200
+      FAIL  after an Arabic-request rebuild [collection, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [collection, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/collection/t28-collection-ar/
+      PASS  after an Arabic-request rebuild [collection, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      FAIL  after an Arabic-request rebuild [collection, ar] canonical leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, ar] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, ar] hreflang en leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+      FAIL  after an Arabic-request rebuild [collection, ar] hreflang x-default leads to /collection/t28-collection/, which answers 200 WITHOUT the term it should show
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

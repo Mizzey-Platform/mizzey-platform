@@ -79,3 +79,26 @@ record.
 **Pass.** One inconsistency found and fixed, two readings surfaced for review, four decisions recorded rather than
 invented, and no task scheduled against a path this work type may not touch. **Implementation is unblocked for
 twenty-eight of the thirty rows**, and stops at the checkpoint by instruction rather than by obstacle.
+
+## Repair, 5 October 2026
+
+| # | Finding | Severity | Resolution |
+|---|---|---|---|
+| R-1 | t22 took "the archive address answers 200" as the term's archive, and t23 never fetched a term archive, so no scenario read the links of an Arabic archive | Evidence, and a defect behind it | t28 fetches each archive as a visitor in both languages and follows every address it points at. t22 requires the term on the page |
+| R-2 | The brand taxonomy's address word was a translatable default | Defect, AC-242-09 and NFR-03's language links | Pinned to the documented word by `Brands`. `research.md` section 11 |
+| R-3 | The collection archive answered 200 with nothing on it | Defect, AC-242-05 | Served with the platform's product archive template. `research.md` section 12. Found by the storefront guard, which is why it is in this repair and was not in the staging finding |
+| R-4 | A note in the spec, the verification record and t23 said the structured-data generators do not fire | Evidence | False: it described the "coming soon" page. Corrected with a dated note; the criteria assert the mechanism and stand |
+| R-5 | Serving the collection archive with the product archive template could be read as building a page | Scope, checked | It reuses the template the category and brand archives already use, through a documented filter, and steps aside for any template the theme supplies. No design, no content, no new template. SSC-06 and the design rows are untouched |
+| R-6 | `Brands` overrides a WooCommerce default | Behaviour, checked | Only the default. A word saved in the permalink settings is used as saved |
+
+Guards on the repair diff. Each skill was invoked in the session and its rules walked against the diff. None of
+them exposes a command that runs.
+
+| Guard | What it changed or confirmed |
+|---|---|
+| wp-guard | Confirmed: both hooks exist in the installed source, no output, no request data, no query. The filter values are checked before use because any plugin can pass anything through a filter |
+| woo-guard | Confirmed: a hook and a template slug are used, and no template is copied into the plugin or the theme |
+| clean-code-guard | Changed: the address word constant is private, since nothing outside the class reads it |
+| test-guard | Confirmed: no mock; t28 cites the staging incident; each language and taxonomy is a loop over one body. A link is asserted by fetching what it leads to, not by its text |
+| docs-guard | Each named function, hook, option and figure in the repair's records was checked against the installed source or the committed evidence |
+
