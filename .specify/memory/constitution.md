@@ -1,6 +1,6 @@
 # Mizzey Launch Platform Constitution
 
-**Version**: 1.0.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-09-22
+**Version**: 1.1.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-10-05
 
 This constitution governs every specification, plan, task and pull request in this repository. Spec Kit reads it
 through `/speckit-plan` (Constitution Check) and `/speckit-analyze`.
@@ -48,7 +48,14 @@ Change Request under MS-CHG-2026-028, or is recorded goodwill, and never a task.
 When a detailed register row and a narrative passage disagree, the disagreement is recorded in
 `docs/scope/open-items.json` with a CX id, and raised with Mustafa for the Stage 1 review. No spec, criterion,
 test, code path or governance text may settle it. A spec that touches an affected id cites the CX id, and marks
-dependent criteria "pending". Open at ratification: **CX-01, the Accountant role** (ROLE-06).
+dependent criteria "pending". Open at ratification: **CX-01, the Accountant role** (ROLE-06), resolved by D-10
+on 5 October 2026.
+
+**Closing a contradiction.** A contradiction is closed only by Mustafa's decision, recorded in `DECISIONS.md` and
+in the item's `resolution` in `docs/scope/open-items.json`. The original evidence stays in the record, and the
+resolution says whether the client has confirmed it. A resolution does not change the register. Where it needs a
+row to read differently, that correction goes through the document route, and until
+`docs/scope/register-ids.json` carries it no criterion traces that row as an obligation (M-1).
 
 ### M-3. P1-E waits for PRE-09
 
@@ -89,6 +96,27 @@ compatibility guarantee. Every upgrade follows the regression path in `docs/stac
 Working discussion and engineering documents are in English. The storefront is bilingual, English primary with
 Arabic fully supported, right to left. The admin interface is English only (ADM-159); an Arabic admin is P2
 (ADM-159a). Tests and evidence follow that split.
+
+### M-10. A missing input blocks development only when nothing can stand in for it
+
+A missing client or vendor value does not block development when the functionality can be built safely through
+configuration, a professional working default, a placeholder, a fixture, a fake or mock adapter, an interface or
+contract, sandbox credentials, or a later acceptance or launch gate. Every open input is placed in one class:
+
+| Class | Meaning |
+|---|---|
+| Blocks development now | Nothing above can stand in for it, or a predecessor PBI is not delivered |
+| Blocks final acceptance | The work is built and verified; contractual acceptance waits for the input |
+| Blocks production or launch only | Development and staging proceed; the live site waits |
+| Content or client input | Copy, imagery, names, policy text and similar, held as placeholders |
+| Vendor or account input | Credentials, merchant approval, provider accounts, held behind a sandbox or a fake |
+| ERP input | Waits for PRE-09 behind the adapter boundary (M-3) |
+| Configurable working default | An owner-approved default the client can change later |
+
+**This never invents client approval and never weakens contractual acceptance.** A working default is recorded
+as an owner decision with `client_confirmed: false` in `docs/scope/open-items.json`, and a criterion that rests on
+one is `provisional` or `pending OD-nn`, never `final`, until the client confirms it. M-1, M-3 and M-7 apply
+unchanged.
 
 ## Work categories
 

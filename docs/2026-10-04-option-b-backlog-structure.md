@@ -365,7 +365,7 @@ Both account for the same 595 rows.
 | E-PRE-1 Infrastructure and environments | #244 | 6 ids, in the ownership map | `mixed` | `S1` | Seeded. Merges the old E-PRE-1 and E-PRE-2, and owns the two NFR rows that are their own work |
 | E-PRE-3 Repository, CI and governance | - | `PRE-04` | `DLV` | `S1` | Done in substance: the governance foundation landed 22 September. Not seeded as a PBI |
 | E-PRE-4 Import specification | #249 | 7 ids, in the ownership map | `mixed` | `S1` | Seeded. Absorbed the old E-MIG-1 and E-MIG-2 source and mapping rows |
-| E-PRE-5 Design system and interface design | #250 | `PRE-07, PRE-08` | `DLV` | `S1` | Seeded. Blocked by OD-01 |
+| E-PRE-5 Design system and interface design | #250 | `PRE-07, PRE-08` | `DLV` | `S1` | Seeded. OD-01 gates approval of the design, not the structural work (D-10) |
 | E-PRE-6 ERP Integration Specification | #243 | `PRE-09` | `DLV` | `-` | Seeded. PRE-09 is the only register row carrying no stage, which the board spells `per PRE-09`. ERP-10 is named as a boundary and owned by #245 |
 
 ### E-FND (74 delivery rows over 7 slices)
@@ -537,7 +537,7 @@ Both account for the same 595 rows.
 
 | Can proceed now | Must wait for PRE-09 |
 |---|---|
-| E-FND, E-ROLE (with CX-01 noted), E-SF-1 to E-SF-5, E-SF-7, E-SF-9 to E-SF-12 | E-ADM-4 (all 8 inventory rows are P1-E) |
+| E-FND, E-ROLE (CX-01 resolved by D-10), E-SF-1 to E-SF-5, E-SF-7, E-SF-9 to E-SF-12 | E-ADM-4 (all 8 inventory rows are P1-E) |
 | E-RULES (all three slices) | E-ERP-4 to E-ERP-7 |
 | E-ORD-1 to E-ORD-4 | E-MIG-7 (MIG-14 initial stock load) |
 | E-ADM-1 to E-ADM-3, E-ADM-5 to E-ADM-10 | The 5 P1-E acceptance scenarios in E-ACC |
@@ -578,8 +578,32 @@ The sequence now:
 | 8 | **#245**, the ERP adapter seam, as far as PRE-09 allows | ERP-01, ERP-02 and INT-16 are P1, not P1-E, so the seam can be designed now and PRE-09 fills in a known shape | Partly PRE-09 |
 | 9 | **The design-dependent storefront PBIs**, #250 then #253, #254, #255 and the rest | All of them are behind the approved interface design | **OD-01** |
 
-Items 1 and 3 are unblocked today. Everything from 5 onward is behind either a client decision or #241, which is
-why #241 is the only work that starts now.
+**That table is the sequence as first reasoned, on 4 October.** #241 and #242 are since merged and `Verified`, and
+D-10 reclassified every blocker in it. The section below is the current reading.
+
+## Blockers after D-10 (5 October 2026)
+
+Constitution M-10: a missing client or vendor value does not block development when configuration, a working
+default, a placeholder, a fixture, a mock adapter, a contract or sandbox credentials can stand in for it. The
+owner's decisions are in `DECISIONS.md` D-10 and `docs/scope/open-items.json`; none is a client confirmation.
+
+| Was blocking | Class now | What proceeds, and what still waits |
+|---|---|---|
+| OD-27 hosting outside Egypt | Blocks production or launch only | Development and staging run on the developer's machine, staging isolated, on its own database, synthetic data only, reviewed through a Cloudflare Tunnel. Production waits for the client's written instruction. **Not client-approved** |
+| OD-14 operating budget | Blocks production or launch only | A production hosting and budget gate |
+| OD-15 volumes | Configurable working default | 5,000 products as the baseline, growth without redesign, 300 orders a day as the planning assumption |
+| OD-01 brand identity | Blocks final acceptance | Structural design on neutral tokens proceeds in #250. Approval of the interface design waits |
+| CR-06, CR-07 the Amazon export | Blocks final acceptance | #249 is built against a fixture in the documented export format. It is not final, and not validated against the real file, until CR-06 arrives |
+| CX-01 the Accountant role | Resolved by the owner | The role exists at launch, least privilege, refunds a separate capability. ROLE-06 still reads DEF in the register, so the Accountant criteria wait for the register correction |
+| PRE-09 and the ERP meeting | ERP input | The adapter seam, #245, is built against mocks and contracts on the fixed invariants. No P1-E criterion is final before PRE-09 (M-3) |
+| OD-03, OD-04, OD-05, OD-19, OD-21 | Configurable working default | Owner defaults, each admin-configurable or a launch-time activation |
+| OD-12 product cost basis | Blocks final acceptance | AC-7 of #252 |
+| OD-08, OD-09, OD-13, OD-26 | Content or client input | Placeholders until supplied |
+| The Paymob merchant account, the carrier account and rate card, the Bosta legend, OD-20, the tracking accounts | Vendor or account input | Sandbox credentials or a fake adapter until supplied |
+| OD-18, CR-04, CR-05, CR-09 | Blocks production or launch only | Launch inputs |
+
+**What blocks development now is only sequencing between PBIs**: #247 behind #249; #253 behind #250; #254 behind
+#250 and #253; #255 behind #250, #254 and #245. Every other seeded PBI is `Ready` or `Verified`.
 
 ## Client decisions to group into the next Stage 1 review
 

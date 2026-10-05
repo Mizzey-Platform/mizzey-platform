@@ -109,8 +109,42 @@ class SpecChecks(unittest.TestCase):
         errs = self.check(spec([("MIG-13", "P1-L", "S1")], [("AC-1", "x", "MIG-13", "pending CX-99")]))
         self.assertError(errs, "CX-99, which is not in open-items.json")
 
+    # The live CX-01 was resolved by D-10, so the rule is tested against a contradiction this file controls.
+    STILL_OPEN = {"gates": OPEN["gates"],
+                  "contradictions": {"CX-90": {"status": "open", "ids": ["ROLE-06"], "related_ids": ["ADM-27"]}}}
+
     def test_open_contradiction_must_be_cited(self):
-        self.assertError(self.check(spec([("ADM-27", "P1", "S1")], [("AC-1", "x", "ADM-27", "final")])), "CX-01")
+        md = spec([("ADM-27", "P1", "S1")], [("AC-1", "x", "ADM-27", "final")])
+        errs = st.check_spec("specs/001-x/spec.md", md, IDS, self.STILL_OPEN)
+        self.assertError(errs, "touched by open contradiction CX-90")
+
+    def test_resolved_contradiction_need_not_be_cited(self):
+        closed = {"gates": OPEN["gates"],
+                  "contradictions": {"CX-90": {"status": "resolved", "ids": ["ROLE-06"], "related_ids": ["ADM-27"]}}}
+        md = spec([("ADM-27", "P1", "S1")], [("AC-1", "x", "ADM-27", "final")])
+        self.assertEqual(st.check_spec("specs/001-x/spec.md", md, IDS, closed), [])
+
+    def test_a_resolution_does_not_make_a_deferred_row_traceable(self):
+        # D-10 decides the Accountant role exists at launch. ROLE-06 still reads DEF in the register, and the
+        # checker must keep refusing it until the document route changes the register itself.
+        self.assertEqual(IDS["ROLE-06"]["scope"], "DEF")
+        errs = self.check(spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "final")]))
+        self.assertError(errs, "creates no obligation")
+
+    def test_cx01_is_closed_with_a_recorded_owner_resolution(self):
+        cx = OPEN["contradictions"]["CX-01"]
+        self.assertEqual(cx["status"], "resolved")
+        self.assertTrue(cx["evidence"], "the historical contradiction must stay in the record")
+        self.assertIs(cx["resolution"]["client_confirmed"], False)
+        self.assertIn("D-10", cx["resolution"]["record"])
+
+    def test_no_working_decision_claims_client_confirmation(self):
+        decisions = {k: v for k, v in OPEN["working_decisions"].items() if isinstance(v, dict)}
+        self.assertTrue(decisions)
+        for key, item in decisions.items():
+            self.assertIs(item["client_confirmed"], False, key)
+            self.assertEqual(item["decided_by"], "owner", key)
+            self.assertIn(item["class"], OPEN["working_decisions"]["classes"], key)
 
     def test_comments_are_ignored(self):
         md = VALID.replace("## Register trace [checked]", "<!-- ## Register trace -->\n## Register trace [checked]")
