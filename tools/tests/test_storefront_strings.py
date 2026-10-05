@@ -106,6 +106,13 @@ def looks_user_facing(text: str) -> bool:
         return False
     if len(re.findall(r"[A-Za-z]", text)) < 2:
         return False
+    # Markup, not interface text. A literal that is only tags and format specifiers has no words a visitor
+    # reads: `<link rel="canonical" href="%s" />` is a template, while `<p>Add to cart</p>` is a sentence in a
+    # wrapper and still counts. Found by running the check against the #242 SEO output classes.
+    without_markup = re.sub(r"<[^>]*>", " ", text)
+    without_markup = re.sub(r"%[sd\d.]*", " ", without_markup)
+    if len(re.findall(r"[A-Za-z]", without_markup)) < 2:
+        return False
     if any(p.match(text) for p in IGNORE_PATTERNS):
         return False
     # A sentence a visitor could read has a space, or ends in sentence punctuation.
@@ -256,6 +263,26 @@ class StorefrontStrings(unittest.TestCase):
                 found = self._scan_snippet(snippet)
                 self.assertEqual(len(found), 1, f"expected one finding, got {found}")
                 self.assertIn("could not be loaded", found[0])
+
+    def test_markup_without_words_is_not_interface_text(self):
+        """Found by running the check against #242 SEO output: a tag template has no words to translate."""
+        for snippet in (
+            "<?php\nprintf('<link rel=\"canonical\" href=\"%s\" />', $url);\n",
+            "<?php\nprintf('<meta name=\"description\" content=\"%s\" />', $d);\n",
+            "<?php\necho '<div class=\"wrap\"></div>';\n",
+        ):
+            with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
+                self.assertEqual(self._scan_snippet(snippet), [])
+
+    def test_a_sentence_inside_markup_still_counts(self):
+        """The markup exemption must not become a hole: words in a wrapper are still words."""
+        for snippet in (
+            "<?php\necho '<p>Your cart could not be loaded.</p>';\n",
+            "<?php\nprintf('<span>%s items in your basket</span>', $n);\n",
+        ):
+            with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
+                found = self._scan_snippet(snippet)
+                self.assertEqual(len(found), 1, f"expected one finding, got {found}")
 
     def test_an_unreadable_file_fails_rather_than_being_skipped(self):
         """A check that silently skips is how the board-metadata check once exempted its five largest rows."""

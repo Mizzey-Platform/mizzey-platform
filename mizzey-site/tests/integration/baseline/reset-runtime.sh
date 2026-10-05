@@ -56,3 +56,6 @@ $WP rewrite flush >/dev/null
 
 $WP eval-file "$HERE/setup.php"
 $WP eval-file "$HERE/admin-visit.php"
+# After the admin visit, because WooCommerce only registers its endpoint slugs as translatable strings when it
+# runs in an admin context. See the file for the measurement.
+$WP eval-file "$HERE/ia-endpoints.php"

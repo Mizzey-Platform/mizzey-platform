@@ -368,13 +368,20 @@ run(
 		// `WP_Translation_Controller::is_textdomain_loaded()` both read false at that moment while `__()`
 		// translates correctly. Measured on this runtime; see research.md. Asserting the flag failed the
 		// scenario while the mechanism worked, which is the wrong way round.
+		// The second argument matters, and #242 is what revealed it. `unload_textdomain( $domain )` defaults to
+		// $reloadable = false, which stops WordPress loading that domain again in the same request. Once
+		// anything earlier in the request has made a just-in-time attempt for a locale with no .mo, the
+		// non-reloadable unload leaves the domain permanently unavailable and this probe reads its source
+		// string. Measured in two fresh processes: with the default the probe returns English, with
+		// $reloadable = true it returns the Arabic translation. #242 introduced the earlier attempt by giving
+		// the collection taxonomy translatable labels, which is ordinary and correct.
 		$sitepress->switch_lang( 'ar', true );
-		unload_textdomain( 'mizzey-site' );
+		unload_textdomain( 'mizzey-site', true );
 		\MizzeySite\I18n\Localisation::loadPluginTextdomain();
 		$arabic = __( $probe, 'mizzey-site' ); // phpcs:ignore WordPress.WP.I18n
 
 		$sitepress->switch_lang( 'en', true );
-		unload_textdomain( 'mizzey-site' );
+		unload_textdomain( 'mizzey-site', true );
 		\MizzeySite\I18n\Localisation::loadPluginTextdomain();
 		$english = __( $probe, 'mizzey-site' ); // phpcs:ignore WordPress.WP.I18n
 

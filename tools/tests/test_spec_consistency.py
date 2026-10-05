@@ -22,6 +22,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FEATURE = "specs/002-bilingual-platform-baseline"
+# #242's artifacts. Only the claims that can drift across documents are checked, per the plan's own rule that no
+# generic governance machinery is built where the existing checks suffice.
+FEATURE_242 = "specs/003-information-architecture-urls"
 ARTIFACTS = ("spec.md", "research.md", "plan.md", "tasks.md", "analysis.md", "checklists/requirements.md",
              "verification.md")
 # The scenario that produces the evidence. An artifact can state a requirement correctly while the test meant to
@@ -262,6 +265,39 @@ class SpecConsistency(unittest.TestCase):
                 self.assertTrue(marker in src, f"the scenario does not record {marker!r}")
         self.assertTrue("[clean session] GET /" in src,
                         "the independent clean-session assertion was dropped; both halves are required")
+
+    def test_242_does_not_claim_rows_another_slice_owns(self) -> None:
+        """#242 owns NFR-03's output. The admin controls and the structured-data row belong elsewhere.
+
+        The class of error this catches is the one the audit kept finding: a spec that owes an output quietly
+        growing into the admin surface a neighbouring row contracts.
+        """
+        spec = (ROOT / FEATURE_242 / "spec.md").read_text(encoding="utf-8")
+        for row, owner in (("MKT-12", "editable title"), ("MKT-15", "sitemap and robots"),
+                           ("MKT-16", "structured data"), ("MKT-18", "hreflang"),
+                           ("ADM-41", "canonical and robots override"), ("SSC-27", "per-product")):
+            with self.subTest(row=row):
+                self.assertTrue(row in spec, f"{row} is no longer named as a boundary in #242's spec")
+        self.assertTrue(squash("owns the admin controls") in squash(spec)
+                        or squash("own the admin controls") in squash(spec),
+                        "#242's spec no longer states that the admin controls belong to other rows")
+
+    def test_242_keeps_the_guardrail_separate_from_contracted_acceptance(self) -> None:
+        """G-1 is derived, not contracted: NFR-03 says clean URLs, not no duplicate URLs."""
+        spec = squash((ROOT / FEATURE_242 / "spec.md").read_text(encoding="utf-8"))
+        self.assertTrue("G-1, one managed route per screen" in spec,
+                        "#242's spec no longer states guardrail G-1")
+        self.assertTrue("not contracted acceptance" in spec or "engineering guardrail" in spec,
+                        "G-1 is no longer marked as derived rather than contracted")
+        self.assertFalse("AC-242-16" in spec,
+                         "the duplicate-URL rule is back among the contracted criteria")
+
+    def test_242_states_the_staging_closure_dependency(self) -> None:
+        """DOD-04 requires manual testing on staging. The spec must not claim there is no dependency."""
+        spec = squash((ROOT / FEATURE_242 / "spec.md").read_text(encoding="utf-8"))
+        self.assertTrue("DOD-04" in spec, "#242's spec no longer cites DOD-04 for closure")
+        self.assertFalse("no acceptance criterion of #242 is blocked on #244" in spec,
+                         "#242's spec claims no staging dependency, which contradicts DOD-04")
 
     def test_the_probe_boundaries_are_still_stated(self) -> None:
         """What the pilot and the probes bought must not quietly drop out of the spec."""
