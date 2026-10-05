@@ -117,7 +117,17 @@ visitor cannot remove. The staging web server asks any such request to sign in (
 names listed in `../app-staging/allowed-hosts.txt`, serves them as HTTPS, and tells search engines not to index
 anything. A Cloudflare Access policy can be added on top for a named tunnel.
 
-**Everything up to the sign-in is prepared. The sign-in itself is one action only Mustafa can take.** Two ways:
+**Decided on 5 October 2026 (D-13): a named, fixed tunnel, not a temporary one.** A fixed address is stable for
+the walkthrough and for acceptance checks, can be written into a document once, and does not change between
+sessions. The temporary address below is kept as a description of what exists and is not used.
+
+**Everything up to the sign-in is prepared. The sign-in itself is one action only Mustafa can take:**
+`cloudflared tunnel login`, which opens a browser, asks him to sign in to Cloudflare and to pick the domain the
+staging address will sit under. A domain in that Cloudflare account is required for a fixed address. After it:
+the named tunnel is created, routed to staging only, the host name is allowed, and the checks at the end of this
+section are run from outside.
+
+**The two ways, for the record:**
 
 | | A temporary address | A fixed address on a domain in the Cloudflare account |
 |---|---|---|
@@ -165,7 +175,7 @@ the local address. **No tunnel has been opened, and no public address exists yet
 
 | Tool | Use |
 |---|---|
-| `node mizzey-site/tests/staging/browser-matrix.cjs` | Both reading directions in real browser windows: the installed Chrome and Edge, and the Firefox build Playwright ships. It cannot exercise Safari on a Mac or an iPhone, or Chrome on an Android phone, and says so |
+| `node mizzey-site/tests/staging/browser-matrix.cjs` | Both reading directions in real browser windows: the installed Chrome, the installed Edge and the installed release Firefox, found at `FIREFOX_PATH` or in its usual folders. The Firefox build Playwright ships, a WebKit build and a phone-sized window also run, as indications only, and never count for a row. It cannot exercise Safari on a Mac or an iPhone, or Chrome on an Android phone, and says so |
 | `node mizzey-site/tests/staging/staging-pass.cjs ia` or `stock` | The scripted staging pass for #242 and #246 |
 | `python mizzey-site/tests/staging/concurrency.py last-units` | N buyers ordering the last K units at the same instant (workstream item B6) |
 | `python mizzey-site/tests/staging/concurrency.py read-load` | Many clients reading storefront pages at once |

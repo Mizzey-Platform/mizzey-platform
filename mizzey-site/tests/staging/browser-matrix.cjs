@@ -7,14 +7,20 @@
  * What a row here is, and is not. The approved matrix (D-09) is current Chrome, Safari, Edge and Firefox on
  * desktop, Chrome on Android and Safari on iOS. This machine is Windows:
  *
- *   chrome   the installed Google Chrome, in a window                    a real browser
- *   edge     the installed Microsoft Edge, in a window                   a real browser
- *   firefox  the Firefox build Playwright ships, in a window             the real engine, not the release channel
- *   webkit   the WebKit build Playwright ships                           NOT Safari. Indicative only
- *   phone    the installed Chrome at a phone-sized viewport              NOT Android Chrome. A layout check only
+ *   chrome         the installed Google Chrome, in a window              a real browser: exercises the row
+ *   edge           the installed Microsoft Edge, in a window             a real browser: exercises the row
+ *   firefox        the installed release Firefox, in a window            a real browser: exercises the row
+ *   firefox-build  the Firefox build Playwright ships                    NOT the release channel. Indicative only
+ *   webkit         the WebKit build Playwright ships                     NOT Safari. Indicative only
+ *   phone          the installed Chrome at a phone-sized viewport        NOT Android Chrome. A layout check only
  *
- * Safari on a Mac, Safari on an iPhone and Chrome on an Android phone can only be exercised on those devices,
- * through the tunnel. This script says so in its output and never reports those rows as exercised.
+ * The Firefox row is the release channel or it is nothing: Playwright's own Firefox build is a patched build and
+ * does not count as "current Firefox" (decided 5 October 2026). The release browser is driven over WebDriver
+ * BiDi, found at FIREFOX_PATH or in its usual install folders, and its version is recorded with the row.
+ *
+ * Safari on a Mac, Safari on an iPhone and Chrome on an Android phone can only be exercised on those devices, or
+ * on a device cloud that really runs them, through the tunnel. A WebKit build is not Safari and a phone-sized
+ * window is not a phone. This script says so in its output and never reports those rows as exercised.
  *
  * It measures and records. It opens each page, reads what the browser itself computed, and saves a screenshot
  * of the window, as a visitor first sees it, for a person to look at. A layout that is wrong but overflows nothing passes these checks, which is why the
@@ -94,12 +100,28 @@ const DIRECTIONS = [
 	['rtl', 'ar', '/ar'],
 ];
 
+/** The installed release Firefox, or null. Playwright's own build is never returned from here. */
+function releaseFirefox() {
+	const folders = [
+		process.env.FIREFOX_PATH,
+		process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Programs', 'Firefox-Release', 'firefox.exe'),
+		process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Mozilla Firefox', 'firefox.exe'),
+		process.env.PROGRAMFILES && path.join(process.env.PROGRAMFILES, 'Mozilla Firefox', 'firefox.exe'),
+		process.env['PROGRAMFILES(X86)'] && path.join(process.env['PROGRAMFILES(X86)'], 'Mozilla Firefox', 'firefox.exe'),
+		'/Applications/Firefox.app/Contents/MacOS/firefox',
+		'/usr/bin/firefox',
+	].filter(Boolean);
+	return folders.find((candidate) => fs.existsSync(candidate)) || null;
+}
+
+// `exercises` says whether a run of the row counts for the approved matrix. Only a real, installed browser does.
 const ROWS = [
-	{ key: 'chrome', engine: 'chromium', channel: 'chrome', matrixRow: 'Chrome, current, desktop', kind: 'the installed browser' },
-	{ key: 'edge', engine: 'chromium', channel: 'msedge', matrixRow: 'Edge, current, desktop', kind: 'the installed browser' },
-	{ key: 'firefox', engine: 'firefox', matrixRow: 'Firefox, current, desktop', kind: 'the Firefox build Playwright ships, not the release channel' },
-	{ key: 'webkit', engine: 'webkit', matrixRow: 'Safari, current, desktop', kind: 'WebKit build, NOT Safari: indicative only, the row stays unexercised' },
-	{ key: 'phone', engine: 'chromium', channel: 'chrome', viewport: { width: 390, height: 844 }, matrixRow: 'Chrome on Android, current', kind: 'desktop Chrome at a phone viewport, NOT Android Chrome: a layout check only, the row stays unexercised' },
+	{ key: 'chrome', engine: 'chromium', channel: 'chrome', exercises: true, matrixRow: 'Chrome, current, desktop', kind: 'the installed browser' },
+	{ key: 'edge', engine: 'chromium', channel: 'msedge', exercises: true, matrixRow: 'Edge, current, desktop', kind: 'the installed browser' },
+	{ key: 'firefox', engine: 'firefox', channel: 'moz-firefox', executablePath: releaseFirefox(), needsExecutable: true, exercises: true, matrixRow: 'Firefox, current, desktop', kind: 'the installed release Firefox, driven over WebDriver BiDi' },
+	{ key: 'firefox-build', engine: 'firefox', exercises: false, matrixRow: 'Firefox, current, desktop', kind: 'the Firefox build Playwright ships, NOT the release channel: indicative only' },
+	{ key: 'webkit', engine: 'webkit', exercises: false, matrixRow: 'Safari, current, desktop', kind: 'WebKit build, NOT Safari: indicative only, the row stays unexercised' },
+	{ key: 'phone', engine: 'chromium', channel: 'chrome', exercises: false, viewport: { width: 390, height: 844 }, matrixRow: 'Chrome on Android, current', kind: 'desktop Chrome at a phone viewport, NOT Android Chrome: a layout check only, the row stays unexercised' },
 ];
 
 async function inspect(page, wantDir, wantLang, expect) {
@@ -152,22 +174,26 @@ async function inspect(page, wantDir, wantLang, expect) {
 		playwright: version,
 		machine: `${os.type()} ${os.release()}`,
 		notExercisedHere: [
-			'Safari, current, desktop: needs a Mac',
-			'Safari on iOS, current: needs an iPhone or iPad',
-			'Chrome on Android, current: needs an Android phone',
+			'Safari, current, desktop: needs a Mac, or a device cloud that really runs Safari',
+			'Safari on iOS, current: needs an iPhone or iPad, or a device cloud that really runs one',
+			'Chrome on Android, current: needs an Android phone, or a device cloud that really runs one',
 		],
 		rows: [],
 	};
 
 	for (const row of ROWS) {
 		if (ONLY.length && !ONLY.includes(row.key)) continue;
-		const result = { key: row.key, matrixRow: row.matrixRow, kind: row.kind, pages: [], launched: false };
+		const result = { key: row.key, matrixRow: row.matrixRow, kind: row.kind, exercisesTheRow: row.exercises, pages: [], launched: false };
 		record.rows.push(result);
 		let browser;
 		try {
-			browser = await pw[row.engine].launch({ headless: false, channel: row.channel });
+			if (row.needsExecutable && !row.executablePath) {
+				throw new Error('the release browser is not installed on this machine, and the Playwright build is not used in its place');
+			}
+			browser = await pw[row.engine].launch({ headless: false, channel: row.channel, executablePath: row.executablePath || undefined });
 			result.launched = true;
 			result.browserVersion = browser.version();
+			result.executable = row.executablePath || `channel ${row.channel || 'bundled build'}`;
 		} catch (error) {
 			result.error = String(error.message).split('\n')[0];
 			continue;
@@ -189,6 +215,8 @@ async function inspect(page, wantDir, wantLang, expect) {
 				try {
 					const response = await page.goto(BASE + prefix + address, { waitUntil: 'load', timeout: 90000 });
 					await page.waitForTimeout(600);
+					// What the browser says it is, recorded once per row: the evidence that the row ran on that browser.
+					result.userAgent = result.userAgent || await page.evaluate(() => navigator.userAgent);
 					entry.status = response ? response.status() : null;
 					entry.landed = page.url().replace(BASE, '');
 					Object.assign(entry, await inspect(page, dir, lang, expect));
@@ -224,11 +252,16 @@ async function inspect(page, wantDir, wantLang, expect) {
 	}
 
 	fs.writeFileSync(path.join(OUT, 'matrix.json'), JSON.stringify(record, null, 1) + '\n');
-	for (const row of record.rows) {
-		const state = !row.launched ? `DID NOT START (${row.error})` : `${row.checked - row.withProblems}/${row.checked} pages without a finding`;
-		console.log(`${row.key.padEnd(8)} ${String(row.browserVersion || '').padEnd(16)} ${state}  [${row.kind}]`);
-		for (const p of row.pages || []) {
-			if (p.problems.length) console.log(`           ${p.direction} ${p.page}: ${p.problems.join('; ')}`);
+	for (const [heading, wanted] of [['Rows exercised on a real, installed browser', true], ['Indications only: the approved row is NOT exercised by these', false]]) {
+		const rows = record.rows.filter((row) => row.exercisesTheRow === wanted);
+		if (!rows.length) continue;
+		console.log(`${heading}:`);
+		for (const row of rows) {
+			const state = !row.launched ? `DID NOT START (${row.error})` : `${row.checked - row.withProblems}/${row.checked} pages without a finding`;
+			console.log(`  ${row.key.padEnd(14)} ${String(row.browserVersion || '').padEnd(16)} ${state}  [${row.kind}]`);
+			for (const p of row.pages || []) {
+				if (p.problems.length) console.log(`             ${p.direction} ${p.page}: ${p.problems.join('; ')}`);
+			}
 		}
 	}
 	console.log(`not exercised on this machine: ${record.notExercisedHere.join(' | ')}`);

@@ -7,7 +7,7 @@ Feature `003-information-architecture-urls`, PBI #242. Thirty register rows: 28 
 | State | Where this stands |
 |---|---|
 | **Workflow complete** | Yes. Spec, clarification, research, plan, checklist, tasks, analysis, implementation, verification |
-| **Technically verified** | **AC-242-01 to AC-242-15 and guardrail G-1 on the disposable runtime, with AC-242-05 and AC-242-09 now verified by fetching each term archive as a visitor and following every address it points at**, after the repair of 5 October 2026. The first verification of those two was disproved the same day. **The staging re-run on the repaired `main` is owed before the board status returns to Verified** |
+| **Technically verified** | **AC-242-01 to AC-242-15 and guardrail G-1 on the disposable runtime, with AC-242-05 and AC-242-09 now verified by fetching each term archive as a visitor and following every address it points at**, after the repair of 5 October 2026. The first verification of those two was disproved the same day. **Re-run on staging after the repair, on a staging reset and reseeded from `main` at `25c391e`: 54 of 54 checks without a finding.** The board status returned to Verified on that result |
 | **Contractually accepted** | **No criterion.** Acceptance happens only through the Acceptance and UAT Plan MS-UAT-2026-027 |
 
 **Closure still owes the project Definition of Done**, which this record does not weaken:
@@ -99,8 +99,22 @@ Nineteen contract scenarios pass and 5 are fact-finding scenarios that give no v
 
 ### What the repair does not claim
 
-- **Staging.** The staging pass is repeated on the repaired `main`, on a reseeded staging that now holds a
-  collection. Until it passes there, the board status stays In progress.
+- **Staging, as first written.** The staging pass is repeated on the repaired `main`, on a reseeded staging that
+  now holds a collection. Until it passes there, the board status stays In progress.
+
+### Staging after the repair, 5 October 2026
+
+Run on a staging reset and reseeded from `main` at `25c391e`, in the installed Chrome. **54 of 54 checks without a
+finding**: the 52 of the first pass, and the collection archive in both languages. On the Arabic brand archive
+the canonical link and the Arabic language link are `/ar/brand/{term}/`, the English and x-default links are
+`/brand/{term}/`, and each answers 200. Each of the three archives shows its term and lists its products, in both
+languages. No page was a placeholder. Record: `docs/2026-10-05-staging-regression-after-repairs.md`; evidence:
+`specs/005-local-staging-environment/evidence/regression-2026-10-05/`.
+
+One observation, not a defect of this feature and not corrected: on the Arabic collection archive the breadcrumb
+shows the taxonomy's own label, "Collections", in English. It is a storefront string of the collection page.
+
+**The board status returned to Verified on this result.** It is a scripted pass in a real browser.
 - **A person's look.** Still owed under DOD-04.
 - **What a collection page says and looks like.** SSC-06 and the design. Not touched.
 - **Contractual acceptance.** Pending DOD-09, through MS-UAT-2026-027.

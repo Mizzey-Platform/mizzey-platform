@@ -177,6 +177,27 @@ Classes:
 | ADM-160 | (a) for order status; stock part (b) | On a phone: WooCommerce > Orders, open an order, change its status. The stock update part is per PRE-09 and is described | | | |
 | ADM-161 | (a) for export; import described | Products > All Products > Export, which is MIG-25, "the standard supported commerce export format". For import, describe Section U: one Developer-performed migration, "not a reusable self-service import application that you operate afterwards". See section 6 | | | |
 
+## 5a. When the session may be held, and what is not shown as complete (D-13, 5 October 2026)
+
+**The session is not held until all four of these are true.**
+
+| Condition | State on 5 October 2026 |
+|---|---|
+| The fixed Cloudflare staging address exists | **Not yet.** It waits for Mustafa's one sign-in, `cloudflared tunnel login` |
+| The #246 repair is deployed on staging | **Yes.** `main` at `25c391e`, re-run on staging: 7 of 7 |
+| The #242 repair is deployed on staging | **Yes.** The same commit, re-run on staging: 54 of 54 |
+| Staging is reset and reseeded cleanly | **Yes**, on 5 October 2026, from that commit. Reset again on the day before the session, as the runbook says |
+
+**Stage 1 functionality still to be completed.** Shown to the client under exactly this heading, and never
+demonstrated as working.
+
+| Row | What is still to be completed | Owner |
+|---|---|---|
+| ADM-157, order search by customer phone number, a key row | The standard search finds a number only when what is typed is contained, character for character, in what was stored. A number typed with a country code, or without the spaces it was stored with, is not found. Section 6.1 has the measured cases | #278, not yet delivered |
+
+**PRE-07 is not accepted by anything in this document.** It is complete only when the walkthrough has been held
+with the client and the client has confirmed the outcome in writing.
+
 ## 6. Five items to settle in the dry run, before the client sees them
 
 These are the places where the standard administration may not match the register's words exactly. Each needs a

@@ -182,7 +182,7 @@ a verified criterion.
 | Chrome, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the installed Chrome 154, with finding F-241-1 |
 | Safari, current, desktop | - | - | **Not exercised.** Needs a Mac |
 | Edge, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the installed Edge 154, with finding F-241-1 |
-| Firefox, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the Firefox 155 build Playwright ships, not the release channel, with finding F-241-1 |
+| Firefox, current, desktop | 6 of 7 pages | 6 of 7 pages | **Exercised** on the installed release Firefox 157, with finding F-241-1. An earlier run on the Firefox build Playwright ships does not count for this row |
 | Chrome on Android, current | - | - | **Not exercised.** Needs an Android phone |
 | Safari on iOS, current | - | - | **Not exercised.** Needs an iPhone or iPad |
 
@@ -190,6 +190,13 @@ What ran is real browser windows driven by a script against the local staging ad
 and not a user-agent string or a headless approximation. A WebKit build and a phone-sized Chrome window were also
 run and are **not** offered as the Safari or Android rows: they are indications and are recorded as such in
 `docs/2026-10-05-staging-verification.md`.
+
+**The rows as they stand after the regression of 5 October 2026** (`docs/2026-10-05-staging-regression-after-repairs.md`, decision D-13). A row counts only when a
+real, installed, current browser of that kind ran it. Chrome 154, Edge 154 and the release Firefox 157 did, on a
+staging reset and reseeded from `main` at `25c391e`. The Firefox build Playwright ships is a patched build and
+does not count as current Firefox; a WebKit build is not Safari; a phone-sized window is not a phone. The three
+device rows may be run on the devices themselves or on a device cloud that really runs the named browser on the
+named system, with the evidence saying so. They are acceptance verification and do not block development.
 
 On the rows that ran, each of seven pages was opened in English and in Arabic. Every page answered, computed the
 right direction and language, held its own content in its own language, and showed nothing a visitor can see
@@ -200,7 +207,8 @@ both directions: the "New in store" product grid. It is not a mirroring fault. T
 and the theme is still the bare baseline.
 
 **To complete AC-9:** the three device rows, run through the tunnel on a Mac, an iPhone or iPad and an Android
-phone. Evidence for what ran: `specs/005-local-staging-environment/evidence/`.
+phone, or on a device cloud that really runs them. Evidence for what ran:
+`specs/005-local-staging-environment/evidence/`, and `regression-2026-10-05/` under it for the release Firefox row.
 
 Excluded by the same decision, and not added unless separately required: Internet Explorer, Opera Mini, in-app
 browsers and any named device model.

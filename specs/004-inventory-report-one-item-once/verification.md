@@ -7,7 +7,7 @@ Feature `004-inventory-report-one-item-once`, PBI #246. One register row: RPT-10
 | State | Where this stands |
 |---|---|
 | **Workflow complete** | Yes. Spec, clarification, research, plan, checklist, tasks, analysis, implementation, verification |
-| **Technically verified** | **AC-246-01 to AC-246-08 on the disposable runtime, through the signed-in HTTP request the screen makes**, after the repair of 5 October 2026. The first verification, in process only, was disproved on staging the same day. **The staging re-run on the repaired `main` is owed before the board status returns to Verified** |
+| **Technically verified** | **AC-246-01 to AC-246-08 on the disposable runtime, through the signed-in HTTP request the screen makes**, after the repair of 5 October 2026. The first verification, in process only, was disproved on staging the same day. **Re-run on staging after the repair, on a staging reset and reseeded from `main` at `25c391e`: 7 of 7 checks without a finding in the signed-in browser, and the same lists over signed-in HTTP.** The board status returned to Verified on that result |
 | **Contractually accepted** | **No criterion.** Acceptance happens only through the Acceptance and UAT Plan MS-UAT-2026-027 |
 
 **Closure still owes three things**, which this record does not weaken:
@@ -218,8 +218,26 @@ deduplicated in PHP.
 
 ### What the repair does not claim
 
-- **Staging.** The staging pass is repeated on the repaired `main` after merge. Until it passes there, the board
-  status stays In progress.
+- **Staging, as first written.** The staging pass is repeated on the repaired `main` after merge. Until it passes
+  there, the board status stays In progress.
+
+### Staging after the repair, 5 October 2026
+
+Run on a staging reset and reseeded from `main` at `25c391e`, in the installed Chrome, signed in as the invented
+staging administrator, and again over signed-in HTTP outside the browser.
+
+| Admin language context | Low stock, 4 owed | Out of stock, 4 owed | Summary under the table |
+|---|---|---|---|
+| English | 4 lines, each item once | 4 lines, each item once, the Arabic-only item among them | 4 low stock, 4 out of stock |
+| Arabic, asked under the Arabic address prefix | the same 4 | the same 4 | 4 low stock, 4 out of stock |
+| All languages | the same 4 | the same 4 | 4 low stock, 4 out of stock |
+
+**7 of 7 checks without a finding**, the download included. F-246-1, F-246-2 and F-246-3 are corrected. The first
+browser attempt after the code was refreshed timed out while the admin page first loaded and found nothing; the
+pass was run again, and again after the reset, and the record kept is the last. Record: `docs/2026-10-05-staging-regression-after-repairs.md`; evidence:
+`specs/005-local-staging-environment/evidence/regression-2026-10-05/`.
+
+**The board status returned to Verified on this result.** It is a scripted pass in a real browser.
 - **A person's look.** Still owed under DOD-04.
 - **AC-246-11.** `pending PRE-09`.
 - **Contractual acceptance.** Pending DOD-09, through MS-UAT-2026-027.

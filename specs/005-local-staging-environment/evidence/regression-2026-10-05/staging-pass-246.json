@@ -1,0 +1,266 @@
+{
+ "ran": "2026-10-05T17:41:00.482Z",
+ "pass": "stock",
+ "base": "http://127.0.0.1:8088",
+ "browser": "Google Chrome 154.0.8037.94, in a window",
+ "how": "A scripted pass in a real browser. Not a person looking at the screens.",
+ "build": {
+  "built": "2026-10-05T17:35:20Z",
+  "ref": "origin/main",
+  "commit": "25c391e478b184539cadb29590eafc157e0dbdd0",
+  "merged_to_main": true,
+  "corex": {
+   "version": "v0.42.0",
+   "commit": "12dde4967449e5fcf955f33db5d6f61b3b93b575"
+  },
+  "source": "mizzey-site and mizzey-theme exported with git archive; tests excluded",
+  "scope": "site code only"
+ },
+ "checks": [
+  {
+   "check": "stock report, lowstock, admin language context en",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=en",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-EN-ONLY",
+      "DEMO-S-003",
+      "DEMO-S-007",
+      "DEMO-V-001-M"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-lowstock-en.png"
+  },
+  {
+   "check": "stock report, lowstock, admin language context ar",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=ar",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/ar/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-EN-ONLY",
+      "DEMO-S-003",
+      "DEMO-S-007",
+      "DEMO-V-001-M"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-lowstock-ar.png"
+  },
+  {
+   "check": "stock report, lowstock, admin language context all",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=all",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-EN-ONLY",
+      "DEMO-S-003",
+      "DEMO-S-007",
+      "DEMO-V-001-M"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-lowstock-all.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context en",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=en",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-AR-ONLY",
+    "DEMO-S-004",
+    "DEMO-S-008",
+    "DEMO-V-001-L"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-AR-ONLY",
+      "DEMO-S-004",
+      "DEMO-S-008",
+      "DEMO-V-001-L"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-outofstock-en.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context ar",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=ar",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-AR-ONLY",
+    "DEMO-S-004",
+    "DEMO-S-008",
+    "DEMO-V-001-L"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/ar/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-AR-ONLY",
+      "DEMO-S-004",
+      "DEMO-S-008",
+      "DEMO-V-001-L"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-outofstock-ar.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context all",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=all",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-AR-ONLY",
+    "DEMO-S-004",
+    "DEMO-S-008",
+    "DEMO-V-001-L"
+   ],
+   "summary": [
+    "23Products",
+    "4Out of stock",
+    "4Low stock",
+    "0On backorder",
+    "19In stock"
+   ],
+   "summaryFigure": 4,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-AR-ONLY",
+      "DEMO-S-004",
+      "DEMO-S-008",
+      "DEMO-V-001-L"
+     ]
+    }
+   ],
+   "problems": [],
+   "screenshot": "stock-outofstock-all.png"
+  },
+  {
+   "check": "stock report export, lowstock",
+   "file": "stock-lowstock-export.csv",
+   "dataLines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "problems": []
+  }
+ ],
+ "expected": {
+  "lowstock": [
+   "DEMO-EN-ONLY",
+   "DEMO-S-003",
+   "DEMO-S-007",
+   "DEMO-V-001-M"
+  ],
+  "outofstock": [
+   "DEMO-AR-ONLY",
+   "DEMO-S-004",
+   "DEMO-S-008",
+   "DEMO-V-001-L"
+  ]
+ },
+ "signedInAs": "staging_admin (synthetic)",
+ "checked": 7,
+ "withProblems": 0
+}

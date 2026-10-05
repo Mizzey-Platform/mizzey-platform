@@ -70,8 +70,9 @@ language records. Board status went from Verified to In progress before any code
 - [x] T022 Correct the claim in t24's header that the three in-process contexts are the whole input.
 - [x] T023 Run the guards on the diff, reset the runtime to the clean baseline and run the whole suite serially;
       commit `evidence/repair/`. Test: the suite.
-- [ ] T024 After merge: rebuild staging from the new `main`, repeat the staging pass through the signed-in
-      browser, and only then return the board status to Verified.
+- [x] T024 After merge: rebuild staging from the new `main`, repeat the staging pass through the signed-in
+      browser, and only then return the board status to Verified. Done on 5 October 2026, on a staging reset and
+      reseeded from `main` at `25c391e`: 7 of 7 checks without a finding.
 
 ## Not tasks, by decision D-246-1
 
