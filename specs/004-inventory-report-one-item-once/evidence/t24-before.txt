@@ -1,0 +1,41 @@
+t24 run with the #246 correction unhooked: what the native stock report does without it.
+Recorded on a clean baseline, 5 October 2026. Versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+
+FAIL  t24-stock-report-physical-items  AC-246-01 to AC-246-08
+      Stored state: the pair holds lookup stock 2 (en) and 2 (ar): two records, one item.
+      PASS  [en] the report answers
+      FAIL  [en] AC-246-01, 03, 07 low-stock lists each physical item once: size(en), pair(en), english
+      PASS  [en] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [en] no line is repeated
+      FAIL  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 3 of 3, out 1 of 1
+      PASS  [en] the session language is unchanged after the report: 'en'
+      PASS  [ar] the report answers
+      FAIL  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, orphan(ar), size(ar), pair(ar)
+      FAIL  [ar] AC-246-02 out-of-stock lists each physical item once: out(ar)
+      PASS  [ar] no line is repeated
+      FAIL  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 4 of 4, out 1 of 1
+      PASS  [ar] the session language is unchanged after the report: 'ar'
+      PASS  [all] the report answers
+      FAIL  [all] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), size(ar), pair(en), english, pair(ar)
+      FAIL  [all] AC-246-02 out-of-stock lists each physical item once: out(en), out(ar)
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 7 of 7, out 2 of 2
+      PASS  [all] the session language is unchanged after the report: 'all'
+      FAIL  AC-246-04 the three language contexts return the same list and the same totals
+      PASS  AC-246-06 two per page gives 2 pages for 3 items
+      PASS  AC-246-06 walking every page yields 3 distinct lines for a total of 3
+      FAIL  AC-246-06 no fixture is lost or repeated at a page boundary
+      FAIL  sorted by stock_quantity asc: one line per item, total 3, order kept
+      FAIL  sorted by stock_quantity desc: one line per item, total 3, order kept
+      FAIL  sorted by sku asc: one line per item, total 3, order kept
+      FAIL  sorted by stock_status asc: one line per item, total 3, order kept
+      FAIL  [en] AC-246-08 the export holds each physical item once: T24-ENGLISH, T24-PAIR, T24-VAR-S
+      PASS  [en] AC-246-08 the export total is 3, the screen total 3
+      FAIL  [ar] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      FAIL  [ar] AC-246-08 the export total is 4, the screen total 3
+      FAIL  with no stock filter, each fixture item is still one line: parent(en), size(en), pair(en), english, roomy(en), out(en)
+      PASS  FR-010 reading the report changed no stored stock value on any record
+      PASS  FR-010 an ordinary product query in an English session is still scoped to English: pair(en), english

@@ -26,6 +26,8 @@ require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
 require_once __DIR__ . '/src/Seo/ArchiveCanonical.php';
 require_once __DIR__ . '/src/Seo/MetaDescription.php';
 require_once __DIR__ . '/src/Seo/SitemapLanguages.php';
+require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
+require_once __DIR__ . '/src/Reporting/StockReport.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -45,3 +47,8 @@ MizzeySite\Catalogue\Collections::register();
 MizzeySite\Seo\ArchiveCanonical::register();
 MizzeySite\Seo\MetaDescription::register();
 MizzeySite\Seo\SitemapLanguages::register();
+
+// RPT-10: the standard stock report lists one line per physical item, whichever language its records are in and
+// whichever language the operator's session is in. Confined to that report's own query.
+// See specs/004-inventory-report-one-item-once.
+MizzeySite\Reporting\StockReport::register();

@@ -4,7 +4,7 @@
 
 **Created**: 5 October 2026
 
-**Status**: Draft
+**Status**: Implemented, technically verified
 
 **Work type**: requirement
 
@@ -31,6 +31,7 @@ line a defect, are owned by #241 under the one-accepting-owner rule (D-09) and a
 | ADM-159 | P1 | The admin interface is English only. The report is an admin screen, so it has no Arabic layout to verify |
 | ADM-70, ADM-72 | P1-E | Stock on hand and stock available come from the ERP. Where those figures land in the store is PRE-09 |
 | ADM-74 | P1-E | The low-stock threshold, per SKU or global, is staged "Per PRE-09". This feature does not define it |
+| ADM-10, ADM-11 | P1 | The dashboard's low-stock and out-of-stock figures, "as reported by the ERP". Their own rows, with their own future owner. Not accepted here (D-246-1) |
 | ADM-75 | P1-E | Low and out-of-stock alerts. A different capability from the report, and not built here |
 | RPT-03 | DEF | Products, best sellers, slow movers, stock cover. Not built |
 | ADM-76 | P2 | The full inventory transaction log. Not built |
@@ -46,7 +47,8 @@ line a defect, are owned by #241 under the one-accepting-owner rule (D-09) and a
 ## Contractual acceptance criteria [checked]
 
 "Physical item" means one sellable product or one sellable variation, however many language records describe it.
-"The stock report" means the standard low-stock and out-of-stock report of the commerce platform.
+"The stock report" means the current standard stock report of the commerce platform, the Analytics Stock report
+(D-246-1). The dashboard figures and the older stock report screen are not criteria of this feature.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
@@ -58,31 +60,29 @@ line a defect, are owned by #241 under the one-accepting-owner rule (D-09) and a
 | AC-246-06 | The report's total, and its paging, count physical items: the total equals the number of lines across all pages | RPT-10 | final |
 | AC-246-07 | The rule holds for a variation as it does for a simple product: a translated variation is one line | RPT-10 | final |
 | AC-246-08 | The report's own export lists the same physical items as the screen | RPT-10 | final |
-| AC-246-09 | The dashboard's low-stock and out-of-stock counts, which link to the report, count physical items and agree with it | RPT-10 | provisional |
-| AC-246-10 | The older stock report screen, where it is reachable, lists physical items on the same rule | RPT-10 | provisional |
 | AC-246-11 | The figures the report shows are the figures the ERP supplies | RPT-10 | pending PRE-09 |
 
-AC-246-09 and AC-246-10 are `provisional` because whether "standard low-stock and out-of-stock reporting" reaches
-those two surfaces is a reading of the row, put to Mustafa in C-1. They become `final` or leave the table at the
-planning checkpoint.
+AC-246-09 and AC-246-10 were drafted as `provisional` and are **removed by decision D-246-1**. The numbers are
+not reused, so an earlier reference to either still means what it meant.
 
 ## Clarifications
 
-### C-1. Which screens are "standard low-stock and out-of-stock reporting"?
+### C-1. Which screens are "standard low-stock and out-of-stock reporting"? Decided: the stock report only
 
-Measured on the runtime, the platform has three places that report low and out-of-stock items:
+**Decision D-246-1, Mustafa, 5 October 2026.** RPT-10 is satisfied on the current standard stock report, the
+Analytics Stock report, and on nothing else.
 
-| Surface | What it is | Fault measured (see Native coverage) |
+| Surface | Decision | Why |
 |---|---|---|
-| The stock report (Analytics, Stock) | The current standard report, with paging, sorting and export | Both faults, depending on the language context |
-| The dashboard status counts | Two counts that link to the stock report | Double count in every context |
-| The older stock report screen (Reports, Stock) | The predecessor report, still reachable from the menu on this runtime | Language-scoped by the multilingual plugin in the admin |
+| The stock report (Analytics, Stock) | **In.** The whole of this feature | It is the current standard report, with paging, sorting and export |
+| The dashboard status counts | **Out of #246** | The signed register owns them separately: ADM-10 "Low stock, as reported by the ERP" and ADM-11 "Out of stock, as reported by the ERP", both P1, S1. They need their own accepting owner and are not absorbed into RPT-10 |
+| The older stock report screen (Reports, Stock) | **Out of #246** | An obsolete screen being reachable does not create scope. Not fixed here |
 
-**Proposed reading:** the stock report is the obligation without question. The dashboard counts are the same
-statement as the report they link to, so a count of four above a list of three is the same defect, and they are
-proposed in. The older screen is proposed in only if it stays reachable: the alternative, equally valid under the
-row, is to leave it unreachable, since two reports of the same thing is not what "standard" asks for. **This is a
-scope reading, and it is Mustafa's.** Neither proposal adds a capability; each makes an existing surface correct.
+**The two findings are kept as evidence, not lost.** Both are recorded in `research.md` with their measurements:
+the dashboard counts double count a translated item in every language context, and are evidence and a
+dependency for the future owner of ADM-10 and ADM-11; the older screen is language-scoped by the multilingual
+plugin in the admin, and is a known admin compatibility finding for the Stage 1 ownership pass to place, either
+under a contracted admin row or as a screen that is not exposed or recommended operationally.
 
 ### C-2. Which record stands for the item on its line?
 
@@ -128,23 +128,7 @@ report shows three lines.
 4. **Given** an item that is out of stock in both of its records, **When** the out-of-stock report is opened,
    **Then** it appears once.
 
-### User Story 2 - The count on the dashboard agrees with the list (Priority: Medium)
-
-The same person sees "3 products low in stock" on the dashboard, follows the link and finds three lines.
-
-**Why this priority**: it depends on C-1. If the reading is accepted, a count that disagrees with its own report
-is the first thing an operator notices.
-
-**Independent Test**: with the fixtures of story 1, the two dashboard counts are 3 and 1.
-
-**Acceptance Scenarios**:
-
-1. **Given** three low physical items, one of them in two languages, **When** the dashboard is opened, **Then**
-   the low-stock count is 3.
-2. **Given** one out-of-stock physical item in two languages, **When** the dashboard is opened, **Then** the
-   out-of-stock count is 1.
-
-### User Story 3 - A variation is an item too (Priority: High)
+### User Story 2 - A variation is an item too (Priority: High)
 
 A size or colour that is running low appears once, although its parent and the variation itself both have an
 Arabic record.
@@ -183,8 +167,8 @@ out-of-stock item in both languages. Three low physical items and one out-of-sto
 | The list in an Arabic session | Low: 2 lines, the English-only item missing. Out: 1 line | **GAP**: an item is omitted |
 | The list in an all-languages session | Low: 4 lines for 3 items. Out: 2 lines for 1 item. The reported total is 4 and 2 | **GAP**: double count (B10, P-020) |
 | One stock figure per item | Each language record holds its own `wc_product_meta_lookup` row with the full quantity | **GAP** at the root: two stockable records describe one item (P-020) |
-| The dashboard counts | 4 low and 2 out for the same fixtures. The multilingual plugin hooks `woocommerce_status_widget_low_in_stock_count_query`, a filter WooCommerce 11.1.0 no longer applies | **GAP**: double count in every context |
-| The older stock report screen | Its query is scoped to the session language by the multilingual plugin's `filter_reports_stock_query`, which runs in the admin only | **GAP** by source reading; to be measured in an admin request |
+| The dashboard counts | 4 low and 2 out for the same fixtures. The multilingual plugin hooks `woocommerce_status_widget_low_in_stock_count_query`, a filter WooCommerce 11.1.0 no longer applies | Measured defect, **not this feature**: evidence for the owner of ADM-10 and ADM-11 |
+| The older stock report screen | Its query is scoped to the session language by the multilingual plugin's `filter_reports_stock_query`, which runs in the admin only | Finding by source reading, **not this feature** |
 | The low-stock thresholds | The site-wide amount and the per-product amount, both native | VERIFIED, native, used as they stand |
 
 The correction therefore needs custom code, and the gap is recorded as M-4 requires: no setting of WooCommerce,
@@ -203,8 +187,8 @@ WPML or WooCommerce Multilingual makes the stock report list one line per physic
   one, and MUST show that record's stock figure.
 - **FR-005**: The report's total and paging MUST count physical items.
 - **FR-006**: Sorting and the report's own export MUST operate on the same resolved list.
-- **FR-007**: The dashboard's low-stock and out-of-stock counts MUST count physical items (subject to C-1).
-- **FR-008**: The older stock report screen MUST follow the same rule where it is reachable (subject to C-1).
+- **FR-007** and **FR-008** were drafted for the dashboard counts and the older stock report screen and are
+  **removed by D-246-1**. The numbers are not reused.
 - **FR-009**: The resolution of a record to its physical item MUST be one shared piece of the reporting layer,
   not written once per report: the decision of 9 September records that a second report needs the same thing.
 - **FR-010**: The feature MUST NOT change stock, how stock is synchronised between language records, or any
@@ -234,12 +218,14 @@ WPML or WooCommerce Multilingual makes the stock report list one line per physic
 | Profitability and margin | RPT-02, P2 |
 | The product analytics report splitting one item by language (P-019) | The same root, a different report, owned with RPT-03 and not built here |
 | Low and out-of-stock alerts | ADM-75, P1-E, behind PRE-09 |
+| The dashboard's low-stock and out-of-stock figures | ADM-10 and ADM-11, P1, S1: contracted, owned by the dashboard PBI, with this feature's measurement as its evidence |
+| The older stock report screen | No row. A compatibility finding for the Stage 1 ownership pass |
 
 ## Decisions this feature needs
 
 | Id | Decision | Whose | Default if none is given |
 |---|---|---|---|
-| D-246-1 | C-1: whether the dashboard counts and the older stock report screen are inside RPT-10 | Mustafa | The stock report only is `final`; the other two stay `provisional` and are not built |
+| D-246-1 | C-1: whether the dashboard counts and the older stock report screen are inside RPT-10 | Mustafa | **Decided, 5 October 2026: neither is.** Only the current standard stock report is built and accepted here |
 
 No client decision is needed to build or to verify this feature.
 
