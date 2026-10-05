@@ -1242,3 +1242,73 @@ staging and demonstration environment, with a restore performed and compared; no
 MS-CLR-2026-037 to version 1.1 through the document route, outside this repository; it is not sent. Item 7
 needed no change. What the first staging checks found in #241, #242 and #246 is recorded in
 `docs/2026-10-05-staging-verification.md` and was not corrected under this decision.
+
+## 2026-10-05 - D-13: verification disproved on staging is reopened, repaired and re-run before the queue starts
+
+Decided by Mustafa on 5 October 2026, after the engineering-readiness closure (D-12) was accepted and before #249
+could start. **These are owner engineering decisions. None is a client confirmation, and nothing here is
+contractual acceptance.**
+
+**1. An issue does not stay Verified after staging has directly disproved one of its criteria.** #246 and #242
+moved from Verified to In progress. The earlier local evidence is kept as historical evidence and is not
+rewritten; the staging finding is recorded as the reason verification was reopened. An issue returns to Verified
+only after its repair is merged, staging is rebuilt from the new `main`, and the real staging path passes.
+
+**2. A repair starts with a regression that reproduces the real failure.** It goes through the request actually
+made in use, signed in where the screen is signed in, in each language context, at the address the browser uses,
+and it must fail on `main` before the fix. The cause is identified, not patched around. For #246: corrected at
+the shared query layer, no deduplication in PHP after paging, the report's own summary included, and no dashboard
+scope (ADM-10, ADM-11), no legacy report and no stock storage or synchronisation touched. For #242: corrected at
+the cause, with no SEO plugin and no second URL system.
+
+**3. The test baseline does not leave the commerce "coming soon" page on.** The test, development and staging
+baselines serve the real store, and any storefront scenario fails clearly when it is served that page, a
+maintenance page or another shell. Status 200 is not evidence that a page rendered. The production launch-mode
+policy is not changed by this.
+
+**4. The staging tunnel is a named, fixed Cloudflare Tunnel, not a temporary one.** A stable address for the
+walkthrough, for documents and for acceptance checks. `cloudflared tunnel login` is the one manual account
+action. The tunnel routes to staging only, keeps staging's sign-in and its instruction to search engines not to
+index, and exposes neither the development runtime nor any database or admin service.
+
+**5. The browser matrix counts real browsers only.** Playwright's bundled Firefox build is not the contractual
+"current Firefox" row: the current stable release is. A WebKit build is not Safari and device emulation is not a
+phone. A reputable device cloud may satisfy a device row if it really runs the named browser on the named system
+and the evidence records that. The remaining device rows are acceptance verification and do not block
+development.
+
+**6. Two staging findings are attached to their owners and not corrected now.** The 8 pixel empty-cart overflow
+is evidence and a dependency for the cart PBI, #306, and is not fixed under #241, #242 or #246. The oversale of
+the last units under simultaneous orders (B6) belongs to checkout and stock validation, #255, with BR-003 (#290)
+and ERP-05 (#301), and is not fixed under infrastructure. Its architectural consequence is recorded: the final
+checkout must not assume the platform's native local validation and decrement are sufficient for the last
+units, and the ERP invariant stands, that a final sale fails closed unless authoritative stock can be validated
+under the design PRE-09 fixes. No ERP behaviour is built ahead of PRE-09.
+
+**7. The store operations walkthrough (PRE-07) is not held until** the fixed staging address exists, both
+repairs are deployed on staging, and staging is reset and reseeded cleanly. The phone-format finding on ADM-157
+is listed as "Stage 1 functionality still to be completed" while its owning PBI, #278, is undelivered, and no
+known-broken behaviour is demonstrated as complete. PRE-07 is accepted only by the actual walkthrough and the
+client's confirmation.
+
+**8. The external documents are prepared for issue and not sent.** The ERP pack is ready to issue once the
+recipient and dates are filled, and unrelated development does not wait for its answers. The Accountant
+clarification MS-CLR-2026-037 version 1.1 is ready for acknowledgement, and the signed register is not updated
+before it is acknowledged. The PRE-03a and PRE-05 companions are issued as client documents through the document
+route, and the historical signed documents are not rewritten. PRE-08 stays "approval pending / sent date not
+evidenced", and deemed approval is not invoked without an evidenced submission date. Nothing is sent by the
+agent.
+
+**9. #249 does not start until Mustafa has reviewed the repair report.**
+
+**Applied, 5 October 2026.** Item 1: both issues moved, commented, repaired and returned to Verified on the
+staging result. Item 2: PR #329, squash `f44caa0`, for #246, and PR #331, squash `25c391e`, for #242, which also
+corrected a second defect the repair uncovered, a collection archive that answered 200 with nothing on it. Item
+3: PR #330, squash `c0a523f`; four scenarios had been reading the placeholder on fourteen fetches. Item 5: the
+Firefox row was run on the installed release Firefox 157. Item 6: comments on #306, #255, #290 and #301. Items 7
+and 8: the walkthrough record, and the client documents MS-CMP-2026-038 and MS-CMP-2026-039 rendered through the
+document route outside this repository. Item 4 waits for the sign-in. The staging regression is
+`docs/2026-10-05-staging-regression-after-repairs.md`. One thing found on the way and corrected: staging's web
+server was writing its database password into its own local PHP error log, through a debugging extension; the
+old credential was searched for and is not present in the repository, its history or any retained evidence.
+

@@ -298,7 +298,8 @@ pass visits it and requires the term and a product on every archive. **Done.**
 
 ### T-21. After merge: rebuild and reseed staging, repeat the pass, then return the status to Verified
 
-**Not done until it has passed on staging.**
+**Done on 5 October 2026.** Staging reset and reseeded from `main` at `25c391e`; 54 of 54 checks without a
+finding; board status Verified. `verification.md`, "Staging after the repair".
 
 ## What no task does
 

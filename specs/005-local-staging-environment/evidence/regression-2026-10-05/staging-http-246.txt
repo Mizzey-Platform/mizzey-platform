@@ -1,0 +1,13 @@
+signed in: True
+[en] screen 200 in 0.4s, REST address http://127.0.0.1:8088/wp-json/
+[en] lowstock: 200 in 0.2s, total 4, ['DEMO-EN-ONLY', 'DEMO-S-003', 'DEMO-S-007', 'DEMO-V-001-M']
+[en] outofstock: 200 in 0.2s, total 4, ['DEMO-AR-ONLY', 'DEMO-S-004', 'DEMO-S-008', 'DEMO-V-001-L']
+[en] summary: 200 in 0.2s, {'lowstock': 4, 'instock': 19, 'outofstock': 4, 'onbackorder': 0, 'products': 23}
+[ar] screen 200 in 0.6s, REST address http://127.0.0.1:8088/ar/wp-json/
+[ar] lowstock: 200 in 0.3s, total 4, ['DEMO-EN-ONLY', 'DEMO-S-003', 'DEMO-S-007', 'DEMO-V-001-M']
+[ar] outofstock: 200 in 0.3s, total 4, ['DEMO-AR-ONLY', 'DEMO-S-004', 'DEMO-S-008', 'DEMO-V-001-L']
+[ar] summary: 200 in 0.3s, {'lowstock': 4, 'instock': 19, 'outofstock': 4, 'onbackorder': 0, 'products': 23}
+[all] screen 200 in 0.4s, REST address http://127.0.0.1:8088/wp-json/
+[all] lowstock: 200 in 0.3s, total 4, ['DEMO-EN-ONLY', 'DEMO-S-003', 'DEMO-S-007', 'DEMO-V-001-M']
+[all] outofstock: 200 in 0.2s, total 4, ['DEMO-AR-ONLY', 'DEMO-S-004', 'DEMO-S-008', 'DEMO-V-001-L']
+[all] summary: 200 in 0.2s, {'lowstock': 4, 'instock': 19, 'outofstock': 4, 'onbackorder': 0, 'products': 23}

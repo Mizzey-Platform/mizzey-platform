@@ -4,6 +4,11 @@ The first checks run on the staging and demonstration environment (#244). They a
 features were waiting for. **Nothing here is client acceptance**, and nothing here was corrected: each finding is
 recorded against the PBI that owns it.
 
+> **What happened next.** #246 and #242 were moved from Verified to In progress on these findings, repaired and
+> merged the same day, and re-run on a reset staging: `docs/2026-10-05-staging-regression-after-repairs.md`. The
+> development baseline's "coming soon" screen was switched off and guarded:
+> `docs/2026-10-05-storefront-placeholder-guard.md`. This record is kept as it was written.
+
 **How it was run.** By the agent, driving real browser windows on the developer's machine against the local
 staging address, on the code of `main`. It is repeatable, and it is **not a person looking at the screens**. The
 definition of done asks for "manual testing on staging" (DOD-04). What was done is a scripted pass in a real
