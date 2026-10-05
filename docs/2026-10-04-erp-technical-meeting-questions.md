@@ -56,7 +56,7 @@ it does. What we need from the ERP side is **which key to map to**, not whether 
 
 ## Must answer in the meeting
 
-Fifteen decisions. Each one can change the architecture or the schedule, which is why they come before the
+Eighteen decisions. Each one can change the architecture or the schedule, which is why they come before the
 checklist rather than inside it. The numbered sections below remain the complete questionnaire, and are the
 appendix to work through once these are settled.
 
@@ -84,7 +84,7 @@ appendix to work through once these are settled.
 |---|---|---|---|
 | M16 | **If the key is the SKU, how is a SKU change handled at all?** The store cannot change a SKU cleanly on a translated catalogue: WooCommerce **refuses** a SKU change on a translated variation, because the duplicate holds the same SKU, and a SKU change on a simple product does not reach its translation | The SKU cannot be the mapping key, or SKU changes become a manual operational procedure | 3.1, 3.4 |
 | M17 | **Does the ERP hold stock per variant?** If it does, the mapping sits at the variation level, which is exactly the level where a translation group was measured to detach, leaving a mapping pointing at a record no longer linked to its counterpart | The mapping needs its own integrity check, independent of WPML's rows | 3.2, 4.2 |
-| M18 | **What does the ERP expect when the store's own `manage_stock` setting differs between language versions?** It was measured not to synchronise | ERP-07 has to say which record the admin's stock view is authoritative over | 4.2, 12.x (ERP-07) |
+| M18 | **What does the ERP expect when the store's own `manage_stock` setting differs between language versions?** It was measured not to synchronise | ERP-07 has to say which record the admin's stock view is authoritative over | 4.2 (ERP-07) |
 
 Anything not on this list can be answered in writing afterwards. Anything on it that is left open gets a named
 owner and a date, because PRE-09 cannot be written without it.

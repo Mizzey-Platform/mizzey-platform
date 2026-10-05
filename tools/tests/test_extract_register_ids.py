@@ -31,6 +31,18 @@ class Extraction(unittest.TestCase):
         self.assertEqual(erp, {"scope": "P1-E", "stage": "S1", "key": False, "obligation": True})
         self.assertFalse(rows["ROLE-06a"]["obligation"])
 
+    def test_the_contractual_stage_is_the_last_stage_column(self):
+        # The customer journey table heads two columns Stage: the journey step, then the release stage.
+        journey = """
+| ID | Stage | Requirement | § | Scope | Stage |
+|---|---|---|---|---|---|
+| JRN-01 | Discovery | Arrives from search | 4 | P1 | S1 |
+| JRN-11 | Repeat purchase | Reorders | 4 | P1-L | S2 |
+"""
+        rows = ex.extract(MD + journey)
+        self.assertEqual(rows["JRN-01"]["stage"], "S1")
+        self.assertEqual(rows["JRN-11"]["stage"], "S2")
+
     def test_tables_without_scope_column_are_ignored(self):
         self.assertNotIn("ROLE-06", ex.extract(MD))
 

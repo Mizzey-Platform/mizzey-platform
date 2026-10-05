@@ -1,6 +1,6 @@
 # Mizzey Launch Platform Constitution
 
-**Version**: 1.1.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-10-05
+**Version**: 1.2.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-10-05
 
 This constitution governs every specification, plan, task and pull request in this repository. Spec Kit reads it
 through `/speckit-plan` (Constitution Check) and `/speckit-analyze`.
@@ -56,6 +56,12 @@ in the item's `resolution` in `docs/scope/open-items.json`. The original evidenc
 resolution says whether the client has confirmed it. A resolution does not change the register. Where it needs a
 row to read differently, that correction goes through the document route, and until
 `docs/scope/register-ids.json` carries it no criterion traces that row as an obligation (M-1).
+
+**Building on a resolution before the register follows.** A resolution may name the affected row under
+`engineering_ids`. A spec may then trace that row, written with the scope and stage the register still gives it,
+and every criterion that cites it is `pending CX-nn`: never `final`, never `provisional`. Engineering proceeds on
+the owner's decision; contractual acceptance of the row waits for the client's acknowledgement and the corrected
+register. The checker enforces both halves.
 
 ### M-3. P1-E waits for PRE-09
 

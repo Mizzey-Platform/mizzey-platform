@@ -171,6 +171,21 @@ def check_status(label: str, status: str, cited_scopes: set[str], pre09_open: bo
     return errs
 
 
+def engineering_ids(open_items: dict) -> dict[str, str]:
+    """Rows a spec may trace although the register does not carry them as an obligation: id -> the CX that allows it.
+
+    Only a contradiction Mustafa has resolved can list one, under `resolution.engineering_ids`. It lets engineering
+    proceed on his decision while the contract-side correction is outstanding. It never makes a criterion
+    acceptable: every criterion citing such a row must be `pending CX-nn`.
+    """
+    out = {}
+    for cx, item in open_items.get("contradictions", {}).items():
+        if item.get("status") == "resolved":
+            for rid in item.get("resolution", {}).get("engineering_ids", []):
+                out[rid] = cx
+    return out
+
+
 def check_spec(path: str, md: str, ids: dict, open_items: dict) -> list[str]:
     errs: list[str] = []
     md = strip_comments(md)
@@ -181,6 +196,7 @@ def check_spec(path: str, md: str, ids: dict, open_items: dict) -> list[str]:
     if not trace:
         return [f"{path}: Register trace table has no rows"]
     traced: dict[str, dict] = {}
+    engineering = engineering_ids(open_items)
     for r in trace:
         rid = r.get("id", "").strip("`* ")
         if rid not in ids:
@@ -189,9 +205,12 @@ def check_spec(path: str, md: str, ids: dict, open_items: dict) -> list[str]:
         reg = ids[rid]
         scope, stage = r.get("scope", "").strip("`* "), r.get("stage", "").strip("`* ")
         if reg["scope"] not in OBLIGATION:
-            errs.append(f"{path}: {rid} is {reg['scope']} in the register and creates no obligation; "
-                        "move it to 'Context rows'")
-            continue
+            if rid not in engineering:
+                errs.append(f"{path}: {rid} is {reg['scope']} in the register and creates no obligation; "
+                            "move it to 'Context rows'")
+                continue
+            # An owner-resolved contradiction lets engineering trace the row. It is still not an obligation in the
+            # register, so the scope and stage are written as the register has them and no criterion may be final.
         if scope != reg["scope"]:
             errs.append(f"{path}: {rid} scope written as {scope!r}, register says {reg['scope']!r}")
         if stage != reg["stage"]:
@@ -225,6 +244,11 @@ def check_spec(path: str, md: str, ids: dict, open_items: dict) -> list[str]:
                         "{} not in the Register trace".format("is" if len(stray) == 1 else "are"))
         errs += check_status(label, r.get("status", ""), {traced[i]["scope"] for i in cited}, pre09_open,
                              open_items, path)
+        for i in cited:
+            if i in engineering and r.get("status", "").strip() != f"pending {engineering[i]}":
+                errs.append(f"{path}: criterion {label} cites {i}, which the register does not carry as an "
+                            f"obligation; it is traced only under {engineering[i]}, so its status must be "
+                            f"'pending {engineering[i]}'")
 
     open_body = section(md, "Open contract items") or ""
     for cx, item in open_items.get("contradictions", {}).items():

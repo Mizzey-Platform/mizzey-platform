@@ -58,7 +58,13 @@ generation is disabled, and the agent-context skill is removed.
 - **Contradictions are escalated, not resolved.** Open items are in `docs/scope/open-items.json`. Only Mustafa
   closes one, in `DECISIONS.md`. **CX-01 is resolved by D-10: the Accountant role exists at launch**, least
   privilege, with refunds a separate capability. It is an owner decision, not a client confirmation, and ROLE-06
-  still reads DEF in the register: no criterion traces it as an obligation until the document route corrects it.
+  still reads DEF in the register. A spec may trace ROLE-06 only with every dependent criterion `pending CX-01`
+  (D-11), and acceptance waits for the client's acknowledgement of the Scope Clarification MS-CLR-2026-037.
+  CX-02 to CX-06 are open: cite them, mark dependent criteria pending, and decide none of them.
+- **One row, one PBI.** `docs/scope/backlog-ownership.json` says which PBI accepts each delivery row, and
+  `tools/tests/test_backlog_ownership.py` checks it against the register. Before starting a PBI, read its issue and
+  its entry there. Change ownership only through an `internal:governance` PR, then regenerate the records with
+  `tools/gen_backlog_docs.py`. Never cite a row another PBI owns.
 - **A missing input is classified before it is called a blocker** (constitution M-10). Build through
   configuration, a working default, a placeholder, a fixture, a mock adapter, a contract or sandbox credentials,
   and leave the real value to an acceptance or launch gate. Never record an owner default as client-confirmed.

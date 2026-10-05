@@ -1003,3 +1003,111 @@ OD-27 and OD-14 for production. **OD-29** stays out of scope: COD verification, 
 
 **Status:** applied. Constitution 1.1.0 (M-2 clarified, M-10 added), `AGENTS.md`, `docs/scope/open-items.json`,
 the affected issue bodies and the live Project.
+
+## 2026-10-05 - D-11: #246 scope, the pre-development closure, and the complete Stage 1 backlog
+
+Decided by Mustafa on 5 October 2026, after reviewing the signed Feature Register against the findings of #246
+and of the first ownership check. As with D-10, **every decision here is the owner's, and none is a client
+confirmation.**
+
+**1. D-246-1: #246 is the current standard stock report and nothing else.** RPT-10 is accepted on the Analytics
+Stock report. The dashboard figures are owned separately by the register, as ADM-10 and ADM-11, and are not
+absorbed into RPT-10; the older Reports, Stock screen has no row, and an obsolete screen being reachable does not
+create scope. Both measurements are kept in `specs/004-inventory-report-one-item-once/research.md` R-9. #246
+merged as `8d99435` (PR #265) and is `Verified`, not `Accepted`.
+
+**2. Three PBIs cited rows that were not their outcome. Corrected.**
+
+| PBI | Cited | The register words those rows as | Now owns |
+|---|---|---|---|
+| #244 Infrastructure | PRE-01, PRE-02, PRE-03a, PRE-03b | The technical design, the stack proposal, the sitemap and flows, the interface design | `NFR-08, NFR-09`. Epic E-NFR |
+| #250 Interface design | PRE-07, PRE-08 | The store operations walkthrough, the functional specification | `PRE-03b` |
+| #249 Import specification | PRE-05, PRE-06 | The integrations list, the register itself | `MIG-01, MIG-03, MIG-04, MIG-06, MIG-19` |
+
+The seven document rows are owned by **#266**, and PRE-07 by **#267**. No row was kept on a PBI to make it look
+like a pre-development PBI, and no further row was added to #244: nine candidates were read and none is provably
+infrastructure (`docs/2026-10-05-stage1-ownership-audit.md` section 3.2).
+
+**3. The register extraction mis-staged the customer journey rows. Corrected.** The journey table has two columns
+headed Stage; the extractor read the first, which names the journey step, and recorded all eleven rows as
+unstaged. The signed register stages ten of them S1 and JRN-11 S2. `tools/extract_register_ids.py` now reads the
+last Stage column and the mirror is regenerated from the same register file, hash unchanged. **The Stage 1
+delivery rows are 572, not 562.** No scope value changed.
+
+**4. The complete Stage 1 backlog is seeded.** Mustafa authorised creating the remaining PBIs. Fifty-nine issues,
+#266 to #324, were created from `docs/scope/backlog-ownership.json` and added to the Project with every field
+set.
+
+| Measure | Count |
+|---|---|
+| PBIs on the board | 74 |
+| Second-release slices, recorded and not created | 9 |
+| Delivery rows, each owned exactly once | 595 |
+| Stage 1 delivery rows, each owned by a PBI that exists | 572 |
+| Orphan rows | 0 |
+| Rows with two owners | 0 |
+| P1-E rows with an owner | 19 of 19 |
+
+`tools/tests/test_backlog_ownership.py` asserts all of it in CI and is shown to fail on each fault it exists to
+catch. `tools/gen_backlog_docs.py` regenerates the ownership map and the board snapshot from their sources.
+
+**5. Two PBIs hold unstaged P1-E rows.** #318 and #319 own the seven rows the register stages "Per PRE-09". They
+are created so that the rows have an owner, carry Stage `per PRE-09`, receive no acceptance criteria, and wait for
+#243. They are not Stage 1 rows.
+
+**6. The Accountant role: engineering proceeds, acceptance waits.** The signed register is not edited. A Scope
+Clarification and Register Correction, MS-CLR-2026-037, is prepared for the client's acknowledgement and is not
+acknowledged. Until it is, and until the register carries the row as an obligation, **a spec may trace ROLE-06
+only with every dependent criterion `pending CX-01`** (constitution 1.2.0, M-2; `tools/scope_trace.py`). That
+keeps #251 buildable and keeps the checker honest: nothing about ROLE-06 can be marked final.
+
+**7. "Admin where appropriate", defined.** The launch policy, unless an exact signed row contradicts it,
+implemented through granular capabilities so that it can be adjusted without rebuilding roles:
+
+| Role | Holds | Does not hold |
+|---|---|---|
+| Owner / Super Admin | Full authorised launch financial capability; refunds; role and user management | |
+| Admin | Operational financial visibility needed to manage orders; payment transaction and reference visibility; invoices; product cost where the contracted admin role needs it; refunds where the launch refund flow permits | Unrestricted owner-only governance |
+| Accountant | Financial and payment visibility; invoices; product cost; reconciliation information; the financial reporting actually present at launch | Refunds by default; user and role management; plugins, themes and files; unrelated system configuration |
+
+The exact capability matrix is written in the roles PBI, #251.
+
+**8. Cash on delivery: no value ceiling and no fee.** Every PAY, CHK, ADM and BR row was read. None supports an
+order-value eligibility, a configurable payment-method condition or a fee. PAY-09 contracts the capability and
+its launch switch. So cash on delivery is the native capability, switched on or off, restricted by shipping
+method or zone where that is native, and a value ceiling or a fee is a later scope decision. The example limit
+and fee recorded under D-10 are **withdrawn**. The Functional Specification promises "any value limit, zone
+restriction or fee" in two stories whose rows do not support it; the register governs, and the stories are
+corrected at the Stage 1 review.
+
+**9. Five further contradictions are recorded, and none is resolved.** The ownership audit found five places
+where a contracted row presupposes something the register defers. They are open in
+`docs/scope/open-items.json` as CX-02 to CX-06, each with a proposal that is only a proposal:
+
+| Id | The contradiction | First PBI it touches |
+|---|---|---|
+| CX-02 | Two contracted rows restrict "the Marketing role" while its profile is deferred | #298 |
+| CX-03 | Three contracted rows need an audit trail the register defers | #273 |
+| CX-04 | An Import Run entity is contracted while import history is deferred | #273 |
+| CX-05 | Two dashboard rows name queues whose workflow is deferred | #294 |
+| CX-06 | Banner scheduling is contracted while section scheduling is a later phase | #311 |
+
+A spec touching one cites it and marks the dependent criteria `pending CX-nn`. None stops a PBI from starting.
+
+**10. PRE-07 is an overdue gate, and is recorded as one.** The store operations walkthrough reads "before
+development begins", and development has begun. It has not been held, offered or scheduled, and nothing says
+otherwise. The package is prepared so that holding it is a short review event:
+`docs/2026-10-05-pre07-store-operations-walkthrough.md`. It needs the staging environment of #244.
+
+**11. PRE-08 is an acceptance gate.** The Functional Specification exists, is in the pack as a review document,
+and is not rebuilt. Its approval is required before Stage 2 is accepted; no clause makes a dependent
+implementation impossible without it. `docs/2026-10-05-pre08-functional-specification-status.md`.
+
+**12. The plans D-10 called for are written.** `docs/2026-10-05-structural-design-plan.md` for #250,
+`docs/2026-10-05-local-environments-plan.md` for #244, and `docs/2026-10-05-erp-question-pack.md` for #243. The
+Cloudflare sign-in is raised only when the tunnel is ready to connect.
+
+**13. No production PBI starts until Mustafa reviews this closure.**
+
+**Status:** applied. Constitution 1.2.0, `AGENTS.md`, `docs/scope/`, the tools and their tests, the issue bodies
+and the live Project.

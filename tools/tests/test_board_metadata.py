@@ -40,7 +40,15 @@ DELIVERY = ('P1', 'P1-L', 'P1-E', 'DLV')
 SCOPE_ORDER = {'P1': 0, 'P1-L': 1, 'P1-E': 2, 'DLV': 3}
 ERP_OPTIONS = {'no', 'partial', 'yes'}
 STATUS_OPTIONS = {'Blocked', 'Ready', 'In progress', 'In review', 'Verified', 'Accepted'}
-SEEDED = 15
+
+
+def seeded_count():
+    """How many PBIs the board must show: every slice of the ownership file that has an issue."""
+    data = json.loads((ROOT / 'docs' / 'scope' / 'backlog-ownership.json').read_text(encoding='utf-8'))
+    return sum(1 for s in data['slices'] if s.get('issue'))
+
+
+SEEDED = seeded_count()
 
 # "| 3 | #243 | Title | E-PRE | PRE-09, ERP-10 | **mixed** | **mixed** | **Blocked** | **yes** | ..."
 ROW = re.compile(r'^\|\s*(\d+)\s*\|\s*#(\d+)\s*\|([^|]*)\|([^|]*)\|([^|]*)\|\s*\*\*([^*]+)\*\*\s*\|'
@@ -126,7 +134,7 @@ class BoardMetadata(unittest.TestCase):
         self.appendix = exact_ids()
 
     # ---- coverage: the guard against a row escaping validation -------------------------------------------
-    def test_all_fifteen_seeded_pbis_are_present(self):
+    def test_every_seeded_pbi_is_present(self):
         self.assertEqual(len(self.rows), SEEDED, f'expected {SEEDED} snapshot rows, found {len(self.rows)}')
 
     def test_no_row_escapes_validation_through_an_abbreviated_cell(self):

@@ -2284,67 +2284,67 @@
   },
   "JRN-01": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-02": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-03": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-04": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-05": {
    "scope": "P1-L",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-06": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": true,
    "obligation": true
   },
   "JRN-07": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-08": {
    "scope": "P1-L",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-09": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-10": {
    "scope": "P1",
-   "stage": "-",
+   "stage": "S1",
    "key": false,
    "obligation": true
   },
   "JRN-11": {
    "scope": "P1-L",
-   "stage": "-",
+   "stage": "S2",
    "key": false,
    "obligation": true
   },

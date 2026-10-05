@@ -26,6 +26,25 @@
    requirement-kind id appears in the PDF that the extraction missed. The PDF states Version 1.5 and
    MS-ANX-2026-006.
 
+## Correction of 5 October 2026: the customer journey rows
+
+The register did not change: same file, same hash, same 754 ids, same scope counts. The extraction did.
+
+Register section A5, the customer journey, has two columns headed Stage. The first names the journey step, such as
+Discovery; the last carries S1 or S2. The extractor took the first, found no stage value there, and recorded all
+eleven journey rows as unstaged. It now reads the last Stage column of a table.
+
+| | Before | After |
+|---|---|---|
+| Delivery rows staged S1 | 562 | **572** |
+| Delivery rows staged S2 | 14 | **15** |
+| Delivery rows unstaged | 19 | **8**: PRE-09 and the seven P1-E rows the register stages "Per PRE-09" |
+
+The eleven rows that changed are the journey rows and no others: ten to S1 and one, the reorder row, to S2, as
+Part One 1.1 of the register also lists it among the second-release rows. Found by the Stage 1 ownership audit
+(`docs/2026-10-05-stage1-ownership-audit.md`), which compared the extraction with the register's own column.
+`tools/tests/test_extract_register_ids.py` carries the case.
+
 ## Regenerating
 
 When a new register version is issued through change control:
