@@ -21,7 +21,8 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
-- **`main` was `c60d68badfc624fe8befbb0573981065ffd10b5a` before the D-10 record merged**: the pilot (#237, squash `93d647b`), its close-out
+- **`main` was `8d994351f866e38c781678da26de18078e0b7c35` before the D-11 record merged**: the D-10 record
+  (#264, `3f074a9`), the inventory report correction (#265, `8d99435`), and before them the pilot (#237, squash `93d647b`), its close-out
   and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
   probes with the exposure assessment (#240, `eadd254`), the A11 and price-matrix probes with three rounds of
   record corrections (#256, `7e39c4b`), the backlog-template reconciliation (#257, `b158a1c`), the
@@ -42,9 +43,18 @@ Live status. First action each session: read this, then continue from **Next**.
 - **The Option B delivery board exists**: https://github.com/orgs/Mizzey-Platform/projects/1,
   "Mizzey Option B Delivery", organisation-owned, with 11 custom fields, 6 views and **the first 15 PBIs seeded,
   #241 to #255**. The remaining 45 to 55 PBIs are **not** created. Status separates **Verified** from
-  **Accepted**; #252 is the reference case, Verified and not Accepted. **#241, #242 and #252 are `Verified`; eight
-  are `Ready` (#243, #244, #245, #246, #248, #249, #250, #251); four are `Blocked` on predecessor PBIs alone
-  (#247, #253, #254, #255).** Project #4 and the 232 historical Option C issues are untouched.
+  **Accepted**; #252 is the reference case, Verified and not Accepted. Project #4 and the 232 historical Option C
+  issues are untouched.
+- **The complete Stage 1 backlog is seeded (D-11, 5 October 2026): 74 PBIs on the board, #241 to #255 and #266 to
+  #324.** 4 are `Verified` (#241, #242, #246, #252), 30 `Ready`, 40 `Blocked` on predecessor PBIs. Nine
+  second-release slices are recorded and not created. **Every one of the 595 delivery rows has exactly one
+  accepting owner, and each of the 572 Stage 1 rows is owned by a PBI that exists**:
+  `docs/scope/backlog-ownership.json`, asserted by `tools/tests/test_backlog_ownership.py`. #244, #249 and #250
+  were re-sliced because they cited rows that were not their outcome, and the register extraction was corrected
+  for the customer journey rows (572 Stage 1 rows, not 562).
+- **The inventory report correction is merged (#265, squash `8d99435`, 5 October 2026)**: `specs/004-inventory-report-one-item-once/`,
+  RPT-10. AC-246-01 to AC-246-08 technically verified, 21 scenarios 0 failed on a clean baseline; AC-246-11
+  `pending PRE-09`; not contractually accepted. Scope by D-246-1: the current standard stock report only.
 - **D-10, 5 October 2026: owner decisions, CX-01 closed, blockers classified.** Constitution 1.1.0 adds M-10: a
   missing client or vendor value blocks development only when no default, placeholder, fixture, mock, contract or
   sandbox can stand in for it. **None of the owner decisions is a client confirmation.** OD-27 and OD-14 are
@@ -52,6 +62,11 @@ Live status. First action each session: read this, then continue from **Next**.
   Cloudflare Tunnel. CX-01 is resolved: the Accountant role exists at launch, least privilege, refunds a separate
   capability. The ERP stays behind the adapter boundary on fixed invariants, and structural design proceeds on
   neutral tokens.
+- **D-11, 5 October 2026: the pre-development closure.** Constitution 1.2.0: a spec may trace ROLE-06 only with
+  every dependent criterion `pending CX-01`, so #251 can build the Accountant role while its acceptance waits for
+  the client. Five further contradictions, CX-02 to CX-06, are open and unresolved. Cash on delivery carries no
+  value ceiling and no fee. PRE-01 to PRE-09 have owners and a status matrix; PRE-07, the store operations
+  walkthrough, is **overdue and not held**.
 - **Probes A11 and the price matrix have run** (`t19`, `t20`), are **merged**, and **both questions are closed as
   probes, with no fix built from either.** None of A11, A12, B1 or the price matrix is reopened. A11: the translation-group corruption needs the WCML translation editor **plus** product
   creation in the same process; wp-admin one-save-per-request, the WPML duplicate method and the native CSV
@@ -91,41 +106,46 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-1. **#246, the inventory report correction, is the PBI in hand.** It is `Ready` and starts through the normal
-   Spec Kit workflow, with no further approval needed to begin it (D-10).
-2. **#241 and #242 are merged and `Verified`, and stay open.** #241: AC-1 to AC-8 technically verified, AC-9, the
-   browser matrix, UNEXERCISED. #242: AC-242-01 to AC-242-15 and guardrail G-1 technically verified (19 scenarios,
-   0 failed), DOD-04 manual testing on staging not performed. **No criterion of either is contractually
-   accepted**, and no staging result is reported that did not happen. Both wait for the local staging environment
-   of #244, which D-10 unblocked.
-3. **Ready after #246, in delivery order:** #243 the ERP specification's preparation, #244 the local development
-   and staging environments, #249 the import specification on a fixture, #245 the ERP adapter seam on mocks, #248
-   the order status model, #250 the structural design on neutral tokens, #251 roles.
-4. **The ROLE-06 register correction.** D-10 decided the Accountant role exists at launch, but ROLE-06 still reads
-   DEF in the signed register, so the checker refuses it and #251's Accountant criteria cannot be traced. The
-   correction is an engagement-document edit through the document route and needs Mustafa's approval.
+**No production PBI starts until Mustafa reviews the pre-development closure (D-11).**
+
+1. **Mustafa's review of the closure.** The records are `DECISIONS.md` D-11,
+   `docs/scope/backlog-ownership.json`, `docs/2026-10-05-stage1-ownership-audit.md` and
+   `docs/2026-10-05-pre-deliverables-matrix.md`.
+2. **Then the queue, in delivery order.** The first PBIs that are `Ready`: #243 the ERP specification's
+   preparation, #244 local development and staging, #249 the import specification on a fixture, #245 the ERP
+   adapter seam on mocks, #248 the order status model, #250 structural design on neutral tokens, #251 roles, #266
+   the pre-development documents as an evidence and approval record, #268 the definition of done, #269 the
+   cross-cutting standards. #247 follows #249, and #267, the walkthrough, follows #244.
+3. **#241, #242 and #246 are merged and `Verified`, and stay open.** No criterion of any is contractually
+   accepted. #241: AC-9, the browser matrix, UNEXERCISED. #242 and #246: DOD-04, manual testing on staging, not
+   performed. #246: AC-246-11 `pending PRE-09`. All three wait for the staging environment of #244.
+4. **Owner actions that are not engineering:** send the ERP question pack
+   (`docs/2026-10-05-erp-question-pack.md`); send the Accountant Scope Clarification MS-CLR-2026-037 for the
+   client's acknowledgement; hold the store operations walkthrough once staging exists
+   (`docs/2026-10-05-pre07-store-operations-walkthrough.md`); decide CX-02 to CX-06; sign in to Cloudflare when
+   the tunnel is ready to connect.
 5. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
-6. **The ERP question pack** continues to be prepared and sent, from the eighteen must-answer decisions in
-   `docs/2026-10-04-erp-technical-meeting-questions.md`. PRE-09 gates 19 P1-E rows plus MIG-14 and blocks no
-   unrelated development.
-7. **Collect the client's answers for acceptance and launch**, none of which stops development: OD-01, CR-06,
+6. **Collect the client's answers for acceptance and launch**, none of which stops development: OD-01, CR-06,
    OD-12, then the rest of the table below.
 
 ## Inputs still open, by class (D-10, constitution M-10)
 
-**No client, vendor or ERP input blocks development now.** The only development blockers are predecessor PBIs:
-#247 behind #249; #253 behind #250; #254 behind #250 and #253; #255 behind #250, #254 and #245.
+**No client, vendor or ERP input blocks development of a Stage 1 PBI now.** A `Blocked` PBI is waiting for a
+predecessor PBI and for nothing else; `docs/scope/backlog-ownership.json` names each predecessor. Two PBIs
+outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09" and wait for #243.
 
 | Class | Item | Waiting on |
 |---|---|---|
-| Blocks final acceptance | **AC-9 of #241** and **DOD-04 of #242**, the staging checks | The local staging environment, #244 |
+| Blocks final acceptance | **AC-9 of #241** and **DOD-04 of #242 and #246**, the staging checks | The local staging environment, #244 |
 | Blocks final acceptance | DOD-09, client approval of acceptance criteria, on every PBI | Client, through MS-UAT-2026-027 |
 | Blocks final acceptance | OD-01 brand name, logo, visual identity: approval of the interface design | Client |
 | Blocks final acceptance | CR-06 a real, unmodified Amazon sample export; CR-07 the account type | Client |
 | Blocks final acceptance | OD-12 product cost basis, who enters it, zero versus missing (AC-7 of #252) | Client |
-| Blocks final acceptance | The ROLE-06 register correction, for the Accountant criteria | Mustafa, through the document route |
+| Blocks final acceptance | The Accountant Scope Clarification MS-CLR-2026-037, prepared and **not acknowledged**, for the ROLE-06 criteria | Client |
+| Blocks final acceptance | CX-02 to CX-06, five open contradictions: dependent criteria are `pending CX-nn` | Mustafa |
+| Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**; PRE-08 approval of the Functional Specification | Client, with Mustafa |
 | Blocks production or launch only | OD-27 written instruction on hosting outside Egypt, **not client-approved**; OD-14 operating budget | Client |
 | Blocks production or launch only | OD-18 domain and legal entity details; CR-04 policy text; CR-05 photographs; CR-09 the full catalogue export | Client |
 | Content or client input | D-242-1 to D-242-4, the page copy for IA-24 to IA-32, the final Arabic endpoint slug wording | Client |
@@ -133,7 +153,7 @@ Live status. First action each session: read this, then continue from **Next**.
 | Vendor or account input | The Paymob merchant account and wallet approval; the carrier account, API key and rate card | Client and provider |
 | Vendor or account input | Bosta status code legend (SHIP-14, ADR-0002); COD remittance cycle OD-20 (SHIP-16) | Client or Bosta |
 | Vendor or account input | The Google, Meta and TikTok accounts | Client |
-| ERP input | PRE-09 ERP Integration Specification (19 P1-E rows plus MIG-14) | Joint meeting with the ERP team, targeted week 4 |
+| ERP input | PRE-09 ERP Integration Specification (the 19 P1-E rows, MIG-14 among them) and AC-246-11 | Joint meeting with the ERP team, targeted week 4 |
 | Configurable working default | OD-03, OD-04, OD-05, OD-15, OD-19, OD-21: owner decisions, **not client-confirmed** | Client confirmation, at any time |
 | Repository visibility | The end of the external review period | Mustafa, explicitly |
 

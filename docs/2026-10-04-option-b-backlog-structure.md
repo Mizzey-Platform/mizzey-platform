@@ -346,192 +346,189 @@ owns part of a section recomputes both over the ids it actually cites.
 
 ## The slices, by epic
 
-Each slice states the **exact delivery ids it owns**. A short list is given in the table; a longer one is in the
-ownership map at the end of this document, which is generated in the same pass as these tables and is what CI
-reads. `Scope class` and `Stage` below are **computed over the ids the slice owns**, not over the register section
-it sits in and not chosen from the slice's purpose.
+Generated from `docs/scope/backlog-ownership.json` by `tools/gen_backlog_docs.py`. Each slice states the **exact delivery ids it owns** in the ownership map at the end of this document, which is generated in the same pass and is what CI reads. `Scope class` and `Stage` are **computed over the ids the slice owns**.
 
-**Seeded** names the live PBI where one exists. Fifteen of the eighty slices are seeded; the rest are a plan.
+**74 of the 83 slices are PBIs on the live board.** The other 9 hold second-release rows: they are recorded here so that every delivery row has an owner, and they are not created until the second release is planned. The outcome, dependencies, inputs and notes of a slice live in its issue and in the ownership file, not in this table.
 
-A slice may own a row from another register section where the outcome is the same: #248 owns two admin order rows,
-#255 owns one business rule and one data-model row, #247 owns one self-service row, #244 owns two non-functional
-rows. That is why the per-epic counts here do not match the epic table above, which counts by register section.
-Both account for the same 595 rows.
+A slice may own a row from another register section where the outcome is the same, which is why the per-epic counts here do not match the epic table above, which counts by register section. Both account for the same delivery rows.
 
-### E-PRE (18 delivery rows over 5 slices)
+### E-PRE (15 delivery rows over 5 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-PRE-1 Infrastructure and environments | #244 | 6 ids, in the ownership map | `mixed` | `S1` | Seeded. Merges the old E-PRE-1 and E-PRE-2, and owns the two NFR rows that are their own work |
-| E-PRE-3 Repository, CI and governance | - | `PRE-04` | `DLV` | `S1` | Done in substance: the governance foundation landed 22 September. Not seeded as a PBI |
-| E-PRE-4 Import specification | #249 | 7 ids, in the ownership map | `mixed` | `S1` | Seeded. Absorbed the old E-MIG-1 and E-MIG-2 source and mapping rows |
-| E-PRE-5 Design system and interface design | #250 | `PRE-07, PRE-08` | `DLV` | `S1` | Seeded. OD-01 gates approval of the design, not the structural work (D-10) |
-| E-PRE-6 ERP Integration Specification | #243 | `PRE-09` | `DLV` | `-` | Seeded. PRE-09 is the only register row carrying no stage, which the board spells `per PRE-09`. ERP-10 is named as a boundary and owned by #245 |
+| E-PRE-6 ERP Integration Specification approved (PRE-09) | #243 | 1 | `DLV` | `per PRE-09` | 3 |
+| E-PRE-4 Catalogue import specification, validated against the real source file | #249 | 5 | `P1-L` | `S1` | 7 |
+| E-PRE-5 Design system and interface design delivered as working HTML and CSS | #250 | 1 | `DLV` | `S1` | 10 |
+| E-PRE-7 Pre-development documents delivered and approved | #266 | 7 | `DLV` | `S1` | 16 |
+| E-PRE-8 Store operations walkthrough held on the live admin, with the Section G10 list confirmed | #267 | 1 | `DLV` | `S1` | 17 |
 
-### E-FND (74 delivery rows over 7 slices)
+### E-FND (74 delivery rows over 8 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-FND-1 Bilingual platform baseline | #241 | `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14` | `P1` | `S1` | Seeded, and the only PBI in Ready. The first implementation feature after the pilot |
-| E-FND-1b The remaining fixed core decisions | - | 9 ids, in the ownership map | `mixed` | `S1` | The rest of register section A4. Not bilingual baseline work, so not in #241 |
-| E-FND-2 Information architecture and URL structure | #242 | 30 ids, in the ownership map | `mixed` | `S1` | Seeded, Stage 1. IA-23 and IA-33 were removed from it because the register stages them S2 |
-| E-FND-2b Information architecture, second release | - | `IA-23, IA-33` | `P1-L` | `S2` | Contracted P1-L rows that the register stages S2. Removed from #242, not removed from scope |
-| E-FND-3 Customer journey skeleton | - | 11 ids, in the ownership map | `mixed` | `-` | Every JRN delivery row carries stage `-` in the register, so this slice is not S1 |
-| E-FND-4 Vision, objectives and platform-type guardrails | - | 15 ids, in the ownership map | `mixed` | `S1` | Mostly recorded constraints rather than build work |
-| E-FND-4b Business objectives, second release | - | `OBJ-06, OBJ-07` | `P1-L` | `S2` | Two P1-L rows the register stages S2 |
+| E-FND-1 Bilingual platform baseline: English default, Arabic fully delivered right to left | #241 | 5 | `P1` | `S1` | 1 |
+| E-FND-2 Information architecture and URL structure, in both languages | #242 | 30 | `mixed` | `S1` | 2 |
+| E-FND-1b The remaining fixed core decisions hold across the build | #271 | 9 | `mixed` | `S1` | 21 |
+| E-FND-4 Vision, objectives and platform-type guardrails are met by the delivered store | #272 | 15 | `mixed` | `S1` | 22 |
+| E-FND-3 The customer journey holds end to end, from discovery to after-sales | #322 | 10 | `mixed` | `S1` | 72 |
+| E-FND-2b Information architecture, second release | not created, second release | 2 | `P1-L` | `S2` | - |
+| E-FND-3b Reorder from order history, second release | not created, second release | 1 | `P1-L` | `S2` | - |
+| E-FND-4b Business objectives, second release | not created, second release | 2 | `P1-L` | `S2` | - |
 
 ### E-ROLE (5 delivery rows over 1 slice)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-ROLE-1 Launch roles and permissions | #251 | `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09` | `mixed` | `S1` | Seeded. CX-01 is open: five of the twelve ROLE rows are DEF and ROLE-06a and ROLE-11 are P2 and P3 |
+| E-ROLE-1 Launch staff roles and permissions | #251 | 5 | `mixed` | `S1` | 11 |
 
 ### E-SF (154 delivery rows over 14 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-SF-1 Header, navigation and footer | #253 | 10 ids, in the ownership map | `P1` | `S1` | Seeded. Behind OD-01 |
-| E-SF-2 Home page | - | 11 ids, in the ownership map | `mixed` | `S1` | Behind OD-01 |
-| E-SF-3 Product listing, category and collection | - | 21 ids, in the ownership map | `P1` | `S1` | Behind OD-01 |
-| E-SF-3b Product listing, second release | - | `PLP-11` | `P1-L` | `S2` | One P1-L row the register stages S2 |
-| E-SF-4 Search | - | 9 ids, in the ownership map | `mixed` | `S1` | The Arabic synonym and correction list is admin managed (SRCH-06, SRCH-07). An external search engine is P2 |
-| E-SF-5 Product details page | #254 | 22 ids, in the ownership map | `mixed` | `S1` | Seeded. Behind OD-01 |
-| E-SF-6 Cart | - | 18 ids, in the ownership map | `mixed` | `S1` | Buildable now. The stock-aware behaviour inside it is ERP-03, which waits for PRE-09 |
-| E-SF-7 Authentication | - | 16 ids, in the ownership map | `mixed` | `S1` | P-001: WooCommerce replaces the guest cart rather than merging it. Cart merge is real work |
-| E-SF-8 Checkout and order placement | #255 | 14 ids, in the ownership map | `P1` | `S1` | Seeded. It owns one business rule and one data-model row. ERP-05 is a named boundary, not a citation |
-| E-SF-9 My Account and after-sales | - | 9 ids, in the ownership map | `mixed` | `S1` | Behind OD-01 |
-| E-SF-9b My Account, second release | - | `ACCT-09, ACCT-11, ACCT-13` | `P1-L` | `S2` | Three P1-L rows the register stages S2, not two |
-| E-SF-10 Wishlist, recently viewed, compare | - | `WISH-01, WISH-02, WISH-03, WISH-04, WISH-07` | `P1` | `S1` | P-015: WooCommerce provides no wishlist. Custom |
-| E-SF-11 Reviews and questions | - | `REV-01, REV-02, REV-03, REV-04, REV-05` | `P1` | `S1` | Behind OD-01 |
-| E-SF-12 Trust and support pages | - | 10 ids, in the ownership map | `P1` | `S1` | Gutenberg blocks are the mechanism. OD-08 and OD-13 are open |
+| E-SF-1 Header, navigation and footer, mirrored right to left | #253 | 10 | `P1` | `S1` | 13 |
+| E-SF-5 Product details page, in both languages | #254 | 22 | `mixed` | `S1` | 14 |
+| E-SF-8 Checkout and order placement, in both languages | #255 | 14 | `P1` | `S1` | 15 |
+| E-SF-2 Home page, in both languages, with sections the client edits and reorders | #302 | 11 | `mixed` | `S1` | 52 |
+| E-SF-3 Product listing, category and collection pages with filters and sorting, in both languages | #303 | 21 | `P1` | `S1` | 53 |
+| E-SF-4 Search that works in English and Arabic, with an admin-managed synonym list | #304 | 9 | `mixed` | `S1` | 54 |
+| E-SF-7 Registration, sign-in and Google sign-in resolve to one account, with guest checkout kept open | #305 | 16 | `mixed` | `S1` | 55 |
+| E-SF-6 Cart that survives registration, sign-in and return visits, in both languages | #306 | 18 | `mixed` | `S1` | 56 |
+| E-SF-10 Wishlist for guests and customers, and recently viewed products | #307 | 5 | `P1` | `S1` | 57 |
+| E-SF-9 My Account: profile, addresses, order history, tracking and invoice download | #308 | 9 | `mixed` | `S1` | 58 |
+| E-SF-11 Moderated product reviews with ratings, and a review invitation after delivery | #309 | 5 | `P1` | `S1` | 59 |
+| E-SF-12 Trust and support pages, editable without a developer, in both languages | #310 | 10 | `P1` | `S1` | 60 |
+| E-SF-3b Product listing, second release: filter by rating | not created, second release | 1 | `P1-L` | `S2` | - |
+| E-SF-9b My Account, second release: reorder, notification preferences, account deletion request | not created, second release | 3 | `P1-L` | `S2` | - |
 
 ### E-RULES (33 delivery rows over 3 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-RULES-1 Promotion engine | - | 17 ids, in the ownership map | `P1` | `S1` | P-003: WooCommerce coupons stack freely with no priority policy |
-| E-RULES-2 Launch business rules | - | 9 ids, in the ownership map | `P1` | `S1` | BR-005 is owned by #255. BR-003 concurrency is data-integrity item B6 |
-| E-RULES-3 Merchandising and premium positioning | - | 7 ids, in the ownership map | `P1` | `S1` | - |
+| E-RULES-1 Promotion engine: discounts, conditions, limits and schedules configurable from admin | #281 | 17 | `P1` | `S1` | 31 |
+| E-RULES-3 Merchandising controls: badges, featured products, manual ordering, curated collections and related products | #282 | 7 | `P1` | `S1` | 32 |
+| E-RULES-2 Launch business rules enforced: welcome discount, free shipping on two items, explicit stacking, refund ceiling | #290 | 9 | `P1` | `S1` | 40 |
 
 ### E-ORD (43 delivery rows over 4 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-ORD-1 Order status model with a queryable history | #248 | 13 ids, in the ownership map | `mixed` | `S1` | Seeded. It owns two admin order rows, so E-ADM-5 does not |
-| E-ORD-2 Payments, Paymob | - | 16 ids, in the ownership map | `mixed` | `S1` | Callback verification is a recorded gap in the Technical Design. P-004: order placement is idempotent |
-| E-ORD-3 Shipping, Bosta | - | 13 ids, in the ownership map | `mixed` | `S1` | P-012: carrier status mapping is dormant in the plugin. OD-20 is open |
-| E-ORD-4 Returns and refunds, customer side | - | `RET-08` | `P1-L` | `S1` | One delivery row. Nine of the ten RET rows are DEF or P2: the dedicated returns workflow is not built |
+| E-ORD-1 Order status model with a queryable status history | #248 | 13 | `mixed` | `S1` | 9 |
+| E-ORD-2 Payments through Paymob: verified callbacks, no duplicate charge, refunds from the order screen | #283 | 16 | `mixed` | `S1` | 33 |
+| E-ORD-3 Shipping through Bosta with an explicit status mapping, governorate rates and cash-on-delivery reconciliation | #291 | 13 | `mixed` | `S1` | 41 |
+| E-ORD-4 Refunds recorded from the standard order screen, with the standard refund email | #292 | 1 | `P1-L` | `S1` | 42 |
 
 ### E-NOTF (10 delivery rows over 2 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-NOTF-1 Transactional email channel and templates | - | 9 ids, in the ownership map | `mixed` | `S1` | Email only at launch is agreed, recorded at OD-11 |
-| E-NOTF-1b Notifications, second release | - | `NOTF-14` | `P1-L` | `S2` | One P1-L row the register stages S2 |
+| E-NOTF-1 Transactional emails for account, order, payment, shipping, delivery and refund | #285 | 9 | `mixed` | `S1` | 35 |
+| E-NOTF-1b Notifications, second release: admin-editable templates | not created, second release | 1 | `P1-L` | `S2` | - |
 
-### E-ADM (114 delivery rows over 13 slices)
+### E-ADM (114 delivery rows over 14 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-ADM-1 Dashboard | - | 12 ids, in the ownership map | `mixed` | `S1` | Register section G1 is ADM-01 to ADM-15, not ADM-01 to ADM-10 |
-| E-ADM-1b Dashboard, second release | - | `ADM-05, ADM-07` | `P1-L` | `S2` | Two P1-L rows the register stages S2 |
-| E-ADM-2 Product management | - | 28 ids, in the ownership map | `mixed` | `S1` | ADM-27 cost capture is owned by #252, so it is not cited here. These 28 rows are not started |
-| E-ADM-3 Categories, brands, collections, content | - | 7 ids, in the ownership map | `mixed` | `S1` | - |
-| E-ADM-4 Inventory | - | 8 ids, in the ownership map | `P1-E` | `mixed` | Eight P1-E rows: seven in register section G4 and ADM-149 in G10, which is where the earlier count of eight came from while the range ADM-70 to ADM-77 held only seven. Five carry stage `-`. Nothing here gets final criteria before PRE-09 |
-| E-ADM-5 Order management | - | 7 ids, in the ownership map | `mixed` | `S1` | ADM-86 and ADM-87 are owned by #248 |
-| E-ADM-6 Customers | - | `ADM-100, ADM-103, ADM-104` | `mixed` | `S1` | - |
-| E-ADM-6b Customers, second release | - | `ADM-101, ADM-105` | `P1-L` | `S2` | Two P1-L rows the register stages S2 |
-| E-ADM-7 Promotions and coupons admin | - | `ADM-110, ADM-111, ADM-113, ADM-115` | `mixed` | `S1` | - |
-| E-ADM-8 Returns and refunds admin | - | `ADM-124` | `P1` | `S1` | One delivery row. Six of the seven G8 rows are DEF or P2 |
-| E-ADM-9 Staff users, roles and audit | - | `ADM-130, ADM-131, ADM-132, ADM-133, ADM-134` | `mixed` | `S1` | CX-01 is open |
-| E-ADM-10 Self-service storefront and product control | - | 23 ids, in the ownership map | `mixed` | `S1` | SSC-21, Arabic product content maintained separately, is owned by #247. Register section G11 is SSC-01 to SSC-14 then SSC-20 to SSC-29: there is no SSC-15 to SSC-19 |
-| E-ADM-11 Admin efficiency: bulk editing, search and export | - | 12 ids, in the ownership map | `mixed` | `S1` | New slice. Register section G10 holds 13 delivery rows that no earlier version of this document owned. The dedicated Operations Console is DEF; these rows are not, and ADM-157 is a key row |
+| E-ADM-9 Staff accounts with two-factor sign-in and a searchable log that ordinary users cannot delete | #275 | 5 | `mixed` | `S1` | 25 |
+| E-ADM-2 Product management in admin: content, media, pricing, variants, SEO fields, flags, bulk import, export and update | #276 | 28 | `mixed` | `S1` | 26 |
+| E-ADM-3 Categories, brands, collections, home page sections and static pages managed from admin | #277 | 7 | `mixed` | `S1` | 27 |
+| E-ADM-11 Everyday admin tasks in the standard administration: quick product entry, bulk edits, search, export, mobile checks | #278 | 12 | `mixed` | `S1` | 28 |
+| E-ADM-6 Customer records in admin: profile, internal notes, and suspension with a reason | #279 | 3 | `mixed` | `S1` | 29 |
+| E-ADM-5 Order management in admin: find, annotate, ship, cancel, refund and print | #280 | 7 | `mixed` | `S1` | 30 |
+| E-ADM-7 Promotions and coupons managed from admin: create, schedule, pause, keep the usage history | #289 | 4 | `mixed` | `S1` | 39 |
+| E-ADM-8 A refund is recorded with its payment reference from the standard order screen | #293 | 1 | `P1` | `S1` | 43 |
+| E-ADM-1 Admin dashboard: sales figures, top products, and low and out-of-stock counts that count each item once | #294 | 12 | `mixed` | `S1` | 44 |
+| E-ADM-10 Self-service storefront and product control: everything a customer sees is editable in both languages, with preview | #311 | 23 | `mixed` | `S1` | 61 |
+| E-ADM-4 Stock on hand and stock available shown in admin from the ERP | #317 | 2 | `P1-E` | `S1` | 67 |
+| E-ADM-4b Inventory tasks whose method and timing PRE-09 sets | #318 | 6 | `P1-E` | `per PRE-09` | 68 |
+| E-ADM-1b Dashboard, second release: new and returning customers, conversion rate | not created, second release | 2 | `P1-L` | `S2` | - |
+| E-ADM-6b Customers, second release: lifetime metrics and export under privacy controls | not created, second release | 2 | `P1-L` | `S2` | - |
 
 ### E-MIG (13 delivery rows over 5 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-MIG-3 Catalogue migration does not corrupt Arabic content | #247 | `MIG-02, MIG-09, MIG-13, SSC-21` | `mixed` | `S1` | Seeded. It owns one G11 row, SSC-21, because Arabic product content integrity is the same outcome. Carries the MIG-13 precondition and the A11 sequencing invariant |
-| E-MIG-2 Attribute, category and brand mapping | - | `MIG-10, MIG-11, MIG-12` | `P1-L` | `S1` | MIG-01, MIG-03, MIG-04, MIG-06 and MIG-19 are owned by #249 |
-| E-MIG-4 Images and alt text | - | `MIG-15, MIG-16, MIG-17` | `P1-L` | `S1` | Blocked by CR-08 and OD-26, image rights in writing. R-01, the highest legal risk |
-| E-MIG-6 Background execution and export | - | `MIG-20, MIG-25` | `P1-L` | `S1` | - |
-| E-MIG-7 Initial stock load | - | `MIG-14` | `P1-E` | `S1` | P1-E. Destination follows PRE-09 |
+| E-MIG-3 The catalogue migration does not corrupt Arabic product or variation content | #247 | 4 | `mixed` | `S1` | 6 |
+| E-MIG-2 Attributes, categories, brands and SEO fields mapped into the store in the initial migration | #295 | 4 | `P1-L` | `S1` | 45 |
+| E-MIG-4 Product images imported to the Mizzey server with alt text, once rights are confirmed | #296 | 2 | `P1-L` | `S1` | 46 |
+| E-MIG-6 The initial migration runs in the background, and the catalogue stays exportable | #297 | 2 | `P1-L` | `S1` | 47 |
+| E-MIG-7 Initial stock quantities loaded where PRE-09 settles | #320 | 1 | `P1-E` | `S1` | 70 |
 
 ### E-ERP (10 delivery rows over 7 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-ERP-1 Stock source of truth and adapter seam | #245 | `ERP-01, ERP-02, ERP-10, INT-16` | `P1` | `S1` | Seeded. It owns ERP-10, the adapter rule. #243 names it as context and does not cite it |
-| E-ERP-2 Sale reduces ERP stock | - | `ERP-04` | `P1` | `S1` | P1, and unbuildable before PRE-09 defines the call |
-| E-ERP-3 No sale against unvalidated stock | - | `ERP-05` | `P1` | `S1` | P1 and key. OD-41 settled the business rule: the store does not confirm the sale |
-| E-ERP-4 Cart and view stock awareness | - | `ERP-03` | `P1-E` | `S1` | P1-E, PRE-09 |
-| E-ERP-5 Restoration on failure, cancel and return | - | `ERP-06` | `P1-E` | `S1` | P1-E, PRE-09 |
-| E-ERP-6 Stock in the store admin | - | `ERP-07` | `P1-E` | `S1` | P1-E, PRE-09. Pairs with E-ADM-4 |
-| E-ERP-7 Product and variant matching, both languages | - | `ERP-08` | `P1-E` | `S1` | P1-E, PRE-09. Our constraint is already fixed: WPML identity, never SKU alone |
+| E-ERP-1 ERP adapter seam: one commercial item resolves to one ERP stock item | #245 | 4 | `P1` | `S1` | 8 |
+| E-ERP-7 Products and variants are matched to the ERP, one stock identity per item in both languages | #299 | 1 | `P1-E` | `S1` | 49 |
+| E-ERP-2 A sale on the website reduces the corresponding stock in the ERP, exactly once | #300 | 1 | `P1` | `S1` | 50 |
+| E-ERP-3 No sale is confirmed against stock the ERP cannot validate, including when it is unreachable | #301 | 1 | `P1` | `S1` | 51 |
+| E-ERP-4 Adding to the cart and viewing the cart take account of ERP stock | #314 | 1 | `P1-E` | `S1` | 64 |
+| E-ERP-5 Stock is restored in the ERP on a failed payment or a cancellation, and returned parcels are received | #315 | 1 | `P1-E` | `S1` | 65 |
+| E-ERP-6 Stock appears in, and is changed through, the store admin as PRE-09 settles | #316 | 1 | `P1-E` | `S1` | 66 |
 
-### E-RPT (8 delivery rows over 4 slices)
+### E-RPT (6 delivery rows over 4 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-RPT-1 Sales report | - | `RPT-01` | `P1-L` | `S1` | Order level, so not exposed to the product split |
-| E-RPT-2 Inventory report counts one item once | #246 | `RPT-10` | `P1-L` | `S1` | Seeded. P-020: one physical item listed twice. It needs the bilingual baseline, which #241 delivers and owns, so FIX-04 and NFR-04 are in its Dependencies field and not cited here |
-| E-RPT-3 Product cost captured | #252 | `RPT-11, ADM-27` | `P1` | `S1` | Seeded. Technically verified by the pilot; acceptance pending CX-01 and OD-12 |
-| E-RPT-4 Funnel and traffic through GA4 | - | `RPT-08, RPT-09` | `P1-L` | `S1` | Delivered through GA4 configuration, not a built report |
+| E-RPT-2 The inventory report counts one physical item once, not once per language | #246 | 1 | `P1-L` | `S1` | 5 |
+| E-RPT-3 Product cost: carry CX-01 and OD-12 to the Stage 1 gate | #252 | 2 | `P1` | `S1` | 12 |
+| E-RPT-1 Sales report: revenue, net sales, orders, units, average order value, discounts and shipping | #286 | 1 | `P1-L` | `S1` | 36 |
+| E-RPT-4 Funnel and traffic reports available in Google Analytics | #313 | 2 | `P1-L` | `S1` | 63 |
 
 ### E-INT (4 delivery rows over 1 slice)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-INT-1 Email delivery, analytics and merchant feeds | - | `INT-05, INT-09, INT-10, INT-12` | `mixed` | `S1` | INT-01 and INT-02 sit with their payment and shipping slices; INT-16, the adapter rule, is on #245 |
+| E-INT-1 Transactional email service, Google Analytics with Tag Manager, Meta Pixel and the Merchant Center feed connected | #284 | 4 | `mixed` | `S1` | 34 |
 
-### E-NFR (11 delivery rows over 3 slices)
+### E-NFR (13 delivery rows over 4 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-NFR-1 Cross-cutting non-functional requirements | - | 9 ids, in the ownership map | `mixed` | `S1` | Attached to the slices they constrain rather than built alone. NFR-07 data integrity is the row the multilingual data-integrity workstream serves |
-| E-NFR-2 Observability | - | `NFR-10` | `P1-L` | `S1` | Its own work, not an attachment |
-| E-NFR-1b Non-functional, second release | - | `NFR-12a` | `P1-L` | `S2` | One P1-L row the register stages S2 |
+| E-NFR-3 Infrastructure provisioned for development, staging and production | #244 | 2 | `P1` | `S1` | 4 |
+| E-NFR-1 Cross-cutting standards met: mobile first, performance, locale formatting, security, data integrity, accessibility, privacy, scalability | #269 | 9 | `mixed` | `S1` | 19 |
+| E-NFR-2 Observability: application logs, error monitoring, integration logs and admin audit logs | #270 | 1 | `P1-L` | `S1` | 20 |
+| E-NFR-1b Privacy, second release: automated data export and deletion requests | not created, second release | 1 | `P1-L` | `S2` | - |
 
 ### E-DATA (16 delivery rows over 2 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-DATA-1 The data model | - | 15 ids, in the ownership map | `mixed` | `S1` | ENT-08 snapshots is owned by #255 and is already proved for price and cost |
-| E-DATA-2 Stock entity | - | `ENT-04` | `P1-E` | `-` | P1-E, stage `-`, PRE-09 |
+| E-DATA-1 The contracted data model exists: every launch entity is stored, related and documented | #273 | 15 | `mixed` | `S1` | 23 |
+| E-DATA-2 Inventory transaction records, as PRE-09 settles | #319 | 1 | `P1-E` | `per PRE-09` | 69 |
 
 ### E-EVT (18 delivery rows over 2 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-EVT-1 Analytics events | - | 17 ids, in the ownership map | `mixed` | `S1` | Developer work, in client-owned accounts. OD-21 decides which trackers are activated |
-| E-EVT-2 Event tracking plan | - | `EVT-20` | `DLV` | `S1` | A DLV deliverable, not a build row |
+| E-EVT-2 Event Tracking Plan: every event, trigger, parameter and source of truth per business metric | #274 | 1 | `DLV` | `S1` | 24 |
+| E-EVT-1 The standard e-commerce events fire across the funnel, in both languages | #312 | 17 | `mixed` | `S1` | 62 |
 
 ### E-MKT (21 delivery rows over 3 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-MKT-1 Measurement and advertising | - | 7 ids, in the ownership map | `mixed` | `S1` | MKT-01 to MKT-03 are built. Activation is OD-21 |
-| E-MKT-2 Search engine optimisation | - | 8 ids, in the ownership map | `mixed` | `S1` | - |
-| E-MKT-3 Third-party access and site protection | - | `MKT-21, MKT-22, MKT-23, MKT-24, MKT-25, MKT-26` | `mixed` | `S1` | MKT-26 is a DLV deliverable |
+| E-MKT-2 Search engine controls: editable meta and canonical, redirects, missing-page log, sitemap and robots, hreflang | #287 | 8 | `mixed` | `S1` | 37 |
+| E-MKT-1 Measurement and advertising tools ready for a marketing team: analytics, pixels, product feeds, attribution, consent | #288 | 7 | `mixed` | `S1` | 38 |
+| E-MKT-3 Third parties work through a restricted role, Tag Manager and staging, under a written protocol | #298 | 6 | `mixed` | `S1` | 48 |
 
 ### E-DOD (9 delivery rows over 1 slice)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-DOD Definition of done | - | 9 ids, in the ownership map | `mixed` | `S1` | Not a build epic. It is the completion standard applied to every slice |
+| E-DOD Definition of done applied to every Stage 1 PBI, with the evidence recorded | #268 | 9 | `mixed` | `S1` | 18 |
 
 ### E-ACC (25 delivery rows over 2 slices)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-ACC-1 Acceptance scenarios | - | 20 ids, in the ownership map | `mixed` | `S1` | Not a build epic. The evidence requirement attached to the other epics. AC-06 and AC-07 are the cost pilot open items |
-| E-ACC-2 ERP acceptance scenarios | - | `AC-21, AC-22, AC-23, AC-24, AC-25` | `P1-E` | `S1` | Five P1-E scenarios. No final criteria before PRE-09 |
+| E-ACC-2 ERP stock acceptance scenarios, finalised in PRE-09, pass against the ERP test environment | #321 | 5 | `P1-E` | `S1` | 71 |
+| E-ACC-1 The client's acceptance scenarios pass as the UAT script | #323 | 20 | `mixed` | `S1` | 73 |
 
 ### E-HND (12 delivery rows over 1 slice)
 
-| Slice | Seeded | Owns | Scope class | Stage | Notes |
+| Slice | PBI | Rows | Scope class | Stage | Delivery order |
 |---|---|---|---|---|---|
-| E-HND Handover | - | 12 ids, in the ownership map | `DLV` | `S1` | End of the engagement |
+| E-HND Handover: code, design, documentation, accounts, environments, training and warranty | #324 | 12 | `DLV` | `S1` | 74 |
 
 ## What can proceed independently of the ERP, and what cannot
 
@@ -642,142 +639,143 @@ Format: slice, live PBI where one exists, count, then the exact ids.
 
 **E-PRE**
 
-- **E-PRE-1 Infrastructure and environments** (#244) (6 ids): `PRE-01, PRE-02, PRE-03a, PRE-03b, NFR-09, NFR-08`
-- **E-PRE-3 Repository, CI and governance** (1 ids): `PRE-04`
-- **E-PRE-4 Import specification** (#249) (7 ids): `PRE-05, PRE-06, MIG-01, MIG-03, MIG-04, MIG-06, MIG-19`
-- **E-PRE-5 Design system and interface design** (#250) (2 ids): `PRE-07, PRE-08`
-- **E-PRE-6 ERP Integration Specification** (#243) (1 ids): `PRE-09`
+- **E-PRE-4 Catalogue import specification, validated against the real source file** (#249) (5 ids): `MIG-01, MIG-03, MIG-04, MIG-06, MIG-19`
+- **E-PRE-5 Design system and interface design delivered as working HTML and CSS** (#250) (1 ids): `PRE-03b`
+- **E-PRE-6 ERP Integration Specification approved (PRE-09)** (#243) (1 ids): `PRE-09`
+- **E-PRE-7 Pre-development documents delivered and approved** (#266) (7 ids): `PRE-01, PRE-02, PRE-03a, PRE-04, PRE-05, PRE-06, PRE-08`
+- **E-PRE-8 Store operations walkthrough held on the live admin, with the Section G10 list confirmed** (#267) (1 ids): `PRE-07`
 
 **E-FND**
 
-- **E-FND-1 Bilingual platform baseline** (#241) (5 ids): `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14`
-- **E-FND-1b The remaining fixed core decisions** (9 ids): `FIX-01, FIX-02, FIX-03, FIX-05, FIX-06, FIX-07, FIX-08, FIX-09, FIX-10`
-- **E-FND-2 Information architecture and URL structure** (#242) (30 ids): `IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35, NFR-03`
+- **E-FND-1 Bilingual platform baseline: English default, Arabic fully delivered right to left** (#241) (5 ids): `FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14`
+- **E-FND-1b The remaining fixed core decisions hold across the build** (#271) (9 ids): `FIX-01, FIX-02, FIX-03, FIX-05, FIX-06, FIX-07, FIX-08, FIX-09, FIX-10`
+- **E-FND-2 Information architecture and URL structure, in both languages** (#242) (30 ids): `IA-01, IA-02, IA-03, IA-04, IA-05, IA-06, IA-07, IA-08, IA-09, IA-10, IA-11, IA-14, IA-15, IA-16, IA-17, IA-18, IA-19, IA-20, IA-21, IA-24, IA-25, IA-26, IA-27, IA-28, IA-29, IA-30, IA-31, IA-32, IA-35, NFR-03`
 - **E-FND-2b Information architecture, second release** (2 ids): `IA-23, IA-33`
-- **E-FND-3 Customer journey skeleton** (11 ids): `JRN-01, JRN-02, JRN-03, JRN-04, JRN-05, JRN-06, JRN-07, JRN-08, JRN-09, JRN-10, JRN-11`
-- **E-FND-4 Vision, objectives and platform-type guardrails** (15 ids): `VIS-01, VIS-02, VIS-03, VIS-04, VIS-05, VIS-06, OBJ-01, OBJ-02, OBJ-03, OBJ-04, OBJ-05, PLT-01, PLT-02, PLT-03, PLT-06`
+- **E-FND-3 The customer journey holds end to end, from discovery to after-sales** (#322) (10 ids): `JRN-01, JRN-02, JRN-03, JRN-04, JRN-05, JRN-06, JRN-07, JRN-08, JRN-09, JRN-10`
+- **E-FND-3b Reorder from order history, second release** (1 ids): `JRN-11`
+- **E-FND-4 Vision, objectives and platform-type guardrails are met by the delivered store** (#272) (15 ids): `VIS-01, VIS-02, VIS-03, VIS-04, VIS-05, VIS-06, OBJ-01, OBJ-02, OBJ-03, OBJ-04, OBJ-05, PLT-01, PLT-02, PLT-03, PLT-06`
 - **E-FND-4b Business objectives, second release** (2 ids): `OBJ-06, OBJ-07`
 
 **E-ROLE**
 
-- **E-ROLE-1 Launch roles and permissions** (#251) (5 ids): `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09`
+- **E-ROLE-1 Launch staff roles and permissions** (#251) (5 ids): `ROLE-01, ROLE-02, ROLE-07, ROLE-08, ROLE-09`
 
 **E-SF**
 
-- **E-SF-1 Header, navigation and footer** (#253) (10 ids): `NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10`
-- **E-SF-2 Home page** (11 ids): `HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, HOME-06, HOME-07, HOME-08, HOME-09, HOME-10, HOME-11`
-- **E-SF-3 Product listing, category and collection** (21 ids): `PLP-01, PLP-02, PLP-03, PLP-04, PLP-05, PLP-06, PLP-07, PLP-08, PLP-09, PLP-10, PLP-12, PLP-13, PLP-14, PLP-15, PLP-16, PLP-17, PLP-18, PLP-19, PLP-20, PLP-21, PLP-22`
-- **E-SF-3b Product listing, second release** (1 ids): `PLP-11`
-- **E-SF-4 Search** (9 ids): `SRCH-01, SRCH-02, SRCH-03, SRCH-04, SRCH-05, SRCH-06, SRCH-07, SRCH-08, SRCH-06a`
-- **E-SF-5 Product details page** (#254) (22 ids): `PDP-01, PDP-02, PDP-03, PDP-04, PDP-05, PDP-06, PDP-07, PDP-08, PDP-09, PDP-10, PDP-11, PDP-12, PDP-13, PDP-14, PDP-15, PDP-16, PDP-17, PDP-18, PDP-19, PDP-21, PDP-22, PDP-24`
-- **E-SF-6 Cart** (18 ids): `CART-01, CART-02, CART-03, CART-04, CART-05, CART-06, CART-07, CART-08, CART-09, CART-10, CART-11, CART-12, CART-13, CART-14, CART-15, CART-16, CART-17, CART-18`
-- **E-SF-7 Authentication** (16 ids): `AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, AUTH-07, AUTH-08, AUTH-09, AUTH-10, AUTH-11, AUTH-12, AUTH-13, AUTH-14, AUTH-15, AUTH-16`
-- **E-SF-8 Checkout and order placement** (#255) (14 ids): `CHK-01, CHK-02, CHK-03, CHK-04, CHK-05, CHK-06, CHK-07, CHK-08, CHK-09, CHK-10, CHK-11, CHK-12, BR-005, ENT-08`
-- **E-SF-9 My Account and after-sales** (9 ids): `ACCT-01, ACCT-02, ACCT-03, ACCT-04, ACCT-05, ACCT-06, ACCT-07, ACCT-08, ACCT-12`
-- **E-SF-9b My Account, second release** (3 ids): `ACCT-09, ACCT-11, ACCT-13`
-- **E-SF-10 Wishlist, recently viewed, compare** (5 ids): `WISH-01, WISH-02, WISH-03, WISH-04, WISH-07`
-- **E-SF-11 Reviews and questions** (5 ids): `REV-01, REV-02, REV-03, REV-04, REV-05`
-- **E-SF-12 Trust and support pages** (10 ids): `CMS-01, CMS-02, CMS-03, CMS-04, CMS-05, CMS-06, CMS-07, CMS-08, CMS-09, CMS-10`
+- **E-SF-1 Header, navigation and footer, mirrored right to left** (#253) (10 ids): `NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10`
+- **E-SF-10 Wishlist for guests and customers, and recently viewed products** (#307) (5 ids): `WISH-01, WISH-02, WISH-03, WISH-04, WISH-07`
+- **E-SF-11 Moderated product reviews with ratings, and a review invitation after delivery** (#309) (5 ids): `REV-01, REV-02, REV-03, REV-04, REV-05`
+- **E-SF-12 Trust and support pages, editable without a developer, in both languages** (#310) (10 ids): `CMS-01, CMS-02, CMS-03, CMS-04, CMS-05, CMS-06, CMS-07, CMS-08, CMS-09, CMS-10`
+- **E-SF-2 Home page, in both languages, with sections the client edits and reorders** (#302) (11 ids): `HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, HOME-06, HOME-07, HOME-08, HOME-09, HOME-10, HOME-11`
+- **E-SF-3 Product listing, category and collection pages with filters and sorting, in both languages** (#303) (21 ids): `PLP-01, PLP-02, PLP-03, PLP-04, PLP-05, PLP-06, PLP-07, PLP-08, PLP-09, PLP-10, PLP-12, PLP-13, PLP-14, PLP-15, PLP-16, PLP-17, PLP-18, PLP-19, PLP-20, PLP-21, PLP-22`
+- **E-SF-3b Product listing, second release: filter by rating** (1 ids): `PLP-11`
+- **E-SF-4 Search that works in English and Arabic, with an admin-managed synonym list** (#304) (9 ids): `SRCH-01, SRCH-02, SRCH-03, SRCH-04, SRCH-05, SRCH-06, SRCH-06a, SRCH-07, SRCH-08`
+- **E-SF-5 Product details page, in both languages** (#254) (22 ids): `PDP-01, PDP-02, PDP-03, PDP-04, PDP-05, PDP-06, PDP-07, PDP-08, PDP-09, PDP-10, PDP-11, PDP-12, PDP-13, PDP-14, PDP-15, PDP-16, PDP-17, PDP-18, PDP-19, PDP-21, PDP-22, PDP-24`
+- **E-SF-6 Cart that survives registration, sign-in and return visits, in both languages** (#306) (18 ids): `CART-01, CART-02, CART-03, CART-04, CART-05, CART-06, CART-07, CART-08, CART-09, CART-10, CART-11, CART-12, CART-13, CART-14, CART-15, CART-16, CART-17, CART-18`
+- **E-SF-7 Registration, sign-in and Google sign-in resolve to one account, with guest checkout kept open** (#305) (16 ids): `AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, AUTH-07, AUTH-08, AUTH-09, AUTH-10, AUTH-11, AUTH-12, AUTH-13, AUTH-14, AUTH-15, AUTH-16`
+- **E-SF-8 Checkout and order placement, in both languages** (#255) (14 ids): `CHK-01, CHK-02, CHK-03, CHK-04, CHK-05, CHK-06, CHK-07, CHK-08, CHK-09, CHK-10, CHK-11, CHK-12, BR-005, ENT-08`
+- **E-SF-9 My Account: profile, addresses, order history, tracking and invoice download** (#308) (9 ids): `ACCT-01, ACCT-02, ACCT-03, ACCT-04, ACCT-05, ACCT-06, ACCT-07, ACCT-08, ACCT-12`
+- **E-SF-9b My Account, second release: reorder, notification preferences, account deletion request** (3 ids): `ACCT-09, ACCT-11, ACCT-13`
 
 **E-RULES**
 
-- **E-RULES-1 Promotion engine** (17 ids): `PROMO-01, PROMO-02, PROMO-03, PROMO-04, PROMO-05, PROMO-06, PROMO-07, PROMO-08, PROMO-09, PROMO-11, PROMO-12, PROMO-13, PROMO-14, PROMO-15, PROMO-18, PROMO-19, PROMO-23`
-- **E-RULES-2 Launch business rules** (9 ids): `BR-001, BR-002, BR-003, BR-004, BR-006, BR-007, BR-008, BR-009, BR-010`
-- **E-RULES-3 Merchandising and premium positioning** (7 ids): `MER-01, MER-02, MER-03, MER-04, MER-05, MER-06, MER-07`
+- **E-RULES-1 Promotion engine: discounts, conditions, limits and schedules configurable from admin** (#281) (17 ids): `PROMO-01, PROMO-02, PROMO-03, PROMO-04, PROMO-05, PROMO-06, PROMO-07, PROMO-08, PROMO-09, PROMO-11, PROMO-12, PROMO-13, PROMO-14, PROMO-15, PROMO-18, PROMO-19, PROMO-23`
+- **E-RULES-2 Launch business rules enforced: welcome discount, free shipping on two items, explicit stacking, refund ceiling** (#290) (9 ids): `BR-001, BR-002, BR-003, BR-004, BR-006, BR-007, BR-008, BR-009, BR-010`
+- **E-RULES-3 Merchandising controls: badges, featured products, manual ordering, curated collections and related products** (#282) (7 ids): `MER-01, MER-02, MER-03, MER-04, MER-05, MER-06, MER-07`
 
 **E-ORD**
 
-- **E-ORD-1 Order status model with a queryable history** (#248) (13 ids): `ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-12, ORD-13, ORD-14, ADM-86, ADM-87`
-- **E-ORD-2 Payments, Paymob** (16 ids): `PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06, PAY-07, PAY-08, PAY-09, PAY-13, PAY-14, PAY-15, PAY-16, PAY-17, PAY-19, INT-01`
-- **E-ORD-3 Shipping, Bosta** (13 ids): `SHIP-01, SHIP-03, SHIP-04, SHIP-05, SHIP-08, SHIP-09, SHIP-12, SHIP-13, SHIP-14, SHIP-15, SHIP-16, SHIP-17, INT-02`
-- **E-ORD-4 Returns and refunds, customer side** (1 ids): `RET-08`
+- **E-ORD-1 Order status model with a queryable status history** (#248) (13 ids): `ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-12, ORD-13, ORD-14, ADM-86, ADM-87`
+- **E-ORD-2 Payments through Paymob: verified callbacks, no duplicate charge, refunds from the order screen** (#283) (16 ids): `PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06, PAY-07, PAY-08, PAY-09, PAY-13, PAY-14, PAY-15, PAY-16, PAY-17, PAY-19, INT-01`
+- **E-ORD-3 Shipping through Bosta with an explicit status mapping, governorate rates and cash-on-delivery reconciliation** (#291) (13 ids): `SHIP-01, SHIP-03, SHIP-04, SHIP-05, SHIP-08, SHIP-09, SHIP-12, SHIP-13, SHIP-14, SHIP-15, SHIP-16, SHIP-17, INT-02`
+- **E-ORD-4 Refunds recorded from the standard order screen, with the standard refund email** (#292) (1 ids): `RET-08`
 
 **E-NOTF**
 
-- **E-NOTF-1 Transactional email channel and templates** (9 ids): `NOTF-01, NOTF-02, NOTF-03, NOTF-04, NOTF-06, NOTF-08, NOTF-11, NOTF-12, NOTF-13`
-- **E-NOTF-1b Notifications, second release** (1 ids): `NOTF-14`
+- **E-NOTF-1 Transactional emails for account, order, payment, shipping, delivery and refund** (#285) (9 ids): `NOTF-01, NOTF-02, NOTF-03, NOTF-04, NOTF-06, NOTF-08, NOTF-11, NOTF-12, NOTF-13`
+- **E-NOTF-1b Notifications, second release: admin-editable templates** (1 ids): `NOTF-14`
 
 **E-ADM**
 
-- **E-ADM-1 Dashboard** (12 ids): `ADM-01, ADM-02, ADM-03, ADM-04, ADM-06, ADM-08, ADM-09, ADM-10, ADM-11, ADM-12, ADM-13, ADM-15`
-- **E-ADM-1b Dashboard, second release** (2 ids): `ADM-05, ADM-07`
-- **E-ADM-2 Product management** (28 ids): `ADM-20, ADM-21, ADM-22, ADM-23, ADM-24, ADM-25, ADM-26, ADM-29, ADM-30, ADM-31, ADM-32, ADM-33, ADM-34, ADM-35, ADM-36, ADM-37, ADM-38, ADM-39, ADM-40, ADM-41, ADM-42, ADM-43, ADM-44, ADM-45, ADM-47, ADM-48, ADM-49, ADM-50`
-- **E-ADM-3 Categories, brands, collections, content** (7 ids): `ADM-55, ADM-56, ADM-57, ADM-59, ADM-60, ADM-61, ADM-63`
-- **E-ADM-4 Inventory** (8 ids): `ADM-70, ADM-71, ADM-72, ADM-73, ADM-74, ADM-75, ADM-77, ADM-149`
-- **E-ADM-5 Order management** (7 ids): `ADM-85, ADM-88, ADM-89, ADM-90, ADM-91, ADM-92, ADM-93`
-- **E-ADM-6 Customers** (3 ids): `ADM-100, ADM-103, ADM-104`
-- **E-ADM-6b Customers, second release** (2 ids): `ADM-101, ADM-105`
-- **E-ADM-7 Promotions and coupons admin** (4 ids): `ADM-110, ADM-111, ADM-113, ADM-115`
-- **E-ADM-8 Returns and refunds admin** (1 ids): `ADM-124`
-- **E-ADM-9 Staff users, roles and audit** (5 ids): `ADM-130, ADM-131, ADM-132, ADM-133, ADM-134`
-- **E-ADM-10 Self-service storefront and product control** (23 ids): `SSC-01, SSC-02, SSC-03, SSC-04, SSC-05, SSC-06, SSC-07, SSC-08, SSC-09, SSC-10, SSC-11, SSC-12, SSC-13, SSC-14, SSC-20, SSC-22, SSC-23, SSC-24, SSC-25, SSC-26, SSC-27, SSC-28, SSC-29`
-- **E-ADM-11 Admin efficiency: bulk editing, search and export** (12 ids): `ADM-146, ADM-148, ADM-150, ADM-151, ADM-152, ADM-153, ADM-154, ADM-157, ADM-158, ADM-159, ADM-160, ADM-161`
+- **E-ADM-1 Admin dashboard: sales figures, top products, and low and out-of-stock counts that count each item once** (#294) (12 ids): `ADM-01, ADM-02, ADM-03, ADM-04, ADM-06, ADM-08, ADM-09, ADM-10, ADM-11, ADM-12, ADM-13, ADM-15`
+- **E-ADM-10 Self-service storefront and product control: everything a customer sees is editable in both languages, with preview** (#311) (23 ids): `SSC-01, SSC-02, SSC-03, SSC-04, SSC-05, SSC-06, SSC-07, SSC-08, SSC-09, SSC-10, SSC-11, SSC-12, SSC-13, SSC-14, SSC-20, SSC-22, SSC-23, SSC-24, SSC-25, SSC-26, SSC-27, SSC-28, SSC-29`
+- **E-ADM-11 Everyday admin tasks in the standard administration: quick product entry, bulk edits, search, export, mobile checks** (#278) (12 ids): `ADM-146, ADM-148, ADM-150, ADM-151, ADM-152, ADM-153, ADM-154, ADM-157, ADM-158, ADM-159, ADM-160, ADM-161`
+- **E-ADM-1b Dashboard, second release: new and returning customers, conversion rate** (2 ids): `ADM-05, ADM-07`
+- **E-ADM-2 Product management in admin: content, media, pricing, variants, SEO fields, flags, bulk import, export and update** (#276) (28 ids): `ADM-20, ADM-21, ADM-22, ADM-23, ADM-24, ADM-25, ADM-26, ADM-29, ADM-30, ADM-31, ADM-32, ADM-33, ADM-34, ADM-35, ADM-36, ADM-37, ADM-38, ADM-39, ADM-40, ADM-41, ADM-42, ADM-43, ADM-44, ADM-45, ADM-47, ADM-48, ADM-49, ADM-50`
+- **E-ADM-3 Categories, brands, collections, home page sections and static pages managed from admin** (#277) (7 ids): `ADM-55, ADM-56, ADM-57, ADM-59, ADM-60, ADM-61, ADM-63`
+- **E-ADM-4 Stock on hand and stock available shown in admin from the ERP** (#317) (2 ids): `ADM-70, ADM-72`
+- **E-ADM-4b Inventory tasks whose method and timing PRE-09 sets** (#318) (6 ids): `ADM-71, ADM-73, ADM-74, ADM-75, ADM-77, ADM-149`
+- **E-ADM-5 Order management in admin: find, annotate, ship, cancel, refund and print** (#280) (7 ids): `ADM-85, ADM-88, ADM-89, ADM-90, ADM-91, ADM-92, ADM-93`
+- **E-ADM-6 Customer records in admin: profile, internal notes, and suspension with a reason** (#279) (3 ids): `ADM-100, ADM-103, ADM-104`
+- **E-ADM-6b Customers, second release: lifetime metrics and export under privacy controls** (2 ids): `ADM-101, ADM-105`
+- **E-ADM-7 Promotions and coupons managed from admin: create, schedule, pause, keep the usage history** (#289) (4 ids): `ADM-110, ADM-111, ADM-113, ADM-115`
+- **E-ADM-8 A refund is recorded with its payment reference from the standard order screen** (#293) (1 ids): `ADM-124`
+- **E-ADM-9 Staff accounts with two-factor sign-in and a searchable log that ordinary users cannot delete** (#275) (5 ids): `ADM-130, ADM-131, ADM-132, ADM-133, ADM-134`
 
 **E-MIG**
 
-- **E-MIG-3 Catalogue migration does not corrupt Arabic content** (#247) (4 ids): `MIG-02, MIG-09, MIG-13, SSC-21`
-- **E-MIG-2 Attribute, category and brand mapping** (3 ids): `MIG-10, MIG-11, MIG-12`
-- **E-MIG-4 Images and alt text** (3 ids): `MIG-15, MIG-16, MIG-17`
-- **E-MIG-6 Background execution and export** (2 ids): `MIG-20, MIG-25`
-- **E-MIG-7 Initial stock load** (1 ids): `MIG-14`
+- **E-MIG-2 Attributes, categories, brands and SEO fields mapped into the store in the initial migration** (#295) (4 ids): `MIG-10, MIG-11, MIG-12, MIG-15`
+- **E-MIG-3 The catalogue migration does not corrupt Arabic product or variation content** (#247) (4 ids): `MIG-02, MIG-09, MIG-13, SSC-21`
+- **E-MIG-4 Product images imported to the Mizzey server with alt text, once rights are confirmed** (#296) (2 ids): `MIG-16, MIG-17`
+- **E-MIG-6 The initial migration runs in the background, and the catalogue stays exportable** (#297) (2 ids): `MIG-20, MIG-25`
+- **E-MIG-7 Initial stock quantities loaded where PRE-09 settles** (#320) (1 ids): `MIG-14`
 
 **E-ERP**
 
-- **E-ERP-1 Stock source of truth and adapter seam** (#245) (4 ids): `ERP-01, ERP-02, ERP-10, INT-16`
-- **E-ERP-2 Sale reduces ERP stock** (1 ids): `ERP-04`
-- **E-ERP-3 No sale against unvalidated stock** (1 ids): `ERP-05`
-- **E-ERP-4 Cart and view stock awareness** (1 ids): `ERP-03`
-- **E-ERP-5 Restoration on failure, cancel and return** (1 ids): `ERP-06`
-- **E-ERP-6 Stock in the store admin** (1 ids): `ERP-07`
-- **E-ERP-7 Product and variant matching, both languages** (1 ids): `ERP-08`
+- **E-ERP-1 ERP adapter seam: one commercial item resolves to one ERP stock item** (#245) (4 ids): `ERP-01, ERP-02, ERP-10, INT-16`
+- **E-ERP-2 A sale on the website reduces the corresponding stock in the ERP, exactly once** (#300) (1 ids): `ERP-04`
+- **E-ERP-3 No sale is confirmed against stock the ERP cannot validate, including when it is unreachable** (#301) (1 ids): `ERP-05`
+- **E-ERP-4 Adding to the cart and viewing the cart take account of ERP stock** (#314) (1 ids): `ERP-03`
+- **E-ERP-5 Stock is restored in the ERP on a failed payment or a cancellation, and returned parcels are received** (#315) (1 ids): `ERP-06`
+- **E-ERP-6 Stock appears in, and is changed through, the store admin as PRE-09 settles** (#316) (1 ids): `ERP-07`
+- **E-ERP-7 Products and variants are matched to the ERP, one stock identity per item in both languages** (#299) (1 ids): `ERP-08`
 
 **E-RPT**
 
-- **E-RPT-1 Sales report** (1 ids): `RPT-01`
-- **E-RPT-2 Inventory report counts one item once** (#246) (1 ids): `RPT-10`
-- **E-RPT-3 Product cost captured** (#252) (2 ids): `RPT-11, ADM-27`
-- **E-RPT-4 Funnel and traffic through GA4** (2 ids): `RPT-08, RPT-09`
+- **E-RPT-1 Sales report: revenue, net sales, orders, units, average order value, discounts and shipping** (#286) (1 ids): `RPT-01`
+- **E-RPT-2 The inventory report counts one physical item once, not once per language** (#246) (1 ids): `RPT-10`
+- **E-RPT-3 Product cost: carry CX-01 and OD-12 to the Stage 1 gate** (#252) (2 ids): `ADM-27, RPT-11`
+- **E-RPT-4 Funnel and traffic reports available in Google Analytics** (#313) (2 ids): `RPT-08, RPT-09`
 
 **E-INT**
 
-- **E-INT-1 Email delivery, analytics and merchant feeds** (4 ids): `INT-05, INT-09, INT-10, INT-12`
+- **E-INT-1 Transactional email service, Google Analytics with Tag Manager, Meta Pixel and the Merchant Center feed connected** (#284) (4 ids): `INT-05, INT-09, INT-10, INT-12`
 
 **E-NFR**
 
-- **E-NFR-1 Cross-cutting non-functional requirements** (9 ids): `NFR-01, NFR-02, NFR-04b, NFR-05, NFR-06, NFR-07, NFR-11, NFR-12, NFR-13`
-- **E-NFR-2 Observability** (1 ids): `NFR-10`
-- **E-NFR-1b Non-functional, second release** (1 ids): `NFR-12a`
+- **E-NFR-1 Cross-cutting standards met: mobile first, performance, locale formatting, security, data integrity, accessibility, privacy, scalability** (#269) (9 ids): `NFR-01, NFR-02, NFR-04b, NFR-05, NFR-06, NFR-07, NFR-11, NFR-12, NFR-13`
+- **E-NFR-1b Privacy, second release: automated data export and deletion requests** (1 ids): `NFR-12a`
+- **E-NFR-2 Observability: application logs, error monitoring, integration logs and admin audit logs** (#270) (1 ids): `NFR-10`
+- **E-NFR-3 Infrastructure provisioned for development, staging and production** (#244) (2 ids): `NFR-08, NFR-09`
 
 **E-DATA**
 
-- **E-DATA-1 The data model** (15 ids): `ENT-01, ENT-02, ENT-03, ENT-05, ENT-06, ENT-07, ENT-09, ENT-10, ENT-11, ENT-13, ENT-14, ENT-15, ENT-16, ENT-17, ENT-19`
-- **E-DATA-2 Stock entity** (1 ids): `ENT-04`
+- **E-DATA-1 The contracted data model exists: every launch entity is stored, related and documented** (#273) (15 ids): `ENT-01, ENT-02, ENT-03, ENT-05, ENT-06, ENT-07, ENT-09, ENT-10, ENT-11, ENT-13, ENT-14, ENT-15, ENT-16, ENT-17, ENT-19`
+- **E-DATA-2 Inventory transaction records, as PRE-09 settles** (#319) (1 ids): `ENT-04`
 
 **E-EVT**
 
-- **E-EVT-1 Analytics events** (17 ids): `EVT-01, EVT-02, EVT-03, EVT-04, EVT-05, EVT-06, EVT-07, EVT-08, EVT-09, EVT-10, EVT-11, EVT-12, EVT-13, EVT-14, EVT-15, EVT-16, EVT-18`
-- **E-EVT-2 Event tracking plan** (1 ids): `EVT-20`
+- **E-EVT-1 The standard e-commerce events fire across the funnel, in both languages** (#312) (17 ids): `EVT-01, EVT-02, EVT-03, EVT-04, EVT-05, EVT-06, EVT-07, EVT-08, EVT-09, EVT-10, EVT-11, EVT-12, EVT-13, EVT-14, EVT-15, EVT-16, EVT-18`
+- **E-EVT-2 Event Tracking Plan: every event, trigger, parameter and source of truth per business metric** (#274) (1 ids): `EVT-20`
 
 **E-MKT**
 
-- **E-MKT-1 Measurement and advertising** (7 ids): `MKT-01, MKT-02, MKT-03, MKT-05, MKT-06, MKT-09, MKT-10`
-- **E-MKT-2 Search engine optimisation** (8 ids): `MKT-12, MKT-13, MKT-14, MKT-15, MKT-16, MKT-17, MKT-18, MKT-20`
-- **E-MKT-3 Third-party access and site protection** (6 ids): `MKT-21, MKT-22, MKT-23, MKT-24, MKT-25, MKT-26`
+- **E-MKT-1 Measurement and advertising tools ready for a marketing team: analytics, pixels, product feeds, attribution, consent** (#288) (7 ids): `MKT-01, MKT-02, MKT-03, MKT-05, MKT-06, MKT-09, MKT-10`
+- **E-MKT-2 Search engine controls: editable meta and canonical, redirects, missing-page log, sitemap and robots, hreflang** (#287) (8 ids): `MKT-12, MKT-13, MKT-14, MKT-15, MKT-16, MKT-17, MKT-18, MKT-20`
+- **E-MKT-3 Third parties work through a restricted role, Tag Manager and staging, under a written protocol** (#298) (6 ids): `MKT-21, MKT-22, MKT-23, MKT-24, MKT-25, MKT-26`
 
 **E-DOD**
 
-- **E-DOD Definition of done** (9 ids): `DOD-01, DOD-02, DOD-03, DOD-04, DOD-05, DOD-06, DOD-07, DOD-08, DOD-09`
+- **E-DOD Definition of done applied to every Stage 1 PBI, with the evidence recorded** (#268) (9 ids): `DOD-01, DOD-02, DOD-03, DOD-04, DOD-05, DOD-06, DOD-07, DOD-08, DOD-09`
 
 **E-ACC**
 
-- **E-ACC-1 Acceptance scenarios** (20 ids): `AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20`
-- **E-ACC-2 ERP acceptance scenarios** (5 ids): `AC-21, AC-22, AC-23, AC-24, AC-25`
+- **E-ACC-1 The client's acceptance scenarios pass as the UAT script** (#323) (20 ids): `AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20`
+- **E-ACC-2 ERP stock acceptance scenarios, finalised in PRE-09, pass against the ERP test environment** (#321) (5 ids): `AC-21, AC-22, AC-23, AC-24, AC-25`
 
 **E-HND**
 
-- **E-HND Handover** (12 ids): `HND-01, HND-02, HND-03, HND-04, HND-05, HND-06, HND-07, HND-08, HND-09, HND-10, HND-11, HND-12`
-
-**595 citations over 595 distinct delivery rows**, which is every delivery row in the register, each owned exactly once.
+- **E-HND Handover: code, design, documentation, accounts, environments, training and warranty** (#324) (12 ids): `HND-01, HND-02, HND-03, HND-04, HND-05, HND-06, HND-07, HND-08, HND-09, HND-10, HND-11, HND-12`
 
 ### One row, one accepting owner: how the three shared citations were resolved
 

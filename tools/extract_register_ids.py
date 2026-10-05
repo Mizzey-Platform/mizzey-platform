@@ -48,6 +48,16 @@ def parse_stage(cell: str) -> str:
     return m.group(1) if m else "-"
 
 
+def stage_column(header: list[str]) -> int:
+    """The index of the register's stage column.
+
+    One table, the customer journey (A5), has two columns headed Stage: the first names the journey step, such
+    as Discovery, and the last carries S1 or S2. The contractual stage is always the last one. Reading the first
+    recorded every journey row as unstaged.
+    """
+    return len(header) - 1 - header[::-1].index("stage")
+
+
 def extract(md: str) -> dict[str, dict]:
     rows: dict[str, dict] = {}
     conflicts: list[str] = []
@@ -74,7 +84,7 @@ def extract(md: str) -> dict[str, dict]:
             continue
         rec = {
             "scope": scope,
-            "stage": parse_stage(c[header.index("stage")]),
+            "stage": parse_stage(c[stage_column(header)]),
             "key": "[key]" in line,
             "obligation": scope in OBLIGATION,
         }

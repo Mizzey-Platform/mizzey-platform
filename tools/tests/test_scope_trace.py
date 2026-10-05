@@ -48,7 +48,7 @@ class SpecChecks(unittest.TestCase):
                          "not in the Feature Register")
 
     def test_deferred_id_in_trace_fails(self):
-        errs = self.check(spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "final")], "- CX-01"))
+        errs = self.check(spec([("ROLE-03", "DEF", "-")], [("AC-1", "x", "ROLE-03", "final")], "- CX-01"))
         self.assertError(errs, "DEF in the register and creates no obligation")
 
     def test_p2_id_in_trace_fails(self):
@@ -124,12 +124,44 @@ class SpecChecks(unittest.TestCase):
         md = spec([("ADM-27", "P1", "S1")], [("AC-1", "x", "ADM-27", "final")])
         self.assertEqual(st.check_spec("specs/001-x/spec.md", md, IDS, closed), [])
 
-    def test_a_resolution_does_not_make_a_deferred_row_traceable(self):
-        # D-10 decides the Accountant role exists at launch. ROLE-06 still reads DEF in the register, and the
-        # checker must keep refusing it until the document route changes the register itself.
+    def test_a_resolution_alone_does_not_make_a_deferred_row_traceable(self):
+        # A resolved contradiction that lists no engineering id changes nothing for the checker.
+        closed = {"gates": OPEN["gates"],
+                  "contradictions": {"CX-90": {"status": "resolved", "ids": ["ROLE-06"], "resolution": {}}}}
+        md = spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "pending CX-90")])
+        self.assertError(st.check_spec("specs/001-x/spec.md", md, IDS, closed), "creates no obligation")
+
+    def test_an_engineering_id_is_traceable_only_as_pending_its_contradiction(self):
+        # D-11: the Accountant role is built under D-10 while ROLE-06 still reads DEF in the signed register.
         self.assertEqual(IDS["ROLE-06"]["scope"], "DEF")
-        errs = self.check(spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "final")]))
+        self.assertEqual(self.check(spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "pending CX-01")])), [])
+        for status in ("final", "provisional", "pending PRE-09"):
+            with self.subTest(status=status):
+                errs = self.check(spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", status)]))
+                self.assertError(errs, "its status must be 'pending CX-01'")
+
+    def test_an_engineering_id_is_written_with_the_register_scope_not_a_promoted_one(self):
+        errs = self.check(spec([("ROLE-06", "P1", "S1")], [("AC-1", "x", "ROLE-06", "pending CX-01")]))
+        self.assertError(errs, "register says 'DEF'")
+
+    def test_another_deferred_row_is_still_refused(self):
+        self.assertEqual(IDS["ROLE-03"]["scope"], "DEF")
+        errs = self.check(spec([("ROLE-03", "DEF", "-")], [("AC-1", "x", "ROLE-03", "pending CX-01")]))
         self.assertError(errs, "creates no obligation")
+
+    def test_an_open_contradiction_grants_no_engineering_id(self):
+        still_open = {"gates": OPEN["gates"], "contradictions": {
+            "CX-90": {"status": "open", "ids": ["ROLE-06"], "resolution": {"engineering_ids": ["ROLE-06"]}}}}
+        md = spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "pending CX-90")], "- CX-90")
+        self.assertError(st.check_spec("specs/001-x/spec.md", md, IDS, still_open), "creates no obligation")
+
+    def test_the_new_contradictions_are_open_and_unresolved(self):
+        for cx in ("CX-02", "CX-03", "CX-04", "CX-05", "CX-06"):
+            with self.subTest(cx=cx):
+                item = OPEN["contradictions"][cx]
+                self.assertEqual(item["status"], "open")
+                self.assertNotIn("resolution", item)
+                self.assertTrue(item["evidence"])
 
     def test_cx01_is_closed_with_a_recorded_owner_resolution(self):
         cx = OPEN["contradictions"]["CX-01"]

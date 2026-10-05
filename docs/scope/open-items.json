@@ -1,5 +1,5 @@
 {
- "about": "Contract items that specs must cite and must not resolve, with the record of how each was closed. Maintained by hand through internal:governance PRs. tools/scope_trace.py reads `gates` and `contradictions`; `working_decisions` is the record of owner decisions on open client items (DECISIONS.md D-10) and is read by people, not by the checker.",
+ "about": "Contract items that specs must cite and must not resolve, with the record of how each was closed. Maintained by hand through internal:governance PRs. tools/scope_trace.py reads `gates` and `contradictions`; A resolved contradiction may list `engineering_ids`, which the checker lets a spec trace with every dependent criterion `pending CX-nn`. `working_decisions` is the record of owner decisions on open client items (DECISIONS.md D-10) and is read by people, not by the checker.",
  "gates": {
   "PRE-09": {
    "title": "ERP Integration Specification",
@@ -49,8 +49,147 @@
      "Refund permission is a separate granular capability. Being an Accountant does not grant it."
     ],
     "history": "The contradiction is kept as evidence above and is not rewritten. It was open from ratification (22 September 2026) to this decision.",
-    "contract_instrument": "Outstanding. ROLE-06 still reads DEF in the signed register and in register-ids.json, so no criterion can trace it as an obligation yet (M-1). The correction goes through the document route, outside this repository, and is an engagement-document edit that needs Mustafa's approval. ROLE-06a stays P2: the advanced reports arrive later."
+    "contract_instrument": "Outstanding. A Scope Clarification and Register Correction, MS-CLR-2026-037, is drafted for the client's acknowledgement and is not acknowledged. The signed register is not edited. ROLE-06 still reads DEF there and in register-ids.json. ROLE-06a stays P2: the advanced reports arrive later.",
+    "engineering_ids": [
+     "ROLE-06"
+    ],
+    "engineering_note": "D-11: engineering proceeds under this resolution. A spec may trace ROLE-06 while it still reads DEF, and every criterion that cites it is `pending CX-01`, never final or provisional. That is not contractual acceptance: acceptance of ROLE-06 waits for the client's acknowledgement of the Scope Clarification and for the register to carry the row as an obligation.",
+    "capability_policy": {
+     "decided": "2026-10-05, D-11, Mustafa. The launch policy unless an exact signed row contradicts it. Implemented as granular capabilities, so it can be adjusted without rebuilding roles. The exact capability matrix is recorded in the roles PBI, #251.",
+     "Owner / Super Admin": [
+      "full authorised launch financial capability",
+      "refund capability",
+      "role and user management"
+     ],
+     "Admin": [
+      "operational financial visibility needed to manage orders",
+      "payment transaction and reference visibility",
+      "invoices",
+      "product cost where the contracted admin role needs it",
+      "refund capability where the launch refund flow permits it",
+      "no unrestricted owner-only governance capability"
+     ],
+     "Accountant": [
+      "financial and payment visibility",
+      "invoices",
+      "product cost",
+      "reconciliation information",
+      "financial reporting actually present at launch",
+      "no refund capability by default",
+      "no user or role management",
+      "no plugins, themes or files",
+      "no unrelated system configuration"
+     ]
+    }
    }
+  },
+  "CX-02": {
+   "title": "The Marketing role is restricted by two contracted rows, and its profile is deferred",
+   "status": "open",
+   "ids": [
+    "ROLE-05"
+   ],
+   "related_ids": [
+    "MKT-21",
+    "MKT-22",
+    "MKT-26"
+   ],
+   "evidence": [
+    "Register v1.5, MKT-21 (P1, key, S1): 'The Marketing role cannot install software, edit templates, or edit files'",
+    "Register v1.5, MKT-22 (P1-L, S1): 'The Marketing role cannot access customer personal data beyond campaign needs'",
+    "Register v1.5, ROLE-05 row: Marketing role profile, scope DEF",
+    "Register v1.5, Part One 1.6 at ROLE-05: the standard commerce role set is applied instead (ROLE-09)"
+   ],
+   "affects": "Whether a restricted marketing role exists at launch, which MKT-21 and MKT-22 presuppose.",
+   "raised": "2026-10-05, by the Stage 1 ownership audit",
+   "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
+   "proposed_default": "Proposal only: build MKT-23, MKT-24 and MKT-26, and hold the criteria of MKT-21 and MKT-22 `pending CX-02`."
+  },
+  "CX-03": {
+   "title": "Three contracted rows need an audit trail that the register defers",
+   "status": "open",
+   "ids": [
+    "ROLE-10"
+   ],
+   "related_ids": [
+    "MKT-25",
+    "ENT-17",
+    "ADM-50",
+    "ADM-132"
+   ],
+   "evidence": [
+    "Register v1.5, MKT-25 (P1-L, S1): 'All third-party administrative actions recorded in the audit log'",
+    "Register v1.5, ENT-17 (P1-L, S1): 'Audit Log / Actor, action, entity, before-and-after values, timestamp'",
+    "Register v1.5, ADM-50 (P1-L, S1): 'Price and stock change history with user and timestamp. The stock part is P1-E'",
+    "Register v1.5, ROLE-10 row: sensitive operations logged, scope DEF",
+    "Register v1.5, ADM-132 (P1-L, S1): 'The custom audit trail of sensitive operations is ROLE-10, deferred'"
+   ],
+   "affects": "How much audit record exists at launch.",
+   "raised": "2026-10-05, by the Stage 1 ownership audit",
+   "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
+   "proposed_default": "Proposal only: deliver the price change history of ADM-50 per product, read MKT-25 and ENT-17 at the reduced wording of ADM-132, and hold their criteria `pending CX-03`."
+  },
+  "CX-04": {
+   "title": "An Import Run entity is contracted while import history is deferred",
+   "status": "open",
+   "ids": [
+    "MIG-18"
+   ],
+   "related_ids": [
+    "ENT-19",
+    "MIG-19"
+   ],
+   "evidence": [
+    "Register v1.5, ENT-19 (P1, S1): 'Import Run / File, mapping used, row counts, outcome, actor, timestamp'",
+    "Register v1.5, MIG-18 row: 'Import history: who, when, which file, row counts, outcome', scope DEF",
+    "Register v1.5, Part One 1.6 at MIG-18: the Developer's migration report for the initial load instead (MIG-19)"
+   ],
+   "affects": "Whether an import run is stored data with a screen, or a record in the migration report.",
+   "raised": "2026-10-05, by the Stage 1 ownership audit",
+   "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
+   "proposed_default": "Proposal only: one import-run record for the Developer-performed migration, kept with the migration report, with no admin screen and no history list. Criteria `pending CX-04`."
+  },
+  "CX-05": {
+   "title": "Two dashboard rows name queues whose workflow is deferred",
+   "status": "open",
+   "ids": [
+    "ADM-120",
+    "ADM-141"
+   ],
+   "related_ids": [
+    "ADM-12",
+    "ADM-13"
+   ],
+   "evidence": [
+    "Register v1.5, ADM-13 (P1, S1): 'Pending returns and refunds'",
+    "Register v1.5, ADM-12 (P1, S1): 'Orders requiring action'",
+    "Register v1.5, ADM-120 row: queue of new return cases, scope DEF",
+    "Register v1.5, ADM-141 row: orders requiring action queue worked top to bottom, scope DEF"
+   ],
+   "affects": "What the two dashboard figures count and link to.",
+   "raised": "2026-10-05, by the Stage 1 ownership audit",
+   "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
+   "proposed_default": "Proposal only: each is a count on the dashboard linking to the standard filtered order list, ADM-13 counting pending refunds only, and no queue is built. Criteria `pending CX-05`."
+  },
+  "CX-06": {
+   "title": "Promotional banners are contracted with scheduling while section scheduling is a later phase",
+   "status": "open",
+   "ids": [
+    "HOME-12",
+    "ADM-62"
+   ],
+   "related_ids": [
+    "SSC-09"
+   ],
+   "evidence": [
+    "Register v1.5, SSC-09 (P1-L, S1): 'Promotional banners: create, schedule, target to a page, and remove'",
+    "Register v1.5, HOME-12 row: 'Section scheduling', scope P2",
+    "Register v1.5, ADM-62 row: 'Home page section scheduling', scope P2"
+   ],
+   "affects": "Whether a banner's schedule can be built without the deferred section scheduling.",
+   "raised": "2026-10-05, by the Stage 1 ownership audit",
+   "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
+   "proposed_default": "Proposal only: a start and an end date on the promotional banner alone, and no general section scheduling. Criteria `pending CX-06`."
   }
  },
  "working_decisions": {
@@ -135,7 +274,7 @@
    "decided_by": "owner",
    "client_confirmed": false,
    "date": "2026-10-05",
-   "decision": "The capability is built and tested as PAY-09 requires, available wherever the carrier serves. A value limit and a fee are example values only: neither is native to WooCommerce, so neither is promised until the checkout rows are checked.",
+   "decision": "The cash on delivery capability is built and tested as PAY-09 requires: native, with a configurable switch, and restricted by shipping method or zone where that is native. D-11: no value ceiling and no fee is contracted. No PAY, CHK, ADM or BR row supports one, so neither is built, and either would be a later scope decision. The example limit and fee recorded under D-10 are withdrawn.",
    "still_gates": "The launch switch stays the client's: PAY-09 is enabled at launch only if the client selects it."
   }
  }

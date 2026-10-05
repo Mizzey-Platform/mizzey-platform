@@ -1,0 +1,4998 @@
+{
+ "about": "The accepting owner of every delivery row of the Feature Register: one PBI per slice, one slice per row. Maintained through internal:governance PRs and checked by tools/tests/test_backlog_ownership.py against docs/scope/register-ids.json. `issue` is the GitHub issue; null means the slice is a second-release slice that is recorded and not created. The live Project is the authority for Status; this file is the authority for which PBI owns which row.",
+ "register": {
+  "document": "MS-ANX-2026-006",
+  "version": "1.5",
+  "sha256": "6624a6dcbc351e5437bc8aedf7008de8cae5e332acf694f328380fb58322204f"
+ },
+ "field_notes": {
+  "depends_on": "ref is a real issue number for a seeded PBI and a slice key for an unseeded one. blocking true means a predecessor PBI; blocking false is context, an ERP input or acceptance evidence, and never puts a PBI in Blocked.",
+  "status": "For a seeded PBI, the live board status read on 5 October 2026. For a proposed PBI, Blocked when a blocking predecessor is not delivered (Verified or Accepted), otherwise Ready (D-10).",
+  "stage": "The literal register-ids.json value. '-' is spelled 'per PRE-09' on the board.",
+  "not_in_slice": "Neighbouring rows this PBI does not own, each with its register scope, and its stage or owner where it is a delivery row."
+ },
+ "slices": [
+  {
+   "key": "E-FND-1",
+   "issue": 241,
+   "epic": "E-FND",
+   "title": "Bilingual platform baseline: English default, Arabic fully delivered right to left",
+   "outcome": "The storefront runs in English by default and in Arabic right to left, with no hard-coded storefront text, on the approved browser matrix.",
+   "ids": [
+    "FIX-04",
+    "FIX-04a",
+    "NFR-04",
+    "NFR-04a",
+    "NFR-14"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Verified",
+   "delivery_order": 1,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Browser matrix check",
+     "class": "Blocks final acceptance",
+     "note": "The NFR-14 browser matrix criterion of spec 002 is still open; it needs the staging environment of #244"
+    }
+   ],
+   "data_integrity": "A1, A2 verified working (t12, t16)",
+   "acceptance_evidence": "specs/002-bilingual-platform-baseline verification record. Merged 4 October 2026 as 405a113; status Verified, not Accepted.",
+   "not_in_slice": [],
+   "notes": "D-09: translation identity is a technical acceptance criterion of this PBI, not FIX-04 wording, and is not a client deliverable. D-09 approved the browser matrix: current Chrome, Safari, Edge and Firefox on desktop, current Chrome on Android and current Safari on iOS, both reading directions. NFR-04b (locale formatting) is not in this PBI; it is owned by E-NFR-1."
+  },
+  {
+   "key": "E-FND-2",
+   "issue": 242,
+   "epic": "E-FND",
+   "title": "Information architecture and URL structure, in both languages",
+   "outcome": "Every contracted page exists, sits where it belongs and is reachable in both languages, and the storefront emits the SEO fundamentals NFR-03 names.",
+   "ids": [
+    "IA-01",
+    "IA-02",
+    "IA-03",
+    "IA-04",
+    "IA-05",
+    "IA-06",
+    "IA-07",
+    "IA-08",
+    "IA-09",
+    "IA-10",
+    "IA-11",
+    "IA-14",
+    "IA-15",
+    "IA-16",
+    "IA-17",
+    "IA-18",
+    "IA-19",
+    "IA-20",
+    "IA-21",
+    "IA-24",
+    "IA-25",
+    "IA-26",
+    "IA-27",
+    "IA-28",
+    "IA-29",
+    "IA-30",
+    "IA-31",
+    "IA-32",
+    "IA-35",
+    "NFR-03"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Verified",
+   "delivery_order": 2,
+   "depends_on": [
+    {
+     "ref": "#241",
+     "reason": "Bilingual platform baseline. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Page copy and Arabic endpoint slug wording",
+     "class": "Content or client input",
+     "note": "The #242 content inputs recorded in D-10; placeholders until supplied"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "specs/003-information-architecture-urls verification record. Merged 5 October 2026 as 3ff7488; status Verified, not Accepted.",
+   "not_in_slice": [
+    "IA-12 (P2)",
+    "IA-13 (P2)",
+    "IA-22 (DEF)",
+    "IA-34 (P2)",
+    "IA-36 (P2)",
+    "IA-23 (P1-L, stage S2, owned by E-FND-2b)",
+    "IA-33 (P1-L, stage S2, owned by E-FND-2b)"
+   ],
+   "notes": "Spec 003 (C-3): NFR-03 owes the SEO output; the editable controls are MKT-12, MKT-15, MKT-16 and MKT-18, owned by E-MKT-2. IA-23 and IA-33 were removed because the register stages them S2."
+  },
+  {
+   "key": "E-PRE-6",
+   "issue": 243,
+   "epic": "E-PRE",
+   "title": "ERP Integration Specification approved (PRE-09)",
+   "outcome": "The ERP Integration Specification is written, agreed with the ERP developers at the joint technical meeting and approved by the client in writing.",
+   "ids": [
+    "PRE-09"
+   ],
+   "scope_class": "DLV",
+   "stage": "-",
+   "stage1": false,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 3,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "Owns ERP-10, the adapter rule, which this specification is context for. Not a predecessor",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "ERP technical meeting",
+     "class": "ERP input",
+     "note": "Gates approval of the specification, not its preparation"
+    },
+    {
+     "id": "CR-17",
+     "class": "ERP input",
+     "note": "ERP developers available for the meeting, target week 4, and the client's written review within 10 Working Days of submission"
+    },
+    {
+     "id": "CR-16",
+     "class": "ERP input",
+     "note": "ERP test environment and interface documentation, by the date PRE-09 agrees"
+    }
+   ],
+   "data_integrity": "B1 and A12 raised meeting questions M16, M17 and M18",
+   "acceptance_evidence": "The approved specification, with the client's written approval.",
+   "not_in_slice": [],
+   "notes": "The register's stage cell for PRE-09 reads 'Per plan', extracted as '-' and spelled 'per PRE-09' on the board. The register calls it a later milestone, not a Stage 1 deliverable. Eighteen must-answer decisions are in docs/2026-10-04-erp-technical-meeting-questions.md. D-10 fixes the invariants the specification cannot redefine: the ERP is the stock source of truth; one commercial item or variant is one ERP stock identity regardless of language; no independent authoritative stock in the store; a final sale fails closed; no duplicate decrement; idempotency, retry, logging and reconciliation."
+  },
+  {
+   "key": "E-NFR-3",
+   "issue": 244,
+   "epic": "E-NFR",
+   "title": "Infrastructure provisioned for development, staging and production",
+   "outcome": "Development, staging and production environments exist, are reachable, and are backed up with a restore procedure that has been exercised rather than written.",
+   "ids": [
+    "NFR-08",
+    "NFR-09"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 4,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-27",
+     "class": "Blocks production or launch only",
+     "note": "The client's written instruction on hosting outside Egypt (R-03, CR-10). Not client-approved"
+    },
+    {
+     "id": "OD-14",
+     "class": "Blocks production or launch only",
+     "note": "Monthly operating budget for hosting and services"
+    },
+    {
+     "id": "OD-15",
+     "class": "Configurable working default",
+     "note": "Owner baseline: 5,000 products, growth without redesign, 300 orders a day. Not client-confirmed"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Three environments reachable; a backup restored end to end on staging and the restore procedure written from that run; no risky change tested on the live site.",
+   "not_in_slice": [
+    "PRE-01 (DLV, owned by E-PRE-7)",
+    "PRE-02 (DLV, owned by E-PRE-7)",
+    "PRE-03a (DLV, owned by E-PRE-7)",
+    "PRE-03b (DLV, owned by #250)"
+   ],
+   "notes": "CORRECTED (owner decision, 5 October 2026): PRE-01, PRE-02, PRE-03a and PRE-03b are removed. The issue body described them as 'Pre-development infrastructure deliverables' and 'The environment deliverables'; the register words them as the technical design document, the technology stack proposal, the sitemap and user flows, and the interface design. Scope class recomputes from mixed to P1. No other row is added: the candidates and why none is provably infrastructure are in audit section 3. D-10: development and staging run on the developer's machine, staging isolated, on its own database, synthetic data only, reviewed through a Cloudflare Tunnel. Staging is the only place the concurrency test (B6) can run. The Epic moves from E-PRE to E-NFR, because both remaining rows sit in register section J."
+  },
+  {
+   "key": "E-RPT-2",
+   "issue": 246,
+   "epic": "E-RPT",
+   "title": "The inventory report counts one physical item once, not once per language",
+   "outcome": "The low-stock and out-of-stock report lists one line per physical item with the right quantity, in both language contexts.",
+   "ids": [
+    "RPT-10"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Verified",
+   "delivery_order": 5,
+   "depends_on": [
+    {
+     "ref": "#241",
+     "reason": "Bilingual platform baseline. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    }
+   ],
+   "data_integrity": "B10 measured defect (P-020); B11 open",
+   "acceptance_evidence": "specs/004-inventory-report-one-item-once: with the audit fixtures the report shows 3 lines and a total of 3.",
+   "not_in_slice": [
+    "RPT-03 (DEF)",
+    "RPT-02 (P2)",
+    "ADM-76 (P2)"
+   ],
+   "notes": "Live board status is In progress (the snapshot document still says Ready). P-020: one physical item is listed twice, each line with the full quantity. Spec 004 also measured the dashboard status counts: 4 low and 2 out for fixtures holding 3 and 1 physical items. Decision D-246-1 (Mustafa, 5 October 2026, in the working copy of spec 004, uncommitted when read): RPT-10 is satisfied on the current standard stock report; the dashboard counts and the older stock report screen are out of #246. The dashboard counts are ADM-10 and ADM-11, owned by E-ADM-1, for which this PBI's measurement is evidence and its shared resolution of a record to its physical item (FR-009) a dependency. The older stock report screen has no register row and no owner."
+  },
+  {
+   "key": "E-MIG-3",
+   "issue": 247,
+   "epic": "E-MIG",
+   "title": "The catalogue migration does not corrupt Arabic product or variation content",
+   "outcome": "The initial migration loads the catalogue with Arabic text intact, variations built correctly and prices and cost migrated, and leaves every translation group intact.",
+   "ids": [
+    "MIG-02",
+    "MIG-09",
+    "MIG-13",
+    "SSC-21"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 6,
+   "depends_on": [
+    {
+     "ref": "#249",
+     "reason": "Catalogue import specification, not yet delivered: the only development blocker",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #249"
+    },
+    {
+     "id": "CR-06",
+     "class": "Blocks final acceptance",
+     "note": "A real, unmodified Amazon sample export. Development proceeds on a fixture"
+    }
+   ],
+   "data_integrity": "B1 trigger measured; A11 measured (t19); A5 MIG-13 precondition",
+   "acceptance_evidence": "A migration run on staging from the agreed export: translation groups read from icl_translations before and after are intact, Arabic names and attributes unchanged, variations selectable.",
+   "not_in_slice": [
+    "MIG-05 (DEF)",
+    "MIG-07 (DEF)",
+    "MIG-08 (DEF)",
+    "MIG-18 (DEF)"
+   ],
+   "notes": "A11 (t19): the corruption needs the WCML editor translation plus product creation in the same process. Creating all sources first and translations second prevents it; the native CSV importer and the WPML duplicate method did not corrupt. The correction is a sequencing invariant in the migration runbook, not runtime code. Damage measured: the Arabic parent loses its translation registration, Arabic variation titles are overwritten, attributes wiped, stock stops synchronising and overselling becomes possible. A5: resolve the source-language record through WPML identity before any write addressed by SKU."
+  },
+  {
+   "key": "E-PRE-4",
+   "issue": 249,
+   "epic": "E-MIG",
+   "title": "Catalogue import specification, validated against the real source file",
+   "outcome": "The import specification exists, and a validation pass over the client's real export file reports, per row, what will be created, updated or rejected before anything is written to the store.",
+   "ids": [
+    "MIG-01",
+    "MIG-03",
+    "MIG-04",
+    "MIG-06",
+    "MIG-19"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 7,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "CR-06",
+     "class": "Blocks final acceptance",
+     "note": "A real, unmodified Amazon sample export. The specification is built against a fixture in the documented export format and is not final until the file arrives"
+    },
+    {
+     "id": "CR-07",
+     "class": "Blocks final acceptance",
+     "note": "Professional Seller account and Category Listings Report availability"
+    }
+   ],
+   "data_integrity": "A5 duplicate SKU resolution",
+   "acceptance_evidence": "The specification, and a validation report over the real export stating per row the resolved product id and whether it is the source-language original.",
+   "not_in_slice": [
+    "PRE-05 (DLV, owned by E-PRE-7)",
+    "PRE-06 (DLV, owned by E-PRE-7)",
+    "MIG-05 (DEF)",
+    "MIG-07 (DEF)",
+    "MIG-08 (DEF)",
+    "MIG-18 (DEF)",
+    "MIG-21 (P2)",
+    "MIG-22 (P2)",
+    "MIG-23 (OUT)",
+    "MIG-24 (OUT)"
+   ],
+   "notes": "CORRECTED: PRE-05 and PRE-06 are removed. The issue body called them 'The pre-development import deliverables'; the register words PRE-05 as external integrations identified with accounts and costs, and PRE-06 as the requirements needing change or carrying technical risk, 'this document', which is the Feature Register itself. Scope class recomputes from mixed to P1-L. P-008: the native importer handles Arabic encoding and re-runs safely by SKU, and has no dry run and no saved mappings."
+  },
+  {
+   "key": "E-ERP-1",
+   "issue": 245,
+   "epic": "E-ERP",
+   "title": "ERP adapter seam: one commercial item resolves to one ERP stock item",
+   "outcome": "Every stock question the store asks goes through one adapter, and the two language records of a commercial item resolve to a single ERP stock identity.",
+   "ids": [
+    "ERP-01",
+    "ERP-02",
+    "ERP-10",
+    "INT-16"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 8,
+   "depends_on": [
+    {
+     "ref": "#243",
+     "reason": "The ERP Integration Specification, for the production behaviour behind the seam. An ERP input, not a development blocker: the seam is built against a mock and a contract",
+     "blocking": false
+    },
+    {
+     "ref": "#241",
+     "reason": "Bilingual platform baseline. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    }
+   ],
+   "data_integrity": "B1 measured (closed); M17 open; C3, C4",
+   "acceptance_evidence": "Contract tests on the adapter against a mock; both language records of an item resolve to one stock identity.",
+   "not_in_slice": [
+    "ERP-09 (OUT)",
+    "INT-14 (P3)"
+   ],
+   "notes": "INT-16 reads 'Every integration behind an adapter with retries, logging and webhook handling': it covers Paymob, Bosta and email as well as the ERP, so this PBI cannot evidence the whole row alone. See audit section 3. Where the canonical mapping is stored is an architecture decision for PRE-09."
+  },
+  {
+   "key": "E-ORD-1",
+   "issue": 248,
+   "epic": "E-ORD",
+   "title": "Order status model with a queryable status history",
+   "outcome": "Orders move through the contracted status model with validation, and when each order entered each status is a queryable fact rather than a prose note.",
+   "ids": [
+    "ORD-01",
+    "ORD-02",
+    "ORD-03",
+    "ORD-04",
+    "ORD-05",
+    "ORD-06",
+    "ORD-07",
+    "ORD-08",
+    "ORD-12",
+    "ORD-13",
+    "ORD-14",
+    "ADM-86",
+    "ADM-87"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 9,
+   "depends_on": [
+    {
+     "ref": "#241",
+     "reason": "Bilingual platform baseline. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Bosta status code legend",
+     "class": "Vendor or account input",
+     "note": "For the shipment states ADR-0002 records"
+    }
+   ],
+   "data_integrity": "D6 order language context; D7 shipment status history",
+   "acceptance_evidence": "Status transitions validated; a query returns when an order entered each status.",
+   "not_in_slice": [
+    "ORD-09 (DEF)",
+    "ORD-10 (DEF)",
+    "ORD-11 (DEF)",
+    "RPT-06 (P2)"
+   ],
+   "notes": "P-018: no structured status history natively, only prose order notes. ADR-0002 records the minimum shipment state record. D6: capture the language an order was placed in here."
+  },
+  {
+   "key": "E-PRE-5",
+   "issue": 250,
+   "epic": "E-PRE",
+   "title": "Design system and interface design delivered as working HTML and CSS",
+   "outcome": "The interface design exists as working HTML and CSS screens with design tokens, right to left included, and is approved before storefront implementation begins.",
+   "ids": [
+    "PRE-03b"
+   ],
+   "scope_class": "DLV",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 10,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "CR-02",
+     "class": "Blocks final acceptance",
+     "note": "Written approval of brand direction"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "The HTML and CSS screens, English canonical and Arabic right-to-left localisation, presented for approval in Stage 1 and approved by the client.",
+   "not_in_slice": [
+    "PRE-07 (DLV, owned by E-PRE-8)",
+    "PRE-08 (DLV, owned by E-PRE-7)"
+   ],
+   "notes": "CORRECTED: PRE-07 and PRE-08 are removed and PRE-03b is added. The issue body called PRE-07 and PRE-08 'the pre-development design deliverables'; the register words them as the store operations walkthrough and the functional specification. PRE-03b is the interface design row: working HTML and CSS screens under Statement of Work section 9, produced after the brand identity is approved, the screens being the approved artefact with no separate wireframe stage; English is the canonical design source and Arabic its right-to-left localisation. Scope class and Stage are unchanged (DLV, S1). D-10: structural design proceeds on neutral tokens; approval waits for OD-01."
+  },
+  {
+   "key": "E-ROLE-1",
+   "issue": 251,
+   "epic": "E-ROLE",
+   "title": "Launch staff roles and permissions",
+   "outcome": "Visitor, Customer, Admin and Owner hold the access the register gives them, and no staff account receives owner-level access by default.",
+   "ids": [
+    "ROLE-01",
+    "ROLE-02",
+    "ROLE-07",
+    "ROLE-08",
+    "ROLE-09"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 11,
+   "depends_on": [
+    {
+     "ref": "#241",
+     "reason": "Bilingual platform baseline. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "ROLE-06 register correction",
+     "class": "Blocks final acceptance",
+     "note": "CX-01 was resolved by the owner (D-10), not client-confirmed. ROLE-06 still reads DEF, so the Accountant criteria wait for the correction"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Permission tests per role (DOD-06); AC-11.",
+   "not_in_slice": [
+    "ROLE-03 (DEF)",
+    "ROLE-04 (DEF)",
+    "ROLE-05 (DEF)",
+    "ROLE-06 (DEF)",
+    "ROLE-06a (P2)",
+    "ROLE-10 (DEF)",
+    "ROLE-11 (P3)"
+   ],
+   "notes": "P-013: WooCommerce contributes only customer and shop_manager, and report access is one all-or-nothing capability. D-10: the Accountant role exists at launch, least privilege, refunds a separate capability."
+  },
+  {
+   "key": "E-RPT-3",
+   "issue": 252,
+   "epic": "E-ADM",
+   "title": "Product cost: carry CX-01 and OD-12 to the Stage 1 gate",
+   "outcome": "Product cost is captured from day one and frozen on the order line, in both language records.",
+   "ids": [
+    "ADM-27",
+    "RPT-11"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Verified",
+   "delivery_order": 12,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-12",
+     "class": "Blocks final acceptance",
+     "note": "Cost basis, who enters it, and zero versus missing"
+    },
+    {
+     "id": "CX-01",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-10), not client-confirmed"
+    }
+   ],
+   "data_integrity": "A1, D2 verified working",
+   "acceptance_evidence": "specs/001-product-cost-capture/verification.md. Verified, not Accepted.",
+   "not_in_slice": [
+    "RPT-02 (P2)",
+    "ROLE-06a (P2)"
+   ],
+   "notes": "The ownership map files this slice under E-RPT; the live board's Epic is E-ADM. P-016, P-017: Cost of Goods Sold is native, off by default, and snapshots cost onto the order."
+  },
+  {
+   "key": "E-SF-1",
+   "issue": 253,
+   "epic": "E-SF",
+   "title": "Header, navigation and footer, mirrored right to left",
+   "outcome": "Every page carries a header with logo, language switcher, search, account, wishlist and cart entry points and admin-managed navigation, simplified on mobile and mirrored in Arabic.",
+   "ids": [
+    "NAV-01",
+    "NAV-02",
+    "NAV-03",
+    "NAV-04",
+    "NAV-05",
+    "NAV-06",
+    "NAV-07",
+    "NAV-08",
+    "NAV-09",
+    "NAV-10"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 13,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered: the only development blocker",
+     "blocking": true
+    },
+    {
+     "ref": "#241",
+     "reason": "Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    },
+    {
+     "ref": "#242",
+     "reason": "Satisfied: merged 5 October 2026 as 3ff7488",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Header and navigation verified at mobile and desktop widths in both reading directions.",
+   "not_in_slice": [
+    "SSC-07 (P1, owned by E-ADM-10)",
+    "SSC-08 (P1, owned by E-ADM-10)"
+   ],
+   "notes": "The title names the footer, but no NAV row does. The only register row that names the footer is SSC-08 (footer content, links and columns), owned by E-ADM-10. See audit section 3. P-010 (does the CoreX header, mobile navigation, mega menu and footer mirror correctly) was not run."
+  },
+  {
+   "key": "E-SF-5",
+   "issue": 254,
+   "epic": "E-SF",
+   "title": "Product details page, in both languages",
+   "outcome": "A customer evaluates a product in either language: media, price, variants, stock, delivery, returns, authenticity, reviews and related products.",
+   "ids": [
+    "PDP-01",
+    "PDP-02",
+    "PDP-03",
+    "PDP-04",
+    "PDP-05",
+    "PDP-06",
+    "PDP-07",
+    "PDP-08",
+    "PDP-09",
+    "PDP-10",
+    "PDP-11",
+    "PDP-12",
+    "PDP-13",
+    "PDP-14",
+    "PDP-15",
+    "PDP-16",
+    "PDP-17",
+    "PDP-18",
+    "PDP-19",
+    "PDP-21",
+    "PDP-22",
+    "PDP-24"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 14,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#241",
+     "reason": "Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "OD-13",
+     "class": "Content or client input",
+     "note": "Authenticity and warranty policy; a placeholder until supplied"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    }
+   ],
+   "data_integrity": "A3 variation identity (measured working)",
+   "acceptance_evidence": "The page verified on staging in both languages at mobile and desktop widths.",
+   "not_in_slice": [
+    "PDP-20 (P2)",
+    "PDP-23 (P2)"
+   ],
+   "notes": "PDP-06 and PDP-22 read stock from the ERP (ERP-02): their ERP half is pending PRE-09. The price development rule from t20 is recorded on this issue."
+  },
+  {
+   "key": "E-SF-8",
+   "issue": 255,
+   "epic": "E-SF",
+   "title": "Checkout and order placement, in both languages",
+   "outcome": "A customer can complete checkout in either language, is charged the price displayed, and the order records what applied at the moment of purchase.",
+   "ids": [
+    "CHK-01",
+    "CHK-02",
+    "CHK-03",
+    "CHK-04",
+    "CHK-05",
+    "CHK-06",
+    "CHK-07",
+    "CHK-08",
+    "CHK-09",
+    "CHK-10",
+    "CHK-11",
+    "CHK-12",
+    "BR-005",
+    "ENT-08"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 15,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#254",
+     "reason": "Product details page, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#245",
+     "reason": "ERP adapter seam, not yet delivered",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #254, #245"
+    },
+    {
+     "id": "OD-05",
+     "class": "Configurable working default",
+     "note": "The cash on delivery capability is built and tested (PAY-09, owned by E-ORD-2); the launch switch stays with the client. Not client-confirmed"
+    },
+    {
+     "id": "OD-19",
+     "class": "Configurable working default",
+     "note": "Cards and mobile wallets are launch-capable. Not client-confirmed"
+    },
+    {
+     "id": "OD-09",
+     "class": "Content or client input",
+     "note": "VAT and invoicing for the legal entity"
+    },
+    {
+     "id": "ERP-03, ERP-05",
+     "class": "ERP input",
+     "note": "Behind the adapter boundary; owned by E-ERP-4 and E-ERP-3"
+    }
+   ],
+   "data_integrity": "B6 concurrency (needs staging); D6 order language context",
+   "acceptance_evidence": "Checkout completed on staging in both languages; BR-005 and ENT-08 snapshots verified (P-002, P-017).",
+   "not_in_slice": [
+    "CHK-13 (P2)",
+    "PAY-10 (P2)",
+    "ERP-03 (P1-E, owned by E-ERP-4)",
+    "ERP-05 (P1, owned by E-ERP-3)"
+   ],
+   "notes": "CHK-12 names ERP-04 (owned by E-ERP-2). Once the remaining PBIs are seeded, the Dependencies field should also name the cart PBI (E-SF-6) and the two ERP owners by issue number. COD value limit and fee: no register row supports either, see audit section 4."
+  },
+  {
+   "key": "E-PRE-7",
+   "issue": 266,
+   "epic": "E-PRE",
+   "title": "Pre-development documents delivered and approved",
+   "outcome": "Each pre-development document the register lists exists as a named, versioned document, has been delivered to the client, and its approval or deemed approval is on record.",
+   "ids": [
+    "PRE-01",
+    "PRE-02",
+    "PRE-03a",
+    "PRE-04",
+    "PRE-05",
+    "PRE-06",
+    "PRE-08"
+   ],
+   "scope_class": "DLV",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 16,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "CR-13",
+     "class": "Blocks final acceptance",
+     "note": "Client feedback on any deliverable within 10 Working Days; otherwise the deliverable is deemed approved"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A deliverables index naming, for each of the seven rows, the document id, version and delivery date, with the client's approval or the deemed-approval date. PRE-08 approval recorded before Stage 2 is accepted.",
+   "not_in_slice": [
+    "PRE-03b (DLV, owned by #250)",
+    "PRE-07 (DLV, owned by E-PRE-8)",
+    "PRE-09 (DLV, stage -, owned by #243)"
+   ],
+   "notes": "New PBI, replacing the wrong citations on #244, #249 and #250 and the unseeded E-PRE-3. Register wording: PRE-01 technical design and architecture document; PRE-02 technology stack proposal with reasoning and expected operating cost; PRE-03a sitemap and user flows, delivered in the Functional Specification; PRE-04 project broken into milestones and deliverables; PRE-05 external integrations identified, with accounts and costs required from the client; PRE-06 requirements needing change or carrying technical risk identified, which the register says is the register itself; PRE-08 functional specification, delivered in Stage 1 and approved before Stage 2 is accepted. Found in final docs/Client/Branded: the Technical Design states it satisfies PRE-01 and PRE-02; the Functional Specification states its contract role is PRE-08 and that it and the Feature Register together satisfy PRE-06; its Stage 1 record of 22 September 2026 lists both documents as issued for review. A Project Plan and a What You Need To Provide document exist but cite neither PRE-04 nor PRE-05 by id. This is document work, not code: engagement documents are read-only in the platform repository, so a correction goes through the document route."
+  },
+  {
+   "key": "E-PRE-8",
+   "issue": 267,
+   "epic": "E-PRE",
+   "title": "Store operations walkthrough held on the live admin, with the Section G10 list confirmed",
+   "outcome": "The client has been shown the actual admin environment, has performed their daily tasks in it, and the Section G10 capability list has been reviewed together and confirmed.",
+   "ids": [
+    "PRE-07"
+   ],
+   "scope_class": "DLV",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 17,
+   "depends_on": [
+    {
+     "ref": "#244",
+     "reason": "The walkthrough is a live demonstration and needs the staging and demonstration environment, reachable by the client",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #244"
+    },
+    {
+     "id": "Client attendance and written confirmation of the G10 list",
+     "class": "Blocks final acceptance",
+     "note": "The row is closed by the session and the confirmation, not by preparation"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A dated walkthrough record: who attended, which daily tasks the client performed, the G10 list as confirmed, and any gap raised.",
+   "not_in_slice": [
+    "ADM-140 (DEF)",
+    "ADM-141 (DEF)",
+    "ADM-142 (DEF)",
+    "ADM-143 (DEF)",
+    "ADM-144 (DEF)",
+    "ADM-145 (DEF)",
+    "ADM-147 (DEF)",
+    "ADM-155 (DEF)",
+    "ADM-156 (DEF)",
+    "ADM-159a (P2)"
+   ],
+   "notes": "New PBI. Register wording: 'a live demonstration of the actual admin environment, with the Section G10 list reviewed together and confirmed, before development begins'. PRE-07 is a key row and the register calls it strongly recommended. Development has already begun (#241, #242 and #252 are Verified), so the timing in the row has passed; the date held is recorded as it is. A task the client performs daily that is missing from G10 is a Change Request (EX-27). The G10 delivery rows are owned by E-ADM-11, and ADM-149 by E-ADM-4b."
+  },
+  {
+   "key": "E-DOD",
+   "issue": 268,
+   "epic": "E-DOD",
+   "title": "Definition of done applied to every Stage 1 PBI, with the evidence recorded",
+   "outcome": "Every Stage 1 feature is closed against the nine criteria of the definition of done, and the record shows it.",
+   "ids": [
+    "DOD-01",
+    "DOD-02",
+    "DOD-03",
+    "DOD-04",
+    "DOD-05",
+    "DOD-06",
+    "DOD-07",
+    "DOD-08",
+    "DOD-09"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 18,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "#244 staging environment",
+     "class": "Blocks final acceptance",
+     "note": "The manual staging half of DOD-04 waits for it (D-10)"
+    },
+    {
+     "id": "DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Client approval of acceptance criteria before a feature moves to production"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Per Stage 1 PBI, a done record against the nine criteria. Closes when the last Stage 1 PBI is accepted.",
+   "not_in_slice": [],
+   "notes": "Not a build PBI: the completion standard applied to every slice. DOD-04 is P1-L: tests covering critical business logic (pricing, promotions, refunds, stock, duplicate-order protection), not full coverage (Part One 1.2, EX-16). Constitution M-7 keeps workflow complete, technically verified and contractually accepted apart."
+  },
+  {
+   "key": "E-NFR-1",
+   "issue": 269,
+   "epic": "E-NFR",
+   "title": "Cross-cutting standards met: mobile first, performance, locale formatting, security, data integrity, accessibility, privacy, scalability",
+   "outcome": "The store meets the register's non-functional standards, with a measured record for each.",
+   "ids": [
+    "NFR-01",
+    "NFR-02",
+    "NFR-04b",
+    "NFR-05",
+    "NFR-06",
+    "NFR-07",
+    "NFR-11",
+    "NFR-12",
+    "NFR-13"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 19,
+   "depends_on": [
+    {
+     "ref": "#244",
+     "reason": "Staging, for the performance and concurrency measurements. Not a predecessor for starting",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-15",
+     "class": "Configurable working default",
+     "note": "5,000 products and 300 orders a day as the sizing baseline"
+    },
+    {
+     "id": "OD-27, OD-14",
+     "class": "Blocks production or launch only",
+     "note": "The CDN, the production cache and HTTPS on the live domain depend on production hosting"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A7 verified working; A12 measured (nine of fourteen fields do not follow a code-level save); B6 not yet tested (needs staging)",
+   "acceptance_evidence": "A non-functional verification record: mobile-first test runs, performance measurements on staging, locale formatting in both languages, a security checklist, the data-integrity probes, an accessibility check, and the consent and privacy flow.",
+   "not_in_slice": [
+    "NFR-12a (P1-L, stage S2, owned by E-NFR-1b)",
+    "NFR-03 (P1, owned by #242)",
+    "NFR-04 (P1, owned by #241)",
+    "NFR-04a (P1, owned by #241)",
+    "NFR-14 (P1, owned by #241)",
+    "NFR-08 (P1, owned by #244)",
+    "NFR-09 (P1, owned by #244)",
+    "NFR-10 (P1-L, owned by E-NFR-2)"
+   ],
+   "notes": "Standards attached to the slices they constrain; this PBI holds the evidence. NFR-07 is a key row and is the row the multilingual data-integrity workstream serves. NFR-06 repeats PAY-02 (E-ORD-2). NFR-04b, locale formatting of currency, numbers and dates, was not part of #241. NFR-11 and NFR-13 are P1-L; NFR-13 is bounded by FIX-10. NFR-02 names caching and CDN beside image optimisation and lazy loading."
+  },
+  {
+   "key": "E-NFR-2",
+   "issue": 270,
+   "epic": "E-NFR",
+   "title": "Observability: application logs, error monitoring, integration logs and admin audit logs",
+   "outcome": "When something fails, the application log, the error monitor and the integration log show what happened, and administrative actions are logged.",
+   "ids": [
+    "NFR-10"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 20,
+   "depends_on": [
+    {
+     "ref": "#244",
+     "reason": "The environments the logs and the monitor run in. Not a predecessor for starting",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-14",
+     "class": "Blocks production or launch only",
+     "note": "Monitoring carries a recurring cost that is the client's"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A forced application error and a failed integration call each appear in their log and in the error monitor on staging.",
+   "not_in_slice": [
+    "ROLE-10 (DEF)",
+    "ADM-76 (P2)",
+    "ADM-132 (P1-L, owned by E-ADM-9)"
+   ],
+   "notes": "P1-L, with no reduction stated in Part One 1.2 or in the row. Part One 1.6 at ROLE-10: standard platform and hosting logs, no custom operational audit trail. Integration logs are also part of INT-16 (#245); admin audit logs overlap ADM-132 and ADM-134 (E-ADM-9)."
+  },
+  {
+   "key": "E-FND-1b",
+   "issue": 271,
+   "epic": "E-FND",
+   "title": "The remaining fixed core decisions hold across the build",
+   "outcome": "Each remaining fixed core decision of register section A4 is demonstrably true of the delivered store, with the slice that delivers it named.",
+   "ids": [
+    "FIX-01",
+    "FIX-02",
+    "FIX-03",
+    "FIX-05",
+    "FIX-06",
+    "FIX-07",
+    "FIX-08",
+    "FIX-09",
+    "FIX-10"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 21,
+   "depends_on": [
+    {
+     "ref": "#290",
+     "reason": "Delivers the behaviour behind FIX-06 and FIX-07. Evidence, not a predecessor",
+     "blocking": false
+    },
+    {
+     "ref": "#281",
+     "reason": "Delivers the behaviour behind FIX-08",
+     "blocking": false
+    },
+    {
+     "ref": "#305",
+     "reason": "Delivers the behaviour behind FIX-09",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A traceability record: for each of the nine rows, the delivering PBI and its verification, checked at the Stage 1 gate.",
+   "not_in_slice": [
+    "FIX-04 (P1, owned by #241)",
+    "FIX-04a (P1, owned by #241)"
+   ],
+   "notes": "Guardrail rows: most are met by behaviour another slice builds, so this PBI's own work is the record. FIX-10 is P1-L and gives no guarantee that a future P2 or P3 capability can be added without redesign. P-011: WooCommerce's free shipping method has no item-count condition, so FIX-07 rests on the custom rule BR-002 owns."
+  },
+  {
+   "key": "E-FND-4",
+   "issue": 272,
+   "epic": "E-FND",
+   "title": "Vision, objectives and platform-type guardrails are met by the delivered store",
+   "outcome": "The delivered store is the single-vendor, premium, mobile-first store the register's vision, objectives and platform rows describe, and the client runs it without daily dependence on the developer.",
+   "ids": [
+    "VIS-01",
+    "VIS-02",
+    "VIS-03",
+    "VIS-04",
+    "VIS-05",
+    "VIS-06",
+    "OBJ-01",
+    "OBJ-02",
+    "OBJ-03",
+    "OBJ-04",
+    "OBJ-05",
+    "PLT-01",
+    "PLT-02",
+    "PLT-03",
+    "PLT-06"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 22,
+   "depends_on": [
+    {
+     "ref": "#278",
+     "reason": "OBJ-05 is tested against the G10 capabilities. Evidence, not a predecessor",
+     "blocking": false
+    },
+    {
+     "ref": "#311",
+     "reason": "OBJ-05, second half: self-service storefront control",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A traceability record per row at the Stage 1 gate; OBJ-05 evidenced by the client changing a price, adding a product and running an offer unaided.",
+   "not_in_slice": [
+    "OBJ-06 (P1-L, stage S2, owned by E-FND-4b)",
+    "OBJ-07 (P1-L, stage S2, owned by E-FND-4b)",
+    "PLT-04 (OUT)",
+    "PLT-05 (OUT)",
+    "PLT-07 (OUT)",
+    "PLT-08 (P3)",
+    "PLT-09 (P2)"
+   ],
+   "notes": "Recorded constraints rather than build work. OBJ-05 is a key row; the register calls it the acceptance test for the entire admin panel. OBJ-02 and OBJ-03 are P1-L. PLT-02 is P1 as single-vendor only. PLT-03 is P1 as a principle, with no conversion guarantee (EX-02)."
+  },
+  {
+   "key": "E-DATA-1",
+   "issue": 273,
+   "epic": "E-DATA",
+   "title": "The contracted data model exists: every launch entity is stored, related and documented",
+   "outcome": "Each launch entity of register section K exists in the running store with the fields the register names, and a record says where it lives and how it behaves across the two languages.",
+   "ids": [
+    "ENT-01",
+    "ENT-02",
+    "ENT-03",
+    "ENT-05",
+    "ENT-06",
+    "ENT-07",
+    "ENT-09",
+    "ENT-10",
+    "ENT-11",
+    "ENT-13",
+    "ENT-14",
+    "ENT-15",
+    "ENT-16",
+    "ENT-17",
+    "ENT-19"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 23,
+   "depends_on": [
+    {
+     "ref": "#307",
+     "reason": "ENT-07, the wishlist store. Evidence, not a predecessor",
+     "blocking": false
+    },
+    {
+     "ref": "#248",
+     "reason": "ENT-10, the shipment state record of ADR-0002",
+     "blocking": false
+    },
+    {
+     "ref": "#249",
+     "reason": "ENT-19, the import run",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "D1 verified working (observed); D4, D5 not yet tested",
+   "acceptance_evidence": "A data-model record naming, per entity, where it is stored (native table, post type, taxonomy, meta or custom table), its relations and its language behaviour, checked against a running store. HND-05 draws on it.",
+   "not_in_slice": [
+    "ENT-04 (P1-E, stage -, owned by E-DATA-2)",
+    "ENT-08 (P1, owned by #255)",
+    "ENT-12 (DEF)",
+    "ENT-18 (P2)"
+   ],
+   "notes": "Most entities are native WooCommerce or WPML structures (M-4); the work is the mapping record and the custom ones. ENT-07 has no native store (P-015). ENT-10: ADR-0002 records the minimum shipment state record. ENT-02 lists stock among the variant fields while stock movements (ENT-04) are P1-E. ENT-19 Import Run is P1 while import history (MIG-18) is DEF, and ENT-17 Audit Log, with before-and-after values, is P1-L while the sensitive-operation audit (ROLE-10) is DEF: see audit section 5. One commercial item is two WordPress posts, each with its own meta rows. D1: an order line stores the id of the language record actually ordered."
+  },
+  {
+   "key": "E-EVT-2",
+   "issue": 274,
+   "epic": "E-EVT",
+   "title": "Event Tracking Plan: every event, trigger, parameter and source of truth per business metric",
+   "outcome": "A written plan defines every analytics event, what triggers it, its parameters, and which system is the source of truth for each business metric.",
+   "ids": [
+    "EVT-20"
+   ],
+   "scope_class": "DLV",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 24,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-21",
+     "class": "Configurable working default",
+     "note": "Google Analytics with Tag Manager, Meta and TikTok are all in the launch tracking plan. Not client-confirmed"
+    },
+    {
+     "id": "CR-13",
+     "class": "Blocks final acceptance",
+     "note": "Client feedback within 10 Working Days"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "The plan document, delivered and approved, covering each delivery event row.",
+   "not_in_slice": [
+    "EVT-17 (P2)",
+    "EVT-19 (DEF)"
+   ],
+   "notes": "DLV. HND-12 hands the same plan over (E-HND). Part One 1.2: the standard e-commerce event set across the full funnel, not a bespoke plan. The plan has to say how one commercial item is identified in events when it exists as two language records: product-level identity inside GA4 is not yet tested (workstream E)."
+  },
+  {
+   "key": "E-ADM-9",
+   "issue": 275,
+   "epic": "E-ADM",
+   "title": "Staff accounts with two-factor sign-in and a searchable log that ordinary users cannot delete",
+   "outcome": "The owner creates staff users with roles and permissions, admin accounts sign in with two factors, and logins and security events are recorded in a searchable log that ordinary users cannot delete.",
+   "ids": [
+    "ADM-130",
+    "ADM-131",
+    "ADM-132",
+    "ADM-133",
+    "ADM-134"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 25,
+   "depends_on": [
+    {
+     "ref": "#251",
+     "reason": "The launch role set that ADM-130 assigns. ADM-131, ADM-132, ADM-133 and ADM-134 do not wait for it",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "ROLE-06 register correction",
+     "class": "Blocks final acceptance",
+     "note": "The Accountant criteria wait for it (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Permission tests (DOD-06); a login, a failed login and a security event found by search; an ordinary user cannot delete log entries; two-factor enforced on admin accounts.",
+   "not_in_slice": [
+    "ROLE-03 (DEF)",
+    "ROLE-04 (DEF)",
+    "ROLE-05 (DEF)",
+    "ROLE-06 (DEF)",
+    "ROLE-06a (P2)",
+    "ROLE-10 (DEF)",
+    "ADM-125 (DEF)"
+   ],
+   "notes": "ADM-130 is P1-L: Part One 1.6 says the standard commerce role set is applied (ROLE-09), and the Customer Service, Warehouse, Marketing and Accountant profiles are DEF. ADM-132 is P1-L: logins, security events and order notes, searchable in the standard administration; the custom audit trail of refunds, price, stock and permission changes is ROLE-10, DEF. P-013: only customer and shop_manager come from WooCommerce. Two-factor authentication is not covered by any probe."
+  },
+  {
+   "key": "E-ADM-2",
+   "issue": 276,
+   "epic": "E-ADM",
+   "title": "Product management in admin: content, media, pricing, variants, SEO fields, flags, bulk import, export and update",
+   "outcome": "A staff member creates and maintains simple and variable products with every contracted field, in both languages, singly and in bulk.",
+   "ids": [
+    "ADM-20",
+    "ADM-21",
+    "ADM-22",
+    "ADM-23",
+    "ADM-24",
+    "ADM-25",
+    "ADM-26",
+    "ADM-29",
+    "ADM-30",
+    "ADM-31",
+    "ADM-32",
+    "ADM-33",
+    "ADM-34",
+    "ADM-35",
+    "ADM-36",
+    "ADM-37",
+    "ADM-38",
+    "ADM-39",
+    "ADM-40",
+    "ADM-41",
+    "ADM-42",
+    "ADM-43",
+    "ADM-44",
+    "ADM-45",
+    "ADM-47",
+    "ADM-48",
+    "ADM-49",
+    "ADM-50"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 26,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "ADM-34 reads stock per variant from the ERP through the seam. Not a predecessor for the other rows",
+     "blocking": false
+    },
+    {
+     "ref": "#247",
+     "reason": "ADM-47 points to Section U, where the migration lives",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A3 verified working; A4 shared SKU by design; A10, A11 (the browser translation flow is a staging check); A12 measured",
+   "acceptance_evidence": "A non-developer creates, edits, clones, archives and schedules a simple and a variable product with every listed field in both languages; a bulk update changes price, status and category across a selection and both language records are checked afterwards; price change history shows user and timestamp. Stock criteria pending PRE-09.",
+   "not_in_slice": [
+    "ADM-27 (P1, owned by #252)",
+    "ADM-28 (P2)",
+    "ADM-46 (P2)",
+    "ADM-147 (DEF)",
+    "MIG-05 (DEF)",
+    "MIG-07 (DEF)"
+   ],
+   "notes": "Price matrix (t20): the wp-admin product form (ADM-25, ADM-26), the wp-admin variations save (ADM-33) and the native CSV importer keep the Arabic price correct. REST, WP-CLI and custom code leave a stale Arabic price and charge the old amount, so any code that writes a price must fire save_post or synchronise the translation explicitly. A12: weight, dimensions (ADM-35) and catalog_visibility do not reach the Arabic record on a code-level save. A4: a WPML duplicate shares its original's SKU, so the SKU (ADM-31) is not an identity. ADM-34 reads stock from the ERP, and the rows say the stock part of ADM-49 and of ADM-50 is P1-E. ADM-50, price change history with user and timestamp, is P1-L while ROLE-10 is DEF: see audit section 5. ADM-47 says 'Bulk import: see Section U', where the reusable import tool is DEF and the migration is Developer-performed. ADM-21 scheduled state is publication scheduling; scheduled price changes (ADM-28) are P2. ADM-32 barcode per variant is not covered by any probe."
+  },
+  {
+   "key": "E-ADM-3",
+   "issue": 277,
+   "epic": "E-ADM",
+   "title": "Categories, brands, collections, home page sections and static pages managed from admin",
+   "outcome": "A staff member maintains categories, brand pages, curated collections, the home page sections and the static pages without code.",
+   "ids": [
+    "ADM-55",
+    "ADM-56",
+    "ADM-57",
+    "ADM-59",
+    "ADM-60",
+    "ADM-61",
+    "ADM-63"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 27,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "ADM-59, ADM-60 and ADM-61 manage sections from the library the approved design defines. The taxonomy rows do not wait for it",
+     "blocking": false
+    },
+    {
+     "ref": "#311",
+     "reason": "The editing mechanism for sections and static pages",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A12 (product_cat is translated by WPML as its own element)",
+   "acceptance_evidence": "Categories with ordering, image and SEO, a brand page and a curated collection created in both languages; a home page section edited and reordered; a static page edited without code.",
+   "not_in_slice": [
+    "ADM-58 (P2)",
+    "ADM-62 (P2)",
+    "IA-33 (P1-L, stage S2, owned by E-FND-2b)",
+    "IA-34 (P2)"
+   ],
+   "notes": "ADM-59 and ADM-60 are P1-L: content, images, links and section order through the curated section library, not free-form page building (Part One 1.2). ADM-59, ADM-60 and ADM-61 are the admin side of HOME-10 and HOME-11 (E-SF-2) and of SSC-02 and SSC-03 (E-ADM-10); ADM-63 is the admin side of CMS-09 (E-SF-12) and SSC-10. #242 delivered the category, collection and brand URL structure in both languages. Collections are curated by hand: rules-based collections (ADM-58) are P2."
+  },
+  {
+   "key": "E-ADM-11",
+   "issue": 278,
+   "epic": "E-ADM",
+   "title": "Everyday admin tasks in the standard administration: quick product entry, bulk edits, search, export, mobile checks",
+   "outcome": "The client's team performs the Section G10 daily tasks in the English standard administration without a developer.",
+   "ids": [
+    "ADM-146",
+    "ADM-148",
+    "ADM-150",
+    "ADM-151",
+    "ADM-152",
+    "ADM-153",
+    "ADM-154",
+    "ADM-157",
+    "ADM-158",
+    "ADM-159",
+    "ADM-160",
+    "ADM-161"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 28,
+   "depends_on": [
+    {
+     "ref": "#267",
+     "reason": "The walkthrough confirms the G10 list this PBI delivers. Not a predecessor",
+     "blocking": false
+    },
+    {
+     "ref": "#245",
+     "reason": "ADM-146 says the stock figure follows ERP-01; the stock part of ADM-160 is per PRE-09",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A5 verified defect, bounded (SKU lookup); A12 (the list-table bulk-edit channel was not measured)",
+   "acceptance_evidence": "A timed task: a simple product added in under three minutes. Each bulk action run over a selection, with both language records checked afterwards. A product found by SKU, title and barcode; an order found by customer phone number; the order export opened in a spreadsheet; an order status check on a phone.",
+   "not_in_slice": [
+    "ADM-140 (DEF)",
+    "ADM-141 (DEF)",
+    "ADM-142 (DEF)",
+    "ADM-143 (DEF)",
+    "ADM-144 (DEF)",
+    "ADM-145 (DEF)",
+    "ADM-147 (DEF)",
+    "ADM-149 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-155 (DEF)",
+    "ADM-156 (DEF)",
+    "ADM-159a (P2)"
+   ],
+   "notes": "Register G10: these rows are met in the standard commerce administration; the dedicated Operations Console is DEF. ADM-148, ADM-150, ADM-151, ADM-154 and ADM-158 each say 'using the standard commerce' capability, so the contracted outcome is the native capability working (M-4), not a new tool. The price matrix (t20) measured the product form, the variations save, the CSV importer and the sale cron; the list-table bulk edit behind ADM-148 was not one of the measured channels, so whether a bulk price change reaches the Arabic record has to be measured before ADM-148 is accepted. ADM-157 is a key row. ADM-159 fixes the admin in English (M-9). ADM-161 points to Section U. The ownership map titles this slice 'bulk editing, search and export'; ADM-159 and ADM-160 are language and mobile-use rows of the same register section. EX-27: anything not listed in G10 is a Change Request."
+  },
+  {
+   "key": "E-ADM-6",
+   "issue": 279,
+   "epic": "E-ADM",
+   "title": "Customer records in admin: profile, internal notes, and suspension with a reason",
+   "outcome": "A staff member opens a customer's profile with contacts, addresses and order history, keeps notes the customer cannot see, and suspends an account with a recorded reason.",
+   "ids": [
+    "ADM-100",
+    "ADM-103",
+    "ADM-104"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 29,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A customer profile showing contacts, addresses and orders; an internal note absent from the customer's own account; a suspended customer cannot sign in and the reason is recorded.",
+   "not_in_slice": [
+    "ADM-101 (P1-L, stage S2, owned by E-ADM-6b)",
+    "ADM-105 (P1-L, stage S2, owned by E-ADM-6b)",
+    "ADM-102 (P2)"
+   ],
+   "notes": "ADM-103 and ADM-104 are P1-L with no reduction stated in Part One 1.2 or in the rows. No probe covers customer notes or account suspension."
+  },
+  {
+   "key": "E-ADM-5",
+   "issue": 280,
+   "epic": "E-ADM",
+   "title": "Order management in admin: find, annotate, ship, cancel, refund and print",
+   "outcome": "A staff member finds any order by its attributes, adds internal notes, attaches a shipment, cancels, refunds within their permission, and prints an invoice and a packing slip.",
+   "ids": [
+    "ADM-85",
+    "ADM-88",
+    "ADM-89",
+    "ADM-90",
+    "ADM-91",
+    "ADM-92",
+    "ADM-93"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 30,
+   "depends_on": [
+    {
+     "ref": "#248",
+     "reason": "Owns ADM-86 and ADM-87 and the status model the filters use. Not a predecessor for starting",
+     "blocking": false
+    },
+    {
+     "ref": "#291",
+     "reason": "ADM-89 attaches the shipment the carrier integration creates",
+     "blocking": false
+    },
+    {
+     "ref": "#283",
+     "reason": "ADM-91 refunds through the payment integration",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-09",
+     "class": "Content or client input",
+     "note": "VAT and invoicing requirements decide the invoice content (ADM-92)"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "Legal entity details that appear on invoices"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B7 measured working on the WooCommerce side; D7, F1, F3 not yet tested",
+   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order.",
+   "not_in_slice": [
+    "ADM-86 (P1, owned by #248)",
+    "ADM-87 (P1, owned by #248)",
+    "ADM-94 (P2)",
+    "ADM-141 (DEF)",
+    "ADM-155 (DEF)",
+    "ADM-156 (DEF)"
+   ],
+   "notes": "ADM-89, ADM-92 and ADM-93 are P1-L. Packing slips are printed per order; bulk packing-slip printing (ADM-156) is DEF. Invoice and packing-slip documents are not covered by any probe; an approved plugin comes before custom code (M-4). B7: cancelling an Arabic order restored both language records on the WooCommerce side (t17); the ERP half is ERP-06. D-10: refund permission is a separate granular capability. Order search by phone (ADM-157) is owned by E-ADM-11."
+  },
+  {
+   "key": "E-RULES-1",
+   "issue": 281,
+   "epic": "E-RULES",
+   "title": "Promotion engine: discounts, conditions, limits and schedules configurable from admin",
+   "outcome": "The store applies percentage, fixed and free-shipping promotions, automatically or by code, under the contracted conditions, limits, exclusions and dates, all set from admin without code.",
+   "ids": [
+    "PROMO-01",
+    "PROMO-02",
+    "PROMO-03",
+    "PROMO-04",
+    "PROMO-05",
+    "PROMO-06",
+    "PROMO-07",
+    "PROMO-08",
+    "PROMO-09",
+    "PROMO-11",
+    "PROMO-12",
+    "PROMO-13",
+    "PROMO-14",
+    "PROMO-15",
+    "PROMO-18",
+    "PROMO-19",
+    "PROMO-23"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 31,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Each reward, condition, limit and exclusion configured from admin and exercised by automated tests on pricing and promotions (DOD-04 critical logic); the AC-04 invalid-coupon scenario.",
+   "not_in_slice": [
+    "PROMO-10 (DEF)",
+    "PROMO-16 (DEF)",
+    "PROMO-17 (DEF)",
+    "PROMO-20 (P2)",
+    "PROMO-21 (P2)",
+    "PROMO-22 (P2)",
+    "ADM-112 (P2)",
+    "ADM-114 (P2)"
+   ],
+   "notes": "P-003: the WooCommerce 11.1.0 coupon schema has no priority or stacking field; individual_use is the only exclusivity control, and two percentage coupons applied together. The 26 fields P-003 recorded include product and category restrictions, minimum and maximum amount, usage limits and an expiry date; they include no item-count condition (PROMO-05), no start date (PROMO-15), no discount cap (PROMO-19) and no automatic application without a code (PROMO-11). A brand condition (PROMO-08) is not in that list and needs measuring. PROMO-16 and PROMO-17 are DEF: Part One 1.6 says one promotion applies per order unless separately configured, and the only contracted combination control is BR-004 (E-RULES-2). PROMO-23 is a key row."
+  },
+  {
+   "key": "E-RULES-3",
+   "issue": 282,
+   "epic": "E-RULES",
+   "title": "Merchandising controls: badges, featured products, manual ordering, curated collections and related products",
+   "outcome": "The client marks products with badges, features them, orders them by hand within categories and collections, curates collections and assigns related products, and discounts are presented in a premium manner.",
+   "ids": [
+    "MER-01",
+    "MER-02",
+    "MER-03",
+    "MER-04",
+    "MER-05",
+    "MER-06",
+    "MER-07"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 32,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "MER-06 and MER-07 are visual treatment and follow the approved design. The control rows do not wait for it",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A12 (catalog_visibility and other fields do not follow a code-level save)",
+   "acceptance_evidence": "Each control set in admin and visible on the listing and product page in both languages; manual order respected within a category and a collection.",
+   "not_in_slice": [
+    "ADM-58 (P2)",
+    "PDP-20 (P2)",
+    "ADM-46 (P2)",
+    "HOME-13 (P3)"
+   ],
+   "notes": "MER-01 names four badges: New, Trending, Limited, Best Seller. ADM-42, ADM-43, ADM-44 and ADM-45 (E-ADM-2) and SSC-22, SSC-23, SSC-24 and SSC-25 (E-ADM-10) describe the same controls from the admin side: three slices touch one mechanism, so it is built once, here. Collections are curated by hand; rules-based collections (ADM-58) are P2."
+  },
+  {
+   "key": "E-ORD-2",
+   "issue": 283,
+   "epic": "E-ORD",
+   "title": "Payments through Paymob: verified callbacks, no duplicate charge, refunds from the order screen",
+   "outcome": "A customer pays by card with 3-D Secure, and by wallet or cash on delivery where enabled; every callback is cryptographically verified; a repeated callback or a double click never creates a second order or charge; and staff refund in full or in part from the order screen.",
+   "ids": [
+    "PAY-01",
+    "PAY-02",
+    "PAY-03",
+    "PAY-04",
+    "PAY-05",
+    "PAY-06",
+    "PAY-07",
+    "PAY-08",
+    "PAY-09",
+    "PAY-13",
+    "PAY-14",
+    "PAY-15",
+    "PAY-16",
+    "PAY-17",
+    "PAY-19",
+    "INT-01"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 33,
+   "depends_on": [
+    {
+     "ref": "#248",
+     "reason": "The Pending Payment, Payment Failed and Confirmed states the callbacks move an order through, and ORD-14 for cash on delivery. Not a predecessor for starting",
+     "blocking": false
+    },
+    {
+     "ref": "#255",
+     "reason": "CHK-04, payment method selection, is the checkout's row",
+     "blocking": false
+    },
+    {
+     "ref": "#245",
+     "reason": "Owns INT-16, the adapter rule this integration must also meet",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "CR-01",
+     "class": "Vendor or account input",
+     "note": "Paymob merchant account approved: commercial registration and tax card. Sandbox credentials stand in during development; launch is blocked without it"
+    },
+    {
+     "id": "Wallet approval",
+     "class": "Vendor or account input",
+     "note": "PAY-15 is enabled only if selected and approved by the provider"
+    },
+    {
+     "id": "OD-19",
+     "class": "Configurable working default",
+     "note": "Cards and mobile wallets are launch-capable. Not client-confirmed"
+    },
+    {
+     "id": "OD-05",
+     "class": "Configurable working default",
+     "note": "The cash on delivery capability is built and tested; the launch switch is the client's. A value limit and a fee are not supported by any register row (audit section 4)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B8 not yet tested (failed payment, both languages); F3 not yet tested multilingually",
+   "acceptance_evidence": "AC-06, AC-07, AC-08 and AC-10 against the Paymob sandbox; automated tests on the payment, refund and duplicate-protection paths (M-7); a forged or unsigned callback is rejected; no card data in the database or the logs; the settlement note of PAY-19 written.",
+   "not_in_slice": [
+    "PAY-10 (P2)",
+    "PAY-20 (P2)",
+    "PAY-21 (P2)",
+    "PAY-22 (P3)",
+    "INT-06 (P2)",
+    "INT-17 (OUT)"
+   ],
+   "notes": "P-004: a repeated payment_complete for the same order was a no-op, but WooCommerce does nothing about a customer submitting checkout twice and creating two orders, or about a gateway retrying against an order meanwhile cancelled; both are PAY-05 work. P-014: the native refund ceiling holds. The backlog document records callback verification (PAY-04, PAY-16) as a gap in the Technical Design. PAY-09 and PAY-15 are capabilities conditional on OD-05 and OD-19: the register's stage cells read 'S1 if selected' and 'S1 if selected and approved', extracted as S1. PAY-17 is P1-L: a gateway refund only where the selected Paymob integration supports it, otherwise made through Paymob and recorded on the order. The native cash on delivery gateway in the local runtime has settings for enable, title, description, instructions, shipping methods and virtual orders, and none for an order-value limit or a fee (source reading, not a probe)."
+  },
+  {
+   "key": "E-INT-1",
+   "issue": 284,
+   "epic": "E-INT",
+   "title": "Transactional email service, Google Analytics with Tag Manager, Meta Pixel and the Merchant Center feed connected",
+   "outcome": "The four launch integrations outside payment and shipping are connected in client-owned accounts, each behind an adapter.",
+   "ids": [
+    "INT-05",
+    "INT-09",
+    "INT-10",
+    "INT-12"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 34,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "Owns INT-16, the adapter rule these integrations must also meet",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Email provider account",
+     "class": "Vendor or account input",
+     "note": "A sandbox or a fake stands in during development"
+    },
+    {
+     "id": "Google, Meta and Merchant Center accounts",
+     "class": "Vendor or account input",
+     "note": "Opened by the client"
+    },
+    {
+     "id": "OD-21",
+     "class": "Configurable working default",
+     "note": "All three trackers are in the launch plan; activation is the client's"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "The sending address and domain"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A transactional email delivered through the provider on staging; GA4 and Meta receiving test events through Tag Manager; a Merchant Center feed that validates.",
+   "not_in_slice": [
+    "INT-03 (P2)",
+    "INT-04 (P3)",
+    "INT-06 (P2)",
+    "INT-07 (P2)",
+    "INT-08 (P2)",
+    "INT-11 (P2)",
+    "INT-13 (P3)",
+    "INT-14 (P3)",
+    "INT-15 (P2)",
+    "INT-17 (OUT)"
+   ],
+   "notes": "Each row has a twin elsewhere: INT-05 with the notification rows (E-NOTF-1), INT-09 with MKT-01, INT-10 with MKT-02 and INT-12 with MKT-06 (all E-MKT-1). The ownership map already placed INT-01 and INT-02 with their payment and shipping slices; see audit section 5. INT-12 is P1-L."
+  },
+  {
+   "key": "E-NOTF-1",
+   "issue": 285,
+   "epic": "E-NOTF",
+   "title": "Transactional emails for account, order, payment, shipping, delivery and refund",
+   "outcome": "A customer receives the contracted emails at each event, in their language, within consent and frequency rules.",
+   "ids": [
+    "NOTF-01",
+    "NOTF-02",
+    "NOTF-03",
+    "NOTF-04",
+    "NOTF-06",
+    "NOTF-08",
+    "NOTF-11",
+    "NOTF-12",
+    "NOTF-13"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 35,
+   "depends_on": [
+    {
+     "ref": "#248",
+     "reason": "The Shipped and Delivered states that trigger NOTF-04 and NOTF-06. The account, order, payment and refund emails do not wait for it",
+     "blocking": false
+    },
+    {
+     "ref": "#284",
+     "reason": "INT-05, the delivery service",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "The sending email address"
+    },
+    {
+     "id": "OD-01",
+     "class": "Content or client input",
+     "note": "Brand name and logo in the email header; placeholders until supplied"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "D6 not yet tested (the language an order was placed in decides the language of its emails)",
+   "acceptance_evidence": "Each event triggered on staging and the email received in English and in Arabic; a marketing opt-out does not stop a transactional email.",
+   "not_in_slice": [
+    "NOTF-05 (P2)",
+    "NOTF-07 (DEF)",
+    "NOTF-09 (P2)",
+    "NOTF-10 (P2)",
+    "NOTF-14 (P1-L, stage S2, owned by E-NOTF-1b)",
+    "INT-03 (P2)",
+    "INT-06 (P2)",
+    "INT-07 (P2)"
+   ],
+   "notes": "Email only at launch is agreed (OD-11); WhatsApp and SMS are P2. Admin-editable templates (NOTF-14) are S2: in the first release the developer changes wording on request. NOTF-08 uses the standard WooCommerce refunded-order email. NOTF-12 is P1-L with no reduction stated. No email is contracted for Out for Delivery (NOTF-05 is P2) although ORD-06 is a P1 status. REV-05, the review invitation, is owned by E-SF-11 and NOTF-06 names the same invitation."
+  },
+  {
+   "key": "E-RPT-1",
+   "issue": 286,
+   "epic": "E-RPT",
+   "title": "Sales report: revenue, net sales, orders, units, average order value, discounts and shipping",
+   "outcome": "The owner reads sales for any period with the seven contracted figures, correct across both languages.",
+   "ids": [
+    "RPT-01"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 36,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "D8 not yet tested; workstream E classes RPT-01 as not yet tested, low risk",
+   "acceptance_evidence": "For a known set of English and Arabic orders the report's seven figures match a hand calculation.",
+   "not_in_slice": [
+    "RPT-02 (P2)",
+    "RPT-03 (DEF)",
+    "RPT-04 (P2)",
+    "RPT-05 (P2)",
+    "RPT-06 (P2)",
+    "RPT-07 (DEF)",
+    "ADM-143 (DEF)"
+   ],
+   "notes": "P1-L. The source is order level (wc_order_stats), so the product split P-019 measured does not apply. WCML removes the All languages option from the analytics switcher. ROLE-06, a DEF row, lists RPT-01 in the Accountant profile (CX-01)."
+  },
+  {
+   "key": "E-MKT-2",
+   "issue": 287,
+   "epic": "E-MKT",
+   "title": "Search engine controls: editable meta and canonical, redirects, missing-page log, sitemap and robots, hreflang",
+   "outcome": "A marketing user edits the title, description and canonical of any product, category or page, creates redirects, sees missing-page errors, and controls the sitemap and robots file, without a developer.",
+   "ids": [
+    "MKT-12",
+    "MKT-13",
+    "MKT-14",
+    "MKT-15",
+    "MKT-16",
+    "MKT-17",
+    "MKT-18",
+    "MKT-20"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 37,
+   "depends_on": [
+    {
+     "ref": "#242",
+     "reason": "The SEO output these controls edit. Satisfied: merged 5 October 2026 as 3ff7488",
+     "blocking": true
+    },
+    {
+     "ref": "#311",
+     "reason": "MKT-20, campaign landing pages, is built from the section library (SSC-11)",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Google Search Console and Bing Webmaster accounts",
+     "class": "Vendor or account input",
+     "note": "Opened by the client"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "Verification needs the production domain"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Each control exercised from admin and its effect read back from the page source in both languages; a redirect created and followed; a missing page appearing in the log.",
+   "not_in_slice": [
+    "MKT-19 (OUT)",
+    "IA-34 (P2)"
+   ],
+   "notes": "Spec 003 (C-3): NFR-03 owes the SEO output and these rows own the editable controls. #242 technically verified clean URLs, canonical links, a sitemap covering both languages, robots.txt, the breadcrumb and structured-data mechanisms and meta descriptions. MKT-13 is a key row. MKT-14 and MKT-20 are P1-L. MKT-20 has the same outcome as SSC-11 (E-ADM-10). MKT-16 overlaps PDP-24 (#254). The per-product SEO fields are ADM-38, ADM-39, ADM-40 and ADM-41 (E-ADM-2) and SSC-27 (E-ADM-10)."
+  },
+  {
+   "key": "E-MKT-1",
+   "issue": 288,
+   "epic": "E-MKT",
+   "title": "Measurement and advertising tools ready for a marketing team: analytics, pixels, product feeds, attribution, consent",
+   "outcome": "A media buyer arrives to working Google Analytics and Tag Manager, Meta and TikTok pixels, Meta and Google product feeds, campaign attribution on the order, and consent-aware tracking.",
+   "ids": [
+    "MKT-01",
+    "MKT-02",
+    "MKT-03",
+    "MKT-05",
+    "MKT-06",
+    "MKT-09",
+    "MKT-10"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 38,
+   "depends_on": [
+    {
+     "ref": "#274",
+     "reason": "The plan that defines the event set MKT-01 carries. Not a predecessor for installing the containers",
+     "blocking": false
+    },
+    {
+     "ref": "#284",
+     "reason": "INT-09, INT-10 and INT-12 are the same integrations",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Google, Meta and TikTok accounts",
+     "class": "Vendor or account input",
+     "note": "Opened by the client; activation is theirs"
+    },
+    {
+     "id": "OD-21",
+     "class": "Configurable working default",
+     "note": "All three trackers are in the launch plan. Not client-confirmed"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "Workstream E: product-level identity inside GA4 is not yet tested",
+   "acceptance_evidence": "Tags firing through Tag Manager only (MKT-23); both feeds validating; an order placed from a tagged link carrying its campaign; tracking held until consent is given.",
+   "not_in_slice": [
+    "MKT-04 (P2)",
+    "MKT-07 (P2)",
+    "MKT-08 (P2)",
+    "MKT-11 (P3)",
+    "INT-11 (P2)"
+   ],
+   "notes": "P-021: campaign attribution to the order record is native in WooCommerce 11.1.0, on by default and queryable by campaign, so MKT-09 needs no plugin for the capture; the product feeds still need one. MKT-05, MKT-06, MKT-09 and MKT-10 are P1-L; MKT-03, MKT-05, MKT-06 and MKT-09 are key rows. The backlog document says MKT-01, MKT-02 and MKT-03 'are built'; that repeats the register's OD-21 sentence, and no spec in this repository covers them (specs holds four features: product cost, bilingual baseline, information architecture, inventory report). Whether a feed lists a translated product once per language feed is not measured."
+  },
+  {
+   "key": "E-ADM-7",
+   "issue": 289,
+   "epic": "E-ADM",
+   "title": "Promotions and coupons managed from admin: create, schedule, pause, keep the usage history",
+   "outcome": "A staff member creates an automatic promotion or a coupon, sets its conditions, schedules it, and pauses it without losing its usage history.",
+   "ids": [
+    "ADM-110",
+    "ADM-111",
+    "ADM-113",
+    "ADM-115"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 39,
+   "depends_on": [
+    {
+     "ref": "#281",
+     "reason": "The promotion engine these screens configure",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #281"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A promotion and a coupon created, scheduled, paused and reactivated from admin, with the usage count intact after the pause.",
+   "not_in_slice": [
+    "ADM-112 (P2)",
+    "ADM-114 (P2)",
+    "PROMO-16 (DEF)",
+    "PROMO-17 (DEF)"
+   ],
+   "notes": "ADM-111 is P1-L: conditions, rewards, limits and exclusions plus the combination setting of BR-004; general priority and stacking rules are PROMO-16 and PROMO-17, DEF."
+  },
+  {
+   "key": "E-RULES-2",
+   "issue": 290,
+   "epic": "E-RULES",
+   "title": "Launch business rules enforced: welcome discount, free shipping on two items, explicit stacking, refund ceiling",
+   "outcome": "The nine launch rules hold on every order: the welcome discount and the two-item free shipping follow their admin settings, combination is an explicit setting, a refund never exceeds what was paid, no total goes negative, and stock is validated and returned.",
+   "ids": [
+    "BR-001",
+    "BR-002",
+    "BR-003",
+    "BR-004",
+    "BR-006",
+    "BR-007",
+    "BR-008",
+    "BR-009",
+    "BR-010"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 40,
+   "depends_on": [
+    {
+     "ref": "#281",
+     "reason": "BR-001, BR-002, BR-004, BR-009 and BR-010 are rules of the promotion engine",
+     "blocking": true
+    },
+    {
+     "ref": "#245",
+     "reason": "BR-003 and BR-007 name the ERP figure and ERP-04; their ERP half sits behind the seam",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #281"
+    },
+    {
+     "id": "OD-03",
+     "class": "Configurable working default",
+     "note": "Example default, admin-configurable: 10 percent off the first order, capped at 200 EGP, minimum order 500 EGP, valid 14 days, one use, new customers only, not combined with other coupons. Not client-confirmed"
+    },
+    {
+     "id": "OD-04",
+     "class": "Configurable working default",
+     "note": "Two or more units in the cart, any mix of products, no exclusions; admin-configurable. Not client-confirmed"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B6 not yet tested (BR-003, needs staging); B7 measured working on the WooCommerce side; B8 not yet tested",
+   "acceptance_evidence": "AC-01, AC-02, AC-03 and AC-10; automated tests on welcome-discount eligibility, item-count free shipping, the combination setting, the refund ceiling and the non-negative total. The ERP criteria of BR-003 and BR-007 are pending PRE-09.",
+   "not_in_slice": [
+    "BR-005 (P1, owned by #255)",
+    "PROMO-16 (DEF)",
+    "PROMO-17 (DEF)"
+   ],
+   "notes": "P-011: WooCommerce's free shipping method offers no item-count condition, so BR-002 is custom work under either reading of OD-04. P-014: the native refund API rejected a refund above the remaining paid amount, so the BR-006 ceiling holds natively for WooCommerce bookkeeping. P-003: coupons stack freely, so BR-004 needs an explicit setting. P-009 (partial): the stock write does not refuse to go negative, the guard is a validation step before payment, and true simultaneity is untested. BR-003 and BR-007 are P1, not P1-E, yet both are worded on the ERP figure: see audit section 5. BR-006 sits with refunds and BR-008 with authentication by subject; the map keeps all nine together."
+  },
+  {
+   "key": "E-ORD-3",
+   "issue": 291,
+   "epic": "E-ORD",
+   "title": "Shipping through Bosta with an explicit status mapping, governorate rates and cash-on-delivery reconciliation",
+   "outcome": "Rates are charged by governorate zone, an order is pushed to Bosta and receives its tracking code, carrier statuses move the order through an explicit, documented mapping in which a returned parcel is never recorded as delivered, and cash collected is recorded separately from cash remitted.",
+   "ids": [
+    "SHIP-01",
+    "SHIP-03",
+    "SHIP-04",
+    "SHIP-05",
+    "SHIP-08",
+    "SHIP-09",
+    "SHIP-12",
+    "SHIP-13",
+    "SHIP-14",
+    "SHIP-15",
+    "SHIP-16",
+    "SHIP-17",
+    "INT-02"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 41,
+   "depends_on": [
+    {
+     "ref": "#248",
+     "reason": "The mapping targets the statuses #248 defines, including ORD-13 and ORD-14, and the shipment state record of ADR-0002",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #248"
+    },
+    {
+     "id": "CR-03",
+     "class": "Vendor or account input",
+     "note": "Carrier account, API key and rate card by governorate"
+    },
+    {
+     "id": "Bosta status code legend",
+     "class": "Vendor or account input",
+     "note": "The plugin ships none; it must come from Bosta"
+    },
+    {
+     "id": "OD-20",
+     "class": "Vendor or account input",
+     "note": "Carrier COD collection and remittance cycle (classed with the vendor inputs in D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "D7 not yet tested; F2 verified defect in the carrier layer (P-012); F5 requires OD-20; F6 verified defect (P-018)",
+   "acceptance_evidence": "AC-16; the mapping visible in admin with every Bosta code accounted for; a returned parcel ending in the distinct state; collected versus remitted recorded per order; rates matching the client's rate card.",
+   "not_in_slice": [
+    "SHIP-02 (P2)",
+    "SHIP-06 (P2)",
+    "SHIP-07 (P2)",
+    "SHIP-10 (DEF)",
+    "SHIP-11 (DEF)",
+    "SHIP-18 (P2)",
+    "ADM-155 (DEF)",
+    "ADM-156 (DEF)"
+   ],
+   "notes": "P-012: WooCommerce ships no returned-to-origin status. Bosta plugin 4.5.7 maps state codes 45 and 46 both to completed, ships no legend for its codes, and its mapping is dormant: the call to map_bosta_state_to_wc_status is commented out in handle_status_update, so a webhook writes meta and never changes the order status. SHIP-14 and SHIP-17 therefore need the mapping built. A12: weight and dimensions do not reach the Arabic record on a code-level save. SHIP-15 and Part One 1.2: manual rate zones by governorate, no live rate lookup. The plugin's bulk sending and bulk airway-bill features are not part of the Launch Platform even where the plugin offers them. SHIP-05 states the same rule as BR-009 (E-RULES-2). SHIP-04, SHIP-08, SHIP-09, SHIP-12, SHIP-13 and SHIP-16 are P1-L."
+  },
+  {
+   "key": "E-ORD-4",
+   "issue": 292,
+   "epic": "E-ORD",
+   "title": "Refunds recorded from the standard order screen, with the standard refund email",
+   "outcome": "When the client's team agrees a return, the refund is recorded in full or in part from the standard order screen and the customer receives the standard refund email.",
+   "ids": [
+    "RET-08"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 42,
+   "depends_on": [
+    {
+     "ref": "#283",
+     "reason": "The gateway route of the refund, and the fallback where the integration does not support it",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #283"
+    },
+    {
+     "id": "OD-08",
+     "class": "Content or client input",
+     "note": "Return window and exceptions: policy text only, since automatic eligibility (RET-03) is DEF"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "F3 not yet tested multilingually; F4 not yet tested",
+   "acceptance_evidence": "AC-14: a refund recorded from the order screen, the standard refund email received, and no customer returns area or approval workflow present.",
+   "not_in_slice": [
+    "RET-01 (DEF)",
+    "RET-02 (DEF)",
+    "RET-03 (DEF)",
+    "RET-04 (DEF)",
+    "RET-05 (P2)",
+    "RET-06 (DEF)",
+    "RET-07 (P2)",
+    "RET-09 (P2)",
+    "RET-10 (DEF)",
+    "ACCT-10 (DEF)",
+    "NOTF-07 (DEF)"
+   ],
+   "notes": "RET-08 is the only delivery row of register section E4, and it is P1-L. Returns are handled by the client's team through support channels. ADM-124 (E-ADM-8) cites RET-08 in its own wording, and PAY-07, PAY-08, PAY-17 (E-ORD-2), ADM-91 (E-ADM-5), NOTF-08 (E-NOTF-1), ORD-12 (#248), BR-006 (E-RULES-2) and ENT-13 (E-DATA-1) describe the same refund from other sides: see audit section 5."
+  },
+  {
+   "key": "E-ADM-8",
+   "issue": 293,
+   "epic": "E-ADM",
+   "title": "A refund is recorded with its payment reference from the standard order screen",
+   "outcome": "A staff member with permission records a full or partial refund against an order, with its payment reference, from the standard order screen.",
+   "ids": [
+    "ADM-124"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 43,
+   "depends_on": [
+    {
+     "ref": "#283",
+     "reason": "The payment reference (PAY-06) and the gateway refund route",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #283"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "F3 not yet tested multilingually",
+   "acceptance_evidence": "A full and a partial refund recorded with their payment reference; a staff user without the refund capability cannot record one (AC-11).",
+   "not_in_slice": [
+    "ADM-120 (DEF)",
+    "ADM-121 (DEF)",
+    "ADM-122 (DEF)",
+    "ADM-123 (DEF)",
+    "ADM-125 (DEF)",
+    "ADM-126 (P2)"
+   ],
+   "notes": "A key row, and the only delivery row of register section G8. Its wording cites RET-08 (E-ORD-4). D-10: refund permission is a separate granular capability."
+  },
+  {
+   "key": "E-ADM-1",
+   "issue": 294,
+   "epic": "E-ADM",
+   "title": "Admin dashboard: sales figures, top products, and low and out-of-stock counts that count each item once",
+   "outcome": "The owner opens the dashboard and reads revenue, orders, units, average order value, charts, top products, orders needing action and refunds, with low-stock and out-of-stock figures as the ERP reports them and one physical item counted once.",
+   "ids": [
+    "ADM-01",
+    "ADM-02",
+    "ADM-03",
+    "ADM-04",
+    "ADM-06",
+    "ADM-08",
+    "ADM-09",
+    "ADM-10",
+    "ADM-11",
+    "ADM-12",
+    "ADM-13",
+    "ADM-15"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Ready",
+   "delivery_order": 44,
+   "depends_on": [
+    {
+     "ref": "#246",
+     "reason": "ADM-10 and ADM-11 use the resolution of a record to its physical item that #246 builds; spec 004 FR-009 requires it to be one shared piece of the reporting layer",
+     "blocking": true
+    },
+    {
+     "ref": "#245",
+     "reason": "The ERP figures behind ADM-10 and ADM-11 arrive through the seam",
+     "blocking": false
+    },
+    {
+     "ref": "#248",
+     "reason": "ADM-12, orders requiring action, reads the status model",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B10 verified defect (P-020); B11 not yet tested; P-019 for ADM-09",
+   "acceptance_evidence": "With the spec 004 fixtures the dashboard low-stock and out-of-stock counts read 3 and 1 and agree with the #246 report; revenue, orders and units agree with RPT-01 for the same period; a translated product appears once in top products. ERP-figure criteria pending PRE-09.",
+   "not_in_slice": [
+    "ADM-05 (P1-L, stage S2, owned by E-ADM-1b)",
+    "ADM-07 (P1-L, stage S2, owned by E-ADM-1b)",
+    "ADM-14 (P2)",
+    "ADM-140 (DEF)",
+    "ADM-141 (DEF)",
+    "ADM-142 (DEF)",
+    "ADM-143 (DEF)",
+    "RPT-03 (DEF)",
+    "RPT-02 (P2)"
+   ],
+   "notes": "Owner decision: this PBI owns ADM-10 (low stock, as reported by the ERP) and ADM-11 (out of stock, as reported by the ERP). D-246-1 (Mustafa, 5 October 2026, spec 004) took the dashboard counts out of #246 and names them as this PBI's rows, with #246's measurement as evidence and a dependency. Measured in specs/004-inventory-report-one-item-once: for fixtures holding 3 low and 1 out-of-stock physical items the WooCommerce dashboard status counts read 4 and 2, a double count in every language context; the multilingual plugin hooks woocommerce_status_widget_low_in_stock_count_query, a filter WooCommerce 11.1.0 no longer applies. ADM-09: P-019 measured that the product report splits one product by language and that the WCML merge recovers totals but not ranking and is wrong under pagination; RPT-03 is DEF but ADM-09 is P1. What defines low (ADM-74) is P1-E. ADM-13 reads 'Pending returns and refunds' while the returns queue is DEF, and ADM-12 reads 'Orders requiring action' while the worked queue (ADM-141) is DEF: see audit section 5. ADM-04, ADM-06 and ADM-08 are P1-L."
+  },
+  {
+   "key": "E-MIG-2",
+   "issue": 295,
+   "epic": "E-MIG",
+   "title": "Attributes, categories, brands and SEO fields mapped into the store in the initial migration",
+   "outcome": "The migration maps the source's attributes, categories and brands to the store's structures, and carries SEO fields where the source has them, in both languages.",
+   "ids": [
+    "MIG-10",
+    "MIG-11",
+    "MIG-12",
+    "MIG-15"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 45,
+   "depends_on": [
+    {
+     "ref": "#249",
+     "reason": "The import specification and its column mapping",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #249"
+    },
+    {
+     "id": "CR-06, CR-07",
+     "class": "Blocks final acceptance",
+     "note": "The real sample export and the report availability decide what can be mapped"
+    },
+    {
+     "id": "CR-09",
+     "class": "Blocks production or launch only",
+     "note": "The full catalogue export"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A11 (sequencing invariant, owned by #247); A12 (product_cat)",
+   "acceptance_evidence": "For the agreed export: every source attribute, category and brand resolved to a store term in both languages or reported as an issue; SEO fields present on migrated products where the source held them.",
+   "not_in_slice": [
+    "MIG-05 (DEF)",
+    "MIG-07 (DEF)",
+    "MIG-08 (DEF)",
+    "MIG-18 (DEF)",
+    "MIG-21 (P2)",
+    "MIG-22 (P2)"
+   ],
+   "notes": "MIG-15 is moved here from E-MIG-4: its wording is 'SEO fields are migrated where present in the agreed source', which is field mapping, not images, and E-MIG-4 is gated on image rights. MIG-11: a saved reusable category mapping table is not delivered. Taxonomies are WPML elements in their own right, so a mapped category, brand or attribute term needs both language terms linked. P-006: WPML translated a variable product with a global attribute and kept one translation group. The A11 sequence, all sources first and translations second, applies to any scripted creation here."
+  },
+  {
+   "key": "E-MIG-4",
+   "issue": 296,
+   "epic": "E-MIG",
+   "title": "Product images imported to the Mizzey server with alt text, once rights are confirmed",
+   "outcome": "Product images are downloaded from the source references and stored on the Mizzey server, with alt text generated from the product title where the source supplies none.",
+   "ids": [
+    "MIG-16",
+    "MIG-17"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 46,
+   "depends_on": [
+    {
+     "ref": "#249",
+     "reason": "The import specification names the image source references",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #249"
+    },
+    {
+     "id": "CR-08, OD-26",
+     "class": "Content or client input",
+     "note": "Written confirmation of image and content rights. The register: if not provided, images will not be imported. Development proceeds on fixture images"
+    },
+    {
+     "id": "CR-05",
+     "class": "Blocks production or launch only",
+     "note": "Product photographs meeting the agreed standard"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "For the agreed export: every image reference either stored locally and attached, or reported; alt text present on every imported image. No client image is downloaded before CR-08 is on file.",
+   "not_in_slice": [
+    "MIG-15 (P1-L, owned by E-MIG-2)",
+    "MIG-23 (OUT)",
+    "MIG-24 (OUT)"
+   ],
+   "notes": "MIG-16 is 'subject to the rights confirmation at CR-08'; R-01 is the register's most important legal risk. How image attachments and alt text behave across the two language records is not measured."
+  },
+  {
+   "key": "E-MIG-6",
+   "issue": 297,
+   "epic": "E-MIG",
+   "title": "The initial migration runs in the background, and the catalogue stays exportable",
+   "outcome": "The migration runs without interrupting the store, and afterwards the catalogue can be exported in the standard commerce export format.",
+   "ids": [
+    "MIG-20",
+    "MIG-25"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 47,
+   "depends_on": [
+    {
+     "ref": "#247",
+     "reason": "The migration run that this PBI executes in the background",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #247"
+    },
+    {
+     "id": "CR-09",
+     "class": "Blocks production or launch only",
+     "note": "The full catalogue export"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A11 (owned by #247)",
+   "acceptance_evidence": "The migration run on staging while the storefront stays responsive; a standard export of the migrated catalogue that opens and holds every product.",
+   "not_in_slice": [
+    "MIG-05 (DEF)",
+    "MIG-07 (DEF)",
+    "MIG-21 (P2)",
+    "MIG-22 (P2)"
+   ],
+   "notes": "MIG-25: custom reusable export profiles matching the import schema are not included. ADM-48 (E-ADM-2) and ADM-161 (E-ADM-11) describe the same export. A11: a migration-shaped batch through WooCommerce CRUD corrupted the translation group and the native CSV importer did not, so background execution must keep the sources-first sequence #247 owns. Whether the standard export lists a translated product once or once per language is not measured."
+  },
+  {
+   "key": "E-MKT-3",
+   "issue": 298,
+   "epic": "E-MKT",
+   "title": "Third parties work through a restricted role, Tag Manager and staging, under a written protocol",
+   "outcome": "An agency the client engages can add tracking and change content without being able to install software, edit templates or files, or reach customer data beyond campaign needs, and the client has a written protocol to hand them.",
+   "ids": [
+    "MKT-21",
+    "MKT-22",
+    "MKT-23",
+    "MKT-24",
+    "MKT-25",
+    "MKT-26"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 48,
+   "depends_on": [
+    {
+     "ref": "#251",
+     "reason": "The launch role set, from which the restricted role is drawn",
+     "blocking": true
+    },
+    {
+     "ref": "#244",
+     "reason": "MKT-24: third parties receive staging access",
+     "blocking": false
+    },
+    {
+     "ref": "#275",
+     "reason": "MKT-25: third-party administrative actions in the audit log",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #251"
+    },
+    {
+     "id": "CR-13",
+     "class": "Blocks final acceptance",
+     "note": "Client feedback on the protocol document within 10 Working Days"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Permission tests for the restricted role (DOD-06); no tracking script outside Tag Manager; the protocol document delivered.",
+   "not_in_slice": [
+    "ROLE-05 (DEF)",
+    "ROLE-10 (DEF)",
+    "MKT-11 (P3)"
+   ],
+   "notes": "MKT-21, a key row, and MKT-22 restrict 'the Marketing role', but the Marketing role profile (ROLE-05) is DEF and Part One 1.6 says the standard commerce role set is applied instead. MKT-25 requires third-party administrative actions in the audit log while ADM-132 is reduced to logins, security events and order notes. Both are in audit section 5. MKT-26 is DLV and HND-11 hands the same protocol over. MKT-22, MKT-24 and MKT-25 are P1-L. The register lists what the protocol states."
+  },
+  {
+   "key": "E-ERP-7",
+   "issue": 299,
+   "epic": "E-ERP",
+   "title": "Products and variants are matched to the ERP, one stock identity per item in both languages",
+   "outcome": "Every sellable product and variant resolves to exactly one ERP stock item whichever language record is used, and an unmatched one is found.",
+   "ids": [
+    "ERP-08"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 49,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam and the one-commercial-item identity it fixes",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets the external key. An ERP input, not a predecessor",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-18",
+     "class": "ERP input",
+     "note": "Every sellable product and variant carries a SKU that matches the ERP exactly"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C1, C2, C3, C4 require ERP clarification; A2 verified working; A5 verified defect, bounded",
+   "acceptance_evidence": "Pending PRE-09. Before it: a contract test that both language records of an item resolve to one mapping.",
+   "not_in_slice": [
+    "ERP-09 (OUT)",
+    "INT-14 (P3)"
+   ],
+   "notes": "P1-E, S1. The constraint is already fixed: identity through WPML translation rows, never by SKU alone. A WPML duplicate shares its original's SKU and wc_get_product_id_by_sku can return either member of the pair. Where the canonical mapping is stored is an architecture decision to finalise with PRE-09. AC-25 (E-ACC-2) is its provisional scenario."
+  },
+  {
+   "key": "E-ERP-2",
+   "issue": 300,
+   "epic": "E-ERP",
+   "title": "A sale on the website reduces the corresponding stock in the ERP, exactly once",
+   "outcome": "When an order is placed, the stock of each item sold is reduced in the ERP once and only once.",
+   "ids": [
+    "ERP-04"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 50,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam the decrement goes through",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 defines the call. An ERP input, not a predecessor: built against a mock and a contract",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-16",
+     "class": "ERP input",
+     "note": "ERP test environment with test data on the real SKUs"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B4, B5 measured working; C8, C9, C10 require ERP clarification",
+   "acceptance_evidence": "Against the mock adapter: one order produces exactly one decrement and a retried or duplicated call produces none. Production behaviour verified against the ERP test environment after PRE-09.",
+   "not_in_slice": [
+    "ERP-09 (OUT)",
+    "INT-14 (P3)",
+    "PLT-08 (P3)"
+   ],
+   "notes": "P1 and a key row, not P1-E: the outcome is owed, and the call shape is PRE-09's. D-10 invariants: no duplicate decrement; idempotency, retry, logging and reconciliation paths exist. B4, B5: an Arabic or an English order reduces both language records for simple products and intact variations (t17). P-004: WooCommerce guards a repeated callback with _order_stock_reduced. The register: an order reference, a product identifier and a quantity sent to reduce stock are part of the stock integration, not order synchronisation (EX-35). CHK-12 (#255), BR-003 and BR-007 (E-RULES-2) name this row."
+  },
+  {
+   "key": "E-ERP-3",
+   "issue": 301,
+   "epic": "E-ERP",
+   "title": "No sale is confirmed against stock the ERP cannot validate, including when it is unreachable",
+   "outcome": "The store confirms an order only when the ERP has validated the stock, and declines it cleanly when the ERP cannot be reached.",
+   "ids": [
+    "ERP-05"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 51,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam the validation goes through",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets what the customer sees. An ERP input, not a predecessor",
+     "blocking": false
+    },
+    {
+     "ref": "#255",
+     "reason": "Checkout is where the rule bites; #255 names this row as a boundary",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B6 not yet tested; C6, C11",
+   "acceptance_evidence": "Against the mock adapter: an unreachable ERP and an unvalidated quantity each leave no order confirmed. The customer experience is verified after PRE-09.",
+   "not_in_slice": [
+    "ERP-09 (OUT)"
+   ],
+   "notes": "P1 and a key row. OD-41 is confirmed: the store does not confirm the sale. D-10: a final sale fails closed. R-18: the store depends on the ERP's availability. AC-23 (E-ACC-2) is the provisional scenario."
+  },
+  {
+   "key": "E-SF-2",
+   "issue": 302,
+   "epic": "E-SF",
+   "title": "Home page, in both languages, with sections the client edits and reorders",
+   "outcome": "A visitor lands on a home page with the hero, trending, new arrivals, collections, categories, brands, offers, trust signals and a signup prompt in either language, and the client changes section content and order without a developer.",
+   "ids": [
+    "HOME-01",
+    "HOME-02",
+    "HOME-03",
+    "HOME-04",
+    "HOME-05",
+    "HOME-06",
+    "HOME-07",
+    "HOME-08",
+    "HOME-09",
+    "HOME-10",
+    "HOME-11"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 52,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#311",
+     "reason": "The section library and editing mechanism (SSC-02, SSC-03)",
+     "blocking": false
+    },
+    {
+     "ref": "#282",
+     "reason": "The badge and featured flags the sections draw from",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "CR-05",
+     "class": "Blocks production or launch only",
+     "note": "Product photographs"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Both language versions on staging at mobile and desktop widths; a non-developer edits a section's content and changes the section order, and both storefronts show it (supports AC-20).",
+   "not_in_slice": [
+    "HOME-12 (P2)",
+    "HOME-13 (P3)",
+    "ADM-62 (P2)"
+   ],
+   "notes": "HOME-11 is P1-L: Part One 1.2 gives the client content, images, links and section order through the curated section library, not free-form page building. The register does not define how Trending is computed; the Functional Specification says each section draws its products from the rule or curation set in admin. Best-seller reporting (RPT-03) is DEF."
+  },
+  {
+   "key": "E-SF-3",
+   "issue": 303,
+   "epic": "E-SF",
+   "title": "Product listing, category and collection pages with filters and sorting, in both languages",
+   "outcome": "A customer browses a category, collection or brand listing, narrows it with filters, sorts it and sees what is in stock, in either language.",
+   "ids": [
+    "PLP-01",
+    "PLP-02",
+    "PLP-03",
+    "PLP-04",
+    "PLP-05",
+    "PLP-06",
+    "PLP-07",
+    "PLP-08",
+    "PLP-09",
+    "PLP-10",
+    "PLP-12",
+    "PLP-13",
+    "PLP-14",
+    "PLP-15",
+    "PLP-16",
+    "PLP-17",
+    "PLP-18",
+    "PLP-19",
+    "PLP-20",
+    "PLP-21",
+    "PLP-22"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 53,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#245",
+     "reason": "PLP-03 and PLP-10 show ERP stock through the seam",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B2 measured working (each language record mirrors stock while the translation group is intact)",
+   "acceptance_evidence": "Listings on staging in both languages at mobile and desktop widths; each filter and sort exercised; active filters removable one by one; the empty state shown. Stock criteria pending PRE-09.",
+   "not_in_slice": [
+    "PLP-11 (P1-L, stage S2, owned by E-SF-3b)",
+    "IA-34 (P2)",
+    "WISH-08 (P2)"
+   ],
+   "notes": "PLP-03 reads 'Stock status indication, from your ERP (ERP-02)'. P-019 measured that sales of one product split across its two language records at the storage layer; whether the best-selling sort (PLP-14) is affected is not measured and should be before it is accepted. Filter by rating (PLP-11) is S2. REV-04, the average rating on the listing, is owned by E-SF-11."
+  },
+  {
+   "key": "E-SF-4",
+   "issue": 304,
+   "epic": "E-SF",
+   "title": "Search that works in English and Arabic, with an admin-managed synonym list",
+   "outcome": "A customer finds products by typing in English, Arabic or common Franco-Arabic spellings, with suggestions as they type and a useful page when nothing matches.",
+   "ids": [
+    "SRCH-01",
+    "SRCH-02",
+    "SRCH-03",
+    "SRCH-04",
+    "SRCH-05",
+    "SRCH-06",
+    "SRCH-06a",
+    "SRCH-07",
+    "SRCH-08"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 54,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#303",
+     "reason": "SRCH-04: the results page carries the listing's full filter set",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253, #303"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "Initial synonym and correction entries",
+     "class": "Content or client input",
+     "note": "The client's main categories and brands, including Franco-Arabic spellings; seeded examples until supplied"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A4 (a duplicate shares its original's SKU, which SRCH-02 searches)",
+   "acceptance_evidence": "A fixed query set in English, Arabic and Franco-Arabic returning the expected products in the current language; a synonym added in admin taking effect; zero-result and autocomplete states; search terms logged.",
+   "not_in_slice": [
+    "SRCH-09 (P2)",
+    "INT-15 (P2)",
+    "RPT-07 (DEF)"
+   ],
+   "notes": "P-007: native WordPress search is substring matching. It reached the Arabic product only when the query was literally contained in the name, and failed an orthographic variant and the Franco-Arabic rendering. SRCH-06 is P1-L: a curated synonym and correction list across the main categories and brands, not full automatic typo tolerance. SRCH-08 logs terms; reporting on them (RPT-07) is DEF. An external search engine is P2."
+  },
+  {
+   "key": "E-SF-7",
+   "issue": 305,
+   "epic": "E-SF",
+   "title": "Registration, sign-in and Google sign-in resolve to one account, with guest checkout kept open",
+   "outcome": "A customer registers, signs in, resets a password or uses Google, always ending in one account per email address; a guest can buy without an account and convert afterwards by setting a password only.",
+   "ids": [
+    "AUTH-01",
+    "AUTH-02",
+    "AUTH-03",
+    "AUTH-04",
+    "AUTH-05",
+    "AUTH-06",
+    "AUTH-07",
+    "AUTH-08",
+    "AUTH-09",
+    "AUTH-10",
+    "AUTH-11",
+    "AUTH-12",
+    "AUTH-13",
+    "AUTH-14",
+    "AUTH-15",
+    "AUTH-16"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 55,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#290",
+     "reason": "AUTH-06 applies the welcome discount of BR-001",
+     "blocking": false
+    },
+    {
+     "ref": "#255",
+     "reason": "AUTH-07 and AUTH-11 run through checkout and the order confirmation",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "Google sign-in credentials",
+     "class": "Vendor or account input",
+     "note": "An OAuth client in a client-owned Google account; a developer test client stands in"
+    },
+    {
+     "id": "OD-03",
+     "class": "Configurable working default",
+     "note": "The welcome discount values AUTH-06 applies"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "AC-13 and AC-19; a Google sign-in and a manual registration on the same email yielding one account; automated tests on sessions, login rate limiting and the single-use, time-limited reset link.",
+   "not_in_slice": [
+    "AUTH-10a (P2)",
+    "INT-07 (P2)"
+   ],
+   "notes": "AUTH-02, register with phone number, and AUTH-12, passwordless email link, are P1-L, and neither has a reduction stated in Part One 1.2 or in its row; SMS and OTP are P2 (INT-07), so OTP verification of a phone number is not available. See audit section 5. AUTH-10, AUTH-11, AUTH-13 and AUTH-15 are key rows. P-001 applies on sign-in: the cart is replaced, not merged; the merge is owned by E-SF-6. AUTH-09: marketing consent is captured separately from account creation (R-04)."
+  },
+  {
+   "key": "E-SF-6",
+   "issue": 306,
+   "epic": "E-SF",
+   "title": "Cart that survives registration, sign-in and return visits, in both languages",
+   "outcome": "A customer manages a cart with a clear breakdown, coupon feedback and a free-shipping prompt, and a guest cart carries through registration, sign-in and Google sign-in with no item lost and no duplicate line.",
+   "ids": [
+    "CART-01",
+    "CART-02",
+    "CART-03",
+    "CART-04",
+    "CART-05",
+    "CART-06",
+    "CART-07",
+    "CART-08",
+    "CART-09",
+    "CART-10",
+    "CART-11",
+    "CART-12",
+    "CART-13",
+    "CART-14",
+    "CART-15",
+    "CART-16",
+    "CART-17",
+    "CART-18"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 56,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#305",
+     "reason": "CART-13, CART-14 and CART-15 need the registration, sign-in and Google flows",
+     "blocking": true
+    },
+    {
+     "ref": "#281",
+     "reason": "CART-06 coupon entry uses the engine",
+     "blocking": false
+    },
+    {
+     "ref": "#290",
+     "reason": "CART-07 reads the BR-002 condition",
+     "blocking": false
+    },
+    {
+     "ref": "#245",
+     "reason": "CART-10 re-validates stock through the seam; ERP-03 is owned by E-ERP-4",
+     "blocking": false
+    },
+    {
+     "ref": "#307",
+     "reason": "CART-04 and CART-17 touch the wishlist",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253, #305"
+    },
+    {
+     "id": "OD-04",
+     "class": "Configurable working default",
+     "note": "Two or more units, any mix; admin-configurable"
+    },
+    {
+     "id": "Guest cart retention window",
+     "class": "Configurable working default",
+     "note": "CART-16 says a defined window; the Functional Specification makes it a documented setting. Owner to set the default"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B1 measured (stock limits read one effective balance while the translation group is intact)",
+   "acceptance_evidence": "AC-01 and AC-18 on staging in both languages; each merge case (guest then register, guest then sign in with a saved cart, guest then Google) leaving no lost item and no duplicate line. The ERP criteria of CART-10 are pending PRE-09.",
+   "not_in_slice": [
+    "ERP-03 (P1-E, owned by E-ERP-4)",
+    "NOTF-10 (P2)",
+    "WISH-05 (P2)",
+    "PDP-20 (P2)",
+    "ADM-46 (P2)"
+   ],
+   "notes": "P-001: on login WooCommerce 11.1.0 replaces rather than merges. The guest session cart survived and the saved persistent cart was dropped silently, so CART-13, CART-14, CART-15 and CART-18 are custom work. P-015: there is no native wishlist, and a guest wishlist faces the same replace-or-merge decision, so CART-17 is designed together with E-SF-10. CART-10 is a P1 row worded on ERP-03, which is P1-E. P-011: no native item-count condition for free shipping. CART-13, CART-14 and CART-15 are key rows; CART-08 and CART-17 are P1-L. Once seeded, #255 should name this PBI as a predecessor."
+  },
+  {
+   "key": "E-SF-10",
+   "issue": 307,
+   "epic": "E-SF",
+   "title": "Wishlist for guests and customers, and recently viewed products",
+   "outcome": "A visitor saves products to a wishlist that persists once they have an account, moves them to the cart, and sees what they recently viewed.",
+   "ids": [
+    "WISH-01",
+    "WISH-02",
+    "WISH-03",
+    "WISH-04",
+    "WISH-07"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 57,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Add, remove and move to cart as a guest and as a customer in both languages; the wishlist present after signing in on another device; recently viewed products listed.",
+   "not_in_slice": [
+    "WISH-05 (P2)",
+    "WISH-06 (P2)",
+    "WISH-08 (P2)",
+    "IA-12 (P2)"
+   ],
+   "notes": "P-015: WooCommerce 11.1.0 has no wishlist functions, classes or tables, and guest state has no native carrier for one. Part One 1.2: save, view and move to cart; no sharing, multiple lists or price-drop alerts. The transfer of a guest wishlist to the account is CART-17 (E-SF-6). The wishlist page (IA-11) is #242's row; PDP-10 and PDP-19 are #254's. Whether a product saved in one language shows in the wishlist in the other is not measured."
+  },
+  {
+   "key": "E-SF-9",
+   "issue": 308,
+   "epic": "E-SF",
+   "title": "My Account: profile, addresses, order history, tracking and invoice download",
+   "outcome": "A signed-in customer edits their profile and password, keeps an address book, reads their orders in detail, tracks a shipment, opens their wishlist and downloads an invoice.",
+   "ids": [
+    "ACCT-01",
+    "ACCT-02",
+    "ACCT-03",
+    "ACCT-04",
+    "ACCT-05",
+    "ACCT-06",
+    "ACCT-07",
+    "ACCT-08",
+    "ACCT-12"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 58,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#305",
+     "reason": "The account exists only after sign-in",
+     "blocking": true
+    },
+    {
+     "ref": "#248",
+     "reason": "ACCT-07 reads the status and shipment state #248 records",
+     "blocking": false
+    },
+    {
+     "ref": "#307",
+     "reason": "ACCT-08 shows the saved wishlist",
+     "blocking": false
+    },
+    {
+     "ref": "#280",
+     "reason": "ACCT-12 downloads the invoice document ADM-92 produces",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253, #305"
+    },
+    {
+     "id": "OD-09",
+     "class": "Content or client input",
+     "note": "VAT and invoicing requirements decide the invoice content"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "Legal entity details on invoices"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "D1 verified working (observed); D5 not yet tested generally",
+   "acceptance_evidence": "Each account page on staging in both languages; an address added, edited, deleted and set as default; an order tracked; an invoice downloaded.",
+   "not_in_slice": [
+    "ACCT-09 (P1-L, stage S2, owned by E-SF-9b)",
+    "ACCT-11 (P1-L, stage S2, owned by E-SF-9b)",
+    "ACCT-13 (P1-L, stage S2, owned by E-SF-9b)",
+    "ACCT-10 (DEF)",
+    "IA-22 (DEF)",
+    "RET-10 (DEF)"
+   ],
+   "notes": "ACCT-12 is P1-L. #242 owns the account page rows (IA-17, IA-18, IA-19, IA-20, IA-21) and their URLs in both languages. Reorder, notification preferences and the account deletion request are S2; returns from the account are DEF."
+  },
+  {
+   "key": "E-SF-11",
+   "issue": 309,
+   "epic": "E-SF",
+   "title": "Moderated product reviews with ratings, and a review invitation after delivery",
+   "outcome": "A customer rates and reviews a product, nothing is published before moderation, the average shows on the product page and the listing, and a delivered order triggers an invitation to review.",
+   "ids": [
+    "REV-01",
+    "REV-02",
+    "REV-03",
+    "REV-04",
+    "REV-05"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 59,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#254",
+     "reason": "The product page the reviews are submitted and shown on (PDP-17), not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#248",
+     "reason": "The Delivered state that triggers REV-05",
+     "blocking": false
+    },
+    {
+     "ref": "#285",
+     "reason": "NOTF-06 names the same invitation",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #254"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery.",
+   "not_in_slice": [
+    "REV-06 (P2)",
+    "REV-07 (P2)",
+    "REV-08 (P2)",
+    "REV-09 (P2)",
+    "PLP-11 (P1-L, stage S2, owned by E-SF-3b)"
+   ],
+   "notes": "Part One 1.2: star ratings and text, moderated before publication; no photo or video reviews, verified-purchase badge, voting or questions. A review attaches to one language record of a product: whether a review left on the Arabic product shows on the English one, and whether the average of REV-04 combines both, is not measured and is not in the data-integrity workstream."
+  },
+  {
+   "key": "E-SF-12",
+   "issue": 310,
+   "epic": "E-SF",
+   "title": "Trust and support pages, editable without a developer, in both languages",
+   "outcome": "The eight trust and support pages exist in both languages with a working contact form and a WhatsApp link, and the client edits all of them without a developer.",
+   "ids": [
+    "CMS-01",
+    "CMS-02",
+    "CMS-03",
+    "CMS-04",
+    "CMS-05",
+    "CMS-06",
+    "CMS-07",
+    "CMS-08",
+    "CMS-09",
+    "CMS-10"
+   ],
+   "scope_class": "P1",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 60,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "Design system, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
+     "blocking": true
+    },
+    {
+     "ref": "#242",
+     "reason": "The pages and their URLs. Satisfied: merged 5 October 2026 as 3ff7488",
+     "blocking": true
+    },
+    {
+     "ref": "#311",
+     "reason": "SSC-10, the editing mechanism for static and policy pages",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250, #253"
+    },
+    {
+     "id": "CR-04",
+     "class": "Blocks production or launch only",
+     "note": "Legal and policy text: shipping, returns, privacy, terms"
+    },
+    {
+     "id": "OD-08",
+     "class": "Content or client input",
+     "note": "Return window and exceptions, for the returns policy page"
+    },
+    {
+     "id": "OD-13",
+     "class": "Content or client input",
+     "note": "Authenticity and warranty policy, for the guarantee page"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "Support numbers and the contact form's recipient"
+    },
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "Each page on staging in both languages; the contact form delivering a message; the WhatsApp link opening a chat; a non-developer editing a policy page.",
+   "not_in_slice": [
+    "MKT-19 (OUT)",
+    "INT-03 (P2)",
+    "RET-01 (DEF)"
+   ],
+   "notes": "The pages are built by the developer; the legal and policy text is the client's. The register's G11 names the block editor as the editing mechanism. CMS-10 is a click-to-chat link, not an automated notification."
+  },
+  {
+   "key": "E-ADM-10",
+   "issue": 311,
+   "epic": "E-ADM",
+   "title": "Self-service storefront and product control: everything a customer sees is editable in both languages, with preview",
+   "outcome": "The client changes any storefront text, image, link, section, navigation item, footer, banner, page or product field, independently in English and Arabic, previews it, and sees it live on save.",
+   "ids": [
+    "SSC-01",
+    "SSC-02",
+    "SSC-03",
+    "SSC-04",
+    "SSC-05",
+    "SSC-06",
+    "SSC-07",
+    "SSC-08",
+    "SSC-09",
+    "SSC-10",
+    "SSC-11",
+    "SSC-12",
+    "SSC-13",
+    "SSC-14",
+    "SSC-20",
+    "SSC-22",
+    "SSC-23",
+    "SSC-24",
+    "SSC-25",
+    "SSC-26",
+    "SSC-27",
+    "SSC-28",
+    "SSC-29"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 61,
+   "depends_on": [
+    {
+     "ref": "#250",
+     "reason": "The curated section library is derived from the approved Interface Design",
+     "blocking": true
+    },
+    {
+     "ref": "#253",
+     "reason": "SSC-07 and SSC-08 edit the header navigation and the footer",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "needs design",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #250"
+    },
+    {
+     "id": "OD-01",
+     "class": "Blocks final acceptance",
+     "note": "Brand name, logo and visual identity. Structural work proceeds on neutral tokens; approval waits (D-10)"
+    },
+    {
+     "id": "CR-15",
+     "class": "Content or client input",
+     "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "A8 verified working; A10, A11 (the browser translation flow is a staging check)",
+   "acceptance_evidence": "AC-20: the client edits a product and a storefront section unaided and both storefronts show it; preview before publishing and revert demonstrated; no customer-facing string needing a code change.",
+   "not_in_slice": [
+    "SSC-21 (P1, owned by #247)",
+    "HOME-12 (P2)",
+    "ADM-62 (P2)",
+    "ADM-58 (P2)",
+    "ADM-159a (P2)"
+   ],
+   "notes": "Register G11: the standard block editor with a curated library of complete storefront sections, and Full Site Editing for templates, header and footer where appropriate. Not included: new section types, arbitrary layout, unrestricted nesting, a custom page-builder product; a new section type or a variant outside the approved Interface Design is a Change Request. SSC-01, SSC-12 and SSC-20 are key rows. SSC-20 says the stock field is P1-E. SSC-09 contracts banner scheduling at P1-L while section scheduling (HOME-12, ADM-62) is P2: see audit section 5. SSC-08 is the only register row that names the footer. A8: a WPML duplicate keeps the source-language name until translated. A10: the Arabic parent of a variable product translated programmatically was registered as simple."
+  },
+  {
+   "key": "E-EVT-1",
+   "issue": 312,
+   "epic": "E-EVT",
+   "title": "The standard e-commerce events fire across the funnel, in both languages",
+   "outcome": "Each contracted analytics event fires once, with its parameters, at the moment the plan defines, on both storefronts.",
+   "ids": [
+    "EVT-01",
+    "EVT-02",
+    "EVT-03",
+    "EVT-04",
+    "EVT-05",
+    "EVT-06",
+    "EVT-07",
+    "EVT-08",
+    "EVT-09",
+    "EVT-10",
+    "EVT-11",
+    "EVT-12",
+    "EVT-13",
+    "EVT-14",
+    "EVT-15",
+    "EVT-16",
+    "EVT-18"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 62,
+   "depends_on": [
+    {
+     "ref": "#274",
+     "reason": "The plan defines each event, trigger and parameter",
+     "blocking": true
+    },
+    {
+     "ref": "#288",
+     "reason": "The Tag Manager container and the data layer the events travel through",
+     "blocking": true
+    },
+    {
+     "ref": "#303",
+     "reason": "Listing events",
+     "blocking": true
+    },
+    {
+     "ref": "#304",
+     "reason": "Search events",
+     "blocking": true
+    },
+    {
+     "ref": "#254",
+     "reason": "Product events",
+     "blocking": true
+    },
+    {
+     "ref": "#307",
+     "reason": "Wishlist event",
+     "blocking": true
+    },
+    {
+     "ref": "#306",
+     "reason": "Cart events",
+     "blocking": true
+    },
+    {
+     "ref": "#255",
+     "reason": "Checkout and purchase events",
+     "blocking": true
+    },
+    {
+     "ref": "#305",
+     "reason": "Registration and login events",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #274, #288, #303, #304, #254, #307, #306, #255, #305"
+    },
+    {
+     "id": "Google, Meta and TikTok accounts",
+     "class": "Vendor or account input",
+     "note": "Opened by the client"
+    },
+    {
+     "id": "OD-21",
+     "class": "Configurable working default",
+     "note": "Which trackers are activated at launch"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "Workstream E: product-level identity inside GA4 is not yet tested",
+   "acceptance_evidence": "Each event observed in the tag debugger on staging with the planned parameters, in both languages (DOD-05); purchase carrying items, tax, shipping and discount values.",
+   "not_in_slice": [
+    "EVT-17 (P2)",
+    "EVT-19 (DEF)",
+    "EVT-20 (DLV, owned by E-EVT-2)"
+   ],
+   "notes": "EVT-10, EVT-15 and EVT-18 are P1-L. The refund event (EVT-15) is in the first release; the return-requested event is DEF and the promotion events are P2. The register fixes the event names, including view_home and zero_result_search. Consent (MKT-10) governs whether events are sent."
+  },
+  {
+   "key": "E-RPT-4",
+   "issue": 313,
+   "epic": "E-RPT",
+   "title": "Funnel and traffic reports available in Google Analytics",
+   "outcome": "The owner reads the purchase funnel and traffic by channel, source and campaign in Google Analytics.",
+   "ids": [
+    "RPT-08",
+    "RPT-09"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 63,
+   "depends_on": [
+    {
+     "ref": "#312",
+     "reason": "The funnel is built from the events",
+     "blocking": true
+    },
+    {
+     "ref": "#288",
+     "reason": "The GA4 property and Tag Manager container",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #312, #288"
+    },
+    {
+     "id": "GA4 property in a client-owned account",
+     "class": "Vendor or account input",
+     "note": "Opened by the client"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "Workstream E: RPT-08 and RPT-09 not yet tested",
+   "acceptance_evidence": "The funnel exploration and the traffic acquisition report populated in GA4 from staging test traffic.",
+   "not_in_slice": [
+    "RPT-07 (DEF)",
+    "RPT-04 (P2)",
+    "ADM-07 (P1-L, stage S2, owned by E-ADM-1b)"
+   ],
+   "notes": "Both rows are P1-L (via GA4): delivered through GA4 configuration, not a built report. Conversion rate on the dashboard (ADM-07) is S2 and available in Google Analytics until then."
+  },
+  {
+   "key": "E-ERP-4",
+   "issue": 314,
+   "epic": "E-ERP",
+   "title": "Adding to the cart and viewing the cart take account of ERP stock",
+   "outcome": "A customer cannot add or keep in the cart a quantity the ERP does not hold.",
+   "ids": [
+    "ERP-03"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 64,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#306",
+     "reason": "The cart this behaviour lives in",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets the method. An ERP input",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245, #306"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C5, C6, C7 require ERP clarification",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "ERP-09 (OUT)"
+   ],
+   "notes": "P1-E, S1. Owner now; acceptance pending PRE-09 (M-3). CART-10 (E-SF-6) is the P1 row worded on this one. The register: ERP-02 is not a promise of a separate call to the ERP on every page view."
+  },
+  {
+   "key": "E-ERP-5",
+   "issue": 315,
+   "epic": "E-ERP",
+   "title": "Stock is restored in the ERP on a failed payment or a cancellation, and returned parcels are received",
+   "outcome": "When a payment fails or an order is cancelled the units return to the ERP, and a parcel returned after dispatch is received in the ERP.",
+   "ids": [
+    "ERP-06"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 65,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#300",
+     "reason": "Restoration reverses the decrement it owns",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets the method. An ERP input",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245, #300"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B7 measured working on the WooCommerce side; B8, B9 not yet tested; C13; F4",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "RET-07 (P2)",
+    "ADM-126 (P2)"
+   ],
+   "notes": "P1-E, S1. B7: an Arabic order of 2 reduced both records to 8 and cancelling restored both to 10 (t17); the ERP half is PRE-09. BR-007 (E-RULES-2) is the P1 rule worded on the same behaviour. AC-24 (E-ACC-2) is the provisional scenario. Disposition of a returned item (RET-07, ADM-126) is P2."
+  },
+  {
+   "key": "E-ERP-6",
+   "issue": 316,
+   "epic": "E-ERP",
+   "title": "Stock appears in, and is changed through, the store admin as PRE-09 settles",
+   "outcome": "Staff see stock in the store admin, and change it there or in the ERP, exactly as the ERP Integration Specification settles.",
+   "ids": [
+    "ERP-07"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 66,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 settles whether each stock task is done in the ERP or in the store",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C12 requires ERP clarification",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "ADM-76 (P2)",
+    "ADM-78 (P3)",
+    "ADM-79 (P2)",
+    "ADM-80 (OUT)"
+   ],
+   "notes": "P1-E, S1. Pairs with E-ADM-4 and E-ADM-4b. A12: manage_stock is one of the fields that did not follow a code-level save; the board document assigns that finding to PRE-09."
+  },
+  {
+   "key": "E-ADM-4",
+   "issue": 317,
+   "epic": "E-ADM",
+   "title": "Stock on hand and stock available shown in admin from the ERP",
+   "outcome": "Staff read stock on hand and stock available for any item in the store admin, as the ERP reports them.",
+   "ids": [
+    "ADM-70",
+    "ADM-72"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 67,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#316",
+     "reason": "How stock appears in the admin is ERP-07's",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09. An ERP input",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245, #316"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B2 measured working; B3 measured defect, conditional on group integrity; C12",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "ADM-71 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-73 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-74 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-75 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-77 (P1-E, stage -, owned by E-ADM-4b)",
+    "ADM-76 (P2)",
+    "ADM-78 (P3)",
+    "ADM-79 (P2)",
+    "ADM-80 (OUT)"
+   ],
+   "notes": "Split from the map's E-ADM-4: these two rows are the S1 ones. P1-E; owner now, acceptance pending PRE-09. B2: a translated pair holds separate stock rows that WCML keeps equal on the stock write."
+  },
+  {
+   "key": "E-ADM-4b",
+   "issue": 318,
+   "epic": "E-ADM",
+   "title": "Inventory tasks whose method and timing PRE-09 sets",
+   "outcome": "Reserved stock, stock adjustments with reason and user, low-stock thresholds, low and out-of-stock alerts, bulk stock import and bulk stock change work as the ERP Integration Specification settles.",
+   "ids": [
+    "ADM-71",
+    "ADM-73",
+    "ADM-74",
+    "ADM-75",
+    "ADM-77",
+    "ADM-149"
+   ],
+   "scope_class": "P1-E",
+   "stage": "-",
+   "stage1": false,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 68,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets both method and stage",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245, #243"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C7, C12 require ERP clarification",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "ADM-76 (P2)",
+    "ADM-78 (P3)",
+    "ADM-79 (P2)",
+    "ADM-80 (OUT)",
+    "ADM-147 (DEF)"
+   ],
+   "notes": "Split from the map's E-ADM-4: the six P1-E rows whose stage cell in the register reads 'Per PRE-09', extracted as '-'. Not an S1 PBI. Recommended to be created now, with the board Stage 'per PRE-09', because the owner's instruction gives every P1-E row an owner now: see audit section 5. ADM-74 defines what 'low' means for RPT-10 (#246) and ADM-10 (E-ADM-1)."
+  },
+  {
+   "key": "E-DATA-2",
+   "issue": 319,
+   "epic": "E-DATA",
+   "title": "Inventory transaction records, as PRE-09 settles",
+   "outcome": "Every stock movement and its reason is recorded where the ERP Integration Specification places it.",
+   "ids": [
+    "ENT-04"
+   ],
+   "scope_class": "P1-E",
+   "stage": "-",
+   "stage1": false,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 69,
+   "depends_on": [
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 sets both method and stage",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #245, #243"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C12",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "ADM-76 (P2)",
+    "ENT-12 (DEF)",
+    "ENT-18 (P2)"
+   ],
+   "notes": "P1-E, with a stage cell reading 'Per PRE-09', extracted as '-'. Not an S1 PBI; recommended to be created now with the board Stage 'per PRE-09'. The full inventory transaction log (ADM-76) is P2."
+  },
+  {
+   "key": "E-MIG-7",
+   "issue": 320,
+   "epic": "E-MIG",
+   "title": "Initial stock quantities loaded where PRE-09 settles",
+   "outcome": "At the initial load each item's stock quantity lands in the ERP or in the store, as the ERP Integration Specification settles.",
+   "ids": [
+    "MIG-14"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 70,
+   "depends_on": [
+    {
+     "ref": "#247",
+     "reason": "The migration run",
+     "blocking": true
+    },
+    {
+     "ref": "#245",
+     "reason": "The adapter seam",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "PRE-09 settles the destination. An ERP input",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #247, #245"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-09",
+     "class": "Blocks production or launch only",
+     "note": "The full catalogue export"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "C14 requires ERP clarification",
+   "acceptance_evidence": "Pending PRE-09.",
+   "not_in_slice": [
+    "MIG-21 (P2)",
+    "MIG-22 (P2)"
+   ],
+   "notes": "P1-E, S1. MIG-14 is itself one of the 19 P1-E rows; the board document's phrase 'the 19 P1-E rows plus MIG-14' counts it twice."
+  },
+  {
+   "key": "E-ACC-2",
+   "issue": 321,
+   "epic": "E-ACC",
+   "title": "ERP stock acceptance scenarios, finalised in PRE-09, pass against the ERP test environment",
+   "outcome": "The five ERP stock scenarios pass in the wording the ERP Integration Specification finalises.",
+   "ids": [
+    "AC-21",
+    "AC-22",
+    "AC-23",
+    "AC-24",
+    "AC-25"
+   ],
+   "scope_class": "P1-E",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 71,
+   "depends_on": [
+    {
+     "ref": "#300",
+     "reason": "AC-22",
+     "blocking": true
+    },
+    {
+     "ref": "#301",
+     "reason": "AC-21, AC-23",
+     "blocking": true
+    },
+    {
+     "ref": "#314",
+     "reason": "AC-21",
+     "blocking": true
+    },
+    {
+     "ref": "#315",
+     "reason": "AC-24",
+     "blocking": true
+    },
+    {
+     "ref": "#299",
+     "reason": "AC-25",
+     "blocking": true
+    },
+    {
+     "ref": "#243",
+     "reason": "Final wording is set in PRE-09",
+     "blocking": false
+    }
+   ],
+   "erp_blocked": "yes",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #300, #301, #314, #315, #299"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-16",
+     "class": "ERP input",
+     "note": "ERP test environment with test data on the real SKUs"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B6 not yet tested (AC-22); C5, C6, C11, C13",
+   "acceptance_evidence": "Pending PRE-09. Each row is marked Provisional in the register.",
+   "not_in_slice": [],
+   "notes": "Five P1-E scenarios, S1. The register marks each 'Provisional' and says the final wording is set in PRE-09. No final criteria before then (M-3)."
+  },
+  {
+   "key": "E-FND-3",
+   "issue": 322,
+   "epic": "E-FND",
+   "title": "The customer journey holds end to end, from discovery to after-sales",
+   "outcome": "A customer moves through the ten journey steps of register section A5 without a break, the cart carrying through every identity path.",
+   "ids": [
+    "JRN-01",
+    "JRN-02",
+    "JRN-03",
+    "JRN-04",
+    "JRN-05",
+    "JRN-06",
+    "JRN-07",
+    "JRN-08",
+    "JRN-09",
+    "JRN-10"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 72,
+   "depends_on": [
+    {
+     "ref": "#302",
+     "reason": "JRN-01",
+     "blocking": true
+    },
+    {
+     "ref": "#304",
+     "reason": "JRN-02",
+     "blocking": true
+    },
+    {
+     "ref": "#254",
+     "reason": "JRN-03, JRN-04",
+     "blocking": true
+    },
+    {
+     "ref": "#306",
+     "reason": "JRN-05, JRN-06",
+     "blocking": true
+    },
+    {
+     "ref": "#305",
+     "reason": "JRN-06",
+     "blocking": true
+    },
+    {
+     "ref": "#255",
+     "reason": "JRN-07, JRN-08",
+     "blocking": true
+    },
+    {
+     "ref": "#248",
+     "reason": "JRN-09",
+     "blocking": true
+    },
+    {
+     "ref": "#292",
+     "reason": "JRN-10",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #302, #304, #254, #306, #305, #255, #248, #292"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "An end-to-end walk of the journey on staging in both languages.",
+   "not_in_slice": [
+    "JRN-12 (P3)"
+   ],
+   "notes": "Split from the earlier E-FND-3, which also held JRN-11, a second-release row. JRN-06 is a key row. JRN-05 and JRN-08 are P1-L. These ten rows were recorded as unstaged until the register extraction was corrected on 5 October 2026: the journey table has two columns headed Stage, and the contractual one is the last. This PBI is an end-to-end record, accepted on the evidence of the PBIs it depends on."
+  },
+  {
+   "key": "E-ACC-1",
+   "issue": 323,
+   "epic": "E-ACC",
+   "title": "The client's acceptance scenarios pass as the UAT script",
+   "outcome": "The twenty non-ERP acceptance scenarios pass on staging, run as the UAT script.",
+   "ids": [
+    "AC-01",
+    "AC-02",
+    "AC-03",
+    "AC-04",
+    "AC-05",
+    "AC-06",
+    "AC-07",
+    "AC-08",
+    "AC-09",
+    "AC-10",
+    "AC-11",
+    "AC-12",
+    "AC-13",
+    "AC-14",
+    "AC-15",
+    "AC-16",
+    "AC-17",
+    "AC-18",
+    "AC-19",
+    "AC-20"
+   ],
+   "scope_class": "mixed",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 73,
+   "depends_on": [
+    {
+     "ref": "#306",
+     "reason": "AC-01, AC-18",
+     "blocking": true
+    },
+    {
+     "ref": "#290",
+     "reason": "AC-02, AC-03, AC-10",
+     "blocking": true
+    },
+    {
+     "ref": "#281",
+     "reason": "AC-04",
+     "blocking": true
+    },
+    {
+     "ref": "#255",
+     "reason": "AC-05, AC-06, AC-09, AC-13, AC-15",
+     "blocking": true
+    },
+    {
+     "ref": "#283",
+     "reason": "AC-06, AC-07, AC-08, AC-10",
+     "blocking": true
+    },
+    {
+     "ref": "#251",
+     "reason": "AC-11",
+     "blocking": true
+    },
+    {
+     "ref": "#305",
+     "reason": "AC-13, AC-19",
+     "blocking": true
+    },
+    {
+     "ref": "#292",
+     "reason": "AC-14",
+     "blocking": true
+    },
+    {
+     "ref": "#291",
+     "reason": "AC-16",
+     "blocking": true
+    },
+    {
+     "ref": "#247",
+     "reason": "AC-17",
+     "blocking": true
+    },
+    {
+     "ref": "#311",
+     "reason": "AC-20",
+     "blocking": true
+    },
+    {
+     "ref": "#301",
+     "reason": "AC-05, AC-15",
+     "blocking": true
+    },
+    {
+     "ref": "#241",
+     "reason": "AC-12. Satisfied: merged 4 October 2026 as 405a113",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "partial",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #306, #290, #281, #255, #283, #251, #305, #292, #291, #247, #311, #301"
+    },
+    {
+     "id": "PRE-09",
+     "class": "ERP input",
+     "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
+    },
+    {
+     "id": "CR-14",
+     "class": "Blocks final acceptance",
+     "note": "UAT completed by the client within the agreed window"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "B6 not yet tested (AC-05); D3 verified working (AC-09); F2 (AC-16)",
+   "acceptance_evidence": "The UAT run under the Acceptance and UAT Plan MS-UAT-2026-027, one recorded result per scenario.",
+   "not_in_slice": [],
+   "notes": "Not a build PBI. The register: these become the UAT script verbatim. AC-14 and AC-17 are P1-L. AC-05 and AC-15 concern stock running out; the stock figure is the ERP's (BR-003), so their ERP half is pending PRE-09 although the rows are P1. AC-09 holds natively (P-002) and AC-10 holds natively for WooCommerce bookkeeping (P-014). P-004 narrows AC-06 and AC-07 without clearing them. The backlog document's remark that 'AC-06 and AC-07 are the cost pilot open items' refers to the pilot's own sixth and seventh criteria (CX-01 and OD-12), not to these register rows, which are the double-click and the duplicate-confirmation scenarios."
+  },
+  {
+   "key": "E-HND",
+   "issue": 324,
+   "epic": "E-HND",
+   "title": "Handover: code, design, documentation, accounts, environments, training and warranty",
+   "outcome": "At the end of the engagement the client owns and can operate everything: repository, design system, documentation, accounts, environments and procedures, and has been trained.",
+   "ids": [
+    "HND-01",
+    "HND-02",
+    "HND-03",
+    "HND-04",
+    "HND-05",
+    "HND-06",
+    "HND-07",
+    "HND-08",
+    "HND-09",
+    "HND-10",
+    "HND-11",
+    "HND-12"
+   ],
+   "scope_class": "DLV",
+   "stage": "S1",
+   "stage1": true,
+   "create_now": true,
+   "status": "Blocked",
+   "delivery_order": 74,
+   "depends_on": [
+    {
+     "ref": "#244",
+     "reason": "HND-04, HND-05, HND-07 and HND-08 hand over the environments and their procedures",
+     "blocking": true
+    },
+    {
+     "ref": "#250",
+     "reason": "HND-02 hands over the design system",
+     "blocking": true
+    },
+    {
+     "ref": "#298",
+     "reason": "HND-11 hands over the protocol of MKT-26",
+     "blocking": true
+    },
+    {
+     "ref": "#274",
+     "reason": "HND-12 hands over the plan of EVT-20",
+     "blocking": true
+    },
+    {
+     "ref": "#323",
+     "reason": "HND-07 includes the acceptance results",
+     "blocking": true
+    }
+   ],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [
+    {
+     "id": "Predecessor PBIs",
+     "class": "Blocks development now",
+     "note": "Not yet delivered: #244, #250, #298, #274, #323"
+    },
+    {
+     "id": "OD-27, OD-14",
+     "class": "Blocks production or launch only",
+     "note": "Production hosting, which HND-04 and HND-08 depend on"
+    },
+    {
+     "id": "OD-18",
+     "class": "Blocks production or launch only",
+     "note": "Domain and DNS"
+    },
+    {
+     "id": "Client-owned provider accounts",
+     "class": "Vendor or account input",
+     "note": "Payment, shipping, email and analytics (HND-06)"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    }
+   ],
+   "data_integrity": "",
+   "acceptance_evidence": "A handover record, one line per row, countersigned by the client.",
+   "not_in_slice": [],
+   "notes": "HND-09 is reduced: a written Arabic admin manual plus a live handover session (Part One 1.2). HND-06 lists SMS accounts although SMS is P2 (INT-07); the Functional Specification's handover story lists payment, shipping, email and analytics only. HND-02: PRE-03b is delivered as working HTML and CSS screens. HND-01: the Functional Specification's Stage 1 record of 22 September 2026 lists 'Code repository in your name' as not yet set up. HND-10: the warranty runs from Production Go-Live on the Services Agreement terms."
+  },
+  {
+   "key": "E-ADM-1b",
+   "issue": null,
+   "epic": "E-ADM",
+   "title": "Dashboard, second release: new and returning customers, conversion rate",
+   "outcome": "The dashboard shows new and returning customers and the conversion rate.",
+   "ids": [
+    "ADM-05",
+    "ADM-07"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-ADM-6b",
+   "issue": null,
+   "epic": "E-ADM",
+   "title": "Customers, second release: lifetime metrics and export under privacy controls",
+   "outcome": "Staff read a customer's total spend, average order value, returns and coupon usage, and export customer data under privacy controls.",
+   "ids": [
+    "ADM-101",
+    "ADM-105"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-FND-2b",
+   "issue": null,
+   "epic": "E-FND",
+   "title": "Information architecture, second release",
+   "outcome": "The notification preferences page and brand landing pages exist in both languages.",
+   "ids": [
+    "IA-23",
+    "IA-33"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": "Part One 1.1: unsubscribe links in emails stand in for IA-23 in the first release."
+  },
+  {
+   "key": "E-FND-3b",
+   "issue": null,
+   "epic": "E-FND",
+   "title": "Reorder from order history, second release",
+   "outcome": "A customer repeats a previous order from their history.",
+   "ids": [
+    "JRN-11"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "JRN-11 is staged S2 by the register, a second-release row. Not created now.",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": "The register stages JRN-11 as S2 and pairs it with ACCT-09 in Part One 1.1 (E-SF-9b)."
+  },
+  {
+   "key": "E-FND-4b",
+   "issue": null,
+   "epic": "E-FND",
+   "title": "Business objectives, second release",
+   "outcome": "The client owns clear data on sales, customer behaviour and product demand, and the platform is prepared for future integrations.",
+   "ids": [
+    "OBJ-06",
+    "OBJ-07"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-NFR-1b",
+   "issue": null,
+   "epic": "E-NFR",
+   "title": "Privacy, second release: automated data export and deletion requests",
+   "outcome": "Data export and deletion requests are handled automatically.",
+   "ids": [
+    "NFR-12a"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-NOTF-1b",
+   "issue": null,
+   "epic": "E-NOTF",
+   "title": "Notifications, second release: admin-editable templates",
+   "outcome": "The client edits notification templates from admin.",
+   "ids": [
+    "NOTF-14"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-SF-3b",
+   "issue": null,
+   "epic": "E-SF",
+   "title": "Product listing, second release: filter by rating",
+   "outcome": "A customer filters a listing by rating.",
+   "ids": [
+    "PLP-11"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": ""
+  },
+  {
+   "key": "E-SF-9b",
+   "issue": null,
+   "epic": "E-SF",
+   "title": "My Account, second release: reorder, notification preferences, account deletion request",
+   "outcome": "A customer reorders from history, sets notification preferences and requests account deletion from the account.",
+   "ids": [
+    "ACCT-09",
+    "ACCT-11",
+    "ACCT-13"
+   ],
+   "scope_class": "P1-L",
+   "stage": "S2",
+   "stage1": false,
+   "create_now": false,
+   "hold_reason": "Second release: the register stages every row S2. Listed, not created now",
+   "status": null,
+   "delivery_order": null,
+   "depends_on": [],
+   "erp_blocked": "no",
+   "design_dependency": "none",
+   "inputs": [],
+   "data_integrity": "",
+   "acceptance_evidence": "",
+   "not_in_slice": [],
+   "notes": "Part One 1.1: in the first release customers view past orders, emails carry unsubscribe links and deletion is handled manually on request."
+  }
+ ]
+}
