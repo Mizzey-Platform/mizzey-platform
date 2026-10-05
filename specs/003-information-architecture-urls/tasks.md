@@ -29,10 +29,9 @@ because the answer decides whether T-09 is configuration or code.
 **D-242-1** the Home page, **D-242-2** what a Collection is and what the collections are, **D-242-3** the brand
 list and whether `product_brand` becomes translatable, **D-242-4** what Tracking shows and where it lives.
 
-**Do not invent any of them.** No category name, collection name or page content is written by this feature.
+**Do not invent any of them.** No category name, collection name, page copy or marketing content is written by this feature; fixture content is used where a record is needed. **None of the four blocks implementation**: the collection model follows ADM-57 and its neighbours (spec C-7), and the tracking route follows ORD-05, SHIP-03 and ADR-0002 (spec C-6).
 
-**Gate**: each decision is recorded as answered, or the row it gates is recorded as incomplete with the reason.
-**IA-04 and IA-35 cannot start without D-242-2**; the other three can have their URL identity established first.
+**Gate**: each input is recorded as supplied, or named as still required, with the row it affects.
 
 ---
 
@@ -104,19 +103,17 @@ Without the brand list, the test uses a placeholder term created and cleaned up 
 
 ---
 
-### T-07. Establish the collection mechanism
+### T-07. Implement the collection capability
 
-**Kind**: depends on D-242-2. **Cannot start without it.**
+**Kind**: site-code to register the taxonomy, plus site-tests for fixture terms. **Not blocked.**
 
-If a taxonomy: site-code to register it. If a `product_cat` convention: configuration. If curated pages: page
-records.
+The model follows the register, per spec C-7: **ADM-57 "Manually curated collections" is P1/S1** while ADM-58 rules-based is P2, so a manually curated taxonomy with per-collection content and manual ordering is the established shape. Register `product_collection` as a public, WPML-translatable product taxonomy, which gives IA-04 and IA-35 their archive route in both languages.
 
-**Do not choose on the client's behalf**, and do not invent collection names. The SRS names examples in §6.2,
-which is a different section and not these rows.
+**Scope boundary**: the taxonomy registration only. The admin CRUD (ADM-57), assignment (ADM-44), ordering (MER-03) and per-collection content (SSC-06, SSC-24) belong to other slices and are not built. **Do not invent collection names**: the tests create and clean up clearly non-production fixture terms.
 
-**Test**: T-11 asserts IA-04 and IA-35 URLs serve in both languages, once the mechanism exists.
+**Test**: T-11 asserts a fixture collection term's archive serves in both languages, and that the taxonomy is registered translatable. Guard: **wp-guard**, **woo-guard**.
 
-**Gate**: the decision is recorded; the rows are either delivered or recorded as blocked on it.
+**Gate**: a collection archive serves in both languages; the final names remain a recorded content input.
 
 ---
 
@@ -185,12 +182,12 @@ way. Assertions, each naming its criterion:
 | Every contracted Arabic URL returns 200, serves Arabic, and is **not** the English record | AC-242-02 |
 | Each page pair is one translation group with English as source | AC-242-03 |
 | Each account endpoint resolves in both languages | AC-242-04 |
-| **No page record duplicates an endpoint slug**, in either language | AC-242-04, AC-242-16 |
+| **No page record duplicates an endpoint slug**, in either language | AC-242-04, G-1 |
 | A term URL serves that term's archive, per language | AC-242-05 |
 | Order confirmation is reachable only post-checkout and is not publicly listed | AC-242-06 |
 | Search results have a stable URL carrying the query, both languages | AC-242-07 |
 | **No contracted page is reachable only by `?page_id=`** | AC-242-08 |
-| **No contracted page is reachable at two URLs**, and a trailing-slash variant resolves to one form | AC-242-16 |
+| **No contracted page is reachable at two URLs**, and a trailing-slash variant resolves to one form | G-1 |
 
 **Fresh-state safe**: runs from a scripted clean baseline and leaves the runtime clean, cleaning up anything it
 creates through `on_finish` rather than `track_post`, which #241 measured to be product-only.
@@ -273,14 +270,12 @@ task reopens #241. No task creates an issue, a PBI or a Project change. No task 
 
 ```text
 T-01 ─> T-09
-T-02 ─┬─> T-05 (D-242-1)
-      ├─> T-06 (D-242-3)
-      └─> T-07 (D-242-2, hard blocker for IA-04 and IA-35)
+T-02 records the four content inputs and blocks nothing
+T-05, T-06 and T-07 proceed with fixture content
 
 T-03 ─┬─────────────> T-11 ─> T-13 ─> T-14
 T-04 ─┘               ▲
 T-08, T-09, T-10 ───> T-12 ┘
 ```
 
-T-01 and T-02 first: one decides a task's kind, the other decides whether four rows can be completed at all.
-T-03 and T-04 are the bulk of the feature and are unblocked today.
+T-01 first, because it decides whether T-09 is configuration or code. T-02 records the content inputs and blocks nothing. Every other task is unblocked.

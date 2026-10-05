@@ -17,13 +17,13 @@ The point is not to agree with the spec. It is to try to break it.
 - [x] **Rows owned by other slices are named as boundaries, not built.** MKT-12, MKT-15, MKT-16, MKT-18, ADM-41,
       SSC-27, ADM-159, the NAV rows, PRE-07 and PRE-08.
 - [x] **Does any criterion quietly expand a row?** The hardest case is **NFR-03**. Its eight words became nine
-      criteria, AC-242-08 to AC-242-16, and each is checked against the wording: clean URLs, meta, sitemap, robots,
-      canonical, breadcrumbs, structured data, alt text, plus AC-242-16 for the duplicate-URL risk that "clean" implies
-      and that is the failure mode most likely to appear. **AC-242-16 is the one to challenge**, and it is kept
+      criteria, AC-242-08 to G-1, and each is checked against the wording: clean URLs, meta, sitemap, robots,
+      canonical, breadcrumbs, structured data, alt text, plus G-1 for the duplicate-URL risk that "clean" implies
+      and that is the failure mode most likely to appear. **G-1 is the one to challenge**, and it is kept
       because a URL that is clean and duplicated fails the obligation in substance.
 - [x] **Is "information architecture" read correctly?** Checked against the **SRS**, not inferred from the PBI
       title. SRS §5 is a page inventory with no URL content, so the page rows oblige existence and reachability
-      and NFR-03 carries the URL obligation. **This is the reading most likely to be wrong, and it is sourced.**
+      and #242 owns the runtime IA, URL and SEO output assigned to its registered rows, while separately registered SEO and admin-control rows keep their own ownership. **This is the reading most likely to be wrong, and it is sourced.**
 
 ## Clarity and testability
 
@@ -42,7 +42,7 @@ The point is not to agree with the spec. It is to try to break it.
       because the class exists but was not observed in output: the runtime had no products.
 - [x] **The three states are kept apart** in the spec and in T-14.
 - [x] **No staging claim is manufactured, and none is dodged.** C-4 separates the obligations: all eight are
-      verifiable locally by served HTTP, and **no criterion is blocked on #244**. The issue's phrase "on staging"
+      verifiable locally by served HTTP, so **#244 is not required to start**. **DOD-04 still requires manual testing on staging for closure**, which is named as the remaining dependency rather than dismissed. The issue's phrase "on staging"
       was **not** converted wholesale into a blocker, which was the explicit instruction.
 - [x] **No browser matrix is invented.** None of these thirty rows obliges browser rendering. #241 needed one
       because NFR-14 named browsers; #242 does not, and T-12 says so.
@@ -76,27 +76,24 @@ The point is not to agree with the spec. It is to try to break it.
 ## The things most likely to go wrong
 
 - [x] **Creating pages for the endpoint rows.** The single most likely error, and the one the audit exists to
-      prevent. T-04 says create no pages; AC-242-04 and AC-242-16 assert no duplicate route; T-11 asserts it negatively.
+      prevent. T-04 says create no pages; AC-242-04 and G-1 assert no duplicate route; T-11 asserts it negatively.
 - [x] **An Arabic URL silently serving the English record.** A 200 in the right place with the wrong content.
       AC-242-02 and S-2 assert against it specifically.
 - [x] **A suffixed slug and a 301.** #241 measured the cause; T-03 applies the invariant; T-11 would catch it.
 - [x] **Attributing the sitemap gap to the wrong cause.** T-01 measures before T-09 decides configuration or code.
 - [x] **Building an admin control while emitting output.** The line is drawn in C-3 and restated in T-08, T-09,
       T-10 and FR-011.
-- [x] **Inventing a collection taxonomy because nobody has decided.** T-07 cannot start without D-242-2, and says
-      so rather than guessing.
+- [x] **Inventing a collection model.** Avoided by reading the register rather than deciding: ADM-57 makes manually curated collections P1/S1 and ADM-58 defers rules-based membership to P2, so the shape is given. Only the names are content input, and the tests use fixture terms.
 - [x] **A path this work type may not touch.** All planned paths are feature-spec, site-code or site-tests.
 
 ## Open, and not blocking the feature
 
 - [ ] **D-242-1, the Home page.** Static page or posts index. Gates IA-01 only.
-- [ ] **D-242-2, what a Collection is and what the collections are.** **A hard blocker for IA-04 and IA-35**: there
-      is nothing to create until it is answered. It blocks two rows, not the feature.
+- [ ] **D-242-2, the final collection names, copy and imagery.** **Content input, not a blocker**: the model follows ADM-57, and the capability, routing and tests are built with fixture terms.
 - [ ] **D-242-3, the brand list.** Gates IA-05's completion; the translatability setting is not blocked.
-- [ ] **D-242-4, what Tracking shows and where.** Gates IA-21 only.
-- [ ] **AC-242-16's reading of NFR-03**, noted under Scope discipline, surfaced for disagreement on the record.
+- [ ] **D-242-4, the tracking screen's presentation detail.** **Design and content input, not a blocker**: the route and the data source follow ORD-05, SHIP-03 and ADR-0002.
+- [ ] **G-1's reading of NFR-03**, noted under Scope discipline, surfaced for disagreement on the record.
 
 ## Result
 
-**Pass, with four recorded decisions and one scope reading surfaced.** Nothing blocks the feature; two of the
-thirty rows cannot be completed until D-242-2 is answered, and that is stated rather than worked around.
+**Pass, with four content inputs recorded and two scope readings surfaced.** **No row is blocked.** All thirty are implementable now, and four carry an open content or presentation input, named rather than invented. Closure still owes DOD-04's staging step, which #244 must deliver.

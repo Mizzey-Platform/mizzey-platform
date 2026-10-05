@@ -42,7 +42,7 @@ confusion more likely rather than less.
 from the trace, and the labels live in the `#` column. The product-cost pilot used `AC-1` to `AC-7` and #241 used
 `AC-1` to `AC-9`, both below the collision, so #242 is the first spec to cross it.
 
-**Fixed** by relabelling to `AC-242-01` to `AC-242-16`, 95 references across five artifacts, with the reason
+**Fixed** by relabelling to `AC-242-01` to `G-1`, 95 references across five artifacts, with the reason
 recorded in the spec so the next feature does not reintroduce it. The merged specs for 001 and 002 are **not
 touched**: their labels do not collide, and rewriting merged records to satisfy a convention they never breached
 would be churn.
@@ -53,8 +53,7 @@ would be churn.
   in both languages, so AC-242-01 to AC-242-03 carry them collectively rather than being repeated twenty-nine
   times. Nine criteria decompose NFR-03's eight words. That is a reasonable shape, and a spec with thirty
   near-identical criteria would be worse.
-- **Two rows cannot be completed.** IA-04 and IA-35 wait on D-242-2. That is stated in the spec, the checklist
-  and T-07, and it is a recorded decision rather than a coverage gap.
+- **No row is blocked.** The collection model follows ADM-57 and its neighbours, and the tracking route follows ORD-05, SHIP-03 and ADR-0002, both verified against the register, so IA-04, IA-35 and IA-21 are implemented now. Four rows carry an open **content or presentation input**, named rather than invented.
 - **Three code items for thirty rows** is small, and correct: the audit found five of NFR-03's eight obligations
   native and eight rows deliverable as endpoint configuration. A plan producing more code would be the thing
   worth flagging.
@@ -66,12 +65,11 @@ would be churn.
 Both are in the checklist too, because they are judgements rather than measurements.
 
 **The "information architecture" reading.** SRS §5, which all twenty-nine page rows cite, is a page inventory
-with no URL content, so the page rows oblige existence and reachability and **NFR-03 carries every URL
-obligation**. This is sourced from the SRS rather than inferred from the PBI's title, and it is the reading most
+with no URL content, so the page rows oblige existence and reachability, and #242 owns the runtime IA, URL and SEO **output** assigned to its registered rows while separately registered SEO and admin-control rows keep their own ownership. This is sourced from the SRS rather than inferred from the PBI's title, and it is the reading most
 likely to be challenged: someone could argue the title "and URL structure" implies a broader URL deliverable. The
 spec's position is that a title is not a register row.
 
-**AC-242-16, the duplicate-URL criterion.** NFR-03 says "Clean URLs" and does not say "no duplicate URLs". The
+**G-1, the duplicate-URL criterion.** NFR-03 says "Clean URLs" and does not say "no duplicate URLs". The
 criterion is kept because a URL that is clean and duplicated fails the obligation in substance, and because the
 endpoint finding showed exactly how duplicates would arise here. Surfaced so it can be disagreed with on the
 record.

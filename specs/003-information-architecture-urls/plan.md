@@ -20,11 +20,9 @@ suggests.
 | Both languages in the sitemap | **Production code or configuration**, to be settled in Phase 1 | NFR-03 |
 | A meta description mechanism | **Production code**, small | NFR-03 |
 | The URL map, written down | Evidence | IA-02 to IA-07, NFR-03 |
-| A served-request scenario over every contracted URL | Test | AC-242-01 to AC-242-16 |
+| A served-request scenario over every contracted URL | Test | AC-242-01 to G-1 |
 
-**Four rows cannot be completed without a decision** (IA-01, IA-04, IA-05, IA-21, decisions D-242-1 to D-242-4).
-Three of the four can have their URL identity established and their decision deferred; **IA-04 and IA-35 cannot**,
-because there is nothing to create until someone says what a collection is.
+**All thirty rows are implementable now.** Four carry an open **content or presentation input**, not an architectural decision: IA-01 the Home choice, IA-04 and IA-35 the collection names and copy, IA-05 the brand list, IA-21 the tracking presentation. Each row's capability, route and bilingual behaviour is built with fixture content, and the inputs are named rather than invented.
 
 **Nothing from #241 is rebuilt.** English at the root, Arabic under `/ar/`, direction from the locale, one
 template set and translation identity are a satisfied dependency.
@@ -61,7 +59,7 @@ content or names invented.
 
 - [x] **M-1 Scope**: all thirty ids are obligation rows, 28 P1 and two P1-L. Each criterion is supported by the
       wording of the row it cites, and the hardest test was NFR-03: its eight words were decomposed into AC-242-08 to
-      AC-242-16 rather than becoming one vague "URL structure" criterion, and the admin controls its neighbours own
+      G-1 rather than becoming one vague "URL structure" criterion, and the admin controls its neighbours own
       were explicitly excluded.
 - [x] **M-2 Open items**: no `open-items.json` entry touches these ids. Four feature decisions are **recorded in
       the spec, not resolved**, and OD-27 is cited as bearing on nothing here.
@@ -85,10 +83,9 @@ content or names invented.
 
 Full working in [research.md](research.md). The four findings that shaped this plan:
 
-1. **The page rows oblige existence, not a URL taxonomy.** SRS §5 is a page inventory with no URL content. All
-   URL obligation comes from NFR-03's "Clean URLs".
+1. **The page rows oblige existence, not a URL taxonomy.** SRS section 5 is a page inventory with no URL content. #242 owns the runtime IA, URL and SEO **output** assigned to its registered rows; separately registered SEO and admin-control rows keep their own ownership.
 2. **Eight rows are endpoints, and their Arabic slugs are already translatable.** Creating pages for them would
-   produce duplicate routes, which AC-242-16 forbids.
+   produce duplicate routes, which G-1 forbids.
 3. **NFR-03 is five-eighths native.** The gaps are canonical on archives (core returns early unless
    `is_singular()`), sitemap language coverage, and meta description.
 4. **CoreX has no part in this.** No template, routing, URL, canonical, SEO or sitemap layer.
@@ -169,7 +166,7 @@ No constitution violation to justify. Four deliberate decisions not to build:
 
 | Considered | Rejected because |
 |---|---|
-| Pages for the account rows, to satisfy "the page exists" literally | They are WooCommerce endpoints. Pages would create a second route to each screen, which AC-242-16 forbids and which no row asks for |
+| Pages for the account rows, to satisfy "the page exists" literally | They are WooCommerce endpoints. Pages would create a second route to each screen, which G-1 forbids and which no row asks for |
 | An SEO plugin, to cover meta, canonical and sitemap in one step | It would deliver MKT-12, MKT-15, MKT-16, ADM-41 and SSC-27's admin surfaces along with the output, taking four other slices' rows. A plugin may be the right answer **when those slices run**; it is not this slice's call |
 | hreflang output | WPML already emits it and MKT-18 owns it. Nothing to build and not ours to build |
-| A redirect map and trailing-slash policy as deliverables | Neither appears in SRS §5 or NFR-03. AC-242-16 asserts no duplicate URL exists, which is the obligation; a policy document is not |
+| A redirect map and trailing-slash policy as deliverables | Neither appears in SRS §5 or NFR-03. G-1 asserts no duplicate URL exists, which is the obligation; a policy document is not |
