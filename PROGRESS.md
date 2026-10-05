@@ -46,7 +46,8 @@ Live status. First action each session: read this, then continue from **Next**.
   **Accepted**; #252 is the reference case, Verified and not Accepted. Project #4 and the 232 historical Option C
   issues are untouched.
 - **The complete Stage 1 backlog is seeded (D-11, 5 October 2026): 74 PBIs on the board, #241 to #255 and #266 to
-  #324.** 4 are `Verified` (#241, #242, #246, #252), 30 `Ready`, 40 `Blocked` on predecessor PBIs. Nine
+  #324.** After the D-12 closure: 5 are `Verified` (#241, #242, #246, #252, #266), 2 `In progress` (#243 awaiting
+  ERP input, #244 open for production), 28 `Ready`, 39 `Blocked` on predecessor PBIs. Nine
   second-release slices are recorded and not created. **Every one of the 595 delivery rows has exactly one
   accepting owner, and each of the 572 Stage 1 rows is owned by a PBI that exists**:
   `docs/scope/backlog-ownership.json`, asserted by `tools/tests/test_backlog_ownership.py`. #244, #249 and #250
@@ -75,6 +76,28 @@ Live status. First action each session: read this, then continue from **Next**.
   promotional banner alone (HOME-12 and ADM-62 stay P2). A criterion resting on one is `provisional` or
   `pending CX-nn`, never `final`. From now on *engineering pre-development readiness* and *contractual
   pre-development acceptance* are reported as two separate statuses.
+- **The staging and demonstration environment exists (#244, PR #327, squash `b5a7bd3`, 5 October 2026)**:
+  `specs/005-local-staging-environment/`, NFR-08 and NFR-09. A separate runtime on the developer's machine, on
+  `http://127.0.0.1:8088`: own web server process, database, account, keys and uploads, the code of a named
+  commit, invented data only, all mail captured, every screen marked. Backed up, and **restored from its backup
+  and compared: PASS**. AC-244-01 to AC-244-11 technically verified; production is not provisioned (`pending
+  OD-27`), so #244 is `In progress`. **It has no public address**: the tunnel needs one Cloudflare sign-in. How to
+  run it: `docs/staging-environment.md`.
+- **Staging found defects on its first day** (`docs/2026-10-05-staging-verification.md`), none corrected:
+  #246's stock report omits an Arabic-only item outside the Arabic context and lists nothing shared inside it,
+  although its scenario passes; #242's Arabic brand archive points its canonical and language links at addresses
+  that answer 404; the empty cart page is 8 pixels too wide; simultaneous orders oversell the last units in
+  every run (B6). #241's browser matrix was exercised on Chrome, Edge and a Firefox build, and **AC-9 is still
+  not verified**: three rows need devices. The passes were scripted, in real browser windows: a person has not
+  looked.
+- **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
+  companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
+  accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08 reads "approval pending / sent
+  date not evidenced"**, and the deemed-approval rule is not applied.
+- **The ERP pack is ready to send and not sent**: `docs/erp-pack/`. The SKU is the contracted matching baseline
+  (CR-18, ADM-34); the pack confirms how the SKU behaves and no longer asks what the key should be.
+- **The Accountant clarification MS-CLR-2026-037 is at version 1.1**: "P1-L, S1" is the proposed classification
+  of ROLE-06, effective only on signature. Not sent, not acknowledged; the signed register is untouched.
 - **Probes A11 and the price matrix have run** (`t19`, `t20`), are **merged**, and **both questions are closed as
   probes, with no fix built from either.** None of A11, A12, B1 or the price matrix is reopened. A11: the translation-group corruption needs the WCML translation editor **plus** product
   creation in the same process; wp-admin one-save-per-request, the WPML duplicate method and the native CSV
@@ -114,24 +137,36 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**No production PBI starts until Mustafa reviews the pre-development closure (D-11).**
+**No production PBI starts until Mustafa reviews the pre-development closure (D-12).** The closure work is done;
+the record of it is `docs/2026-10-05-engineering-readiness-audit.md`.
 
-1. **Mustafa's review of the closure.** The records are `DECISIONS.md` D-11,
-   `docs/scope/backlog-ownership.json`, `docs/2026-10-05-stage1-ownership-audit.md` and
-   `docs/2026-10-05-pre-deliverables-matrix.md`.
-2. **Then the queue, in delivery order.** The first PBIs that are `Ready`: #243 the ERP specification's
-   preparation, #244 local development and staging, #249 the import specification on a fixture, #245 the ERP
-   adapter seam on mocks, #248 the order status model, #250 structural design on neutral tokens, #251 roles, #266
-   the pre-development documents as an evidence and approval record, #268 the definition of done, #269 the
-   cross-cutting standards. #247 follows #249, and #267, the walkthrough, follows #244.
-3. **#241, #242 and #246 are merged and `Verified`, and stay open.** No criterion of any is contractually
-   accepted. #241: AC-9, the browser matrix, UNEXERCISED. #242 and #246: DOD-04, manual testing on staging, not
-   performed. #246: AC-246-11 `pending PRE-09`. All three wait for the staging environment of #244.
-4. **Owner actions that are not engineering:** send the ERP question pack
-   (`docs/2026-10-05-erp-question-pack.md`); send the Accountant Scope Clarification MS-CLR-2026-037 for the
-   client's acknowledgement; hold the store operations walkthrough once staging exists
-   (`docs/2026-10-05-pre07-store-operations-walkthrough.md`); sign in to Cloudflare when the tunnel is ready to
-   connect. CX-02 to CX-06 are decided (D-12).
+**Two statuses, reported separately (D-12):**
+
+| Status | State |
+|---|---|
+| **Engineering pre-development readiness** | **Complete.** Normal Stage 1 development can proceed continuously; remaining external items are isolated to explicit acceptance, integration or launch gates |
+| **Contractual pre-development acceptance** | **Pending.** PRE-07 is not held, PRE-03b is not approved, PRE-08 reads "approval pending / sent date not evidenced", PRE-09 is not written, and the Accountant clarification is not acknowledged |
+
+1. **Mustafa's review of the closure.** `DECISIONS.md` D-12, the readiness audit, `docs/pre-development/README.md`,
+   `docs/erp-pack/README.md`, `docs/2026-10-05-staging-verification.md`.
+2. **Two corrections staging showed are owed, recommended before any new PBI.** #246: the stock report is right
+   in the English admin context and wrong outside it (AC-246-03, AC-246-04), although its scenario passes. #242:
+   the Arabic brand archive's canonical and language links answer 404 (AC-242-09). Each needs a scenario that
+   goes through the real request. Whether either leaves `Verified` meanwhile is Mustafa's decision.
+3. **Then the queue, in delivery order:** #249 the import specification on a fixture, #245 the ERP adapter seam
+   on mocks, #248 the order status model, #250 structural design on neutral tokens, #251 roles, #270
+   observability, #273 the data model, #275 staff accounts and the log, #276 product management, #280 order
+   management. #247 follows #249. #268, #269, #271 and #272 are standing records kept alongside.
+4. **Owner actions that are not engineering:**
+   - **Sign in to Cloudflare once**, or agree to its terms for a temporary address, so staging has a public
+     address: `docs/staging-environment.md`, "The Cloudflare Tunnel". Everything else is prepared.
+   - **Send the ERP pack**, after filling in the recipient and the dates: `docs/erp-pack/`.
+   - **Send the Accountant clarification** MS-CLR-2026-037, now version 1.1, for acknowledgement.
+   - **Hold the store operations walkthrough**: `docs/2026-10-05-pre07-store-operations-walkthrough.md`, with its
+     runbook and the dry run.
+   - **Look at staging**, and run the three device rows of the browser matrix on a Mac, an iPhone and an Android
+     phone.
+   - Issue the two PRE companions to the client through the document route.
 5. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
@@ -146,14 +181,14 @@ outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09
 
 | Class | Item | Waiting on |
 |---|---|---|
-| Blocks final acceptance | **AC-9 of #241** and **DOD-04 of #242 and #246**, the staging checks | The local staging environment, #244 |
+| Blocks final acceptance | **AC-9 of #241**: three device rows of the browser matrix. **DOD-04 of #242 and #246**: a person's pass, and a correction on each | A Mac, an iPhone and an Android phone through the tunnel; Mustafa; the two corrections |
 | Blocks final acceptance | DOD-09, client approval of acceptance criteria, on every PBI | Client, through MS-UAT-2026-027 |
 | Blocks final acceptance | OD-01 brand name, logo, visual identity: approval of the interface design | Client |
 | Blocks final acceptance | CR-06 a real, unmodified Amazon sample export; CR-07 the account type | Client |
 | Blocks final acceptance | OD-12 product cost basis, who enters it, zero versus missing (AC-7 of #252) | Client |
 | Blocks final acceptance | The Accountant Scope Clarification MS-CLR-2026-037, prepared and **not acknowledged**, for the ROLE-06 criteria | Client |
 | Blocks final acceptance | CX-02 to CX-06, resolved by the owner (D-12) and **not client-confirmed**: dependent criteria are `provisional` or `pending CX-nn` | Client confirmation of each reading |
-| Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**; PRE-08 approval of the Functional Specification | Client, with Mustafa |
+| Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**, prepared with a runbook; PRE-08 approval of the Functional Specification, **approval pending / sent date not evidenced** | Client, with Mustafa |
 | Blocks production or launch only | OD-27 written instruction on hosting outside Egypt, **not client-approved**; OD-14 operating budget | Client |
 | Blocks production or launch only | OD-18 domain and legal entity details; CR-04 policy text; CR-05 photographs; CR-09 the full catalogue export | Client |
 | Content or client input | D-242-1 to D-242-4, the page copy for IA-24 to IA-32, the final Arabic endpoint slug wording | Client |
@@ -161,7 +196,7 @@ outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09
 | Vendor or account input | The Paymob merchant account and wallet approval; the carrier account, API key and rate card | Client and provider |
 | Vendor or account input | Bosta status code legend (SHIP-14, ADR-0002); COD remittance cycle OD-20 (SHIP-16) | Client or Bosta |
 | Vendor or account input | The Google, Meta and TikTok accounts | Client |
-| ERP input | PRE-09 ERP Integration Specification (the 19 P1-E rows, MIG-14 among them) and AC-246-11 | Joint meeting with the ERP team, targeted week 4 |
+| ERP input | PRE-09 ERP Integration Specification (the 19 P1-E rows, MIG-14 among them) and AC-246-11. The question pack is ready to send | Mustafa sends the pack; then the joint meeting with the ERP team, targeted week 4 |
 | Configurable working default | OD-03, OD-04, OD-05, OD-15, OD-19, OD-21: owner decisions, **not client-confirmed** | Client confirmation, at any time |
 | Repository visibility | The end of the external review period | Mustafa, explicitly |
 

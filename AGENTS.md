@@ -83,7 +83,11 @@ generation is disabled, and the agent-context skill is removed.
   through tokens and assets. Approval of the interface design still waits for OD-01.
 - **Development and staging run on the developer's machine**, the staging and demonstration copy isolated, on its
   own database, with synthetic data only, reviewed through a Cloudflare Tunnel. Production hosting stays the
-  client's written decision (OD-27).
+  client's written decision (OD-27). Staging is built, reset, backed up and restored with
+  `mizzey-site/tests/staging/staging.py` (`docs/staging-environment.md`); its destructive commands need
+  `MIZZEY_CONFIRM_STAGING=yes` and refuse any other environment. **A feature's DOD-04 check is run on staging
+  through the real request a browser makes**: a scenario that passes inside one process is not that check, as
+  #246 showed. A scripted pass is recorded as scripted, and is never called a person's look or acceptance.
 - **P1-E rows** get no final criteria before PRE-09 is approved. Choose no ERP mechanism before the ERP team's input.
 - **Native first.** Custom code needs a recorded gap.
 - **The contractual stage never moves.** Engineering timing is noted separately.

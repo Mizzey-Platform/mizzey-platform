@@ -25,6 +25,8 @@ CLASSES = {
     "Blocks development now", "Blocks final acceptance", "Blocks production or launch only",
     "Content or client input", "Vendor or account input", "ERP input", "Configurable working default",
 }
+# What a PBI with no undelivered predecessor may be, short of Verified.
+STARTABLE = {"Ready", "In progress", "In review"}
 SINGLE_ID = re.compile(r"^[A-Z]{2,6}-\d{1,3}[a-z]?$")
 OWNED = re.compile(r"^- \*\*(\S+) [^*]*\*\*(?:\s*\(#(\d+)\))?\s*\((\d+) ids?\):\s*`([^`]+)`")
 
@@ -138,8 +140,14 @@ class Ownership(unittest.TestCase):
             waiting = [d["ref"] for d in s.get("depends_on", [])
                        if d.get("blocking") and int(d["ref"].lstrip("#")) not in delivered]
             with self.subTest(slice=s["key"]):
-                self.assertEqual(s["status"], "Blocked" if waiting else "Ready",
-                                 "Blocked means a predecessor PBI is not delivered, and only that (D-10)")
+                # A PBI whose predecessors are delivered is Ready, or has been started: In progress or In review
+                # (D-12: #243 stays in progress awaiting ERP input, #244 stays open for production).
+                if waiting:
+                    self.assertEqual(s["status"], "Blocked",
+                                     "a PBI with an undelivered predecessor is Blocked, whatever else is true")
+                else:
+                    self.assertIn(s["status"], STARTABLE,
+                                  "Blocked means a predecessor PBI is not delivered, and only that (D-10)")
 
     def test_every_dependency_names_a_pbi_that_exists(self):
         numbers = {s["issue"] for s in self.slices if s.get("issue")}

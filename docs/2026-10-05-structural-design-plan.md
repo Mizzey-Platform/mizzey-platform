@@ -152,6 +152,32 @@ Components reference roles, never raw values. Neutral values are greys and one s
 5. The client's written approval is recorded. Only then is PRE-03b accepted, and only then is a storefront PBI's
    interface criterion (DOD-01, "interface implemented as approved") acceptable.
 
+## Readiness, and the order #250 follows (D-12)
+
+**The structural-design path is ready to start. No structural screen exists yet, and this plan is not one.**
+
+| What #250 needs to start structural work | State on 5 October 2026 |
+|---|---|
+| The screens to design, each with an owner | Section 1 |
+| The pages, their addresses in both languages and the principal flows | `docs/pre-development/PRE-03a-sitemap-and-user-flows.md`, and the verified routes of #242 |
+| A place to see the work in both directions, in real browsers | The staging environment of #244, with its browser matrix runner |
+| Invented catalogue and order data to fill the screens | The staging seed |
+| The rule for what an editor may change | Section 8, with banner scheduling as D-12 resolved CX-06 |
+| The brand identity | **Not supplied.** OD-01 is the client's. It is not needed for structural work |
+
+The order is fixed:
+
+1. Complete the structural design: flows, neutral wireframes as working HTML and CSS, responsive structure,
+   component architecture, states, both reading directions, neutral tokens.
+2. Apply the final brand identity when the client supplies it.
+3. Produce the working HTML and CSS screens.
+4. Go through the contracted approval rounds.
+5. Only then is PRE-03b satisfied.
+
+**Two things that are never said.** Structural wireframes are not called "approved interface design". And no
+final branded storefront implementation starts as though PRE-03b had been approved. There are enough PBIs that
+are not storefront screens to keep engineering continuous while the brand approval is pending.
+
 ## What this plan does not settle
 
 - The brand. OD-01 is the client's.
