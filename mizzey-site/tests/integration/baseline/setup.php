@@ -265,6 +265,13 @@ foreach ( array( 'product_brand', 'product_collection' ) as $tax ) {
 	$ia_taxonomies[ $tax ] = (bool) $sitepress->is_translated_taxonomy( $tax );
 }
 
+// The store is open to visitors on this runtime. A fresh WooCommerce answers every store page with a "coming
+// soon" page, status 200, and a scenario that fetches the shop, a product or the cart as a visitor then reads
+// that placeholder and not the page. Four scenarios did, on fourteen fetches, until 5 October 2026. This is the
+// test and development baseline only: whether the live store opens to visitors is the launch policy, and is not
+// set here. tests/integration/_storefront.php is the guard that fails a scenario if the placeholder returns.
+update_option( 'woocommerce_coming_soon', 'no' );
+
 // IA-10 and the account endpoints are translated in ia-endpoints.php, which runs after admin-visit.php.
 // WooCommerce registers its endpoint slugs under context "WP Endpoints" only when it runs in an admin context,
 // so at this point in the reset the strings do not exist yet. Measured on the first run: every lookup returned
@@ -294,5 +301,6 @@ echo wp_json_encode(
 		'ia_front_page'       => array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ) ),
 		'ia_terms_page'       => (int) get_option( 'woocommerce_terms_page_id' ),
 		'ia_taxonomies'       => $ia_taxonomies,
+		'coming_soon'         => get_option( 'woocommerce_coming_soon' ),
 	)
 ), "\n";

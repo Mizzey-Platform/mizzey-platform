@@ -251,7 +251,7 @@ run(
 		$plain_ids = array( $pair_en, $pair_ar, $english, $arabic );
 		foreach ( array( 'en' => array( $pair_en, $english ), 'ar' => array( $pair_ar, $arabic ) ) as $lang => $own_language ) {
 			$home  = (string) apply_filters( 'wpml_permalink', home_url( '/' ), $lang );
-			$r     = wp_remote_get( add_query_arg( array( 't26_probe' => $secret, 'ids' => implode( ',', $plain_ids ) ), $home ), array( 'timeout' => 120, 'redirection' => 0, 'cookies' => array() ) );
+			$r     = wp_remote_get( add_query_arg( array( 't26_probe' => $secret, 'ids' => implode( ',', $plain_ids ) ), $home ), array( 'timeout' => 120, 'redirection' => 0, 'cookies' => array() ) ); // storefront-guard: exempt, a JSON probe endpoint and not a page.
 			$probe = is_wp_error( $r ) ? null : json_decode( wp_remote_retrieve_body( $r ), true );
 			if ( ! is_array( $probe ) ) {
 				$check( false, "[$lang] the front-end probe did not answer: " . substr( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_body( $r ), 0, 160 ) );

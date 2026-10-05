@@ -14,6 +14,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_storefront.php';
 
 const COST_SIMPLE    = 4321.87;
 const COST_VARIATION = 3876.19;
@@ -79,13 +80,22 @@ run(
 			'REST v3 product'           => add_query_arg( 'rest_route', "/wc/v3/products/$sid", $base ),
 			'REST v3 variations'        => add_query_arg( 'rest_route', "/wc/v3/products/$pid/variations", $base ),
 		);
+		// The name each product page must show. A page that holds no cost because it is not the product's page
+		// would pass this check on nothing, which is what the "coming soon" placeholder made it do.
+		$page_of = array( 'product page (simple)' => 't08 simple', 'product page (variable)' => 't08 variable' );
 		foreach ( $visitor as $label => $url ) {
 			$r      = wp_remote_get( $url, array( 'timeout' => 20 ) );
 			$code   = is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r );
-			$found  = is_wp_error( $r ) ? array( 'request failed' ) : leaks( wp_remote_retrieve_body( $r ) );
+			$body   = is_wp_error( $r ) ? '' : (string) wp_remote_retrieve_body( $r );
+			$found  = is_wp_error( $r ) ? array( 'request failed' ) : leaks( $body );
 			$reached = ! is_wp_error( $r ) && in_array( (int) $code, array( 200, 401, 403 ), true );
-			$ok     = $ok && $reached && ! $found;
-			$s->note( sprintf( 'visitor %s: HTTP %s, cost %s', $label, $code, $found ? 'FOUND ' . implode( ', ', $found ) : 'absent' ) );
+			$is_page = true;
+			if ( isset( $page_of[ $label ] ) && ! is_wp_error( $r ) ) {
+				storefront_refuse_shell( $url, (int) $code, $body );
+				$is_page = storefront_shows( $body, $page_of[ $label ] );
+			}
+			$ok     = $ok && $reached && ! $found && $is_page;
+			$s->note( sprintf( 'visitor %s: HTTP %s, cost %s%s', $label, $code, $found ? 'FOUND ' . implode( ', ', $found ) : 'absent', isset( $page_of[ $label ] ) ? ( $is_page ? ', the product page itself' : ', NOT THE PRODUCT PAGE' ) : '' ) );
 		}
 
 		// Customer, in process.

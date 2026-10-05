@@ -133,7 +133,8 @@ async function inspect(page, wantDir, wantLang, expect) {
 			headingText: heading ? heading.textContent.trim().slice(0, 60) : null,
 			stagingBanner: Boolean(banner),
 			bodyTextLength: body.innerText.length,
-			comingSoonScreen: Boolean(document.querySelector('[class*="coming-soon"]')) || /Great things are on the horizon/.test(body.innerText),
+			comingSoonScreen: Boolean(document.querySelector('meta[name="woo-coming-soon-page"], [class*="coming-soon"]')) || /Great things are on the horizon/.test(body.innerText),
+			errorPage: body.id === 'error-page',
 			expectedText: expect.text ? expect.text[lang] : null,
 			expectedTextFound: expect.text ? body.innerText.includes(expect.text[lang]) : null,
 			expectedElement: expect.selector || null,
@@ -204,6 +205,7 @@ async function inspect(page, wantDir, wantLang, expect) {
 					if (entry.elementsOutsideViewport.length) problems.push(`content past the viewport edge: ${entry.elementsOutsideViewport.join(', ')}`);
 					if (!entry.stagingBanner) problems.push('no staging banner');
 					if (entry.comingSoonScreen) problems.push('the "coming soon" screen is showing instead of the page');
+					if (entry.errorPage) problems.push('a WordPress error or maintenance page is showing instead of the page');
 					if (entry.expectedTextFound === false) problems.push(`expected text is not on the page: ${entry.expectedText}`);
 					if (entry.expectedElementFound === false) problems.push(`expected element is not on the page: ${entry.expectedElement}`);
 					if (consoleErrors.length) problems.push(`${consoleErrors.length} console error(s)`);

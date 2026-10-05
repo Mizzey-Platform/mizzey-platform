@@ -105,7 +105,7 @@ function t14_shopper_view( int $id, int $page_id ): array {
 	do_action( 'wpml_switch_language', 'ar' );
 	wp_cache_flush();
 	$product  = wc_get_product( $id );
-	$response = wp_remote_get( add_query_arg( 'rest_route', "/wc/store/v1/products/$page_id", home_url( '/' ) ), array( 'timeout' => 60 ) );
+	$response = wp_remote_get( add_query_arg( 'rest_route', "/wc/store/v1/products/$page_id", home_url( '/' ) ), array( 'timeout' => 60 ) ); // storefront-guard: exempt, a Store API JSON answer and not a page.
 	$code     = is_wp_error( $response ) ? $response->get_error_message() : (int) wp_remote_retrieve_response_code( $response );
 	$json     = is_wp_error( $response ) ? null : json_decode( wp_remote_retrieve_body( $response ), true );
 	$exposed  = is_array( $json ) ? t14_cost_fields( $json ) : array( 'response not readable' );

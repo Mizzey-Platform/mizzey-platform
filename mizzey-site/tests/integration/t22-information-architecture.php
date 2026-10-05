@@ -13,6 +13,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_storefront.php';
 
 /**
  * Fetch a URL and return the status plus the <html> element.
@@ -25,6 +26,7 @@ function t22_get( string $url ): array {
 		return array( 'status' => 0, 'html' => $r->get_error_message(), 'lang' => '', 'rtl' => false, 'body' => '' );
 	}
 	$body = (string) wp_remote_retrieve_body( $r );
+	storefront_refuse_shell( $url, (int) wp_remote_retrieve_response_code( $r ), $body );
 	preg_match( '/<html[^>]*>/i', $body, $m );
 	$html = $m[0] ?? '';
 	preg_match( '/\blang="([^"]*)"/i', $html, $l );
@@ -45,6 +47,7 @@ function t22_checkout_target( string $url ): string {
 	if ( is_wp_error( $r ) ) {
 		return '';
 	}
+	storefront_refuse_shell( $url, (int) wp_remote_retrieve_response_code( $r ), (string) wp_remote_retrieve_body( $r ) );
 	return (string) wp_remote_retrieve_header( $r, 'location' );
 }
 
@@ -109,6 +112,17 @@ run(
 			} else {
 				$good = 200 === $en['status'] && 'en-US' === $en['lang'] && ! $en['rtl']
 					&& 200 === $ar['status'] && 'ar' === $ar['lang'] && $ar['rtl'];
+				// And each answer must be that page: its own title or text, or, for a page that renders a
+				// component instead of text, that component. Status, language and direction are all right on a
+				// placeholder too.
+				$component = array( 'my-account' => 'woocommerce-form-login', 'track-your-order' => 'woocommerce-form-track-order' )[ $slug ] ?? '';
+				$shown     = '' !== $component
+					? false !== strpos( $en['body'], $component ) && false !== strpos( $ar['body'], $component )
+					: storefront_shows_page( $en['body'], $page ) && storefront_shows_page( $ar['body'], get_post( $ar_id ) );
+				if ( ! $shown ) {
+					$s->note( "FAIL {$row} ({$slug}): an address answered without rendering its page" );
+				}
+				$good = $good && $shown;
 			}
 			$s->note( sprintf(
 				'%s %-22s en=%d/%s  ar=%d/%s%s',

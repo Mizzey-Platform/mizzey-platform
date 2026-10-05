@@ -172,6 +172,15 @@ the local address. **No tunnel has been opened, and no public address exists yet
 
 The browser tools use Playwright as test tooling on the developer's machine. It is not a dependency of the site.
 
+Both browser tools fail a page that is the commerce "coming soon" page or a WordPress error or maintenance page,
+whatever its language, and the integration scenarios do the same through
+`mizzey-site/tests/integration/_storefront.php`. A status of 200 is never taken as evidence that a page rendered:
+`docs/2026-10-05-storefront-placeholder-guard.md`.
+
+**Staging runs without Xdebug.** The machine's PHP loads it in development mode, which writes every argument of
+every stack frame into the PHP error log, the database password among them. `staging.py up` starts the staging
+web server with it switched off for that process. If the log is ever shared, search it for the credential first.
+
 ## What staging does not have yet
 
 - **A public address.** See above.

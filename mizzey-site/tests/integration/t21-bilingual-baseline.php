@@ -17,6 +17,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_storefront.php';
 
 /**
  * Fetch a storefront URL as a visitor would, following no redirect.
@@ -28,7 +29,8 @@ require_once __DIR__ . '/_bootstrap.php';
  *
  * @param string                $path    Path relative to the site root, for example '/ar/'.
  * @param array<int,\WP_Http_Cookie> $cookies Jar to send. Empty for a clean session.
- * @return array{status:int,html:string,title:string,body_classes:string,error:string,set_cookies:array<int,\WP_Http_Cookie>,cookie_names:string}
+ * @return array{status:int,html:string,title:string,body_classes:string,error:string,set_cookies:array<int,\WP_Http_Cookie>,cookie_names:string,body:string}
+ * @throws StorefrontShell When the answer is a placeholder standing in front of the page.
  */
 function t21_get( string $path, array $cookies = array() ): array {
 	$response = wp_remote_get(
@@ -49,9 +51,11 @@ function t21_get( string $path, array $cookies = array() ): array {
 			'error'        => $response->get_error_message(),
 			'set_cookies'  => array(),
 			'cookie_names' => '',
+			'body'         => '',
 		);
 	}
 	$body = (string) wp_remote_retrieve_body( $response );
+	storefront_refuse_shell( home_url( $path ), (int) wp_remote_retrieve_response_code( $response ), $body );
 	preg_match( '/<html[^>]*>/i', $body, $html );
 	preg_match( '#<title>(.*?)</title>#is', $body, $title );
 	preg_match( '/<body[^>]+class="([^"]*)"/i', $body, $classes );
@@ -69,6 +73,7 @@ function t21_get( string $path, array $cookies = array() ): array {
 		'error'        => '',
 		'set_cookies'  => $set,
 		'cookie_names' => $names ? implode( ', ', $names ) : 'none',
+		'body'         => $body,
 	);
 }
 
@@ -193,6 +198,14 @@ run(
 		$s->note( "[clean session] GET /ar/shop/ -> {$ar_shop['status']} {$ar_shop['html']}" );
 		if ( 200 !== $ar_shop['status'] || 'ar' !== $ar_s['lang'] || ! $ar_s['rtl'] ) {
 			$s->note( 'FAIL AC-2: an Arabic storefront page did not serve Arabic right to left.' );
+			$ok = false;
+		}
+		// The address must have served the shop itself, not something standing in front of it.
+		$ar_shop_page = get_post( (int) apply_filters( 'wpml_object_id', wc_get_page_id( 'shop' ), 'page', true, 'ar' ) );
+		$is_shop      = $ar_shop_page instanceof \WP_Post && storefront_shows_page( $ar_shop['body'], $ar_shop_page );
+		$s->note( '[clean session] /ar/shop/ shows the shop page: ' . ( $is_shop ? 'yes' : 'NO' ) );
+		if ( ! $is_shop ) {
+			$s->note( 'FAIL AC-2: the Arabic shop address did not render the shop page.' );
 			$ok = false;
 		}
 
