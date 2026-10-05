@@ -20,7 +20,7 @@ Everything below this section is the audit **as written, before its findings wer
 | The ten Stage 1 journey rows were held back | #322 owns them, once the extraction was corrected |
 | The unstaged P1-E rows | #318 and #319 own them, with Stage `per PRE-09` |
 | The dashboard figures | #294 owns ADM-10 and ADM-11, with #246's measurement as evidence |
-| Questions 4 to 8 of section 5 | Recorded as open contradictions CX-02 to CX-06 in `docs/scope/open-items.json`. Not resolved |
+| Questions 4 to 8 of section 5 | Recorded as contradictions CX-02 to CX-06 in `docs/scope/open-items.json`, and resolved by the owner in D-12 on 5 October 2026. Owner decisions, not client confirmations. The questions and their recommended defaults below are kept as written |
 | Question 3, cash on delivery | Decided in D-11: no value ceiling and no fee is contracted, so neither is built |
 
 **Result: 74 PBIs on the board, 9 second-release slices recorded and not created, 595 delivery rows each owned

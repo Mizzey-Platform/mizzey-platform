@@ -64,9 +64,17 @@ Live status. First action each session: read this, then continue from **Next**.
   neutral tokens.
 - **D-11, 5 October 2026: the pre-development closure.** Constitution 1.2.0: a spec may trace ROLE-06 only with
   every dependent criterion `pending CX-01`, so #251 can build the Accountant role while its acceptance waits for
-  the client. Five further contradictions, CX-02 to CX-06, are open and unresolved. Cash on delivery carries no
+  the client. Five further contradictions, CX-02 to CX-06, were recorded. Cash on delivery carries no
   value ceiling and no fee. PRE-01 to PRE-09 have owners and a status matrix; PRE-07, the store operations
   walkthrough, is **overdue and not held**.
+- **D-12, 5 October 2026: CX-02 to CX-06 resolved by the owner, and two statuses for "pre-development
+  complete".** None is a client confirmation and none makes a deferred row traceable: a restricted Marketing
+  access profile only as far as MKT-21 to MKT-26 need it (not ROLE-05); a narrow shared audit-event record for
+  the rows that explicitly require history (not ROLE-10); a persisted Import Run record for developer-operated
+  runs (not MIG-18); ADM-12 and ADM-13 as dashboard counts with links (not ADM-120 or ADM-141); scheduling on the
+  promotional banner alone (HOME-12 and ADM-62 stay P2). A criterion resting on one is `provisional` or
+  `pending CX-nn`, never `final`. From now on *engineering pre-development readiness* and *contractual
+  pre-development acceptance* are reported as two separate statuses.
 - **Probes A11 and the price matrix have run** (`t19`, `t20`), are **merged**, and **both questions are closed as
   probes, with no fix built from either.** None of A11, A12, B1 or the price matrix is reopened. A11: the translation-group corruption needs the WCML translation editor **plus** product
   creation in the same process; wp-admin one-save-per-request, the WPML duplicate method and the native CSV
@@ -122,8 +130,8 @@ Live status. First action each session: read this, then continue from **Next**.
 4. **Owner actions that are not engineering:** send the ERP question pack
    (`docs/2026-10-05-erp-question-pack.md`); send the Accountant Scope Clarification MS-CLR-2026-037 for the
    client's acknowledgement; hold the store operations walkthrough once staging exists
-   (`docs/2026-10-05-pre07-store-operations-walkthrough.md`); decide CX-02 to CX-06; sign in to Cloudflare when
-   the tunnel is ready to connect.
+   (`docs/2026-10-05-pre07-store-operations-walkthrough.md`); sign in to Cloudflare when the tunnel is ready to
+   connect. CX-02 to CX-06 are decided (D-12).
 5. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
@@ -144,7 +152,7 @@ outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09
 | Blocks final acceptance | CR-06 a real, unmodified Amazon sample export; CR-07 the account type | Client |
 | Blocks final acceptance | OD-12 product cost basis, who enters it, zero versus missing (AC-7 of #252) | Client |
 | Blocks final acceptance | The Accountant Scope Clarification MS-CLR-2026-037, prepared and **not acknowledged**, for the ROLE-06 criteria | Client |
-| Blocks final acceptance | CX-02 to CX-06, five open contradictions: dependent criteria are `pending CX-nn` | Mustafa |
+| Blocks final acceptance | CX-02 to CX-06, resolved by the owner (D-12) and **not client-confirmed**: dependent criteria are `provisional` or `pending CX-nn` | Client confirmation of each reading |
 | Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**; PRE-08 approval of the Functional Specification | Client, with Mustafa |
 | Blocks production or launch only | OD-27 written instruction on hosting outside Egypt, **not client-approved**; OD-14 operating budget | Client |
 | Blocks production or launch only | OD-18 domain and legal entity details; CR-04 policy text; CR-05 photographs; CR-09 the full catalogue export | Client |

@@ -1,3 +1,4 @@
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -155,13 +156,45 @@ class SpecChecks(unittest.TestCase):
         md = spec([("ROLE-06", "DEF", "-")], [("AC-1", "x", "ROLE-06", "pending CX-90")], "- CX-90")
         self.assertError(st.check_spec("specs/001-x/spec.md", md, IDS, still_open), "creates no obligation")
 
-    def test_the_new_contradictions_are_open_and_unresolved(self):
-        for cx in ("CX-02", "CX-03", "CX-04", "CX-05", "CX-06"):
+    # D-12 closed CX-02 to CX-06 as owner decisions. The digest is of the evidence as the ownership audit recorded
+    # it on 5 October 2026: a resolution is added beside the evidence and never replaces a line of it.
+    D12 = {"CX-02": "e430c99650721626", "CX-03": "a1c333c34e3c77b0", "CX-04": "e91e92020db60047",
+           "CX-05": "2f35374fa95c24be", "CX-06": "6b09d3a9caa1adc4"}
+
+    def test_cx02_to_cx06_are_closed_by_owner_resolutions_with_the_evidence_kept(self):
+        for cx, digest in self.D12.items():
             with self.subTest(cx=cx):
                 item = OPEN["contradictions"][cx]
-                self.assertEqual(item["status"], "open")
-                self.assertNotIn("resolution", item)
-                self.assertTrue(item["evidence"])
+                self.assertEqual(item["status"], "resolved")
+                self.assertEqual(hashlib.sha256("\n".join(item["evidence"]).encode()).hexdigest()[:16], digest,
+                                 "the historical evidence was edited")
+                self.assertTrue(item["proposed_default"], "the audit's proposal is part of the history")
+                resolution = item["resolution"]
+                self.assertIs(resolution["client_confirmed"], False)
+                self.assertIn("D-12", resolution["record"])
+                self.assertIn("owner", resolution["decided_by"])
+                self.assertTrue(resolution["decision"])
+                self.assertTrue(resolution["must_not"], "a resolution states what stays unbuilt")
+
+    def test_the_d12_resolutions_make_no_deferred_row_traceable(self):
+        # None of the five grants an engineering id, so the rows the register defers stay refused by the checker
+        # and the signed register still reads as it did.
+        for cx in self.D12:
+            item = OPEN["contradictions"][cx]
+            self.assertNotIn("engineering_ids", item["resolution"])
+            for rid in item["ids"]:
+                with self.subTest(cx=cx, id=rid):
+                    self.assertNotIn(IDS[rid]["scope"], st.OBLIGATION)
+                    md = spec([(rid, IDS[rid]["scope"], IDS[rid]["stage"])], [("AC-1", "x", rid, f"pending {cx}")])
+                    self.assertError(self.check(md), "creates no obligation")
+
+    def test_a_criterion_may_wait_on_a_d12_resolution(self):
+        # The contracted rows stay traceable, and a criterion resting on the owner's reading can say so.
+        md = spec([("SSC-09", "P1-L", "S1")], [("AC-1", "x", "SSC-09", "pending CX-06")])
+        self.assertEqual(self.check(md), [])
+
+    def test_only_cx01_grants_an_engineering_id(self):
+        self.assertEqual(st.engineering_ids(OPEN), {"ROLE-06": "CX-01"})
 
     def test_cx01_is_closed_with_a_recorded_owner_resolution(self):
         cx = OPEN["contradictions"]["CX-01"]

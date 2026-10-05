@@ -113,7 +113,7 @@ with a curated library, not a free canvas.
 | Section | Allowed variants | Editable fields | Locked |
 |---|---|---|---|
 | Hero | Image left, image right, full bleed | Heading, text, button label and link, image, alt text | Height, type scale, spacing, overlay |
-| Promotional banner | Strip, card | Text, link, image, start and end date where the row allows | Position rules, size |
+| Promotional banner | Strip, card | Text, link, image, start date and time, optional end date and time, page placement, enabled or disabled (SSC-09, CX-06) | Position rules, size |
 | Product rail | Manual pick, by collection, by category | Heading, source, item count within a fixed range | Card layout, columns per viewport |
 | Category tiles | Four or six tiles | Category, image, label | Grid, aspect ratio |
 | Rich text | One or two columns | Text, headings to a fixed depth, links | Fonts, colours |
@@ -123,7 +123,9 @@ with a curated library, not a free canvas.
 
 **Locked layout rules.** An editor chooses a section, a variant and its content. An editor cannot set arbitrary
 colours, fonts, spacing, widths or custom CSS, cannot nest sections freely, and cannot break the mirrored layout.
-Whether banner scheduling is in scope is the open contradiction CX-06 and is not settled here.
+Banner scheduling follows the owner resolution of CX-06 (D-12, not client-confirmed): a promotional banner carries
+its own start, optional end, page placement and enabled state. No other section is scheduled: HOME-12 and ADM-62
+are P2.
 
 ## 9. Neutral design tokens
 
