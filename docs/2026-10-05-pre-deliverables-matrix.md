@@ -5,6 +5,13 @@ wording, its owner, what already exists, and what it does and does not block. **
 approval has happened.** Technically complete and approved are reported separately, as Verified and Accepted are
 on the board.
 
+**Status after D-12 (5 October 2026).** This matrix is kept as written on the morning of 5 October. Since then:
+PRE-03a and PRE-05 each gained a companion and are complete as artefacts; PRE-08 reads "approval pending / sent
+date not evidenced"; the staging environment exists, so the walkthrough of PRE-07 can be held; and the ERP pack
+is ready to send. The current index, with existence and approval kept apart, is
+`docs/pre-development/README.md`, and the two statuses are in `docs/2026-10-05-engineering-readiness-audit.md`.
+Where a cell below says "Partly", "not built" or "No", read it with that index.
+
 ## Owner and state, at a glance
 
 | Row | What it is | Owner PBI | Artefact exists | Engineering state | Client approval | Blocks development | Blocks acceptance | Blocks launch |

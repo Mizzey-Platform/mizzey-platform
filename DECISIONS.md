@@ -1235,3 +1235,10 @@ development path: it stays in progress, awaiting ERP input, while unrelated PBIs
 contradiction consistency tests in `tools/tests/test_scope_trace.py`, `AGENTS.md` and the affected issue bodies.
 The constitution is unchanged: M-2 already says how a contradiction is closed, and no principle is added or
 redefined. Items 2 to 8 are applied by the pull requests that follow this one.
+
+**Applied, 5 October 2026.** Items 1 and 9: PR #326, squash `5f161d9`. Item 5: PR #327, squash `b5a7bd3`, the
+staging and demonstration environment, with a restore performed and compared; no tunnel was opened. Items 2, 3,
+4, 6 and 8, and the readiness audit of item 10: the pull request that carries this paragraph. Item 2 also revised
+MS-CLR-2026-037 to version 1.1 through the document route, outside this repository; it is not sent. Item 7
+needed no change. What the first staging checks found in #241, #242 and #246 is recorded in
+`docs/2026-10-05-staging-verification.md` and was not corrected under this decision.

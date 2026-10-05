@@ -1,8 +1,15 @@
 # Local development and staging plan (#244, NFR-08 and NFR-09)
 
 5 October 2026. Owner PBI: #244. The plan for the environments D-10 approved as the engineering approach. **None
-of this is production, and nothing here is to be called production.** It is a plan: the staging environment does
-not exist yet.
+of this is production, and nothing here is to be called production.**
+
+**Built the same day.** The staging environment now exists: PR #327, `specs/005-local-staging-environment/`, and
+the operating guide `docs/staging-environment.md`. This plan is kept as the plan. Three things came out
+differently from it, each for a recorded reason: staging has its own web server process on its own port and not
+a host name of the development server; mail is captured by the store itself and no mail catcher runs; and the
+site is kept out of search engines by the web server's header and the tunnel sign-in, not by the store's own
+setting, which would also switch the sitemap off. A scheduled backup was not built: staging runs only during a
+review and is backed up before every reset. The tunnel is prepared and not opened.
 
 ## What is contracted, and what D-10 decided
 

@@ -2,6 +2,12 @@
 
 5 October 2026. Owner PBI: #266. The specification exists and is not rebuilt.
 
+**Status, as D-12 fixed it: approval pending / sent date not evidenced.** The artefact exists and is not rebuilt.
+Its approval is a separate fact, and it has not happened. The 10 Working Day deemed-approval rule is **not
+applied**: it runs from the date of submission, no record on file shows the date the pack was sent, and no date
+is assumed. The calculation in section 6 below is kept as written, on an assumed date, and is not relied on.
+The index of all the pre-development deliverables is `docs/pre-development/README.md`.
+
 
 ## 1. Where it is
 
@@ -94,10 +100,10 @@ Agreement (section 23). It is still what the client was told to expect.
 | # | Item | State |
 |---|---|---|
 | 1 | The client's review | No response found. No date of submission found |
-| 2 | Staging environment, set up and shown | Not set up. #244 is `Ready`. D-10 runs staging on the developer's machine through a tunnel; production hosting waits for the client's written instruction |
+| 2 | Staging environment, set up and shown | **Set up on 5 October 2026 on the developer's machine, and not yet shown**: no tunnel address exists and the client has not seen it (`docs/staging-environment.md`). Production hosting waits for the client's written instruction |
 | 3 | Code repository "in your name", set up and shown | The repository is `Mizzey-Platform/mizzey-platform`. I found no evidence of who owns that organisation, so I cannot say this condition is met |
 | 4 | Known corrections to make as part of Stage 1, at no charge | (a) The Accountant stories. US-08-05, US-08-06, US-20-05 and US-24-03 are written "As the accountant", while the three stories that trace ROLE-06 (US-08-05, US-21-01, US-24-03) each say ROLE-06 is "Not part of this story in the Launch Platform". This is the CX-01 contradiction and needs the ROLE-06 clarification first. (b) US-27-10 lists "wireframes" as delivered, against PRE-03b, "no separate wireframe stage is produced", and traces neither PRE-03a nor PRE-03b. (c) The 20 ERP-dependent stories stay provisional until PRE-09 and are excluded from this approval by the record's own words |
-| 5 | PRE-03a, sitemap and user flows | The register says they are "Delivered in the Functional Specification (PRE-08)". The specification has no section or diagram by that name. The content is there as stories traced to IA and JRN rows |
+| 5 | PRE-03a, sitemap and user flows | The register says they are "Delivered in the Functional Specification (PRE-08)". The specification has no section or diagram by that name. The content is there as stories traced to IA and JRN rows. **A companion that makes the sitemap and the flows visible was prepared on 5 October 2026** and is not yet delivered: `docs/pre-development/PRE-03a-sitemap-and-user-flows.md` |
 
 ## 6. A point that needs a decision, not an assumption
 

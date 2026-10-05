@@ -6,6 +6,22 @@
 Section G10 list has been confirmed by the client. This package prepares the session. Every confirmation cell below
 is blank on purpose.
 
+**Position after D-12 (5 October 2026).** PRE-07 is overdue in its literal timing, "before development begins",
+and that is stated here and to the client, not hidden. It is treated as: technically prepared now; session and
+confirmation pending; an acceptance event; held before any Section G10 operational row is implemented wherever
+that is still possible. No G10 row has been built. **It is not complete until the session takes place and the
+client confirms**, and nothing in this file marks it complete.
+
+| What the session needs | State on 5 October 2026 |
+|---|---|
+| A working environment with invented data | **Ready.** The staging and demonstration environment of #244 runs on the developer's machine: `docs/staging-environment.md` |
+| An address the client can open | **Not yet.** Staging answers on the developer's machine only. A Cloudflare Tunnel address needs Mustafa's one sign-in, or the session is held by screen share |
+| Accounts | **Ready.** `client_operator`, a Shop manager account for the client to drive, and `staging_admin` for the Developer. Passwords are generated on the machine and are not in this repository |
+| The dry run of section 6 | **Done on 5 October 2026, by the agent, as the client's account**: section 6.1. One key row, order search by phone, does not yet meet its wording and is described, not demonstrated |
+| A date, and the client's attendance | **Not arranged** |
+
+The runbook for the day is section 10.
+
 ## 1. What the register says about PRE-07
 
 The row, register Part Seven, verbatim:
@@ -174,6 +190,22 @@ fact, not an assumption, before the session.
 | ADM-158, export | The register says "the standard supported commerce export" and does not name it. The standard order list has no export button; the Analytics orders report has a download. Are its columns enough for the client? | So the reduced specification is seen, not imagined |
 | ADM-161, import | The standard product screen has an Import button. The register contracts a Developer-performed migration and defers the reusable import tooling (MIG-05, MIG-07, MIG-08, MIG-18) | So the Import button is not taken for a contracted self-service tool |
 
+### 6.1 The dry run, performed on staging on 5 October 2026
+
+Done by the agent in a real browser window, signed in as `client_operator`, the Shop manager account the client
+will use, on the seeded staging. It read and changed nothing. It is not the client's own trial, and it does not
+confirm any row.
+
+| Item | What was found | What it means for the session |
+|---|---|---|
+| ADM-157, order search by phone | **The standard search finds a number only when what is typed is contained, character for character, in what was stored.** Stored `+201000000102`: found by `01000000102`, `201000000102` and `1000000102`. Stored `01000000101`: **not found** by `+201000000101`. Stored `010 0000 0104`, with spaces: **not found** by `01000000104`. Stored `00201000000103`: found by `01000000103` | The standard search falls short of the row for a number typed with a country code, or without the spaces it was stored with. This is a key row. **Describe it as Stage 1 work under ADM-157, and do not demonstrate it as finished.** Its owner PBI builds the difference |
+| ADM-152, find a product by SKU, title or barcode | All three found "Sample Product 10": by `DEMO-S-010`, by its title, by its barcode `6220000000109`. Part of a SKU, `S-010`, also finds it | Demonstrable as it stands |
+| ADM-150, "archive" | The bulk actions offered are "Bulk edit" and "Move to Trash". Bulk edit sets the status to Published, Draft or Private. There is no status called archive | Ask which of the three the client means, and write the answer in the gap column |
+| ADM-158, order export | The orders report is under Analytics, Orders, with a Download button. Its columns: Date, Order number, Status, Customer, Customer type, Products, Items sold, Coupons, Net sales, Attribution, Language. **On a freshly seeded staging it first read "No data"**, because the reports are filled by a background job; the seed now ends by running that import. The standard order list itself has no export button | Show the download, and ask whether those columns are enough |
+| ADM-161, import | The products screen shows "Import" and "Export" buttons to a Shop manager | Say plainly that the Import button is the standard one and is not the contracted route: the catalogue is loaded once by the Developer |
+| ADM-154, bulk order status | Offered: change status to processing, on hold, completed, cancelled; move to Trash | Demonstrable as it stands |
+| Not on the list, and seen | The carrier plugin adds three bulk actions to the standard order list: "Send To Bosta", "Print Bosta AirWaybill" and "Send Cash Collection Orders". No carrier account exists, so none can run | **Do not present them as the bulk dispatch of ADM-155**, which is deferred with the Operations Console. If the client asks, they are the carrier plugin's own screen actions, and what is contracted is dispatch per order (SHIP-08, SHIP-09, SHIP-13) |
+
 ## 7. Agenda
 
 Ninety minutes. One screen shared, the client's operator driving wherever possible.
@@ -232,3 +264,68 @@ the rows marked as confirmed in section 5 are confirmed. This changes no scope, 
 2. The answers to the five questions in section 6.
 3. Whether the client has been told the walkthrough exists as a step. It is in the register and the specification only.
 4. Who on the client side operates the store day to day, which decides who should drive.
+
+## 10. Runbook for the session, on staging
+
+Written on 5 October 2026 against the staging environment as it stands. Nothing in it has been done with the
+client.
+
+### 10.1 The day before
+
+| # | Step | How |
+|---|---|---|
+| 1 | Rebuild staging on the merged code and reset it to the known seed | `python mizzey-site/tests/staging/staging.py build --code-only`, then `MIZZEY_CONFIRM_STAGING=yes python mizzey-site/tests/staging/staging.py reset` |
+| 2 | Take a backup, so the session can be repeated from the same state | `python mizzey-site/tests/staging/staging.py backup --label before-walkthrough` |
+| 3 | Repeat the dry run of section 6.1 by hand as `client_operator`, on the day's build | In a browser, signed in as the client will be. The first run is recorded in section 6.1 |
+| 4 | Open the tunnel, or agree a screen share | `docs/staging-environment.md`, "The Cloudflare Tunnel" |
+| 5 | Send the client the address, the tunnel sign-in and the `client_operator` sign-in, by a channel that is not this repository | From `../app-staging/CREDENTIALS.json` |
+
+### 10.2 The address and the accounts
+
+| | Value |
+|---|---|
+| Demonstration address | The tunnel address of the day. **None exists yet.** On the developer's machine: `http://127.0.0.1:8088` |
+| First sign-in, at the tunnel | User `mizzey-review`. The browser asks for it before the store appears |
+| The client's account | `client_operator`, role Shop manager |
+| The Developer's account | `staging_admin`, role Administrator |
+| Admin address | The demonstration address followed by `/wp-admin/` |
+| What the client will see on every screen | A strip, or in the admin a toolbar label, reading STAGING. The data is invented and nothing they do reaches a real customer: no message leaves the machine |
+
+### 10.3 The tasks the client performs
+
+Each is done by the client's operator, signed in as `client_operator`, with the Developer watching and not
+driving. The seed data they act on is named so the task can be repeated.
+
+| # | Task, in the client's words | G10 row | On the seed | Done by the client | Comment |
+|---|---|---|---|---|---|
+| 1 | Add a new simple product with a title, a price, an image and a category, against the clock | ADM-146 | Any name. Stop the clock at Publish. Target: under three minutes | | |
+| 2 | Make a copy of an existing product as a starting point | ADM-153 | "Sample Product 05" | | |
+| 3 | Find a product by its SKU, by its title, and by its barcode | ADM-152 | SKU `DEMO-S-010`; title "Sample Product 10"; barcode `6220000000109` | | |
+| 4 | Raise the price of several products at once by a percentage | ADM-148 | The three products of the category "Sample Home" that are in stock. Check the Arabic versions afterwards | | |
+| 5 | Unpublish several products at once, then publish them again | ADM-150 | The same three. Agree what "archive" means: section 6 | | |
+| 6 | Move several products to another category at once | ADM-151 | Two products from "Sample Care" to "Sample Accessories" | | |
+| 7 | Export the product list | ADM-161 | Products, Export | | |
+| 8 | Find an order by the customer's phone number | ADM-157 | Stored as `+201000000102`; type `01000000102`, which the standard search finds. Then say what it does not yet find: section 6.1 | | |
+| 9 | Change the status of several orders at once | ADM-154 | The three orders in Processing, to Completed | | |
+| 10 | Export orders to a spreadsheet | ADM-158 | Analytics, Orders, Download | | |
+| 11 | On a phone: open an order and change its status | ADM-160 | Any order in On hold | | |
+| 12 | Their own daily tasks, as they do them today | all | Whatever they bring | | |
+
+Described and not demonstrated, in the register's own words: bulk stock change (ADM-149, per PRE-09), and each
+row of the dedicated Operations Console, with what the launch release provides instead (section 5, class (c)).
+
+### 10.4 What is written down in the room
+
+| Record | Where |
+|---|---|
+| Each G10 row, seen and confirmed or not | Section 5 |
+| Each gap or request, classified as a defect in the list, a clarification or a Change Request | Section 8. Assessed under MS-CHG-2026-028. **Nothing is agreed by being listed** |
+| Who attended, the date, the environment shown | Section 8 |
+| The acknowledgement | Section 8, signed by both |
+
+### 10.5 Afterwards
+
+1. Restore staging to the backup of step 2 of 10.1, so the client's trial changes do not stay.
+2. File the signed record through the document route, and record its date on #267.
+3. Raise each Change Request separately. None is started on the strength of the session.
+4. Only then is PRE-07 complete, and only for what the client confirmed.

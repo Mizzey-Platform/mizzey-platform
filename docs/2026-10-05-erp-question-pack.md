@@ -1,5 +1,12 @@
 # ERP question pack: readiness to send
 
+**Superseded in part on 5 October 2026 by D-12.** This note is kept as written. Two things in it no longer hold:
+its draft cover note, fixed-points table and reply sheet are replaced by the pack in `docs/erp-pack/`, and its
+remarks on product matching are corrected there. The signed register sets the SKU as the store-side matching
+baseline (CR-18, ADM-34), so the pack confirms how the SKU behaves and does not ask what the key should be. The
+statement in section 6 that the client's document says "the opposite" of the current position is withdrawn: its
+statement that both language versions carry the same SKU is consistent with the pack.
+
 5 October 2026. Owner PBI: #243. The eighteen must-answer questions are in `docs/2026-10-04-erp-technical-meeting-questions.md` and are not rewritten here.
 
 Draft, 5 October 2026. Review of `C:\wamp64\www\mizzey\platform\docs\2026-10-04-erp-technical-meeting-questions.md`

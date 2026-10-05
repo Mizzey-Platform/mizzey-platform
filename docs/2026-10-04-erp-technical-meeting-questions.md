@@ -1,5 +1,7 @@
 # ERP technical meeting: question set
 
+Corrected 5 October 2026 (D-12): the SKU is the contracted matching baseline; the external version is the ERP question pack.
+
 Prepared 4 October 2026, for the technical meeting with the client's ERP developers, targeted for week 4. The
 output of that meeting is the **ERP Integration Specification (PRE-09)**, which the client approves in writing
 before any dependent work begins (Services Agreement MS-AGR-2026-023 section 6.5).
@@ -20,14 +22,20 @@ defines **how**, not **whether**.
 | No interim operation on a separately maintained stock balance is contracted. Any interim arrangement needs a separate written agreement | **ERP-09** is OUT, confirmed at **OD-42** |
 | The integration is built and tested against a test environment, not live stock | ERP-10 |
 
+**The matching baseline is contracted too, outside I2.1, and is equally not up for discussion.** Every sellable
+product and variant carries a SKU that matches the ERP exactly, before catalogue load (**CR-18**). Every variant
+has its own SKU (ADM-31), and stock per variant is read from the ERP by variant SKU (**ADM-34**). ERP-08 contracts
+the outcome, "how products and variants are matched to your ERP, in both languages", and leaves the technical
+method to PRE-09. The meeting confirms how the SKU behaves on the ERP side. It does not choose the key.
+
 **Do not expand the integration beyond stock** in this meeting. If a participant proposes order, customer, price or
 accounting synchronisation, it is noted and routed to Change Control (MS-CHG-2026-028), not agreed at the table.
 
 ## One constraint we bring, rather than ask about
 
-The store holds each product in two languages, as two WordPress records with their own metadata. The product-cost
-pilot established that identity must be resolved through the translation relationship, and that a SKU can match
-either language version.
+The store holds each product in two languages, as two WordPress records with their own metadata. Both records
+carry the same SKU. The product-cost pilot established that identity must be resolved through the translation
+relationship, and that a store-side SKU lookup can match either language version.
 
 ### The invariant (mandatory, not negotiable at the meeting)
 
@@ -36,28 +44,36 @@ either language version.
 
 This follows from **ERP-01**, which makes the ERP the source of truth for stock and forbids the store from
 operating a balance that can disagree with it. Two ERP balances for one physical item is precisely that
-disagreement. **The meeting determines the external key. It does not get to redefine this invariant.**
+disagreement. **The contract sets the external key, which is the SKU. The meeting confirms the technical behaviour
+around it. Neither redefines this invariant.**
 
 ### The proposal (our architecture position, which is not the invariant)
 
-1. Resolve the canonical commercial item through WPML translation identity, never by SKU alone, and never by title
-   or list position.
-2. Maintain **one** canonical ERP mapping per commercial item.
-3. Translations resolve to that mapping rather than carrying their own.
-4. **Where the canonical mapping is stored, and by what mechanism, is an architecture decision to finalise with
+1. **The external key is the SKU**, under CR-18, ADM-34 and ERP-08: the store's SKUs match the ERP exactly
+   (CR-18), stock is read per variant by variant SKU (ADM-34), and the match holds in both languages (ERP-08).
+2. Inside the store, both language versions carry the one SKU and resolve, through WPML translation identity, to
+   one commercial item and so to one ERP stock item. Never by title or list position.
+3. Maintain **one** canonical ERP mapping per commercial item. Translations resolve to that mapping rather than
+   carrying their own.
+4. **An ERP internal item id may supplement the SKU** if PRE-09 decides that is safer, persisted in addition to
+   the SKU for resilience. It never replaces the SKU, and it never contradicts the contract requirement that store
+   SKUs match the ERP.
+5. **Where the canonical mapping is stored, and by what mechanism, is an architecture decision to finalise with
    PRE-09 and the implementation design.** Holding it on the source-language record is the obvious candidate and
    not the only one: a mapping table keyed by translation group satisfies the invariant equally, and may behave
    better when a source-language record is deleted or re-pointed.
 
 ERP-01 requires the single balance. It does not require any particular storage location, and nothing here claims
-it does. What we need from the ERP side is **which key to map to**, not whether one balance is required.
+it does. What we need from the ERP side is **how the SKU behaves there** (section 3): how it is resolved, how
+unique and stable it is, and what happens when it changes or cannot be found. We do not ask which key to map to,
+and we do not ask whether one balance is required.
 
 ---
 
 ## Must answer in the meeting
 
-Eighteen decisions. Each one can change the architecture or the schedule, which is why they come before the
-checklist rather than inside it. The numbered sections below remain the complete questionnaire, and are the
+Eighteen decisions, M1 to M18. Each one can change the architecture or the schedule, which is why they come before
+the checklist rather than inside it. The numbered sections below remain the complete questionnaire, and are the
 appendix to work through once these are settled.
 
 | # | Decision | If the answer is unfavourable | Full question |
@@ -65,8 +81,8 @@ appendix to work through once these are settled.
 | M1 | **Is ERP-side development required** to satisfy ERP-01 to ERP-05? If so, whose, and on what timeline? | Schedule change, and a Change Control item if it affects scope, cost or time | 2.6 |
 | M2 | **Authentication and connectivity**: what method, and is the API reachable from a host outside the client's network and outside Egypt? | Can force the hosting decision (**OD-27**) or require a tunnel and a static outbound IP | 1.1, 1.4, 1.5 |
 | M3 | **Is there a test environment** with data we can safely decrement? | ERP-10 contractually requires one. Without it the integration cannot be built and tested as contracted | 10.1 |
-| M4 | **The canonical ERP item and variant key**: SKU, internal product id, variant id, barcode, or another external key? Which level carries the balance? | Decides the mapping, the migration and the adapter | 3.1, 3.2 |
-| M5 | **Key uniqueness and stability**: is it unique, enforced rather than conventional, and stable across ERP edits? | If only conventional, that key cannot be the mapping key at all | 3.3, 3.4, 3.5 |
+| M4 | **SKU resolution.** The store's products and variants carry SKUs that match the ERP exactly (CR-18, ADM-34). That is the contracted baseline and is not in question. What exact endpoint or query resolves a SKU to its stock item? Does the ERP also expose an immutable internal item id, and if so, should the store persist it in addition to the SKU, for resilience? How are a simple product and a product with variants each represented? | If a SKU cannot be resolved directly, PRE-09 needs an extra lookup step or a maintained cross-reference. The SKU stays the matching baseline either way. An internal id can supplement it and never replaces it | 3.1, 3.2, 3.3, 3.4 |
+| M5 | **SKU uniqueness and normalisation.** Is the SKU unique in the ERP, and is that enforced by the system or only conventional? Can two items share a SKU, or one item carry several? Are case, leading zeros and whitespace significant, and does the ERP normalise them? | If uniqueness is only conventional, duplicates must be found and corrected before catalogue load (CR-18), a duplicated SKU cannot be sold until it is corrected, and persisting the internal item id beside the SKU becomes the safer design. If the two systems normalise differently, "matches exactly" needs a written rule | 3.6, 3.7, 3.8 |
 | M6 | **What the stock value means**: physical on hand, available to sell, net of reservations, net of a safety buffer? One location or several? | Changes what the storefront may show and what ADM-70 and ADM-72 mean | 4.2, 4.3 |
 | M7 | **Lookup mechanism, freshness and caching**: one call per item, batch, snapshot, delta feed; push or poll; and how long a figure may be treated as current | Decides whether ERP-02 is satisfiable without a call per page view | 4.1, 4.5, 4.6, 4.7 |
 | M8 | **Is reservation supported at all?** | If not, there is a window between validating stock and completing payment, and ERP-05 has to say what the store does in it | 5.1, 5.5 |
@@ -78,13 +94,14 @@ appendix to work through once these are settled.
 | M14 | **Reversal and restoration mechanism**: compensating increment, credit document, or cancellation of the original; and is a double reversal refused? | Decides ERP-06 and the second half of criterion 11.5 | 7.1, 7.2, 7.3 |
 | M15 | **Who owns reconciliation** when the two sides disagree, how is it detected, and what happens to an order caught in the middle? | ERP-01 makes the ERP authoritative, so the store corrects itself from it. Who notices, and how fast, has to be agreed | 10.6, 10.7 |
 
-**Added 4 October 2026, from the B1 and A12 probe results** (`docs/2026-10-04-multilingual-data-integrity-workstream.md`):
+**M16 to M18 were added on 4 October 2026, from the B1 and A12 probe results**
+(`docs/2026-10-04-multilingual-data-integrity-workstream.md`), and rewritten on 5 October 2026 on the SKU baseline:
 
 | # | Decision | If the answer is unfavourable | Full question |
 |---|---|---|---|
-| M16 | **If the key is the SKU, how is a SKU change handled at all?** The store cannot change a SKU cleanly on a translated catalogue: WooCommerce **refuses** a SKU change on a translated variation, because the duplicate holds the same SKU, and a SKU change on a simple product does not reach its translation | The SKU cannot be the mapping key, or SKU changes become a manual operational procedure | 3.1, 3.4 |
-| M17 | **Does the ERP hold stock per variant?** If it does, the mapping sits at the variation level, which is exactly the level where a translation group was measured to detach, leaving a mapping pointing at a record no longer linked to its counterpart | The mapping needs its own integrity check, independent of WPML's rows | 3.2, 4.2 |
-| M18 | **What does the ERP expect when the store's own `manage_stock` setting differs between language versions?** It was measured not to synchronise | ERP-07 has to say which record the admin's stock view is authoritative over | 4.2 (ERP-07) |
+| M16 | **SKU change.** Can the SKU of an existing ERP item change? If it can: what happens to the item and its balance, how is a renamed or replaced SKU reconciled with the old one, are old SKUs kept as aliases, and how does the store learn of the change? On the store side a SKU change is applied to both language versions together, as a deliberate step and not automatically: WooCommerce was measured to **refuse** a SKU change on a translated variation, because the duplicate holds the same SKU, and a SKU change on a simple product does not reach its translation | If a SKU can change with no alias and no notice, the product stops matching and cannot be sold until the store is corrected (CR-18, AC-25). SKU changes then need an agreed operational procedure with notice, and an internal item id persisted beside the SKU becomes the safeguard | 3.9, 3.10, 3.11 |
+| M17 | **Stock per variant, or only per parent product?** The store reads stock per variant, by variant SKU (ADM-34). Does the ERP hold a balance for each variant SKU, or only at parent or product level? | If stock exists only at parent level, ADM-34 cannot be read from the ERP as contracted. That is a gap for PRE-09, and a Change Control item if it affects scope, cost or time. If stock is per variant, as expected, the mapping sits at the variation level, which is exactly the level where a translation group was measured to detach, so the store needs its own integrity check, independent of WPML's rows, that both language versions of every variant carry the same SKU | 3.4, 3.5 |
+| M18 | **SKUs with no usable stock answer.** What does the ERP return for a SKU that is unknown, inactive, duplicated, or held without a stock balance? The store's own `manage_stock` setting was measured not to synchronise between language versions, so under the SKU baseline it follows the ERP's answer for the SKU, identically on both versions, and is never set per language | If the ERP cannot tell these cases apart, the store treats every one of them as not available for sale and lists the SKU for correction (AC-25, provisional). ERP-07 then has to say what the admin's stock view shows for such a SKU | 3.12, 3.13 |
 
 Anything not on this list can be answered in writing afterwards. Anything on it that is left open gets a named
 owner and a date, because PRE-09 cannot be written without it.
@@ -120,22 +137,37 @@ Question 2.6 is the one that can change the project plan. The register anticipat
 problem of scope, cost, time or feasibility, it is written down and agreed under Change Control before the
 dependent work proceeds.
 
-## 3. Product and variant identifiers
+## 3. Product and variant identifiers: how the SKU behaves
+
+The SKU is the contracted matching key (CR-18, ADM-34). These questions confirm the technical behaviour around it.
 
 | # | Question | Register id |
 |---|---|---|
-| 3.1 | What identifies a stock item in the ERP: SKU, an internal product id, a variant id, a barcode or EAN, or another external key? | ERP-08 |
-| 3.2 | If there is both a product and a variant level, which one carries the stock balance? | ERP-08, ADM-70 |
-| 3.3 | Is that identifier stable for the life of the item, or can it change on an ERP edit or re-import? | ERP-08 |
-| 3.4 | Is the SKU unique in the ERP, and is it enforced or merely conventional? | ERP-08, MIG-13 |
-| 3.5 | Can two ERP items share a SKU, and can one item carry several SKUs or barcodes? | ERP-08 |
-| 3.6 | Is the identifier case-sensitive, and are leading zeros or whitespace significant? | ERP-08 |
-| 3.7 | Does the ERP hold any language-specific product records, or one record with translated labels? | ERP-08, NFR-04 |
-| 3.8 | Can the ERP export a full item list, so the initial mapping can be built and reconciled rather than typed? | MIG-14 |
+| 3.1 | What exact endpoint, call or query resolves a SKU to its stock item? What does it take as input, and what does it return? | ERP-08, ADM-34 |
+| 3.2 | Does the ERP also hold an internal item id that never changes for the life of the item, and is it exposed through the interface? | ERP-08 |
+| 3.3 | If it does, do you recommend that the store keeps that id in addition to the SKU, for resilience? | ERP-08, CR-18 |
+| 3.4 | How is a simple product (no variants) represented in the ERP, and how is a product with variants: one item per variant with its own SKU, or a parent record with child records? | ERP-08, ADM-31, ENT-02 |
+| 3.5 | Does stock exist per variant, or only at parent or product level? If both levels exist, which one carries the balance? | ERP-08, ADM-34, ADM-70 |
+| 3.6 | Is the SKU unique in the ERP, and is uniqueness enforced by the system or only a convention? | ERP-08, CR-18 |
+| 3.7 | Can two ERP items share a SKU, and can one item carry several SKUs or barcodes? | ERP-08, ENT-02 |
+| 3.8 | Is the SKU case-sensitive? Are leading zeros, leading or trailing spaces, or spaces inside the SKU significant? Does the ERP normalise a SKU when it is entered or when it is looked up? | ERP-08, CR-18 |
+| 3.9 | Can the SKU of an existing item be changed in the ERP? If so, what happens to the item, its stock balance and its history, and how would the store learn of the change? | ERP-08, CR-18 |
+| 3.10 | When a SKU is renamed, or an item is replaced by a new item with a new SKU, how is the old SKU reconciled with the new one? Is there a recorded link between them? | ERP-08 |
+| 3.11 | Are old SKUs retained as aliases, so that a lookup by an old SKU still resolves? For how long? | ERP-08 |
+| 3.12 | What does a lookup return, and what does a stock reduction return, for a SKU that is unknown, for one that is inactive or retired, and for one that matches more than one item? | ERP-08, AC-25, ERP-05 |
+| 3.13 | Is every sellable item stock-tracked in the ERP? Are any items held without a stock balance, and what does a lookup return for them? | ERP-07, ERP-01 |
+| 3.14 | Does the ERP hold any language-specific product records, or one record with translated labels? | ERP-08, NFR-04 |
+| 3.15 | Can the ERP export a full item list with SKUs, and with the internal item id if one exists? | MIG-14, CR-18 |
 
-Question 3.4 matters more than it looks: we have measured that a shared SKU inside the store already makes a
-SKU-addressed lookup ambiguous. If SKU uniqueness is also only conventional on the ERP side, SKU cannot be the
-mapping key at all.
+None of these questions reopens the choice of key. Question 3.6 matters more than it looks: if SKU uniqueness is
+only conventional on the ERP side, duplicates must be found and corrected before catalogue load, and an internal
+item id persisted beside the SKU (3.2, 3.3) becomes the safer design. An internal id may supplement the SKU if
+PRE-09 decides that is safer. It never replaces it.
+
+A store-side note, not a question for the ERP: we have measured that both language versions of a product hold the
+same SKU, so a SKU-addressed lookup inside the store returns two records. The store resolves them to one commercial
+item through the translation relationship. That is our work under the invariant above, and it does not weaken the
+SKU as the external key.
 
 ## 4. Stock lookup and availability
 
@@ -168,7 +200,7 @@ specification has to say what the store does in it and what the customer sees.
 | # | Question | Register id |
 |---|---|---|
 | 6.1 | What call reduces stock: an absolute set, a relative decrement, a document (sales order, issue note, invoice)? | ERP-04 |
-| 6.2 | What does the ERP need from us: item identity, quantity, an order reference, a date, a location, anything else? | ERP-04 |
+| 6.2 | What does the ERP need from us: item identity (the SKU), quantity, an order reference, a date, a location, anything else? | ERP-04 |
 | 6.3 | Is a partial success possible on a multi-line order, and what is returned if line 2 fails after line 1 succeeded? | ERP-04, NFR-07 |
 | 6.4 | At what point should the store write back: payment authorised, payment captured, order confirmed, dispatch? | ERP-04, BR-007 |
 | 6.5 | Does the ERP reject a decrement that would take the balance negative, or does it allow it? | ERP-04, ERP-05 |
@@ -219,7 +251,7 @@ decide how often customers will meet that, and therefore what the customer-facin
 
 | # | Question | Register id |
 |---|---|---|
-| 10.1 | Is there a test or sandbox environment, with data we can safely decrement? | **ERP-10**, which requires it |
+| 10.1 | Is there a test or sandbox environment, with test data that uses the real SKUs and that we can safely decrement? | **ERP-10**, which requires it, and CR-16 |
 | 10.2 | Does the test environment match production in interface and behaviour? | ERP-10 |
 | 10.3 | What does the ERP log about our calls, and who can read those logs? | NFR-10 |
 | 10.4 | Can the ERP side give us a correlation id we can record on our side for support? | NFR-10, INT-16 |
@@ -243,7 +275,7 @@ The specification needs its own acceptance criteria. Proposed shape, to agree at
 | 11.4 | An order is not confirmed when the ERP cannot validate availability, and the customer sees the agreed message | ERP-05, OD-41 |
 | 11.5 | **If** stock has already been reserved or decremented, a failed payment or cancellation releases or reverses that effect **exactly once**, and the reversal is linked to the original so a repeat is refused. **If no stock mutation has occurred**, no compensating mutation is sent. Either way the outcome is reconcilable: the store can state, per order, whether a mutation happened and whether it was reversed | ERP-06, NFR-07 |
 | 11.6 | A returned parcel is received in the ERP by the agreed route | ERP-06 |
-| 11.7 | An Arabic order and an English order against the same item decrement the same single ERP stock item | ERP-08, NFR-04, NFR-07 |
+| 11.7 | An Arabic order and an English order against the same item decrement the same single ERP stock item, found by the same SKU | ERP-08, CR-18, NFR-04, NFR-07 |
 | 11.8 | Stock fields in the store admin behave as the specification states, and the admin cannot create a figure that contradicts the ERP | ERP-07 |
 | 11.9 | The initial stock load lands in the agreed destination with a reconciliation report | MIG-14 |
 | 11.10 | Every criterion is demonstrated against the test environment, not live stock | ERP-10 |
@@ -254,15 +286,18 @@ precedes a failure would be asserting a decision nobody has made. What does not 
 pair of obligations: a mutation that happened is reversed exactly once, a mutation that never happened is not
 compensated, and in both cases the state is reconcilable per order.
 
-Criterion 11.7 is the one that comes from our side of the table, and it is the reason the invariant above is
-settled before the meeting rather than at it.
+Criterion 11.7 is the one that comes from our side of the table, and it is the reason the invariant and the SKU
+baseline above are settled before the meeting rather than at it.
 
 ## What a good meeting produces
 
 1. Written answers to sections 1 to 10, or a named owner and a date for each one still open.
-2. A decision on the mapping key (section 3), because the migration and the adapter both depend on it.
+2. Confirmation of the SKU resolution behaviour (section 3, questions 3.1 to 3.13): how a SKU is resolved, whether
+   an internal item id is persisted beside it, the uniqueness and normalisation rules, and what happens when a SKU
+   changes or cannot be resolved. The migration and the adapter both depend on it. The SKU itself is already
+   contracted as the matching key (CR-18, ADM-34).
 3. A clear yes or no on reservation (section 5) and on idempotency (section 8.1).
-4. Test environment access (10.1).
+4. Test environment access, or a date for it (10.1).
 5. Agreement on whether ERP-side development is needed, and if so its scope and timeline (2.6), routed through
    Change Control if it affects scope, cost or time.
 6. Agreed acceptance criteria (section 11).

@@ -7,7 +7,7 @@
  },
  "field_notes": {
   "depends_on": "ref is a real issue number for a seeded PBI and a slice key for an unseeded one. blocking true means a predecessor PBI; blocking false is context, an ERP input or acceptance evidence, and never puts a PBI in Blocked.",
-  "status": "For a seeded PBI, the live board status read on 5 October 2026. For a proposed PBI, Blocked when a blocking predecessor is not delivered (Verified or Accepted), otherwise Ready (D-10).",
+  "status": "For a seeded PBI, the live board status. Blocked when a blocking predecessor is not delivered (Verified or Accepted). Otherwise Ready, or In progress or In review once work has started (D-10, D-12).",
   "stage": "The literal register-ids.json value. '-' is spelled 'per PRE-09' on the board.",
   "not_in_slice": "Neighbouring rows this PBI does not own, each with its register scope, and its stage or owner where it is a delivery row."
  },
@@ -38,11 +38,11 @@
     {
      "id": "Browser matrix check",
      "class": "Blocks final acceptance",
-     "note": "The NFR-14 browser matrix criterion of spec 002 is still open; it needs the staging environment of #244"
+     "note": "Staging exists. Three rows of the matrix need a Mac, an iPhone or iPad and an Android phone, through the tunnel"
     }
    ],
    "data_integrity": "A1, A2 verified working (t12, t16)",
-   "acceptance_evidence": "specs/002-bilingual-platform-baseline verification record. Merged 4 October 2026 as 405a113; status Verified, not Accepted.",
+   "acceptance_evidence": "specs/002-bilingual-platform-baseline verification record. Merged 4 October 2026 as 405a113; status Verified, not Accepted. Staging, 5 October 2026: the browser matrix was exercised on Chrome, Edge and a Firefox build, with one finding on the cart page. Three device rows are not exercised, so the NFR-14 criterion is still not verified.",
    "not_in_slice": [],
    "notes": "D-09: translation identity is a technical acceptance criterion of this PBI, not FIX-04 wording, and is not a client deliverable. D-09 approved the browser matrix: current Chrome, Safari, Edge and Firefox on desktop, current Chrome on Android and current Safari on iOS, both reading directions. NFR-04b (locale formatting) is not in this PBI; it is owned by E-NFR-1."
   },
@@ -107,7 +107,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "specs/003-information-architecture-urls verification record. Merged 5 October 2026 as 3ff7488; status Verified, not Accepted.",
+   "acceptance_evidence": "specs/003-information-architecture-urls verification record. Merged 5 October 2026 as 3ff7488; status Verified, not Accepted. Staging, 5 October 2026: 51 of 52 checks without a finding. One defect: the Arabic brand archive's canonical and language links answer 404 (AC-242-09). A correction is owed.",
    "not_in_slice": [
     "IA-12 (P2)",
     "IA-13 (P2)",
@@ -132,7 +132,7 @@
    "stage": "-",
    "stage1": false,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 3,
    "depends_on": [
     {
@@ -161,9 +161,9 @@
     }
    ],
    "data_integrity": "B1 and A12 raised meeting questions M16, M17 and M18",
-   "acceptance_evidence": "The approved specification, with the client's written approval.",
+   "acceptance_evidence": "The approved specification, with its own acceptance criteria, approved in writing before dependent work begins. The question pack is ready to send and not sent: docs/erp-pack/. The specification is not written.",
    "not_in_slice": [],
-   "notes": "The register's stage cell for PRE-09 reads 'Per plan', extracted as '-' and spelled 'per PRE-09' on the board. The register calls it a later milestone, not a Stage 1 deliverable. Eighteen must-answer decisions are in docs/2026-10-04-erp-technical-meeting-questions.md. D-10 fixes the invariants the specification cannot redefine: the ERP is the stock source of truth; one commercial item or variant is one ERP stock identity regardless of language; no independent authoritative stock in the store; a final sale fails closed; no duplicate decrement; idempotency, retry, logging and reconciliation."
+   "notes": "The register's stage cell for PRE-09 reads 'Per plan', extracted as '-' and spelled 'per PRE-09' on the board. The register calls it a later milestone, not a Stage 1 deliverable. Eighteen must-answer decisions are in docs/2026-10-04-erp-technical-meeting-questions.md. D-10 fixes the invariants the specification cannot redefine: the ERP is the stock source of truth; one commercial item or variant is one ERP stock identity regardless of language; no independent authoritative stock in the store; a final sale fails closed; no duplicate decrement; idempotency, retry, logging and reconciliation. D-12: the SKU is the contracted matching baseline (CR-18, ADM-34); the pack confirms how the SKU behaves and does not ask what the key should be. In progress, awaiting ERP input, and not on the development path."
   },
   {
    "key": "E-NFR-3",
@@ -179,7 +179,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 4,
    "depends_on": [],
    "erp_blocked": "no",
@@ -188,28 +188,38 @@
     {
      "id": "OD-27",
      "class": "Blocks production or launch only",
-     "note": "The client's written instruction on hosting outside Egypt (R-03, CR-10). Not client-approved"
+     "note": "The client's written instruction on hosting outside Egypt. Not client-approved. No production infrastructure is provisioned before it"
     },
     {
      "id": "OD-14",
      "class": "Blocks production or launch only",
-     "note": "Monthly operating budget for hosting and services"
+     "note": "The operating budget, decided with OD-27"
     },
     {
-     "id": "OD-15",
+     "id": "Cloudflare sign-in",
+     "class": "Blocks final acceptance",
+     "note": "Staging has no public address until the tunnel is opened, which needs Mustafa's one sign-in. Everything else is prepared"
+    },
+    {
+     "id": "Staging location",
      "class": "Configurable working default",
-     "note": "Owner baseline: 5,000 products, growth without redesign, 300 orders a day. Not client-confirmed"
+     "note": "Staging runs on the developer's machine by owner decision (D-10, D-12), not client-confirmed"
+    },
+    {
+     "id": "DOD-04, DOD-09",
+     "class": "Blocks final acceptance",
+     "note": "Manual testing on staging by a person, and client approval, as on every PBI (D-10)"
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Three environments reachable; a backup restored end to end on staging and the restore procedure written from that run; no risky change tested on the live site.",
+   "acceptance_evidence": "specs/005-local-staging-environment verification record. Merged 5 October 2026 as b5a7bd3. Development and staging: AC-244-01 to AC-244-11 technically verified, including a restore performed and compared. Production: AC-244-12 and AC-244-13 not started, pending OD-27. Not accepted.",
    "not_in_slice": [
     "PRE-01 (DLV, owned by E-PRE-7)",
     "PRE-02 (DLV, owned by E-PRE-7)",
     "PRE-03a (DLV, owned by E-PRE-7)",
     "PRE-03b (DLV, owned by #250)"
    ],
-   "notes": "CORRECTED (owner decision, 5 October 2026): PRE-01, PRE-02, PRE-03a and PRE-03b are removed. The issue body described them as 'Pre-development infrastructure deliverables' and 'The environment deliverables'; the register words them as the technical design document, the technology stack proposal, the sitemap and user flows, and the interface design. Scope class recomputes from mixed to P1. No other row is added: the candidates and why none is provably infrastructure are in audit section 3. D-10: development and staging run on the developer's machine, staging isolated, on its own database, synthetic data only, reviewed through a Cloudflare Tunnel. Staging is the only place the concurrency test (B6) can run. The Epic moves from E-PRE to E-NFR, because both remaining rows sit in register section J."
+   "notes": "CORRECTED (owner decision, 5 October 2026): PRE-01, PRE-02, PRE-03a and PRE-03b are removed. The issue body described them as 'Pre-development infrastructure deliverables' and 'The environment deliverables'; the register words them as the technical design document, the technology stack proposal, the sitemap and user flows, and the interface design. Scope class recomputes from mixed to P1. No other row is added: the candidates and why none is provably infrastructure are in audit section 3. D-10: development and staging run on the developer's machine, staging isolated, on its own database, synthetic data only, reviewed through a Cloudflare Tunnel. Staging is the only place the concurrency test (B6) can run. The Epic moves from E-PRE to E-NFR, because both remaining rows sit in register section J. D-12: the staging and demonstration environment is the highest-priority internal pre-development work. Delivered for development and staging; the PBI stays open for production."
   },
   {
    "key": "E-RPT-2",
@@ -243,7 +253,7 @@
     }
    ],
    "data_integrity": "B10 measured defect (P-020); B11 open",
-   "acceptance_evidence": "specs/004-inventory-report-one-item-once: with the audit fixtures the report shows 3 lines and a total of 3.",
+   "acceptance_evidence": "specs/004-inventory-report-one-item-once: with the audit fixtures the report shows 3 lines and a total of 3. Staging, 5 October 2026: right in the English admin context, wrong outside it. AC-246-03 and AC-246-04 do not hold in the signed-in browser although the scenario passes. A correction is owed.",
    "not_in_slice": [
     "RPT-03 (DEF)",
     "RPT-02 (P2)",
@@ -491,7 +501,7 @@
     "PRE-07 (DLV, owned by E-PRE-8)",
     "PRE-08 (DLV, owned by E-PRE-7)"
    ],
-   "notes": "CORRECTED: PRE-07 and PRE-08 are removed and PRE-03b is added. The issue body called PRE-07 and PRE-08 'the pre-development design deliverables'; the register words them as the store operations walkthrough and the functional specification. PRE-03b is the interface design row: working HTML and CSS screens under Statement of Work section 9, produced after the brand identity is approved, the screens being the approved artefact with no separate wireframe stage; English is the canonical design source and Arabic its right-to-left localisation. Scope class and Stage are unchanged (DLV, S1). D-10: structural design proceeds on neutral tokens; approval waits for OD-01."
+   "notes": "CORRECTED: PRE-07 and PRE-08 are removed and PRE-03b is added. The issue body called PRE-07 and PRE-08 'the pre-development design deliverables'; the register words them as the store operations walkthrough and the functional specification. PRE-03b is the interface design row: working HTML and CSS screens under Statement of Work section 9, produced after the brand identity is approved, the screens being the approved artefact with no separate wireframe stage; English is the canonical design source and Arabic its right-to-left localisation. Scope class and Stage are unchanged (DLV, S1). D-10: structural design proceeds on neutral tokens; approval waits for OD-01. D-12: structural design, then the brand identity, then the working screens, then the approval rounds, and only then PRE-03b. Structural wireframes are never called approved interface design."
   },
   {
    "key": "E-ROLE-1",
@@ -831,20 +841,30 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "Verified",
    "delivery_order": 16,
    "depends_on": [],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
     {
+     "id": "Stage 1 Approval Record",
+     "class": "Blocks final acceptance",
+     "note": "The client's written approval of the Stage 1 set. Blank. PRE-08 must be approved before Stage 2 is accepted"
+    },
+    {
      "id": "CR-13",
      "class": "Blocks final acceptance",
-     "note": "Client feedback on any deliverable within 10 Working Days; otherwise the deliverable is deemed approved"
+     "note": "The 10 Working Day deemed-approval rule is not applied: the date the pack was sent is not evidenced (D-12)"
+    },
+    {
+     "id": "Companion delivery",
+     "class": "Blocks final acceptance",
+     "note": "The PRE-03a and PRE-05 companions are prepared and not yet delivered to the client. Issuing them goes through the document route"
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A deliverables index naming, for each of the seven rows, the document id, version and delivery date, with the client's approval or the deemed-approval date. PRE-08 approval recorded before Stage 2 is accepted.",
+   "acceptance_evidence": "docs/pre-development/README.md: the index of the seven rows with document id, version, existence and approval kept apart. Technically complete on 5 October 2026 for every artefact that can be produced internally, including the two companions for PRE-03a and PRE-05. Not accepted: PRE-01, PRE-02, PRE-03a and PRE-08 wait for the Stage 1 Approval Record. PRE-08 reads 'approval pending / sent date not evidenced' (D-12).",
    "not_in_slice": [
     "PRE-03b (DLV, owned by #250)",
     "PRE-07 (DLV, owned by E-PRE-8)",
@@ -865,31 +885,31 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 17,
    "depends_on": [
     {
      "ref": "#244",
-     "reason": "The walkthrough is a live demonstration and needs the staging and demonstration environment, reachable by the client",
-     "blocking": true
+     "reason": "The staging and demonstration environment exists since 5 October 2026 (b5a7bd3). The production part of #244 is not needed for the walkthrough",
+     "blocking": false
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
     {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #244"
-    },
-    {
      "id": "Client attendance and written confirmation of the G10 list",
      "class": "Blocks final acceptance",
-     "note": "The row is closed by the session and the confirmation, not by preparation"
+     "note": "The row is closed by the session and the confirmation, not by preparation. Overdue in its literal timing and not held (D-12)"
+    },
+    {
+     "id": "Cloudflare sign-in",
+     "class": "Blocks final acceptance",
+     "note": "A public address for the session needs Mustafa's one sign-in. A screen share is the alternative"
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A dated walkthrough record: who attended, which daily tasks the client performed, the G10 list as confirmed, and any gap raised.",
+   "acceptance_evidence": "A dated walkthrough record: who attended, which daily tasks the client performed, the G10 list as confirmed, and any gap raised. Prepared and not held: docs/2026-10-05-pre07-store-operations-walkthrough.md, with the runbook and the dry run of 5 October 2026.",
    "not_in_slice": [
     "ADM-140 (DEF)",
     "ADM-141 (DEF)",
