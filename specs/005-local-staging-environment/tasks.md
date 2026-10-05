@@ -14,7 +14,7 @@ Feature `005-local-staging-environment`, PBI #244. Every task names its check. A
 
 - [x] T006 The staging plugin: marker, mail capture, test payment method (FR-005, FR-006, S-1). Check: the marker is in the home, Arabic home and sign-in pages; a test message is captured and not sent
 - [x] T007 The tunnel gate and `noindex` (FR-006, AC-244-07). Check: a request with tunnel headers and no sign-in answers 401; a wrong password answers 401; every response carries `X-Robots-Tag`
-- [x] T008 The seed, four steps in four processes, failing loudly (FR-004, AC-244-05). Check: the translation step verifies every pair is one group with one SKU; a second reset produces the same counts
+- [x] T008 The seed, each step its own process, failing loudly, ending with the import of the orders into the reports (FR-004, AC-244-05). Check: the translation step verifies every pair is one group with one SKU; a second reset produces the same counts
 
 ## Phase 3: backup and restore
 

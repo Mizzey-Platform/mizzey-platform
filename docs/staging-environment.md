@@ -65,6 +65,7 @@ Invented data, shaped by what a review has to exercise. Nothing in it is the cli
 | Cost | Present on most, zero on one, missing on two |
 | Orders | Twelve, in every state: pending, processing, on hold, completed, cancelled, failed, refunded, and one partial refund. Two placed in Arabic. Phone numbers written in four formats |
 | Checkout settings | Cash on delivery on, one invented shipping price for Egypt, guest checkout on, the "coming soon" screen off |
+| Reports | The seeded orders and refunds are imported into the reports by the commerce platform's own importer, so the report screens are not empty. Without this step a fresh staging reads "No data" until a background job has run |
 | Payment | Cash on delivery, and a test payment method that moves no money. An email beginning with `decline` produces a refused payment |
 
 Sources are created first and translations in a separate process, which is the sequencing rule finding A11

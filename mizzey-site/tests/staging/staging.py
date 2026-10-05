@@ -434,7 +434,7 @@ def seed() -> None:
     passwords = {u: secrets.token_urlsafe(14) for u in ("client_operator", "demo_customer")}
     os.environ["MIZZEY_SEED_PASSWORDS"] = json.dumps(passwords)
     for script in ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
-                   "30-catalogue-translations.php", "40-orders.php"):
+                   "30-catalogue-translations.php", "40-orders.php", "50-reports.php"):
         out = wp("eval-file", str(HERE / "seed" / script))
         say(f"seed/{script}: {out.splitlines()[-1] if out else ''}")
     for user, password in passwords.items():
