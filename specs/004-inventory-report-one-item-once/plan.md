@@ -65,6 +65,30 @@ One class, used by any report that lists products (FR-009).
 The report's query is identified by the controller's own clause filter being registered, plus its two post types
 (`research.md` R-5). That holds for the screen and the export and for nothing else.
 
+### Repair, 5 October 2026: the design as it stands
+
+The two tables above are the first design and are kept as its record. Staging showed that switching the session
+language does nothing in the request the screen makes (`research.md` R-11), so the language pair is gone and the
+summary is covered (`research.md` R-12). The classes and their responsibilities are the same.
+
+`MizzeySite\Reporting\PhysicalItems`:
+
+| Method | Does |
+|---|---|
+| `representativeOnly( string $postsTable ): string` | Unchanged |
+| `everyLanguage( WP_Query $query ): void` | Sets the multilingual plugin's own per-query switch, `suppress_wpml_where_and_join_filter`, so that the plugin adds neither its join nor its language condition to that query. Replaces `widenLanguageScope()` and `restoreLanguageScope()`. No session state is changed, so nothing is restored |
+| `available(): bool` | Unchanged |
+
+`MizzeySite\Reporting\StockReport`:
+
+| Hook | Priority | Does |
+|---|---|---|
+| `parse_query` | default | For the report's query, lifts the language filter before the plugin's own filters run |
+| `posts_clauses` | 20, after the controller's 10 | Appends the representative condition to the `WHERE`. Unchanged |
+| `woocommerce_analytics_stock_stats_query` | default | Replaces each figure of the summary under the table with the total of the list it summarises, asked of the report's own controller |
+
+The `posts_request` hook and the stored language are removed.
+
 ### Why this is the smallest correction
 
 Two classes, no storage, no setting, no template, no change to any stock write. The report keeps its native
@@ -84,6 +108,19 @@ filter, ordering, paging, columns and export.
 | AC-246-11 | Not testable before PRE-09. `pending PRE-09` |
 | FR-010 | t24: stored stock unchanged after every read; an ordinary product query still narrowed |
 
+Added by the repair of 5 October 2026. t26 reads the report over HTTP as a signed-in administrator, at the
+address and with the nonce the screen hands the browser, in the English, Arabic and all-languages admin contexts.
+
+| Criterion | Asserted by |
+|---|---|
+| AC-246-01 to AC-246-03, AC-246-05, AC-246-07 | t26: the low and out-of-stock lists over HTTP, per admin language context, with an Arabic-only item in each list |
+| AC-246-04 | t26: the three contexts return identical lists, totals and summaries, and the in-process dispatch agrees with each HTTP reading |
+| AC-246-06 | t26: total equals lines; a two-per-page walk and three sort orders in the Arabic context; each summary figure equals its list's total. t25: 5,000 items in process and over HTTP |
+| AC-246-08 | t26: WooCommerce's exporter run in a front-end request, neither wp-admin nor WP-CLI, under each language prefix |
+| FR-010 | t26: an ordinary product query in that same front-end request is still narrowed to its language |
+| FR-012 | t26 as a whole, with t24 for the WP-CLI context |
+| FR-013 | t26: the summary assertion, per context |
+
 ## Project Structure
 
 ```text
@@ -93,6 +130,8 @@ mizzey-site/
   src/Reporting/StockReport.php         the stock report hook
   tests/integration/t24-stock-report-physical-items.php
   tests/integration/t25-stock-report-volume.php
+  tests/integration/t26-stock-report-real-request.php      added by the repair
+  tests/integration/fixtures/t26-front-probe.php.txt       added by the repair
 specs/004-inventory-report-one-item-once/
   spec.md  research.md  plan.md  tasks.md  analysis.md  verification.md
   checklists/requirements.md
@@ -103,6 +142,7 @@ specs/004-inventory-report-one-item-once/
 
 | Risk | Answer |
 |---|---|
+| A future version of the multilingual plugin drops or renames its per-query switch | t26 fails loudly in every context: it asserts the lists over HTTP, not the flag |
 | A future WooCommerce version changes how the report queries | The scenario fails loudly: it asserts the list, not the hook. M-8's upgrade path reruns it |
 | A corrupted translation group (A11) | The report follows the relationship as stored. Repair is #247 |
 | A catalogue far beyond the baseline | Measured at 5,000 items. A stored representative flag is the growth path, a later decision |

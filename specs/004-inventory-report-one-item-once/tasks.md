@@ -46,9 +46,32 @@ Task-to-issue generation is disabled: these are not GitHub issues.
       `evidence/clean-baseline.txt`, `evidence/final-suite.txt` and `evidence/final-suite.json`. Test: the suite.
 - [x] T013 Write `verification.md`, reporting the three states separately. Test: `test_spec_consistency.py` and
       the scope trace.
-- [ ] T014 Manual testing on staging (DOD-04). **Not done: no staging environment exists yet (#244).**
+- [ ] T014 Manual testing on staging (DOD-04). **Run on 5 October 2026 as a scripted pass in a real browser, and
+      it found three faults**, corrected in Phase 6. A person's own pass is still owed.
 - [ ] T015 Client approval of the acceptance criteria (DOD-09), through MS-UAT-2026-027. **Not done.**
 - [ ] T016 AC-246-11, the figures the ERP supplies. **Not done: `pending PRE-09`.**
+
+## Phase 6: Repair after the staging finding, 5 October 2026
+
+Staging disproved AC-246-03 and AC-246-04 in the signed-in browser session, and showed a summary that counted
+language records. Board status went from Verified to In progress before any code changed.
+
+- [x] T017 Reproduce through the real request before touching production code: write
+      `mizzey-site/tests/integration/t26-stock-report-real-request.php` and its front-end probe fixture, reading
+      the report over HTTP, signed in, in the English, Arabic and all-languages admin contexts. Test: it fails on
+      the code of `main`, with t24 passing beside it (`evidence/repair/t26-before.txt`).
+- [x] T018 Identify the cause by tracing one such request. Test: `evidence/repair/root-cause-trace.txt`,
+      `research.md` R-11.
+- [x] T019 [US1] Replace the session-language switch in `PhysicalItems` with the multilingual plugin's per-query
+      switch, and drop the restore step from `StockReport` (FR-012). Test: t26, AC-246-01 to AC-246-08.
+- [x] T020 [US1] Make each figure of the summary under the table the total of its list (FR-013). Test: t26, the
+      summary assertion in each context.
+- [x] T021 Re-run the sizing baseline, in process and over HTTP, with the summary. Test: t25.
+- [x] T022 Correct the claim in t24's header that the three in-process contexts are the whole input.
+- [x] T023 Run the guards on the diff, reset the runtime to the clean baseline and run the whole suite serially;
+      commit `evidence/repair/`. Test: the suite.
+- [ ] T024 After merge: rebuild staging from the new `main`, repeat the staging pass through the signed-in
+      browser, and only then return the board status to Verified.
 
 ## Not tasks, by decision D-246-1
 

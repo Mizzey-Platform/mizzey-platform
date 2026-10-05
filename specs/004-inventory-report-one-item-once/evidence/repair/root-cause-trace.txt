@@ -1,0 +1,57 @@
+# #246 repair: the trace that identified the cause
+#
+# Run 2026-10-05 on the disposable runtime, production code as on main at 1de55d7.
+# WordPress 7.1.2, WooCommerce 11.1.0, WPML 4.9.7, WooCommerce Multilingual 5.5.7.
+#
+# How it was taken. A throwaway scenario created one low item in both languages, one in English only and one in
+# Arabic only, opened the Analytics Stock screen over HTTP as a signed-in administrator with the admin language
+# set to Arabic, read the REST address and nonce the page hands the browser, and sent the screen's own request to
+# that address. A temporary tracer in the disposable runtime, removed after the run, logged the request's context,
+# every language switch after the REST server started, and the language at each stage of the report's query.
+# The tracer and the throwaway scenario are not committed; t26 is the permanent form of the request.
+
+The request the screen made, and its answer:
+  GET http://mizzey.local/ar/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user
+  -> 200, X-WP-Total 1, the Arabic-only item alone. Three physical items were owed.
+
+The trace of that request, in order:
+  init: uri=/ar/wp-json/wc-analytics/reports/stock?... is_admin=false lang='ar' user=<the signed-in administrator>
+  rest_api_init: lang='ar'
+  SWITCH to 'all' now='ar' via do_action < SitePress::switch_lang < wpml_switch_language_action < WP_Hook::apply_filters < WP_Hook::do_action < do_action < MizzeySite\Reporting\PhysicalItems::widenLanguageScope < MizzeySite\Reporting\StockReport::beforeQuery < WP_Hook::apply_filters
+  parse_query@-1000: lang='ar'
+  parse_query@0: lang='ar'
+  parse_query@10: lang='ar'
+  parse_query@100: lang='ar'
+  pre_get_posts(late): lang='ar'
+  posts_clauses(late): lang='ar'
+  SWITCH to 'ar' now='ar' via ... < MizzeySite\Reporting\PhysicalItems::restoreLanguageScope < MizzeySite\Reporting\StockReport::afterQueryBuilt < WP_Hook::apply_filters
+
+The line that settles it is the first SWITCH: the correction asked for 'all', and the language read back in the
+same call, straight after the switch, is still 'ar'. The switch ran and changed nothing.
+
+The built query carried both conditions at once:
+  ... AND ( ( ( wpml_translations.language_code = 'ar' OR 0 ) AND mz_posts.post_type IN (...,'product','product_variation' ) ) OR ... )
+  ... AND NOT EXISTS ( SELECT 1 FROM mz_icl_translations AS mizzey_self INNER JOIN mz_icl_translations AS mizzey_rival ... )
+The representative condition was applied to a list already narrowed to Arabic. A translated item's representative
+is its English record, so every item that exists in both languages dropped out, and only an item whose one record
+is Arabic survived. In the English context the same thing left out the Arabic-only item.
+
+Why the switch changed nothing. sitepress-multilingual-cms/sitepress.class.php, SitePress::is_valid_language():
+  return ( null !== $language && isset( $active_languages[ $language ] ) )
+      || ( 'all' === $language && ( $is_admin || $is_wp_cli_request ) );
+'all' is a valid language only inside wp-admin or WP-CLI. The trace shows is_admin=false: the report's request is a
+REST request. switch_lang() calls set_this_lang(), which silently keeps the old language when the new one is not
+valid.
+
+Why t24 passed. It dispatches the endpoint inside a WP-CLI process, one of the two contexts in which 'all' is
+accepted. The scenario's own input, the context it ran in, was what made the correction work.
+
+The same request in the other two admin contexts:
+  English:        root http://mizzey.local/wp-json/     -> total 2, the pair and the English-only item
+  All languages:  root http://mizzey.local/wp-json/     -> total 2, the same request as English
+
+The mechanism that replaced it. sitepress-multilingual-cms/classes/query-filtering/wpml-query-filter.class.php,
+is_join_filter_active():
+  if ( isset( $query->query['suppress_wpml_where_and_join_filter'] ) && $query->query['suppress_wpml_where_and_join_filter'] ) { return false; }
+WPML reads this flag from the query's own arguments and then adds neither its join nor its language condition.
+It depends on the query, not on the kind of request.

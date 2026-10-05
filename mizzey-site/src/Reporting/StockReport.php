@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace MizzeySite\Reporting;
 
 use Automattic\WooCommerce\Admin\API\Reports\Stock\Controller as StockController;
+use Automattic\WooCommerce\Enums\ProductStockStatus;
 use WP_Query;
+use WP_REST_Request;
 
 defined('ABSPATH') || exit;
 
@@ -23,9 +25,14 @@ defined('ABSPATH') || exit;
  *
  * The correction is confined to the report's own query. `Reports\Stock\Controller::get_items()` registers its
  * clause filters, runs one WP_Query, and removes them, both for the screen and for the export, which calls the
- * same method. While those filters are registered, this class widens the language scope for that query and adds
- * the representative-record condition from PhysicalItems. The report's stock filter, ordering, total and paging
- * then run on physical items, in SQL.
+ * same method. While those filters are registered, this class lifts the language filter from that query and adds
+ * the representative-record condition, both from PhysicalItems. The report's stock filter, ordering, total and
+ * paging then run on physical items, in SQL, in whatever kind of request the report is read: the screen's REST
+ * request under either language's address, a scheduled export, wp-admin or WP-CLI.
+ *
+ * The summary under the report's table is a second set of figures, counted by WooCommerce with statements of its
+ * own that no query filter reaches, and it counted language records. Each figure is replaced by the total of the
+ * list it summarises, so the summary and the lists cannot disagree.
  *
  * It changes no stock, no synchronisation and no storefront behaviour, and it chooses nothing about where the
  * ERP's figures are stored or what "low" means: the report keeps reading the store's own figures and thresholds.
@@ -34,26 +41,22 @@ defined('ABSPATH') || exit;
  */
 final class StockReport
 {
-    /** The language to restore once the report's query has been built. */
-    private static ?string $languageToRestore = null;
-
     public static function register(): void
     {
-        // As early as possible, so the language scope is already wide when WPML's own query filters run.
-        add_action('parse_query', [self::class, 'beforeQuery'], PHP_INT_MIN);
+        // Before the query is built, so WPML's own query filters find the flag when they run.
+        add_action('parse_query', [self::class, 'everyLanguage']);
         // After the report's own clause filters at 10, which add the stock filter and the ordering.
         add_filter('posts_clauses', [self::class, 'onePerPhysicalItem'], 20, 2);
-        // Once the SQL exists the language scope has done its work, whatever the query then returns.
-        add_filter('posts_request', [self::class, 'afterQueryBuilt'], PHP_INT_MAX, 2);
+        add_filter('woocommerce_analytics_stock_stats_query', [self::class, 'summaryOfPhysicalItems']);
     }
 
     /**
-     * Widen the language scope for the stock report's query.
+     * Let the stock report's query see every language record.
      */
-    public static function beforeQuery(WP_Query $query): void
+    public static function everyLanguage(WP_Query $query): void
     {
-        if (self::isStockReportQuery($query) && null === self::$languageToRestore) {
-            self::$languageToRestore = PhysicalItems::widenLanguageScope();
+        if (self::isStockReportQuery($query)) {
+            PhysicalItems::everyLanguage($query);
         }
     }
 
@@ -74,16 +77,54 @@ final class StockReport
     }
 
     /**
-     * Restore the language scope once the stock report's query has been built.
+     * Make each figure of the report's summary the total of the list it summarises.
+     *
+     * The figures are read live. WooCommerce keeps its own for thirty days; a summary that can lag behind the
+     * list beside it is the fault being corrected, and the cost is measured in t25.
+     *
+     * @param mixed $totals The summary as WooCommerce counted it, keyed by figure.
+     * @return mixed
      */
-    public static function afterQueryBuilt(string $request, WP_Query $query): string
+    public static function summaryOfPhysicalItems($totals)
     {
-        if (self::isStockReportQuery($query)) {
-            PhysicalItems::restoreLanguageScope(self::$languageToRestore);
-            self::$languageToRestore = null;
+        if (!is_array($totals) || !PhysicalItems::available()) {
+            return $totals;
         }
 
-        return $request;
+        $report = new StockController();
+        // The lists the report offers: low stock, and one per stock status. Any other figure is left as it came.
+        $lists = array_merge([ProductStockStatus::LOW_STOCK], array_keys(wc_get_product_stock_status_options()));
+        foreach (array_keys($totals) as $figure) {
+            $isWholeReport = 'products' === $figure;
+            if ($isWholeReport || in_array($figure, $lists, true)) {
+                $totals[$figure] = self::listTotal($report, $isWholeReport ? null : $figure) ?? $totals[$figure];
+            }
+        }
+
+        return $totals;
+    }
+
+    /**
+     * The number of physical items in one of the report's lists, as the list itself counts them.
+     *
+     * @param string|null $type The list, or null for the whole report.
+     * @return int|null Null when the list answered with an error, which its contract allows.
+     */
+    private static function listTotal(StockController $report, ?string $type): ?int
+    {
+        $request = new WP_REST_Request('GET', '/wc-analytics/reports/stock');
+        $request->set_param('page', 1);
+        $request->set_param('per_page', 1);
+        if (null !== $type) {
+            $request->set_param('type', $type);
+        }
+
+        $response = rest_ensure_response($report->get_items($request));
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        return (int) ($response->get_headers()['X-WP-Total'] ?? 0);
     }
 
     /**

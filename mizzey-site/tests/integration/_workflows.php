@@ -435,6 +435,54 @@ final class Workflows {
 
 	// ---- wp-admin over HTTP ----------------------------------------------------------------------------------
 
+	/**
+	 * Open a WooCommerce Analytics screen over HTTP as the signed-in test administrator, in one admin language
+	 * context, and read what the page hands the browser: the REST address its requests go to, the nonce they
+	 * carry, and the cookies the page set. The language is chosen as the admin language switcher chooses it.
+	 *
+	 * @param string $report The report's path under Analytics, for example `stock`.
+	 * @param string $lang   en, ar or all.
+	 * @return array{status:int,root:string,nonce:string,cookies:\WP_Http_Cookie[]}
+	 */
+	public function analytics_screen( string $report, string $lang ): array {
+		$page = $this->admin_get( admin_url( 'admin.php?page=wc-admin&path=' . rawurlencode( '/analytics/' . $report ) . '&lang=' . $lang ) );
+		preg_match( '/createRootURLMiddleware\(\s*"([^"]+)"/', $page['body'], $root );
+		preg_match( '/createNonceMiddleware\(\s*"([^"]+)"/', $page['body'], $nonce );
+		return array( 'status' => $page['status'], 'root' => $root[1] ?? '', 'nonce' => $nonce[1] ?? '', 'cookies' => $page['cookies'] );
+	}
+
+	/**
+	 * A REST GET sent as a screen opened with analytics_screen() sends it: to the address the page gave, with its
+	 * nonce and its cookies.
+	 *
+	 * @param array<string,scalar> $params Query arguments.
+	 * @return array{status:int,body:string,headers:array<string,string>,cookies:\WP_Http_Cookie[]}
+	 */
+	public function screen_get( array $screen, string $route, array $params = array() ): array {
+		return $this->admin_get( add_query_arg( $params + array( '_locale' => 'user' ), $screen['root'] . $route ), array( 'X-WP-Nonce' => $screen['nonce'] ), $screen['cookies'] );
+	}
+
+	/**
+	 * A GET over HTTP as the signed-in test administrator. Redirects are not followed, so the answer is the one
+	 * to the address asked for.
+	 *
+	 * @param array<string,string> $headers Request headers.
+	 * @param \WP_Http_Cookie[]    $cookies Cookies an earlier answer set, sent back as a browser would.
+	 * @return array{status:int,body:string,headers:array<string,string>,cookies:\WP_Http_Cookie[]}
+	 */
+	private function admin_get( string $url, array $headers = array(), array $cookies = array() ): array {
+		$r = wp_remote_get( $url, array( 'cookies' => array_merge( $this->cookies, $cookies ), 'headers' => $headers, 'timeout' => 120, 'redirection' => 0 ) );
+		if ( is_wp_error( $r ) ) {
+			return array( 'status' => 0, 'body' => $r->get_error_message(), 'headers' => array(), 'cookies' => array() );
+		}
+		return array(
+			'status'  => (int) wp_remote_retrieve_response_code( $r ),
+			'body'    => (string) wp_remote_retrieve_body( $r ),
+			'headers' => array_change_key_case( wp_remote_retrieve_headers( $r )->getAll() ),
+			'cookies' => wp_remote_retrieve_cookies( $r ),
+		);
+	}
+
 	private function http( string $method, string $url, array $body = array() ): array {
 		$args = array( 'cookies' => $this->cookies, 'timeout' => 60, 'redirection' => 0, 'method' => $method );
 		if ( $body ) {

@@ -4,7 +4,9 @@
 
 **Created**: 5 October 2026
 
-**Status**: Implemented, technically verified
+**Status**: Implemented. Verification was reopened on 5 October 2026, when staging disproved AC-246-03 and
+AC-246-04 in the signed-in browser session, and the feature was repaired the same day (C-5, C-6, FR-012, FR-013).
+Where verification stands is in `verification.md`
 
 **Work type**: requirement
 
@@ -105,6 +107,23 @@ measurements. The cause of the difference is not established here and is a resea
 is that the baseline's language configuration changed when #241 landed. The feature does not depend on which is
 true, because AC-246-03 and AC-246-04 hold in every context.
 
+### C-5. What is "the operator's admin session", for AC-246-04? Added by the repair of 5 October 2026
+
+It is the session as the operator has it: signed in, in a browser, on the Analytics Stock screen, with the admin
+language switcher set to English, Arabic or all languages. The screen reads the report through a REST request,
+and in the Arabic context that request goes to an address under the Arabic prefix. The criteria are therefore
+verified through that request, over HTTP, and not only by calling the report inside one process. The first
+verification did the second and was wrong about the first (`research.md` R-11). The same holds for the export: a
+long export is built by a scheduled job, which can run in a request that is neither wp-admin nor WP-CLI.
+
+### C-6. Is the summary under the table part of the report? Added by the repair of 5 October 2026
+
+Yes. The screen shows, under the table, how many products, and how many low, out of stock, on backorder and in
+stock. It is the same standard report, on the same screen, and AC-246-06 says the report's total counts physical
+items. A summary reading "7 Low stock" beside a list of four lines is that criterion failing as a reader meets
+it. Each figure of the summary is therefore the total of the list it summarises. This is not the dashboard: the
+dashboard's figures stay with ADM-10 and ADM-11 (D-246-1), and nothing here changes them.
+
 ## User Scenarios and Testing *(mandatory)*
 
 ### User Story 1 - A buyer restocks from a list of real items (Priority: High)
@@ -194,6 +213,11 @@ WPML or WooCommerce Multilingual makes the stock report list one line per physic
 - **FR-010**: The feature MUST NOT change stock, how stock is synchronised between language records, or any
   storefront behaviour. It changes what a report lists.
 - **FR-011**: The feature MUST NOT choose where the ERP's figures are stored or what defines "low" (M-3).
+- **FR-012**: The resolution MUST hold in every kind of request the report is read in: the screen's REST request
+  under either language's address, a scheduled export, wp-admin and WP-CLI. It MUST NOT depend on a setting the
+  multilingual plugin honours in some of those and not in others. Added by the repair of 5 October 2026.
+- **FR-013**: Each figure of the summary under the report's table MUST equal the total of the list it
+  summarises, in every admin language context. Added by the repair of 5 October 2026.
 
 ### Key Entities
 
@@ -236,6 +260,9 @@ No client decision is needed to build or to verify this feature.
 - **SC-002**: No fixture item is missing from, or repeated in, any of the six lists.
 - **SC-003**: A translated low variation is one line.
 - **SC-004**: The existing integration suite still passes: the feature changes no stock and no synchronisation.
+- **SC-005**: Read over HTTP as a signed-in administrator, in the English, Arabic and all-languages admin
+  contexts, the lists, their totals and the summary under the table are identical, and hold each fixture item
+  once. Added by the repair of 5 October 2026.
 
 ## Delivery stage
 

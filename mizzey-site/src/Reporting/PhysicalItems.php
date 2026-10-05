@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Reporting;
 
+use WP_Query;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -18,10 +20,11 @@ defined('ABSPATH') || exit;
  * record holds its own `wc_product_meta_lookup` row with the full quantity. A report that lists product posts
  * therefore lists language records, not items.
  *
- * What this class supplies. A WHERE condition that keeps exactly one record per translation group: the
- * representative. Because it is part of the query, the report's own filtering, ordering, total and paging all
- * operate on physical items. Nothing is merged in PHP afterwards, which is the approach P-019 measured as wrong:
- * merging after the page is cut gives totals and page boundaries that count language records.
+ * What this class supplies. A switch that lets one query see every language record, and a WHERE condition that
+ * then keeps exactly one record per translation group: the representative. Because both are part of the query,
+ * the report's own filtering, ordering, total and paging all operate on physical items. Nothing is merged in PHP
+ * afterwards, which is the approach P-019 measured as wrong: merging after the page is cut gives totals and page
+ * boundaries that count language records.
  *
  * The representative of a group is its source-language record, the one the translations were made from. Where a
  * group has no listable source-language record, for example because the original is in the bin, it is the
@@ -95,37 +98,26 @@ final class PhysicalItems
     }
 
     /**
-     * Lift the language scope, so that the query that follows sees every language record.
+     * Lift the language filter from one query, so that it sees every language record.
      *
-     * A report of physical items must not depend on the language the operator's session is in. WPML otherwise
+     * A report of physical items must not depend on the language of the request it is asked in. WPML otherwise
      * narrows a product query to that language, which is how an item that exists only in the other language
      * drops out of the list.
      *
-     * @return string|null The language to restore, or null when there is nothing to restore.
+     * The flag is WPML's own per-query switch: its query filter reads it from the query's arguments and then adds
+     * neither its join nor its language condition to that query. It is set on the query and on nothing else, so
+     * the request's language is never touched.
+     *
+     * Why not the session language "all". WPML accepts that value only inside wp-admin and WP-CLI
+     * (`SitePress::is_valid_language()`, measured on 4.9.7). The stock report is read through a REST request,
+     * which is neither, and a long export is built by a scheduled job, which need not be either. Switching to
+     * "all" there does nothing and says nothing. The first version of this class did exactly that, and was right
+     * only in the WP-CLI process that tested it.
      */
-    public static function widenLanguageScope(): ?string
+    public static function everyLanguage(WP_Query $query): void
     {
-        if (!self::available()) {
-            return null;
-        }
-
-        $current = apply_filters('wpml_current_language', null);
-        if (!is_string($current) || 'all' === $current) {
-            return null;
-        }
-
-        do_action('wpml_switch_language', 'all');
-
-        return $current;
-    }
-
-    /**
-     * Restore the language scope taken by widenLanguageScope().
-     */
-    public static function restoreLanguageScope(?string $language): void
-    {
-        if (null !== $language) {
-            do_action('wpml_switch_language', $language);
+        if (self::available()) {
+            $query->query['suppress_wpml_where_and_join_filter'] = true;
         }
     }
 }

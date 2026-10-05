@@ -66,6 +66,10 @@ B11 is therefore closed as **measured: the scoped view does omit an item**, on t
 
 ## R-4. Does a browser admin request differ from the in-process measurement?
 
+> **Refuted on staging, 5 October 2026.** The answer below is wrong, and is kept as the record of what was
+> believed when the feature was first verified. A browser request differs in a second respect, which decided the
+> result: the kind of request it is. See R-11.
+
 A browser request differs from the scenario in one respect only: how the session language is first chosen (an
 admin cookie or a request parameter, instead of `switch_lang()`). Everything after that is the same code: the
 same controller, the same `WP_Query`, the same filters.
@@ -105,6 +109,9 @@ Two cases need a rule rather than an assumption.
 representative's own, so nothing is summed.
 
 ## R-7. Language scope: switch it, do not rewrite it
+
+> **Replaced on 5 October 2026.** Switching the session language to all languages works only inside wp-admin and
+> WP-CLI. The text below is kept as the record of the first design. The mechanism in use is in R-11.
 
 WPML adds its language condition through its own query filters. Removing that condition from the built SQL by
 pattern would bind this code to the plugin's internal wording. The documented interface is the language itself:
@@ -162,3 +169,80 @@ known to own this screen; whether it is owned, or simply not exposed or recommen
 | Merge duplicate lines in PHP after the query | Wrong totals and page boundaries, as P-019 measured |
 | Force the session to one language | It trades the duplicate for the omission |
 | Replace the report with a custom one | RPT-10 is P1-L, "standard" reporting. The native report is correct once its query is |
+
+## R-11. Why the screen was wrong while the scenario passed. Added by the repair of 5 October 2026
+
+**What staging showed.** In the signed-in browser the English context left out the Arabic-only item, and the
+Arabic context listed only that item, while t24 passed on the same runtime the same day
+(`docs/2026-10-05-staging-verification.md`).
+
+**Reproduced first.** Scenario t26 opens the Analytics Stock screen over HTTP as a signed-in administrator, in
+each admin language context, reads the REST address and the nonce the page hands the browser, and sends the
+screen's own requests there. On the code of `main` it failed in the same way as staging:
+`evidence/repair/t26-before.txt`, where t24 passes beside it.
+
+**The cause, traced and not inferred.** `evidence/repair/root-cause-trace.txt` is the trace of one such request.
+The correction asked the multilingual plugin for the session language "all", and the language read back
+straight after the switch was unchanged.
+
+| Fact | Where |
+|---|---|
+| The plugin accepts "all" as a language only inside wp-admin or WP-CLI | `SitePress::is_valid_language()`, WPML 4.9.7 |
+| A refused switch is silent: `switch_lang()` keeps the old language and reports nothing | `SitePress::set_this_lang()` |
+| The report's request is a REST request: `is_admin()` is false | The trace |
+| In the Arabic admin context the screen sends that request under the Arabic address prefix, so its language is Arabic | The page's own `createRootURLMiddleware` address |
+| t24 dispatches the endpoint inside a WP-CLI process, one of the two contexts where "all" is accepted | t24 |
+
+So the representative condition, which was applied, ran on a list still narrowed to one language. A translated
+item's representative is its English record, which the Arabic context had already excluded, and the Arabic-only
+item's record was excluded by the English one.
+
+**Classification.** Production code, and a test abstraction that hid it. Not a fixture defect, not a staging
+configuration and not a stale cache: the dev runtime reproduces it on a clean seed.
+
+**The mechanism now.** The multilingual plugin has a switch on the query itself: when a query's arguments carry
+`suppress_wpml_where_and_join_filter`, its query filter adds neither its join nor its language condition
+(`WPML_Query_Filter::is_join_filter_active()`). `PhysicalItems::everyLanguage()` sets it on the report's query
+and on nothing else. It does not depend on the kind of request, it changes no session state, and there is
+nothing to restore afterwards.
+
+| Alternative | Why not |
+|---|---|
+| Keep the switch to "all" and force the plugin to accept it | It would mean pretending to be wp-admin, or rewriting the plugin's validation, for one query |
+| Strip the language condition from the built SQL | It binds this code to the plugin's internal wording, the objection R-7 already made |
+| Send the screen's request without the language prefix | It would correct the screen and leave the export and any other caller wrong |
+| Deduplicate in PHP after the page is cut | Wrong totals and page boundaries, as P-019 measured |
+
+## R-12. The summary under the table. Added by the repair of 5 October 2026
+
+The screen shows five figures under the table: products, out of stock, low stock, on backorder, in stock. They
+come from a second endpoint, `wc-analytics/reports/stock/stats`, whose data store counts with statements of its
+own, written directly against the tables, and keeps each result for thirty days. No query filter reaches those
+statements, so they count language records in every context: staging read "7 Low stock" beside a list of four.
+
+WooCommerce passes the finished figures through one filter, `woocommerce_analytics_stock_stats_query`, and that
+endpoint is its only caller in WooCommerce 11.1.0. `StockReport::summaryOfPhysicalItems()` replaces each figure
+there with the total of the list it summarises, asked of the report's own controller. The summary and the lists
+therefore cannot disagree, and no second copy of the low-stock rule exists.
+
+| Alternative | Why not |
+|---|---|
+| Copy the data store's statements and add the representative condition | Two copies of the low-stock rule, which would drift from the list's |
+| Replace the data store | Its counting methods are private; the replacement would be the same copy |
+| Leave the summary | It is the same report on the same screen, and AC-246-06 is read there by the operator |
+
+The figures are read live and are not cached: a summary that lags behind the list beside it is the fault being
+corrected. The cost is in R-13.
+
+## R-13. Cost at the sizing baseline, after the repair
+
+t25 at 5,000 physical items stored as 10,000 records, on the developer's machine. The figures are those of the
+committed run, `evidence/repair/final-suite.txt`, and are not a production figure.
+
+The total is 5,000 and the first page is 25 distinct source-language records, in process in all three session
+languages and over HTTP in the Arabic admin context. The last page, 200, is full. The scenario records the time
+of a signed-in REST request that reads no product beside the two it measures, so that the cost of the report can
+be read apart from the cost of any request on this machine.
+
+Filtering, ordering, the total and the paging all run in the one SQL statement, on physical items, before the
+page is cut. Nothing is deduplicated in PHP.
