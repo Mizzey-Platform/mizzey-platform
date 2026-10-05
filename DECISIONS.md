@@ -905,3 +905,101 @@ demand. S-2 is a test assertion and changes no behaviour.
 
 **Status:** applied. The board edits are live, the records follow in this pull request, and #241 implementation
 proceeds from `tasks.md`.
+
+## 2026-10-05 - D-10: owner decisions on open client items, CX-01 closed, and blockers classified
+
+Decided by Mustafa on 5 October 2026, to finish pre-development and stop avoidable interruptions during
+implementation. **Every decision here is the owner's. None is a client confirmation, and none may be described as
+one unless the client later confirms it explicitly.** The machine-readable record is
+`docs/scope/open-items.json`, where each carries `client_confirmed: false`.
+
+**1. The standing rule, now constitution M-10.** A missing client or vendor value does not block development when
+the functionality can be built safely through configuration, a professional working default, a placeholder, a
+fixture, a fake or mock adapter, an interface or contract, sandbox credentials, or a later acceptance or launch
+gate. Every open input is placed in one of seven classes: blocks development now; blocks final acceptance; blocks
+production or launch only; content or client input; vendor or account input; ERP input; configurable working
+default. The rule never invents client approval and never weakens contractual acceptance: a criterion resting on
+a working default is `provisional` or `pending OD-nn`, never `final`.
+
+**2. OD-27 and OD-14: production gates, not development blockers. OD-27 is not client-approved.** Development and
+the staging and demonstration environment run on the developer's own machine. The staging and demonstration
+environment is isolated from development where practical, uses a separate database, holds synthetic and test data
+only and no real customer or personal production data, is exposed for review through a Cloudflare Tunnel, is
+suitable for browser, UAT and manual staging verification, supports the DOD-04 staging checks, and uses sandbox
+or fake integrations where a real provider is unavailable. This is the approved engineering approach for
+development. **Production hosting location and provider remain a later client decision**: the contract requires
+the client's written instruction before production infrastructure is provisioned (R-03, CR-10), and OD-14, the
+operating budget, is decided with it. #244 can therefore start; its production environment cannot be accepted
+until both are answered.
+
+**3. CX-01 is closed: the Accountant role exists at launch.** The contradiction stood from ratification: the
+register's narrative promises the role twice ("There is no period during which your accountant has no role"),
+while the ROLE-06 row reads DEF and the Client Scope Summary lists the profile as not included. The reading that
+favours the client is taken. The role follows least privilege:
+
+| Rule | Recorded as |
+|---|---|
+| Who holds financial permission | Owner / Super Admin; Admin where appropriate; the Accountant for its accounting and financial responsibilities |
+| What the Accountant covers | The Stage 1 financial functions it needs: payment and financial visibility, invoices, product cost where permitted, reconciliation information inside contracted Stage 1 scope |
+| What the Accountant never holds | General administration; plugin, theme or file management; user or role administration; unrelated system configuration |
+| Refunds | A separate granular capability. Being an Accountant does not grant it |
+| Advanced reporting | Unchanged: ROLE-06a stays P2 and arrives with RPT-02 and RPT-04 |
+
+**The history is preserved, not rewritten.** `docs/scope/open-items.json` keeps the six pieces of evidence and
+gains a `resolution`; its status moves from `open` to `resolved`. **One contract-side step is outstanding and is
+not taken here:** ROLE-06 still reads DEF in the signed register and in `docs/scope/register-ids.json`, so no
+criterion can trace it as an obligation yet (M-1), and the checker keeps refusing it. The correction goes through
+the document route as an engagement-document edit, which needs its own approval. Until then #251 builds the five
+rows it owns and the Accountant criteria wait on that correction. Constitution M-2 now states how a contradiction
+is closed.
+
+**4. Working and delivery decisions, owner-approved.**
+
+| Id | Decision | What it still gates |
+|---|---|---|
+| OD-15 | Starting sizing baseline of 5,000 products. The architecture supports growth beyond 5,000 without redesign. The 300 orders a day planning assumption stays unless testing or evidence requires a revision | Nothing in development |
+| OD-19 | Launch-capable payment methods are cards and mobile wallets. Provider credentials or activation do not block payment architecture or development | Activation depends on the payment provider and the merchant account (PAY-15) |
+| OD-21 | Google Analytics with Tag Manager, Meta and TikTok are all in the launch tracking plan, where the contracted Stage 1 rows require them | Provider and account setup, an integration and launch input |
+| OD-03 | Example default, admin-configurable under BR-001: 10 percent off the first order, capped at 200 EGP, minimum order 500 EGP, valid 14 days from account creation, one use, new customers only, not combined with other coupons | The client's real values, set in the admin |
+| OD-04 | "Two items" means two or more units in the cart, any mix of products, no exclusions. The condition stays admin-configurable under BR-002 | The client's confirmation before launch |
+| OD-05 | The cash on delivery capability is built and tested as PAY-09 requires. A value limit and a fee are example values only: neither is native to WooCommerce, so neither is promised until the checkout rows are checked | The launch switch, which PAY-09 leaves to the client |
+
+OD-03, OD-04 and OD-05 were delegated by Mustafa to a professional default; the values are examples the client is
+expected to change.
+
+**5. The ERP stays behind the adapter boundary.** The question pack continues to be prepared and sent, and PRE-09
+does not block unrelated development. ERP design proceeds against mocks and contracts on these fixed invariants:
+the ERP is the stock source of truth; one commercial item or variant is one ERP stock identity regardless of
+language; the store holds no independent authoritative stock; a final sale fails closed if authoritative stock
+cannot be validated; no duplicate decrement; idempotency, retry, logging and reconciliation paths exist.
+Production ERP specifics stay pending PRE-09, and M-3 is unchanged: no P1-E criterion is final before it.
+
+**6. Missing brand identity does not stop structural design.** Feature-driven wireframes, professional ecommerce
+patterns, responsive states, English left to right and Arabic right to left, component architecture and neutral
+design tokens all proceed. The final identity is applied later through tokens and assets without rebuilding the
+structural experience. **Approval of the interface design still waits for OD-01**: PRE-03b says the design is
+produced after the brand identity is approved and that the screens are the approved artefact, so the structural
+work is an engineering step and is not presented to the client as a separate wireframe deliverable.
+
+**7. The inputs, classified.**
+
+| Class | Items |
+|---|---|
+| Blocks development now | No client or vendor item. Only sequencing between PBIs: #247 behind #249; #253 behind #250; #254 behind #250 and #253; #255 behind #250, #254 and #245 |
+| Blocks final acceptance | Staging checks (DOD-04) on #241, #242 and later PBIs, until the local staging environment of #244 exists; client approval (DOD-09) throughout; OD-01 for the interface design; CR-06 and CR-07 for the import specification and the migration; OD-12 for the product cost; the ROLE-06 register correction for the Accountant criteria |
+| Blocks production or launch only | OD-27, OD-14, OD-18, CR-04 legal and policy text, CR-05 product photographs, CR-09 the full catalogue export |
+| Content or client input | The #242 content inputs D-242-1 to D-242-4, page copy for IA-24 to IA-32, the Arabic endpoint slug wording; OD-08 return window; OD-13 authenticity and warranty policy; OD-09 VAT and invoicing; OD-26 image and content rights |
+| Vendor or account input | The Paymob merchant account and wallet approval; the carrier account, API key and rate card (CR-03); the Bosta status code legend; OD-20 the COD remittance cycle; the Google, Meta and TikTok accounts |
+| ERP input | PRE-09 and the ERP technical meeting; CR-18 SKUs matching the ERP; the 19 P1-E rows and MIG-14 |
+| Configurable working default | OD-03, OD-04, OD-05, OD-15, OD-19, OD-21 |
+
+**8. The board follows.** `Blocked` now means only that development cannot start: a predecessor PBI is not
+delivered. #243, #244, #245, #246, #248, #249, #250 and #251 move to `Ready`; #247, #253, #254 and #255 stay
+`Blocked` on predecessor PBIs alone. The `Client decision` field of each PBI now says which class its inputs fall
+in. Approved by Mustafa as a Project change in the same instruction.
+
+**Not decided here, and still the client's:** OD-01, OD-08, OD-09, OD-12, OD-13, OD-18, OD-20, OD-26, OD-29, and
+OD-27 and OD-14 for production. **OD-29** stays out of scope: COD verification, PAY-10, is P2.
+
+**Status:** applied. Constitution 1.1.0 (M-2 clarified, M-10 added), `AGENTS.md`, `docs/scope/open-items.json`,
+the affected issue bodies and the live Project.

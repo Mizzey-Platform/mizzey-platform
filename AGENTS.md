@@ -55,8 +55,24 @@ generation is disabled, and the agent-context skill is removed.
 
 ## Hard rules
 
-- **Contradictions are escalated, not resolved.** Open items are in `docs/scope/open-items.json`. CX-01 (the
-  Accountant role) is open. Cite it and mark dependent criteria pending. Never decide it in code or criteria.
+- **Contradictions are escalated, not resolved.** Open items are in `docs/scope/open-items.json`. Only Mustafa
+  closes one, in `DECISIONS.md`. **CX-01 is resolved by D-10: the Accountant role exists at launch**, least
+  privilege, with refunds a separate capability. It is an owner decision, not a client confirmation, and ROLE-06
+  still reads DEF in the register: no criterion traces it as an obligation until the document route corrects it.
+- **A missing input is classified before it is called a blocker** (constitution M-10). Build through
+  configuration, a working default, a placeholder, a fixture, a mock adapter, a contract or sandbox credentials,
+  and leave the real value to an acceptance or launch gate. Never record an owner default as client-confirmed.
+- **The ERP stays behind the adapter boundary**, built against mocks and contracts on fixed invariants: the ERP is
+  the stock source of truth; one commercial item or variant is one ERP stock identity whatever the language; the
+  store holds no independent authoritative stock; a final sale fails closed when authoritative stock cannot be
+  validated; no duplicate decrement; idempotency, retry, logging and reconciliation paths exist. Production ERP
+  specifics stay pending PRE-09.
+- **Missing brand identity does not stop structural design.** Wireframes, responsive states, both reading
+  directions, component architecture and neutral design tokens proceed; the final identity is applied later
+  through tokens and assets. Approval of the interface design still waits for OD-01.
+- **Development and staging run on the developer's machine**, the staging and demonstration copy isolated, on its
+  own database, with synthetic data only, reviewed through a Cloudflare Tunnel. Production hosting stays the
+  client's written decision (OD-27).
 - **P1-E rows** get no final criteria before PRE-09 is approved. Choose no ERP mechanism before the ERP team's input.
 - **Native first.** Custom code needs a recorded gap.
 - **The contractual stage never moves.** Engineering timing is noted separately.

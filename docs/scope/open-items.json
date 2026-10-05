@@ -1,5 +1,5 @@
 {
- "about": "Open contract items that specs must cite and must not resolve. Maintained by hand through internal:governance PRs. Read by tools/scope_trace.py.",
+ "about": "Contract items that specs must cite and must not resolve, with the record of how each was closed. Maintained by hand through internal:governance PRs. tools/scope_trace.py reads `gates` and `contradictions`; `working_decisions` is the record of owner decisions on open client items (DECISIONS.md D-10) and is read by people, not by the checker.",
  "gates": {
   "PRE-09": {
    "title": "ERP Integration Specification",
@@ -11,9 +11,21 @@
  "contradictions": {
   "CX-01": {
    "title": "Accountant role: narrative says it exists at launch, the row says DEF",
-   "status": "open",
-   "ids": ["ROLE-06", "ROLE-06a"],
-   "related_ids": ["ADM-27", "RPT-11", "PAY-06", "PAY-07", "PAY-08", "ADM-86", "ADM-92", "RPT-01"],
+   "status": "resolved",
+   "ids": [
+    "ROLE-06",
+    "ROLE-06a"
+   ],
+   "related_ids": [
+    "ADM-27",
+    "RPT-11",
+    "PAY-06",
+    "PAY-07",
+    "PAY-08",
+    "ADM-86",
+    "ADM-92",
+    "RPT-01"
+   ],
    "evidence": [
     "Register v1.5 line 224 (Part One 1.3, ROLE-06a): 'The Accountant role itself exists at launch (ROLE-06)'",
     "Register v1.5 lines 774-779 (blockquote 'On the Accountant role'): 'the role and its permission profile exist at launch (ROLE-06)'",
@@ -23,7 +35,108 @@
     "Functional Specification v1.2: stories written 'As the accountant' (lines 1143, 1165, 2584, 3141) while carrying ROLE-06 as DEF"
    ],
    "affects": "Which staff roles hold 'financial permission', for example US-16-05 AC2 (product cost visibility).",
-   "route": "Stage 1 review with the client. Raised by Mustafa. Not resolved in code, criteria or governance."
+   "route": "Stage 1 review with the client. Raised by Mustafa. Not resolved in code, criteria or governance.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-10",
+    "client_confirmed": false,
+    "decision": "The Accountant role exists at launch. Where the ROLE-06 row and the register's own narrative disagree, the reading that favours the client is taken: the narrative promises the role twice in plain words.",
+    "permissions": [
+     "Least privilege. Financial permission is held by Owner / Super Admin, by Admin where appropriate, and by the Accountant for its accounting and financial responsibilities.",
+     "The Accountant covers the Stage 1 financial functions it needs: payment and financial visibility, invoices, product cost where permitted, and reconciliation information inside contracted Stage 1 scope.",
+     "The Accountant holds no general administration: no plugin, theme or file management, no user or role administration, no unrelated system configuration.",
+     "Refund permission is a separate granular capability. Being an Accountant does not grant it."
+    ],
+    "history": "The contradiction is kept as evidence above and is not rewritten. It was open from ratification (22 September 2026) to this decision.",
+    "contract_instrument": "Outstanding. ROLE-06 still reads DEF in the signed register and in register-ids.json, so no criterion can trace it as an obligation yet (M-1). The correction goes through the document route, outside this repository, and is an engagement-document edit that needs Mustafa's approval. ROLE-06a stays P2: the advanced reports arrive later."
+   }
+  }
+ },
+ "working_decisions": {
+  "about": "Owner-approved working and delivery decisions. None is a client confirmation, and none is to be described as one unless the client later confirms it explicitly. A criterion that rests on one is `provisional` or `pending OD-nn`, never `final` (M-10).",
+  "classes": [
+   "blocks-development",
+   "blocks-acceptance",
+   "blocks-launch",
+   "client-content-input",
+   "vendor-account-input",
+   "erp-input",
+   "working-default"
+  ],
+  "OD-27": {
+   "title": "Hosting outside Egypt",
+   "class": "blocks-launch",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Not decided, and not recorded as client-approved. Development and the staging and demonstration environment run on the developer's own machine, with synthetic data only, so OD-27 no longer blocks development or staging verification.",
+   "still_gates": "Production infrastructure and launch: the contract requires the client's written instruction before production hosting is provisioned (R-03, CR-10)."
+  },
+  "OD-14": {
+   "title": "Monthly operating budget for hosting and services",
+   "class": "blocks-launch",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Not decided. It is a production hosting and budget gate, not a development blocker.",
+   "still_gates": "The production provider and plan."
+  },
+  "OD-15": {
+   "title": "Expected product count, order volume and traffic",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Starting sizing baseline of 5,000 products. The architecture supports growth beyond 5,000 without redesign. The 300 orders a day planning assumption stays until testing or evidence requires a revision.",
+   "still_gates": "Nothing in development. Production sizing is confirmed with OD-14."
+  },
+  "OD-19": {
+   "title": "Payment methods at launch",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Launch-capable payment methods are cards and mobile wallets. Provider credentials or activation do not block payment architecture or development.",
+   "still_gates": "Activation of wallets at launch depends on the payment provider and the merchant account (PAY-15).",
+   "also": "vendor-account-input"
+  },
+  "OD-21": {
+   "title": "Tracking integrations at launch",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Google Analytics with Tag Manager, Meta and TikTok are all in the launch tracking plan, where the contracted Stage 1 rows require them.",
+   "still_gates": "Provider and account setup is an integration and launch input.",
+   "also": "vendor-account-input"
+  },
+  "OD-03": {
+   "title": "Welcome discount",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Example default, admin-configurable under BR-001: 10 percent off the first order, capped at 200 EGP, minimum order 500 EGP, valid 14 days from account creation, one use, new customers only, not combined with other coupons.",
+   "still_gates": "The client's real values, set in the admin before launch."
+  },
+  "OD-04": {
+   "title": "Free shipping: what two items means",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "Two or more units in the cart, any mix of products, no exclusions. The condition stays admin-configurable under BR-002.",
+   "still_gates": "The client's confirmation of the rule before launch."
+  },
+  "OD-05": {
+   "title": "Cash on delivery",
+   "class": "working-default",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-05",
+   "decision": "The capability is built and tested as PAY-09 requires, available wherever the carrier serves. A value limit and a fee are example values only: neither is native to WooCommerce, so neither is promised until the checkout rows are checked.",
+   "still_gates": "The launch switch stays the client's: PAY-09 is enabled at launch only if the client selects it."
   }
  }
 }
