@@ -110,12 +110,12 @@ Neither template invents acceptance criteria. Criteria come from the spec, which
 ## The fifteen seeded PBIs, as the live board holds them
 
 **Read from the live Project, which is the operational state; this document records it, never the reverse.**
-Regenerated 4 October 2026.
+Regenerated 5 October 2026, after #241 and #242 moved to `Verified`.
 
 | Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14 | **P1** | **S1** | **Ready** | **no** | none | - | - | - |
-| 2 | #242 | Information architecture and URL structure, in both languages | E-FND | 30 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | - | #241 bilingual platform baseline |
+| 1 | #241 | Bilingual platform baseline: English default, Arabic fully delivered right to left | E-FND | FIX-04, FIX-04a, NFR-04, NFR-04a, NFR-14 | **P1** | **S1** | **Verified** | **no** | none | - | - | - |
+| 2 | #242 | Information architecture and URL structure, in both languages | E-FND | 30 ids, listed in the issue | **mixed** | **S1** | **Verified** | **no** | none | - | - | #241 bilingual platform baseline: SATISFIED, merged 4 October 2026 as 405a113. Its remaining AC-9 browser matrix is not a blocker for this PBI |
 | 3 | #243 | ERP Integration Specification approved (PRE-09) | E-PRE | PRE-09 | **DLV** | **per PRE-09** | **Blocked** | **yes** | none | B1 and A12 raised M16 to M18 | The ERP technical meeting, targeted week 4 | #245 owns ERP-10, the adapter rule, which this specification is context for |
 | 4 | #244 | Infrastructure provisioned for development, staging and production | E-PRE | 6 ids, listed in the issue | **mixed** | **S1** | **Blocked** | **no** | none | - | OD-27 hosting outside Egypt, in writing; OD-15 volumes; OD-14 operating budget | - |
 | 5 | #246 | The inventory report counts one physical item once, not once per language | E-RPT | RPT-10 | **P1-L** | **S1** | **Blocked** | **partial** | none | B10 measured defect (P-020); B11 open | - | #241 bilingual platform baseline, which owns FIX-04 and NFR-04 |

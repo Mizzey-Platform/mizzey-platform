@@ -2,7 +2,7 @@
 
 Live status. First action each session: read this, then continue from **Next**.
 
-## Now (4 October 2026)
+## Now (5 October 2026)
 
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
   public so the live repository, pull requests and issues can be inspected independently. **This is intentional
@@ -21,13 +21,15 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
-- **`main` is `405a113ac90c6ae880d7e17b0f53abbab45e59fc`**: the pilot (#237, squash `93d647b`), its close-out
+- **`main` is `3ff7488370e3a4f90aa6a7c356a79494a3700864`**: the pilot (#237, squash `93d647b`), its close-out
   and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
   probes with the exposure assessment (#240, `eadd254`), the A11 and price-matrix probes with three rounds of
   record corrections (#256, `7e39c4b`), the backlog-template reconciliation (#257, `b158a1c`), the
   one-accepting-owner board correction (#258, `e291ce6`), and **the bilingual platform baseline, the first real
-  Option B feature (#259, squash `405a113`, merged 4 October 2026)**. Each merged with green CI; `main-push` and
-  `baseline` pass at `405a113`.
+  Option B feature (#259, squash `405a113`, merged 4 October 2026)**, its post-merge progress record (#260,
+  `6bde6b4`), the stale #243 scope sentence corrected in two documents (#261, `276b50c`), and **the information
+  architecture and URL structure, the second Option B feature (#262, squash `3ff7488`, merged 5 October 2026)**.
+  Each merged with green CI; `main-push` and `baseline` pass at `3ff7488`.
 - **t17, t18, t19 and t20 are fact-finding scenarios**: they return no pass or fail verdict and record defects as
   findings. A suite line reading `0 failed` means the harness held and the contract scenarios t02 to t16 passed,
   **not** that every measured behaviour was correct.
@@ -39,8 +41,9 @@ Live status. First action each session: read this, then continue from **Next**.
 - **The Option B delivery board exists**: https://github.com/orgs/Mizzey-Platform/projects/1,
   "Mizzey Option B Delivery", organisation-owned, with 11 custom fields, 6 views and **the first 15 PBIs seeded,
   #241 to #255**. The remaining 45 to 55 PBIs are **not** created. Status separates **Verified** from
-  **Accepted**; #252 is the reference case, Verified and not Accepted. Only **#241** is `Ready`. Project #4 and
-  the 232 historical Option C issues are untouched.
+  **Accepted**; #252 is the reference case, Verified and not Accepted. **#241, #242 and #252 are `Verified`, the
+  other twelve are `Blocked`, and none is `Ready`.** Project #4 and the 232 historical Option C issues are
+  untouched.
 - **Probes A11 and the price matrix have run** (`t19`, `t20`), are **merged**, and **both questions are closed as
   probes, with no fix built from either.** None of A11, A12, B1 or the price matrix is reopened. A11: the translation-group corruption needs the WCML translation editor **plus** product
   creation in the same process; wp-admin one-save-per-request, the WPML duplicate method and the native CSV
@@ -73,6 +76,10 @@ Live status. First action each session: read this, then continue from **Next**.
   checks came with it: `tools/tests/test_storefront_strings.py`, which fails on hard-coded user-facing storefront
   text, and `tools/tests/test_spec_consistency.py`, which fails when the feature's artifacts contradict each
   other or when a browser row is marked verified.
+- **The second implemented feature's records** are `specs/003-information-architecture-urls/`: spec, research,
+  plan, checklist, tasks, implementation analysis, the URL map in both languages, the verification record, and
+  the committed suite evidence. Two scenarios came with it, `t22-information-architecture.php` and
+  `t23-seo-fundamentals.php`.
 
 ## Next
 
@@ -82,16 +89,23 @@ Live status. First action each session: read this, then continue from **Next**.
    contractually accepted**, which happens only through MS-UAT-2026-027. **AC-9, the browser matrix, is
    UNEXERCISED and blocked on #244**: a command-line runtime has no browsers and nothing was substituted for
    one. The issue stays open for that reason, and a CI case fails if any browser row is ever marked otherwise.
-2. **Nothing else is started.** #242 is the next PBI in delivery order and is not begun.
-3. **One browser pass on the board**: the six view filters and groupings listed in
+2. **#242 is merged and `Verified`, and stays open.** The three states, per M-7: **workflow complete**;
+   **AC-242-01 to AC-242-15 and guardrail G-1 technically verified** on a clean baseline (19 scenarios, 0 failed,
+   evidence under `specs/003-information-architecture-urls/evidence/`); **no criterion contractually accepted**.
+   **DOD-04, manual testing on staging, is not performed and is blocked on #244. DOD-09, client approval, is
+   outstanding.** No staging result is reported that did not happen. The content inputs D-242-1 to D-242-4, the
+   page copy for IA-24 to IA-32 and the final Arabic endpoint slug wording are still required from the client.
+3. **Nothing else is started, and no PBI is `Ready`.** The next PBI is not selected here: it is Mustafa's
+   decision, and moving a PBI to `Ready` is a Project change that needs his approval.
+4. **One browser pass on the board**: the six view filters and groupings listed in
    `docs/2026-10-04-github-project-proposal.md`. The GraphQL schema has no filter input, so the API cannot set
    them. Accepted, and no tooling is to be invented for it.
-4. **Obtain the client decisions**, in this order of value: **OD-01** brand identity (blocks all 152 storefront
+5. **Obtain the client decisions**, in this order of value: **OD-01** brand identity (blocks all 152 storefront
    rows), **OD-27** hosting in writing (blocks all infrastructure), **CR-06** the real Amazon export (blocks the
    import specification), **CX-01** and **OD-12** (close the product-cost pilot contractually).
-5. **The ERP meeting**, from the eighteen must-answer decisions in
+6. **The ERP meeting**, from the eighteen must-answer decisions in
    `docs/2026-10-04-erp-technical-meeting-questions.md`. It gates 19 P1-E rows plus MIG-14.
-6. Then the seeded order: #242 information architecture, #246 the inventory report correction, #247 the migration
+7. Then the seeded order: #246 the inventory report correction, #247 the migration
    sequencing invariant, #249 the import specification (after CR-06), #245 the ERP adapter seam.
 
 ## Blocked or waiting
@@ -108,6 +122,9 @@ Live status. First action each session: read this, then continue from **Next**.
 | Bosta status code legend (SHIP-14, ADR-0002) | Client or Bosta |
 | COD remittance cycle OD-20 (SHIP-16, ADR-0002) | Client |
 | **AC-9 of #241**, the six-browser matrix in both reading directions | **#244**, staging. The only open item on an otherwise verified PBI |
+| **DOD-04 of #242**, manual testing on staging | **#244**, staging, itself Blocked on OD-27, OD-15 and OD-14 |
+| **DOD-09 of #242**, client approval of the acceptance criteria | Client, through MS-UAT-2026-027 |
+| D-242-1 to D-242-4, the page copy for IA-24 to IA-32, and the final Arabic endpoint slug wording | Client. Content inputs for #242 |
 | The end of the external review period, which is when repository visibility is reconsidered | Mustafa, explicitly |
 
 The full decision list to group into the next Stage 1 review is in
