@@ -1,0 +1,261 @@
+{
+ "ran": "2026-10-05T14:49:15.174Z",
+ "pass": "stock",
+ "base": "http://127.0.0.1:8088",
+ "browser": "Google Chrome 154.0.8037.94, in a window",
+ "how": "A scripted pass in a real browser. Not a person looking at the screens.",
+ "build": {
+  "built": "2026-10-05T14:42:51Z",
+  "ref": "origin/main",
+  "commit": "5f161d968fe13213fd98560c340a9e1abb70f9f4",
+  "merged_to_main": true,
+  "corex": {
+   "version": "v0.42.0",
+   "commit": "12dde4967449e5fcf955f33db5d6f61b3b93b575"
+  },
+  "source": "mizzey-site and mizzey-theme exported with git archive; tests excluded"
+ },
+ "checks": [
+  {
+   "check": "stock report, lowstock, admin language context en",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=en",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-EN-ONLY",
+      "DEMO-S-003",
+      "DEMO-S-007",
+      "DEMO-V-001-M"
+     ]
+    }
+   ],
+   "problems": [
+    "the summary under the table reads \"7 Low stock\" while the list holds 4 lines"
+   ],
+   "screenshot": "stock-lowstock-en.png"
+  },
+  {
+   "check": "stock report, lowstock, admin language context ar",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=ar",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 0,
+   "skus": [],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/ar/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "0",
+     "skus": []
+    }
+   ],
+   "problems": [
+    "not listed: DEMO-EN-ONLY, DEMO-S-003, DEMO-S-007, DEMO-V-001-M",
+    "the summary under the table reads \"7 Low stock\" while the list holds 0 lines"
+   ],
+   "screenshot": "stock-lowstock-ar.png"
+  },
+  {
+   "check": "stock report, lowstock, admin language context all",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=lowstock&per_page=100&lang=all",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=lowstock&_locale=user",
+     "total": "4",
+     "skus": [
+      "DEMO-EN-ONLY",
+      "DEMO-S-003",
+      "DEMO-S-007",
+      "DEMO-V-001-M"
+     ]
+    }
+   ],
+   "problems": [
+    "the summary under the table reads \"7 Low stock\" while the list holds 4 lines"
+   ],
+   "screenshot": "stock-lowstock-all.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context en",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=en",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 3,
+   "skus": [
+    "DEMO-S-004",
+    "DEMO-S-008",
+    "DEMO-V-001-L"
+   ],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "3",
+     "skus": [
+      "DEMO-S-004",
+      "DEMO-S-008",
+      "DEMO-V-001-L"
+     ]
+    }
+   ],
+   "problems": [
+    "not listed: DEMO-AR-ONLY",
+    "the summary under the table reads \"7 Out of stock\" while the list holds 3 lines"
+   ],
+   "screenshot": "stock-outofstock-en.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context ar",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=ar",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 1,
+   "skus": [
+    "DEMO-AR-ONLY"
+   ],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/ar/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "1",
+     "skus": [
+      "DEMO-AR-ONLY"
+     ]
+    }
+   ],
+   "problems": [
+    "not listed: DEMO-S-004, DEMO-S-008, DEMO-V-001-L",
+    "the summary under the table reads \"7 Out of stock\" while the list holds 1 lines"
+   ],
+   "screenshot": "stock-outofstock-ar.png"
+  },
+  {
+   "check": "stock report, outofstock, admin language context all",
+   "address": "/wp-admin/admin.php?page=wc-admin&path=%2Fanalytics%2Fstock&type=outofstock&per_page=100&lang=all",
+   "adminLang": "en-US",
+   "headers": [],
+   "lines": 3,
+   "skus": [
+    "DEMO-S-004",
+    "DEMO-S-008",
+    "DEMO-V-001-L"
+   ],
+   "summary": [
+    "22Products",
+    "7Out of stock",
+    "7Low stock",
+    "0On backorder",
+    "37In stock"
+   ],
+   "summaryFigure": 7,
+   "marker": true,
+   "asked": [
+    {
+     "request": "/wp-json/wc-analytics/reports/stock?orderby=stock_status&order=asc&page=1&per_page=100&type=outofstock&_locale=user",
+     "total": "3",
+     "skus": [
+      "DEMO-S-004",
+      "DEMO-S-008",
+      "DEMO-V-001-L"
+     ]
+    }
+   ],
+   "problems": [
+    "not listed: DEMO-AR-ONLY",
+    "the summary under the table reads \"7 Out of stock\" while the list holds 3 lines"
+   ],
+   "screenshot": "stock-outofstock-all.png"
+  },
+  {
+   "check": "stock report export, lowstock",
+   "file": "stock-lowstock-export.csv",
+   "dataLines": 4,
+   "skus": [
+    "DEMO-EN-ONLY",
+    "DEMO-S-003",
+    "DEMO-S-007",
+    "DEMO-V-001-M"
+   ],
+   "problems": []
+  }
+ ],
+ "expected": {
+  "lowstock": [
+   "DEMO-EN-ONLY",
+   "DEMO-S-003",
+   "DEMO-S-007",
+   "DEMO-V-001-M"
+  ],
+  "outofstock": [
+   "DEMO-AR-ONLY",
+   "DEMO-S-004",
+   "DEMO-S-008",
+   "DEMO-V-001-L"
+  ]
+ },
+ "signedInAs": "staging_admin (synthetic)",
+ "checked": 7,
+ "withProblems": 6
+}

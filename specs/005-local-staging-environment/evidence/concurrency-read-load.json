@@ -1,0 +1,27 @@
+{
+ "measured": "2026-10-05T14:51:35Z",
+ "what": "storefront pages read by many clients at once",
+ "clients": 16,
+ "requests": 160,
+ "wall_seconds": 14.54,
+ "requests_per_second": 11.0,
+ "statuses": {
+  "200": 160
+ },
+ "seconds": {
+  "median": 1.322,
+  "p95": 1.966,
+  "max": 2.284
+ },
+ "by_page_median": {
+  "/": 0.956,
+  "/ar/": 1.068,
+  "/shop/": 1.745,
+  "/ar/shop/": 1.95,
+  "/product/sample-product-01/": 1.32,
+  "/ar/product/sample-product-01/": 1.506,
+  "/cart/": 1.304,
+  "/my-account/": 0.986
+ },
+ "note": "Measured on the developer's machine, with debugging on and no page cache. It shows that the harness produces load and that staging holds it. It is not a production performance figure."
+}

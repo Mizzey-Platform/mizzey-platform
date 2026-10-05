@@ -1,0 +1,53 @@
+{
+ "measured": "2026-10-05T14:51:20Z",
+ "what": "N buyers ordering the last K units at the same instant",
+ "item": "DEMO-LOAD-001",
+ "records": {
+  "en": 69,
+  "ar": 92
+ },
+ "languages": [
+  "en"
+ ],
+ "payment_method": "mizzey_staging_test",
+ "buyers": 2,
+ "buyers_with_a_cart": 2,
+ "stock_before": {
+  "en": 5,
+  "ar": 5
+ },
+ "stock_after": {
+  "en": 3,
+  "ar": 3
+ },
+ "release_spread_ms": 0.14,
+ "orders_confirmed": 2,
+ "orders_refused": 0,
+ "units_oversold": 0,
+ "confirmed_by_language": {
+  "en": 2
+ },
+ "language_records_agree_after": true,
+ "refusal_messages": [],
+ "cart_errors": [],
+ "rows": [
+  {
+   "buyer": 1,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.17,
+   "order_id": 133,
+   "order_status": "processing",
+   "message": null
+  },
+  {
+   "buyer": 2,
+   "lang": "en",
+   "status": 200,
+   "seconds": 1.15,
+   "order_id": 132,
+   "order_status": "processing",
+   "message": null
+  }
+ ]
+}

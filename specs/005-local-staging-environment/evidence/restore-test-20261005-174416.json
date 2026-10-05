@@ -1,0 +1,198 @@
+{
+ "started": "2026-10-05T14:43:47Z",
+ "environment": "staging",
+ "database": "mizzey_staging",
+ "steps": [
+  {
+   "step": "1 fingerprint before",
+   "at": "2026-10-05T14:43:55Z",
+   "fingerprint": {
+    "tables": 83,
+    "rows_stable": 6926,
+    "rows_volatile": 718,
+    "tables_checksum": "84ead5e1271e6c44b3834d6253087f6b73396793334771505eaa86477ee15949",
+    "checksummed": 74,
+    "products": 32,
+    "variations": 12,
+    "orders": 12,
+    "refunds": 2,
+    "users": 3,
+    "translation_rows": 123,
+    "upload_files": 7,
+    "uploads_checksum": "db3b06e9b96f606389853f8154ef1a9c76036c318eab9711287f242311b43b06",
+    "wordpress": "7.1.2",
+    "woocommerce": "11.1.0"
+   },
+   "http": {
+    "/": {
+     "status": 200,
+     "landed": "/",
+     "install_screen": false,
+     "seeded_product": false
+    },
+    "/ar/": {
+     "status": 200,
+     "landed": "/ar/",
+     "install_screen": false,
+     "seeded_product": false
+    },
+    "/shop/": {
+     "status": 200,
+     "landed": "/shop/",
+     "install_screen": false,
+     "seeded_product": true
+    },
+    "/product/sample-product-01/": {
+     "status": 200,
+     "landed": "/product/sample-product-01/",
+     "install_screen": false,
+     "seeded_product": true
+    },
+    "/wp-login.php": {
+     "status": 200,
+     "landed": "/wp-login.php",
+     "install_screen": false,
+     "seeded_product": false
+    }
+   }
+  },
+  {
+   "step": "2 backup taken",
+   "at": "2026-10-05T14:43:59Z",
+   "set": "20261005-174355-restore-test",
+   "files": {
+    "database.sql.gz": {
+     "bytes": 132037,
+     "sha256": "79e1bf3b4fb745ed4b39f8e5d02ffb8a3517f73c2c186dfaf2618c3b428f6d58"
+    },
+    "uploads.tar.gz": {
+     "bytes": 28883,
+     "sha256": "38cb41c1c60e19c008302c302b9cc1f0aaaf56cfbdc11968f450cc6783017a88"
+    }
+   }
+  },
+  {
+   "step": "3 staging destroyed",
+   "at": "2026-10-05T14:44:00Z",
+   "tables_left": 0,
+   "upload_files_left": 0,
+   "http": {
+    "/": {
+     "status": 200,
+     "landed": "/wp-admin/install.php",
+     "install_screen": true,
+     "seeded_product": false
+    },
+    "/ar/": {
+     "status": 200,
+     "landed": "/wp-admin/install.php",
+     "install_screen": true,
+     "seeded_product": false
+    },
+    "/shop/": {
+     "status": 200,
+     "landed": "/wp-admin/install.php",
+     "install_screen": true,
+     "seeded_product": false
+    },
+    "/product/sample-product-01/": {
+     "status": 200,
+     "landed": "/wp-admin/install.php",
+     "install_screen": true,
+     "seeded_product": false
+    },
+    "/wp-login.php": {
+     "status": 200,
+     "landed": "/wp-admin/install.php",
+     "install_screen": true,
+     "seeded_product": false
+    }
+   }
+  },
+  {
+   "step": "4 restored from the backup set",
+   "at": "2026-10-05T14:44:09Z",
+   "seconds": 8.4
+  },
+  {
+   "step": "5 fingerprint after",
+   "at": "2026-10-05T14:44:16Z",
+   "fingerprint": {
+    "tables": 83,
+    "rows_stable": 6926,
+    "rows_volatile": 737,
+    "tables_checksum": "84ead5e1271e6c44b3834d6253087f6b73396793334771505eaa86477ee15949",
+    "checksummed": 74,
+    "products": 32,
+    "variations": 12,
+    "orders": 12,
+    "refunds": 2,
+    "users": 3,
+    "translation_rows": 123,
+    "upload_files": 7,
+    "uploads_checksum": "db3b06e9b96f606389853f8154ef1a9c76036c318eab9711287f242311b43b06",
+    "wordpress": "7.1.2",
+    "woocommerce": "11.1.0"
+   },
+   "http": {
+    "/": {
+     "status": 200,
+     "landed": "/",
+     "install_screen": false,
+     "seeded_product": false
+    },
+    "/ar/": {
+     "status": 200,
+     "landed": "/ar/",
+     "install_screen": false,
+     "seeded_product": false
+    },
+    "/shop/": {
+     "status": 200,
+     "landed": "/shop/",
+     "install_screen": false,
+     "seeded_product": true
+    },
+    "/product/sample-product-01/": {
+     "status": 200,
+     "landed": "/product/sample-product-01/",
+     "install_screen": false,
+     "seeded_product": true
+    },
+    "/wp-login.php": {
+     "status": 200,
+     "landed": "/wp-login.php",
+     "install_screen": false,
+     "seeded_product": false
+    }
+   }
+  }
+ ],
+ "finished": "2026-10-05T14:44:16Z",
+ "fingerprints_identical": true,
+ "http_identical": true,
+ "compared": [
+  "checksummed",
+  "orders",
+  "products",
+  "refunds",
+  "rows_stable",
+  "tables",
+  "tables_checksum",
+  "translation_rows",
+  "upload_files",
+  "uploads_checksum",
+  "users",
+  "variations",
+  "woocommerce",
+  "wordpress"
+ ],
+ "not_compared": {
+  "rows_volatile": [
+   718,
+   737
+  ]
+ },
+ "differences": {},
+ "result": "PASS"
+}

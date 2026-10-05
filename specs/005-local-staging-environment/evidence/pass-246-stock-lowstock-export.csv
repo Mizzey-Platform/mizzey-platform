@@ -1,0 +1,5 @@
+﻿"Product / Variation",SKU,Status,Stock
+"Sample Product 07",DEMO-S-007,"In stock",1
+"Sample Product 03",DEMO-S-003,"In stock",2
+"Sample Variable Product 01 - Medium",DEMO-V-001-M,"In stock",2
+"Sample Product, English only",DEMO-EN-ONLY,"In stock",2

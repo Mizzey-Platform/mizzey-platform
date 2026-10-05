@@ -212,17 +212,34 @@ class SpecConsistency(unittest.TestCase):
         self.assertTrue(squash("**No criterion.**") in flat,
                         "the verification record no longer says that no criterion is contractually accepted")
 
-    def test_no_browser_row_is_reported_as_exercised(self) -> None:
-        """AC-9 needs staging. A row marked anything but unexercised would be a false claim."""
+    def test_only_rows_run_on_a_real_browser_are_reported_as_exercised(self) -> None:
+        """Staging exists since #244, and part of the matrix has been run on it.
+
+        A row may say it was exercised only if a real browser of that kind ran it. Safari on a Mac, Safari on iOS
+        and Chrome on Android cannot be run on the developer's Windows machine, so those rows stay unexercised
+        until they are run on those devices, whatever an engine build or a phone-sized window showed. And a partly
+        exercised matrix is not a verified criterion: the record must go on saying AC-9 is not verified.
+        """
         text = self.text["verification.md"]
         rows = [ln for ln in text.splitlines()
                 if ln.startswith("| ") and ("Chrome" in ln or "Safari" in ln or "Edge" in ln
                                             or "Firefox" in ln) and "|" in ln[2:]]
         self.assertTrue(rows, "the browser matrix has no rows")
         for row in rows:
+            if "LTR" in row:
+                continue
             with self.subTest(row=row[:48]):
-                self.assertTrue("Not exercised" in row or "LTR" in row,
-                                f"a browser row claims a state other than unexercised: {row!r}")
+                needs_a_device = "Safari" in row or "Android" in row
+                if needs_a_device:
+                    self.assertTrue("Not exercised" in row,
+                                    f"a row that needs a device this project has not used claims a state: {row!r}")
+                else:
+                    self.assertTrue("Not exercised" in row or "Exercised" in row,
+                                    f"a browser row states no recognised state: {row!r}")
+                self.assertFalse("Verified" in row or "Passed" in row or "Accepted" in row,
+                                 f"a browser row claims more than having been run: {row!r}")
+        self.assertTrue(squash("AC-9 is not verified") in self.flat["verification.md"],
+                        "the verification record no longer says that AC-9 is not verified")
 
     def test_is_textdomain_loaded_is_never_stated_as_a_gate(self) -> None:
         """The flag reads false on WordPress 7.1 while the mechanism works, so it cannot gate anything.

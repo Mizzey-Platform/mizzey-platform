@@ -14,10 +14,29 @@ Feature `003-information-architecture-urls`, PBI #242. Thirty register rows: 28 
 
 | Row | Wording | State |
 |---|---|---|
-| **DOD-04** | "Tests written and executed per system layer, **plus manual testing on staging**" | **Outstanding.** Staging does not exist; #244 is Blocked on OD-27, OD-15 and OD-14 |
+| **DOD-04** | "Tests written and executed per system layer, **plus manual testing on staging**" | **Run on staging on 5 October 2026 as a scripted pass in a real browser, and it found a defect.** 51 of 52 checks without a finding. **Finding F-242-1**: on the Arabic brand archive the canonical link and all three language links point at addresses that answer 404, which is AC-242-09. A pass by a person is still owed. See "Staging pass" below |
 | DOD-09 | "Client approval of acceptance criteria before a feature moves to production" | Outstanding, a client gate rather than an engineering one |
 
-**No staging result is claimed.** Nothing in this record reports a manual staging test that did not happen.
+**The staging result is reported as it came out.** Nothing in this record reports a manual staging test that did
+not happen: what ran is a scripted pass in a real browser by the agent, not a person looking.
+
+## Staging pass, 5 October 2026
+
+Run on the staging environment of #244, on the code of `main`, in the installed Chrome. Every page of the URL
+map in both languages, a product, a category archive, a brand archive, search results and the lost-password
+screen; the empty-cart checkout; an unknown address; `robots.txt`; the sitemap; and, signed in as the invented
+demonstration customer, the order list, the addresses and one order.
+
+| Result | Detail |
+|---|---|
+| 51 of 52 checks without a finding | Status, address, language, direction, canonical link, language links and whether each answers, on every page |
+| **Finding F-242-1, a defect** | `/ar/brand/{term}/` answers 200 and is the documented address. Its canonical link and its `ar`, `en` and `x-default` language links carry a translated form of "brand" and **all four answer 404**. The English brand archive and both category archives are correct. **AC-242-09 does not hold on that page**, and the scenario `t23` did not catch it |
+| The sitemap | 34 page addresses, 16 Arabic. AC-242-10 holds on staging |
+| The lost-password screen's canonical is the account page | Correct: it is an endpoint, not a page |
+
+**AC-242-09 is therefore technically verified except on the Arabic brand archive**, where it fails. The feature
+needs a correction and a scenario that fetches the archive as a visitor does. Full record:
+`docs/2026-10-05-staging-verification.md`; evidence: `specs/005-local-staging-environment/evidence/`.
 
 Versions this is evidence for, and no others (M-8): WordPress 7.1.2, WooCommerce 11.1.0, WPML 4.9.7, WPML String
 Translation 3.5.4, WCML 5.5.7, CoreX 0.42.0, PHP 8.3.6, MySQL 8.3.0.
