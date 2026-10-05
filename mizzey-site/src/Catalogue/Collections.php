@@ -20,6 +20,12 @@ defined('ABSPATH') || exit;
  * placement. A manually curated grouping of products, with its own page content and manual ordering, is a
  * taxonomy, the same shape as product_cat.
  *
+ * The archive page. A collection archive is served with the platform's product archive template, the one a
+ * category and a brand archive already use. Without that the address resolved and answered 200 with nothing on
+ * it, because the theme has no template for this taxonomy and WooCommerce maps only its own taxonomies to its
+ * product archive: the page held the site title, no collection name and no product. Measured on 5 October 2026,
+ * once the store's "coming soon" page stopped standing in front of it.
+ *
  * What this class owns, and what it does not. It owns the taxonomy and therefore the archive route in both
  * languages, which is IA-04 "Collections" and IA-35 "Curated collection pages". It does not own the admin CRUD
  * (ADM-57), the assignment UI (ADM-44), the ordering (MER-03) or the per-collection content (SSC-06, SSC-24):
@@ -37,9 +43,34 @@ final class Collections
      */
     public const SLUG = 'collection';
 
+    /** WooCommerce's product archive template, "Product Catalog", by its template slug. */
+    private const PRODUCT_ARCHIVE_TEMPLATE = 'archive-product';
+
     public static function register(): void
     {
         add_action('init', [self::class, 'registerTaxonomy'], 9);
+        add_filter('taxonomy_template_hierarchy', [self::class, 'useProductArchiveTemplate']);
+    }
+
+    /**
+     * Offer the product archive template for a collection archive.
+     *
+     * It is placed before the last, most general candidate, which is where WooCommerce places it for its own
+     * product taxonomies. A template the theme later supplies for this taxonomy comes earlier in the list and
+     * wins, so the design work is not pre-empted.
+     *
+     * @param mixed $templates The candidate templates, most specific first.
+     * @return mixed
+     */
+    public static function useProductArchiveTemplate($templates)
+    {
+        if (!is_array($templates) || !is_tax(self::TAXONOMY) || !wp_is_block_theme()) {
+            return $templates;
+        }
+
+        array_splice($templates, max(0, count($templates) - 1), 0, [self::PRODUCT_ARCHIVE_TEMPLATE]);
+
+        return $templates;
     }
 
     /**

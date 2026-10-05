@@ -258,6 +258,48 @@ verified.
 
 ---
 
+## Phase E: repair after the staging finding, 5 October 2026
+
+Staging disproved AC-242-09 on the Arabic brand archive. The board status went from Verified to In progress
+before any code changed.
+
+### T-15. Reproduce through a visitor's request, before touching production code
+
+**Kind**: site-tests. `mizzey-site/tests/integration/t28-archive-language-links.php`: each term archive in each
+language at its documented address, its canonical link, its three language links, and a fetch of every address
+they name. Then the same after the routing rules are rebuilt inside an Arabic request.
+
+**Test**: it fails on the code of `main` (`evidence/repair/t28-before.txt`). **Done.**
+
+### T-16. Identify the cause
+
+**Kind**: feature-spec. `research.md` sections 11 and 12, each candidate cause ruled in or out by measurement.
+**Done.**
+
+### T-17. Fix the brand archive's address word in every language
+
+**Kind**: site-code. `mizzey-site/src/Catalogue/Brands.php`. **Test**: t28, the brand rows. Guard: **wp-guard**,
+**woo-guard**, **clean-code-guard**. **Done.**
+
+### T-18. Serve the collection archive as a product archive
+
+**Kind**: site-code. `Collections::useProductArchiveTemplate()`. Found by the storefront guard, not by staging.
+**Test**: t28, the collection rows; t22, which now requires an archive to show its term. **Done.**
+
+### T-19. Correct the note the placeholder made false
+
+**Kind**: site-tests and feature-spec. t23's comment and note on structured data; a dated correction in `spec.md`
+and `verification.md`. **Done.**
+
+### T-20. Staging covers a collection, and an archive must show its term there too
+
+**Kind**: site-tests. The staging seed holds one collection with three products, in both languages; the browser
+pass visits it and requires the term and a product on every archive. **Done.**
+
+### T-21. After merge: rebuild and reseed staging, repeat the pass, then return the status to Verified
+
+**Not done until it has passed on staging.**
+
 ## What no task does
 
 No task invents a page name, a category name, a collection name, Arabic copy or SEO text. No task builds an SEO

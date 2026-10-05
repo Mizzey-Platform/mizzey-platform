@@ -158,12 +158,14 @@ run(
 			}
 		}
 		$s->note( 'AC-242-13 structured-data types on the product page: '
-			. ( $types ? implode( ', ', array_unique( $types ) ) : 'none yet' ) );
+			. ( $types ? implode( ', ', array_unique( $types ) ) : 'none' ) );
 
-		// The criterion is the mechanism, not the emission, and that is an ownership boundary. WooCommerce hooks
-		// its generators to template actions; the theme has no product template yet, so they never fire. The
-		// product template is PDP-01 to PDP-24 (#254) and MKT-16 contracts the structured-data row (E-MKT-2).
-		// Building a template here would take #254's rows. So assert the wiring and record the dependency.
+		// The criterion is the mechanism, not the emission, and that is an ownership boundary: the product
+		// template is PDP-01 to PDP-24 (#254) and MKT-16 contracts the structured-data row (E-MKT-2). So the
+		// wiring is what is asserted. The emission is recorded above as a fact. An earlier version of this
+		// comment said the generators never fire because the theme has no product template. That described the
+		// "coming soon" page this scenario was being served: on the real product page WooCommerce's own
+		// template runs them, and the line above lists what they emit.
 		$wired_product = false !== has_action( 'woocommerce_single_product_summary',
 			array( WC()->structured_data, 'generate_product_data' ) );
 		$wired_crumbs = false !== has_action( 'woocommerce_breadcrumb',
@@ -171,8 +173,8 @@ run(
 		$s->note( 'AC-242-13 WC_Structured_Data present: ' . ( is_object( WC()->structured_data ) ? 'yes' : 'NO' )
 			. ', product generator wired: ' . ( $wired_product ? 'yes' : 'NO' )
 			. ', breadcrumb generator wired: ' . ( $wired_crumbs ? 'yes' : 'NO' ) );
-		$s->note( 'AC-242-13 emission depends on a product template, which is PDP-01 to PDP-24 (#254); the '
-			. 'structured-data row itself is MKT-16 (E-MKT-2). Not built here.' );
+		$s->note( 'AC-242-13 the product template is PDP-01 to PDP-24 (#254) and the structured-data row itself is '
+			. 'MKT-16 (E-MKT-2). Nothing is built here: what the page emits today comes from the platform\'s own template.' );
 		if ( ! is_object( WC()->structured_data ) || ! $wired_product || ! $wired_crumbs ) {
 			$s->note( 'FAIL AC-242-13: the structured-data mechanism is absent or suppressed' );
 			$ok = false;

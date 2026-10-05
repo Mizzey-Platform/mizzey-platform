@@ -4,7 +4,9 @@
 
 **Created**: 4 October 2026
 
-**Status**: Draft
+**Status**: Implemented. Verification was reopened on 5 October 2026, when staging disproved AC-242-09 on the
+Arabic brand archive, and the feature was repaired the same day, together with a second defect the repair
+uncovered on the collection archive (AC-242-05). Where verification stands is in `verification.md`
 
 **Work type**: requirement
 
@@ -112,6 +114,12 @@ cross-artifact analysis, because `tools/scope_trace.py` inspects the criterion t
 
 **Fifteen contracted criteria, every one traced to a row in the Register trace.** AC-242-01 to AC-242-07
 carry the page rows; AC-242-08 to AC-242-15 are NFR-03's eight obligations, one criterion each.
+
+> **Corrected on 5 October 2026.** The paragraph below says that neither generator fires yet because the theme
+> has no product template. That was measured on the store's "coming soon" page, which the development baseline
+> was serving in place of the product page. On the real product page the platform's own template runs both
+> generators, and the page emits `Product` and `BreadcrumbList`. The criteria and their ownership boundary are
+> unchanged: they assert the mechanism, and the emission is recorded as a fact in `verification.md`.
 
 **AC-242-12 and AC-242-13 assert the mechanism, not the emission, and that is an ownership boundary rather
 than a convenience.** Measured: `WC_Structured_Data::generate_product_data` is hooked on
@@ -411,6 +419,12 @@ specific and small, and only three of them are code.
 - **FR-003**: The account and confirmation URLs MUST remain WooCommerce endpoints, with their Arabic slugs supplied through string translation, and no page record may duplicate an endpoint. (AC-242-04, G-1)
 - **FR-004**: The storefront's product, category, collection and brand URL patterns MUST be documented per language, and a URL naming a term MUST serve that term's archive. (AC-242-05)
 - **FR-005**: A canonical link MUST be emitted on every contracted URL, including archive URLs where core emits none. (AC-242-09)
+- **FR-005a**: Every address a contracted page points at as its canonical form or as a language counterpart MUST
+  resolve to that page, in every language, and the address word of a taxonomy MUST NOT depend on the language of
+  the request that builds the link or the routing rules. Added by the repair of 5 October 2026. (AC-242-09,
+  NFR-03)
+- **FR-004a**: A term's archive MUST show the term and the products assigned to it. An address that answers 200
+  with neither does not serve the archive. Added by the repair of 5 October 2026. (AC-242-05)
 - **FR-006**: The sitemap MUST include both languages for every contracted page. (AC-242-10)
 - **FR-007**: A meta description MUST be emitted per contracted page, without one page's description leaking onto another. (AC-242-14)
 - **FR-008**: No contracted page may be reachable only by a query-string identity, and no contracted page may have a duplicate URL. (AC-242-08, G-1)

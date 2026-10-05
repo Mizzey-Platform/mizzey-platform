@@ -27,6 +27,9 @@ $arabic_terms = array(
 		'sample-brand-north' => 'علامة تجريبية شمال',
 		'sample-brand-south' => 'علامة تجريبية جنوب',
 	),
+	'product_collection' => array(
+		'sample-collection' => 'مجموعة تجريبية',
+	),
 );
 
 // Terms first, so a translated product has a translated category and brand to land in.

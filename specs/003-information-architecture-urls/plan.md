@@ -105,6 +105,17 @@ All three are output, not controls, which is what keeps them inside NFR-03 and o
 **The boundary that keeps these honest**: each emits output from data that already exists. **None adds an admin
 field, an override, or a settings screen.** The moment one would, it has crossed into MKT-12, ADM-41 or SSC-27.
 
+### Repair, 5 October 2026: two more code items
+
+| Item | Where | Size |
+|---|---|---|
+| The brand archive's address word is `brand` in every language | `mizzey-site/src/Catalogue/Brands.php`, one filter on `register_taxonomy_product_brand` | One class, one method. `research.md` section 11 |
+| A collection archive is served with the platform's product archive template | `mizzey-site/src/Catalogue/Collections.php`, one filter on `taxonomy_template_hierarchy` | One method. `research.md` section 12 |
+
+Neither stores anything, adds a setting or adds a template. Asserted by `t28-archive-language-links.php`, which
+fetches each archive as a visitor and follows every address it points at, and by the staging pass, which now
+visits a seeded collection and requires each archive to show its term.
+
 ### Page creation follows #241's measured invariant
 
 Every page record created here sets the target language **before** `wp_insert_post`. #241 measured the

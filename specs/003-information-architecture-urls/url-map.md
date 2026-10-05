@@ -47,13 +47,19 @@ duplicated, which is why its id is lower than its neighbours'.
 | Row | Page | English | Arabic | Base |
 |---|---|---|---|---|
 | IA-03 | Categories | `/product-category/{term}/` | `/ar/product-category/{term}/` | WooCommerce `category_base` |
-| IA-05 | Brands | `/brand/{term}/` | `/ar/brand/{term}/` | WooCommerce `product_brand` |
+| IA-05 | Brands | `/brand/{term}/` | `/ar/brand/{term}/` | WooCommerce `product_brand`, with the address word fixed by `MizzeySite\Catalogue\Brands` |
 | IA-04, IA-35 | Collections | `/collection/{term}/` | `/ar/collection/{term}/` | `MizzeySite\Catalogue\Collections::SLUG` |
 | IA-07 | Product details | `/product/{slug}/` | `/ar/product/{slug}/` | WooCommerce `product_base`, with WPML slug translation on for `product` |
 | IA-06 | Search results | `/?s={query}` | `/ar/?s={query}` | WordPress search |
 
 **The three taxonomy bases are deliberately distinct** (`product-category`, `brand`, `collection`) so a
 collection archive can never collide with a category archive, which guardrail G-1 forbids.
+
+**The address word of each taxonomy is the same in every language.** WooCommerce's default word for the brand
+taxonomy is a translatable string, which gave an Arabic request links under an Arabic word that no routing rule
+answered. The site now supplies `brand` as the default (repair of 5 October 2026, `research.md` section 11).
+**Each of the three archives shows its term and the products assigned to it**, in both languages: the collection
+archive is served with the platform's product archive template (`research.md` section 12).
 
 **IA-05 needed one configuration change**: `product_brand` ships with WooCommerce and was not registered as
 translatable in WPML, so its Arabic archive did not exist. **IA-04 and IA-35 needed the taxonomy**, which the
