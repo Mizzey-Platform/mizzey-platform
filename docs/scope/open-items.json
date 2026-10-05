@@ -1,5 +1,5 @@
 {
- "about": "Contract items that specs must cite and must not resolve, with the record of how each was closed. Maintained by hand through internal:governance PRs. tools/scope_trace.py reads `gates` and `contradictions`; A resolved contradiction may list `engineering_ids`, which the checker lets a spec trace with every dependent criterion `pending CX-nn`. `working_decisions` is the record of owner decisions on open client items (DECISIONS.md D-10) and is read by people, not by the checker.",
+ "about": "Contract items that specs must cite and must not resolve, with the record of how each was closed. Maintained by hand through internal:governance PRs. tools/scope_trace.py reads `gates` and `contradictions`; A contradiction is closed only by an owner `resolution`, which keeps the evidence and says whether the client has confirmed it. A resolved contradiction may list `engineering_ids`, which the checker lets a spec trace with every dependent criterion `pending CX-nn`. `working_decisions` is the record of owner decisions on open client items (DECISIONS.md D-10 to D-12) and is read by people, not by the checker.",
  "gates": {
   "PRE-09": {
    "title": "ERP Integration Specification",
@@ -85,7 +85,7 @@
   },
   "CX-02": {
    "title": "The Marketing role is restricted by two contracted rows, and its profile is deferred",
-   "status": "open",
+   "status": "resolved",
    "ids": [
     "ROLE-05"
    ],
@@ -103,11 +103,31 @@
    "affects": "Whether a restricted marketing role exists at launch, which MKT-21 and MKT-22 presuppose.",
    "raised": "2026-10-05, by the Stage 1 ownership audit",
    "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
-   "proposed_default": "Proposal only: build MKT-23, MKT-24 and MKT-26, and hold the criteria of MKT-21 and MKT-22 `pending CX-02`."
+   "proposed_default": "Proposal only: build MKT-23, MKT-24 and MKT-26, and hold the criteria of MKT-21 and MKT-22 `pending CX-02`.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-12",
+    "client_confirmed": false,
+    "decision": "A restricted Marketing access profile exists at launch only to the extent needed to satisfy the contracted Stage 1 marketing and security rows. It is the minimal access principal that MKT-21, MKT-22, MKT-23, MKT-24, MKT-25 and MKT-26 need in order to work, on least privilege. The full deferred ROLE-05 profile has not moved into Stage 1.",
+    "may": [
+     "Perform only the marketing, content and tracking functions actually contracted for Stage 1."
+    ],
+    "must_not": [
+     "Install software.",
+     "Edit plugins, themes, files or templates outside the contracted content controls.",
+     "Receive owner-level or administrator-level access.",
+     "Access customer personal data beyond what a contracted campaign function genuinely requires.",
+     "Receive unrelated financial or system administration access."
+    ],
+    "contract_instrument": "None issued. ROLE-05 still reads DEF in the signed register and in register-ids.json. Where a criterion depends on the ROLE-05 contradiction, the contractual distinction stays explicit until the clarification route is complete.",
+    "history": "The contradiction is kept as evidence above and is not rewritten, with the proposal the audit made. It was open from 5 October 2026, when the Stage 1 ownership audit raised it, to this decision.",
+    "engineering_note": "D-12: engineering proceeds on this reading. The deferred rows named in `ids` stay untraceable: no engineering id is granted, and the signed register is not edited. A criterion that rests on this reading is written against the contracted row, cites this item under the spec's open contract items, and is `provisional` or `pending CX-02`, never `final`, until the client confirms the reading. That is not contractual acceptance."
+   }
   },
   "CX-03": {
    "title": "Three contracted rows need an audit trail that the register defers",
-   "status": "open",
+   "status": "resolved",
    "ids": [
     "ROLE-10"
    ],
@@ -127,11 +147,37 @@
    "affects": "How much audit record exists at launch.",
    "raised": "2026-10-05, by the Stage 1 ownership audit",
    "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
-   "proposed_default": "Proposal only: deliver the price change history of ADM-50 per product, read MKT-25 and ENT-17 at the reduced wording of ADM-132, and hold their criteria `pending CX-03`."
+   "proposed_default": "Proposal only: deliver the price change history of ADM-50 per product, read MKT-25 and ENT-17 at the reduced wording of ADM-132, and hold their criteria `pending CX-03`.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-12",
+    "client_confirmed": false,
+    "decision": "Stage 1 has a narrow shared audit-event mechanism, because explicit Stage 1 rows require recorded history. Only a Stage 1 behaviour whose own row explicitly requires an audit or history record writes to it.",
+    "record_supports_at_least": [
+     "actor",
+     "action",
+     "entity or type",
+     "entity identifier",
+     "before value or state, where applicable",
+     "after value or state, where applicable",
+     "timestamp",
+     "request or correlation reference, where technically useful"
+    ],
+    "writers": "The relevant portions of MKT-25, ENT-17 and ADM-50, and any other Stage 1 row that explicitly requires an audit or history record. The register stages the stock part of ADM-50 as P1-E, so that part waits for PRE-09 (M-3).",
+    "must_not": [
+     "Become the deferred ROLE-10 general sensitive-operation audit system.",
+     "Become an unrestricted general-purpose 'log every admin action' feature, unless another exact Stage 1 row requires it.",
+     "Cross the boundaries of ADM-132 and ROLE-10, which stay as the register words them."
+    ],
+    "contract_instrument": "None issued. ROLE-10 still reads DEF in the signed register and in register-ids.json.",
+    "history": "The contradiction is kept as evidence above and is not rewritten, with the proposal the audit made. It was open from 5 October 2026, when the Stage 1 ownership audit raised it, to this decision.",
+    "engineering_note": "D-12: engineering proceeds on this reading. The deferred rows named in `ids` stay untraceable: no engineering id is granted, and the signed register is not edited. A criterion that rests on this reading is written against the contracted row, cites this item under the spec's open contract items, and is `provisional` or `pending CX-03`, never `final`, until the client confirms the reading. That is not contractual acceptance."
+   }
   },
   "CX-04": {
    "title": "An Import Run entity is contracted while import history is deferred",
-   "status": "open",
+   "status": "resolved",
    "ids": [
     "MIG-18"
    ],
@@ -147,11 +193,36 @@
    "affects": "Whether an import run is stored data with a screen, or a record in the migration report.",
    "raised": "2026-10-05, by the Stage 1 ownership audit",
    "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
-   "proposed_default": "Proposal only: one import-run record for the Developer-performed migration, kept with the migration report, with no admin screen and no history list. Criteria `pending CX-04`."
+   "proposed_default": "Proposal only: one import-run record for the Developer-performed migration, kept with the migration report, with no admin screen and no history list. Criteria `pending CX-04`.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-12",
+    "client_confirmed": false,
+    "decision": "ENT-19 is implemented as a real persisted Import Run record for the developer-operated Stage 1 import and validation process. The data may support several developer-operated runs during migration, and the migration report and its evidence can reference these records.",
+    "record_holds_for_each_run": [
+     "source file or reference",
+     "mapping used, and its version",
+     "row counts",
+     "outcome",
+     "actor",
+     "timestamp",
+     "validation or error summary reference, where applicable"
+    ],
+    "must_not": [
+     "Build the deferred MIG-18 self-service or admin import-history product.",
+     "Add a generic history browser merely because the records exist.",
+     "Add a reusable self-service re-upload workflow.",
+     "Add a customer-operated import management interface, unless another contracted row requires it."
+    ],
+    "contract_instrument": "None issued. MIG-18 still reads DEF in the signed register and in register-ids.json.",
+    "history": "The contradiction is kept as evidence above and is not rewritten, with the proposal the audit made. It was open from 5 October 2026, when the Stage 1 ownership audit raised it, to this decision.",
+    "engineering_note": "D-12: engineering proceeds on this reading. The deferred rows named in `ids` stay untraceable: no engineering id is granted, and the signed register is not edited. A criterion that rests on this reading is written against the contracted row, cites this item under the spec's open contract items, and is `provisional` or `pending CX-04`, never `final`, until the client confirms the reading. That is not contractual acceptance."
+   }
   },
   "CX-05": {
    "title": "Two dashboard rows name queues whose workflow is deferred",
-   "status": "open",
+   "status": "resolved",
    "ids": [
     "ADM-120",
     "ADM-141"
@@ -169,11 +240,29 @@
    "affects": "What the two dashboard figures count and link to.",
    "raised": "2026-10-05, by the Stage 1 ownership audit",
    "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
-   "proposed_default": "Proposal only: each is a count on the dashboard linking to the standard filtered order list, ADM-13 counting pending refunds only, and no queue is built. Criteria `pending CX-05`."
+   "proposed_default": "Proposal only: each is a count on the dashboard linking to the standard filtered order list, ADM-13 counting pending refunds only, and no queue is built. Criteria `pending CX-05`.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-12",
+    "client_confirmed": false,
+    "decision": "ADM-12 and ADM-13 are dashboard information: counts and links. They do not require the deferred custom queue experiences ADM-120 or ADM-141.",
+    "ADM-12": "'Orders requiring action' is a dashboard count or list entry derived from the launch order and status model, linking to an appropriate standard filtered order view.",
+    "ADM-13": "'Pending returns and refunds' is a dashboard count or list entry derived only from return or refund state that actually exists in the contracted Stage 1 platform, linking to the appropriate standard or native filtered view.",
+    "must_not": [
+     "Invent a dedicated return-case workflow merely to populate ADM-13.",
+     "Manufacture a return-case entity where no separate contracted one exists at Stage 1.",
+     "Build the ADM-120 custom return queue.",
+     "Build the ADM-141 Operations Console order queue."
+    ],
+    "contract_instrument": "None issued. ADM-120 and ADM-141 still read DEF in the signed register and in register-ids.json.",
+    "history": "The contradiction is kept as evidence above and is not rewritten, with the proposal the audit made. It was open from 5 October 2026, when the Stage 1 ownership audit raised it, to this decision.",
+    "engineering_note": "D-12: engineering proceeds on this reading. The deferred rows named in `ids` stay untraceable: no engineering id is granted, and the signed register is not edited. A criterion that rests on this reading is written against the contracted row, cites this item under the spec's open contract items, and is `provisional` or `pending CX-05`, never `final`, until the client confirms the reading. That is not contractual acceptance."
+   }
   },
   "CX-06": {
    "title": "Promotional banners are contracted with scheduling while section scheduling is a later phase",
-   "status": "open",
+   "status": "resolved",
    "ids": [
     "HOME-12",
     "ADM-62"
@@ -189,7 +278,26 @@
    "affects": "Whether a banner's schedule can be built without the deferred section scheduling.",
    "raised": "2026-10-05, by the Stage 1 ownership audit",
    "route": "Mustafa's decision. Not resolved in a spec, a criterion, a test or code (M-2).",
-   "proposed_default": "Proposal only: a start and an end date on the promotional banner alone, and no general section scheduling. Criteria `pending CX-06`."
+   "proposed_default": "Proposal only: a start and an end date on the promotional banner alone, and no general section scheduling. Criteria `pending CX-06`.",
+   "resolution": {
+    "decided_by": "Mustafa Shaaban, as owner of the engagement",
+    "date": "2026-10-05",
+    "record": "DECISIONS.md D-12",
+    "client_confirmed": false,
+    "decision": "SSC-09 explicitly contracts scheduling for promotional banners, so each promotional banner may carry its own schedule. This is banner-specific scheduling only.",
+    "each_banner_may_have": [
+     "a start date and time",
+     "an optional end date and time",
+     "a target or page placement",
+     "an enabled or disabled state, as appropriate"
+    ],
+    "must_not": [
+     "Build generic home-section scheduling."
+    ],
+    "contract_instrument": "None issued. HOME-12 and ADM-62 remain P2 in the signed register and in register-ids.json.",
+    "history": "The contradiction is kept as evidence above and is not rewritten, with the proposal the audit made. It was open from 5 October 2026, when the Stage 1 ownership audit raised it, to this decision.",
+    "engineering_note": "D-12: engineering proceeds on this reading. The deferred rows named in `ids` stay untraceable: no engineering id is granted, and the signed register is not edited. A criterion that rests on this reading is written against the contracted row, cites this item under the spec's open contract items, and is `provisional` or `pending CX-06`, never `final`, until the client confirms the reading. That is not contractual acceptance."
+   }
   }
  },
  "working_decisions": {

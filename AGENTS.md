@@ -60,7 +60,12 @@ generation is disabled, and the agent-context skill is removed.
   privilege, with refunds a separate capability. It is an owner decision, not a client confirmation, and ROLE-06
   still reads DEF in the register. A spec may trace ROLE-06 only with every dependent criterion `pending CX-01`
   (D-11), and acceptance waits for the client's acknowledgement of the Scope Clarification MS-CLR-2026-037.
-  CX-02 to CX-06 are open: cite them, mark dependent criteria pending, and decide none of them.
+  **CX-02 to CX-06 are resolved by D-12**, as owner decisions that are not client confirmations and that grant no
+  engineering id: the rows the register defers (ROLE-05, ROLE-10, MIG-18, ADM-120, ADM-141, HOME-12, ADM-62) stay
+  untraceable and unbuilt. Read the item's `resolution` in `docs/scope/open-items.json` before touching a row it
+  names: it says what is built and what is not. A criterion that rests on one is written against the contracted
+  row, cites the CX id, and is `provisional` or `pending CX-nn`, never `final`, until the client confirms the
+  reading. A new contradiction is still escalated, never decided in a spec.
 - **One row, one PBI.** `docs/scope/backlog-ownership.json` says which PBI accepts each delivery row, and
   `tools/tests/test_backlog_ownership.py` checks it against the register. Before starting a PBI, read its issue and
   its entry there. Change ownership only through an `internal:governance` PR, then regenerate the records with
@@ -83,6 +88,10 @@ generation is disabled, and the agent-context skill is removed.
 - **Native first.** Custom code needs a recorded gap.
 - **The contractual stage never moves.** Engineering timing is noted separately.
 - **Report three states separately:** workflow complete, technically verified, contractually accepted.
+- **"Pre-development complete" is two statuses, never one (D-12).** *Engineering pre-development readiness* is
+  about whether the next executable PBIs can start. *Contractual pre-development acceptance* stays pending until
+  PRE-07, PRE-03b, PRE-08, PRE-09 and the ROLE-06 clarification really meet their contract conditions. The
+  second is not called a development blocker unless a specific dependent PBI genuinely cannot proceed.
 - **No** force-push, history rewrite, direct push to `main`, issue bulk-creation or closure, Project changes, paid
   plans, production probes, engagement-document edits or CoreX-internal changes without Mustafa's explicit approval.
 - Discovery probes run only against the disposable local runtime, never production.

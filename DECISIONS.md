@@ -1111,3 +1111,127 @@ Cloudflare sign-in is raised only when the tunnel is ready to connect.
 
 **Status:** applied. Constitution 1.2.0, `AGENTS.md`, `docs/scope/`, the tools and their tests, the issue bodies
 and the live Project.
+
+## 2026-10-05 - D-12: CX-02 to CX-06 resolved, and what "pre-development complete" means
+
+Decided by Mustafa on 5 October 2026, after reviewing D-11 and the live repository. PR #265 (#246) and PR #325
+are accepted at the engineering and governance level. As with D-10 and D-11, **every decision here is an owner
+engineering decision. None is a client confirmation, and none may be described as one.** The signed Feature
+Register is not edited by anything below.
+
+**1. The five contradictions D-11 recorded are resolved.** Each keeps its evidence and the audit's proposal in
+`docs/scope/open-items.json` exactly as recorded, and gains a `resolution` with `client_confirmed: false`, as was
+done for CX-01. None grants an engineering id: the rows the register defers stay untraceable.
+
+| Id | Decision | What is not built |
+|---|---|---|
+| CX-02 | A restricted Marketing access profile exists at launch only to the extent needed to satisfy the contracted Stage 1 marketing and security rows. It is the minimal access principal that MKT-21, MKT-22, MKT-23, MKT-24, MKT-25 and MKT-26 need in order to work, on least privilege, and it performs only the marketing, content and tracking functions actually contracted for Stage 1 | It cannot install software; edit plugins, themes, files or templates outside the contracted content controls; hold owner-level or administrator-level access; reach customer personal data beyond what a contracted campaign function genuinely requires; or hold unrelated financial or system administration access. **The full deferred ROLE-05 profile has not moved into Stage 1** |
+| CX-03 | Stage 1 has a narrow shared audit-event mechanism, because explicit Stage 1 rows require recorded history. The record supports at least: actor, action, entity or type, entity identifier, before value or state and after value or state where applicable, timestamp, and a request or correlation reference where technically useful. Only a Stage 1 behaviour whose own row explicitly requires an audit or history record writes to it: the relevant portions of MKT-25, ENT-17 and ADM-50, and any other Stage 1 row that says so | The deferred ROLE-10 general sensitive-operation audit system. No unrestricted "log every admin action" feature, unless another exact Stage 1 row requires it. The boundaries of ADM-132 and ROLE-10 stay as the register words them |
+| CX-04 | ENT-19 is a real persisted Import Run record for the developer-operated Stage 1 import and validation process. Each relevant run records its source file or reference, the mapping used and its version, row counts, outcome, actor, timestamp, and a validation or error summary reference where applicable. The data may support several developer-operated runs during migration, and the migration report and its evidence can reference the records | The deferred MIG-18 self-service or admin import-history product: no generic history browser merely because the records exist, no reusable self-service re-upload workflow, and no customer-operated import management interface unless another contracted row requires it |
+| CX-05 | ADM-12 and ADM-13 are dashboard information: counts and links. "Orders requiring action" is a count or list entry derived from the launch order and status model, linking to an appropriate standard filtered order view. "Pending returns and refunds" is a count or list entry derived only from return or refund state that actually exists in the contracted Stage 1 platform, linking to the appropriate standard or native filtered view | No dedicated return-case workflow is invented to populate ADM-13, and no return-case entity is manufactured where none is contracted at Stage 1. Not the ADM-120 custom return queue. Not the ADM-141 Operations Console order queue |
+| CX-06 | SSC-09 explicitly contracts scheduling for promotional banners. Each promotional banner may carry its own start date and time, an optional end date and time, a target or page placement, and an enabled or disabled state as appropriate | Generic home-section scheduling. HOME-12 and ADM-62 remain P2 |
+
+**How the record applies them.** This paragraph is the engineering application of M-2 and M-10 to the table
+above, not a further decision. The contracted rows (MKT-21 to MKT-26, ENT-17, ENT-19, ADM-50, ADM-12, ADM-13,
+SSC-09) were always traceable and stay so. A criterion whose reading rests on one of these resolutions is written
+against the contracted row, cites the CX id under the spec's open contract items, and is `provisional` or
+`pending CX-nn`, never `final`, until the client confirms the reading. Where a criterion depends on the ROLE-05
+contradiction, the contractual distinction stays explicit until the clarification route is complete. One fact
+from the register is carried with CX-03 because it limits it: the stock part of ADM-50 is P1-E, so it waits for
+PRE-09 (M-3). The shared audit-event record is the ENT-17 entity, owned by #273; the price history of ADM-50
+(#276) and MKT-25 (#298) write to it.
+
+**2. ROLE-06: the clarification stays separate, and the proposed classification is only proposed.**
+MS-CLR-2026-037 remains its own client clarification. The signed register is not modified until the clarification
+is acknowledged through the document route, and engineering continues under D-10. One correction to its drafting:
+"P1-L, S1" is the **proposed** corrected classification of ROLE-06 and becomes effective only after the required
+acknowledgement and signature. It is not to be presented as already contractually effective. The substance is
+unchanged: the Accountant access profile exists at launch, on least privilege, for the Stage 1 financial
+functions only; advanced profitability, lifetime-value and other reporting stays later scope; general system
+administration is excluded; refund capability stays granular and is not granted merely by assigning the
+Accountant profile.
+
+**3. PRE-01 to PRE-08: everything that can be produced internally is completed, and nothing signed is
+rewritten.** Where a signed or review document already exists it is reused and referenced. Where something is
+missing, a new versioned companion artefact is created rather than altering contractual history.
+
+| Row | Instruction |
+|---|---|
+| PRE-01 | The issued Technical Design is the artefact. Its status is recorded accurately |
+| PRE-02 | The issued stack proposal and Technical Design are the evidence. No commercial figure is exposed in the public repository |
+| PRE-03a | Partial until now. Completed as an actual sitemap and principal user flows, grounded in the Feature Register, the Functional Specification, the implemented information architecture and Stage 1 scope, with the English and Arabic URL and flow considerations, and with no new functionality |
+| PRE-04 | The existing milestones and project plan are referenced. Only a genuine evidence gap is filled |
+| PRE-05 | Completed as a concise authoritative inventory of integrations, accounts and inputs, with purpose, Stage 1 owner, the account or input required, credentials needed later, sandbox or mock availability, cost status without confidential figures, and whether each blocks development or launch |
+| PRE-06 | The Feature Register and the risk and change records already issued |
+| PRE-08 | The Functional Specification is not rebuilt. Existence and approval are kept apart. **If the date it was sent cannot be proven, the 10 Working Day deemed-approval rule is not applied**, and the record reads "approval pending / sent date not evidenced". No submission date is guessed |
+
+#266 is to become technically complete for every artefact that can be delivered internally, with client
+approval separately outstanding where the wording requires it.
+
+**4. PRE-07 is overdue in literal timing, and that is neither hidden nor pretended away.** It does not stop
+unrelated engineering. It is treated as: technically prepared now; session and confirmation pending; an
+acceptance event once #244 provides the staging and demonstration environment; held before implementation of
+the G10 operational rows wherever that is still possible. Once staging is available, the exact runbook is
+prepared: the demonstration URL, synthetic credentials, the tasks the client performs, the G10 checklist, the gap
+and change-control record, and the acknowledgement and sign-off section. **PRE-07 is not marked complete until the
+session actually occurs.**
+
+**5. #244 is the highest-priority internal pre-development execution**, completed as far as possible before
+another normal production feature. Development is the existing local runtime. Staging and demonstration is a
+separate runtime and configuration with a separate database, synthetic and test data only, no production
+personal data, sandbox or fake payment, ERP and shipping, test or sink email delivery, a visible environment
+marker, reproducible setup, reset and reseed, a backup and an **actual restore test**, browser-test capability,
+the B6 concurrency and load-test capability, and an HTTPS external demonstration through a Cloudflare Tunnel.
+Production stays pending OD-27 and OD-14. Everything for the tunnel is prepared before the account
+authentication step, and that one-time sign-in is reported as the single remaining action without holding up the
+rest of #244. Once staging runs: #241 AC-9, and the DOD-04 staging verification of #242 and #246, are executed
+and recorded honestly, with no claim of client acceptance.
+
+**6. The ERP pack is made externally sendable, and its reading of the SKU is corrected.** The signed register
+already establishes the store-side matching baseline: every sellable product and variant carries a SKU matching
+the ERP exactly (CR-18), and variant stock is read from the ERP by variant SKU (ADM-34). The pack therefore does
+not ask the ERP team an open question equivalent to "what should the product matching key be". It asks them to
+confirm the technical behaviour around that baseline: the endpoint or query that resolves a SKU; whether an
+immutable internal item id also exists, and whether it should be persisted in addition to the SKU for resilience;
+how simple products and variants are represented; uniqueness; case and whitespace normalisation; what happens
+when a SKU changes; how a renamed or replaced SKU is reconciled; whether old aliases are retained; whether stock
+exists per variant or only per parent; and what happens when a SKU is unknown, inactive or duplicated. An ERP
+internal id may supplement the mapping if PRE-09 decides that is safer. It never contradicts the contract
+requirement that store SKUs match the ERP. The pack gains a cover note, a concise reply sheet, a technical
+appendix and a list of material to provide, with internal repository terminology removed from the external
+version. PRE-09 stays pending the ERP team's answers and the client's approval.
+
+**7. Cash on delivery: the D-11 correction stands.** There is no custom value ceiling and no fee in current
+scope, and neither is built. Cash on delivery is whatever the exact PAY and CHK rows contract: the capability,
+its switch, and restriction by supported shipping method or zone where that is native or configurable. A future
+ceiling or fee goes through Change Control unless another exact signed row is found.
+
+**8. PRE-03b and design: the distinction is kept.** Structural design proceeds now: flows, neutral wireframes,
+responsive structure, component architecture, states, both reading directions and neutral tokens. Final visual
+approval waits for OD-01. Structural wireframes are never called "approved interface design", and no final
+branded storefront implementation starts as though PRE-03b were approved. #250 will: complete the structural
+design; apply the final brand identity when supplied; produce the working HTML and CSS screens; go through the
+required approval rounds; and only then satisfy PRE-03b.
+
+**9. "Pre-development complete" is two statuses from now on, never one.**
+
+| Status | Complete when | May stay pending for |
+|---|---|---|
+| **A. Engineering pre-development readiness** | Stage 1 backlog ownership is complete; the owner contradictions are resolved; every internally producible PRE artefact is complete; the local development and staging path is ready or operational; the ERP pack is ready or sent; the structural design path is ready; external inputs are classified; and no known owner, client, vendor or ERP decision blocks starting the next executable PBIs | Nothing: it is complete or it is not |
+| **B. Contractual pre-development acceptance** | Each acceptance condition is really met | The PRE-07 walkthrough and confirmation; PRE-03b final design approval; PRE-08 written or deemed approval; PRE-09 ERP specification approval; the ROLE-06 clarification acknowledgement; and the other explicit client acceptance gates |
+
+Status B is not described as a development blocker unless a specific dependent PBI genuinely cannot proceed. The
+objective is uninterrupted engineering, not falsified acceptance. "Contractual pre-development is complete" is
+not said unless PRE-07, PRE-03b, PRE-08 and PRE-09 really satisfy their contract conditions.
+
+**10. The queue.** No further normal production feature starts inside this closure. The order: record D-12 and
+resolve CX-02 to CX-06; finish the internally producible documents of #266; execute the local staging and
+demonstration infrastructure of #244; prepare #267 to run as soon as staging is reachable; make the ERP pack of
+#243 send-ready; make the structural-design package of #250 ready; re-run the ownership, blocker and readiness
+audit; then report the first continuous production queue. #243 waiting for ERP replies does not occupy the main
+development path: it stays in progress, awaiting ERP input, while unrelated PBIs continue.
+
+**Status:** items 1 and 9 applied here: `docs/scope/open-items.json`, `docs/scope/backlog-ownership.json`, the
+contradiction consistency tests in `tools/tests/test_scope_trace.py`, `AGENTS.md` and the affected issue bodies.
+The constitution is unchanged: M-2 already says how a contradiction is closed, and no principle is added or
+redefined. Items 2 to 8 are applied by the pull requests that follow this one.

@@ -332,6 +332,11 @@
      "id": "CR-07",
      "class": "Blocks final acceptance",
      "note": "Professional Seller account and Category Listings Report availability"
+    },
+    {
+     "id": "CX-04",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. Each developer-operated import or validation run is recorded as an Import Run (ENT-19), which the migration report and the MIG-19 issue list can reference. No self-service import history (MIG-18 stays DEF)"
     }
    ],
    "data_integrity": "A5 duplicate SKU resolution",
@@ -1220,6 +1225,16 @@
    "design_dependency": "none",
    "inputs": [
     {
+     "id": "CX-03",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. ENT-17 is the narrow shared audit-event record: actor, action, entity, identifier, before and after values, timestamp. Only Stage 1 rows that explicitly require history write to it. Not the deferred ROLE-10 audit system"
+    },
+    {
+     "id": "CX-04",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. ENT-19 is a real persisted Import Run record for the developer-operated import and validation runs. No history browser, no self-service re-upload, no customer-operated import interface (MIG-18 stays DEF)"
+    },
+    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
@@ -1233,7 +1248,7 @@
     "ENT-12 (DEF)",
     "ENT-18 (P2)"
    ],
-   "notes": "Most entities are native WooCommerce or WPML structures (M-4); the work is the mapping record and the custom ones. ENT-07 has no native store (P-015). ENT-10: ADR-0002 records the minimum shipment state record. ENT-02 lists stock among the variant fields while stock movements (ENT-04) are P1-E. ENT-19 Import Run is P1 while import history (MIG-18) is DEF, and ENT-17 Audit Log, with before-and-after values, is P1-L while the sensitive-operation audit (ROLE-10) is DEF: see audit section 5. One commercial item is two WordPress posts, each with its own meta rows. D1: an order line stores the id of the language record actually ordered."
+   "notes": "Most entities are native WooCommerce or WPML structures (M-4); the work is the mapping record and the custom ones. ENT-07 has no native store (P-015). ENT-10: ADR-0002 records the minimum shipment state record. ENT-02 lists stock among the variant fields while stock movements (ENT-04) are P1-E. ENT-19 Import Run is P1 while import history (MIG-18) is DEF, and ENT-17 Audit Log, with before-and-after values, is P1-L while the sensitive-operation audit (ROLE-10) is DEF: audit section 5, closed by D-12 as CX-04 and CX-03. ENT-19 is a persisted record of each developer-operated run with no history product; ENT-17 is the narrow shared audit-event record that the price part of ADM-50 (#276) and MKT-25 (#298) write to. One commercial item is two WordPress posts, each with its own meta rows. D1: an order line stores the id of the language record actually ordered."
   },
   {
    "key": "E-EVT-2",
@@ -1308,6 +1323,11 @@
      "note": "The Accountant criteria wait for it (D-10)"
     },
     {
+     "id": "CX-03",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. ADM-132 stays at its own wording: logins, security events and order notes. The narrow audit-event record of ENT-17 is not a general log of admin actions, and ROLE-10 stays DEF"
+    },
+    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
@@ -1378,6 +1398,11 @@
      "ref": "#247",
      "reason": "ADM-47 points to Section U, where the migration lives",
      "blocking": false
+    },
+    {
+     "ref": "#273",
+     "reason": "ADM-50 price history is written to the audit-event record of ENT-17 (D-12, CX-03). Not a predecessor for the other rows",
+     "blocking": false
     }
    ],
    "erp_blocked": "partial",
@@ -1392,6 +1417,11 @@
      "id": "CR-15",
      "class": "Content or client input",
      "note": "Storefront content in both languages is the client's. Placeholders until supplied"
+    },
+    {
+     "id": "CX-03",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. The price part of ADM-50 writes price change history, with user and timestamp, to the narrow audit-event record. The stock part is P1-E and waits for PRE-09"
     },
     {
      "id": "DOD-04, DOD-09",
@@ -1409,7 +1439,7 @@
     "MIG-05 (DEF)",
     "MIG-07 (DEF)"
    ],
-   "notes": "Price matrix (t20): the wp-admin product form (ADM-25, ADM-26), the wp-admin variations save (ADM-33) and the native CSV importer keep the Arabic price correct. REST, WP-CLI and custom code leave a stale Arabic price and charge the old amount, so any code that writes a price must fire save_post or synchronise the translation explicitly. A12: weight, dimensions (ADM-35) and catalog_visibility do not reach the Arabic record on a code-level save. A4: a WPML duplicate shares its original's SKU, so the SKU (ADM-31) is not an identity. ADM-34 reads stock from the ERP, and the rows say the stock part of ADM-49 and of ADM-50 is P1-E. ADM-50, price change history with user and timestamp, is P1-L while ROLE-10 is DEF: see audit section 5. ADM-47 says 'Bulk import: see Section U', where the reusable import tool is DEF and the migration is Developer-performed. ADM-21 scheduled state is publication scheduling; scheduled price changes (ADM-28) are P2. ADM-32 barcode per variant is not covered by any probe."
+   "notes": "Price matrix (t20): the wp-admin product form (ADM-25, ADM-26), the wp-admin variations save (ADM-33) and the native CSV importer keep the Arabic price correct. REST, WP-CLI and custom code leave a stale Arabic price and charge the old amount, so any code that writes a price must fire save_post or synchronise the translation explicitly. A12: weight, dimensions (ADM-35) and catalog_visibility do not reach the Arabic record on a code-level save. A4: a WPML duplicate shares its original's SKU, so the SKU (ADM-31) is not an identity. ADM-34 reads stock from the ERP, and the rows say the stock part of ADM-49 and of ADM-50 is P1-E. ADM-50, price change history with user and timestamp, is P1-L while ROLE-10 is DEF: see audit section 5. ADM-47 says 'Bulk import: see Section U', where the reusable import tool is DEF and the migration is Developer-performed. ADM-21 scheduled state is publication scheduling; scheduled price changes (ADM-28) are P2. ADM-32 barcode per variant is not covered by any probe. D-12, CX-03: the price history is written to the narrow audit-event record of ENT-17, owned by #273."
   },
   {
    "key": "E-ADM-3",
@@ -2499,6 +2529,11 @@
      "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
     },
     {
+     "id": "CX-05",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. ADM-12 and ADM-13 are dashboard counts and links to standard filtered views. ADM-13 counts only return or refund state that exists in the contracted Stage 1 platform. No return-case workflow, no ADM-120 queue, no ADM-141 queue"
+    },
+    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
@@ -2517,7 +2552,7 @@
     "RPT-03 (DEF)",
     "RPT-02 (P2)"
    ],
-   "notes": "Owner decision: this PBI owns ADM-10 (low stock, as reported by the ERP) and ADM-11 (out of stock, as reported by the ERP). D-246-1 (Mustafa, 5 October 2026, spec 004) took the dashboard counts out of #246 and names them as this PBI's rows, with #246's measurement as evidence and a dependency. Measured in specs/004-inventory-report-one-item-once: for fixtures holding 3 low and 1 out-of-stock physical items the WooCommerce dashboard status counts read 4 and 2, a double count in every language context; the multilingual plugin hooks woocommerce_status_widget_low_in_stock_count_query, a filter WooCommerce 11.1.0 no longer applies. ADM-09: P-019 measured that the product report splits one product by language and that the WCML merge recovers totals but not ranking and is wrong under pagination; RPT-03 is DEF but ADM-09 is P1. What defines low (ADM-74) is P1-E. ADM-13 reads 'Pending returns and refunds' while the returns queue is DEF, and ADM-12 reads 'Orders requiring action' while the worked queue (ADM-141) is DEF: see audit section 5. ADM-04, ADM-06 and ADM-08 are P1-L."
+   "notes": "Owner decision: this PBI owns ADM-10 (low stock, as reported by the ERP) and ADM-11 (out of stock, as reported by the ERP). D-246-1 (Mustafa, 5 October 2026, spec 004) took the dashboard counts out of #246 and names them as this PBI's rows, with #246's measurement as evidence and a dependency. Measured in specs/004-inventory-report-one-item-once: for fixtures holding 3 low and 1 out-of-stock physical items the WooCommerce dashboard status counts read 4 and 2, a double count in every language context; the multilingual plugin hooks woocommerce_status_widget_low_in_stock_count_query, a filter WooCommerce 11.1.0 no longer applies. ADM-09: P-019 measured that the product report splits one product by language and that the WCML merge recovers totals but not ranking and is wrong under pagination; RPT-03 is DEF but ADM-09 is P1. What defines low (ADM-74) is P1-E. ADM-13 reads 'Pending returns and refunds' while the returns queue is DEF, and ADM-12 reads 'Orders requiring action' while the worked queue (ADM-141) is DEF: see audit section 5. ADM-04, ADM-06 and ADM-08 are P1-L. D-12, CX-05: ADM-12 and ADM-13 are counts with links to standard filtered views, and no queue is built."
   },
   {
    "key": "E-MIG-2",
@@ -2723,6 +2758,11 @@
      "ref": "#275",
      "reason": "MKT-25: third-party administrative actions in the audit log",
      "blocking": false
+    },
+    {
+     "ref": "#273",
+     "reason": "MKT-25 writes to the audit-event record of ENT-17 (D-12, CX-03)",
+     "blocking": false
     }
    ],
    "erp_blocked": "no",
@@ -2739,6 +2779,16 @@
      "note": "Client feedback on the protocol document within 10 Working Days"
     },
     {
+     "id": "CX-02",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. A restricted Marketing access profile exists only as far as MKT-21 to MKT-26 need it, on least privilege. It is not the deferred ROLE-05 profile, and the contractual distinction stays explicit in every dependent criterion"
+    },
+    {
+     "id": "CX-03",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. MKT-25 writes third-party administrative actions to the narrow Stage 1 audit-event record. Not the deferred ROLE-10 audit system"
+    },
+    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
@@ -2751,7 +2801,7 @@
     "ROLE-10 (DEF)",
     "MKT-11 (P3)"
    ],
-   "notes": "MKT-21, a key row, and MKT-22 restrict 'the Marketing role', but the Marketing role profile (ROLE-05) is DEF and Part One 1.6 says the standard commerce role set is applied instead. MKT-25 requires third-party administrative actions in the audit log while ADM-132 is reduced to logins, security events and order notes. Both are in audit section 5. MKT-26 is DLV and HND-11 hands the same protocol over. MKT-22, MKT-24 and MKT-25 are P1-L. The register lists what the protocol states."
+   "notes": "MKT-21, a key row, and MKT-22 restrict 'the Marketing role', but the Marketing role profile (ROLE-05) is DEF and Part One 1.6 says the standard commerce role set is applied instead. MKT-25 requires third-party administrative actions in the audit log while ADM-132 is reduced to logins, security events and order notes. Both were audit section 5 questions, closed by D-12 as CX-02 and CX-03: a restricted Marketing access profile exists only as far as these six rows need it, and MKT-25 writes to the narrow audit-event record of ENT-17. Neither ROLE-05 nor ROLE-10 moves into Stage 1. MKT-26 is DLV and HND-11 hands the same protocol over. MKT-22, MKT-24 and MKT-25 are P1-L. The register lists what the protocol states."
   },
   {
    "key": "E-ERP-7",
@@ -3780,6 +3830,11 @@
      "note": "No final acceptance criteria before the ERP Integration Specification is approved (constitution M-3). Work before then is limited to seams"
     },
     {
+     "id": "CX-06",
+     "class": "Blocks final acceptance",
+     "note": "Resolved by the owner (D-12), not client-confirmed. SSC-09: each promotional banner carries its own start, optional end, page placement and enabled state. Banner-specific only: no general section scheduling (HOME-12 and ADM-62 stay P2)"
+    },
+    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
@@ -3794,7 +3849,7 @@
     "ADM-58 (P2)",
     "ADM-159a (P2)"
    ],
-   "notes": "Register G11: the standard block editor with a curated library of complete storefront sections, and Full Site Editing for templates, header and footer where appropriate. Not included: new section types, arbitrary layout, unrestricted nesting, a custom page-builder product; a new section type or a variant outside the approved Interface Design is a Change Request. SSC-01, SSC-12 and SSC-20 are key rows. SSC-20 says the stock field is P1-E. SSC-09 contracts banner scheduling at P1-L while section scheduling (HOME-12, ADM-62) is P2: see audit section 5. SSC-08 is the only register row that names the footer. A8: a WPML duplicate keeps the source-language name until translated. A10: the Arabic parent of a variable product translated programmatically was registered as simple."
+   "notes": "Register G11: the standard block editor with a curated library of complete storefront sections, and Full Site Editing for templates, header and footer where appropriate. Not included: new section types, arbitrary layout, unrestricted nesting, a custom page-builder product; a new section type or a variant outside the approved Interface Design is a Change Request. SSC-01, SSC-12 and SSC-20 are key rows. SSC-20 says the stock field is P1-E. SSC-09 contracts banner scheduling at P1-L while section scheduling (HOME-12, ADM-62) is P2: audit section 5, closed by D-12 as CX-06. Scheduling is on the promotional banner alone. SSC-08 is the only register row that names the footer. A8: a WPML duplicate keeps the source-language name until translated. A10: the Arabic parent of a variable product translated programmatically was registered as simple."
   },
   {
    "key": "E-EVT-1",
