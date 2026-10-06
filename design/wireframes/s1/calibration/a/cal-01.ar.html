@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="wf-surfaces" content="gl-header gl-mega-menu gl-language-switcher sf-search-suggestions gl-footer">
+<meta name="wf-viewport" content="desktop">
+<meta name="wf-direction" content="a">
+<title>cal-01 Header, search, footer · Direction A · Arabic RTL</title>
+<link rel="stylesheet" href="../../../_shared/wireframe.css">
+<style>
+body{padding:32px 40px 96px}
+.wf-meta{display:flex;flex-direction:column;gap:16px;max-inline-size:1660px;margin-block-end:40px;padding:20px 24px}
+.meta__eyebrow{font:600 11px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.meta__title{font-size:24px;font-weight:650;line-height:1.25;margin-block:6px 6px}
+.meta__lede{font-size:13.5px;color:#3a3a3a;max-inline-size:780px;text-wrap:pretty}
+.meta__facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 16px;margin-block-start:14px;font-size:12.5px}
+.meta__facts dt{color:#5c5c5c}.meta__facts dd{margin:0}
+.meta__facts code,.wf-note code,.attach code{font:11.5px ui-monospace,Menlo,Consolas,monospace}
+.meta__nav{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg a,.seg span{font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 9px;border:1px solid #bdbdbd;text-decoration:none;color:#1f1f1f;background:#fff}
+.seg .on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+.seg .off{color:#8a8a8a;border-style:dashed}
+.sheet{display:flex;flex-direction:column;gap:64px}
+.board{display:flex;gap:28px;align-items:flex-start}
+.board__notes{flex:none;inline-size:340px;position:sticky;inset-block-start:16px}
+.board__notes>.wf-note:first-child,.mnotes>.wf-note{margin-block-start:0}
+.mboard{display:flex;flex-direction:column;gap:20px}
+.mrow{display:flex;gap:28px;align-items:flex-start}
+.mnotes{display:grid;grid-template-columns:repeat(4,390px);gap:12px 28px;align-items:start}
+.wf-frame{position:relative}
+.wf-frame--desktop{inline-size:1280px;max-inline-size:none}
+.wf-frame--mobile{inline-size:390px;max-inline-size:none}
+.wf-frame__label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+.wf-note{font-size:12px;line-height:1.5}
+.wf-note b{font-weight:650}
+.dsq::before{content:"Design source question"}
+.rtl-note::before{content:"Right to left, decided"}
+.pin{display:inline-flex;align-items:center;justify-content:center;inline-size:20px;block-size:20px;border-radius:50%;background:#1f1f1f;color:#fff;font:700 10.5px/1 ui-monospace,Menlo,Consolas,monospace;flex:none;vertical-align:middle;margin-inline-end:6px}
+.pinat{position:absolute;z-index:6}
+.ph{position:relative;display:flex;align-items:flex-end;justify-content:flex-start;background:#e4e4e4;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.045) 0 1px,transparent 1px 11px);overflow:hidden;min-block-size:24px}
+.ph__l{position:relative;z-index:1;margin:8px;padding:2px 6px;background:rgba(255,255,255,.88);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace;max-inline-size:calc(100% - 16px)}
+.ph--dark{background:#bdbdbd;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.06) 0 1px,transparent 1px 11px)}
+.r11{aspect-ratio:1/1}.r45{aspect-ratio:4/5}.r34{aspect-ratio:3/4}.r23{aspect-ratio:2/3}.r169{aspect-ratio:16/9}.r21{aspect-ratio:2/1}.r31{aspect-ratio:3/1}.r41{aspect-ratio:4/1}.r43{aspect-ratio:4/3}.r32{aspect-ratio:3/2}.r54{aspect-ratio:5/4}
+.lns{display:flex;flex-direction:column;gap:8px}
+.ln{display:block;block-size:8px;background:#e2e2e2;border-radius:2px}
+.logo{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #8a8a8a;font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;letter-spacing:.06em;block-size:34px;padding-inline:14px;white-space:nowrap;flex:none}
+.attach{border:1px dashed #9a9a9a;padding:14px 16px;font-size:12px;color:#5c5c5c;background:#fafafa}
+.stars{letter-spacing:1px;font-size:12px;color:#1f1f1f}
+.money{white-space:nowrap}
+.chev{display:inline-block;font-weight:400}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.muted{color:#6b6b6b}.faint{color:#8a8a8a}
+.strike{text-decoration:line-through;color:#8a8a8a}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:2}
+.rel{position:relative}
+.ltr-field{direction:ltr;text-align:start}
+html[lang="ar"] .ltr-field{text-align:end}
+html[lang="ar"] .wf-frame{line-height:1.7}
+html[lang="ar"] .eyebrow{letter-spacing:0;text-transform:none}
+html[lang="ar"] .disp,html[lang="ar"] .h1,html[lang="ar"] .h2{letter-spacing:0}
+html[lang="ar"] .wf-note,html[lang="ar"] .wf-meta,html[lang="ar"] .wf-frame__label{line-height:1.5}
+
+.fA{background:#fff;color:#1a1a1a;font-size:14px}
+.g{padding-inline:56px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6b6b6b;font-weight:600}
+.h1{font-size:52px;line-height:1.06;font-weight:500;letter-spacing:-.02em}
+.h2{font-size:28px;line-height:1.2;font-weight:500;letter-spacing:-.01em}
+.h3{font-size:18px;line-height:1.3;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;block-size:48px;padding-inline:28px;background:#1a1a1a;color:#fff;font-size:13.5px;font-weight:600;border:1px solid #1a1a1a;text-decoration:none;white-space:nowrap}
+.btn--2{background:#fff;color:#1a1a1a}
+.btn--q{background:transparent;border-color:transparent;color:#1a1a1a;text-decoration:underline;padding-inline:0}
+.btn--block{display:flex;inline-size:100%}
+.btn--sm{block-size:36px;padding-inline:16px;font-size:12.5px}
+.btn.dis{background:#ececec;color:#8a8a8a;border-color:#e2e2e2}
+.hdA{background:#fff;position:relative;z-index:5}
+.hd1{display:grid;grid-template-columns:1fr minmax(0,440px) 1fr;align-items:center;gap:32px;block-size:70px;padding-inline:56px}
+.util{justify-self:end;display:flex;align-items:center;gap:24px;font-size:13px}
+.util a{text-decoration:none;display:inline-flex;align-items:center}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-inline-size:18px;block-size:18px;padding-inline:5px;border-radius:9px;background:#1a1a1a;color:#fff;font-size:10.5px;font-weight:700;margin-inline-start:6px}
+.srchw{position:relative}
+.srch{display:flex;align-items:center;gap:10px;block-size:42px;padding-inline:16px;border:1px solid #d4d4d4;border-radius:21px;color:#767676;font-size:13.5px;background:#fafafa}
+.srch.on{border-color:#1a1a1a;background:#fff;color:#1a1a1a;box-shadow:0 0 0 3px rgba(0,0,0,.08)}
+.sicon{inline-size:14px;block-size:14px;border:1.5px solid currentColor;border-radius:50%;flex:none}
+.caret{inline-size:1px;block-size:18px;background:#1a1a1a;margin-inline-start:-8px}
+.hd2{display:flex;justify-content:center;gap:34px;block-size:46px;align-items:stretch;font-size:13.5px;border-block-end:1px solid #e6e6e6;padding-inline:56px}
+.hd2 a{display:flex;align-items:center;text-decoration:none;border-block-end:1.5px solid transparent}
+.hd2 a.on{border-color:#1a1a1a;font-weight:600}
+.mega{position:absolute;inset-inline:0;inset-block-start:0;z-index:4;background:#fff;border-block-end:1px solid #e6e6e6;box-shadow:0 24px 40px rgba(0,0,0,.10);padding:40px 56px 48px;display:grid;grid-template-columns:minmax(0,1.3fr) repeat(2,minmax(0,1fr)) minmax(0,1.2fr);gap:48px}
+.mcol h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6b6b6b;font-weight:600;margin-block-end:16px}
+.mcol li{font-size:14.5px;padding-block:7px}
+.mcol .all{font-weight:600;margin-block-start:8px}
+.mlead{font-size:26px;line-height:1.2;font-weight:500;margin-block-end:12px}
+.spanel{position:absolute;inset-block-start:52px;inset-inline-start:50%;transform:translateX(-50%);inline-size:680px;z-index:6;background:#fff;border:1px solid #e0e0e0;box-shadow:0 24px 48px rgba(0,0,0,.14);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr)}
+html[dir="rtl"] .spanel{transform:translateX(50%)}
+.sp__col{padding:22px 24px}
+.sp__col+.sp__col{border-inline-start:1px solid #ededed}
+.sp__h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6b6b6b;font-weight:600;margin-block-end:10px}
+.sp__s li{padding-block:7px;font-size:14px}
+.sp__s li.kb{background:#f2f2f2;margin-inline:-10px;padding-inline:10px}
+.sp__p{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;padding-block:8px}
+.sp__all{grid-column:1/-1;border-block-start:1px solid #ededed;padding:14px 24px;font-size:13.5px;font-weight:600;display:flex;justify-content:space-between}
+.ftA{border-block-start:1px solid #e6e6e6;background:#fff}
+.ft__top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:48px;align-items:center;padding:48px 56px;border-block-end:1px solid #ededed}
+.ft__form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.ft__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.3fr);gap:32px;padding:48px 56px}
+.ft__cols h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6b6b6b;font-weight:600;margin-block-end:14px}
+.ft__cols li{font-size:13.5px;padding-block:5px}
+.ft__bot{display:flex;justify-content:space-between;align-items:center;padding:20px 56px;border-block-start:1px solid #ededed;font-size:12.5px;color:#6b6b6b}
+.inp{display:flex;align-items:center;block-size:48px;padding-inline:14px;border:1px solid #cfcfcf;font-size:14px;background:#fff}
+.inp.pt{color:#8a8a8a}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld>label{font-size:12.5px;font-weight:600}
+.fld--err .inp{border:2px solid #1a1a1a}
+.err{font-size:12px;font-weight:600;display:flex;gap:6px;align-items:center}
+.err::before{content:"!";display:inline-flex;inline-size:16px;block-size:16px;border-radius:50%;background:#1a1a1a;color:#fff;font-size:10px;align-items:center;justify-content:center;flex:none}
+.card{display:flex;flex-direction:column;gap:12px}
+.card__img{position:relative}
+.card__badge{position:absolute;inset-block-start:12px;inset-inline-start:12px;z-index:2;background:#fff;padding:3px 8px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+html[lang="ar"] .card__badge{letter-spacing:0}
+.card__wish{position:absolute;inset-block-start:10px;inset-inline-end:10px;z-index:2;inline-size:34px;block-size:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+.card__add{position:absolute;inset-inline:12px;inset-block-end:12px;z-index:2}
+.card__name{font-size:14px;line-height:1.4}
+.card__price{display:flex;gap:10px;align-items:baseline;font-size:14px;flex-wrap:wrap}
+.card__oos{position:absolute;inset-block-end:12px;inset-inline-start:12px;z-index:2;background:#fff;padding:4px 10px;font-size:12px;font-weight:600}
+.card--oos .ph{opacity:.5}
+.card--hover .card__img{outline:1px solid #1a1a1a;outline-offset:0}
+.save{font-size:12px;color:#4a4a4a}
+.rating{display:flex;gap:6px;align-items:center;font-size:12px;color:#6b6b6b}
+.chip{display:inline-flex;align-items:center;gap:8px;block-size:32px;padding-inline:14px;border:1px solid #d4d4d4;border-radius:16px;font-size:12.5px;background:#fff;white-space:nowrap}
+.chip--on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.sel{display:inline-flex;align-items:center;justify-content:space-between;gap:12px;block-size:40px;padding-inline:14px;border:1px solid #d4d4d4;font-size:13px;min-inline-size:210px;background:#fff}
+.qty{display:inline-flex;align-items:center;border:1px solid #cfcfcf;block-size:48px}
+.qty span{inline-size:44px;text-align:center}
+.qty--sm{block-size:36px}.qty--sm span{inline-size:34px}
+.sw{inline-size:34px;block-size:34px;border-radius:50%;border:1px solid #bdbdbd;background:#d6d6d6}
+.sw2{background:#a8a8a8}.sw3{background:#5c5c5c}
+.sw--on{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #1a1a1a}
+.sz{display:inline-flex;align-items:center;justify-content:center;min-inline-size:54px;block-size:44px;border:1px solid #cfcfcf;font-size:13px}
+.sz--on{border:1.5px solid #1a1a1a;font-weight:600}
+.sz--na{color:#9a9a9a;background:linear-gradient(to top right,transparent calc(50% - .5px),#c4c4c4 50%,transparent calc(50% + .5px))}
+.bar{block-size:4px;background:#e6e6e6;border-radius:2px;overflow:hidden}
+.bar>i{display:block;block-size:100%;background:#1a1a1a}
+.tabs{display:flex;gap:36px;border-block-end:1px solid #e6e6e6}
+.tab{padding-block:16px;font-size:14.5px;color:#6b6b6b;border-block-end:2px solid transparent;margin-block-end:-1px}
+.tab--on{color:#1a1a1a;border-color:#1a1a1a;font-weight:600}
+.tbl{inline-size:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th,.tbl td{text-align:start;padding:12px 0;border-block-end:1px solid #ececec;font-weight:400}
+.tbl th{color:#6b6b6b;inline-size:40%}
+.rc{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid #d9d9d9;font-size:14px}
+.rc--on{border:1.5px solid #1a1a1a}
+.dot{inline-size:18px;block-size:18px;border-radius:50%;border:1.5px solid #9a9a9a;flex:none}
+.rc--on .dot{border:5px solid #1a1a1a}
+.cb{inline-size:18px;block-size:18px;border:1.5px solid #9a9a9a;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.cb--on{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.cb--na{border-color:#d6d6d6}
+.hair{border-block-start:1px solid #e6e6e6}
+.crumbs{display:flex;gap:8px;font-size:12.5px;color:#6b6b6b;padding-block:20px}
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px}
+.pager span{display:inline-flex;align-items:center;justify-content:center;min-inline-size:40px;block-size:40px}
+.pager .cur{border:1.5px solid #1a1a1a;font-weight:600}
+.drawer{position:absolute;inset-block:0;z-index:5;background:#fff;box-shadow:0 0 48px rgba(0,0,0,.2);display:flex;flex-direction:column}
+.drawer--end{inset-inline-end:0}.drawer--start{inset-inline-start:0}
+.dr__h{display:flex;justify-content:space-between;align-items:center;padding:22px 28px;border-block-end:1px solid #ececec}
+.dr__b{flex:1;overflow:hidden;padding:24px 28px;display:flex;flex-direction:column;gap:22px}
+.dr__f{padding:20px 28px;border-block-start:1px solid #ececec;display:flex;flex-direction:column;gap:10px}
+.x{inline-size:32px;block-size:32px;display:inline-flex;align-items:center;justify-content:center;font-size:18px}
+.line{display:grid;grid-template-columns:88px minmax(0,1fr) auto;gap:16px;align-items:start}
+.line--new{background:#f4f4f4;outline:8px solid #f4f4f4}
+.mhd{display:grid;grid-template-columns:44px 1fr 44px 44px;align-items:center;block-size:56px;padding-inline:8px;border-block-end:1px solid #ececec;background:#fff}
+.mhd .logo{justify-self:center;block-size:28px;font-size:9.5px}
+.ib{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;position:relative}
+.burger{inline-size:20px;block-size:12px;border-block:1.5px solid #1a1a1a;position:relative}
+.burger::after{content:"";position:absolute;inset-inline:0;inset-block-start:4px;border-block-start:1.5px solid #1a1a1a}
+.bag{inline-size:16px;block-size:17px;border:1.5px solid #1a1a1a;border-radius:2px 2px 4px 4px}
+.ib .cnt{position:absolute;inset-block-start:4px;inset-inline-end:2px;margin:0;min-inline-size:16px;block-size:16px;font-size:9.5px}
+.mlist li{display:flex;justify-content:space-between;align-items:center;min-block-size:56px;border-block-end:1px solid #efefef;font-size:16px}
+.sheet-h{display:block;inline-size:40px;block-size:4px;border-radius:2px;background:#cfcfcf;margin:10px auto 0}
+</style>
+</head>
+<body>
+<header class="wf-meta" lang="en" dir="ltr">
+<div>
+<div class="meta__eyebrow">Mizzey · S1 low-fidelity calibration · Direction A, Clean Premium Commerce · Arabic, right to left</div>
+<h1 class="meta__title">cal-01: Global desktop frame: header, navigation, search and footer</h1>
+<p class="meta__lede">Calm and product-led. A quiet two-row header with the search field centred, large imagery, four products per row at most, merchandising used sparingly, one clear purchase action per view. It favours each interaction’s most native candidate.</p>
+<dl class="meta__facts">
+<dt>Surfaces</dt><dd><code>gl-header</code>, <code>gl-mega-menu</code>, <code>gl-language-switcher</code>, <code>sf-search-suggestions</code>, <code>gl-footer</code></dd>
+<dt>States drawn</dt><dd><code>gl-header:signed_out</code>, <code>gl-header:cart_with_count</code>, <code>gl-mega-menu:open</code>, <code>sf-search-suggestions:suggestions</code></dd>
+<dt>Interaction options</dt><dd><code>IX-02</code> Side drawer from the inline-end edge, on press of the cart and after every add.<br><code>IX-05</code> Opens on hover and on keyboard focus, with an intent delay.<br><code>IX-07</code> Desktop: inline field with a suggestions panel. Mobile: full-screen search overlay.</dd>
+<dt>Viewport</dt><dd>Desktop, 1280 frame</dd>
+<dt>Status</dt><dd>Exploration. Locks no pattern and is not owner approval. Neutral: greys, system typeface, no logo, no imagery.</dd>
+</dl>
+</div>
+<nav class="meta__nav" aria-label="Calibration set">
+<div class="seg"><span class="on">A · Clean Premium Commerce</span><a href="../b/cal-01.ar.html">B · Editorial Modern Retail</a><a href="../c/cal-01.ar.html">C · Dynamic Contemporary Ecommerce</a></div>
+<div class="seg"><a href="cal-01.en.html">English, LTR</a><span class="on">Arabic, RTL</span></div>
+<div class="seg"><span class="on">cal-01 Header, search, footer</span><a href="cal-02.ar.html">cal-02 Mobile header</a><a href="cal-03.en.html">cal-03 Home</a><a href="cal-04.en.html">cal-04 Category</a><a href="cal-05.ar.html">cal-05 Product</a><a href="cal-06.en.html">cal-06 Mini-cart, cart</a><a href="cal-07.ar.html">cal-07 Checkout</a><a href="cal-08.ar.html">cal-08 Mobile shopping</a></div>
+</nav>
+</header>
+<main class="sheet">
+<section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">gl-header · signed_out · cart_with_count · gl-mega-menu: open (hover or keyboard focus on Clothing)</div><div class="fA"><div class="hdA">
+<div class="hd1"><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><div class="srchw"><div class="srch "><span class="sicon"></span><span>ابحث عن منتج أو علامة تجارية أو فئة</span></div></div>
+<div class="util"><a href="#"><span lang="en" dir="ltr">English</span></a><a href="#">تسجيل الدخول</a><a href="#">المفضلة</a><a href="#">السلة<span class="cnt wf-num">2</span></a></div></div>
+<nav class="hd2"><a href="#" class="on">ملابس</a><a href="#" class="">أحذية</a><a href="#" class="">حقائب وإكسسوارات</a><a href="#" class="">المنزل والمعيشة</a><a href="#" class="">الجمال</a><a href="#" class="">المجموعات</a><a href="#" class="">العلامات التجارية</a></nav></div><div class="rel" style="block-size:440px">
+<div class="mega"><div class="mcol"><div class="mlead">ملابس</div><p class="muted" style="font-size:13.5px;margin-block-end:18px">وصف الفئة في سطر واحد، تديره الإدارة.</p><span class="btn btn--2 btn--sm">تسوّق كل الملابس <span class="chev">›</span></span></div>
+<div class="mcol"><h4>الفئات</h4><ul><li>قمصان وقمصان خارجية</li><li>ملابس محبوكة</li><li>بناطيل</li><li>فساتين</li><li>ملابس خارجية</li><li>ملابس منزلية وملابس نوم</li></ul></div>
+<div class="mcol"><h4>المجموعات</h4><ul><li>مختارات الكتان</li><li>أساسيات عطلة نهاية الأسبوع</li><li>الموسم الجديد</li></ul></div>
+<div class="mcol"><h4>العلامات التجارية</h4><ul><li>اسم العلامة 1</li><li>اسم العلامة 2</li><li>اسم العلامة 3</li><li>اسم العلامة 4</li><li class="all">كل العلامات التجارية <span class="chev">›</span></li></ul></div></div>
+<div class="scrim" style="background:rgba(0,0,0,.16);z-index:3"></div><div class="ph "><span class="ph__l" lang="en" dir="ltr">Page content under the open menu</span></div></div></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-header:signed_out</b> — “Sign in” sits in the quiet text utility group. Signed in, the same slot reads “Account” (NAV-04).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-header:cart_with_count</b> — Count badge on the cart, updated live after an add (NAV-06). Empty cart: no badge, the word “Cart” alone.</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-mega-menu:open</b> — A full-width panel under the category row. The lead column names the category and links to all of it; then categories, collections and brands (IA-03, IA-04, IA-05).</aside><aside class="wf-note wf-option" lang="en" dir="ltr"><b>IX-05 · How the category navigation opens</b><br>Shows: Hover and keyboard focus, with a short intent delay so a passing pointer does not open it. Enter or Down opens from the keyboard; Escape closes and returns focus.<br>Not the only candidate: B and C open on click or tap. Status open, no baseline.</aside><aside class="wf-note wf-motion" lang="en" dir="ltr" data-trigger="Pointer rests on a category, or keyboard focus reaches it" data-effect="The panel fades in and drops a few pixels; the page behind dims slightly" data-role="decorative" data-reduced-motion="The panel appears at once, with no movement or fade">Mega menu reveal.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>OD-01</b> — A labelled box stands where the logo goes. No mark, colour or typeface.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>CR-15</b> — Category, collection and brand names are invented stand-ins, including long ones such as “Loungewear & Sleepwear”.</aside><aside class="wf-note wf-note" lang="en" dir="ltr">Focus order follows the reading order: logo, search, language, account, wishlist, cart, then the category row (gl-header: focus).</aside><aside class="wf-note rtl-note" lang="en" dir="ltr">The whole header mirrors: logo at the inline-start (right), the utility group ends with the cart at the far left. The category row reads from ملابس. The panel’s lead column is at the right. Chevrons mirror; the cart count keeps Western digits (DQ-01, provisional). The language link names English in its own script (gl-language-switcher).</aside></div></section><section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">sf-search-suggestions: suggestions · the visitor has typed a query</div><div class="fA"><div class="hdA">
+<div class="hd1"><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><div class="srchw"><div class="srch on"><span class="sicon"></span><span>كتان</span><span class="caret"></span><span class="faint" style="margin-inline-start:auto;font-size:12px">مسح</span></div><div class="spanel">
+<div class="sp__col"><div class="sp__h">اقتراحات</div><ul class="sp__s"><li class="kb"><b>كتان</b> قميص</li><li><b>كتان</b> بنطال</li><li><b>كتان</b> مفارش</li><li><b>كتان</b> قميص خارجي</li></ul>
+<div class="sp__h" style="margin-block-start:18px">الفئات</div><ul class="sp__s"><li>ملابس <span class="chev">›</span> قمصان وقمصان خارجية</li><li>المنزل والمعيشة <span class="chev">›</span> المفروشات</li></ul></div>
+<div class="sp__col"><div class="sp__h">المنتجات</div><div class="sp__p"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><div><div style="font-size:13.5px">قميص كتان مغسول بقصة خارجية</div><div class="muted" style="font-size:13px"><span class="money"><span class="wf-num">1,850</span> ج.م</span></div></div></div><div class="sp__p"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><div><div style="font-size:13.5px">بنطال قطني بقصة مريحة</div><div class="muted" style="font-size:13px"><span class="money"><span class="wf-num">1,650</span> ج.م</span></div></div></div><div class="sp__p"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><div><div style="font-size:13.5px">مصباح طاولة خزفي بغطاء كتان كبير</div><div class="muted" style="font-size:13px"><span class="money"><span class="wf-num">2,950</span> ج.م</span></div></div></div></div>
+<div class="sp__all"><span>عرض كل نتائج “كتان”</span><span class="chev">›</span></div></div></div>
+<div class="util"><a href="#"><span lang="en" dir="ltr">English</span></a><a href="#">تسجيل الدخول</a><a href="#">المفضلة</a><a href="#">السلة<span class="cnt wf-num">2</span></a></div></div>
+<nav class="hd2"><a href="#" class="">ملابس</a><a href="#" class="">أحذية</a><a href="#" class="">حقائب وإكسسوارات</a><a href="#" class="">المنزل والمعيشة</a><a href="#" class="">الجمال</a><a href="#" class="">المجموعات</a><a href="#" class="">العلامات التجارية</a></nav></div><div class="rel" style="block-size:420px"><div class="ph r31"><span class="ph__l" lang="en" dir="ltr">Page content</span></div></div></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-search-suggestions:suggestions</b> — Three groups: query suggestions, categories, and products with image and price, then one route to the full results page.</aside><aside class="wf-note wf-option" lang="en" dir="ltr"><b>IX-07 · Search interaction</b><br>Shows: Inline field with a suggestions panel. The field is always visible and centred, so the search bar stays clear and prominent (NAV-03).<br>Alternatives: field that expands in the header (B); a wider panel with more products (C). Status open.</aside><aside class="wf-note wf-motion" lang="en" dir="ltr" data-trigger="The visitor types the second character" data-effect="Panel opens under the field; results replace a skeleton as they arrive" data-role="essential" data-reduced-motion="Panel appears in place with no movement; the skeleton stays static">Suggestions while typing.</aside><aside class="wf-note dsq" lang="en" dir="ltr"><b>cal-01 · <code>sf-search-suggestions</code> · NAV-03, SRCH-03</b><br>Missing: what a suggestion can contain (query completions, categories, products with image and price) is decided by #304, which is not in the repository. Affects: the panel’s groups, its width and whether a product row shows a price.</aside><aside class="wf-note wf-note" lang="en" dir="ltr">Keyboard: Down moves into the list (first row shown highlighted), Enter opens it, Escape closes the panel and keeps the text (sf-search-suggestions: keyboard_focus).</aside><aside class="wf-note rtl-note" lang="en" dir="ltr">An Arabic query is typed and shown right to left (SRCH-06a). The panel is anchored under the field and its two columns swap sides: suggestions at the right, products at the left. Prices keep their digit order inside the Arabic line.</aside></div></section><section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">gl-footer: default · gl-language-switcher: on_arabic</div><div class="fA"><footer class="ftA">
+<div class="ft__top"><div class="lns" style="gap:6px"><div class="h3">ابقَ على اطلاع</div><p class="muted" style="font-size:13.5px">دعوة الاشتراك. سطر واحد يوضح ما سيصل للزائر، وفق HOME-09.</p></div><div class="ft__form"><div class="inp pt">البريد الإلكتروني</div><span class="btn">اشترك</span></div></div>
+<div class="ft__cols">
+<div><h4>تسوّق</h4><ul><li>ملابس</li><li>أحذية</li><li>حقائب وإكسسوارات</li><li>المنزل والمعيشة</li><li>الجمال</li></ul></div>
+<div><h4>المساعدة</h4><ul><li>اتصل بنا</li><li>سياسة الشحن</li><li>سياسة الإرجاع</li><li>المساعدة والأسئلة الشائعة</li></ul></div>
+<div><h4>عن المتجر</h4><ul><li>من نحن</li><li>الأصالة</li></ul></div>
+<div><h4>قانوني</h4><ul><li>سياسة الخصوصية</li><li>الشروط والأحكام</li></ul></div>
+<div><h4>التواصل</h4><ul><li class="mono faint" style="font-size:12px">هاتف الدعم · OD-18</li><li class="mono faint" style="font-size:12px">بريد الدعم · OD-18</li><li class="mono faint" style="font-size:12px">عنوان الشركة · OD-18</li></ul></div>
+</div>
+<div class="ft__bot"><span>© <span class="mono">اسم الكيان القانوني · OD-18</span></span><a href="#"><span lang="en" dir="ltr">English</span></a></div></footer></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:default</b> — Sign-up prompt across the top, four link columns, a contact column, then a legal line with the language switcher. Columns and links are client-maintained (SSC-08).</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>OD-18</b> — Support phone, email, address and the legal entity are labelled placeholders. No real values.</aside><aside class="wf-note dsq" lang="en" dir="ltr"><b>cal-01 · <code>gl-footer</code> · HOME-09, CMS-10, NFR-12</b><br>Missing: the wording of HOME-09 (newsletter or account sign-up), and what CMS-10 and NFR-12 require the footer to carry. Affects: the prompt’s copy and field, and whether the footer needs any fixed legal or accessibility link.</aside><aside class="wf-note wf-note" lang="en" dir="ltr">Language switcher in the header and the footer lands on the same page in the other language (FIX-04a). No remembered choice and no prompt (OP-14).</aside><aside class="wf-note rtl-note" lang="en" dir="ltr">Column order mirrors, so “Shop” is the right-most column. The email field keeps its Arabic placeholder right-aligned; typed addresses run left to right (ck-address rule, reused).</aside></div></section>
+</main>
+</body>
+</html>
