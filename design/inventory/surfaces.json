@@ -12,6 +12,7 @@
       "context_ids": ["SSC-07", "CART-12", "FIX-04"],
       "excluded_ids": [],
       "owner_pbi": 253,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.1", "F03.1", "F06.1", "F08.1"],
@@ -41,11 +42,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Probe P-010, header and navigation mirroring, runs in #253."
       },
       "native_baseline": "Block theme header template part (Full Site Editing), with the WooCommerce mini-cart and customer account blocks.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-language-switcher", "gl-mega-menu", "sf-search-suggestions", "sf-mini-cart"]
@@ -60,6 +63,7 @@
       "context_ids": ["NAV-01", "NAV-06", "NAV-10"],
       "excluded_ids": [],
       "owner_pbi": 253,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.1", "F03.1"],
@@ -86,11 +90,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "The same header template part, at the mobile breakpoint.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-mobile-nav", "sf-search-suggestions", "sf-mini-cart"]
@@ -105,6 +111,7 @@
       "context_ids": ["NAV-02", "NAV-04", "NAV-05", "NAV-07", "SSC-07"],
       "excluded_ids": [],
       "owner_pbi": 253,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.1"],
@@ -130,11 +137,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "The drawer opens from the inline-start edge in each direction."
       },
       "native_baseline": "Core navigation block overlay.",
       "design_freedom": "free",
       "open_items": ["CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -148,6 +157,7 @@
       "context_ids": ["SSC-07", "IA-03", "IA-04", "IA-05"],
       "excluded_ids": [],
       "owner_pbi": 253,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.1"],
@@ -171,11 +181,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Core navigation block. The structure is admin-managed (NAV-07, SSC-07).",
       "design_freedom": "free",
       "open_items": ["CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -189,6 +201,7 @@
       "context_ids": ["FIX-04", "FIX-04a", "NFR-04", "MKT-18"],
       "excluded_ids": [],
       "owner_pbi": 253,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.5"],
@@ -212,11 +225,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Each language is named in its own script. The name of the other language is not translated."
       },
       "native_baseline": "WPML language switcher. A switch lands on the same page in the other language.",
       "design_freedom": "constrained",
       "open_items": ["OP-14", "OP-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -230,6 +245,7 @@
       "context_ids": ["CMS-10", "HOME-09", "NFR-12"],
       "excluded_ids": [],
       "owner_pbi": 311,
+      "build_pbi": 253,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.3", "S04.5"],
@@ -249,14 +265,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Block theme footer template part, edited through Full Site Editing.",
       "design_freedom": "free",
       "open_items": ["OD-01", "OD-18", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253."
+      "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253.",
+      "build_note": "SSC-08, the footer's editing row, is accepted by #311. The footer itself is part of the frame, built by #253."
     },
     {
       "id": "gl-breadcrumbs",
@@ -268,6 +287,7 @@
       "context_ids": ["NFR-03", "MKT-16"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.2", "F04.1"],
@@ -288,11 +308,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "The separator mirrors. The path order follows the reading direction."
       },
       "native_baseline": "woocommerce_breadcrumb() and the core breadcrumbs block.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -306,6 +328,7 @@
       "context_ids": ["NFR-12", "MKT-23"],
       "excluded_ids": [],
       "owner_pbi": 288,
+      "build_pbi": 288,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.4"],
@@ -328,13 +351,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A consent management tool, selected and configured in #288. Its banner is configured, not built from nothing.",
       "design_freedom": "constrained",
-      "open_items": ["DQ-07"],
+      "open_items": [],
+      "decisions": ["DQ-07"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Accept, Decline and Preferences. The layout stays within what the tool selected in #288 can produce (DQ-07)."
     },
     {
       "id": "gl-promo-banner",
@@ -346,6 +372,7 @@
       "context_ids": ["HOME-07"],
       "excluded_ids": ["HOME-12", "ADM-62"],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.2", "S04.6"],
@@ -369,11 +396,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A section of the curated library. Scheduling is on the banner alone (CX-06, owner reading).",
       "design_freedom": "free",
       "open_items": ["CX-06", "OD-01", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -387,6 +416,7 @@
       "context_ids": ["IA-01", "JRN-01", "SSC-02", "SSC-03", "ADM-59", "ADM-60", "ADM-61", "MER-02", "MER-04"],
       "excluded_ids": ["HOME-12", "HOME-13"],
       "owner_pbi": 302,
+      "build_pbi": 302,
       "stage": "S1",
       "route": {"en": "/", "ar": "/ar/"},
       "flow_steps": ["F01.1", "F01.2", "F01.3"],
@@ -411,11 +441,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A static front page built from the curated section library in the block editor.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-05", "CR-15", "OP-12"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-product-card"],
@@ -431,6 +463,7 @@
       "context_ids": ["IA-02", "JRN-02"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": {"en": "/shop/", "ar": "/ar/shop/"},
       "flow_steps": ["F02.2"],
@@ -453,11 +486,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product archive template (block theme).",
       "design_freedom": "free",
       "open_items": ["CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -472,6 +507,7 @@
       "context_ids": ["IA-03", "SSC-04", "ADM-55", "JRN-02"],
       "excluded_ids": ["IA-34"],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": {"en": "/product-category/{term}/", "ar": "/ar/product-category/{term}/"},
       "flow_steps": ["F01.6", "F02.2"],
@@ -494,11 +530,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product category archive.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -513,6 +551,7 @@
       "context_ids": ["IA-04", "IA-35", "MER-03", "MER-04", "SSC-06", "ADM-57", "HOME-04"],
       "excluded_ids": ["ADM-58"],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": {"en": "/collection/{term}/", "ar": "/ar/collection/{term}/"},
       "flow_steps": ["F01.6", "F02.2"],
@@ -534,11 +573,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "The site's collection taxonomy, served with the platform's product archive template.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-17", "OP-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -553,6 +594,7 @@
       "context_ids": ["IA-05", "ADM-56", "SSC-05", "HOME-06", "PLP-07"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": {"en": "/brand/{term}/", "ar": "/ar/brand/{term}/"},
       "flow_steps": ["F01.6", "F02.2"],
@@ -574,15 +616,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce brand taxonomy archive.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
-      "build_note": "The brand header (logo, description) is contracted by IA-05, ADM-56 and SSC-05, none of which #303 owns. #303 owns only the listing rows used here. Reported in coverage.md, not changed."
+      "note": "#303 builds the customer-facing brand page. IA-05 (#242) names the page, and ADM-56 (#277) and SSC-05 (#311) own the admin and editing rows that shape its header: they are context here and stay with their owners."
     },
     {
       "id": "sf-product-card",
@@ -594,6 +638,7 @@
       "context_ids": ["MER-01", "MER-07", "REV-04", "ERP-02", "WISH-01", "PDP-04"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F01.2", "F02.2", "F02.3", "F02.7", "F06.5", "F07.4"],
@@ -624,11 +669,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product collection block card.",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-01", "CR-05"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -642,6 +689,7 @@
       "context_ids": ["SRCH-04", "ERP-02"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.4", "F03.3"],
@@ -664,11 +712,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product filter blocks.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
@@ -683,6 +733,7 @@
       "context_ids": ["PLP-18"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.4", "F03.3"],
@@ -706,11 +757,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Opens from the inline-start or inline-end edge consistently in each direction."
       },
       "native_baseline": "WooCommerce product filters overlay.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -724,6 +777,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.4", "F02.5", "F03.3"],
@@ -746,17 +800,19 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce catalogue sorting and results count blocks.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
     {
       "id": "sf-pagination",
-      "name": "Pagination or continued loading",
+      "name": "Pagination",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -764,6 +820,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.5", "F03.3"],
@@ -777,7 +834,6 @@
         {"state": "first_page"},
         {"state": "middle_page"},
         {"state": "last_page"},
-        {"state": "loading_more"},
         {"state": "single_page", "note": "Nothing to page"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
@@ -788,13 +844,16 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Previous and next mirror. Page numerals do not."
       },
       "native_baseline": "Core query pagination block.",
       "design_freedom": "free",
-      "open_items": ["DQ-02"],
+      "open_items": [],
+      "decisions": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Numbered pagination. No infinite scroll in the Stage 1 structural design (DQ-02)."
     },
     {
       "id": "sf-listing-empty",
@@ -806,6 +865,7 @@
       "context_ids": ["SRCH-05"],
       "excluded_ids": [],
       "owner_pbi": 303,
+      "build_pbi": 303,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.6"],
@@ -826,11 +886,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce no-results block.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -844,6 +906,7 @@
       "context_ids": ["REV-04"],
       "excluded_ids": [],
       "owner_pbi": "E-SF-3b",
+      "build_pbi": "E-SF-3b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -864,13 +927,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce rating filter block.",
       "design_freedom": "free",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "sf-brand-landing",
@@ -882,6 +948,7 @@
       "context_ids": ["IA-05"],
       "excluded_ids": [],
       "owner_pbi": "E-FND-2b",
+      "build_pbi": "E-FND-2b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -901,14 +968,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Not built. No address yet.",
       "design_freedom": "free",
-      "open_items": ["OP-13", "DQ-04", "CR-15"],
+      "open_items": ["OP-13", "CR-15"],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release. What the first release provides in its place is not stated (OP-13)."
+      "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "sf-search-suggestions",
@@ -920,6 +989,7 @@
       "context_ids": ["NAV-03", "NAV-09", "SRCH-02", "SRCH-06a"],
       "excluded_ids": ["SRCH-09", "INT-15"],
       "owner_pbi": 304,
+      "build_pbi": 304,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F03.1"],
@@ -944,11 +1014,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Selected in #304. No external search provider (SRCH-09 and INT-15 are P2).",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -962,6 +1034,7 @@
       "context_ids": ["IA-06", "PLP-01", "PLP-06", "PLP-17", "EVT-03"],
       "excluded_ids": ["SRCH-09"],
       "owner_pbi": 304,
+      "build_pbi": 304,
       "stage": "S1",
       "route": {"en": "/?s={query}", "ar": "/ar/?s={query}"},
       "flow_steps": ["F03.2"],
@@ -986,11 +1059,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WordPress search results template with the product listing.",
       "design_freedom": "free",
       "open_items": ["OP-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
@@ -1005,6 +1080,7 @@
       "context_ids": ["PLP-19", "EVT-18"],
       "excluded_ids": [],
       "owner_pbi": 304,
+      "build_pbi": 304,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F03.4"],
@@ -1024,11 +1100,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce no-results block.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1042,6 +1120,7 @@
       "context_ids": ["SRCH-06"],
       "excluded_ids": [],
       "owner_pbi": 304,
+      "build_pbi": 304,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.4"],
@@ -1066,6 +1145,7 @@
       "native_baseline": "None in the standard administration. A custom settings screen.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1079,6 +1159,7 @@
       "context_ids": ["IA-07", "JRN-03", "JRN-04", "SHIP-04", "MER-07", "CMS-02", "CMS-07", "ERP-02", "ERP-03", "SSC-21"],
       "excluded_ids": ["PDP-20", "PDP-23", "WISH-08"],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": {"en": "/product/{slug}/", "ar": "/ar/product/{slug}/"},
       "flow_steps": ["F01.6", "F04.1", "F04.3", "F04.4", "F04.7", "F05.3", "F06.1", "F06.2", "F06.3"],
@@ -1108,11 +1189,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce single product template (block theme).",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-08", "OD-13", "OD-01", "CR-05", "CR-15"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": [
@@ -1130,6 +1213,7 @@
       "context_ids": ["IA-07", "PDP-08", "PDP-22", "ERP-02", "ERP-03", "ADM-30"],
       "excluded_ids": [],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": {"en": "/product/{slug}/", "ar": "/ar/product/{slug}/"},
       "flow_steps": ["F04.1", "F05.1", "F06.1"],
@@ -1155,11 +1239,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce add to cart with options block.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": [
@@ -1177,6 +1263,7 @@
       "context_ids": ["ADM-22", "ADM-23", "ADM-24"],
       "excluded_ids": [],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F04.2"],
@@ -1202,11 +1289,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Thumbnail order and swipe direction follow the reading direction. The image itself is never mirrored."
       },
       "native_baseline": "WooCommerce product image gallery block.",
       "design_freedom": "free",
       "open_items": ["CR-05"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1220,6 +1309,7 @@
       "context_ids": ["ERP-02", "ERP-05", "PLP-03"],
       "excluded_ids": ["PDP-23"],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F05.2"],
@@ -1242,11 +1332,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product stock indicator block.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
@@ -1261,6 +1353,7 @@
       "context_ids": ["MER-05", "SSC-25", "JRN-02"],
       "excluded_ids": ["PDP-20", "ADM-46"],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F04.6"],
@@ -1282,11 +1375,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce related products block.",
       "design_freedom": "free",
       "open_items": ["OP-12"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1301,6 +1396,7 @@
       "context_ids": ["WISH-07"],
       "excluded_ids": [],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F04.6"],
@@ -1322,11 +1418,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
-      "native_baseline": "None in the standard store. Built in #307.",
+      "native_baseline": "None in the standard store. The mechanism comes from #307. Its placement on the product page is #254's.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1341,6 +1439,7 @@
       "context_ids": ["REV-01", "REV-04"],
       "excluded_ids": ["REV-06", "REV-07", "REV-08", "REV-09"],
       "owner_pbi": 254,
+      "build_pbi": 254,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F04.5"],
@@ -1361,11 +1460,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce product reviews block.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1379,6 +1480,7 @@
       "context_ids": ["IA-08", "JRN-05", "BR-004", "BR-009", "BR-010", "SHIP-05", "PROMO-12"],
       "excluded_ids": [],
       "owner_pbi": 306,
+      "build_pbi": 306,
       "stage": "S1",
       "route": {"en": "/cart/", "ar": "/ar/cart/"},
       "flow_steps": ["F07.1", "F07.4", "F07.5", "F07.6", "F08.8", "F16.2"],
@@ -1407,11 +1509,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Cart block.",
       "design_freedom": "constrained",
       "open_items": ["OD-04", "PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]
@@ -1426,6 +1530,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 306,
+      "build_pbi": 306,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F07.7"],
@@ -1445,11 +1550,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce empty cart block.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Staging finding: the empty cart page is 8 pixels too wide. Attached to #306 by D-13, not corrected."
@@ -1464,6 +1571,7 @@
       "context_ids": ["NAV-06", "PDP-08", "CART-07"],
       "excluded_ids": [],
       "owner_pbi": 306,
+      "build_pbi": 306,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F02.7", "F06.1"],
@@ -1487,11 +1595,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce mini-cart block.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1505,6 +1615,7 @@
       "context_ids": ["JRN-05", "BR-002", "FIX-07"],
       "excluded_ids": [],
       "owner_pbi": 306,
+      "build_pbi": 306,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F07.3"],
@@ -1527,11 +1638,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "The progress indicator fills from the inline-start edge in each direction."
       },
       "native_baseline": "None. Driven by the admin-configurable rule (BR-002).",
       "design_freedom": "free",
       "open_items": ["OD-04"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1545,6 +1658,7 @@
       "context_ids": ["CART-18", "ERP-03", "BR-003"],
       "excluded_ids": [],
       "owner_pbi": 306,
+      "build_pbi": 306,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F07.2"],
@@ -1566,11 +1680,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce cart notices.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
@@ -1585,6 +1701,7 @@
       "context_ids": ["IA-11", "PDP-10", "PLP-05", "CART-04", "CART-17", "ACCT-08", "NAV-05"],
       "excluded_ids": ["WISH-05", "WISH-06", "WISH-08"],
       "owner_pbi": 307,
+      "build_pbi": 307,
       "stage": "S1",
       "route": {"en": "/wishlist/", "ar": "/ar/wishlist/"},
       "flow_steps": ["F06.3", "F06.4", "F14.6"],
@@ -1609,11 +1726,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store. A wishlist mechanism is selected in #307.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1628,6 +1747,7 @@
       "context_ids": ["PDP-19"],
       "excluded_ids": [],
       "owner_pbi": 307,
+      "build_pbi": 307,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -1649,11 +1769,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1668,6 +1790,7 @@
       "context_ids": ["IA-14", "IA-17", "NAV-04", "CART-14", "ADM-104"],
       "excluded_ids": ["AUTH-10a", "INT-07"],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": {"en": "/my-account/", "ar": "/ar/my-account/"},
       "flow_steps": ["F08.4", "F14.2"],
@@ -1691,11 +1814,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account sign-in form, shown to a signed-out visitor.",
       "design_freedom": "constrained",
       "open_items": ["OP-17"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-google-entry", "au-passwordless"],
@@ -1711,6 +1836,7 @@
       "context_ids": ["IA-15", "BR-001", "FIX-06", "CART-13", "NFR-12"],
       "excluded_ids": ["AUTH-10a", "INT-07"],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": {"en": "/my-account/", "ar": "/ar/my-account/"},
       "flow_steps": ["F08.2", "F14.2"],
@@ -1734,11 +1860,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account registration form.",
       "design_freedom": "constrained",
       "open_items": ["OD-03", "OP-17"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-google-entry"],
@@ -1754,6 +1882,7 @@
       "context_ids": ["IA-16"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": {"en": "/my-account/lost-password/", "ar": "/ar/my-account/lost-password-ar/"},
       "flow_steps": ["F08.7"],
@@ -1774,11 +1903,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce lost-password endpoint.",
       "design_freedom": "constrained",
       "open_items": ["CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1792,6 +1923,7 @@
       "context_ids": ["AUTH-04", "IA-16"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "route_note": "The lost-password endpoint, reached from the emailed link.",
@@ -1816,11 +1948,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce reset-password form.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1834,6 +1968,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.5"],
@@ -1857,11 +1992,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store. Built or selected in #305.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1875,6 +2012,7 @@
       "context_ids": ["CART-15", "JRN-06"],
       "excluded_ids": ["AUTH-10a"],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.6"],
@@ -1898,11 +2036,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A Google sign-in integration, selected in #305. The button follows Google's own presentation rules.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-GOOGLE"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1916,6 +2056,7 @@
       "context_ids": ["NOTF-01"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.3"],
@@ -1938,11 +2079,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1956,6 +2099,7 @@
       "context_ids": ["FIX-09", "JRN-06", "BR-008", "CART-13", "CART-14"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.1", "F09.1"],
@@ -1976,11 +2120,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block sign-in prompt.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Guest checkout is never forced into registration. It is encouraged (FIX-09)."
@@ -1995,6 +2141,7 @@
       "context_ids": ["BR-008", "IA-10", "JRN-08"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F12.3"],
@@ -2018,11 +2165,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "A password only. No re-entry of name, email, phone or address."
@@ -2037,6 +2186,7 @@
       "context_ids": ["IA-09", "JRN-07", "AUTH-07", "PAY-05"],
       "excluded_ids": ["CHK-13", "INT-08"],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": {"en": "/checkout/", "ar": "/ar/checkout/"},
       "flow_steps": ["F06.2", "F09.1", "F10.1"],
@@ -2060,17 +2210,20 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block.",
       "design_freedom": "constrained",
-      "open_items": ["DQ-03", "OP-15"],
+      "open_items": ["OP-15"],
+      "decisions": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": [
         "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order", "ck-validation", "ck-stock-failure",
         "ck-erp-unavailable", "au-checkout-entry"
-      ]
+      ],
+      "note": "One page in clear sections, with the review and order summary before Place Order. No multi-page wizard (DQ-03)."
     },
     {
       "id": "ck-address",
@@ -2082,6 +2235,7 @@
       "context_ids": ["ACCT-04"],
       "excluded_ids": ["CHK-13", "INT-08"],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.2", "F10.2"],
@@ -2106,11 +2260,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Phone numbers and digits keep their own order in Arabic."
       },
       "native_baseline": "WooCommerce Checkout block address form, with the Egyptian structure: governorate, city, district, street, landmark.",
       "design_freedom": "constrained",
       "open_items": ["CR-03"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2124,6 +2280,7 @@
       "context_ids": ["SHIP-01", "SHIP-04", "SHIP-05", "SHIP-15", "BR-009"],
       "excluded_ids": ["SHIP-02", "SHIP-06", "SHIP-07"],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.3", "F10.3"],
@@ -2147,11 +2304,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce shipping options, on manual rate zones by governorate.",
       "design_freedom": "constrained",
       "open_items": ["CR-03"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2165,6 +2324,7 @@
       "context_ids": ["PAY-09", "PAY-13", "PAY-14", "PAY-15"],
       "excluded_ids": ["PAY-10", "PAY-20", "PAY-21", "PAY-22"],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.5", "F10.5"],
@@ -2187,11 +2347,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce payment options block with the Paymob gateway.",
       "design_freedom": "constrained",
       "open_items": ["OD-05", "OD-19", "OP-03", "VENDOR-PAYMOB"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2205,6 +2367,7 @@
       "context_ids": ["CART-06"],
       "excluded_ids": [],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.4", "F10.4"],
@@ -2227,11 +2390,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block coupon form and order note.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2245,6 +2410,7 @@
       "context_ids": ["CHK-08", "BR-005", "PAY-05"],
       "excluded_ids": [],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.6", "F09.7", "F10.6", "F10.7"],
@@ -2266,11 +2432,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block order summary, terms and actions.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2284,6 +2452,7 @@
       "context_ids": ["DOD-03"],
       "excluded_ids": [],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.2"],
@@ -2305,11 +2474,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block validation.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Clear in both languages (CHK-11)."
@@ -2324,6 +2495,7 @@
       "context_ids": ["BR-003", "ERP-04", "ERP-05"],
       "excluded_ids": [],
       "owner_pbi": 255,
+      "build_pbi": 255,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.7", "F10.7"],
@@ -2344,11 +2516,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce checkout notices.",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OP-25"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
@@ -2363,6 +2537,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 301,
+      "build_pbi": 301,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F09.7", "F10.7"],
@@ -2382,11 +2557,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "The sale is not confirmed: that is contracted. What the customer sees is set in PRE-09. Placeholder message only."
@@ -2401,6 +2578,7 @@
       "context_ids": ["PAY-13", "PAY-02", "ORD-01", "CHK-04"],
       "excluded_ids": ["PAY-20", "PAY-21", "PAY-22"],
       "owner_pbi": 283,
+      "build_pbi": 283,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F11.1", "F11.3"],
@@ -2423,11 +2601,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "The official Paymob integration for WooCommerce.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB", "OD-19"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Our side of the handoff only. The hosted card, 3-D Secure and wallet steps are the provider's."
@@ -2442,6 +2622,7 @@
       "context_ids": ["ORD-02", "NOTF-03", "BR-007", "ERP-06"],
       "excluded_ids": [],
       "owner_pbi": 283,
+      "build_pbi": 283,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F11.5"],
@@ -2463,11 +2644,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce order-pay endpoint.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB", "PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -2481,6 +2664,7 @@
       "context_ids": ["JRN-08", "SHIP-04", "NOTF-02", "ORD-03", "PAY-09", "AUTH-11"],
       "excluded_ids": [],
       "owner_pbi": 242,
+      "build_pbi": 255,
       "stage": "S1",
       "route": {"en": "/checkout/order-received/{id}/", "ar": "/ar/checkout/order-received-ar/{id}/"},
       "flow_steps": ["F11.4", "F11.6", "F12.1"],
@@ -2505,15 +2689,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce order confirmation block.",
       "design_freedom": "constrained",
       "open_items": ["OP-13", "OP-15", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-post-order-account", "ord-status-labels"],
-      "build_note": "The only delivery rows that name this page are IA-10 (#242, the route, Verified) and JRN-08 (#322, the journey record). The design plan places the screen with #255, whose rows do not name it. Reported in coverage.md, not changed."
+      "build_note": "IA-10, the page row, is accepted by #242 as the route, and JRN-08 by #322 as the journey record. The visible checkout completion screen is built with the checkout, #255."
     },
     {
       "id": "ac-navigation",
@@ -2525,6 +2711,7 @@
       "context_ids": ["IA-17", "NAV-04"],
       "excluded_ids": ["ACCT-10", "IA-22"],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F14.1"],
@@ -2545,11 +2732,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account navigation.",
       "design_freedom": "constrained",
       "open_items": ["OP-05"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "No returns entry: the returns area is deferred (ACCT-10)."
@@ -2564,6 +2753,7 @@
       "context_ids": ["IA-17"],
       "excluded_ids": ["ACCT-10"],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": {"en": "/my-account/", "ar": "/ar/my-account/"},
       "flow_steps": ["F14.1"],
@@ -2585,11 +2775,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account dashboard.",
       "design_freedom": "constrained",
       "open_items": ["OP-05"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation"]
@@ -2604,6 +2796,7 @@
       "context_ids": ["IA-19"],
       "excluded_ids": [],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": {"en": "/my-account/orders/", "ar": "/ar/my-account/orders-ar/"},
       "flow_steps": ["F13.1", "F14.5", "F16.1"],
@@ -2626,11 +2819,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce orders endpoint.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ord-status-labels"]
@@ -2645,6 +2840,7 @@
       "context_ids": ["IA-20", "BR-005", "SHIP-13", "SHIP-03", "ORD-12", "RET-08"],
       "excluded_ids": ["ACCT-10", "RET-01", "RET-10"],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": {"en": "/my-account/view-order/{id}/", "ar": "/ar/my-account/view-order-ar/{id}/"},
       "flow_steps": ["F13.2", "F13.7", "F14.5", "F15.5", "F16.1"],
@@ -2673,11 +2869,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce view-order endpoint.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OP-20"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ord-status-timeline", "ord-status-labels"]
@@ -2692,6 +2890,7 @@
       "context_ids": ["IA-18", "CHK-01", "CHK-02"],
       "excluded_ids": [],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": {"en": "/my-account/edit-address/", "ar": "/ar/my-account/edit-address-ar/"},
       "flow_steps": ["F14.4"],
@@ -2717,11 +2916,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-address endpoint. Add, edit, delete and set default (ACCT-04) go beyond its two fixed addresses.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation"]
@@ -2736,6 +2937,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": null,
       "route_note": "WooCommerce serves this at its edit-account endpoint. It has no IA row and no entry in the URL map (OP-19).",
@@ -2758,11 +2960,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-account endpoint.",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ac-password"]
@@ -2777,6 +2981,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F14.3"],
@@ -2798,11 +3003,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-account endpoint, password fields.",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2816,6 +3023,7 @@
       "context_ids": ["IA-21", "SHIP-13", "SHIP-03", "SHIP-14"],
       "excluded_ids": [],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": {"en": "/track-your-order/", "ar": "/ar/track-your-order/"},
       "flow_steps": ["F13.5"],
@@ -2838,11 +3046,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce order tracking form: lookup by order number and email.",
       "design_freedom": "constrained",
       "open_items": ["OP-20", "VENDOR-BOSTA"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ord-status-timeline", "ord-status-labels"]
@@ -2857,6 +3067,7 @@
       "context_ids": ["ADM-92"],
       "excluded_ids": ["INT-17"],
       "owner_pbi": 308,
+      "build_pbi": 308,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F13.7"],
@@ -2879,11 +3090,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "An invoice mechanism is selected in #280 and #308.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OD-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "A printable document. Legal content waits for the client's invoicing inputs."
@@ -2898,6 +3111,7 @@
       "context_ids": ["JRN-09", "ACCT-07", "SHIP-13", "SHIP-14"],
       "excluded_ids": ["NOTF-05", "ORD-09", "ORD-10", "ORD-11"],
       "owner_pbi": 248,
+      "build_pbi": 308,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F13.2", "F13.5"],
@@ -2923,13 +3137,16 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "The line runs from the inline-start edge in each direction. Dates and times keep their digit order."
       },
       "native_baseline": "None. WooCommerce shows a status word only.",
       "design_freedom": "free",
       "open_items": ["VENDOR-BOSTA"],
+      "decisions": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "build_note": "The statuses ORD-03 to ORD-07 are accepted by #248, the status model. The timeline the customer sees is built on the order and tracking screens of #308."
     },
     {
       "id": "ord-status-labels",
@@ -2941,6 +3158,7 @@
       "context_ids": ["ORD-03", "SHIP-17", "PAY-19"],
       "excluded_ids": ["ORD-09", "ORD-10", "ORD-11"],
       "owner_pbi": 248,
+      "build_pbi": 248,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F13.2", "F13.8", "F15.5", "S02.4"],
@@ -2957,7 +3175,7 @@
         {"state": "refunded_fully"},
         {"state": "refunded_partly"},
         {"state": "returned_to_origin", "requires": "ORD-13", "note": "Never shown as delivered"},
-        {"state": "cod_collected_awaiting_remittance", "requires": "ORD-14"}
+        {"state": "cod_collected_awaiting_remittance", "requires": "ORD-14", "note": "Staff and accounting only. The customer sees Delivered (DQ-05)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -2966,14 +3184,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce order status names.",
       "design_freedom": "free",
-      "open_items": ["DQ-05"],
+      "open_items": [],
+      "decisions": ["DQ-05"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Customer-facing labels are bilingual. The same states in the administration are English only."
+      "note": "Customer-facing labels are bilingual. The same states in the administration are English only. Cash collected and remitted is never shown to the customer (DQ-05)."
     },
     {
       "id": "ac-reorder",
@@ -2985,6 +3205,7 @@
       "context_ids": ["JRN-11", "ACCT-05", "ACCT-06"],
       "excluded_ids": [],
       "owner_pbi": "E-SF-9b",
+      "build_pbi": "E-SF-9b",
       "stage": "S2",
       "route": null,
       "flow_steps": ["F16.1"],
@@ -3005,13 +3226,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "ac-notification-preferences",
@@ -3023,6 +3247,7 @@
       "context_ids": ["IA-23", "NOTF-11"],
       "excluded_ids": [],
       "owner_pbi": "E-SF-9b",
+      "build_pbi": "E-SF-9b",
       "stage": "S2",
       "route": null,
       "route_note": "Second release. No address yet.",
@@ -3044,14 +3269,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "The first release provides unsubscribe links in emails."
+      "note": "The first release provides unsubscribe links in emails. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "ac-account-deletion",
@@ -3063,6 +3290,7 @@
       "context_ids": ["NFR-12a"],
       "excluded_ids": [],
       "owner_pbi": "E-SF-9b",
+      "build_pbi": "E-SF-9b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -3084,14 +3312,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "The first release handles this manually on request."
+      "note": "The first release handles this manually on request. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "rv-list",
@@ -3103,6 +3333,7 @@
       "context_ids": ["PDP-17"],
       "excluded_ids": ["REV-06", "REV-07", "REV-08", "REV-09"],
       "owner_pbi": 309,
+      "build_pbi": 309,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F04.5", "F15.2"],
@@ -3126,11 +3357,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "A review is shown in the language it was written in. Star order follows the reading direction."
       },
       "native_baseline": "WooCommerce product reviews.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3144,6 +3377,7 @@
       "context_ids": [],
       "excluded_ids": ["REV-06"],
       "owner_pbi": 309,
+      "build_pbi": 309,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F15.1"],
@@ -3154,7 +3388,7 @@
       },
       "states": [
         {"state": "default"},
-        {"state": "signed_out"},
+        {"state": "signed_out", "note": "Asked to sign in"},
         {"state": "form"},
         {"state": "validation"},
         {"state": "submitted"}
@@ -3166,14 +3400,16 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce review form.",
       "design_freedom": "constrained",
-      "open_items": ["DQ-06"],
+      "open_items": [],
+      "decisions": ["DQ-06"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Star rating and text only. No photo or video (REV-06 is P2)."
+      "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06)."
     },
     {
       "id": "rv-pending",
@@ -3185,6 +3421,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 309,
+      "build_pbi": 309,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F15.2"],
@@ -3204,11 +3441,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce comment moderation. Staff moderate on the standard reviews screen, which is not redesigned.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3222,6 +3461,7 @@
       "context_ids": ["SSC-10", "ADM-63"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -3241,11 +3481,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library in the block editor.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "The shared layout the eight trust and support pages use. Each stays editable without a developer (CMS-09)."
@@ -3260,6 +3502,7 @@
       "context_ids": ["IA-24"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/about/", "ar": "/ar/about/"},
       "flow_steps": [],
@@ -3279,11 +3522,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3298,6 +3543,7 @@
       "context_ids": ["IA-27", "PDP-16"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/authenticity-guarantee/", "ar": "/ar/authenticity-guarantee/"},
       "flow_steps": ["F04.4"],
@@ -3317,11 +3563,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "OD-13"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3336,6 +3584,7 @@
       "context_ids": ["IA-28"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/shipping-policy/", "ar": "/ar/shipping-policy/"},
       "flow_steps": [],
@@ -3355,11 +3604,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "CR-03"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3374,6 +3625,7 @@
       "context_ids": ["IA-26"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/help/", "ar": "/ar/help/"},
       "flow_steps": ["F15.4", "F15.6"],
@@ -3396,11 +3648,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3415,6 +3669,7 @@
       "context_ids": ["IA-30", "NFR-12"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/privacy-policy/", "ar": "/ar/privacy-policy/"},
       "flow_steps": [],
@@ -3434,11 +3689,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3453,6 +3710,7 @@
       "context_ids": ["IA-29", "PDP-15", "RET-08"],
       "excluded_ids": ["RET-01", "RET-03", "IA-22"],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/returns-and-refunds/", "ar": "/ar/returns-and-refunds/"},
       "flow_steps": ["F04.4", "F15.3"],
@@ -3472,11 +3730,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "OD-08"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"],
@@ -3492,6 +3752,7 @@
       "context_ids": ["IA-31", "CHK-09"],
       "excluded_ids": [],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/terms-and-conditions/", "ar": "/ar/terms-and-conditions/"},
       "flow_steps": [],
@@ -3511,11 +3772,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3530,6 +3793,7 @@
       "context_ids": ["IA-25", "JRN-10"],
       "excluded_ids": ["INT-03"],
       "owner_pbi": 310,
+      "build_pbi": 310,
       "stage": "S1",
       "route": {"en": "/contact-us/", "ar": "/ar/contact-us/"},
       "flow_steps": ["F15.4", "F15.6"],
@@ -3553,11 +3817,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "A page from the section library with a contact form.",
       "design_freedom": "free",
       "open_items": ["OD-18", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"],
@@ -3573,6 +3839,7 @@
       "context_ids": ["IA-32", "MKT-20"],
       "excluded_ids": [],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": {"en": "/offers/", "ar": "/ar/offers/"},
       "flow_steps": ["S04.7"],
@@ -3593,11 +3860,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Built by the client from the approved templates and the delivered section library.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-05", "CR-15"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-promo-banner", "sf-product-card"],
@@ -3613,6 +3882,7 @@
       "context_ids": ["HOME-10", "HOME-11", "ADM-59", "ADM-60", "ADM-61", "ADM-63", "CMS-09"],
       "excluded_ids": ["HOME-12", "ADM-62"],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S04.1", "S04.2", "S04.3", "S04.4"],
@@ -3641,6 +3911,7 @@
       "native_baseline": "The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned.",
       "design_freedom": "constrained",
       "open_items": ["OD-01", "CX-06"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
@@ -3655,6 +3926,7 @@
       "context_ids": ["NAV-07"],
       "excluded_ids": [],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S04.5"],
@@ -3678,6 +3950,7 @@
       "native_baseline": "WordPress navigation editing (Full Site Editing).",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3691,6 +3964,7 @@
       "context_ids": [],
       "excluded_ids": ["HOME-12", "ADM-62"],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S04.6"],
@@ -3717,6 +3991,7 @@
       "native_baseline": "A library section with its own start, optional end, page placement and enabled state.",
       "design_freedom": "constrained",
       "open_items": ["CX-06"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3730,6 +4005,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S04.8"],
@@ -3752,6 +4028,7 @@
       "native_baseline": "WordPress global styles (Full Site Editing).",
       "design_freedom": "constrained",
       "open_items": ["OD-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
@@ -3766,6 +4043,7 @@
       "context_ids": ["ADM-42", "ADM-43", "ADM-44", "ADM-45", "MER-01", "MER-02", "MER-05", "ERP-07"],
       "excluded_ids": [],
       "owner_pbi": 311,
+      "build_pbi": 311,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.4"],
@@ -3791,6 +4069,7 @@
       "native_baseline": "The standard WooCommerce product screen. Only what it lacks is added.",
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -3804,6 +4083,7 @@
       "context_ids": ["SSC-04", "SSC-05", "SSC-06", "MER-04", "MKT-12"],
       "excluded_ids": ["ADM-58"],
       "owner_pbi": 277,
+      "build_pbi": 277,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S04.9"],
@@ -3828,6 +4108,7 @@
       "native_baseline": "The standard term screens for product categories, brands and collections.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3841,6 +4122,7 @@
       "context_ids": [],
       "excluded_ids": ["ADM-14", "ADM-140", "ADM-143"],
       "owner_pbi": 294,
+      "build_pbi": 294,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.1"],
@@ -3864,6 +4146,7 @@
       "native_baseline": "WooCommerce Analytics overview.",
       "design_freedom": "annotate_only",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3877,6 +4160,7 @@
       "context_ids": ["RPT-10", "ERP-01"],
       "excluded_ids": ["ADM-142"],
       "owner_pbi": 294,
+      "build_pbi": 294,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.7"],
@@ -3900,6 +4184,7 @@
       "native_baseline": "WooCommerce stock widgets.",
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -3913,6 +4198,7 @@
       "context_ids": [],
       "excluded_ids": ["ADM-120", "ADM-141"],
       "owner_pbi": 294,
+      "build_pbi": 294,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.1", "S03.4"],
@@ -3935,6 +4221,7 @@
       "native_baseline": "Counts that link to the standard filtered order list.",
       "design_freedom": "constrained",
       "open_items": ["CX-05"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
@@ -3949,6 +4236,7 @@
       "context_ids": [],
       "excluded_ids": ["ADM-145"],
       "owner_pbi": 294,
+      "build_pbi": 294,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -3970,6 +4258,7 @@
       "native_baseline": "Links to the standard add product, add coupon and order list screens.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3983,6 +4272,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": "E-ADM-1b",
+      "build_pbi": "E-ADM-1b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -4004,9 +4294,11 @@
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
       "native_baseline": "WooCommerce Analytics.",
       "design_freedom": "annotate_only",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "ad-product-edit-additions",
@@ -4018,6 +4310,7 @@
       "context_ids": ["SSC-27", "MKT-12", "ADM-30"],
       "excluded_ids": ["ADM-28", "ADM-46", "ADM-147"],
       "owner_pbi": 276,
+      "build_pbi": 276,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.2", "S01.5"],
@@ -4041,6 +4334,7 @@
       "native_baseline": "The standard WooCommerce product screen.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
@@ -4055,6 +4349,7 @@
       "context_ids": [],
       "excluded_ids": ["ROLE-10", "ADM-76", "ADM-125"],
       "owner_pbi": 276,
+      "build_pbi": 276,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.6"],
@@ -4078,6 +4373,7 @@
       "native_baseline": "None. A narrow shared audit record (CX-03, owner reading).",
       "design_freedom": "constrained",
       "open_items": ["CX-03", "PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4091,6 +4387,7 @@
       "context_ids": ["ADM-85"],
       "excluded_ids": [],
       "owner_pbi": 278,
+      "build_pbi": 278,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.1", "S02.2"],
@@ -4113,6 +4410,7 @@
       "native_baseline": "The standard product and order list search.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Staging found a phone-format gap on ADM-157. It stays with #278."
@@ -4127,6 +4425,7 @@
       "context_ids": ["ORD-03", "ORD-04"],
       "excluded_ids": ["ORD-09", "ORD-10", "ORD-11"],
       "owner_pbi": 248,
+      "build_pbi": 248,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.4"],
@@ -4149,6 +4448,7 @@
       "native_baseline": "The standard WooCommerce order status control.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4162,6 +4462,7 @@
       "context_ids": ["ADM-88", "SHIP-13"],
       "excluded_ids": ["ROLE-10"],
       "owner_pbi": 248,
+      "build_pbi": 248,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.3"],
@@ -4184,6 +4485,7 @@
       "native_baseline": "WooCommerce order notes, which are prose. A queryable status history is added.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4197,6 +4499,7 @@
       "context_ids": ["ADM-157"],
       "excluded_ids": ["ADM-141", "ADM-144"],
       "owner_pbi": 280,
+      "build_pbi": 280,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.2"],
@@ -4219,6 +4522,7 @@
       "native_baseline": "The standard WooCommerce order list. Only missing filters are added.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4232,6 +4536,7 @@
       "context_ids": ["ORD-08", "BR-007"],
       "excluded_ids": [],
       "owner_pbi": 280,
+      "build_pbi": 280,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.9"],
@@ -4254,6 +4559,7 @@
       "native_baseline": "The standard status change. The recorded reason is added.",
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4267,6 +4573,7 @@
       "context_ids": ["ACCT-12"],
       "excluded_ids": ["INT-17"],
       "owner_pbi": 280,
+      "build_pbi": 280,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.5"],
@@ -4290,6 +4597,7 @@
       "native_baseline": "An invoice mechanism selected in #280.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OD-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4303,6 +4611,7 @@
       "context_ids": [],
       "excluded_ids": ["ADM-156"],
       "owner_pbi": 280,
+      "build_pbi": 280,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.5"],
@@ -4325,6 +4634,7 @@
       "native_baseline": "A packing slip mechanism selected in #280. One order at a time.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4338,6 +4648,7 @@
       "context_ids": ["ADM-89", "SHIP-08"],
       "excluded_ids": ["SHIP-10", "SHIP-11", "SHIP-18"],
       "owner_pbi": 291,
+      "build_pbi": 291,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.6"],
@@ -4362,6 +4673,7 @@
       "native_baseline": "The official Bosta integration for WooCommerce.",
       "design_freedom": "annotate_only",
       "open_items": ["VENDOR-BOSTA"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4375,6 +4687,7 @@
       "context_ids": ["SHIP-17", "ORD-13"],
       "excluded_ids": [],
       "owner_pbi": 291,
+      "build_pbi": 291,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.7"],
@@ -4397,6 +4710,7 @@
       "native_baseline": "None. The official plugin stores the carrier state and does not change the order status (probe P-012, DECISIONS.md, 9 September 2026).",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4410,6 +4724,7 @@
       "context_ids": ["ORD-14", "PAY-19"],
       "excluded_ids": [],
       "owner_pbi": 291,
+      "build_pbi": 291,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S02.8"],
@@ -4433,6 +4748,7 @@
       "native_baseline": "None.",
       "design_freedom": "constrained",
       "open_items": ["OD-05", "OD-20"],
+      "decisions": ["DQ-05"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4446,6 +4762,7 @@
       "context_ids": ["RET-08", "PAY-07", "PAY-08", "PAY-17", "ADM-91", "BR-006"],
       "excluded_ids": ["ADM-120", "ADM-121", "ADM-122", "ADM-123", "RET-04"],
       "owner_pbi": 293,
+      "build_pbi": 293,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S03.1"],
@@ -4470,6 +4787,7 @@
       "native_baseline": "The standard WooCommerce refund panel.",
       "design_freedom": "annotate_only",
       "open_items": ["CX-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4483,6 +4801,7 @@
       "context_ids": ["ADM-100"],
       "excluded_ids": [],
       "owner_pbi": 279,
+      "build_pbi": 279,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.3"],
@@ -4506,6 +4825,7 @@
       "native_baseline": "None on the standard customer screen.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4519,6 +4839,7 @@
       "context_ids": ["ADM-100"],
       "excluded_ids": ["ADM-102"],
       "owner_pbi": 279,
+      "build_pbi": 279,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.3"],
@@ -4542,6 +4863,7 @@
       "native_baseline": "None on the standard customer screen.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4555,6 +4877,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": "E-ADM-6b",
+      "build_pbi": "E-ADM-6b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -4576,9 +4899,11 @@
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
       "native_baseline": "WooCommerce Analytics customers report.",
       "design_freedom": "annotate_only",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "ad-promotion-editor",
@@ -4593,6 +4918,7 @@
       ],
       "excluded_ids": ["PROMO-10", "PROMO-16", "PROMO-17", "PROMO-20", "PROMO-21", "PROMO-22", "ADM-112", "ADM-114"],
       "owner_pbi": 289,
+      "build_pbi": 289,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S05.1"],
@@ -4618,6 +4944,7 @@
       "native_baseline": "The standard WooCommerce coupon screen. Conditions it lacks are added.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4631,6 +4958,7 @@
       "context_ids": ["FIX-06", "FIX-07", "FIX-08"],
       "excluded_ids": [],
       "owner_pbi": 290,
+      "build_pbi": 290,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S05.2"],
@@ -4655,6 +4983,7 @@
       "native_baseline": "None.",
       "design_freedom": "constrained",
       "open_items": ["OD-03", "OD-04"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4668,6 +4997,7 @@
       "context_ids": ["SSC-06", "SSC-24"],
       "excluded_ids": ["ADM-58"],
       "owner_pbi": 282,
+      "build_pbi": 282,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S05.3"],
@@ -4690,6 +5020,7 @@
       "native_baseline": "WooCommerce product sorting.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4703,6 +5034,7 @@
       "context_ids": ["ADM-42", "SSC-22", "PLP-01"],
       "excluded_ids": [],
       "owner_pbi": 282,
+      "build_pbi": 282,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -4727,11 +5059,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
         "notes": "Badge position mirrors. Badge text is translated."
       },
       "native_baseline": "WooCommerce shows a sale badge only.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4745,6 +5079,7 @@
       "context_ids": ["FIX-03"],
       "excluded_ids": [],
       "owner_pbi": 282,
+      "build_pbi": 250,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -4764,14 +5099,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Cannot be met in a neutral wireframe. It is applied through tokens once the brand identity is supplied."
+      "note": "Cannot be met in a neutral wireframe. It is applied through tokens once the brand identity is supplied.",
+      "build_note": "MER-06 and MER-07 are accepted by #282. The treatment itself is produced by the interface design, #250, and applied through tokens."
     },
     {
       "id": "ad-staff-log",
@@ -4783,6 +5121,7 @@
       "context_ids": [],
       "excluded_ids": ["ROLE-10", "ADM-125"],
       "owner_pbi": 275,
+      "build_pbi": 275,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.2"],
@@ -4808,6 +5147,7 @@
       "native_baseline": "None in the standard administration.",
       "design_freedom": "constrained",
       "open_items": ["CX-03"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes."
@@ -4822,6 +5162,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 275,
+      "build_pbi": 275,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.1"],
@@ -4846,6 +5187,7 @@
       "native_baseline": "A two-factor mechanism selected in #275.",
       "design_freedom": "annotate_only",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4859,6 +5201,7 @@
       "context_ids": ["ROLE-07", "ROLE-08", "ADM-91"],
       "excluded_ids": ["ROLE-03", "ROLE-04", "ROLE-05", "ROLE-06", "ROLE-06a"],
       "owner_pbi": 251,
+      "build_pbi": 251,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S03.2"],
@@ -4881,6 +5224,7 @@
       "native_baseline": "WordPress capability checks.",
       "design_freedom": "annotate_only",
       "open_items": ["CX-01", "CX-02"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4894,6 +5238,7 @@
       "context_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27"],
       "excluded_ids": [],
       "owner_pbi": 287,
+      "build_pbi": 287,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.5"],
@@ -4917,6 +5262,7 @@
       "native_baseline": "None in the standard administration. Spec 003 already emits the canonical link and the description, each behind a filter these controls can feed.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4930,6 +5276,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 287,
+      "build_pbi": 287,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.5"],
@@ -4954,6 +5301,7 @@
       "native_baseline": "None.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4967,6 +5315,7 @@
       "context_ids": ["MKT-13"],
       "excluded_ids": [],
       "owner_pbi": 287,
+      "build_pbi": 287,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.5"],
@@ -4990,6 +5339,7 @@
       "native_baseline": "None.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5003,6 +5353,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 287,
+      "build_pbi": 287,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.6"],
@@ -5025,6 +5376,7 @@
       "native_baseline": "WordPress core sitemap and robots output, with settings added.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5038,6 +5390,7 @@
       "context_ids": ["ERP-07", "ADM-34", "ERP-01"],
       "excluded_ids": [],
       "owner_pbi": 317,
+      "build_pbi": 317,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S01.3"],
@@ -5060,6 +5413,7 @@
       "native_baseline": "The standard WooCommerce product stock fields.",
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "per PRE-09",
       "status": "inventoried",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
@@ -5074,6 +5428,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": "E-NOTF-1b",
+      "build_pbi": "E-NOTF-1b",
       "stage": "S2",
       "route": null,
       "flow_steps": [],
@@ -5096,9 +5451,11 @@
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
       "native_baseline": "WooCommerce email settings.",
       "design_freedom": "constrained",
-      "open_items": ["DQ-04"],
+      "open_items": [],
+      "decisions": ["DQ-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "inventoried",
+      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
     },
     {
       "id": "rp-sales",
@@ -5110,6 +5467,7 @@
       "context_ids": [],
       "excluded_ids": ["RPT-02", "RPT-03", "RPT-04", "RPT-05", "RPT-06", "RPT-07", "ROLE-06a"],
       "owner_pbi": 286,
+      "build_pbi": 286,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.7"],
@@ -5134,6 +5492,7 @@
       "native_baseline": "WooCommerce Analytics revenue and orders reports.",
       "design_freedom": "annotate_only",
       "open_items": ["CX-01"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5147,6 +5506,7 @@
       "context_ids": ["ADM-10", "ADM-11", "ERP-01"],
       "excluded_ids": ["RPT-03", "ADM-142"],
       "owner_pbi": 246,
+      "build_pbi": 246,
       "stage": "S1",
       "route": null,
       "flow_steps": ["S06.7"],
@@ -5171,6 +5531,7 @@
       "native_baseline": "WooCommerce Analytics stock report, corrected in place so one physical item is counted once (spec 004).",
       "design_freedom": "annotate_only",
       "open_items": ["PRE-09"],
+      "decisions": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -5184,6 +5545,7 @@
       "context_ids": ["NOTF-14"],
       "excluded_ids": ["INT-03", "INT-06", "INT-07"],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": [],
@@ -5204,11 +5566,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce email template.",
       "design_freedom": "constrained",
       "open_items": ["OD-01", "OD-18"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Sent in the language the customer used. Email only at launch."
@@ -5223,6 +5587,7 @@
       "context_ids": ["AUTH-05", "AUTH-06", "BR-001"],
       "excluded_ids": [],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.3"],
@@ -5243,11 +5608,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce new-account email. Verification is added.",
       "design_freedom": "constrained",
       "open_items": ["OD-03"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5263,6 +5630,7 @@
       "context_ids": ["JRN-08", "BR-005", "AUTH-07"],
       "excluded_ids": [],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F12.2"],
@@ -5285,11 +5653,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce processing-order email.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5305,6 +5675,7 @@
       "context_ids": ["ORD-02"],
       "excluded_ids": [],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F11.5"],
@@ -5324,11 +5695,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "To be settled in the Native coverage table of #285: whether the standard store sends the customer a failed-payment email.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5344,6 +5717,7 @@
       "context_ids": ["ORD-05", "SHIP-03", "SHIP-09"],
       "excluded_ids": ["NOTF-05"],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F13.3"],
@@ -5363,11 +5737,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5383,6 +5759,7 @@
       "context_ids": ["REV-05", "ORD-07"],
       "excluded_ids": [],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F13.6", "F15.1"],
@@ -5402,11 +5779,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce completed-order email.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5422,6 +5801,7 @@
       "context_ids": ["RET-08", "ORD-12"],
       "excluded_ids": ["NOTF-07"],
       "owner_pbi": 285,
+      "build_pbi": 285,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F15.5", "S03.3"],
@@ -5442,11 +5822,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "The standard WooCommerce refunded-order email, as the register names it.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5462,6 +5844,7 @@
       "context_ids": ["AUTH-16"],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.7"],
@@ -5481,11 +5864,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce reset-password email.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5501,6 +5886,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": 305,
+      "build_pbi": 305,
       "stage": "S1",
       "route": null,
       "flow_steps": ["F08.5"],
@@ -5520,11 +5906,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5540,6 +5928,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": 285,
       "stage": null,
       "route": null,
       "flow_steps": [],
@@ -5563,9 +5952,11 @@
       "native_baseline": "WooCommerce staff emails.",
       "design_freedom": "annotate_only",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable."
+      "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable.",
+      "build_note": "No row and no accepting PBI. Sent by the platform inside the shared email layout, which #285 builds."
     },
     {
       "id": "sy-404",
@@ -5577,6 +5968,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": 253,
       "stage": null,
       "route": null,
       "route_note": "Any address that resolves to nothing, in each language.",
@@ -5597,14 +5989,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Block theme 404 template.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope."
+      "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope.",
+      "build_note": "No row and no accepting PBI. A theme template of the frame, built with #253."
     },
     {
       "id": "sy-maintenance",
@@ -5616,6 +6011,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": [],
@@ -5636,11 +6032,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WordPress maintenance mode and the server's own error page.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable."
@@ -5655,6 +6053,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": [],
@@ -5677,11 +6076,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce store notices.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message."
@@ -5696,6 +6097,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F14.2"],
@@ -5716,11 +6118,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "WooCommerce account access checks.",
       "design_freedom": "constrained",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen."
@@ -5735,6 +6139,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "route_note": "Shown in place of the storefront before launch, in each language.",
@@ -5755,11 +6160,13 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "CoreX coming-soon mode (from v0.43.0) and WooCommerce's own coming-soon page.",
       "design_freedom": "free",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14)."
@@ -5774,6 +6181,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": 244,
       "stage": null,
       "route": null,
       "flow_steps": [],
@@ -5793,14 +6201,17 @@
         "does_not_mirror": [
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
-        ]
+        ],
+        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
       },
       "native_baseline": "Built in spec 005.",
       "design_freedom": "annotate_only",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable."
+      "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable.",
+      "build_note": "No row and no accepting PBI. Already built with the staging environment, #244."
     },
     {
       "id": "pv-paymob-card",
@@ -5812,6 +6223,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F11.2"],
@@ -5829,6 +6241,7 @@
       "native_baseline": "Paymob.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "The provider's hosted and tokenised step. No card data reaches the store. Document the handoff, loading, failure, return and success on our side (ck-payment-handoff, ck-payment-failed, ck-order-received). Do not redesign it."
@@ -5843,6 +6256,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F11.2"],
@@ -5860,6 +6274,7 @@
       "native_baseline": "Paymob.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "The provider's wallet step, offered only if selected and approved for the merchant account. Our side is the same handoff and return as for cards."
@@ -5874,6 +6289,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F08.6"],
@@ -5891,6 +6307,7 @@
       "native_baseline": "Google.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "Google's own screens. Our side is the entry button and the return (au-google-entry)."
@@ -5905,6 +6322,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F13.4"],
@@ -5922,6 +6340,7 @@
       "native_baseline": "Bosta.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "Where a tracking number links out, the page is the carrier's. Our side is the status shown on the order and on the tracking page."
@@ -5936,6 +6355,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["S06.8"],
@@ -5957,6 +6377,7 @@
       "native_baseline": "Google Analytics 4.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "RPT-08 and RPT-09 are met in Google Analytics, in the client's own account. No report screen is built or designed in the store."
@@ -5971,6 +6392,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F15.4"],
@@ -5988,6 +6410,7 @@
       "native_baseline": "WhatsApp.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "The click-to-chat link (CMS-10) opens WhatsApp. Our side is the link."
@@ -6002,6 +6425,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": ["F04.7"],
@@ -6019,6 +6443,7 @@
       "native_baseline": "The service shared to, or the device's share sheet.",
       "design_freedom": "none",
       "open_items": [],
+      "decisions": [],
       "erp_dependency": "none",
       "status": "not_designed",
       "scope_note": "The share buttons (PDP-21) open another service's dialog. Our side is the buttons."

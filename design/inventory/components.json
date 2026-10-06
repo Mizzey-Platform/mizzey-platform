@@ -10,7 +10,7 @@
       "states": [],
       "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page", "em-shell"],
       "brand": "neutral",
-      "note": "Roles, not faces: display, heading, body, label, caption, numeric. One neutral system typeface per script until the brand identity arrives. Arabic and Latin are sized as separate roles because their proportions differ."
+      "note": "Roles, not faces: display, heading, body, label, caption, numeric. One neutral system typeface per script until the brand identity arrives. Arabic and Latin are sized as separate roles because their proportions differ. Numerals are Western digits 0 to 9 in both languages (DQ-01)."
     },
     {
       "id": "fn-spacing",

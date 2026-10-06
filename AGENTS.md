@@ -25,7 +25,7 @@ client, then storefront implementation.
 
 - **`design/` is the UX source of truth.** Read [design/README.md](design/README.md) before any design work. Its
   authority order governs: the signed documents first, Option C material last and never as scope.
-- **No wireframe is drawn until Mustafa has reviewed `design/coverage.md`.** Low-fidelity wireframes are design
+- **No wireframe is drawn until Mustafa approves the start of the wireframe pass.** Low-fidelity wireframes are design
   artefacts in `design/`. They are not built in `mizzey-theme/`, and nothing is implemented in the theme before
   the contracted working HTML and CSS stage.
 - **Nothing committed is approved UI or UX.** The plugin is technical foundation and the theme is a scaffold.

@@ -13,8 +13,8 @@ that work is prepared, and it changes no contract term.
 | Step | State |
 |---|---|
 | 1. Signed scope and PBIs | Done. Register MS-ANX-2026-006 version 1.5, and `docs/scope/` |
-| 2. Complete inventory of surfaces, flows and states | **This folder. Awaiting the owner's review of `coverage.md`** |
-| 3. Low-fidelity structural wireframes | Not started. The first is drawn only after step 2 is approved |
+| 2. Complete inventory of surfaces, flows and states | **This folder.** Reported in `coverage.md` |
+| 3. Low-fidelity structural wireframes | Not started. The first is drawn only when the owner approves the start of the wireframe pass |
 | 4. Brand identity received | Waiting on the client (OD-01) |
 | 5. High-fidelity UI and UX | Not started |
 | 6. The contracted working HTML and CSS design, approved by the client | Not started. This is PRE-03b |
@@ -65,7 +65,7 @@ folder.**
 | `inventory/surfaces.json` | **The spine.** One record for each thing that needs design, and the delivery rows that have no surface |
 | `inventory/flows.json` | The journeys as ordered steps, each pointing at surfaces |
 | `inventory/components.json` | The structural component inventory, and the curated section library |
-| `inventory/placeholders.json` | Every open decision that affects design, with its neutral placeholder rule |
+| `inventory/placeholders.json` | Every open decision that affects design, with its neutral placeholder rule, and the design questions the owner has decided |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
 | `briefs/` | Empty. One brief per surface, generated when wireframing is approved |
 | `wireframes/` | Empty. Low-fidelity wireframes, after the coverage review |
@@ -85,7 +85,8 @@ a validation message, a report or an addition to an admin screen is each its own
 | `register_ids` | The exact delivery rows this surface is drawn for. Every one is owned by `owner_pbi`. Never a range |
 | `context_ids` | Delivery rows another PBI owns that shape this surface |
 | `excluded_ids` | Neighbouring rows that are deferred, later-phase or out. **What must not be drawn here** |
-| `owner_pbi` | The PBI that accepts the surface's rows: an issue number, or a slice key for a second-release slice |
+| `owner_pbi` | The PBI that **accepts** the surface's rows: an issue number, or a slice key for a second-release slice |
+| `build_pbi` | The PBI that **builds** the visible surface. Usually the same PBI. See below |
 | `stage` | The contractual stage of its rows. Computed, never chosen |
 | `route` | The English and Arabic address, from the URL map, where the surface has one |
 | `flow_steps` | The steps of `flows.json` that pass through it. Derived |
@@ -96,11 +97,25 @@ a validation message, a report or an addition to an admin screen is each its own
 | `native_baseline` | What WordPress, WooCommerce or a selected integration already renders |
 | `design_freedom` | `free`, `constrained` by a platform block, `annotate_only`, or `none` |
 | `open_items` | Ids in `placeholders.json` that this surface waits on |
+| `decisions` | Owner design decisions in `placeholders.json` that govern this surface |
 | `erp_dependency` | `none`, `partial`, or `per PRE-09` |
 | `status` | `inventoried`, `briefed`, `wireframed`, `reviewed`, `branded`, `approved`, or `not_designed` |
 | `composes` | Other surfaces this one contains |
 | `scope_note` | Why a surface outside contracted scope exists |
-| `build_note` | A finding about which PBI builds the screen. Reported, not acted on |
+| `build_note` | Why the build PBI is not the accepting PBI. Present only where they differ |
+
+## Two PBIs behind one surface
+
+Accepting a row and building its screen are two different facts, and a surface records both.
+
+- **`owner_pbi` accepts.** It is the PBI that owns the surface's register rows in
+  `docs/scope/backlog-ownership.json`: one row, one accepting PBI. This folder never changes it.
+- **`build_pbi` builds.** It is the PBI that implements or integrates the visible surface.
+
+They are usually the same PBI. Where they differ, `build_note` says why and `coverage.md` lists the surface. The
+order confirmation is the plain case: its page row IA-10 is accepted by #242 as the route, and the screen is
+built with the checkout, #255. No row moves owner to make this convenient. Design dependency is read on
+`build_pbi`. A surface no PBI builds is a provider's interface or a platform screen the owner has not placed.
 
 ## Scope type
 
@@ -119,7 +134,24 @@ presented to anyone as contracted scope. The 404 page is `native_required`. Comi
 loading, failure, return and success around it.
 
 **Second-release rows are contracted and staged S2.** Their surfaces are inventoried and marked S2. They are not
-built in the first release, and whether they are drawn in the first design is an open question (DQ-04).
+built in the first release and are not wireframed in the Stage 1 pass. Where each attaches is kept free, so the
+first-release structure does not prevent the later work (DQ-04).
+
+## Owner design decisions
+
+Seven questions no source answered were decided by the owner in D-14. They are in
+`inventory/placeholders.json` under `owner_design_decisions`, and each surface they govern cites them in
+`decisions`. **They are owner design decisions: not client confirmations, and not scope additions.**
+
+| Id | Decision |
+|---|---|
+| DQ-01 | Western digits 0 to 9 in both languages. No Arabic-Indic digits unless the client asks |
+| DQ-02 | Numbered pagination. No infinite scroll |
+| DQ-03 | One checkout page in clear sections, with the review before Place Order. No wizard |
+| DQ-04 | S2 surfaces stay inventoried and are not wireframed in the S1 pass |
+| DQ-05 | Cash collected and remitted is a staff state. The customer sees Delivered |
+| DQ-06 | A signed-in customer may review. No verified-purchase requirement or badge |
+| DQ-07 | Accept, Decline and Preferences, within what the consent tool selected in #288 supports |
 
 ## Rules for whoever designs
 
@@ -137,10 +169,10 @@ built in the first release, and whether they are drawn in the first design is an
 7. **Do not design a provider's interface.**
 8. **English is the canonical design. Arabic is the same design mirrored**, never a second layout. Every
    customer-facing surface is drawn in both. Numerals, prices, imagery and logos do not mirror. Directional icons
-   do.
+   do. Numerals are Western digits in both languages (DQ-01).
 9. **Mobile first**, then tablet and desktop.
 10. **A contradiction is escalated, not resolved.** The open points are in `placeholders.json`. A new one is
-    reported to the owner.
+    reported to the owner, who decides it. A designer does not.
 
 ## The administration is not redesigned
 

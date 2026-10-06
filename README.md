@@ -3,8 +3,9 @@
 A bilingual (English primary, Arabic fully supported, right to left) single-vendor store for Mizzey.com, built on
 WordPress and WooCommerce with the CoreX framework layer.
 
-**This repository is private and holds client confidential material.** Do not make it public, and do not add
-collaborators without the client's agreement.
+**This repository is temporarily public, for an owner-authorized external review period under D-08.**
+Client-confidential source documents remain outside the repository. Repository visibility must not be changed
+except by the owner, who decides when the review period ends.
 
 ---
 

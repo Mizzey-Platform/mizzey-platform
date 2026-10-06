@@ -70,8 +70,8 @@ wording governing where this summary differs:
 
 **Amended by D-14.** Low-fidelity structural wireframes are prepared as design artefacts first, in
 `design/wireframes/`. They are **not** built in `mizzey-theme/`, and nothing is implemented in the theme until
-the design reaches the contracted working HTML and CSS stage. The first wireframe is drawn only after the owner
-has reviewed `design/coverage.md`. A wireframe is not a client deliverable: PRE-03b says no separate wireframe
+the design reaches the contracted working HTML and CSS stage. The first wireframe is drawn only when the owner
+approves the start of the wireframe pass. A wireframe is not a client deliverable: PRE-03b says no separate wireframe
 stage is produced.
 
 | Rule | Reason |
@@ -182,7 +182,7 @@ this plan nor the inventory is one.**
 
 | What #250 needs to start structural work | State on 5 October 2026 |
 |---|---|
-| The surfaces to design, each with an owner and its exact rows | `design/inventory/surfaces.json`, with `design/coverage.md` awaiting the owner's review |
+| The surfaces to design, each with its exact rows, the PBI that accepts them and the PBI that builds it | `design/inventory/surfaces.json`, reported in `design/coverage.md` |
 | The pages, their addresses in both languages and the principal flows | `docs/pre-development/PRE-03a-sitemap-and-user-flows.md`, and the verified routes of #242 |
 | A place to see the work in both directions, in real browsers | The staging environment of #244, with its browser matrix runner |
 | Invented catalogue and order data to fill the screens | The staging seed |

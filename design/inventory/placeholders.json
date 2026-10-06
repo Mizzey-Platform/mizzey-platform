@@ -1,5 +1,5 @@
 {
-  "about": "Every open decision that affects design, with the neutral placeholder allowed now and what may not be assumed. affected_surfaces is derived from the open_items of surfaces.json and checked. An owner_reading or a working_default is the owner's, never a client confirmation.",
+  "about": "Every open decision that affects design, with the neutral placeholder allowed now and what may not be assumed, and the design questions the owner has decided. affected_surfaces is derived from surfaces.json and checked. An owner_reading, a working_default or an owner design decision is the owner's, never a client confirmation.",
   "kinds": {
     "client_decision": "An open decision of the register, Part Six. The client's.",
     "working_default": "An open client decision with an owner working default (docs/scope/open-items.json). Not client-confirmed.",
@@ -7,8 +7,7 @@
     "erp": "Waits for the ERP Integration Specification.",
     "owner_reading": "A contradiction in the register resolved by the owner. Not client-confirmed.",
     "vendor": "Waits for a provider account, sandbox or document.",
-    "open_point": "An open point of the sitemap companion, section 7.",
-    "design_question": "A question no source answers, found while building the inventory. Not yet decided by anyone."
+    "open_point": "An open point of the sitemap companion, section 7."
   },
   "placeholders": [
     {
@@ -395,86 +394,104 @@
       "must_not_assume": "No reservation timer or countdown.",
       "replaced_by": "PRE-09.",
       "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
-    },
+    }
+  ],
+  "owner_design_decisions_about": "Design questions no source answered, found while building the inventory and decided by the owner on 6 October 2026 (DECISIONS.md D-14). Owner design decisions: not client confirmations, and not scope additions. They are settled, and no surface waits on one.",
+  "owner_design_decisions": [
     {
       "id": "DQ-01",
-      "kind": "design_question",
       "title": "Numerals in Arabic",
+      "question": "No source says whether Arabic pages show Western or Arabic-Indic digits.",
+      "decision": "Western digits 0 to 9 in both English and Arabic. Locale-aware currency, date and number formatting still follows the localisation requirements (NFR-04b).",
+      "must_not": "No Arabic-Indic digits, unless the client later asks for them explicitly.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
       "affected_surfaces": [],
-      "unknown": "No source says whether Arabic pages show Western or Arabic-Indic digits. NFR-04b asks for number formatting per locale and is owned by #269.",
-      "placeholder_allowed": "Western digits in both languages.",
-      "must_not_assume": "Do not treat this as decided.",
-      "replaced_by": "An owner decision with #269.",
-      "source": "Found while building this inventory"
+      "applies_to": "Every customer-facing surface."
     },
     {
       "id": "DQ-02",
-      "kind": "design_question",
-      "title": "Pagination or continued loading",
-      "affected_surfaces": ["sf-pagination"],
-      "unknown": "PLP-16 allows either.",
-      "placeholder_allowed": "Draw numbered pagination, which the platform provides.",
-      "must_not_assume": "Do not treat infinite scroll as required.",
-      "replaced_by": "A wireframe review decision.",
-      "source": "Found while building this inventory"
+      "title": "Pagination",
+      "question": "PLP-16 allows pagination or infinite scroll.",
+      "decision": "Numbered pagination.",
+      "must_not": "No infinite scroll in the Stage 1 structural design.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["sf-pagination"]
     },
     {
       "id": "DQ-03",
-      "kind": "design_question",
-      "title": "Checkout as one page or as steps",
-      "affected_surfaces": ["ck-checkout"],
-      "unknown": "JRN-07 lists an order of steps and CHK-05 asks for a review step. No source says whether they are separate screens.",
-      "placeholder_allowed": "One page in the listed order, with the review before Place Order, as the platform's checkout provides.",
-      "must_not_assume": "Do not design a multi-page checkout as if contracted.",
-      "replaced_by": "A wireframe review decision.",
-      "source": "Found while building this inventory"
+      "title": "Checkout structure",
+      "question": "JRN-07 lists an order of steps and CHK-05 asks for a review step. No source says whether they are separate screens.",
+      "decision": "One checkout page, divided into clear structural sections, with the review and order summary before Place Order.",
+      "must_not": "No multi-page checkout wizard.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["ck-checkout"]
     },
     {
       "id": "DQ-04",
-      "kind": "design_question",
-      "title": "Second-release screens in the first design",
+      "title": "Second-release screens",
+      "question": "The register stages some contracted rows S2. No source says whether their screens are drawn in the first design.",
+      "decision": "Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work.",
+      "must_not": "No S2 wireframe in the S1 pass, and no S1 layout that leaves the S2 surface nowhere to attach.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
       "affected_surfaces": [
         "sf-filter-by-rating", "sf-brand-landing", "ac-reorder", "ac-notification-preferences", "ac-account-deletion",
         "ad-dashboard-customers-conversion", "ad-customer-metrics-export", "ad-email-template-editor"
-      ],
-      "unknown": "The interface design covers every contracted storefront screen. The register stages some rows S2. No source says whether their screens are drawn in the first design.",
-      "placeholder_allowed": "Inventory them and mark them S2. Leave room where they attach, and do not draw them yet.",
-      "must_not_assume": "Do not build them in the first release.",
-      "replaced_by": "An owner decision before the low-fidelity wireframes are reviewed.",
-      "source": "Found while building this inventory"
+      ]
     },
     {
       "id": "DQ-05",
-      "kind": "design_question",
-      "title": "Whether the customer sees the cash-collected state",
-      "affected_surfaces": ["ord-status-labels"],
-      "unknown": "ORD-14 is a state for the store's books. No source says whether a customer sees it or sees Delivered.",
-      "placeholder_allowed": "Show it to staff. Show the customer Delivered.",
-      "must_not_assume": "Do not treat this as decided.",
-      "replaced_by": "An owner decision in #248.",
-      "source": "Found while building this inventory"
+      "title": "The cash-collected state",
+      "question": "ORD-14 is a state for the store's books. No source says whether a customer sees it.",
+      "decision": "Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state.",
+      "must_not": "The customer is never shown the carrier remittance or accounting state.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["ord-status-labels", "ad-cod-reconciliation"]
     },
     {
       "id": "DQ-06",
-      "kind": "design_question",
-      "title": "Who may write a review",
-      "affected_surfaces": ["rv-form"],
-      "unknown": "No row says whether a review needs an account or a purchase. Verified-purchase badges are not contracted.",
-      "placeholder_allowed": "A signed-in customer writes a review. A signed-out visitor is asked to sign in.",
-      "must_not_assume": "No verified-purchase badge (REV-07 is P2).",
-      "replaced_by": "An owner decision in #309.",
-      "source": "Found while building this inventory"
+      "title": "Review eligibility",
+      "question": "No row says whether a review needs an account or a purchase.",
+      "decision": "The Stage 1 design assumes a signed-in customer may submit a review.",
+      "must_not": "No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2).",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["rv-form"]
     },
     {
       "id": "DQ-07",
-      "kind": "design_question",
-      "title": "The consent tool",
-      "affected_surfaces": ["gl-cookie-consent"],
-      "unknown": "MKT-10 contracts a consent banner. The tool is selected in #288 and its banner has its own layout limits.",
-      "placeholder_allowed": "A neutral banner with accept, decline and preferences.",
-      "must_not_assume": "Do not draw a layout the selected tool cannot produce.",
-      "replaced_by": "The tool selection in #288.",
-      "source": "Found while building this inventory"
+      "title": "The consent banner",
+      "question": "MKT-10 contracts a consent banner. The tool is selected in #288 and has its own layout limits.",
+      "decision": "The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288.",
+      "must_not": "No third-party banner implementation is invented that the eventual tool cannot support.",
+      "decided_by": "owner",
+      "date": "2026-10-06",
+      "record": "DECISIONS.md D-14",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["gl-cookie-consent"]
     }
   ]
 }

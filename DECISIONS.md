@@ -1336,8 +1336,8 @@ no separate wireframe stage is produced, and the approved artefact is still the 
 **3. Low-fidelity structural wireframes are prepared as design artefacts first.** They are not built in
 `mizzey-theme/`, and nothing is implemented in the theme until the design reaches the contracted working HTML and
 CSS stage. This replaces section 3 of `docs/2026-10-05-structural-design-plan.md`, which had them built in the
-theme, and the matching sentence in #250. **No wireframe is drawn until the owner has reviewed the coverage
-report.**
+theme, and the matching sentence in #250. **No wireframe is drawn until the owner approves the start of the
+wireframe pass.**
 
 **4. The CoreX architecture stays as it is.** Mizzey remains its own repository. CoreX remains a separate
 framework repository. Mizzey uses a pinned, disposable CoreX checkout through `corex.lock` and
@@ -1383,12 +1383,36 @@ design authority, and `discovery/tasks/WIREFRAME.md` and `JOURNEY.md` must not d
 `scripts/` and the large historical documents stay where they are. Moving them, for example to
 `history/option-c/`, is a separate housekeeping task for after the design source of truth is stable.
 
-**Applied, 6 October 2026, in one `internal:governance` PR, shown to the owner before merge.** `design/` holds
-the authority order, `sources.json`, and the inventory: 154 surfaces, 22 flows, 72 components and 41 open design
-inputs. `tools/design_inventory.py` checks it against the register mirror and PBI ownership and writes
-`design/coverage.md`: of the 595 delivery rows, 409 are design-relevant and are carried by a surface, 186 are
-marked as having no surface with a reason, and none is unaccounted for. `PATH_POLICY`, `CONTRIBUTING.md`,
-`AGENTS.md`, the structural design plan, the two Option C task templates and `scripts/README.md` are amended.
-No wireframe, brief or token is created, no theme or plugin file is touched, the CoreX pin is unchanged, and no
-PBI ownership or design-dependency field is altered: where the inventory and
-`docs/scope/backlog-ownership.json` disagree, the coverage report lists it for the owner.
+**11. Accepting a row and building its screen are two facts, and both are recorded.** The one-row,
+one-accepting-PBI model does not change, and no row moves owner to make the design model convenient. A surface
+record carries `owner_pbi`, the PBI that accepts its register rows, and `build_pbi`, the PBI that implements the
+visible surface. They are usually the same. Where they differ the surface says why, and the coverage report lists
+it. The order confirmation is accepted through IA-10 by #242 and built with the checkout, #255. The brand page is
+built by #303, while #277 and #311 own the admin and editing rows that shape it. Design dependency is read on the
+PBI that builds. The eighteen PBIs that build only additions to the standard administration stay marked as having
+no design dependency: the additions stay inventoried and annotated and are not made dependent on PRE-03b.
+`docs/scope/backlog-ownership.json` is not changed by this decision.
+
+**12. The seven design questions the inventory raised are decided.** These are owner design decisions. They are
+not client confirmations and they add no scope.
+
+| Id | Question | Decision |
+|---|---|---|
+| DQ-01 | Numerals in Arabic | Western digits 0 to 9 in both English and Arabic. Locale-aware currency, date and number formatting still follows the localisation requirements. Arabic-Indic digits are not introduced unless the client later asks for them explicitly |
+| DQ-02 | Pagination | Numbered pagination. No infinite scroll in the Stage 1 structural design |
+| DQ-03 | Checkout structure | One checkout page, divided into clear structural sections, with the review and order summary before Place Order. No multi-page checkout wizard |
+| DQ-04 | Second-release screens | Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work |
+| DQ-05 | The cash-collected state | Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state, never the carrier remittance or accounting state |
+| DQ-06 | Review eligibility | The Stage 1 design assumes a signed-in customer may submit a review. No verified purchase is required, and no verified-purchase badge is shown, because that requirement is not contracted |
+| DQ-07 | The consent banner | The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288, and no third-party banner implementation is invented that the eventual tool cannot support |
+
+**Status, 6 October 2026: proposed in PR #336, reviewed by the owner, pending merge. Not applied.** The path
+policy for `design/` is prepared separately in PR #337, because a PR may not authorise its own new top-level
+directory, and #336 is rebased onto it. #336 proposes: `design/` with the authority order, `sources.json` and the
+inventory (154 surfaces, 22 flows, 72 components, 34 open design inputs and the seven decisions above);
+`tools/design_inventory.py`, which checks the inventory against the register mirror and PBI ownership and writes
+`design/coverage.md` (of the 595 delivery rows, 409 are carried by a surface, 186 are marked as having no surface
+with a reason, and none is unaccounted for); and the amended `AGENTS.md`, structural design plan, `README.md`,
+the two Option C task templates and `scripts/README.md`. It creates no wireframe, brief or token, touches no theme
+or plugin file, leaves the CoreX pin unchanged, and alters no PBI ownership or design-dependency field. This entry
+is called applied only by a later record, made after #336 has merged.

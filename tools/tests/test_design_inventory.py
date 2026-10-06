@@ -47,6 +47,31 @@ class TheCommittedInventory(unittest.TestCase):
         committed = {p.suffix for p in (ROOT / "design").rglob("*") if p.is_file()}
         self.assertEqual(committed, {".md", ".json"})
 
+    def test_the_seven_design_questions_are_decided_and_none_is_left_open(self):
+        self.assertEqual([d["id"] for d in self.data["decisions"]], [f"DQ-0{n}" for n in range(1, 8)])
+        self.assertFalse([p["id"] for p in self.data["placeholders"] if p["id"].startswith("DQ-")])
+        self.assertFalse([s["id"] for s in self.data["surfaces"] if any(i.startswith("DQ-") for i in s["open_items"])])
+        for d in self.data["decisions"]:
+            self.assertEqual((d["decided_by"], d["client_confirmed"], d["adds_scope"]), ("owner", False, False), d["id"])
+
+    def test_second_release_surfaces_stay_inventoried_and_out_of_the_first_wireframe_pass(self):
+        second = [s for s in self.data["surfaces"] if s["stage"] == "S2"]
+        self.assertEqual(len(second), 8)
+        for s in second:
+            self.assertIn("DQ-04", s["decisions"], s["id"])
+            self.assertEqual(s["status"], "inventoried", s["id"])
+
+    def test_building_a_surface_elsewhere_leaves_its_rows_with_their_accepting_pbi(self):
+        own = di.owners(self.data["slices"])
+        differs = [s for s in self.data["surfaces"] if s["build_pbi"] not in (None, s["owner_pbi"])]
+        self.assertTrue(differs)
+        for s in differs:
+            self.assertTrue(s["build_note"], s["id"])
+            for r in s["register_ids"]:
+                self.assertEqual(own[r], s["owner_pbi"], f"{s['id']}: {r}")
+        received = next(s for s in self.data["surfaces"] if s["id"] == "ck-order-received")
+        self.assertEqual((received["owner_pbi"], received["build_pbi"]), (242, 255))
+
     def test_option_c_is_the_lowest_authority_and_is_named_as_history(self):
         last = max(self.data["sources"], key=lambda s: s["authority_rank"])
         self.assertEqual(last["id"], "OPTION-C")
@@ -55,11 +80,13 @@ class TheCommittedInventory(unittest.TestCase):
 
 def surface(**over) -> dict:
     s = {"id": "x-cart", "name": "Cart", "kind": "page", "scope_type": "contracted", "audience": ["customer"],
-         "register_ids": ["CART-01"], "context_ids": [], "excluded_ids": [], "owner_pbi": 306, "stage": "S1",
+         "register_ids": ["CART-01"], "context_ids": [], "excluded_ids": [], "owner_pbi": 306, "build_pbi": 306,
+         "stage": "S1",
          "route": None, "flow_steps": ["F1.1"], "acceptance": {"stories": [], "scenarios": [], "operations_checks": []},
          "states": [{"state": "default"}], "responsive": {"mobile": "a", "tablet": "b", "desktop": "c"},
          "rtl": {"applies": True, "mirrors": ["layout"], "does_not_mirror": ["numerals"]}, "native_baseline": "",
-         "design_freedom": "free", "open_items": [], "erp_dependency": "none", "status": "inventoried"}
+         "design_freedom": "free", "open_items": [], "decisions": [], "erp_dependency": "none",
+         "status": "inventoried"}
     s.update(over)
     return s
 
@@ -79,13 +106,22 @@ SLICES = [{"issue": 306, "key": "E-SF-6", "title": "Cart", "ids": ["CART-01", "C
           {"issue": 323, "key": "E-ACC-1", "title": "Scenarios", "ids": ["AC-01"], "design_dependency": "none"}]
 
 
-def inventory(*surfaces, no_surface=None, flows=None, components=None, placeholders=None) -> dict:
+def decision(**over) -> dict:
+    d = {"id": "DQ-02", "title": "Pagination", "question": "q", "decision": "d", "must_not": "n", "decided_by": "owner",
+         "date": "2026-10-06", "record": "DECISIONS.md D-14", "client_confirmed": False, "adds_scope": False,
+         "affected_surfaces": []}
+    d.update(over)
+    return d
+
+
+def inventory(*surfaces, no_surface=None, flows=None, components=None, placeholders=None, decisions=None) -> dict:
     return {"surfaces": list(surfaces),
             "no_surface": no_surface if no_surface is not None else
             {"behaviour": {"reason": "No screen.", "ids": ["CART-02", "PLP-11", "NAV-01", "AC-01"]}},
             "flows": flows if flows is not None else
             [{"id": "F1", "steps": [{"step": "F1.1", "surfaces": ["x-cart"], "register_ids": ["CART-01"]}]}],
-            "components": components or [], "placeholders": placeholders or [], "sources": [],
+            "components": components or [], "placeholders": placeholders or [], "decisions": decisions or [],
+            "sources": [],
             "ids": copy.deepcopy(IDS), "slices": SLICES}
 
 
@@ -117,17 +153,18 @@ class TheCheckerRefuses(unittest.TestCase):
         self.assertRefused(inventory(surface(register_ids=["CART-01", "NAV-01"])), "is owned by 253, not by 306")
 
     def test_a_surface_outside_scope_that_cites_a_row(self):
-        s = surface(scope_type="native_required", owner_pbi=None, scope_note="Every site has one.")
+        s = surface(scope_type="native_required", owner_pbi=None, build_pbi=None, scope_note="Every site has one.")
         self.assertRefused(inventory(s), "surfaces cite no register row")
 
     def test_a_surface_outside_scope_that_does_not_say_why_it_exists(self):
-        s = surface(scope_type="internal_operational", register_ids=[], stage=None, owner_pbi=None)
+        s = surface(scope_type="internal_operational", register_ids=[], stage=None, owner_pbi=None, build_pbi=None)
         self.assertRefused(inventory(s, no_surface={"behaviour": {"reason": "No screen.",
                                                                   "ids": ["CART-01", "CART-02", "PLP-11", "NAV-01", "AC-01"]}}),
                            "must say why they exist")
 
     def test_a_provider_surface_needs_no_reading_direction_of_ours(self):
-        s = surface(scope_type="provider_hosted", register_ids=[], stage=None, owner_pbi=None, scope_note="Theirs.",
+        s = surface(scope_type="provider_hosted", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
+                    scope_note="Theirs.",
                     rtl={"applies": False, "reason": "The provider's."})
         data = inventory(s, no_surface={"behaviour": {"reason": "No screen.",
                                                       "ids": ["CART-01", "CART-02", "PLP-11", "NAV-01", "AC-01"]}})
@@ -183,10 +220,75 @@ class TheCheckerRefuses(unittest.TestCase):
         self.assertEqual(di.classify_rows(data)["AC-01"]["how"], "via_surface")
 
     def test_a_missing_design_dependency_is_reported_and_not_an_error(self):
-        s = surface(id="x-header", register_ids=["NAV-01"], owner_pbi=253, flow_steps=[])
+        s = surface(id="x-header", register_ids=["NAV-01"], owner_pbi=253, build_pbi=253, flow_steps=[])
         data = inventory(surface(), s, no_surface={"behaviour": {"reason": "No screen.", "ids": ["CART-02", "PLP-11", "AC-01"]}})
         self.assertEqual(self.errors(data), [])
-        self.assertEqual([k for k, _, _ in di.dependency_findings(data)["missing"]], [253])
+        self.assertEqual([c[0] for c in di.dependency_findings(data)["missing"]], [253])
+
+    # Accepting ownership and build responsibility are two facts
+    HEADER = {"behaviour": {"reason": "No screen.", "ids": ["CART-02", "PLP-11", "AC-01"]}}
+
+    def test_a_surface_may_be_built_by_another_pbi_when_it_says_why(self):
+        s = surface(id="x-header", register_ids=["NAV-01"], owner_pbi=253, build_pbi=306, flow_steps=[],
+                    build_note="The header row is accepted by #253 and the screen is built with the cart.")
+        data = inventory(surface(), s, no_surface=self.HEADER)
+        self.assertEqual(self.errors(data), [])
+        f = di.dependency_findings(data)
+        self.assertEqual([x["id"] for x in f["differs"]], ["x-header"])
+        self.assertEqual(f["missing"], [], "the design dependency is read on the PBI that builds, not the one that accepts")
+
+    def test_building_elsewhere_moves_no_row(self):
+        s = surface(id="x-header", register_ids=["NAV-01"], owner_pbi=306, build_pbi=306, flow_steps=[])
+        self.assertRefused(inventory(surface(), s, no_surface=self.HEADER), "NAV-01 is owned by 253, not by 306")
+
+    def test_a_different_build_pbi_without_a_reason(self):
+        s = surface(id="x-header", register_ids=["NAV-01"], owner_pbi=253, build_pbi=306, flow_steps=[])
+        self.assertRefused(inventory(surface(), s, no_surface=self.HEADER), "say why in build_note")
+
+    def test_a_build_note_where_nothing_differs(self):
+        self.assertRefused(inventory(surface(build_note="x")), "build_note is for a build PBI that differs")
+
+    def test_a_build_pbi_that_is_not_a_pbi(self):
+        self.assertRefused(inventory(surface(build_pbi=999, build_note="x")), "build_pbi 999 is not a PBI")
+
+    def test_a_contracted_surface_nobody_builds(self):
+        self.assertRefused(inventory(surface(build_pbi=None)), "no PBI builds it")
+
+    def test_staff_additions_do_not_raise_a_design_dependency(self):
+        s = surface(id="x-admin", register_ids=["NAV-01"], owner_pbi=253, build_pbi=253, flow_steps=[], audience=["staff"],
+                    rtl={"applies": False, "reason": "English only."})
+        f = di.dependency_findings(inventory(surface(), s, no_surface=self.HEADER))
+        self.assertEqual(f["missing"], [])
+        self.assertEqual([k for k, _, _ in f["staff_only"]], [253])
+
+    # Owner design decisions
+    def test_a_surface_may_cite_an_owner_design_decision(self):
+        data = inventory(surface(decisions=["DQ-02"]), decisions=[decision(affected_surfaces=["x-cart"])])
+        self.assertEqual(self.errors(data), [])
+
+    def test_a_decision_nobody_recorded(self):
+        self.assertRefused(inventory(surface(decisions=["DQ-02"])), "is not an owner design decision")
+
+    def test_a_decided_question_left_open_on_a_surface(self):
+        data = inventory(surface(open_items=["DQ-02"]), decisions=[decision()])
+        self.assertRefused(data, "open item DQ-02 has no entry in placeholders.json")
+
+    def test_a_decision_recorded_as_a_client_confirmation(self):
+        data = inventory(surface(), decisions=[decision(client_confirmed=True)])
+        self.assertRefused(data, "is not a client confirmation and adds no scope")
+
+    def test_a_decision_recorded_as_added_scope(self):
+        data = inventory(surface(), decisions=[decision(adds_scope=True)])
+        self.assertRefused(data, "is not a client confirmation and adds no scope")
+
+    def test_a_decision_that_is_also_an_open_placeholder(self):
+        p = {"id": "DQ-02", "affected_surfaces": [], "unknown": "a", "placeholder_allowed": "b", "must_not_assume": "c",
+             "replaced_by": "d"}
+        self.assertRefused(inventory(surface(), placeholders=[p], decisions=[decision()]), "a decided question is not open")
+
+    def test_a_decision_whose_surfaces_drifted(self):
+        data = inventory(surface(decisions=["DQ-02"]), decisions=[decision()])
+        self.assertRefused(data, "decision DQ-02: affected_surfaces differs")
 
 
 if __name__ == "__main__":

@@ -10,12 +10,21 @@ What it fails on:
 - A `contracted` surface with no delivery row, with a row that creates no obligation (DEF, P2, P3, OUT), or with a
   row its `owner_pbi` does not own.
 - A surface that is not `contracted` and still cites a register row, or does not say why it exists.
+- A `build_pbi` that is not a PBI, a contracted surface with none, or a build PBI that differs from the accepting
+  PBI without a `build_note` saying why.
+- A decision id on a surface that is not an owner design decision, or a decision recorded as a client confirmation
+  or as added scope.
 - A flow step, a component, a placeholder or a `composes` entry that points at a surface that does not exist.
 - A customer-facing surface that does not account for both reading directions.
 - A row whose wording names an email and that no email surface carries.
 - A delivery row that is neither on a surface nor marked `no_surface` with a reason, or that is marked both.
-- Derived fields that have drifted: `stage`, `flow_steps`, a placeholder's `affected_surfaces`.
+- Derived fields that have drifted: `stage`, `flow_steps`, the `affected_surfaces` of a placeholder or a decision.
 - A `design/coverage.md` that is not what this tool would write.
+
+Two PBIs can stand behind one surface, and they are kept apart. `owner_pbi` is the PBI that accepts the surface's
+register rows: one row, one accepting PBI, as `docs/scope/backlog-ownership.json` has it. `build_pbi` is the PBI
+that implements the visible surface. They are usually the same. Where they differ, nothing moves in the ownership
+file: the surface says so, and the report lists it.
 
 What it cannot check: whether a surface is the right reading of the wording of its rows. That is a review
 judgement, made against the signed register.
@@ -42,8 +51,8 @@ FREEDOM = ("free", "constrained", "annotate_only", "none")
 STATUSES = ("inventoried", "briefed", "wireframed", "reviewed", "branded", "approved", "not_designed")
 ERP = ("none", "partial", "per PRE-09")
 FIELDS = ("id", "name", "kind", "scope_type", "audience", "register_ids", "context_ids", "excluded_ids", "owner_pbi",
-          "stage", "route", "flow_steps", "acceptance", "states", "responsive", "rtl", "native_baseline",
-          "design_freedom", "open_items", "erp_dependency", "status")
+          "build_pbi", "stage", "route", "flow_steps", "acceptance", "states", "responsive", "rtl", "native_baseline",
+          "design_freedom", "open_items", "decisions", "erp_dependency", "status")
 STAGES = {"S1": "S1", "S2": "S2", "-": "per PRE-09"}
 # Rows whose register wording names an email. Each must be carried by a surface of kind `email`.
 EMAIL_ROWS = ("NOTF-01", "NOTF-02", "NOTF-03", "NOTF-04", "NOTF-06", "NOTF-08", "AUTH-04", "AUTH-05", "AUTH-12",
@@ -56,12 +65,14 @@ def load(root: Path) -> dict:
         return json.loads(root.joinpath(*parts).read_text(encoding="utf-8"))
 
     surfaces = read("design", "inventory", "surfaces.json")
+    placeholders = read("design", "inventory", "placeholders.json")
     return {
         "surfaces": surfaces["surfaces"],
         "no_surface": surfaces["no_surface"],
         "flows": read("design", "inventory", "flows.json")["flows"],
         "components": read("design", "inventory", "components.json")["components"],
-        "placeholders": read("design", "inventory", "placeholders.json")["placeholders"],
+        "placeholders": placeholders["placeholders"],
+        "decisions": placeholders["owner_design_decisions"],
         "sources": read("design", "sources.json")["sources"],
         "ids": read("docs", "scope", "register-ids.json")["ids"],
         "slices": read("docs", "scope", "backlog-ownership.json")["slices"],
@@ -95,6 +106,19 @@ def affected(surfaces: list[dict]) -> dict[str, list[str]]:
         for item in s["open_items"]:
             out.setdefault(item, []).append(s["id"])
     return out
+
+
+def ruled(surfaces: list[dict]) -> dict[str, list[str]]:
+    """Owner design decision -> the surfaces it governs."""
+    out: dict[str, list[str]] = {}
+    for s in surfaces:
+        for item in s["decisions"]:
+            out.setdefault(item, []).append(s["id"])
+    return out
+
+
+def pbis(slices: list[dict]) -> set:
+    return {s["issue"] or s["key"] for s in slices}
 
 
 def classify_rows(data: dict) -> dict[str, dict]:
@@ -133,6 +157,8 @@ def validate(data: dict) -> list[str]:
     surfaces = data["surfaces"]
     known = {s["id"] for s in surfaces}
     placeholder_ids = {p["id"] for p in data["placeholders"]}
+    decision_ids = {d["id"] for d in data["decisions"]}
+    known_pbis = pbis(data["slices"])
     for sid, n in Counter(s["id"] for s in surfaces).items():
         if n > 1:
             errs.append(f"surface {sid}: id used {n} times")
@@ -176,6 +202,19 @@ def validate(data: dict) -> list[str]:
                 errs.append(f"surface {sid}: {s['scope_type']} surfaces have no accepting PBI")
             if not s.get("scope_note"):
                 errs.append(f"surface {sid}: {s['scope_type']} surfaces must say why they exist (scope_note)")
+        build = s["build_pbi"]
+        if build is None:
+            if s["scope_type"] == "contracted":
+                errs.append(f"surface {sid}: contracted, and no PBI builds it (build_pbi)")
+        elif build not in known_pbis:
+            errs.append(f"surface {sid}: build_pbi {build} is not a PBI of the ownership file")
+        if build is not None and build != s["owner_pbi"] and not s.get("build_note"):
+            errs.append(f"surface {sid}: built by {build} and accepted by {s['owner_pbi']}; say why in build_note")
+        if build == s["owner_pbi"] and s.get("build_note"):
+            errs.append(f"surface {sid}: build_note is for a build PBI that differs from the accepting PBI")
+        for item in s["decisions"]:
+            if item not in decision_ids:
+                errs.append(f"surface {sid}: {item} is not an owner design decision of placeholders.json")
         if s["stage"] != stage_of(s["register_ids"], ids):
             errs.append(f"surface {sid}: stage {s['stage']!r} is not what its rows give "
                         f"({stage_of(s['register_ids'], ids)!r})")
@@ -237,6 +276,18 @@ def validate(data: dict) -> list[str]:
             if not p.get(field):
                 errs.append(f"placeholder {p['id']}: {field} is empty")
 
+    governed = ruled(surfaces)
+    for d in data["decisions"]:
+        if d["id"] in placeholder_ids:
+            errs.append(f"decision {d['id']}: also listed as an open placeholder; a decided question is not open")
+        if d["affected_surfaces"] != governed.get(d["id"], []):
+            errs.append(f"decision {d['id']}: affected_surfaces differs from the surfaces that cite it")
+        if d.get("client_confirmed") is not False or d.get("adds_scope") is not False:
+            errs.append(f"decision {d['id']}: an owner design decision is not a client confirmation and adds no scope")
+        for field in ("question", "decision", "must_not", "decided_by", "date", "record"):
+            if not d.get(field):
+                errs.append(f"decision {d['id']}: {field} is empty")
+
     email = {r for s in surfaces if s["kind"] == "email" for r in s["register_ids"] + s["context_ids"]}
     for r in EMAIL_ROWS:
         if r not in email:
@@ -269,25 +320,48 @@ def pbi_label(pbi) -> str:
     return "none" if pbi is None else f"#{pbi}" if isinstance(pbi, int) else str(pbi)
 
 
+def first_release(s: dict) -> bool:
+    return s["stage"] != "S2"
+
+
+def needs_design(s: dict) -> bool:
+    """A surface a customer sees and that this engagement lays out: not a provider's, and not left as the platform has it."""
+    return bool(CUSTOMER_FACING & set(s["audience"])) and s["design_freedom"] in ("free", "constrained")
+
+
 def dependency_findings(data: dict) -> dict[str, list]:
-    """Where a PBI's `design_dependency` and the surfaces it owns disagree. Reported, never changed here."""
-    by_owner: dict[object, list[dict]] = {}
+    """Where a PBI's `design_dependency` and the surfaces it builds disagree. Reported, never changed here.
+
+    Read on `build_pbi`, the PBI that implements the visible surface, not on the PBI that accepts its rows.
+    """
+    built: dict[object, list[dict]] = {}
     for s in data["surfaces"]:
-        if s["owner_pbi"] is not None:
-            by_owner.setdefault(s["owner_pbi"], []).append(s)
-    missing, admin_only, none_owned = [], [], []
+        if s["build_pbi"] is not None:
+            built.setdefault(s["build_pbi"], []).append(s)
+    customer, second, staff_only, none_built = [], [], [], []
     for sl in data["slices"]:
         key = sl["issue"] or sl["key"]
-        mine = by_owner.get(key, [])
-        facing = [s for s in mine if CUSTOMER_FACING & set(s["audience"])]
-        if sl["design_dependency"] == "none" and facing:
-            missing.append((key, sl["title"], facing))
-        elif sl["design_dependency"] == "none" and mine:
-            admin_only.append((key, sl["title"], mine))
-        elif sl["design_dependency"] != "none" and not mine:
-            none_owned.append((key, sl["title"]))
-    noted = [s for s in data["surfaces"] if s.get("build_note")]
-    return {"missing": missing, "admin_only": admin_only, "none_owned": none_owned, "noted": noted}
+        mine = built.get(key, [])
+        facing = [s for s in mine if needs_design(s)]
+        now = [s for s in facing if first_release(s)]
+        marked = sl["design_dependency"]
+        if now:
+            customer.append((key, sl["title"], marked, now))
+        elif facing:
+            second.append((key, sl["title"], marked, facing))
+        elif marked == "none":
+            # Additions to the standard administration: contracted surfaces only, so a platform screen with no
+            # register row does not make a PBI look like a design question.
+            additions = [s for s in mine if s["scope_type"] == "contracted"]
+            if additions:
+                staff_only.append((key, sl["title"], additions))
+        else:
+            none_built.append((key, sl["title"], mine))
+    differs = [s for s in data["surfaces"] if s["build_pbi"] is not None and s["build_pbi"] != s["owner_pbi"]]
+    unbuilt = [s for s in data["surfaces"] if s["build_pbi"] is None]
+    return {"customer": customer, "second": second, "staff_only": staff_only, "none_built": none_built,
+            "differs": differs, "unbuilt": unbuilt,
+            "missing": [c for c in customer if c[2] == "none"]}
 
 
 def table(header: list[str], rows: list[list[object]]) -> list[str]:
@@ -318,7 +392,8 @@ def render(data: dict) -> str:
     L += table(["Measure", "Count"], [["Surfaces", len(surfaces)], ["Flows", len(data["flows"])],
                                       ["Flow steps", sum(len(f["steps"]) for f in data["flows"])],
                                       ["Components", len(data["components"])],
-                                      ["Open design inputs", len(data["placeholders"])]])
+                                      ["Open design inputs", len(data["placeholders"])],
+                                      ["Owner design decisions", len(data["decisions"])]])
     L += ["", "**Surfaces by kind**", ""]
     L += table(["Kind", "Surfaces"], counted(Counter(s["kind"] for s in surfaces), KINDS))
     L += ["", "**Surfaces by scope type**", ""]
@@ -327,12 +402,15 @@ def render(data: dict) -> str:
     L += table(["Audience", "Surfaces"], counted(Counter(a for s in surfaces for a in s["audience"]), AUDIENCES))
     L += ["", "**Surfaces by stage**", ""]
     L += table(["Stage", "Surfaces"], counted(Counter(s["stage"] or "no register row" for s in surfaces)))
-    L += ["", "**Surfaces by accepting PBI.** `none` is a surface with no register row, which no PBI accepts.", ""]
+    L += ["", "**Surfaces by PBI.** `Accepts` counts the surfaces whose register rows the PBI accepts (`owner_pbi`). "
+              "`Builds` counts the surfaces it implements (`build_pbi`). `none` is a surface with no register row, which "
+              "no PBI accepts, or one nothing here builds.", ""]
     titles = {(sl["issue"] or sl["key"]): sl["title"] for sl in data["slices"]}
-    by_pbi = Counter(s["owner_pbi"] for s in surfaces)
-    L += table(["PBI", "Surfaces", "Title"],
-               [[pbi_label(k), n, titles.get(k, "")] for k, n in
-                sorted(by_pbi.items(), key=lambda kv: (kv[0] is None, isinstance(kv[0], str), str(kv[0]).zfill(6)))])
+    accepts = Counter(s["owner_pbi"] for s in surfaces)
+    builds = Counter(s["build_pbi"] for s in surfaces)
+    order = sorted(set(accepts) | set(builds), key=lambda k: (k is None, isinstance(k, str), str(k).zfill(6)))
+    L += table(["PBI", "Accepts", "Builds", "Title"],
+               [[pbi_label(k), accepts.get(k, 0), builds.get(k, 0), titles.get(k, "")] for k in order])
 
     L += ["", "## 2. Delivery rows", "",
           f"The register has {delivery} delivery rows (P1, P1-L, P1-E, DLV). Each is accounted for exactly once.", ""]
@@ -366,40 +444,67 @@ def render(data: dict) -> str:
         ["Every customer-facing surface accounts for English left to right and Arabic right to left",
          f"{len(facing)} surfaces"],
         ["Every row that names an email is carried by an email surface", f"{len(EMAIL_ROWS)} rows"],
-        ["Every open item on a surface has a placeholder rule", f"{len(data['placeholders'])} rules"]])
+        ["Every open item on a surface has a placeholder rule", f"{len(data['placeholders'])} rules"],
+        ["Every contracted surface names the PBI that builds it, and says why where it is not the accepting PBI",
+         f"{len(contracted)} surfaces"],
+        ["No owner design decision is recorded as a client confirmation or as added scope",
+         f"{len(data['decisions'])} decisions"]])
 
     f = dependency_findings(data)
-    L += ["", "## 4. PBIs and their design dependency", "",
-          "`design_dependency` in `docs/scope/backlog-ownership.json` is compared with the surfaces each PBI owns. "
-          "**Nothing is changed here.** These are findings for the owner.", "",
-          "**4.1 Marked `none`, and owns a customer-facing surface.** The field does not reflect these surfaces.", ""]
-    L += table(["PBI", "Title", "Customer-facing surfaces it owns"],
-               [[pbi_label(k), t, ", ".join(f"`{s['id']}`" for s in ss)] for k, t, ss in f["missing"]]) \
-        if f["missing"] else ["None."]
-    L += ["", "**4.2 Marked `none`, and owns staff surfaces only.** These are additions to the standard "
-              "administration. They are annotated, not part of the storefront interface design, so `none` may be "
-              "right. Listed so the choice is deliberate.", ""]
-    L += table(["PBI", "Title", "Staff surfaces it owns"],
-               [[pbi_label(k), t, ", ".join(f"`{s['id']}`" for s in ss)] for k, t, ss in f["admin_only"]]) \
-        if f["admin_only"] else ["None."]
-    L += ["", "**4.3 Marked `needs design`, and owns no surface.** Expected for a PBI that owns the interface design as a "
-              "whole (PRE-03b) and no single surface.", ""]
-    L += table(["PBI", "Title"], [[pbi_label(k), t] for k, t in f["none_owned"]]) if f["none_owned"] else ["None."]
-    L += ["", "**4.4 Surfaces whose backing rows sit with a PBI that does not build the screen.**", ""]
-    L += table(["Surface", "Accepting PBI", "Finding"],
-               [[f"`{s['id']}`", pbi_label(s["owner_pbi"]), s["build_note"]] for s in f["noted"]]) \
-        if f["noted"] else ["None."]
+    names = lambda ss: ", ".join(f"`{x['id']}`" for x in ss)  # noqa: E731
+    L += ["", "## 4. Accepting PBI and build PBI", "",
+          "`owner_pbi` is the PBI that accepts a surface's register rows. `build_pbi` is the PBI that implements the "
+          "visible surface. **No row changes owner here**: `docs/scope/backlog-ownership.json` is untouched.", "",
+          "**4.1 Surfaces built by a PBI other than the one that accepts their rows**", ""]
+    L += table(["Surface", "Accepts", "Builds", "Why"],
+               [[f"`{x['id']}`", pbi_label(x["owner_pbi"]), pbi_label(x["build_pbi"]), x["build_note"]]
+                for x in f["differs"]]) if f["differs"] else ["None."]
+    L += ["", "**4.2 Surfaces no PBI builds.** A provider's interface, or a platform screen with no PBI named for it. "
+              "The second kind is for the owner to place.", ""]
+    L += table(["Surface", "Scope type", "Why it exists"],
+               [[f"`{x['id']}`", x["scope_type"], x["scope_note"]] for x in f["unbuilt"]]) if f["unbuilt"] else ["None."]
 
-    L += ["", "## 5. Open design inputs", "",
+    L += ["", "## 5. Design dependency", "",
+          "`design_dependency` in `docs/scope/backlog-ownership.json`, compared with the surfaces each PBI **builds**. "
+          "A surface counts when a customer sees it and this engagement lays it out: `design_freedom` is `free` or "
+          "`constrained`. **Nothing is changed in the ownership file.** These are findings for the owner.", "",
+          "**5.1 PBIs that build a customer-facing surface in the first release.** Each needs the design artefact "
+          "before that surface is implemented. `Field` is what the ownership file says today.", ""]
+    L += table(["PBI", "Title", "Field", "Finding", "Customer-facing surfaces it builds"],
+               [[pbi_label(k), t, f"`{m}`", "**Field does not reflect these surfaces**" if m == "none" else "Consistent",
+                 names(ss)] for k, t, m, ss in f["customer"]]) if f["customer"] else ["None."]
+    L += ["", "**5.2 Second-release slices that build a customer-facing surface.** Inventoried, and not wireframed in "
+              "the Stage 1 pass (DQ-04). They need the design artefact when the second release is designed.", ""]
+    L += table(["Slice", "Title", "Field", "Surfaces"],
+               [[pbi_label(k), t, f"`{m}`", names(ss)] for k, t, m, ss in f["second"]]) if f["second"] else ["None."]
+    L += ["", "**5.3 Marked `none`, and builds additions to the standard administration only.** Kept as `none` by "
+              "owner ruling (D-14): the additions stay inventoried and annotated, and are not made dependent on "
+              "PRE-03b.", ""]
+    L += table(["PBI", "Title", "Surfaces it builds"],
+               [[pbi_label(k), t, names(ss)] for k, t, ss in f["staff_only"]]) if f["staff_only"] else ["None."]
+    L += ["", "**5.4 Marked `needs design`, and builds no customer-facing surface of this inventory.** The field may "
+              "be right for another reason, such as rows that shape a surface another PBI builds. Listed so it is "
+              "deliberate.", ""]
+    L += table(["PBI", "Title", "Surfaces it builds"],
+               [[pbi_label(k), t, names(ss) or "none"] for k, t, ss in f["none_built"]]) if f["none_built"] else ["None."]
+
+    L += ["", "## 6. Open design inputs", "",
           "Each has a rule in `design/inventory/placeholders.json`: what may stand in now, and what may not be "
           "assumed.", ""]
     L += table(["Id", "Kind", "Input", "Surfaces affected"],
                [[p["id"], p["kind"], p["title"], len(p["affected_surfaces"])] for p in data["placeholders"]])
 
-    L += ["", "## 6. Every surface", ""]
-    L += table(["Id", "Surface", "Kind", "Scope type", "PBI", "Stage", "Rows"],
+    L += ["", "## 7. Owner design decisions", "",
+          "Questions no source answered, decided by the owner in D-14. **Owner design decisions: not client "
+          "confirmations, and not scope additions.** No surface waits on one.", ""]
+    L += table(["Id", "Question", "Decision", "Not to be done", "Surfaces"],
+               [[d["id"], d["title"], d["decision"], d["must_not"],
+                 d.get("applies_to") or names([{"id": x} for x in d["affected_surfaces"]])] for d in data["decisions"]])
+
+    L += ["", "## 8. Every surface", ""]
+    L += table(["Id", "Surface", "Kind", "Scope type", "Accepts", "Builds", "Stage", "Rows"],
                [[f"`{s['id']}`", s["name"], s["kind"], s["scope_type"], pbi_label(s["owner_pbi"]),
-                 s["stage"] or "", len(s["register_ids"])] for s in surfaces])
+                 pbi_label(s["build_pbi"]), s["stage"] or "", len(s["register_ids"])] for s in surfaces])
     return "\n".join(L) + "\n"
 
 
@@ -420,7 +525,8 @@ def main(argv: list[str] | None = None) -> int:
     for e in errs:
         print(e)
     print(f"design-inventory: {len(data['surfaces'])} surfaces, {len(data['flows'])} flows, "
-          f"{len(data['components'])} components, {len(data['placeholders'])} placeholders, {len(errs)} problems")
+          f"{len(data['components'])} components, {len(data['placeholders'])} open inputs, "
+          f"{len(data['decisions'])} decisions, {len(errs)} problems")
     return 1 if errs else 0
 
 
