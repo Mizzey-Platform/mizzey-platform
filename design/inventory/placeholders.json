@@ -1,0 +1,480 @@
+{
+  "about": "Every open decision that affects design, with the neutral placeholder allowed now and what may not be assumed. affected_surfaces is derived from the open_items of surfaces.json and checked. An owner_reading or a working_default is the owner's, never a client confirmation.",
+  "kinds": {
+    "client_decision": "An open decision of the register, Part Six. The client's.",
+    "working_default": "An open client decision with an owner working default (docs/scope/open-items.json). Not client-confirmed.",
+    "client_input": "Content or material the client supplies (register, Part Five).",
+    "erp": "Waits for the ERP Integration Specification.",
+    "owner_reading": "A contradiction in the register resolved by the owner. Not client-confirmed.",
+    "vendor": "Waits for a provider account, sandbox or document.",
+    "open_point": "An open point of the sitemap companion, section 7.",
+    "design_question": "A question no source answers, found while building the inventory. Not yet decided by anyone."
+  },
+  "placeholders": [
+    {
+      "id": "OD-01",
+      "kind": "client_decision",
+      "title": "Brand name, logo and visual identity",
+      "affected_surfaces": [
+        "gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-home", "sf-product-card", "sf-pdp-simple", "ct-campaign-page",
+        "ad-section-library", "ad-global-brand-controls", "sf-product-badges", "fd-visual-treatment", "em-shell"
+      ],
+      "unknown": "The brand name, the logo, the colours, the typefaces and the rules for using them.",
+      "placeholder_allowed": "Neutral tokens only: greys, one system typeface per script, a labelled box where the logo goes, the working name in plain text.",
+      "must_not_assume": "No logo, no client colour, no final typeface, no imagery style, no tone of voice. Nothing that could be read as a visual proposal.",
+      "replaced_by": "The client supplies the brand identity and approves the brand direction in writing (CR-02). Tokens and assets are then set and the high-fidelity stage begins.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-03",
+      "kind": "working_default",
+      "title": "Welcome discount: value, cap, expiry, eligibility",
+      "affected_surfaces": ["au-register", "ad-launch-rules-settings", "em-welcome"],
+      "unknown": "The client's real values.",
+      "placeholder_allowed": "Show the discount as a variable: a labelled amount and its conditions. The owner's example default is in docs/scope/open-items.json.",
+      "must_not_assume": "Do not print a value as if agreed. Do not show the discount where its conditions are not met.",
+      "replaced_by": "The client's values, set in the admin under BR-001.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-04",
+      "kind": "working_default",
+      "title": "Free shipping: what two items means",
+      "affected_surfaces": ["sf-cart", "sf-free-shipping-progress", "ad-launch-rules-settings"],
+      "unknown": "Two units or two distinct products, and any exclusions.",
+      "placeholder_allowed": "The prompt reads from the rule. Owner default: two or more units, any mix, no exclusions.",
+      "must_not_assume": "Do not hard-code 'two'. Do not draw exclusions.",
+      "replaced_by": "The client's confirmation of the rule. The condition stays admin-configurable (BR-002).",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-05",
+      "kind": "working_default",
+      "title": "Cash on delivery: offered or not",
+      "affected_surfaces": ["ck-payment-method", "ad-cod-reconciliation"],
+      "unknown": "Whether cash on delivery is offered at launch.",
+      "placeholder_allowed": "Draw payment selection with and without cash on delivery. The capability is built either way (PAY-09).",
+      "must_not_assume": "No value ceiling, no fee, no verification step: none is contracted (OP-03, PAY-10 is P2).",
+      "replaced_by": "The client's decision.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-08",
+      "kind": "client_decision",
+      "title": "Return window and exceptions",
+      "affected_surfaces": ["sf-pdp-simple", "ct-returns-policy"],
+      "unknown": "The return window and any product-type exceptions.",
+      "placeholder_allowed": "Placeholder policy text and a variable for the window on the product page summary.",
+      "must_not_assume": "No number of days. No automatic eligibility check, no return form, no returns area (RET-01, RET-03, ACCT-10 are deferred).",
+      "replaced_by": "The client's policy and the policy text (CR-04).",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-09",
+      "kind": "client_decision",
+      "title": "VAT and invoicing requirements",
+      "affected_surfaces": ["ac-order-detail", "ac-invoice", "ad-invoice"],
+      "unknown": "What an invoice must carry for the client's legal entity.",
+      "placeholder_allowed": "An invoice layout with labelled regions for seller details, tax lines and numbering.",
+      "must_not_assume": "No tax rate, no registration number, no statutory wording. No e-invoice or e-receipt (INT-17 is out).",
+      "replaced_by": "The client's invoicing requirements and legal entity details.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-13",
+      "kind": "client_decision",
+      "title": "Authenticity and warranty policy",
+      "affected_surfaces": ["sf-pdp-simple", "ct-authenticity"],
+      "unknown": "The policy wording and any supporting documents.",
+      "placeholder_allowed": "A statement region on the product page and a policy page with placeholder text.",
+      "must_not_assume": "No guarantee wording, no warranty period, no certificate imagery.",
+      "replaced_by": "The client's policy and documents.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-18",
+      "kind": "client_decision",
+      "title": "Domain, sending address, support numbers, legal entity details",
+      "affected_surfaces": ["gl-footer", "ac-invoice", "ct-contact", "ad-invoice", "em-shell"],
+      "unknown": "The contact and legal details shown in the footer, on the contact page, on invoices and in emails.",
+      "placeholder_allowed": "Labelled placeholder fields.",
+      "must_not_assume": "No real address, phone number, domain or company name.",
+      "replaced_by": "The client's details, before launch.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-19",
+      "kind": "working_default",
+      "title": "Payment methods at launch",
+      "affected_surfaces": ["ck-payment-method", "ck-payment-handoff"],
+      "unknown": "Cards only, or cards and wallets.",
+      "placeholder_allowed": "Draw both. Owner default: cards and wallets are launch-capable.",
+      "must_not_assume": "Do not draw instalments, kiosk payment or Instapay (PAY-20, PAY-21, PAY-22).",
+      "replaced_by": "The client's choice, and the provider's approval of wallets for the merchant account (PAY-15).",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "OD-20",
+      "kind": "client_decision",
+      "title": "Carrier cash-on-delivery remittance cycle",
+      "affected_surfaces": ["ad-cod-reconciliation"],
+      "unknown": "How and when the carrier remits collected cash.",
+      "placeholder_allowed": "Two states per order: collected, remitted.",
+      "must_not_assume": "No cycle length, no settlement report layout.",
+      "replaced_by": "The client's or the carrier's answer.",
+      "source": "Feature Register, Part Six"
+    },
+    {
+      "id": "CR-03",
+      "kind": "client_input",
+      "title": "Carrier account and rate card by governorate",
+      "affected_surfaces": ["ck-address", "ck-shipping-method", "ct-shipping-policy"],
+      "unknown": "The zones, the rates and any delivery estimates.",
+      "placeholder_allowed": "Invented governorates and rates from the staging seed.",
+      "must_not_assume": "No real rate. No live rate lookup (SHIP-02 is P2).",
+      "replaced_by": "The client's rate card.",
+      "source": "Feature Register, Part Five"
+    },
+    {
+      "id": "CR-04",
+      "kind": "client_input",
+      "title": "Legal and policy text",
+      "affected_surfaces": ["ct-static-page", "ct-about", "ct-authenticity", "ct-shipping-policy", "ct-help", "ct-privacy", "ct-returns-policy", "ct-terms"],
+      "unknown": "The wording of the privacy, terms, shipping, returns and authenticity pages.",
+      "placeholder_allowed": "Placeholder text of realistic length, headings included, in both languages.",
+      "must_not_assume": "No legal wording written as if final.",
+      "replaced_by": "The client's text.",
+      "source": "Feature Register, Part Five"
+    },
+    {
+      "id": "CR-05",
+      "kind": "client_input",
+      "title": "Product and brand photography",
+      "affected_surfaces": ["sf-home", "sf-category", "sf-collection", "sf-brand", "sf-product-card", "sf-pdp-simple", "sf-pdp-gallery", "ct-campaign-page"],
+      "unknown": "The real images.",
+      "placeholder_allowed": "Neutral image boxes at the intended aspect ratios, and the invented products of the staging seed.",
+      "must_not_assume": "No stock photography that suggests a visual direction.",
+      "replaced_by": "The client's photographs, and the image rights confirmation (CR-08, OD-26).",
+      "source": "Feature Register, Part Five"
+    },
+    {
+      "id": "CR-15",
+      "kind": "client_input",
+      "title": "Storefront content in both languages",
+      "affected_surfaces": [
+        "gl-header", "gl-mobile-nav", "gl-mega-menu", "gl-footer", "gl-promo-banner", "sf-home", "sf-shop", "sf-category", "sf-collection", "sf-brand",
+        "sf-brand-landing", "sf-pdp-simple", "au-lost-password", "ck-order-received", "ct-static-page", "ct-about", "ct-authenticity",
+        "ct-shipping-policy", "ct-help", "ct-privacy", "ct-returns-policy", "ct-terms", "ct-contact", "ct-campaign-page"
+      ],
+      "unknown": "Category names, collection names, the brand list, page copy, and the final Arabic wording of the account addresses.",
+      "placeholder_allowed": "Invented content from the staging seed, in both languages, including long strings.",
+      "must_not_assume": "No real category tree, brand list or campaign.",
+      "replaced_by": "The client's content. The mechanism is ours and the content is theirs.",
+      "source": "Feature Register, Part Five"
+    },
+    {
+      "id": "PRE-09",
+      "kind": "erp",
+      "title": "ERP Integration Specification",
+      "affected_surfaces": [
+        "sf-product-card", "sf-listing-filters", "sf-pdp-simple", "sf-pdp-variable", "sf-pdp-stock-state", "sf-cart", "sf-cart-revalidation",
+        "ck-stock-failure", "ck-erp-unavailable", "ck-payment-failed", "ad-product-storefront-controls", "ad-dashboard-stock", "ad-price-stock-history",
+        "ad-order-cancel", "ad-stock-from-erp", "rp-stock"
+      ],
+      "unknown": "When and how the store reads stock, what the customer sees when stock cannot be validated, how reservation works, and how stock appears in the admin.",
+      "placeholder_allowed": "Structural stock states: in stock, out of stock, unknown or cannot validate, and a changed cart line. Neutral placeholder wording.",
+      "must_not_assume": "No timing, no mechanism, no 'only N left', no reservation timer, no stock quantity shown to customers, no admin stock editing behaviour. No P1-E surface beyond a placeholder.",
+      "replaced_by": "PRE-09 written, agreed with the ERP team and approved by the client.",
+      "source": "docs/scope/open-items.json, gates"
+    },
+    {
+      "id": "CX-01",
+      "kind": "owner_reading",
+      "title": "The Accountant role",
+      "affected_surfaces": ["ad-refund-record", "ad-permission-denied", "rp-sales"],
+      "unknown": "Whether the client acknowledges the role as the owner resolved it.",
+      "placeholder_allowed": "Permission states that hide or refuse an action. Refund permission is a separate capability.",
+      "must_not_assume": "No Accountant-only screen or report. ROLE-06 still reads DEF and advanced financial reporting is P2 (ROLE-06a).",
+      "replaced_by": "The client's acknowledgement of MS-CLR-2026-037.",
+      "source": "docs/scope/open-items.json"
+    },
+    {
+      "id": "CX-02",
+      "kind": "owner_reading",
+      "title": "The restricted Marketing access profile",
+      "affected_surfaces": ["ad-permission-denied"],
+      "unknown": "Whether the client confirms the reading.",
+      "placeholder_allowed": "Only the permission states MKT-21 to MKT-25 need.",
+      "must_not_assume": "No Marketing role screen. ROLE-05 is deferred.",
+      "replaced_by": "The client's confirmation.",
+      "source": "docs/scope/open-items.json"
+    },
+    {
+      "id": "CX-03",
+      "kind": "owner_reading",
+      "title": "The narrow audit record",
+      "affected_surfaces": ["ad-price-stock-history", "ad-staff-log"],
+      "unknown": "Whether the client confirms the reading.",
+      "placeholder_allowed": "A list of recorded events for the rows that explicitly require history (ADM-50, ADM-132 to ADM-134).",
+      "must_not_assume": "No full audit trail of refunds, permissions or stock (ROLE-10 and ADM-125 are deferred). No forensic reporting.",
+      "replaced_by": "The client's confirmation.",
+      "source": "docs/scope/open-items.json"
+    },
+    {
+      "id": "CX-05",
+      "kind": "owner_reading",
+      "title": "Dashboard counts for orders needing action and pending refunds",
+      "affected_surfaces": ["ad-dashboard-attention"],
+      "unknown": "Whether the client confirms the reading.",
+      "placeholder_allowed": "A count with a link to the standard filtered list.",
+      "must_not_assume": "No custom queue, no worked-top-to-bottom view, no saved views (ADM-120, ADM-141, ADM-144 are deferred).",
+      "replaced_by": "The client's confirmation.",
+      "source": "docs/scope/open-items.json"
+    },
+    {
+      "id": "CX-06",
+      "kind": "owner_reading",
+      "title": "Scheduling on the promotional banner alone",
+      "affected_surfaces": ["gl-promo-banner", "ad-section-library", "ad-promo-banner-manager"],
+      "unknown": "Whether the client confirms the reading.",
+      "placeholder_allowed": "Start, optional end, page placement and enabled state on the banner.",
+      "must_not_assume": "No scheduling on any other section (HOME-12 and ADM-62 are P2).",
+      "replaced_by": "The client's confirmation.",
+      "source": "docs/scope/open-items.json"
+    },
+    {
+      "id": "VENDOR-PAYMOB",
+      "kind": "vendor",
+      "title": "Payment provider interface",
+      "affected_surfaces": ["ck-payment-method", "ck-payment-handoff", "ck-payment-failed", "em-payment-failed"],
+      "unknown": "The exact hosted or embedded step, its return behaviour and its error codes, as the merchant account is configured.",
+      "placeholder_allowed": "Our handoff, loading, verifying, failure and return states, with a labelled box for the provider's step.",
+      "must_not_assume": "Do not draw the provider's card form, 3-D Secure screen or wallet screen. Do not promise an embedded step where the provider redirects.",
+      "replaced_by": "The merchant account and the sandbox, in #283.",
+      "source": "Feature Register, section 2.1"
+    },
+    {
+      "id": "VENDOR-BOSTA",
+      "kind": "vendor",
+      "title": "Carrier status legend and tracking",
+      "affected_surfaces": ["ac-tracking", "ord-status-timeline", "ad-shipment-panel", "ad-carrier-status-mapping", "em-shipped"],
+      "unknown": "The carrier's status codes and how each maps to an order status.",
+      "placeholder_allowed": "The contracted order statuses only, and a labelled link out for the carrier's page.",
+      "must_not_assume": "No carrier status the mapping has not fixed. No live map, no courier details.",
+      "replaced_by": "The carrier's status legend and the documented mapping (SHIP-14), in #291.",
+      "source": "docs/adr/0002-minimum-shipment-state-record.md"
+    },
+    {
+      "id": "VENDOR-GOOGLE",
+      "kind": "vendor",
+      "title": "Google sign-in",
+      "affected_surfaces": ["au-google-entry"],
+      "unknown": "The client's Google credentials and the button variant Google requires.",
+      "placeholder_allowed": "A neutral 'Continue with Google' button of the required size.",
+      "must_not_assume": "Do not restyle Google's mark. Do not draw Google's account chooser or consent screen.",
+      "replaced_by": "The Google sign-in credentials, in #305.",
+      "source": "docs/pre-development/PRE-05-integrations-accounts-inputs.md"
+    },
+    {
+      "id": "OP-03",
+      "kind": "open_point",
+      "title": "Cash on delivery limits and fees",
+      "affected_surfaces": ["ck-payment-method"],
+      "unknown": "Two stories promise a value limit, zone restriction or fee that no row contracts.",
+      "placeholder_allowed": "Cash on delivery as an on or off method.",
+      "must_not_assume": "No limit and no fee.",
+      "replaced_by": "The Stage 1 review of the Functional Specification.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-05",
+      "kind": "open_point",
+      "title": "Returns in the account dashboard",
+      "affected_surfaces": ["ac-navigation", "ac-dashboard"],
+      "unknown": "A story gives the dashboard a route to returns, which are deferred.",
+      "placeholder_allowed": "An account with no returns entry.",
+      "must_not_assume": "No returns link, tab or status.",
+      "replaced_by": "The Stage 1 review.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-12",
+      "kind": "open_point",
+      "title": "Recommendations in the find journey",
+      "affected_surfaces": ["sf-home", "sf-pdp-related"],
+      "unknown": "JRN-02 names recommendations and cites no row for them.",
+      "placeholder_allowed": "Curated, hand-picked rails only: trending, new arrivals, collections, related products.",
+      "must_not_assume": "No personalised recommendation (JRN-12 and HOME-13 are P3).",
+      "replaced_by": "The Stage 1 review.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-13",
+      "kind": "open_point",
+      "title": "Reductions the register does not state",
+      "affected_surfaces": ["sf-brand-landing", "ck-order-received"],
+      "unknown": "What the reduced specification of JRN-05 and JRN-08 is, and what the first release provides in place of IA-33.",
+      "placeholder_allowed": "Draw the rows as worded.",
+      "must_not_assume": "Do not invent a reduction or a stand-in.",
+      "replaced_by": "The Stage 1 review.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-14",
+      "kind": "open_point",
+      "title": "Whether a chosen language is remembered",
+      "affected_surfaces": ["gl-language-switcher"],
+      "unknown": "The story says the choice persists. The built site takes the language from the address only.",
+      "placeholder_allowed": "A switcher that changes the address. No remembered state shown.",
+      "must_not_assume": "No language prompt, no auto-redirect by location or browser.",
+      "replaced_by": "An owner decision, then a requirement PR to spec 002 if behaviour changes.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-15",
+      "kind": "open_point",
+      "title": "What a language switch does mid-task",
+      "affected_surfaces": ["gl-language-switcher", "sf-search-results", "ck-checkout", "ck-order-received"],
+      "unknown": "No source says what happens to a search in progress, a part-completed checkout or the order confirmation.",
+      "placeholder_allowed": "The switcher present on every page, landing on the counterpart address.",
+      "must_not_assume": "Do not promise that form entries survive a switch. Do not hide the switcher in checkout.",
+      "replaced_by": "An owner decision in #253.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-17",
+      "kind": "open_point",
+      "title": "Two page rows, one address",
+      "affected_surfaces": ["sf-collection", "au-sign-in", "au-register"],
+      "unknown": "Sign in and register are one address. Collections and curated collection pages are one route.",
+      "placeholder_allowed": "One screen with both forms, and one collection template.",
+      "must_not_assume": "No separate register address or second collection template.",
+      "replaced_by": "An owner decision. A change is a requirement PR to spec 003.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-18",
+      "kind": "open_point",
+      "title": "No index pages",
+      "affected_surfaces": ["sf-category", "sf-collection", "sf-brand"],
+      "unknown": "No page lists all categories, all collections or all brands, and no source says whether one is intended.",
+      "placeholder_allowed": "Reach them through the navigation and the home page sections.",
+      "must_not_assume": "Do not draw an index page as if contracted.",
+      "replaced_by": "An owner decision. A change is a requirement PR to spec 003.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-19",
+      "kind": "open_point",
+      "title": "Profile and password screens have no page row",
+      "affected_surfaces": ["ac-account-details", "ac-password"],
+      "unknown": "ACCT-02 and ACCT-03 are contracted and have no IA row and no entry in the URL map.",
+      "placeholder_allowed": "The standard account-details screen.",
+      "must_not_assume": "No new address.",
+      "replaced_by": "An owner decision. A change is a requirement PR to spec 003.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-20",
+      "kind": "open_point",
+      "title": "Tracking sits outside the account",
+      "affected_surfaces": ["ac-order-detail", "ac-tracking"],
+      "unknown": "The register groups tracking under the account. It is built as a separate page with a lookup, and on the order for signed-in customers.",
+      "placeholder_allowed": "Both: the lookup page and the status on the order.",
+      "must_not_assume": "Do not merge or remove either without a decision.",
+      "replaced_by": "An owner decision. A change is a requirement PR to spec 003.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "OP-25",
+      "kind": "open_point",
+      "title": "CHK-12 names a method",
+      "affected_surfaces": ["ck-stock-failure"],
+      "unknown": "The row says stock is reserved in the ERP, while reservation is among the matters PRE-09 has not decided.",
+      "placeholder_allowed": "A failure state when stock is no longer available.",
+      "must_not_assume": "No reservation timer or countdown.",
+      "replaced_by": "PRE-09.",
+      "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
+    },
+    {
+      "id": "DQ-01",
+      "kind": "design_question",
+      "title": "Numerals in Arabic",
+      "affected_surfaces": [],
+      "unknown": "No source says whether Arabic pages show Western or Arabic-Indic digits. NFR-04b asks for number formatting per locale and is owned by #269.",
+      "placeholder_allowed": "Western digits in both languages.",
+      "must_not_assume": "Do not treat this as decided.",
+      "replaced_by": "An owner decision with #269.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-02",
+      "kind": "design_question",
+      "title": "Pagination or continued loading",
+      "affected_surfaces": ["sf-pagination"],
+      "unknown": "PLP-16 allows either.",
+      "placeholder_allowed": "Draw numbered pagination, which the platform provides.",
+      "must_not_assume": "Do not treat infinite scroll as required.",
+      "replaced_by": "A wireframe review decision.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-03",
+      "kind": "design_question",
+      "title": "Checkout as one page or as steps",
+      "affected_surfaces": ["ck-checkout"],
+      "unknown": "JRN-07 lists an order of steps and CHK-05 asks for a review step. No source says whether they are separate screens.",
+      "placeholder_allowed": "One page in the listed order, with the review before Place Order, as the platform's checkout provides.",
+      "must_not_assume": "Do not design a multi-page checkout as if contracted.",
+      "replaced_by": "A wireframe review decision.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-04",
+      "kind": "design_question",
+      "title": "Second-release screens in the first design",
+      "affected_surfaces": [
+        "sf-filter-by-rating", "sf-brand-landing", "ac-reorder", "ac-notification-preferences", "ac-account-deletion",
+        "ad-dashboard-customers-conversion", "ad-customer-metrics-export", "ad-email-template-editor"
+      ],
+      "unknown": "The interface design covers every contracted storefront screen. The register stages some rows S2. No source says whether their screens are drawn in the first design.",
+      "placeholder_allowed": "Inventory them and mark them S2. Leave room where they attach, and do not draw them yet.",
+      "must_not_assume": "Do not build them in the first release.",
+      "replaced_by": "An owner decision before the low-fidelity wireframes are reviewed.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-05",
+      "kind": "design_question",
+      "title": "Whether the customer sees the cash-collected state",
+      "affected_surfaces": ["ord-status-labels"],
+      "unknown": "ORD-14 is a state for the store's books. No source says whether a customer sees it or sees Delivered.",
+      "placeholder_allowed": "Show it to staff. Show the customer Delivered.",
+      "must_not_assume": "Do not treat this as decided.",
+      "replaced_by": "An owner decision in #248.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-06",
+      "kind": "design_question",
+      "title": "Who may write a review",
+      "affected_surfaces": ["rv-form"],
+      "unknown": "No row says whether a review needs an account or a purchase. Verified-purchase badges are not contracted.",
+      "placeholder_allowed": "A signed-in customer writes a review. A signed-out visitor is asked to sign in.",
+      "must_not_assume": "No verified-purchase badge (REV-07 is P2).",
+      "replaced_by": "An owner decision in #309.",
+      "source": "Found while building this inventory"
+    },
+    {
+      "id": "DQ-07",
+      "kind": "design_question",
+      "title": "The consent tool",
+      "affected_surfaces": ["gl-cookie-consent"],
+      "unknown": "MKT-10 contracts a consent banner. The tool is selected in #288 and its banner has its own layout limits.",
+      "placeholder_allowed": "A neutral banner with accept, decline and preferences.",
+      "must_not_assume": "Do not draw a layout the selected tool cannot produce.",
+      "replaced_by": "The tool selection in #288.",
+      "source": "Found while building this inventory"
+    }
+  ]
+}

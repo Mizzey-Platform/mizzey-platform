@@ -9,11 +9,33 @@ and the current phase are in [README.md](README.md). The rules are in the
 ## Role Gate: CLIENT SITE MODE
 
 - Edit only this client source: `mizzey-site/` (namespace `MizzeySite\`), `mizzey-theme/`, `specs/`, `docs/`,
-  `tools/` and the repository configuration.
+  `design/`, `tools/` and the repository configuration.
 - **Never** edit CoreX framework internals, the pinned checkout in `../app/corex/`, `../app/wp/wp-content/`, or `dist/`.
 - For a framework bug or a reusable component, stop and raise a CoreX task. Never patch CoreX for one client.
 - Site identity: namespace `MizzeySite\`, text domain `mizzey-site`, REST namespace `mizzey/v1`, CSS prefix
   `--mizzey-`, option and CPT prefix `mizzey_`. Use `wp corex make:*` generators.
+
+## Current phase: design first (D-14, 6 October 2026)
+
+**No functional PBI implementation starts now.** Do not start #249, do not create a `006-` spec, do not run Spec
+Kit for a functional PBI, and do not upgrade CoreX, until Mustafa says so. The order is: signed scope and PBIs,
+then the complete inventory of surfaces, flows and states, then low-fidelity structural wireframes, then the
+brand identity, then high-fidelity UI and UX, then the contracted working HTML and CSS design approved by the
+client, then storefront implementation.
+
+- **`design/` is the UX source of truth.** Read [design/README.md](design/README.md) before any design work. Its
+  authority order governs: the signed documents first, Option C material last and never as scope.
+- **No wireframe is drawn until Mustafa has reviewed `design/coverage.md`.** Low-fidelity wireframes are design
+  artefacts in `design/`. They are not built in `mizzey-theme/`, and nothing is implemented in the theme before
+  the contracted working HTML and CSS stage.
+- **Nothing committed is approved UI or UX.** The plugin is technical foundation and the theme is a scaffold.
+- **The signed documents stay in `final docs/`, outside this repository.** `design/sources.json` points at them.
+  Never copy one in, in whole or in part.
+- This changes delivery order only. The register, PRE-03b, the scope and every acceptance obligation are
+  unchanged, and a wireframe is not a client deliverable.
+- **CoreX stays a separate, pinned, disposable checkout** (`corex.lock`, `tools/corex-sync.mjs`). Mizzey is not
+  moved into CoreX's merged `sites/` layout. CoreX v0.43.0 is the next upgrade, evaluated and made in its own
+  infrastructure PR before implementation resumes.
 
 ## Before any work: classify it
 
@@ -78,9 +100,14 @@ generation is disabled, and the agent-context skill is removed.
   store holds no independent authoritative stock; a final sale fails closed when authoritative stock cannot be
   validated; no duplicate decrement; idempotency, retry, logging and reconciliation paths exist. Production ERP
   specifics stay pending PRE-09.
-- **Missing brand identity does not stop structural design.** Wireframes, responsive states, both reading
-  directions, component architecture and neutral design tokens proceed; the final identity is applied later
-  through tokens and assets. Approval of the interface design still waits for OD-01.
+- **Missing brand identity does not stop structural design.** The inventory, then low-fidelity wireframes,
+  responsive states, both reading directions, component architecture and neutral design tokens proceed, as design
+  artefacts in `design/` (D-14); the final identity is applied later through tokens and assets. Approval of the
+  interface design still waits for OD-01.
+- **Option C is history, never authority.** `scripts/stories.json`, `discovery/` (its `tasks/WIREFRAME.md` and
+  `tasks/JOURNEY.md` included), `docs/discovery/`, `docs/decisions/` and Project 4 describe an engagement that was
+  never signed. No scope, surface, flow or wireframe is derived from them. The signed Option B scope and
+  `docs/scope/backlog-ownership.json` are what govern.
 - **Development and staging run on the developer's machine**, the staging and demonstration copy isolated, on its
   own database, with synthetic data only, reviewed through a Cloudflare Tunnel. Production hosting stays the
   client's written decision (OD-27). Staging is built, reset, backed up and restored with

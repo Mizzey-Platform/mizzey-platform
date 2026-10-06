@@ -1312,3 +1312,83 @@ document route outside this repository. Item 4 waits for the sign-in. The stagin
 server was writing its database password into its own local PHP error log, through a debugging extension; the
 old credential was searched for and is not present in the repository, its history or any retained evidence.
 
+## 2026-10-06 - D-14: design first, the design source of truth, and the CoreX model kept
+
+Decided by Mustafa on 6 October 2026, on the read-only assessment of the repository made that day. **These are
+owner decisions on delivery order and repository structure. None is a client confirmation, and none changes the
+contract.**
+
+**1. Functional PBI implementation is frozen while the structural UX package is prepared.** #249 does not start,
+no `006-` spec is created, and Spec Kit is not run for a functional PBI. The approved sequence is:
+
+1. the signed scope and the PBIs;
+2. the complete inventory of UX surfaces, flows and states;
+3. low-fidelity structural wireframes;
+4. the brand identity, received from the client;
+5. high-fidelity UI and UX;
+6. the contracted working HTML and CSS design, approved by the client;
+7. storefront implementation.
+
+**2. What this does not change.** Delivery order only. The contracted scope, PRE-03b, the Feature Register and
+every acceptance obligation are as they were. A low-fidelity wireframe is not a client deliverable: PRE-03b says
+no separate wireframe stage is produced, and the approved artefact is still the working screens.
+
+**3. Low-fidelity structural wireframes are prepared as design artefacts first.** They are not built in
+`mizzey-theme/`, and nothing is implemented in the theme until the design reaches the contracted working HTML and
+CSS stage. This replaces section 3 of `docs/2026-10-05-structural-design-plan.md`, which had them built in the
+theme, and the matching sentence in #250. **No wireframe is drawn until the owner has reviewed the coverage
+report.**
+
+**4. The CoreX architecture stays as it is.** Mizzey remains its own repository. CoreX remains a separate
+framework repository. Mizzey uses a pinned, disposable CoreX checkout through `corex.lock` and
+`tools/corex-sync.mjs`, neither of which is retired. Mizzey is not migrated into CoreX's merged `sites/mizzey/`
+layout. **CoreX v0.43.0 is recorded as the next framework upgrade**, to be evaluated and made in a separate
+infrastructure PR before application and storefront implementation resumes. The pin stays at v0.42.0 until then.
+
+**5. The existing technical foundation is kept, and none of it is approved UI or UX.** The assessment found no
+premature production code to remove.
+
+| Class | What | Treatment |
+|---|---|---|
+| A. Technical foundation | The site plugin's classes (language loading, cost translation sync and its WPML declaration, brands, collections, the three search-engine outputs, the stock report correction), the theme header files, the integration suite and its baseline, the staging tool and seed, specs 001 to 005, `docs/scope/` and the governance tooling | Kept as the baseline |
+| B. Validated spike or reference, not the final baseline | The theme's two stub templates and two parts, the collection archive template fallback, the unregistered service provider and its empty directories, the fact-finding scenarios t17 to t20, and the four information-architecture choices recorded as OP-14, OP-18, OP-19 and OP-20 | Kept. Each may be replaced or challenged by the design, the four choices through a requirement PR to spec 003 |
+| C. Premature implementation | None in code | Nothing removed |
+
+**6. `design/` is the single UX and design source of truth**, a new top-level directory, approved in
+`PATH_POLICY` as the path class `design` for `requirement`, `internal:governance` and `internal:documentation`
+work, markdown and JSON only. Its authority order is: the signed Services Agreement and governing engagement
+documents; the signed Feature Register; the Functional Specification and the client's requirements document; the
+acceptance and UAT requirements; Option B PBI ownership and the exact register ids; approved decisions and open
+items; the verified sitemap, flows and URL map; existing technical evidence where it constrains design; and
+historical Option C material last, as reference only and never as scope.
+
+**7. The signed documents are not copied into the public repository.** They stay in `final docs/`.
+`design/sources.json` references each by document id, name, version, local path, hash and role. Whoever designs
+is given the repository and the original documents. The derived inventory is in Git; the confidential sources are
+not.
+
+**8. Every design surface carries a scope type**: `contracted`, backed by exact delivery rows;
+`native_required`, a standard platform experience no row contracts as a custom feature; `internal_operational`,
+engineering or launch support; `provider_hosted`, a third party's interface that is not redesigned. A surface
+that is not contracted cites no register row, says why it exists and is never presented as contracted scope.
+Rulings: the 404 page is `native_required`; Coming Soon is `internal_operational` and is not a client
+deliverable; for the hosted payment step, our handoff, loading, failure, return and success are designed and the
+provider's interface is not.
+
+**9. The standard administration is not redesigned.** Only the additions this engagement makes are inventoried,
+each naming the standard screen it extends. The administration stays English only (ADM-159).
+
+**10. Option C material is historical reference only, and is not moved now.** `scripts/stories.json` is not
+design authority, and `discovery/tasks/WIREFRAME.md` and `JOURNEY.md` must not drive design. `discovery/`,
+`scripts/` and the large historical documents stay where they are. Moving them, for example to
+`history/option-c/`, is a separate housekeeping task for after the design source of truth is stable.
+
+**Applied, 6 October 2026, in one `internal:governance` PR, shown to the owner before merge.** `design/` holds
+the authority order, `sources.json`, and the inventory: 154 surfaces, 22 flows, 72 components and 41 open design
+inputs. `tools/design_inventory.py` checks it against the register mirror and PBI ownership and writes
+`design/coverage.md`: of the 595 delivery rows, 409 are design-relevant and are carried by a surface, 186 are
+marked as having no surface with a reason, and none is unaccounted for. `PATH_POLICY`, `CONTRIBUTING.md`,
+`AGENTS.md`, the structural design plan, the two Option C task templates and `scripts/README.md` are amended.
+No wireframe, brief or token is created, no theme or plugin file is touched, the CoreX pin is unchanged, and no
+PBI ownership or design-dependency field is altered: where the inventory and
+`docs/scope/backlog-ownership.json` disagree, the coverage report lists it for the owner.

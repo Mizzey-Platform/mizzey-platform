@@ -1,0 +1,157 @@
+{
+  "about": "Where the authority for design lives. The signed and issued documents stay outside this public repository (D-03, D-08): this file points at them and copies none. `source` is relative to this folder, on the developer's machine. `sha256` is of the file named, taken on 6 October 2026. The order of authority is in design/README.md.",
+  "pack": {
+    "name": "Mizzey Launch Platform Pack MZ-02 REV4",
+    "source": "../../final docs/Client/Mizzey-Launch-Platform-Pack-MZ-02-REV4-FINAL.zip",
+    "sha256": "ea9c4377789f0660ab04b7ec75cc9667d077f90b9e7a31617b99f8c7f95a8c13",
+    "note": "The client signed (reported by the owner on 4 October 2026). No countersigned copy and no signature date is on file. The signed PDFs below carry the Developer's signature."
+  },
+  "sources": [
+    {
+      "id": "MS-AGR-2026-023",
+      "name": "Services Agreement",
+      "version": "1.4",
+      "authority_rank": 1,
+      "role": "Governing engagement document. Sets the precedence between the documents (section 2.1).",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Services-Agreement.md",
+      "sha256": "4b3d3792356df89cfc92f6c4f6979ca88e2acff85250b1d9611420f7edbd3b72",
+      "signed_copy": "../../final docs/Client/Engagement-Pack-Option-B/Signed/Mizzey-Launch-Platform-Services-Agreement-SIGNED.pdf",
+      "signed_copy_sha256": "297171d5de8d1c48db32cbaf18abf4215f7a0498f28eda4164bc9dfdbb474916",
+      "in_repository": null
+    },
+    {
+      "id": "MS-SOW-2026-024",
+      "name": "Statement of Work",
+      "version": "1.4",
+      "authority_rank": 1,
+      "role": "Governing engagement document. Section 9 sets the interface design: what it covers, its form as working HTML and CSS, and its revision rounds.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Statement-of-Work.md",
+      "sha256": "50759f53aba70166c922199bea94ef3f82557895d05241dbf24631f3edcec529",
+      "signed_copy": "../../final docs/Client/Engagement-Pack-Option-B/Signed/Mizzey-Launch-Platform-Statement-of-Work-SIGNED.pdf",
+      "signed_copy_sha256": "ce18f2e99864d09450b2e6fa951c1265e1a9805dd62ae19cdd085aae314c4934",
+      "in_repository": null
+    },
+    {
+      "id": "MS-ANX-2026-006",
+      "name": "Feature Register and Scope Definition",
+      "version": "1.5",
+      "authority_rank": 2,
+      "role": "Feature Register. The scope authority: every row, its wording, its scope value and its stage.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Feature-Register.md",
+      "sha256": "6624a6dcbc351e5437bc8aedf7008de8cae5e332acf694f328380fb58322204f",
+      "signed_copy": "../../final docs/Client/Engagement-Pack-Option-B/Signed/Mizzey-Launch-Platform-Feature-Register-SIGNED.pdf",
+      "signed_copy_sha256": "16dd8d0b70eb810fbca5d5b29b5cf8c2c4abf885b90e9377a4db9e35f09127cf",
+      "in_repository": "docs/scope/register-ids.json mirrors the ids, scope values and stages, without the wording."
+    },
+    {
+      "id": "MS-SPC-2026-032",
+      "name": "Functional Specification: User Stories and Acceptance Criteria",
+      "version": "1.2",
+      "authority_rank": 3,
+      "role": "Functional Specification. Stories and acceptance criteria per requirement. Issued for the Stage 1 review; approval pending. The register governs where it differs.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Functional-Specification.md",
+      "sha256": "8ee3e4464f08c7933791c21476eefa50e3869f432069c34cfef11f3d2adc140c",
+      "in_repository": null
+    },
+    {
+      "id": "SRS-AR-1.0",
+      "name": "E-commerce Website Requirements, the client's original requirements document, Arabic",
+      "version": "1.0",
+      "authority_rank": 3,
+      "role": "The upstream requirements every register row traces to by section number. Read for intent only: the register settled what is contracted.",
+      "source": "../../final docs/Ecommerce_Website_Requirements_SRS_v1.0_AR.docx",
+      "sha256": null,
+      "in_repository": null
+    },
+    {
+      "id": "MS-UAT-2026-027",
+      "name": "Acceptance and UAT Plan",
+      "version": "1.4",
+      "authority_rank": 4,
+      "role": "Acceptance. The definition of done, the acceptance script AC-01 to AC-25 and the store operations checks OPS-01 to OPS-08.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Acceptance-and-UAT-Plan.md",
+      "sha256": "2bc81485d40a82225cccda49ebf184ebf60ffaa669e3c8c52594798ee984456a",
+      "in_repository": null
+    },
+    {
+      "id": "PBI-OWNERSHIP",
+      "name": "Option B PBI ownership and exact register ids",
+      "version": "as committed",
+      "authority_rank": 5,
+      "role": "Which PBI accepts each delivery row. One row, one PBI.",
+      "source": "../docs/scope/backlog-ownership.json",
+      "sha256": null,
+      "in_repository": "docs/scope/backlog-ownership.json, docs/scope/register-ids.json"
+    },
+    {
+      "id": "DECISIONS",
+      "name": "Owner decisions and open items",
+      "version": "as committed",
+      "authority_rank": 6,
+      "role": "Approved owner decisions, contradictions and working defaults. An owner decision is not a client confirmation.",
+      "source": "../DECISIONS.md",
+      "sha256": null,
+      "in_repository": "DECISIONS.md, docs/scope/open-items.json"
+    },
+    {
+      "id": "MS-CMP-2026-038",
+      "name": "Sitemap and Principal User Flows, companion to the Functional Specification",
+      "version": "1.0",
+      "authority_rank": 7,
+      "role": "Verified sitemap and flows. Adds no scope. Its section 7 lists the open points it does not resolve.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Sitemap-and-User-Flows.md",
+      "sha256": "e52a10679e158c801779e8150e5df928e0c9e97516790932ca99f41be0b59060",
+      "in_repository": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md is the internal working copy."
+    },
+    {
+      "id": "URL-MAP",
+      "name": "URL map, both languages",
+      "version": "as committed",
+      "authority_rank": 7,
+      "role": "The addresses the runtime serves in English and Arabic, asserted by the integration suite. Evidence, not a contracted deliverable.",
+      "source": "../specs/003-information-architecture-urls/url-map.md",
+      "sha256": null,
+      "in_repository": "specs/003-information-architecture-urls/url-map.md"
+    },
+    {
+      "id": "MS-TDD-2026-033",
+      "name": "Technical Design, Architecture and Data Model",
+      "version": "1.2",
+      "authority_rank": 8,
+      "role": "Technical evidence, where it constrains design. Storefront editing through the block editor is its section 4.1.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Technical-Design.md",
+      "sha256": "ec9bea8098a285e7c84edb9dc48cc276530ace6dde493bed49d60421b3164c0f",
+      "in_repository": null
+    },
+    {
+      "id": "SPECS",
+      "name": "Delivered feature specifications and their verification records",
+      "version": "as committed",
+      "authority_rank": 8,
+      "role": "Technical evidence, where it constrains design: what the language handling, the addresses, the stock report and staging already do.",
+      "source": "../specs/",
+      "sha256": null,
+      "in_repository": "specs/001 to specs/005, docs/staging-environment.md"
+    },
+    {
+      "id": "MS-RFP-2026-034",
+      "name": "Design Brief",
+      "version": "1.3",
+      "authority_rank": 8,
+      "role": "Background only. It adds no scope and contracts nothing.",
+      "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Design-Brief.md",
+      "sha256": "2fae899e6c1a150cdac682bf246cb8189f0f8cf0707bae1c2cea37851aa429e8",
+      "in_repository": null
+    },
+    {
+      "id": "OPTION-C",
+      "name": "Option C material: scripts/stories.json, discovery/, Project 4 and its issues",
+      "version": "historical",
+      "authority_rank": 9,
+      "role": "Historical reference only. Never scope, never a source for a surface, a flow or a wireframe. Option C was never signed.",
+      "source": "../scripts/stories.json",
+      "sha256": null,
+      "in_repository": "scripts/, discovery/, docs/discovery/, docs/decisions/"
+    }
+  ]
+}

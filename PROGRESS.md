@@ -2,8 +2,28 @@
 
 Live status. First action each session: read this, then continue from **Next**.
 
-## Now (5 October 2026)
+## Now (6 October 2026)
 
+- **Design first (D-14, 6 October 2026). Functional PBI implementation is frozen.** #249 is not started, no
+  `006-` spec exists, and Spec Kit is not run for a functional PBI. The order is: signed scope and PBIs, the
+  complete inventory of surfaces, flows and states, low-fidelity structural wireframes, the brand identity,
+  high-fidelity UI and UX, the contracted working HTML and CSS design approved by the client, then storefront
+  implementation. This changes delivery order only: the scope, PRE-03b, the register and every acceptance
+  obligation are unchanged, and a wireframe is not a client deliverable.
+- **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
+  components and 41 open design inputs, each surface on its exact register rows and its accepting PBI. Of the
+  595 delivery rows, 409 are carried by a surface and 186 are marked as having no surface with a reason; none is
+  unaccounted for (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No wireframe,
+  brief or token exists**, and nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  `design/sources.json` points at them and copies none.
+- **The coverage report lists findings it does not act on**: nine PBIs or second-release slices marked as having
+  no design dependency that own a customer-facing surface (#248, #283, #285, #288 and #301 among them), and two
+  screens whose only backing rows sit with a PBI that does not build them, the order confirmation and the brand
+  page header. `docs/scope/backlog-ownership.json` is unchanged.
+- **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
+  v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
+- **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
+  templates under `discovery/tasks/` are marked as not to be used for design.
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
   public so the live repository, pull requests and issues can be inspected independently. **This is intentional
   and authorized. Visibility is not to be changed**, and it is reconsidered only when Mustafa explicitly declares
@@ -180,10 +200,20 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**#249 does not start until Mustafa reviews the repair report (D-13).** The pre-development closure (D-12) is
-accepted. The repairs staging showed were owed are merged and pass on staging:
-`docs/2026-10-05-staging-regression-after-repairs.md`. No known engineering defect is left to correct before
-#249.
+**Design first (D-14). No functional PBI starts, #249 included, until Mustafa says so.** In order:
+
+1. **Mustafa reviews the design-foundation PR**, `design/coverage.md` first, and rules on its findings: the PBIs
+   whose design dependency looks wrong, the two screens with no building PBI behind their rows, and the seven
+   design questions no source answers (DQ-01 to DQ-07 in `design/inventory/placeholders.json`).
+2. **Then the low-fidelity structural wireframes**, as design artefacts in `design/`, from generated briefs, in
+   both reading directions. Their file format is approved first and added to `PATH_POLICY`.
+3. **The CoreX v0.43.0 upgrade**, evaluated and made in its own infrastructure PR, before application and
+   storefront implementation resumes.
+4. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
+   Mustafa's decision. The queue is kept as the order they would follow.
+
+The pre-development closure (D-12) is accepted, and the repairs staging showed were owed are merged and pass on
+staging: `docs/2026-10-05-staging-regression-after-repairs.md`. No known engineering defect is open.
 
 **Two statuses, reported separately (D-12):**
 
@@ -192,13 +222,13 @@ accepted. The repairs staging showed were owed are merged and pass on staging:
 | **Engineering pre-development readiness** | **Complete.** Normal Stage 1 development can proceed continuously; remaining external items are isolated to explicit acceptance, integration or launch gates |
 | **Contractual pre-development acceptance** | **Pending.** PRE-07 is not held, PRE-03b is not approved, PRE-08 reads "approval pending / sent date not evidenced", PRE-09 is not written, and the Accountant clarification is not acknowledged |
 
-1. **Mustafa's review of the repair report.** `DECISIONS.md` D-13,
+1. **Mustafa's review of the repair report**, still owed from D-13. `DECISIONS.md` D-13,
    `docs/2026-10-05-staging-regression-after-repairs.md`, `docs/2026-10-05-storefront-placeholder-guard.md`, and
    the "Repair" sections of `specs/003-information-architecture-urls/verification.md` and
    `specs/004-inventory-report-one-item-once/verification.md`.
 2. **The two corrections staging showed were owed are done.** Nothing is owed here before the queue.
-3. **Then the queue, in delivery order:** #249 the import specification on a fixture, #245 the ERP adapter seam
-   on mocks, #248 the order status model, #250 structural design on neutral tokens, #251 roles, #270
+3. **The queue, frozen by D-14, in the delivery order it would follow:** #249 the import specification on a fixture, #245 the ERP adapter seam
+   on mocks, #248 the order status model, #250 the interface design (now the design-first work above), #251 roles, #270
    observability, #273 the data model, #275 staff accounts and the log, #276 product management, #280 order
    management. #247 follows #249. #268, #269, #271 and #272 are standing records kept alongside.
 4. **Owner actions that are not engineering:**

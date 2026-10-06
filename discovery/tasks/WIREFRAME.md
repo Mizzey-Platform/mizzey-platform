@@ -1,5 +1,10 @@
 # Task type: WIREFRAME
 
+> **RETIRED. Option C, historical reference only (D-14, 6 October 2026).** Do not follow this file. Option C was
+> never signed, and `scripts/stories.json` is not scope. Design work is governed by
+> [`design/README.md`](../../design/README.md): the signed Option B scope and `docs/scope/backlog-ownership.json`
+> are the authority, and no wireframe is drawn until the owner has reviewed `design/coverage.md`.
+
 You are building the low fidelity screens for one journey. You will be given a journey id.
 
 ## Where you are
