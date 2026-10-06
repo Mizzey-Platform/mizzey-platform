@@ -320,8 +320,12 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("calibration cal-01: English is the canonical design and is always drawn")
 
     def test_a_frame_marked_drawn_with_no_file(self):
+        """Judged in an empty root: the repository itself may hold the calibration files."""
         self.data["manifest"]["calibration"]["frames"][0]["status"]["a"] = "drawn"
-        self.assertRefused("calibration cal-01: direction a is drawn, and design/wireframes/s1/calibration/a/cal-01.en.html is missing")
+        with tempfile.TemporaryDirectory() as tmp:
+            errs = dw.check_manifest(self.data, Path(tmp))
+        text = "calibration cal-01: direction a is drawn, and design/wireframes/s1/calibration/a/cal-01.en.html is missing"
+        self.assertTrue(any(text in e for e in errs), f"expected {text!r} in {errs[:6]}")
 
     def test_a_declared_calibration_file_may_exist_before_its_review_is_recorded(self):
         """The designer creates the files and leaves the manifest alone: the status follows the review."""
