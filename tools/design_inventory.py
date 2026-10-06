@@ -593,9 +593,10 @@ def render(data: dict) -> str:
                  names(ss)] for k, t, m, ss in f["customer"]]) if f["customer"] else ["None."]
     L += ["", "**5.2 Second-release slices that build a customer-facing surface.** Not in the initial S1 wireframe pass. "
               "Each gets its own low-fidelity pass before PRE-03b is approved and is part of the final interface-design "
-              "package (DQ-04). They are built in the second release.", ""]
-    L += table(["Slice", "Title", "Field", "Surfaces"],
-               [[pbi_label(k), t, f"`{m}`", names(ss)] for k, t, m, ss in f["second"]]) if f["second"] else ["None."]
+              "package (DQ-04), so each is design-dependent. They are built in the second release.", ""]
+    L += table(["Slice", "Title", "Field", "Finding", "Surfaces"],
+               [[pbi_label(k), t, f"`{m}`", "**Field does not reflect these surfaces**" if m == "none" else "Consistent",
+                 names(ss)] for k, t, m, ss in f["second"]]) if f["second"] else ["None."]
     L += ["", "**5.3 Marked `none`, and builds additions to the standard administration only.** Kept as `none` by "
               "owner ruling (D-14): the additions stay inventoried and annotated, and are not made dependent on "
               "PRE-03b.", ""]

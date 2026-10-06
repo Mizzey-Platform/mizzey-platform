@@ -234,8 +234,9 @@ real limits. An option never adds a capability: it is about how a contracted one
 
 An option with no `contract_pattern` and no `platform` constraint is genuinely open. The product information
 layout (IX-08) shows the difference. PDP-12 words the full description as a tab, so the tab is a
-`contract_pattern`: the designer explores how the other information sits around that tab and how it is treated
-on mobile, and does not propose a product page with no tab. The home hero (IX-09) is genuinely open, because
+`contract_pattern`: the description stays a tab on every viewport. The designer explores how the other
+information sits around that tab, and how the tab navigation responds on a small screen, and does not propose a
+layout in which the description is no longer a tab. The home hero (IX-09) is genuinely open, because
 HOME-01 names a banner or a slider and fixes neither. **A contractual constraint is never an invitation to
 redesign the requirement.**
 

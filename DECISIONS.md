@@ -1431,8 +1431,9 @@ contracted requirement every candidate must meet, and `platform` is what the pla
 pattern is not a design alternative**: every candidate keeps it, and changing it needs a requirement decision,
 not a design review. Eight are recorded, among them the order and the review step of the checkout (JRN-07,
 CHK-05), the mobile filter drawer (PLP-22), the mini-cart in the header (CART-12) and the description tab:
-PDP-12 reads "Full description tab", so IX-08 explores the layout around that tab and its mobile treatment, and
-does not offer a product page with no tab. The home hero (IX-09) is genuinely open, because HOME-01 names a
+PDP-12 reads "Full description tab", so the description stays a tab on every viewport: IX-08 explores how the
+other information is arranged around that tab, and does not offer a product page, or a mobile layout, in which
+the description is no longer a tab. The home hero (IX-09) is genuinely open, because HOME-01 names a
 banner or a slider and fixes neither.
 
 **14. The experience target is recorded, and it is not the brand identity.** `design/direction.md`: a
@@ -1460,6 +1461,9 @@ visually before its design direction is established. No row, owner, dependency e
 The live Project's Design dependency field was set to match for these five on 6 October 2026, on the owner's
 approval, and nothing else on the board changed; its snapshot document is regenerated in a follow-up after #336
 merges.
+The three second-release slices that build customer-facing surfaces, E-FND-2b, E-SF-3b and E-SF-9b, are marked
+`needs design` as well, because DQ-04 puts their surfaces in the design before PRE-03b is approved; their stage,
+scope, ownership and second-release timing are unchanged, and they have no issue or board item.
 The eighteen PBIs that build only additions to the standard administration stay `none`. #277 stays
 `needs design`: it builds an admin surface, and its rows shape the catalogue pages customers see.
 

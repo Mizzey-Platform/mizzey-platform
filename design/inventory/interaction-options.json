@@ -239,11 +239,11 @@
       "id": "IX-08",
       "name": "Product information layout, around the description tab",
       "affected_surfaces": ["sf-pdp-simple"],
-      "requirement_outcome": "The product page carries the key features, the full description as a tab, the specifications table, delivery information, the returns summary and the authenticity statement (PDP-11 to PDP-16). The open part is how the other information is arranged around that tab, and its treatment on mobile.",
+      "requirement_outcome": "The product page carries the key features, the full description as a tab, the specifications table, delivery information, the returns summary and the authenticity statement (PDP-11 to PDP-16). The open part is how the other information is arranged around the description tab.",
       "candidate_patterns": [
-        "Tabs on every viewport: the description tab beside a tab for each other information group",
-        "Tabs on desktop, with a mobile treatment of the same sections, such as an accordion, if the owner confirms that still meets PDP-12",
-        "A description tab and a specifications tab, with delivery, returns and authenticity shown outside the tabs"
+        "Tabs for the description and for the other suitable information groups, on every viewport",
+        "The full description stays a tab on every viewport, with other information groups such as delivery, returns or authenticity in accordions or stacked blocks around it",
+        "A full-description tab and a specifications tab, with delivery, returns and authenticity presented outside the tab group"
       ],
       "working_baseline": null,
       "status": "open",
@@ -252,14 +252,18 @@
       "constraints": [
         {
           "type": "contract_pattern",
-          "text": "PDP-12 reads \"Full description tab\". The full description is presented as a tab, and every candidate keeps it. Removing the tab, for example stacked sections with no tabs or an accordion on every viewport, is not a design alternative: it would need a requirement decision that changes the reading of PDP-12."
+          "text": "PDP-12 reads \"Full description tab\". The full description is presented through a tab on every viewport, and every candidate keeps it. A treatment where the description itself becomes only an accordion or a stacked section, on mobile or anywhere, is not a design alternative: it would need a formal requirement decision that changes the reading of PDP-12."
         },
         {"type": "contract_condition", "text": "The key features are their own block, apart from the full description (PDP-11)."},
         {"type": "contract_condition", "text": "The specifications are a table (PDP-13)."},
         {"type": "contract_condition", "text": "Product content differs in length between English and Arabic (SSC-21)."},
         {"type": "platform", "text": "The WooCommerce product details block renders tabs natively."}
       ],
-      "selection_criteria": ["how much content a product really has", "scanning on mobile", "whether content is hidden from the customer or from search engines", "accessibility"],
+      "selection_criteria": [
+        "how much content a product really has", "scanning on mobile",
+        "how the tab navigation itself responds on a small screen: horizontal scrolling or another accessible treatment, with the description still a tab",
+        "whether content is hidden from the customer or from search engines", "accessibility"
+      ],
       "selected_pattern": null,
       "decision_source": null
     },

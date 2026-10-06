@@ -4909,12 +4909,12 @@
    "delivery_order": null,
    "depends_on": [],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [],
    "data_integrity": "",
    "acceptance_evidence": "",
    "not_in_slice": [],
-   "notes": "Part One 1.1: unsubscribe links in emails stand in for IA-23 in the first release."
+   "notes": "Part One 1.1: unsubscribe links in emails stand in for IA-23 in the first release. D-14, DQ-04: design-dependent. Its customer-facing surfaces get their own low-fidelity pass and are in the interface design before PRE-03b is approved; it is still built in the second release."
   },
   {
    "key": "E-FND-3b",
@@ -5035,12 +5035,12 @@
    "delivery_order": null,
    "depends_on": [],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [],
    "data_integrity": "",
    "acceptance_evidence": "",
    "not_in_slice": [],
-   "notes": ""
+   "notes": "D-14, DQ-04: design-dependent. Its customer-facing surfaces get their own low-fidelity pass and are in the interface design before PRE-03b is approved; it is still built in the second release."
   },
   {
    "key": "E-SF-9b",
@@ -5062,12 +5062,12 @@
    "delivery_order": null,
    "depends_on": [],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [],
    "data_integrity": "",
    "acceptance_evidence": "",
    "not_in_slice": [],
-   "notes": "Part One 1.1: in the first release customers view past orders, emails carry unsubscribe links and deletion is handled manually on request."
+   "notes": "Part One 1.1: in the first release customers view past orders, emails carry unsubscribe links and deletion is handled manually on request. D-14, DQ-04: design-dependent. Its customer-facing surfaces get their own low-fidelity pass and are in the interface design before PRE-03b is approved; it is still built in the second release."
   }
  ]
 }

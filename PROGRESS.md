@@ -31,8 +31,9 @@ Live status. First action each session: read this, then continue from **Next**.
 - **The experience target is `design/direction.md`**, and it is not the brand identity. No implementation library
   is chosen.
 - **Design dependency.** #248, #283, #285, #288 and #301 build a customer-facing surface in the first release and
-  are now marked `needs design`. Eighteen PBIs that build additions to the standard administration only stay
-  `none`. The live Project's Design dependency field was set to match for those five on 6 October 2026, on
+  are now marked `needs design`, as are the three second-release slices that build customer-facing surfaces
+  (E-FND-2b, E-SF-3b, E-SF-9b), which stay second release. Eighteen PBIs that build additions to the standard
+  administration only stay `none`. The live Project's Design dependency field was set to match for those five on 6 October 2026, on
   Mustafa's approval, and nothing else on the board changed. **The board snapshot in
   `docs/2026-10-04-github-project-proposal.md` still shows the earlier values** and is regenerated in a follow-up
   after #336 merges.

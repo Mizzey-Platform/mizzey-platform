@@ -246,7 +246,7 @@
       "states": ["default", "selected", "focus"],
       "used_by": ["sf-pdp-simple", "au-sign-in"],
       "brand": "neutral",
-      "note": "PDP-12 names the full description as a tab, so the tab stays. Its mobile treatment is explored within that (IX-08)."
+      "note": "PDP-12 names the full description as a tab, so it stays a tab on every viewport. How the tab navigation responds on a small screen is explored (IX-08)."
     },
     {
       "id": "nv-pagination",

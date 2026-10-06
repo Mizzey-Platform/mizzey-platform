@@ -387,13 +387,13 @@ Each line is enforced by `tools/design_inventory.py` and fails CI when it does n
 | #310 | Trust and support pages, editable without a developer, in both languages | `needs design` | Consistent | `ct-static-page`, `ct-about`, `ct-authenticity`, `ct-shipping-policy`, `ct-help`, `ct-privacy`, `ct-returns-policy`, `ct-terms`, `ct-contact` |
 | #311 | Self-service storefront and product control: everything a customer sees is editable in both languages, with preview | `needs design` | Consistent | `gl-promo-banner`, `ct-campaign-page` |
 
-**5.2 Second-release slices that build a customer-facing surface.** Not in the initial S1 wireframe pass. Each gets its own low-fidelity pass before PRE-03b is approved and is part of the final interface-design package (DQ-04). They are built in the second release.
+**5.2 Second-release slices that build a customer-facing surface.** Not in the initial S1 wireframe pass. Each gets its own low-fidelity pass before PRE-03b is approved and is part of the final interface-design package (DQ-04), so each is design-dependent. They are built in the second release.
 
-| Slice | Title | Field | Surfaces |
-|---|---|---|---|
-| E-FND-2b | Information architecture, second release | `none` | `sf-brand-landing` |
-| E-SF-3b | Product listing, second release: filter by rating | `none` | `sf-filter-by-rating` |
-| E-SF-9b | My Account, second release: reorder, notification preferences, account deletion request | `none` | `ac-reorder`, `ac-notification-preferences`, `ac-account-deletion` |
+| Slice | Title | Field | Finding | Surfaces |
+|---|---|---|---|---|
+| E-FND-2b | Information architecture, second release | `needs design` | Consistent | `sf-brand-landing` |
+| E-SF-3b | Product listing, second release: filter by rating | `needs design` | Consistent | `sf-filter-by-rating` |
+| E-SF-9b | My Account, second release: reorder, notification preferences, account deletion request | `needs design` | Consistent | `ac-reorder`, `ac-notification-preferences`, `ac-account-deletion` |
 
 **5.3 Marked `none`, and builds additions to the standard administration only.** Kept as `none` by owner ruling (D-14): the additions stay inventoried and annotated, and are not made dependent on PRE-03b.
 
@@ -492,7 +492,7 @@ UX choices with more than one legitimate pattern, where neither the contract nor
 | IX-05 | How the category navigation opens on desktop | `open` | platform | None yet | Opens on hover and on keyboard focus; Opens on click or tap | Low-fidelity review | `gl-mega-menu`, `gl-header` |
 | IX-06 | How the mobile menu shows category levels | `open` | contract, platform | None yet | Drill-down: one level per panel, with a way back; Accordion: levels expand in place | Low-fidelity review | `gl-mobile-nav` |
 | IX-07 | Search interaction | `open` | contract, platform | None yet | Inline field with a suggestions panel; Full-screen search overlay on mobile; Field that expands in the header | Low-fidelity review | `sf-search-suggestions`, `gl-header`, `gl-header-mobile` |
-| IX-08 | Product information layout, around the description tab | `open` | contract, platform | None yet | Tabs on every viewport: the description tab beside a tab for each other information group; Tabs on desktop, with a mobile treatment of the same sections, such as an accordion, if the owner confirms that still meets PDP-12; A description tab and a specifications tab, with delivery, returns and authenticity shown outside the tabs | Low-fidelity review | `sf-pdp-simple` |
+| IX-08 | Product information layout, around the description tab | `open` | contract, platform | None yet | Tabs for the description and for the other suitable information groups, on every viewport; The full description stays a tab on every viewport, with other information groups such as delivery, returns or authenticity in accordions or stacked blocks around it; A full-description tab and a specifications tab, with delivery, returns and authenticity presented outside the tab group | Low-fidelity review | `sf-pdp-simple` |
 | IX-09 | Home hero: one banner or a slider | `open` | nothing: genuinely open | None yet | Single hero banner; Slider of several banners | Low-fidelity review | `sf-home` |
 
 **What the contract fixes inside these choices.** Each line is part of a pattern the signed wording settles. **It is not a design alternative**, and the candidates above all keep it. Changing one needs a requirement decision, not a design review.
@@ -506,7 +506,7 @@ UX choices with more than one legitimate pattern, where neither the contract nor
 | IX-06 | On mobile the navigation is a hamburger menu, reached from a menu button (NAV-10). That is not open. |
 | IX-07 | The search bar is clear and prominent (NAV-03). Read that row before reducing it to an icon on desktop. |
 | IX-07 | Mobile has quick search (NAV-09). |
-| IX-08 | PDP-12 reads "Full description tab". The full description is presented as a tab, and every candidate keeps it. Removing the tab, for example stacked sections with no tabs or an accordion on every viewport, is not a design alternative: it would need a requirement decision that changes the reading of PDP-12. |
+| IX-08 | PDP-12 reads "Full description tab". The full description is presented through a tab on every viewport, and every candidate keeps it. A treatment where the description itself becomes only an accordion or a stacked section, on mobile or anywhere, is not a design alternative: it would need a formal requirement decision that changes the reading of PDP-12. |
 
 ## 9. Every surface
 

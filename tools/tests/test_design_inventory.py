@@ -76,9 +76,13 @@ class TheCommittedInventory(unittest.TestCase):
         ix08 = next(o for o in self.data["options"] if o["id"] == "IX-08")
         self.assertIn("contract", ix08["constrained_by"])
         self.assertTrue(any(c["type"] == "contract_pattern" and "PDP-12" in c["text"] for c in ix08["constraints"]))
+        self.assertTrue(any("on every viewport" in c["text"] for c in ix08["constraints"] if c["type"] == "contract_pattern"))
+        self.assertEqual(len(ix08["candidate_patterns"]), 3)
         for pattern in ix08["candidate_patterns"]:
             self.assertIn("tab", pattern.lower(), pattern)
             self.assertFalse(pattern.lower().startswith(("stacked", "accordion")), pattern)
+            self.assertNotIn("if the owner confirms", pattern)
+            self.assertNotIn("tabs on desktop", pattern.lower(), "the description is a tab on every viewport, not on desktop only")
 
     def test_the_home_hero_is_genuinely_open(self):
         ix09 = next(o for o in self.data["options"] if o["id"] == "IX-09")
@@ -111,6 +115,12 @@ class TheCommittedInventory(unittest.TestCase):
         marked = {(sl["issue"] or sl["key"]): sl["design_dependency"] for sl in self.data["slices"]}
         for pbi in (248, 283, 285, 288, 301):
             self.assertEqual(marked[pbi], "needs design", pbi)
+        for slice_key in ("E-FND-2b", "E-SF-3b", "E-SF-9b"):
+            self.assertEqual(marked[slice_key], "needs design", slice_key)
+        self.assertEqual(sorted(k for k, _, m, _ in f["second"] if m == "needs design"), ["E-FND-2b", "E-SF-3b", "E-SF-9b"])
+        self.assertEqual({sl["key"]: (sl["stage"], sl["issue"]) for sl in self.data["slices"]
+                          if sl["key"] in ("E-FND-2b", "E-SF-3b", "E-SF-9b")},
+                         {k: ("S2", None) for k in ("E-FND-2b", "E-SF-3b", "E-SF-9b")})
         self.assertEqual(len(f["staff_only"]), 18)
         self.assertTrue(all(marked[k] == "none" for k, _, _ in f["staff_only"]))
         self.assertEqual(marked[277], "needs design")
