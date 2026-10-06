@@ -12,6 +12,10 @@
  * test failed on exactly this: a total that included them differed by a hundred rows while every stable table,
  * every count and every media file was identical.
  *
+ * The WPML settings live in the options table, so skipping that table skipped them. They are stable, and a restore
+ * that lost them would bring back a store whose translations behave differently, so they are read on their own
+ * and compared: `wpml_settings` is a hash of what baseline/wpml-settings.php reports.
+ *
  * @package MizzeySite\Tests\Staging
  */
 
@@ -44,6 +48,9 @@ if ( is_dir( $uploads ) ) {
 }
 ksort( $files );
 
+define( 'MIZZEY_WPML_SETTINGS_QUIET', true );
+require __DIR__ . '/../integration/baseline/wpml-settings.php';
+
 $count = static function ( string $type, string $status = 'publish' ) use ( $wpdb ): int {
 	return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE post_type = %s AND post_status = %s', $wpdb->posts, $type, $status ) );
 };
@@ -61,6 +68,7 @@ echo wp_json_encode(
 		'refunds'           => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE type = %s', $wpdb->prefix . 'wc_orders', 'shop_order_refund' ) ),
 		'users'             => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $wpdb->users ) ),
 		'translation_rows'  => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $wpdb->prefix . 'icl_translations' ) ),
+		'wpml_settings'     => hash( 'sha256', wp_json_encode( mizzey_baseline_wpml_settings() ) ),
 		'upload_files'      => count( $files ),
 		'uploads_checksum'  => hash( 'sha256', wp_json_encode( $files ) ),
 		'wordpress'         => get_bloginfo( 'version' ),

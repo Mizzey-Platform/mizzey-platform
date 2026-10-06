@@ -20,6 +20,7 @@ client's written instruction (OD-27) and the operating budget (OD-14).
 | Data | Scenario fixtures, removed on finish | Invented data only, from `mizzey-site/tests/staging/seed/` |
 | Mail | Whatever the machine does | Captured to `../app-staging/mail/`. None is sent |
 | Outside requests | Allowed | Refused (`WP_HTTP_BLOCK_EXTERNAL`) |
+| The translation plugin's downloaded configuration | Fetched from its publisher when a plugin is activated | Copied from development at each reset. Staging does not fetch it |
 | Marker | None | A strip on every storefront, admin and sign-in screen, and a different admin bar colour |
 | Search engines | Not reachable | `noindex` on every response |
 
@@ -39,7 +40,8 @@ All from the repository root. The tool is `mizzey-site/tests/staging/staging.py`
 | `python mizzey-site/tests/staging/staging.py build` | Assembles the staging tree from `origin/main` and writes its configuration. `--ref <commit>` builds another commit and records that it is not merged |
 | `... staging.py db-create` | Creates the staging database and its account. Run once, and after a password change |
 | `... staging.py up` / `down` / `status` | Starts, stops or reports the staging web server |
-| `MIZZEY_CONFIRM_STAGING=yes ... staging.py reset` | Backs up, then reinstalls staging, applies the same baseline development gets, and loads the invented data. About four minutes |
+| `MIZZEY_CONFIRM_STAGING=yes ... staging.py reset` | Backs up, then reinstalls staging, copies the translation plugin's downloaded configuration from development, applies the baseline files development gets, and loads the invented data. It ends by comparing the two runtimes' translation settings and fails if they differ. About two minutes |
+| `... staging.py parity` | Compares the translation settings of staging and development and fails on any difference, naming each one. Reads only |
 | `... staging.py backup` | Database and media into a dated set under `../app-staging/backups/` |
 | `MIZZEY_CONFIRM_STAGING=yes ... staging.py restore <set>` | Puts a backup set back |
 | `MIZZEY_CONFIRM_STAGING=yes ... staging.py restore-test` | Backs up, destroys, restores and compares. Writes an evidence file |
@@ -62,7 +64,7 @@ Invented data, shaped by what a review has to exercise. Nothing in it is the cli
 | Accounts | `staging_admin` (Administrator), `client_operator` (Shop manager, for the client to drive), `demo_customer` (Customer). Passwords are generated at each reset into `CREDENTIALS.json` |
 | Catalogue | Twelve simple products and two with three variants each, in three categories and two brands, each in English and Arabic; one product in English only and one in Arabic only; one item for the concurrency harness. SKUs start with `DEMO-` |
 | Stock | Healthy, low and exhausted, so the stock report has every case |
-| Cost | Present on most, zero on one, missing on two |
+| Cost | Cost capture is switched on before the catalogue is made. A cost on nine simple products and on all six variants, the same on both language records; none on two of the twelve simple products; and one written as zero, which the commerce platform stores as "no cost" (`specs/001-product-cost-capture`, OD-12). The seed fails if a cost it wrote is not stored, or differs between the two language records |
 | Orders | Twelve, in every state: pending, processing, on hold, completed, cancelled, failed, refunded, and one partial refund. Two placed in Arabic. Phone numbers written in four formats |
 | Checkout settings | Cash on delivery on, one invented shipping price for Egypt, guest checkout on, the "coming soon" screen off |
 | Reports | The seeded orders and refunds are imported into the reports by the commerce platform's own importer, so the report screens are not empty. Without this step a fresh staging reads "No data" until a background job has run |
@@ -70,6 +72,43 @@ Invented data, shaped by what a review has to exercise. Nothing in it is the cli
 
 Sources are created first and translations in a separate process, which is the sequencing rule finding A11
 established for migration.
+
+## The same translation settings as development
+
+Both runtimes run the same baseline files (`mizzey-site/tests/integration/baseline/`). Those files are not the
+baseline's only input. When a plugin is activated, WPML asks its publisher's host for a configuration index and
+for the file of each active plugin the index names, and a file marked to override replaces the plugin's own
+bundled `wpml-config.xml`. Development makes that request. Staging refuses every outside request, so until
+6 October 2026 it ran on the bundled files and ended with different settings, while the tool said the two could
+not drift.
+
+| | Development | Staging before the correction |
+|---|---|---|
+| Custom fields with a translation setting | 86 | 85 |
+| `_cogs_total_value`, the stored product cost | Copy, locked | No setting |
+| `shop_subscription` post type | Not translatable | No setting |
+| Where the difference came from | The downloaded file for WooCommerce Multilingual, which adds exactly those two lines to the bundled 5.5.7 file | The bundled file |
+
+It mattered. With no setting for the cost field, a cost that was on the English product before its Arabic record
+was created did not reach the Arabic record in three of four cases (WPML duplicate of a product with variants,
+and the translation editor save of a simple product and of one with variants). With the setting, all four hold.
+A cost changed afterwards through the wp-admin product form reached the Arabic record either way.
+
+What the tool does now:
+
+- **`reset` copies the downloaded configuration from development**
+  (`mizzey-site/tests/staging/wpml-remote-config.php`) before the
+  wp-admin visit that applies it. Staging still makes no outside request. Development must hold a downloaded
+  configuration: if its own reset ran without a connection, the staging reset stops and says so.
+- **`reset` ends by comparing the two runtimes**, and `parity` makes the same comparison at any time
+  (`mizzey-site/tests/integration/baseline/wpml-settings.php`): the languages, every translation-management setting, and which configuration
+  files each runtime was working from, by hash. A difference fails the command and is named.
+- **The backup fingerprint includes the translation settings.** They live in the options table, which the
+  fingerprint otherwise leaves out as volatile, so a restore is now held to them too.
+
+Two limits. The comparison is between this machine's two runtimes, so it runs here and not in CI. And what the
+publisher's host serves can change: both runtimes then follow development's copy, and production will follow
+whatever it downloads on its own host.
 
 ## Backup, retention and restore (NFR-08)
 

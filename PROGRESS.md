@@ -111,6 +111,23 @@ Live status. First action each session: read this, then continue from **Next**.
   every run (B6). #241's browser matrix was exercised on Chrome, Edge and a Firefox build, and **AC-9 is still
   not verified**: three rows need devices. The passes were scripted, in real browser windows: a person has not
   looked.
+- **Staging and development did not end with the same translation settings, and now do (6 October 2026).** Both
+  run the same baseline files, but WPML also works from a configuration it downloads from its publisher, and
+  staging refuses outside requests. Staging was one custom field and one post type short: `_cogs_total_value`,
+  the stored product cost, had no setting there. The staging reset now copies development's downloaded
+  configuration, ends by comparing the two runtimes and fails on a difference (`staging.py parity`), and the
+  seed switches cost capture on, which it never had: until then no product on staging held a cost and the cost
+  field was not on the product form. Explained in `docs/staging-environment.md`, "The same translation settings
+  as development". Internal test infrastructure, no client-facing change.
+- **Open, found by that investigation, and not corrected: part of #252's verified behaviour depends on the
+  downloaded configuration.** Measured on staging with one variable changed. Without WPML's setting for
+  `_cogs_total_value`, a cost that is on the English product before its Arabic record is created does not reach
+  the Arabic record in three of four cases (the creation half of t11); with the setting all four hold. A cost
+  changed afterwards through the wp-admin product form reaches the Arabic record either way, and a cost typed
+  on the Arabic record is replaced by the original's. So ADM-27 and RPT-11 stay technically verified **where the
+  configuration has been downloaded**, which is the only condition they were ever verified under, and nothing in
+  the site plugin declares the setting itself. Whether #252 is reopened to remove that dependence is Mustafa's
+  decision. It is production code and requirement work, and is not touched by the staging correction.
 - **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
   companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
   accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08 reads "approval pending / sent

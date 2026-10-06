@@ -7,6 +7,7 @@
     db-create                   create the staging database and its own database account
     up | down | status          start, stop or report the staging web server
     reset                       DESTRUCTIVE for staging only: reinstall, apply the baseline, load synthetic data
+    parity                      compare the WPML settings of staging and development, and fail if they differ
     backup                      database and uploads into a dated, checksummed backup set
     restore <set>               DESTRUCTIVE for staging only: put a backup set back
     restore-test                back up, destroy, restore, and compare fingerprints. Writes the evidence file
@@ -95,9 +96,9 @@ def sh(args: list, check: bool = True, **kw) -> subprocess.CompletedProcess:
                           errors="replace", check=check, **kw)
 
 
-def wp(*args: str, check: bool = True, themes: bool = False) -> str:
+def wp(*args: str, check: bool = True, themes: bool = False, path: Path = WP) -> str:
     exe = shutil.which("wp") or "wp"
-    flags = [f"--path={WP}"] + ([] if themes else ["--skip-themes"])
+    flags = [f"--path={path}"] + ([] if themes else ["--skip-themes"])
     proc = sh([exe, *flags, *args], check=False)
     if check and proc.returncode:
         raise SystemExit(f"wp {' '.join(args)} failed ({proc.returncode}):\n{proc.stderr[-2000:]}\n{proc.stdout[-800:]}")
@@ -423,7 +424,10 @@ def cmd_reset(a) -> None:
     if wp("eval", 'echo get_option("permalink_structure");') != "/%postname%/":
         raise SystemExit("permalink_structure did not take")
     wp("rewrite", "flush")
-    # The same baseline the development runtime gets, from the same files, so the two cannot drift.
+    # The baseline files are the ones the development runtime gets, but they are not the baseline's only input:
+    # WPML also works from a configuration it downloads, which staging may not fetch. It is carried across here,
+    # before the wp-admin visit that applies it, and the reset ends by comparing the two runtimes.
+    carry_wpml_config()
     for script in ("setup.php", "admin-visit.php", "ia-endpoints.php"):
         say(f"baseline/{script}")
         say("  " + wp("eval-file", str(BASELINE / script))[-400:].replace("\n", "\n  "))
@@ -432,6 +436,69 @@ def cmd_reset(a) -> None:
     wp("rewrite", "flush")
     wp("cache", "flush")
     say(f"staging reset and seeded. Credentials: {STAGING / 'CREDENTIALS.json'}")
+    # Last, so that a reset that fails here leaves a complete staging copy to look at.
+    require_parity()
+
+
+# ---- the same WPML settings as development ------------------------------------------------------------------
+
+def carry_wpml_config() -> None:
+    """Copy the configuration WPML downloaded on development into staging, which makes no outside request."""
+    carried = STAGING / "run" / "wpml-remote-config.json"
+    script = str(HERE / "wpml-remote-config.php")
+    sent = json.loads(wp("eval-file", script, "export", carried.as_posix(), path=DEV_APP / "wp").splitlines()[-1])
+    landed = json.loads(wp("eval-file", script, "import", carried.as_posix()).splitlines()[-1])
+    if not sent["files"] or (sent["index"], sent["files"]) != (landed["index"], landed["files"]):
+        raise SystemExit(f"the WPML configuration did not carry: development holds {sent}, staging holds {landed}")
+    say("WPML configuration carried from development: " + ", ".join(sorted(sent["files"])))
+
+
+def wpml_settings(path: Path) -> dict:
+    return json.loads(wp("eval-file", str(BASELINE / "wpml-settings.php"), path=path).splitlines()[-1])
+
+
+def differences(development, staging, at: str = "") -> list[str]:
+    """Every setting that differs between the two runtimes, by name, with the value each one holds."""
+    if isinstance(development, dict) and isinstance(staging, dict):
+        found = []
+        for key in sorted(set(development) | set(staging)):
+            name = f"{at}.{key}" if at else str(key)
+            if key not in staging:
+                found.append(f"{name}: development {json.dumps(development[key])[:120]}, staging absent")
+            elif key not in development:
+                found.append(f"{name}: development absent, staging {json.dumps(staging[key])[:120]}")
+            else:
+                found += differences(development[key], staging[key], name)
+        return found
+    if isinstance(development, list) and isinstance(staging, list):
+        members = [sorted({json.dumps(v, sort_keys=True) for v in side}) for side in (development, staging)]
+        found = []
+        for label, mine, theirs in (("development", *members), ("staging", *reversed(members))):
+            only = [json.loads(v) for v in mine if v not in theirs]
+            if only:
+                found.append(f"{at}: only on {label} {only}")
+        return found
+    if development != staging:
+        return [f"{at}: development {json.dumps(development)[:120]}, staging {json.dumps(staging)[:120]}"]
+    return []
+
+
+def require_parity() -> None:
+    """Fail unless staging and development hold the same WPML settings, reached from the same configuration."""
+    development, staging = wpml_settings(DEV_APP / "wp"), wpml_settings(WP)
+    found = differences(development, staging)
+    if found:
+        raise SystemExit("the WPML settings of staging and development differ:\n  " + "\n  ".join(found[:60])
+                         + (f"\n  and {len(found) - 60} more" if len(found) > 60 else ""))
+    say(f"WPML settings: staging and development are identical ({len(staging['settings'])} settings, "
+        f"{len(staging['settings'].get('translation-management.custom_fields_translation') or {})} custom fields, "
+        f"configuration from {len(staging['sources']['downloaded_plugins'])} downloaded and "
+        f"{len(staging['sources']['bundled_plugins'])} bundled files)")
+
+
+def cmd_parity(a) -> None:
+    guard_tree()
+    require_parity()
 
 
 def seed() -> None:
@@ -630,7 +697,7 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--ref", default="origin/main")
     b.add_argument("--code-only", action="store_true",
                    help="refresh only the site plugin, the theme and the staging plugin: a minute, not ten")
-    for name in ("db-create", "up", "down", "status", "reset", "seed", "restore-test"):
+    for name in ("db-create", "up", "down", "status", "reset", "seed", "restore-test", "parity"):
         sub.add_parser(name)
     sub.add_parser("backup").add_argument("--label", default="manual")
     sub.add_parser("restore").add_argument("set")

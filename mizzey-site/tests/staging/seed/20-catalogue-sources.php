@@ -9,7 +9,8 @@
  *  - one curated collection holding three of them, so the collection archive of IA-04 has something to show;
  *  - a barcode on some and none on others, for the search row of the store operations list (ADM-152);
  *  - stock that is healthy, low and exhausted, so the stock report of #246 has every case to show;
- *  - a product cost on most and none on two (ADM-27: zero and missing are different things);
+ *  - a product cost on most, none on two, and a zero on one, which WooCommerce stores as "no cost" (ADM-27, and
+ *    the fact recorded in specs/001-product-cost-capture under OD-12);
  *  - one product that exists only in English and one that exists only in Arabic.
  *
  * Translations are NOT made here. Creating a record and translating it in the same process is the measured
@@ -73,6 +74,8 @@ $simple = array(
 );
 
 $made = array( 'simple' => 0, 'variable' => 0, 'variations' => 0, 'single_language' => 0 );
+// Product or variation id => the cost this step wrote on it, checked against what the store holds at the end.
+$costs = array();
 
 $place = static function ( int $id, int $category, ?int $brand ): void {
 	wp_set_object_terms( $id, array( $category ), 'product_cat' );
@@ -102,6 +105,9 @@ foreach ( $simple as list( $n, $category, $brand, $price, $stock, $cost, $barcod
 		$p->set_global_unique_id( $barcode );
 	}
 	$p->save();
+	if ( null !== $cost ) {
+		$costs[ $p->get_id() ] = $cost;
+	}
 	$as_original( $p->get_id(), 'post_product', 'en' );
 	$place( $p->get_id(), $categories[ $category ], $brands[ $brand ] );
 	if ( in_array( $n, $in_collection, true ) ) {
@@ -147,6 +153,7 @@ foreach ( $variable as list( $n, $category, $brand, $sizes ) ) {
 		$v->set_low_stock_amount( 3 );
 		$v->set_cogs_value( round( (float) $price * 0.6, 2 ) );
 		$v->save();
+		$costs[ $v->get_id() ] = round( (float) $price * 0.6, 2 );
 		$as_original( $v->get_id(), 'post_product_variation', 'en' );
 		++$made['variations'];
 	}
@@ -206,5 +213,27 @@ if ( ! wc_get_product_id_by_sku( 'DEMO-AR-ONLY' ) ) {
 	$sitepress->switch_lang( 'en', true );
 	++$made['single_language'];
 }
+
+// A cost this step wrote must be a cost the store holds. WooCommerce drops one without a word while cost capture
+// is switched off (step 15 switches it on), and staging once held none at all while its guide said most products
+// had one. Read back from storage, not from the objects above.
+//
+// A cost of zero is the one exception, and it is WooCommerce's own rule, not a loss: zero is stored as "no cost"
+// (WC_Product::adjust_cogs_value_before_set, recorded in specs/001-product-cost-capture under OD-12). The product
+// seeded with zero is there so a reviewer can see exactly that.
+wp_cache_flush();
+$lost = array();
+foreach ( $costs as $id => $cost ) {
+	$held = wc_get_product( $id )->get_cogs_value();
+	$owed = $cost > 0 ? $cost : null;
+	if ( null === $owed ? null !== $held : ( null === $held || abs( (float) $held - $owed ) >= 0.005 ) ) {
+		$lost[] = sprintf( '%d: wrote %s, holds %s', $id, $cost, null === $held ? 'none' : $held );
+	}
+}
+if ( $lost ) {
+	echo implode( "\n", $lost ), "\n";
+	WP_CLI::error( 'the seeded costs were not stored: is cost capture on (seed/15-store-settings.php)?' );
+}
+$made['costs_stored'] = count( array_filter( $costs, static fn ( float $cost ): bool => $cost > 0 ) );
 
 echo wp_json_encode( $made ), "\n";
