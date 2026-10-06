@@ -14,12 +14,13 @@ Live status. First action each session: read this, then continue from **Next**.
   approved by the client, then storefront implementation. Second-release surfaces are designed before PRE-03b and
   still built in the second release (DQ-04). Delivery order only: the scope,
   PRE-03b, the register and every acceptance obligation are unchanged, and a wireframe is not a client deliverable.
-- **The wireframe production workflow is prepared, and D-15 is proposed, pending merge.** The low-fidelity
-  wireframe is a standalone static HTML and CSS design prototype under `design/wireframes/`, never theme or
-  application code. Its path policy is on `main` (PR #339). The format, the workflow, the production manifest, the brief
-  generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying script, outside
-  resources, a library or colour (`tools/design_wireframes.py`) are in the wireframe-workflow pull request, with
-  32 generated briefs for the calibration surfaces. **No wireframe exists and the calibration set has not
+- **The wireframe production workflow is on `main`, and D-15 is applied** (PR #339 for the path policy, PR #340
+  for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
+  prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
+  manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 32 generated
+  briefs for the calibration surfaces. The shared neutral stylesheet, `design/wireframes/_shared/wireframe.css`,
+  completes the supporting preparation for execution. **No wireframe exists and the calibration set has not
   started.**
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
@@ -228,8 +229,8 @@ Live status. First action each session: read this, then continue from **Next**.
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
 drawn and CoreX is not upgraded until he says so either.** In order:
 
-1. **Mustafa's review of the wireframe-production preparation (D-15)**: the wireframe-workflow pull request
-   (#340), then the shared stylesheet in its own pull request. The path policy is merged (#339).
+1. **The wireframe-production preparation (D-15) is complete** with the shared stylesheet. Nothing further is
+   prepared by Claude Code before the design starts.
 2. **Then, on Mustafa's instruction to Claude Design, the calibration set**: eight frames in three structural
    directions, from the 32 generated briefs. Claude Design draws it; Claude Code does not (D-15, item 9). He
    selects a direction, or one with elements of another.

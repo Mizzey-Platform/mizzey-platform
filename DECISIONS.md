@@ -1565,10 +1565,10 @@ the design review. When design begins, Claude Design is given the repository, th
 signed wording, generated outside the repository, and the original signed documents from `final docs/` as
 read-only reference. The signed documents are never committed.
 
-**Status, 6 October 2026: proposed in PR #340, reviewed by the owner, pending merge. Not applied.** The owner
-keeps this as its own decision, separate from D-14: D-14 sets the design-first sequence and the UX source of
-truth, and D-15 sets how the wireframes are produced. The path policy is on `main` (PR #339, `e4587fa`). The
-format rules, the brief generator, the manifest, the calibration definition, the review batches and the checks
-are in the pull request that carries this entry, with the 32 briefs of the calibration surfaces. The shared
-stylesheet follows in its own pull request. **No wireframe is drawn, and the
-calibration set has not started**: it begins on the owner's instruction.
+**Status: applied, 6 October 2026.** The wireframe-production workflow is on `main`: PR #340, merged as
+`a059e400eb927660b309e2e5e331061dc9039fc8`, after the path policy (PR #339, `e4587fa`). The owner keeps this as
+its own decision, separate from D-14: D-14 sets the design-first sequence and the UX source of truth, and D-15
+sets how the wireframes are produced. The shared stylesheet, `design/wireframes/_shared/wireframe.css`, arrives
+in the pull request after #340. It is supporting preparation for execution, and this decision does not depend
+on it. **No wireframe is drawn, and the calibration set has not started**: it begins on the owner's instruction
+to Claude Design.
