@@ -83,6 +83,10 @@ PATH_POLICY: tuple[tuple[str, str], ...] = (
     (".specify/*", "workflow-config"),
     (".claude/skills/*", "workflow-config"),
     (".github/*", "workflow-config"),
+    # The UX and design source of truth. Data and prose only: a wireframe file type is added here when its format
+    # is approved, so nothing executable can arrive under design/.
+    ("design/*.md", "design"),
+    ("design/*.json", "design"),
     ("docs/engagement/*", "docs"),
     ("docs/*.md", "docs"),
     ("README.md", "docs"),
@@ -92,12 +96,13 @@ PATH_POLICY: tuple[tuple[str, str], ...] = (
 )
 
 ALLOWED: dict[str, set[str]] = {
-    "requirement": {"feature-spec", "site-code", "site-tests", "test-infra", "docs", "delivery-tooling", "version-lock"},
-    "governance": {"governance-control", "workflow-config", "test-infra", "tooling", "docs"},
+    "requirement": {"feature-spec", "site-code", "site-tests", "test-infra", "docs", "delivery-tooling", "version-lock",
+                    "design"},
+    "governance": {"governance-control", "workflow-config", "test-infra", "tooling", "docs", "design"},
     "ci": {"governance-control", "workflow-config", "test-infra", "docs"},
     "test-infrastructure": {"test-infra", "site-tests", "docs"},
     "tooling": {"tooling", "test-infra", "delivery-tooling", "docs"},
-    "documentation": {"docs"},
+    "documentation": {"docs", "design"},
     "security-maintenance": {"site-code", "site-tests", "test-infra", "tooling", "delivery-tooling", "version-lock",
                              "docs"},
 }
