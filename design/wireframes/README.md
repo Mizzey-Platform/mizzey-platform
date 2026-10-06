@@ -28,7 +28,7 @@ reaches the contracted working HTML and CSS stage, that work is built for the pu
 ```text
 design/wireframes/
   README.md            this file
-  workflow.md          the calibration set, the review model, the batches, the sequence
+  workflow.md          the two roles, the calibration set, the review model, the batches, the sequence
   manifest.json        design-production status, one entry per surface
   _shared/
     wireframe.css      the small neutral structural system every wireframe links

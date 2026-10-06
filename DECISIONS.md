@@ -1516,7 +1516,10 @@ labels only: A, Clean Premium Commerce; B, Editorial Modern Retail; C, Dynamic C
 approaches to hierarchy, density, composition and interaction, **not three brand identities**. All three satisfy
 the same scope and keep every pattern the contract fixes. They differ in presentation and in interaction choices
 that are genuinely open, and none adds a feature. The project is committed to no composition until the owner
-selects.
+selects. Arabic, right to left, is drawn for five of the eight frames (`cal-01`, `cal-02`, `cal-05`, `cal-07`,
+`cal-08`), the most direction-sensitive structures, because the calibration chooses a structural direction and
+does not complete the production wireframes. Every applicable customer-facing surface is still drawn in English
+and in Arabic in its production batch.
 
 **5. The owner reviews direction, not detail.** Not an exact radius, pixel spacing, an animation curve or the
 internals of a component, but the overall direction, hierarchy and density, whether it feels like modern
@@ -1543,8 +1546,29 @@ administration are annotated and not redesigned, and the second-release surfaces
 batch, its brief, its artefacts, English and Arabic, mobile and desktop, the states covered, the interaction
 decisions pending, and the review status. It restates no requirement.
 
-**Status, 6 October 2026: proposed, pending merge. Not applied.** The path policy is PR #339. The format rules,
-the brief generator, the manifest, the calibration definition, the review batches and the checks are in the
-wireframe-workflow pull request that carries this entry, with the 32 briefs of the calibration surfaces. The
-shared stylesheet follows in its own pull request once the policy is on `main`. **No wireframe is drawn, and the
+**9. Two roles, kept apart.** Claude Code maintains the repository workflow: the canonical inventories, the
+generators and the checkers, the briefs, the validation of wireframe artefacts, and the manifest and status
+records after approved design work. It reports scope conflicts. It does not choose the visual or UX direction,
+does not create the calibration layouts, and does not silently resolve a design alternative. Claude Design is
+the UI and UX design executor: it reads the repository, the working briefs, the signed source wording supplied
+outside Git and `design/direction.md`, creates the calibration wireframes, proposes the three directions,
+recommends UX alternatives and produces the structural design artefacts. Claude Design does not edit the Feature
+Register, the SRS or a contract document, does not edit canonical scope ownership, does not change
+`surfaces.json` to make its design easier, does not change a contractual constraint, does not invent a customer
+or business capability, and does not resolve a scope conflict itself. A missing requirement, an apparent
+contradiction, a design need that looks like new capability, or a constraint that makes a professional solution
+impossible is reported back, not designed around. **Claude Design changes only the approved design artefacts
+under `design/wireframes/`**: not `design/inventory/`, `design/briefs/`, `docs/scope/`, `DECISIONS.md`,
+`PROGRESS.md`, a PBI or application code, unless the owner later explicitly authorises another path. It creates
+the calibration files at the paths the manifest already declares, and Claude Code updates the manifest after
+the design review. When design begins, Claude Design is given the repository, the working briefs with the
+signed wording, generated outside the repository, and the original signed documents from `final docs/` as
+read-only reference. The signed documents are never committed.
+
+**Status, 6 October 2026: proposed in PR #340, reviewed by the owner, pending merge. Not applied.** The owner
+keeps this as its own decision, separate from D-14: D-14 sets the design-first sequence and the UX source of
+truth, and D-15 sets how the wireframes are produced. The path policy is on `main` (PR #339, `e4587fa`). The
+format rules, the brief generator, the manifest, the calibration definition, the review batches and the checks
+are in the pull request that carries this entry, with the 32 briefs of the calibration surfaces. The shared
+stylesheet follows in its own pull request. **No wireframe is drawn, and the
 calibration set has not started**: it begins on the owner's instruction.
