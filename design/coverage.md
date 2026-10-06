@@ -323,6 +323,7 @@ Each line is enforced by `tools/design_inventory.py` and fails CI when it does n
 | Every contracted surface names the PBI that builds it, and says why where it is not the accepting PBI | 140 surfaces |
 | No owner design decision is recorded as a client confirmation or as added scope | 4 decisions |
 | No interaction option claims more than its status allows: a baseline is not a selection | 12 options |
+| Every constraint of an interaction option is typed, and a pattern the contract fixes shows as fixed | 37 constraints |
 | No PBI is named for a surface that nothing here builds; each says where it comes from | 13 surfaces |
 
 ## 4. Accepting PBI and build PBI
@@ -386,7 +387,7 @@ Each line is enforced by `tools/design_inventory.py` and fails CI when it does n
 | #310 | Trust and support pages, editable without a developer, in both languages | `needs design` | Consistent | `ct-static-page`, `ct-about`, `ct-authenticity`, `ct-shipping-policy`, `ct-help`, `ct-privacy`, `ct-returns-policy`, `ct-terms`, `ct-contact` |
 | #311 | Self-service storefront and product control: everything a customer sees is editable in both languages, with preview | `needs design` | Consistent | `gl-promo-banner`, `ct-campaign-page` |
 
-**5.2 Second-release slices that build a customer-facing surface.** Inventoried, and not wireframed in the Stage 1 pass (DQ-04). They need the design artefact when the second release is designed.
+**5.2 Second-release slices that build a customer-facing surface.** Not in the initial S1 wireframe pass. Each gets its own low-fidelity pass before PRE-03b is approved and is part of the final interface-design package (DQ-04). They are built in the second release.
 
 | Slice | Title | Field | Surfaces |
 |---|---|---|---|
@@ -470,7 +471,7 @@ Boundaries the owner decided in D-14 for questions no source answered. **Owner d
 
 | Id | Question | Decision | Not to be done | Surfaces |
 |---|---|---|---|---|
-| DQ-04 | Second-release screens | Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work. **Boundary:** This governs the low-fidelity S1 wireframe pass only. Statement of Work section 9 measures the contracted interface design by every contracted storefront screen of the register, and second-release rows are contracted. Whether their screens are part of the design presented for PRE-03b is not settled here and is the owner's to decide before that design is presented. | No S2 wireframe in the S1 pass, and no S1 layout that leaves the S2 surface nowhere to attach. | `sf-filter-by-rating`, `sf-brand-landing`, `ac-reorder`, `ac-notification-preferences`, `ac-account-deletion`, `ad-dashboard-customers-conversion`, `ad-customer-metrics-export`, `ad-email-template-editor` |
+| DQ-04 | Second-release surfaces in the design sequence | Second-release (S2) surfaces are excluded from the initial S1 low-fidelity wireframe pass and stay in the master inventory. Their attachment points are preserved during S1. They receive their own low-fidelity structural pass, after the S1 pass and once the structural component and interaction system is stable, and before PRE-03b is approved. They are then part of the high-fidelity design and of the final contracted interface-design package, with every other contracted storefront surface. **Boundary:** Design sequencing only. It does not move any S2 row into Stage 1 implementation, and the contractual stage of every row is unchanged. The signed Statement of Work measures the interface design by every contracted storefront screen, which is why S2 storefront surfaces are designed before PRE-03b is approved. | No S2 wireframe in the initial S1 pass. No S1 layout that leaves an S2 surface nowhere to attach. No contracted S2 storefront surface left undesigned when the interface design is presented for PRE-03b. No S2 implementation in Stage 1. | `sf-filter-by-rating`, `sf-brand-landing`, `ac-reorder`, `ac-notification-preferences`, `ac-account-deletion`, `ad-dashboard-customers-conversion`, `ad-customer-metrics-export`, `ad-email-template-editor` |
 | DQ-05 | The cash-collected state | Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state. | The customer is never shown the carrier remittance or accounting state. | `ord-status-labels`, `ad-cod-reconciliation` |
 | DQ-06 | Review eligibility | The Stage 1 design assumes a signed-in customer may submit a review. | No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2). | `rv-form` |
 | DQ-07 | The consent banner | The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288. | No third-party banner implementation is invented that the eventual tool cannot support. | `gl-cookie-consent` |
@@ -479,20 +480,33 @@ Boundaries the owner decided in D-14 for questions no source answered. **Owner d
 
 UX choices with more than one legitimate pattern, where neither the contract nor the platform fixes one (`design/inventory/interaction-options.json`). **A provisional baseline is not a requirement and not an owner-confirmed final product decision.** It is where the first wireframes start, and it may change in review without a scope change, provided the pattern chosen still meets the requirement and the constraints. None of these adds a capability.
 
-| Id | Choice | Status | Working baseline | Candidate patterns | Selected at | Surfaces |
-|---|---|---|---|---|---|---|
-| DQ-01 | Numerals in Arabic | `provisional` | Western digits 0 to 9 in both languages | Western digits 0 to 9 in both languages; Arabic-Indic digits on Arabic pages; Arabic-Indic digits in running Arabic text, Western digits for prices, quantities and reference numbers | Design and localisation review | Every customer-facing surface. |
-| DQ-02 | Product-list continuation | `provisional` | Numbered pagination | Numbered pagination; Load More; Controlled continuous or infinite loading | Low-fidelity review | `sf-pagination`, `sf-shop`, `sf-category`, `sf-collection`, `sf-brand`, `sf-search-results` |
-| DQ-03 | Checkout structure | `provisional` | One page with clear sections | One page with clear sections; One page with progressive or accordion sections; Stepped checkout, only if it stays compatible with the contracted behaviour and the chosen commerce implementation | Low-fidelity review | `ck-checkout`, `ck-address`, `ck-shipping-method`, `ck-payment-method`, `ck-coupon-notes`, `ck-review-place-order` |
-| IX-01 | Filter placement on desktop and tablet | `open` | None yet | Sidebar beside the grid; Horizontal filter bar above the grid; Drawer on every viewport | Low-fidelity review | `sf-listing-filters`, `sf-filter-drawer`, `sf-listing-toolbar` |
-| IX-02 | Mini-cart presentation | `open` | None yet | Dropdown panel under the header; Side drawer; Drawer that opens after an add, with the count alone at other times | Low-fidelity review | `sf-mini-cart`, `gl-header`, `gl-header-mobile` |
-| IX-03 | Keeping the buy actions in reach on the product page | `open` | None yet | Buy area in the page flow only; Sticky buy bar on mobile once the buy area has scrolled away; Sticky buy area beside the gallery on desktop | Low-fidelity review | `sf-pdp-simple`, `sf-pdp-variable` |
-| IX-04 | Gallery navigation and zoom | `open` | None yet | Thumbnail strip with a main image; Swipe with a position indicator; Image grid on desktop, swipe on mobile | Low-fidelity review | `sf-pdp-gallery` |
-| IX-05 | How the category navigation opens on desktop | `open` | None yet | Opens on hover and on keyboard focus; Opens on click or tap | Low-fidelity review | `gl-mega-menu`, `gl-header` |
-| IX-06 | How the mobile menu shows category levels | `open` | None yet | Drill-down: one level per panel, with a way back; Accordion: levels expand in place | Low-fidelity review | `gl-mobile-nav` |
-| IX-07 | Search interaction | `open` | None yet | Inline field with a suggestions panel; Full-screen search overlay on mobile; Field that expands in the header | Low-fidelity review | `sf-search-suggestions`, `gl-header`, `gl-header-mobile` |
-| IX-08 | Product information layout | `open` | None yet | Tabs; Accordion; Tabs on desktop, accordion on mobile; Stacked sections | Low-fidelity review | `sf-pdp-simple` |
-| IX-09 | Home hero: one banner or a slider | `open` | None yet | Single hero banner; Slider of several banners | Low-fidelity review | `sf-home` |
+| Id | Choice | Status | Constrained by | Working baseline | Candidate patterns | Selected at | Surfaces |
+|---|---|---|---|---|---|---|---|
+| DQ-01 | Numerals in Arabic | `provisional` | nothing: genuinely open | Western digits 0 to 9 in both languages | Western digits 0 to 9 in both languages; Arabic-Indic digits on Arabic pages; Arabic-Indic digits in running Arabic text, Western digits for prices, quantities and reference numbers | Design and localisation review | Every customer-facing surface. |
+| DQ-02 | Product-list continuation | `provisional` | platform | Numbered pagination | Numbered pagination; Load More; Controlled continuous or infinite loading | Low-fidelity review | `sf-pagination`, `sf-shop`, `sf-category`, `sf-collection`, `sf-brand`, `sf-search-results` |
+| DQ-03 | Checkout structure | `provisional` | contract, platform | One page with clear sections | One page with clear sections; One page with progressive or accordion sections; Stepped checkout, only if it stays compatible with the contracted behaviour and the chosen commerce implementation | Low-fidelity review | `ck-checkout`, `ck-address`, `ck-shipping-method`, `ck-payment-method`, `ck-coupon-notes`, `ck-review-place-order` |
+| IX-01 | Filter placement on desktop and tablet | `open` | contract, platform | None yet | Sidebar beside the grid; Horizontal filter bar above the grid; Drawer on every viewport | Low-fidelity review | `sf-listing-filters`, `sf-filter-drawer`, `sf-listing-toolbar` |
+| IX-02 | Mini-cart presentation | `open` | contract, platform | None yet | Dropdown panel under the header; Side drawer; Drawer that opens after an add, with the count alone at other times | Low-fidelity review | `sf-mini-cart`, `gl-header`, `gl-header-mobile` |
+| IX-03 | Keeping the buy actions in reach on the product page | `open` | platform | None yet | Buy area in the page flow only; Sticky buy bar on mobile once the buy area has scrolled away; Sticky buy area beside the gallery on desktop | Low-fidelity review | `sf-pdp-simple`, `sf-pdp-variable` |
+| IX-04 | Gallery navigation and zoom | `open` | platform | None yet | Thumbnail strip with a main image; Swipe with a position indicator; Image grid on desktop, swipe on mobile | Low-fidelity review | `sf-pdp-gallery` |
+| IX-05 | How the category navigation opens on desktop | `open` | platform | None yet | Opens on hover and on keyboard focus; Opens on click or tap | Low-fidelity review | `gl-mega-menu`, `gl-header` |
+| IX-06 | How the mobile menu shows category levels | `open` | contract, platform | None yet | Drill-down: one level per panel, with a way back; Accordion: levels expand in place | Low-fidelity review | `gl-mobile-nav` |
+| IX-07 | Search interaction | `open` | contract, platform | None yet | Inline field with a suggestions panel; Full-screen search overlay on mobile; Field that expands in the header | Low-fidelity review | `sf-search-suggestions`, `gl-header`, `gl-header-mobile` |
+| IX-08 | Product information layout, around the description tab | `open` | contract, platform | None yet | Tabs on every viewport: the description tab beside a tab for each other information group; Tabs on desktop, with a mobile treatment of the same sections, such as an accordion, if the owner confirms that still meets PDP-12; A description tab and a specifications tab, with delivery, returns and authenticity shown outside the tabs | Low-fidelity review | `sf-pdp-simple` |
+| IX-09 | Home hero: one banner or a slider | `open` | nothing: genuinely open | None yet | Single hero banner; Slider of several banners | Low-fidelity review | `sf-home` |
+
+**What the contract fixes inside these choices.** Each line is part of a pattern the signed wording settles. **It is not a design alternative**, and the candidates above all keep it. Changing one needs a requirement decision, not a design review.
+
+| Choice | Fixed by the contract |
+|---|---|
+| DQ-03 | The order of the journey is address, shipping, payment, review, place order (JRN-07). That order is not open. |
+| DQ-03 | A review of the order comes before it is confirmed (CHK-05). The review cannot be dropped or moved after Place Order. |
+| IX-01 | On mobile the filters are a drawer: PLP-22 names it. The mobile presentation is not open. |
+| IX-02 | A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page. |
+| IX-06 | On mobile the navigation is a hamburger menu, reached from a menu button (NAV-10). That is not open. |
+| IX-07 | The search bar is clear and prominent (NAV-03). Read that row before reducing it to an icon on desktop. |
+| IX-07 | Mobile has quick search (NAV-09). |
+| IX-08 | PDP-12 reads "Full description tab". The full description is presented as a tab, and every candidate keeps it. Removing the tab, for example stacked sections with no tabs or an accordion on every viewport, is not a design alternative: it would need a requirement decision that changes the reading of PDP-12. |
 
 ## 9. Every surface
 

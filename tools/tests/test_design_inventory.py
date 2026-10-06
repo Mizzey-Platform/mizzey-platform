@@ -72,6 +72,27 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertEqual([o["id"] for o in self.data["options"] if o["status"] == "locked"], [])
         self.assertEqual([o["id"] for o in self.data["options"] if o["selected_pattern"] is not None], [])
 
+    def test_the_description_tab_is_fixed_by_the_contract_and_no_candidate_removes_it(self):
+        ix08 = next(o for o in self.data["options"] if o["id"] == "IX-08")
+        self.assertIn("contract", ix08["constrained_by"])
+        self.assertTrue(any(c["type"] == "contract_pattern" and "PDP-12" in c["text"] for c in ix08["constraints"]))
+        for pattern in ix08["candidate_patterns"]:
+            self.assertIn("tab", pattern.lower(), pattern)
+            self.assertFalse(pattern.lower().startswith(("stacked", "accordion")), pattern)
+
+    def test_the_home_hero_is_genuinely_open(self):
+        ix09 = next(o for o in self.data["options"] if o["id"] == "IX-09")
+        self.assertEqual((ix09["status"], ix09["constrained_by"], ix09["working_baseline"]), ("open", [], None))
+        self.assertEqual(ix09["candidate_patterns"], ["Single hero banner", "Slider of several banners"])
+
+    def test_second_release_surfaces_are_designed_before_pre03b_and_built_in_the_second_release(self):
+        dq04 = next(d for d in self.data["decisions"] if d["id"] == "DQ-04")
+        for phrase in ("excluded from the initial S1", "own low-fidelity structural pass", "before PRE-03b is approved",
+                       "final contracted interface-design package"):
+            self.assertIn(phrase, dq04["decision"])
+        self.assertIn("No S2 implementation in Stage 1", dq04["must_not"])
+        self.assertIn("sequencing only", dq04["boundary"])
+
     def test_no_surface_text_states_a_provisional_pattern_as_settled(self):
         text = json.dumps(self.data["surfaces"]) + json.dumps(self.data["components"])
         for phrase in ("No infinite scroll", "No multi-page wizard", "No wizard"):
@@ -157,7 +178,9 @@ def decision(**over) -> dict:
 def option(**over) -> dict:
     o = {"id": "IX-01", "name": "List continuation", "affected_surfaces": ["x-cart"], "requirement_outcome": "o",
          "candidate_patterns": ["Numbered pagination", "Load More"], "working_baseline": None, "status": "open",
-         "decision_stage": "low_fidelity_review", "constraints": ["c"], "selection_criteria": ["usability"],
+         "constrained_by": ["platform"], "decision_stage": "low_fidelity_review",
+         "constraints": [{"type": "platform", "text": "The platform paginates natively."}],
+         "selection_criteria": ["usability"],
          "selected_pattern": None, "decision_source": None}
     o.update(over)
     return o
@@ -394,6 +417,30 @@ class TheCheckerRefuses(unittest.TestCase):
 
     def test_a_surface_whose_options_drifted(self):
         self.assertRefused(inventory(surface(), options=[option()]), "interaction_options differs")
+
+    # What the contract fixes is not a design alternative
+    TAB = {"type": "contract_pattern", "text": "The row names a tab."}
+
+    def test_a_choice_the_contract_constrains_says_so(self):
+        data = self.with_option(constraints=[self.TAB], constrained_by=["contract"])
+        self.assertEqual(self.errors(data), [])
+
+    def test_a_contract_pattern_cannot_be_presented_as_unconstrained(self):
+        self.assertRefused(self.with_option(constraints=[self.TAB], constrained_by=[]),
+                           "a pattern the contract fixes must show as fixed")
+
+    def test_a_choice_cannot_claim_a_contract_constraint_it_does_not_record(self):
+        self.assertRefused(self.with_option(constrained_by=["contract", "platform"]), "its constraints say ['platform']")
+
+    def test_a_contracted_condition_alone_does_not_fix_the_pattern(self):
+        data = self.with_option(constraints=[{"type": "contract_condition", "text": "Usable by keyboard."}], constrained_by=[])
+        self.assertEqual(self.errors(data), [])
+
+    def test_a_genuinely_open_choice_has_nothing_fixing_its_pattern(self):
+        self.assertEqual(self.errors(self.with_option(constraints=[], constrained_by=[])), [])
+
+    def test_an_untyped_constraint(self):
+        self.assertRefused(self.with_option(constraints=["Usable by keyboard."], constrained_by=[]), "every constraint needs a text and a type")
 
     def test_a_choice_cannot_also_be_a_locked_decision(self):
         data = inventory(surface(interaction_options=["DQ-05"]), options=[option(id="DQ-05")], decisions=[decision()])

@@ -967,7 +967,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "sf-brand-landing",
@@ -1009,7 +1009,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "sf-search-suggestions",
@@ -3322,7 +3322,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-notification-preferences",
@@ -3366,7 +3366,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "The first release provides unsubscribe links in emails. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "The first release provides unsubscribe links in emails. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-account-deletion",
@@ -3410,7 +3410,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "The first release handles this manually on request. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "The first release handles this manually on request. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "rv-list",
@@ -4411,7 +4411,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "ad-product-edit-additions",
@@ -5032,7 +5032,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "ad-promotion-editor",
@@ -5598,7 +5598,7 @@
       "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
+      "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "rp-sales",

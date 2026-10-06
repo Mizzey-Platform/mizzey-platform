@@ -400,11 +400,11 @@
   "owner_design_decisions": [
     {
       "id": "DQ-04",
-      "title": "Second-release screens",
+      "title": "Second-release surfaces in the design sequence",
       "status": "locked",
-      "question": "The register stages some contracted rows S2. No source says whether their screens are drawn in the first design.",
-      "decision": "Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work.",
-      "must_not": "No S2 wireframe in the S1 pass, and no S1 layout that leaves the S2 surface nowhere to attach.",
+      "question": "The register stages some contracted rows S2. No source says when their screens are designed.",
+      "decision": "Second-release (S2) surfaces are excluded from the initial S1 low-fidelity wireframe pass and stay in the master inventory. Their attachment points are preserved during S1. They receive their own low-fidelity structural pass, after the S1 pass and once the structural component and interaction system is stable, and before PRE-03b is approved. They are then part of the high-fidelity design and of the final contracted interface-design package, with every other contracted storefront surface.",
+      "must_not": "No S2 wireframe in the initial S1 pass. No S1 layout that leaves an S2 surface nowhere to attach. No contracted S2 storefront surface left undesigned when the interface design is presented for PRE-03b. No S2 implementation in Stage 1.",
       "decided_by": "owner",
       "date": "2026-10-06",
       "record": "DECISIONS.md D-14",
@@ -414,7 +414,7 @@
         "sf-filter-by-rating", "sf-brand-landing", "ac-reorder", "ac-notification-preferences", "ac-account-deletion",
         "ad-dashboard-customers-conversion", "ad-customer-metrics-export", "ad-email-template-editor"
       ],
-      "boundary": "This governs the low-fidelity S1 wireframe pass only. Statement of Work section 9 measures the contracted interface design by every contracted storefront screen of the register, and second-release rows are contracted. Whether their screens are part of the design presented for PRE-03b is not settled here and is the owner's to decide before that design is presented."
+      "boundary": "Design sequencing only. It does not move any S2 row into Stage 1 implementation, and the contractual stage of every row is unchanged. The signed Statement of Work measures the interface design by every contracted storefront screen, which is why S2 storefront surfaces are designed before PRE-03b is approved."
     },
     {
       "id": "DQ-05",

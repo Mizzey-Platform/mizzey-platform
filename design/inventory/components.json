@@ -246,7 +246,7 @@
       "states": ["default", "selected", "focus"],
       "used_by": ["sf-pdp-simple", "au-sign-in"],
       "brand": "neutral",
-      "note": "The full description tab (PDP-12). On mobile the wireframe may turn tabs into an accordion."
+      "note": "PDP-12 names the full description as a tab, so the tab stays. Its mobile treatment is explored within that (IX-08)."
     },
     {
       "id": "nv-pagination",

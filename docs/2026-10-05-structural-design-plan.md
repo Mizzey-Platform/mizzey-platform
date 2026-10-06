@@ -193,12 +193,17 @@ The order is fixed, as D-14 set it:
 
 1. The signed scope and the PBIs. Done.
 2. The complete inventory of surfaces, flows and states, in `design/`, reviewed by the owner.
-3. Low-fidelity structural wireframes, as design artefacts in `design/`, in both reading directions.
-4. The client supplies the brand identity.
-5. High-fidelity UI and UX.
-6. The contracted working HTML and CSS design, through the contracted approval rounds. Only then is PRE-03b
-   satisfied.
-7. Storefront implementation.
+3. The low-fidelity wireframe pass for the first-release surfaces, as design artefacts in `design/`, in both
+   reading directions.
+4. The structural component and interaction system, established and stable.
+5. A second low-fidelity pass, for the contracted second-release surfaces.
+6. The client supplies the brand identity, and it is applied.
+7. The high-fidelity design for all contracted storefront surfaces, first and second release.
+8. The contracted working HTML and CSS design, through the contracted approval rounds.
+9. PRE-03b approved by the client.
+10. Only then, storefront implementation.
+
+Designing a second-release surface is sequencing only: it is still built in the second release.
 
 Functional PBI implementation is frozen while the structural package is prepared (D-14).
 

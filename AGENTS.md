@@ -19,9 +19,12 @@ and the current phase are in [README.md](README.md). The rules are in the
 
 **No functional PBI implementation starts now.** Do not start #249, do not create a `006-` spec, do not run Spec
 Kit for a functional PBI, and do not upgrade CoreX, until Mustafa says so. The order is: signed scope and PBIs,
-then the complete inventory of surfaces, flows and states, then low-fidelity structural wireframes, then the
-brand identity, then high-fidelity UI and UX, then the contracted working HTML and CSS design approved by the
-client, then storefront implementation.
+then the complete inventory of surfaces, flows and states, then the low-fidelity wireframe pass for the
+first-release surfaces, then a stable structural component and interaction system, then a second low-fidelity
+pass for the contracted second-release surfaces, then the brand identity, then the high-fidelity design for all
+contracted storefront surfaces, then the contracted working HTML and CSS design, then PRE-03b approved by the
+client, and only then storefront implementation. Designing a second-release surface is sequencing: it is still
+built in the second release.
 
 - **`design/` is the UX source of truth.** Read [design/README.md](design/README.md) before any design work. Its
   authority order governs: the signed documents first, Option C material last and never as scope.
@@ -30,7 +33,8 @@ client, then storefront implementation.
   the contracted working HTML and CSS stage.
 - **Do not lock UX by drawing it.** A requirement fixes an outcome, rarely a pattern. Where more than one pattern
   is legitimate, it is in `design/inventory/interaction-options.json` as `open` or `provisional`: a provisional
-  baseline is not a requirement and not a final owner decision. Presentation is design; a new customer capability
+  baseline is not a requirement and not a final owner decision. A constraint typed `contract_pattern` there is
+  fixed by the signed wording and is not a design alternative. Presentation is design; a new customer capability
   or business behaviour needs scope authority. `design/direction.md` is the experience target, and no
   implementation library is chosen before the design.
 - **Nothing committed is approved UI or UX.** The plugin is technical foundation and the theme is a scaffold.

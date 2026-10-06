@@ -14,11 +14,14 @@ that work is prepared, and it changes no contract term.
 |---|---|
 | 1. Signed scope and PBIs | Done. Register MS-ANX-2026-006 version 1.5, and `docs/scope/` |
 | 2. Complete inventory of surfaces, flows and states | **This folder.** Reported in `coverage.md` |
-| 3. Low-fidelity structural wireframes | Not started. The first is drawn only when the owner approves the start of the wireframe pass |
-| 4. Brand identity received | Waiting on the client (OD-01) |
-| 5. High-fidelity UI and UX | Not started |
-| 6. The contracted working HTML and CSS design, approved by the client | Not started. This is PRE-03b |
-| 7. Storefront implementation | Frozen until step 6 (D-14) |
+| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Not started. The first is drawn only when the owner approves the start of the wireframe pass |
+| 4. Structural component and interaction system, established and stable | Not started |
+| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Not started |
+| 6. Brand identity received and applied | Waiting on the client (OD-01) |
+| 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
+| 8. The contracted working HTML and CSS design | Not started |
+| 9. PRE-03b approved by the client | Not started |
+| 10. Storefront implementation | Frozen until step 9 (D-14) |
 
 **Low-fidelity wireframes are design artefacts, prepared here first.** They are not built in `mizzey-theme/`, and
 nothing is implemented in the theme until the work reaches step 6. They are not a client deliverable: PRE-03b
@@ -177,9 +180,12 @@ presented to anyone as contracted scope. The 404 page is `native_required`. Comi
 `internal_operational`. The payment provider's hosted step is `provider_hosted`: what is designed is our handoff,
 loading, failure, return and success around it.
 
-**Second-release rows are contracted and staged S2.** Their surfaces are inventoried and marked S2. They are not
-built in the first release and are not wireframed in the Stage 1 pass. Where each attaches is kept free, so the
-first-release structure does not prevent the later work (DQ-04).
+**Second-release rows are contracted and staged S2, and their surfaces are designed, not left out.** They are
+inventoried and marked S2. They are excluded from the initial S1 wireframe pass, and where each attaches is kept
+free during it. They then get their own low-fidelity pass before PRE-03b is approved, and are part of the
+high-fidelity design and of the final contracted interface-design package, because the signed documents measure
+that design by every contracted storefront screen. **This is design sequencing only.** They are still built in
+the second release, and no row changes stage (DQ-04).
 
 ## Locked owner decisions
 
@@ -189,7 +195,7 @@ Four boundaries were decided by the owner in D-14, for questions no source answe
 
 | Id | Decision |
 |---|---|
-| DQ-04 | S2 surfaces stay inventoried and are not wireframed in the S1 pass. This governs the low-fidelity pass only: whether their screens are in the design presented for PRE-03b is the owner's to decide before that design is presented |
+| DQ-04 | S2 surfaces are excluded from the initial S1 wireframe pass, keep their attachment points, get their own low-fidelity pass before PRE-03b is approved, and are in the final interface-design package. Sequencing only: they are built in the second release |
 | DQ-05 | Cash collected and remitted is a staff and accounting state. The customer sees Delivered |
 | DQ-06 | A signed-in customer may review. No verified-purchase requirement or badge |
 | DQ-07 | Accept, Decline and Preferences, within what the consent tool selected in #288 supports |
@@ -215,8 +221,23 @@ Three are provisional today, and none is locked:
 | DQ-02 | Product-list continuation | Numbered pagination | Load More, or controlled continuous loading |
 | DQ-03 | Checkout structure | One page with clear sections, review before Place Order | Progressive or accordion sections, or a stepped checkout if it stays compatible with the contracted behaviour and the commerce implementation |
 
-Each entry carries its `constraints`, which are real limits, and its `selection_criteria`, which are what the
-review weighs. An option never adds a capability: it is about how a contracted one is presented.
+Each entry carries its `selection_criteria`, which are what the review weighs, and its `constraints`, which are
+real limits. An option never adds a capability: it is about how a contracted one is presented.
+
+**Not every choice is equally open.** Each constraint is typed, and `constrained_by` sums them up:
+
+| Constraint type | Meaning | What the designer does |
+|---|---|---|
+| `contract_pattern` | The signed wording fixes part of the pattern itself | **Keeps it. It is not a design alternative.** Every candidate pattern already keeps it. Changing it needs a requirement decision, not a design review |
+| `contract_condition` | A contracted requirement that every candidate must meet | Makes sure the pattern chosen meets it |
+| `platform` | What the platform, a native block or a technical fact limits | Works within it, or says what leaving it would cost |
+
+An option with no `contract_pattern` and no `platform` constraint is genuinely open. The product information
+layout (IX-08) shows the difference. PDP-12 words the full description as a tab, so the tab is a
+`contract_pattern`: the designer explores how the other information sits around that tab and how it is treated
+on mobile, and does not propose a product page with no tab. The home hero (IX-09) is genuinely open, because
+HOME-01 names a banner or a slider and fixes neither. **A contractual constraint is never an invitation to
+redesign the requirement.**
 
 ## The designer proposes
 

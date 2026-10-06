@@ -1323,11 +1323,16 @@ no `006-` spec is created, and Spec Kit is not run for a functional PBI. The app
 
 1. the signed scope and the PBIs;
 2. the complete inventory of UX surfaces, flows and states;
-3. low-fidelity structural wireframes;
-4. the brand identity, received from the client;
-5. high-fidelity UI and UX;
-6. the contracted working HTML and CSS design, approved by the client;
-7. storefront implementation.
+3. the low-fidelity wireframe pass for the first-release (S1) surfaces;
+4. the structural component and interaction system, established and stable;
+5. a second low-fidelity pass, for the contracted second-release (S2) surfaces;
+6. the brand identity, received from the client and applied;
+7. the high-fidelity design for all contracted storefront surfaces, S1 and S2;
+8. the contracted working HTML and CSS design;
+9. PRE-03b approved by the client;
+10. only then, storefront implementation.
+
+Steps 5 and 7 are design sequencing. They do not move any S2 row into Stage 1 implementation (item 13, DQ-04).
 
 **2. What this does not change.** Delivery order only. The contracted scope, PRE-03b, the Feature Register and
 every acceptance obligation are as they were. A low-fidelity wireframe is not a client deliverable: PRE-03b says
@@ -1409,7 +1414,7 @@ owner decisions.** None is a client confirmation and none adds scope.
 | DQ-01 | Numerals in Arabic | Provisional | Working baseline: Western digits 0 to 9. The Arabic design may later choose a different locale-appropriate numeral treatment if justified in the design and localisation review and compatible with the requirements |
 | DQ-02 | Product-list continuation | Provisional | Working baseline: numbered pagination. Load More and controlled continuous or infinite loading are candidates. Selected in UX review on usability, mobile behaviour, accessibility, SEO, performance, catalogue size, native platform behaviour and technical cost |
 | DQ-03 | Checkout structure | Provisional | Working baseline: one page with clear sections and the review before Place Order. Progressive or accordion sections, and a stepped checkout that stays compatible with the contracted behaviour and the commerce implementation, are candidates |
-| DQ-04 | Second-release screens | Locked | Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work |
+| DQ-04 | Second-release surfaces in the design sequence | Locked | S2 surfaces are excluded from the initial S1 low-fidelity wireframe pass and stay in the master inventory. Their attachment points are preserved during S1. They receive their own low-fidelity structural pass before PRE-03b is approved, and are included in the high-fidelity design and in the final contracted interface-design package, because the signed documents measure that design by every contracted storefront screen. They are contracted surfaces and are not left undesigned. Sequencing only: no S2 row moves into Stage 1 implementation |
 | DQ-05 | The cash-collected state | Locked | Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state |
 | DQ-06 | Review eligibility | Locked | The Stage 1 design assumes a signed-in customer may submit a review. No verified purchase is required and no verified-purchase badge is shown, because that requirement is not contracted |
 | DQ-07 | The consent banner | Locked | The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288 |
@@ -1419,6 +1424,16 @@ how the mini-cart is presented, whether the buy actions stay in reach on the pro
 zoom, how the category navigation opens, how the mobile menu shows levels, the search interaction, the product
 information layout, and whether the home hero is one banner or a slider. The mobile filter drawer is not among
 them: PLP-22 names it.
+
+**Not every choice is equally open, and the record says which.** Each constraint on an interaction option is
+typed: a `contract_pattern` is a part of the pattern the signed wording fixes, a `contract_condition` is a
+contracted requirement every candidate must meet, and `platform` is what the platform limits. **A contract
+pattern is not a design alternative**: every candidate keeps it, and changing it needs a requirement decision,
+not a design review. Eight are recorded, among them the order and the review step of the checkout (JRN-07,
+CHK-05), the mobile filter drawer (PLP-22), the mini-cart in the header (CART-12) and the description tab:
+PDP-12 reads "Full description tab", so IX-08 explores the layout around that tab and its mobile treatment, and
+does not offer a product page with no tab. The home hero (IX-09) is genuinely open, because HOME-01 names a
+banner or a slider and fixes neither.
 
 **14. The experience target is recorded, and it is not the brand identity.** `design/direction.md`: a
 contemporary, polished, modern ecommerce product, clean without being empty, simple without being generic,
@@ -1442,6 +1457,9 @@ status labels the customer sees), #283 (the payment handoff and failure experien
 transactional emails), #288 (the consent banner) and #301 (the message when stock cannot be validated) are marked
 `needs design` in `docs/scope/backlog-ownership.json`. Their customer-visible experience is not implemented
 visually before its design direction is established. No row, owner, dependency edge or status changes with this.
+The live Project's Design dependency field was set to match for these five on 6 October 2026, on the owner's
+approval, and nothing else on the board changed; its snapshot document is regenerated in a follow-up after #336
+merges.
 The eighteen PBIs that build only additions to the standard administration stay `none`. #277 stays
 `needs design`: it builds an admin surface, and its rows shape the catalogue pages customers see.
 

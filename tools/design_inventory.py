@@ -17,6 +17,8 @@ What it fails on:
 - An interaction option with fewer than two candidate patterns, with a status outside `open`, `provisional` and
   `locked`, with a baseline or a selection that is not one of its candidates, or that claims more than its status
   allows: an open option has no baseline, and only a locked one has a selected pattern and a decision source.
+- An interaction option whose constraints are untyped, or whose `constrained_by` does not say what its constraints
+  say: a part of a pattern the contract fixes must show as fixed, so it is not read as open to redesign.
 - A surface no PBI builds that does not say where it comes from, or a PBI named for one to fill the field.
 - A flow step, a component, a placeholder or a `composes` entry that points at a surface that does not exist.
 - A customer-facing surface that does not account for both reading directions.
@@ -66,7 +68,12 @@ FIELDS = ("id", "name", "kind", "scope_type", "audience", "register_ids", "conte
 OPTION_STATUSES = ("open", "provisional", "locked")
 OPTION_STAGES = ("low_fidelity_review", "high_fidelity_review", "localisation_review")
 OPTION_FIELDS = ("id", "name", "affected_surfaces", "requirement_outcome", "candidate_patterns", "working_baseline",
-                 "status", "decision_stage", "constraints", "selection_criteria", "selected_pattern", "decision_source")
+                 "status", "constrained_by", "decision_stage", "constraints", "selection_criteria", "selected_pattern",
+                 "decision_source")
+# What limits a choice. `contract_pattern`: the signed wording fixes part of the pattern itself, and that part is not
+# a design alternative. `contract_condition`: a contracted requirement every candidate must meet. `platform`: what
+# the platform or a technical fact limits.
+CONSTRAINT_TYPES = ("contract_pattern", "contract_condition", "platform")
 ORIGINS = ("mizzey", "corex", "wordpress", "woocommerce", "provider", "unknown")
 STAGES = {"S1": "S1", "S2": "S2", "-": "per PRE-09"}
 # Rows whose register wording names an email. Each must be carried by a surface of kind `email`.
@@ -330,9 +337,18 @@ def validate(data: dict) -> list[str]:
             errs.append(f"interaction option {oid}: decision_stage is not one of {', '.join(OPTION_STAGES)}")
         if len(o["candidate_patterns"]) < 2:
             errs.append(f"interaction option {oid}: a choice needs at least two candidate patterns")
-        for field in ("requirement_outcome", "constraints", "selection_criteria"):
+        for field in ("requirement_outcome", "selection_criteria"):
             if not o[field]:
                 errs.append(f"interaction option {oid}: {field} is empty")
+        typed = [c for c in o["constraints"] if isinstance(c, dict) and c.get("type") in CONSTRAINT_TYPES and c.get("text")]
+        if len(typed) != len(o["constraints"]):
+            errs.append(f"interaction option {oid}: every constraint needs a text and a type from "
+                        f"{', '.join(CONSTRAINT_TYPES)}")
+        limits = [label for label, t in (("contract", "contract_pattern"), ("platform", "platform"))
+                  if any(c["type"] == t for c in typed)]
+        if o["constrained_by"] != limits:
+            errs.append(f"interaction option {oid}: constrained_by says {o['constrained_by']} and its constraints say "
+                        f"{limits}; a pattern the contract fixes must show as fixed")
         for sid in o["affected_surfaces"]:
             if sid not in known:
                 errs.append(f"interaction option {oid}: affects {sid}, which is not a surface")
@@ -545,6 +561,8 @@ def render(data: dict) -> str:
          f"{len(data['decisions'])} decisions"],
         ["No interaction option claims more than its status allows: a baseline is not a selection",
          f"{len(data['options'])} options"],
+        ["Every constraint of an interaction option is typed, and a pattern the contract fixes shows as fixed",
+         f"{sum(len(o['constraints']) for o in data['options'])} constraints"],
         ["No PBI is named for a surface that nothing here builds; each says where it comes from",
          f"{sum(1 for s in surfaces if s['build_pbi'] is None)} surfaces"]])
 
@@ -573,8 +591,9 @@ def render(data: dict) -> str:
     L += table(["PBI", "Title", "Field", "Finding", "Customer-facing surfaces it builds"],
                [[pbi_label(k), t, f"`{m}`", "**Field does not reflect these surfaces**" if m == "none" else "Consistent",
                  names(ss)] for k, t, m, ss in f["customer"]]) if f["customer"] else ["None."]
-    L += ["", "**5.2 Second-release slices that build a customer-facing surface.** Inventoried, and not wireframed in "
-              "the Stage 1 pass (DQ-04). They need the design artefact when the second release is designed.", ""]
+    L += ["", "**5.2 Second-release slices that build a customer-facing surface.** Not in the initial S1 wireframe pass. "
+              "Each gets its own low-fidelity pass before PRE-03b is approved and is part of the final interface-design "
+              "package (DQ-04). They are built in the second release.", ""]
     L += table(["Slice", "Title", "Field", "Surfaces"],
                [[pbi_label(k), t, f"`{m}`", names(ss)] for k, t, m, ss in f["second"]]) if f["second"] else ["None."]
     L += ["", "**5.3 Marked `none`, and builds additions to the standard administration only.** Kept as `none` by "
@@ -609,10 +628,16 @@ def render(data: dict) -> str:
           "None of these adds a capability.", ""]
     stage = {"low_fidelity_review": "Low-fidelity review", "high_fidelity_review": "High-fidelity review",
              "localisation_review": "Design and localisation review"}
-    L += table(["Id", "Choice", "Status", "Working baseline", "Candidate patterns", "Selected at", "Surfaces"],
-               [[o["id"], o["name"], f"`{o['status']}`", o["working_baseline"] or "None yet",
-                 "; ".join(o["candidate_patterns"]), stage[o["decision_stage"]],
+    L += table(["Id", "Choice", "Status", "Constrained by", "Working baseline", "Candidate patterns", "Selected at",
+                "Surfaces"],
+               [[o["id"], o["name"], f"`{o['status']}`", ", ".join(o["constrained_by"]) or "nothing: genuinely open",
+                 o["working_baseline"] or "None yet", "; ".join(o["candidate_patterns"]), stage[o["decision_stage"]],
                  o.get("applies_to") or names([{"id": x} for x in o["affected_surfaces"]])] for o in data["options"]])
+    fixed = [(o["id"], c["text"]) for o in data["options"] for c in o["constraints"] if c["type"] == "contract_pattern"]
+    L += ["", "**What the contract fixes inside these choices.** Each line is part of a pattern the signed wording "
+              "settles. **It is not a design alternative**, and the candidates above all keep it. Changing one needs a "
+              "requirement decision, not a design review.", ""]
+    L += table(["Choice", "Fixed by the contract"], [[i, t] for i, t in fixed]) if fixed else ["None."]
 
     L += ["", "## 9. Every surface", ""]
     L += table(["Id", "Surface", "Kind", "Scope type", "Accepts", "Builds", "Stage", "Rows"],

@@ -7,8 +7,11 @@ Live status. First action each session: read this, then continue from **Next**.
 - **Design first: D-14 is proposed in PR #336, reviewed by the owner, and pending merge.** Functional PBI
   implementation is frozen by the owner's instruction: #249 is not started, no `006-` spec exists, and Spec Kit is
   not run for a functional PBI. The order is: signed scope and PBIs, the complete inventory of surfaces, flows and
-  states, low-fidelity structural wireframes, the brand identity, high-fidelity UI and UX, the contracted working
-  HTML and CSS design approved by the client, then storefront implementation. Delivery order only: the scope,
+  states, the low-fidelity pass for the first-release surfaces, a stable structural component and interaction
+  system, a second low-fidelity pass for the contracted second-release surfaces, the brand identity, the
+  high-fidelity design for all contracted storefront surfaces, the contracted working HTML and CSS design, PRE-03b
+  approved by the client, then storefront implementation. Second-release surfaces are designed before PRE-03b and
+  still built in the second release (DQ-04). Delivery order only: the scope,
   PRE-03b, the register and every acceptance obligation are unchanged, and a wireframe is not a client deliverable.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
@@ -29,8 +32,10 @@ Live status. First action each session: read this, then continue from **Next**.
   is chosen.
 - **Design dependency.** #248, #283, #285, #288 and #301 build a customer-facing surface in the first release and
   are now marked `needs design`. Eighteen PBIs that build additions to the standard administration only stay
-  `none`. **The live Project's Design dependency field for those five is not yet changed**: it follows when
-  Mustafa approves that Project change.
+  `none`. The live Project's Design dependency field was set to match for those five on 6 October 2026, on
+  Mustafa's approval, and nothing else on the board changed. **The board snapshot in
+  `docs/2026-10-04-github-project-proposal.md` still shows the earlier values** and is regenerated in a follow-up
+  after #336 merges.
 - **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
   v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
@@ -214,11 +219,12 @@ Live status. First action each session: read this, then continue from **Next**.
 **Design first (D-14, pending merge in PR #336). No functional PBI starts, #249 included, until Mustafa says so.**
 In order:
 
-1. **Mustafa's approval of the Project change** that sets the Design dependency field of #248, #283, #285, #288
-   and #301 to `needs design` on the live board, after which the board snapshot is regenerated.
+1. **A minimal follow-up after #336 merges**: the record that calls D-14 applied, and the board snapshot
+   regenerated from the live Project, which now carries the five Design dependency values.
 2. **Then the low-fidelity structural wireframes of the first release**, as design artefacts in `design/`, from
    generated briefs, in both reading directions, when Mustafa approves the start of that pass. Their file format
-   is approved first and added to `PATH_POLICY`.
+   is approved first and added to `PATH_POLICY`. The second-release surfaces get their own pass afterwards, once
+   the structural component and interaction system is stable, and before PRE-03b is approved.
 3. **The CoreX v0.43.0 upgrade**, evaluated and made in its own infrastructure PR, before application and
    storefront implementation resumes.
 4. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
