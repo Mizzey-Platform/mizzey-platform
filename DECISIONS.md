@@ -1447,7 +1447,7 @@ The eighteen PBIs that build only additions to the standard administration stay 
 
 **Status, 6 October 2026: proposed in PR #336, reviewed by the owner, pending merge. Not applied.** The path
 policy for `design/` was prepared separately and merged as PR #337 (`3937786`), because a PR may not authorise
-its own new top-level directory, and #336 is rebased onto it. #336 proposes: `design/` with the authority order,
+its own new top-level directory, and #336 is brought up to date with it. #336 proposes: `design/` with the authority order,
 `sources.json`, `direction.md` and the inventory (154 surfaces, 22 flows, 72 components, 34 open design inputs,
 the four locked decisions and twelve interaction options, three of them provisional and nine open);
 `tools/design_inventory.py`, which checks the inventory against the register mirror and PBI ownership and writes
