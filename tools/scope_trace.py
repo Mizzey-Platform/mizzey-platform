@@ -83,8 +83,8 @@ PATH_POLICY: tuple[tuple[str, str], ...] = (
     (".specify/*", "workflow-config"),
     (".claude/skills/*", "workflow-config"),
     (".github/*", "workflow-config"),
-    # The UX source of truth (D-14). Data and prose only: a wireframe file type is added here when its format is
-    # approved, so nothing executable can arrive under design/.
+    # The UX and design source of truth. Data and prose only: a wireframe file type is added here when its format
+    # is approved, so nothing executable can arrive under design/.
     ("design/*.md", "design"),
     ("design/*.json", "design"),
     ("docs/engagement/*", "docs"),

@@ -49,7 +49,7 @@ Internal categories: `governance`, `ci`, `test-infrastructure`, `tooling`, `secu
 | workflow-config | `.specify/`, `.claude/skills/`, `.github/` templates | governance, ci |
 | tooling | other `tools/`, `discovery/`, `scripts/` | governance, tooling, security-maintenance |
 | test-infra | `tools/tests/`, `discovery/tests/` | all except documentation |
-| design | `design/**/*.md`, `design/**/*.json`: the UX source of truth (D-14) | requirement, governance, documentation |
+| design | `design/**/*.md`, `design/**/*.json`: the UX and design source of truth. Markdown and JSON only | requirement, governance, documentation |
 | docs | `docs/**/*.md`, `docs/engagement/`, README, PROGRESS, DECISIONS, COREX-WORKAROUNDS | all |
 | unclassified | anything else, including any new top-level directory | **nobody**: extend the policy in an internal:governance PR first |
 
@@ -70,7 +70,6 @@ python -m discovery.check
 python -m unittest discover -s discovery/tests -t .
 python -m unittest discover -s tools/tests -t .
 python tools/repo_checks.py
-python tools/design_inventory.py
 python tools/run_trusted.py --base origin/main --body-file <your PR body>
 ```
 
