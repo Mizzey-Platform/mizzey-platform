@@ -3,6 +3,12 @@
 5 October 2026. Owner PBI: #250. This is the plan for the structural work D-10 unblocked. It is a plan, not the
 design: no screen exists yet.
 
+**Amended on 6 October 2026 by D-14.** The delivery sequence is now design first, and the working record of what
+is designed is the `design/` folder. Three things changed in this plan and nothing else: neutral wireframes are
+design artefacts prepared in `design/`, not built in `mizzey-theme/` (sections 3 and 9); the lists in sections 1,
+2 and 6 are kept as written and are superseded as the record by `design/inventory/`; and the order at the end has
+the steps D-14 fixed. PRE-03b, the register, the scope and every acceptance obligation are unchanged.
+
 ## What is contracted, and what this plan is
 
 PRE-03b is the interface design, "approved before storefront implementation begins", delivered as working HTML and
@@ -12,7 +18,7 @@ localisation of that design, not a separate design.
 
 | | |
 |---|---|
-| **What proceeds now** | The structure: screens, journeys, components, states, responsive behaviour and both reading directions, on neutral design tokens. An engineering step |
+| **What proceeds now** | The structure: surfaces, journeys, components, states, responsive behaviour and both reading directions, on neutral design tokens. First as an inventory, then as low-fidelity wireframes, both in `design/` (D-14) |
 | **What waits for OD-01** | Final visual approval. The brand name, logo and identity are the client's input, and no screen is presented to the client as approved before it arrives |
 | **What this is not** | A wireframe deliverable for the client, a Figma file, a logo, or a brand identity. None is contracted |
 | **What it must not become** | A generic, unrestricted page builder. The editable surface is the curated library below and nothing wider |
@@ -20,6 +26,10 @@ localisation of that design, not a separate design.
 ## 1. Screen inventory
 
 Every screen the Stage 1 storefront PBIs build, with its owner. A screen with no row is not designed.
+
+**The record is now `design/inventory/surfaces.json`** (D-14). It goes below the screen: overlays, components,
+emails, states and admin additions are surfaces of their own, each on its exact register rows. The table below
+is the first outline and is kept as written.
 
 | Group | Screens | Owner PBI |
 |---|---|---|
@@ -58,15 +68,22 @@ wording governing where this summary differs:
 
 ## 3. Neutral wireframes
 
-Built as working HTML and CSS in `mizzey-theme/`, never as images, so that the structural work becomes the
-approved screens once the identity is applied rather than being redrawn.
+**Amended by D-14.** Low-fidelity structural wireframes are prepared as design artefacts first, in
+`design/wireframes/`. They are **not** built in `mizzey-theme/`, and nothing is implemented in the theme until
+the design reaches the contracted working HTML and CSS stage. The first wireframe is drawn only when the owner
+approves the start of the wireframe pass. A wireframe is not a client deliverable: PRE-03b says no separate wireframe
+stage is produced.
 
 | Rule | Reason |
 |---|---|
 | Greyscale, one neutral typeface scale, no logo, no brand colour | Nothing that could be mistaken for a visual proposal |
-| Real component markup, placeholder content | The structure is what is being settled |
-| Every measurement, colour and type size is a token | The identity is applied by changing tokens, not markup |
-| No user-facing string hard-coded | `tools/tests/test_storefront_strings.py` already fails on one |
+| One surface at a time, from its record in `design/inventory/surfaces.json` | Nothing is drawn that no row requires |
+| Placeholder content, of realistic length in both languages | The structure is what is being settled |
+| Every open input follows its rule in `design/inventory/placeholders.json` | No client decision, ERP behaviour or provider screen is invented |
+
+The rules that apply once the work becomes working HTML and CSS still stand for that stage: real component
+markup, every measurement, colour and type size a token, and no user-facing string hard-coded
+(`tools/tests/test_storefront_strings.py`).
 
 ## 4. Viewports
 
@@ -90,6 +107,8 @@ Android and current Safari on iOS, each in both reading directions.
 
 ## 6. Component inventory
 
+The record is now `design/inventory/components.json` (D-14). The table is the first outline.
+
 | Layer | Components |
 |---|---|
 | Foundations | Type scale, spacing scale, grid, colour roles, radius, elevation, focus ring |
@@ -110,6 +129,8 @@ long content in both languages. A state that is not designed is a state the buil
 The self-service rows (SSC, owned by #311 and #302) are met with blocks, as the Gutenberg decision records, and
 with a curated library, not a free canvas.
 
+The variants below are proposals. The register fixes no variant before the interface design is approved.
+
 | Section | Allowed variants | Editable fields | Locked |
 |---|---|---|---|
 | Hero | Image left, image right, full bleed | Heading, text, button label and link, image, alt text | Height, type scale, spacing, overlay |
@@ -129,7 +150,9 @@ are P2.
 
 ## 9. Neutral design tokens
 
-Tokens live in `mizzey-theme/theme.json` and as CSS custom properties with the `--mizzey-` prefix.
+Token roles are listed in `design/inventory/components.json`, and neutral values are set with the low-fidelity
+wireframes, in `design/tokens/`. They move into `mizzey-theme/theme.json`, and into CSS custom properties with
+the `--mizzey-` prefix, when the design reaches the working HTML and CSS stage (D-14), not before.
 
 | Group | Tokens |
 |---|---|
@@ -154,29 +177,39 @@ Components reference roles, never raw values. Neutral values are greys and one s
 
 ## Readiness, and the order #250 follows (D-12)
 
-**The structural-design path is ready to start. No structural screen exists yet, and this plan is not one.**
+**The structural-design path has started with the inventory (D-14). No structural screen exists yet, and neither
+this plan nor the inventory is one.**
 
 | What #250 needs to start structural work | State on 5 October 2026 |
 |---|---|
-| The screens to design, each with an owner | Section 1 |
+| The surfaces to design, each with its exact rows, the PBI that accepts them and the PBI that builds it | `design/inventory/surfaces.json`, reported in `design/coverage.md` |
 | The pages, their addresses in both languages and the principal flows | `docs/pre-development/PRE-03a-sitemap-and-user-flows.md`, and the verified routes of #242 |
 | A place to see the work in both directions, in real browsers | The staging environment of #244, with its browser matrix runner |
 | Invented catalogue and order data to fill the screens | The staging seed |
 | The rule for what an editor may change | Section 8, with banner scheduling as D-12 resolved CX-06 |
 | The brand identity | **Not supplied.** OD-01 is the client's. It is not needed for structural work |
 
-The order is fixed:
+The order is fixed, as D-14 set it:
 
-1. Complete the structural design: flows, neutral wireframes as working HTML and CSS, responsive structure,
-   component architecture, states, both reading directions, neutral tokens.
-2. Apply the final brand identity when the client supplies it.
-3. Produce the working HTML and CSS screens.
-4. Go through the contracted approval rounds.
-5. Only then is PRE-03b satisfied.
+1. The signed scope and the PBIs. Done.
+2. The complete inventory of surfaces, flows and states, in `design/`, reviewed by the owner.
+3. The low-fidelity wireframe pass for the first-release surfaces, as design artefacts in `design/`, in both
+   reading directions.
+4. The structural component and interaction system, established and stable.
+5. A second low-fidelity pass, for the contracted second-release surfaces.
+6. The client supplies the brand identity, and it is applied.
+7. The high-fidelity design for all contracted storefront surfaces, first and second release.
+8. The contracted working HTML and CSS design, through the contracted approval rounds.
+9. PRE-03b approved by the client.
+10. Only then, storefront implementation.
+
+Designing a second-release surface is sequencing only: it is still built in the second release.
+
+Functional PBI implementation is frozen while the structural package is prepared (D-14).
 
 **Two things that are never said.** Structural wireframes are not called "approved interface design". And no
-final branded storefront implementation starts as though PRE-03b had been approved. There are enough PBIs that
-are not storefront screens to keep engineering continuous while the brand approval is pending.
+final branded storefront implementation starts as though PRE-03b had been approved. When the PBIs that are not
+storefront screens resume is the owner's decision under D-14.
 
 ## What this plan does not settle
 

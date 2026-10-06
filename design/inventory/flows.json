@@ -1,0 +1,1037 @@
+{
+  "about": "The journeys as ordered steps, each pointing at surface ids. Customer flows follow the sitemap companion (docs/pre-development/PRE-03a-sitemap-and-user-flows.md), which governs where this summary differs. A step's register_ids are the rows it exercises, whoever owns them.",
+  "flows": [
+    {
+      "id": "F01",
+      "name": "Arrival and discovery",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-01"],
+      "source": "PRE-03a Flow C1",
+      "steps": [
+        {
+          "step": "F01.1",
+          "what": "Opens the store with no language chosen: English at the root, Arabic under /ar/",
+          "surfaces": ["sf-home", "gl-header", "gl-header-mobile"],
+          "register_ids": ["IA-01", "FIX-04", "FIX-04a", "NFR-04"]
+        },
+        {
+          "step": "F01.2",
+          "what": "Reads the home page sections",
+          "surfaces": ["sf-home", "gl-promo-banner", "sf-product-card"],
+          "register_ids": ["HOME-01", "HOME-02", "HOME-03", "HOME-04", "HOME-05", "HOME-06", "HOME-07"]
+        },
+        {
+          "step": "F01.3",
+          "what": "Reads the trust signals and the signup prompt",
+          "surfaces": ["sf-home", "gl-footer"],
+          "register_ids": ["HOME-08", "HOME-09"]
+        },
+        {
+          "step": "F01.4",
+          "what": "Meets the consent banner on a first visit",
+          "surfaces": ["gl-cookie-consent"],
+          "register_ids": ["MKT-10"]
+        },
+        {
+          "step": "F01.5",
+          "what": "Switches language, if wanted",
+          "surfaces": ["gl-language-switcher"],
+          "register_ids": ["NAV-02"]
+        },
+        {
+          "step": "F01.6",
+          "what": "Selects a product, a category, a collection or a brand",
+          "surfaces": ["sf-pdp-simple", "sf-category", "sf-collection", "sf-brand"],
+          "register_ids": ["IA-03", "IA-04", "IA-05", "IA-07", "IA-35"]
+        }
+      ],
+      "language": "The language comes from the address and a request with none is English. Whether a chosen language is remembered is open (OP-14). A switch lands on the same page in the other language."
+    },
+    {
+      "id": "F02",
+      "name": "Navigation and browsing",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-02"],
+      "source": "PRE-03a Flow C2, steps 4 to 9",
+      "steps": [
+        {
+          "step": "F02.1",
+          "what": "Opens the category navigation",
+          "surfaces": ["gl-mega-menu", "gl-mobile-nav"],
+          "register_ids": ["NAV-07", "NAV-10"]
+        },
+        {
+          "step": "F02.2",
+          "what": "Browses a listing",
+          "surfaces": ["sf-shop", "sf-category", "sf-collection", "sf-brand", "gl-breadcrumbs", "sf-product-card"],
+          "register_ids": ["PLP-01", "PLP-02", "PLP-17", "PLP-20", "PLP-21"]
+        },
+        {
+          "step": "F02.3",
+          "what": "Reads the stock status on a card",
+          "surfaces": ["sf-product-card"],
+          "register_ids": ["PLP-03", "ERP-02"]
+        },
+        {
+          "step": "F02.4",
+          "what": "Narrows the list",
+          "surfaces": ["sf-listing-filters", "sf-filter-drawer", "sf-listing-toolbar"],
+          "register_ids": ["PLP-06", "PLP-07", "PLP-08", "PLP-09", "PLP-10", "PLP-18", "PLP-22"]
+        },
+        {
+          "step": "F02.5",
+          "what": "Sorts and pages through the list",
+          "surfaces": ["sf-listing-toolbar", "sf-pagination"],
+          "register_ids": ["PLP-12", "PLP-13", "PLP-14", "PLP-15", "PLP-16"]
+        },
+        {
+          "step": "F02.6",
+          "what": "Finds nothing",
+          "surfaces": ["sf-listing-empty"],
+          "register_ids": ["PLP-19"]
+        },
+        {
+          "step": "F02.7",
+          "what": "Adds straight from a card, or opens the product",
+          "surfaces": ["sf-product-card", "sf-mini-cart"],
+          "register_ids": ["PLP-04", "PLP-05"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The filter drawer opens from the mirrored edge. Stock wording is per PRE-09."
+    },
+    {
+      "id": "F03",
+      "name": "Product search",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-02"],
+      "source": "PRE-03a Flow C2, steps 1 to 3",
+      "steps": [
+        {
+          "step": "F03.1",
+          "what": "Types in the search bar",
+          "surfaces": ["gl-header", "gl-header-mobile", "sf-search-suggestions"],
+          "register_ids": ["NAV-03", "NAV-09", "SRCH-01", "SRCH-02", "SRCH-03", "SRCH-06a"]
+        },
+        {
+          "step": "F03.2",
+          "what": "Submits the search",
+          "surfaces": ["sf-search-results"],
+          "register_ids": ["IA-06", "SRCH-04", "SRCH-06", "SRCH-07", "SRCH-08"]
+        },
+        {
+          "step": "F03.3",
+          "what": "Narrows and sorts the results",
+          "surfaces": ["sf-listing-filters", "sf-filter-drawer", "sf-listing-toolbar", "sf-pagination"],
+          "register_ids": ["SRCH-04"]
+        },
+        {
+          "step": "F03.4",
+          "what": "Gets no result",
+          "surfaces": ["sf-search-no-results"],
+          "register_ids": ["SRCH-05"]
+        }
+      ],
+      "language": "Search works in both languages. An Arabic query uses the curated synonym and correction list, Franco-Arabic spellings included (SRCH-06). A query typed in one language on the other language's address is not described by any source. What a language switch does to a search in progress is open (OP-15)."
+    },
+    {
+      "id": "F04",
+      "name": "Product evaluation",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-03"],
+      "source": "PRE-03a Flow C3",
+      "steps": [
+        {
+          "step": "F04.1",
+          "what": "Opens the product page",
+          "surfaces": ["sf-pdp-simple", "sf-pdp-variable", "gl-breadcrumbs"],
+          "register_ids": ["IA-07", "PDP-03", "PDP-04"]
+        },
+        {
+          "step": "F04.2",
+          "what": "Looks at the media",
+          "surfaces": ["sf-pdp-gallery"],
+          "register_ids": ["PDP-01", "PDP-02"]
+        },
+        {
+          "step": "F04.3",
+          "what": "Reads the product information",
+          "surfaces": ["sf-pdp-simple"],
+          "register_ids": ["PDP-11", "PDP-12", "PDP-13"]
+        },
+        {
+          "step": "F04.4",
+          "what": "Reads delivery, returns and authenticity",
+          "surfaces": ["sf-pdp-simple", "ct-authenticity", "ct-returns-policy"],
+          "register_ids": ["PDP-14", "PDP-15", "PDP-16", "SHIP-04"]
+        },
+        {
+          "step": "F04.5",
+          "what": "Reads the reviews",
+          "surfaces": ["sf-pdp-reviews", "rv-list"],
+          "register_ids": ["PDP-17", "REV-04"]
+        },
+        {
+          "step": "F04.6",
+          "what": "Looks at related and recently viewed products",
+          "surfaces": ["sf-pdp-related", "sf-pdp-recently-viewed"],
+          "register_ids": ["PDP-18", "PDP-19", "MER-05", "WISH-07"]
+        },
+        {
+          "step": "F04.7",
+          "what": "Shares the product",
+          "surfaces": ["sf-pdp-simple", "pv-share-targets"],
+          "register_ids": ["PDP-21"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The gallery order and swipe follow the reading direction and the image is never mirrored. Product content is separate per language (SSC-21), so lengths differ."
+    },
+    {
+      "id": "F05",
+      "name": "Variation selection",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-03"],
+      "source": "PRE-03a Flow C3, steps 3 and 4",
+      "steps": [
+        {
+          "step": "F05.1",
+          "what": "Chooses a variant",
+          "surfaces": ["sf-pdp-variable"],
+          "register_ids": ["PDP-05"]
+        },
+        {
+          "step": "F05.2",
+          "what": "Reads the stock status of that variant",
+          "surfaces": ["sf-pdp-stock-state"],
+          "register_ids": ["PDP-06", "PDP-22", "ERP-02"]
+        },
+        {
+          "step": "F05.3",
+          "what": "Chooses a quantity",
+          "surfaces": ["sf-pdp-simple"],
+          "register_ids": ["PDP-07"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. Attribute names and values are translated. Stock wording is per PRE-09."
+    },
+    {
+      "id": "F06",
+      "name": "Add to cart, buy now or wishlist",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-04"],
+      "source": "PRE-03a Flow C4",
+      "steps": [
+        {
+          "step": "F06.1",
+          "what": "Presses Add to Cart",
+          "surfaces": ["sf-pdp-simple", "sf-pdp-variable", "sf-mini-cart", "gl-header"],
+          "register_ids": ["PDP-08", "CART-12", "NAV-06", "ERP-03"]
+        },
+        {
+          "step": "F06.2",
+          "what": "Or presses Buy Now",
+          "surfaces": ["sf-pdp-simple", "ck-checkout"],
+          "register_ids": ["PDP-09"]
+        },
+        {
+          "step": "F06.3",
+          "what": "Or presses Add to Wishlist",
+          "surfaces": ["sf-pdp-simple", "sf-wishlist"],
+          "register_ids": ["PDP-10", "WISH-01", "WISH-02", "WISH-03"]
+        },
+        {
+          "step": "F06.4",
+          "what": "Later moves a saved product to the cart",
+          "surfaces": ["sf-wishlist"],
+          "register_ids": ["WISH-04"]
+        },
+        {
+          "step": "F06.5",
+          "what": "Or adds from a listing",
+          "surfaces": ["sf-product-card"],
+          "register_ids": ["PLP-04", "PLP-05"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The cart is unchanged by a language switch (contracted in the story, not yet built)."
+    },
+    {
+      "id": "F07",
+      "name": "Cart",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-05"],
+      "source": "PRE-03a Flow C5",
+      "steps": [
+        {
+          "step": "F07.1",
+          "what": "Opens the cart",
+          "surfaces": ["sf-cart"],
+          "register_ids": ["IA-08", "CART-01", "CART-05"]
+        },
+        {
+          "step": "F07.2",
+          "what": "Sees a line changed on re-validation",
+          "surfaces": ["sf-cart-revalidation"],
+          "register_ids": ["CART-10", "ERP-03"]
+        },
+        {
+          "step": "F07.3",
+          "what": "Sees the free-shipping prompt",
+          "surfaces": ["sf-free-shipping-progress"],
+          "register_ids": ["CART-07", "BR-002"]
+        },
+        {
+          "step": "F07.4",
+          "what": "Adds one more item from a suggestion",
+          "surfaces": ["sf-cart", "sf-product-card"],
+          "register_ids": ["CART-08"]
+        },
+        {
+          "step": "F07.5",
+          "what": "Adjusts the cart",
+          "surfaces": ["sf-cart"],
+          "register_ids": ["CART-02", "CART-03", "CART-04"]
+        },
+        {
+          "step": "F07.6",
+          "what": "Enters a coupon",
+          "surfaces": ["sf-cart"],
+          "register_ids": ["CART-06"]
+        },
+        {
+          "step": "F07.7",
+          "what": "Finds the cart empty",
+          "surfaces": ["sf-cart-empty"],
+          "register_ids": ["CART-11"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The progress indicator fills from the inline-start edge. Prices keep their digit order."
+    },
+    {
+      "id": "F08",
+      "name": "Registration and sign in",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-06"],
+      "source": "PRE-03a Flow C6",
+      "steps": [
+        {
+          "step": "F08.1",
+          "what": "Goes to the account entry point or to checkout",
+          "surfaces": ["gl-header", "au-checkout-entry"],
+          "register_ids": ["NAV-04", "FIX-09"]
+        },
+        {
+          "step": "F08.2",
+          "what": "Registers with email, password and consent",
+          "surfaces": ["au-register"],
+          "register_ids": ["AUTH-01", "AUTH-02", "AUTH-09", "AUTH-14"]
+        },
+        {
+          "step": "F08.3",
+          "what": "Receives the welcome and verification email, and verifies",
+          "surfaces": ["em-welcome", "au-email-verification"],
+          "register_ids": ["NOTF-01", "AUTH-05", "AUTH-06"]
+        },
+        {
+          "step": "F08.4",
+          "what": "Or signs in",
+          "surfaces": ["au-sign-in"],
+          "register_ids": ["AUTH-03", "AUTH-15"]
+        },
+        {
+          "step": "F08.5",
+          "what": "Or asks for a passwordless link",
+          "surfaces": ["au-passwordless", "em-passwordless"],
+          "register_ids": ["AUTH-12"]
+        },
+        {
+          "step": "F08.6",
+          "what": "Or chooses Google",
+          "surfaces": ["au-google-entry", "pv-google-account"],
+          "register_ids": ["AUTH-10", "AUTH-13"]
+        },
+        {
+          "step": "F08.7",
+          "what": "Has forgotten the password",
+          "surfaces": ["au-lost-password", "em-password-reset", "au-reset-password"],
+          "register_ids": ["AUTH-04", "AUTH-16"]
+        },
+        {
+          "step": "F08.8",
+          "what": "Keeps the cart through every path",
+          "surfaces": ["sf-cart"],
+          "register_ids": ["CART-13", "CART-14", "CART-15", "CART-16", "CART-18"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. Emails are sent in the language the customer used. Google's own screens follow the customer's Google settings, not the store's language."
+    },
+    {
+      "id": "F09",
+      "name": "Guest checkout",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-07"],
+      "source": "PRE-03a Flow C7, guest variant",
+      "steps": [
+        {
+          "step": "F09.1",
+          "what": "Goes to checkout and continues as a guest",
+          "surfaces": ["ck-checkout", "au-checkout-entry"],
+          "register_ids": ["IA-09", "CHK-10", "AUTH-07"]
+        },
+        {
+          "step": "F09.2",
+          "what": "Enters the address",
+          "surfaces": ["ck-address", "ck-validation"],
+          "register_ids": ["CHK-01", "CHK-11"]
+        },
+        {
+          "step": "F09.3",
+          "what": "Chooses a shipping method",
+          "surfaces": ["ck-shipping-method"],
+          "register_ids": ["CHK-03", "SHIP-01", "SHIP-15"]
+        },
+        {
+          "step": "F09.4",
+          "what": "Enters a coupon or an order note",
+          "surfaces": ["ck-coupon-notes"],
+          "register_ids": ["CHK-06", "CHK-07"]
+        },
+        {
+          "step": "F09.5",
+          "what": "Chooses a payment method",
+          "surfaces": ["ck-payment-method"],
+          "register_ids": ["CHK-04"]
+        },
+        {
+          "step": "F09.6",
+          "what": "Reviews the order and accepts the terms",
+          "surfaces": ["ck-review-place-order"],
+          "register_ids": ["CHK-05", "CHK-08", "CHK-09"]
+        },
+        {
+          "step": "F09.7",
+          "what": "Presses Place Order",
+          "surfaces": ["ck-review-place-order", "ck-stock-failure", "ck-erp-unavailable"],
+          "register_ids": ["CHK-12", "ERP-05", "PAY-05"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. Validation messages are clear in both languages (CHK-11). Phone numbers and digits keep their order. With an empty cart, checkout returns to the cart in the same language. What a switch does to a part-completed checkout is open (OP-15)."
+    },
+    {
+      "id": "F10",
+      "name": "Signed-in checkout",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-07"],
+      "source": "PRE-03a Flow C7, signed-in variant",
+      "steps": [
+        {
+          "step": "F10.1",
+          "what": "Goes to checkout",
+          "surfaces": ["ck-checkout"],
+          "register_ids": ["IA-09", "CHK-10"]
+        },
+        {
+          "step": "F10.2",
+          "what": "Selects a saved address, or adds one",
+          "surfaces": ["ck-address"],
+          "register_ids": ["CHK-02", "CHK-01"]
+        },
+        {
+          "step": "F10.3",
+          "what": "Chooses a shipping method",
+          "surfaces": ["ck-shipping-method"],
+          "register_ids": ["CHK-03"]
+        },
+        {
+          "step": "F10.4",
+          "what": "Enters a coupon or an order note",
+          "surfaces": ["ck-coupon-notes"],
+          "register_ids": ["CHK-06", "CHK-07"]
+        },
+        {
+          "step": "F10.5",
+          "what": "Chooses a payment method",
+          "surfaces": ["ck-payment-method"],
+          "register_ids": ["CHK-04"]
+        },
+        {
+          "step": "F10.6",
+          "what": "Reviews the order and accepts the terms",
+          "surfaces": ["ck-review-place-order"],
+          "register_ids": ["CHK-05", "CHK-08", "CHK-09"]
+        },
+        {
+          "step": "F10.7",
+          "what": "Presses Place Order",
+          "surfaces": ["ck-review-place-order", "ck-stock-failure", "ck-erp-unavailable"],
+          "register_ids": ["CHK-12", "ERP-05", "PAY-05"]
+        }
+      ],
+      "language": "As guest checkout. It differs only at the address step."
+    },
+    {
+      "id": "F11",
+      "name": "Payment handoff and return",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-07"],
+      "source": "PRE-03a Flow C7, step 10 and its outcomes",
+      "steps": [
+        {
+          "step": "F11.1",
+          "what": "Is handed to the payment provider",
+          "surfaces": ["ck-payment-handoff"],
+          "register_ids": ["PAY-03", "PAY-13"]
+        },
+        {
+          "step": "F11.2",
+          "what": "Completes the provider's card or wallet step",
+          "surfaces": ["pv-paymob-card", "pv-paymob-wallet"],
+          "register_ids": ["PAY-14", "PAY-15"]
+        },
+        {
+          "step": "F11.3",
+          "what": "Returns while the payment is verified",
+          "surfaces": ["ck-payment-handoff"],
+          "register_ids": ["PAY-04", "PAY-16"]
+        },
+        {
+          "step": "F11.4",
+          "what": "Payment succeeded",
+          "surfaces": ["ck-order-received"],
+          "register_ids": ["ORD-03"]
+        },
+        {
+          "step": "F11.5",
+          "what": "Payment failed or was cancelled",
+          "surfaces": ["ck-payment-failed", "em-payment-failed"],
+          "register_ids": ["ORD-02", "NOTF-03"]
+        },
+        {
+          "step": "F11.6",
+          "what": "Cash on delivery, where enabled: nothing is paid online",
+          "surfaces": ["ck-order-received"],
+          "register_ids": ["PAY-09"]
+        }
+      ],
+      "language": "Our handoff, loading, failure and return states are bilingual and mirrored. The provider's hosted step is the provider's: its language and direction are not ours to design."
+    },
+    {
+      "id": "F12",
+      "name": "Order received",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-08"],
+      "source": "PRE-03a Flow C8",
+      "steps": [
+        {
+          "step": "F12.1",
+          "what": "Arrives at the confirmation",
+          "surfaces": ["ck-order-received"],
+          "register_ids": ["IA-10", "SHIP-04"]
+        },
+        {
+          "step": "F12.2",
+          "what": "Receives the confirmation email",
+          "surfaces": ["em-order-confirmed"],
+          "register_ids": ["NOTF-02"]
+        },
+        {
+          "step": "F12.3",
+          "what": "Guest: is offered an account by setting a password only",
+          "surfaces": ["au-post-order-account"],
+          "register_ids": ["AUTH-11", "AUTH-08"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. What a language switch does on the confirmation is open (OP-15)."
+    },
+    {
+      "id": "F13",
+      "name": "Order tracking",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-09"],
+      "source": "PRE-03a Flow C9",
+      "steps": [
+        {
+          "step": "F13.1",
+          "what": "Signed in: opens the order history",
+          "surfaces": ["ac-orders"],
+          "register_ids": ["ACCT-05"]
+        },
+        {
+          "step": "F13.2",
+          "what": "Signed in: opens an order",
+          "surfaces": ["ac-order-detail", "ord-status-timeline", "ord-status-labels"],
+          "register_ids": ["ACCT-06", "ACCT-07"]
+        },
+        {
+          "step": "F13.3",
+          "what": "Receives the shipped email",
+          "surfaces": ["em-shipped"],
+          "register_ids": ["NOTF-04"]
+        },
+        {
+          "step": "F13.4",
+          "what": "Follows a tracking number to the carrier",
+          "surfaces": ["pv-carrier-tracking"],
+          "register_ids": ["SHIP-03"]
+        },
+        {
+          "step": "F13.5",
+          "what": "Not signed in: looks the order up",
+          "surfaces": ["ac-tracking", "ord-status-timeline"],
+          "register_ids": ["IA-21", "SHIP-13"]
+        },
+        {
+          "step": "F13.6",
+          "what": "Receives the delivered email",
+          "surfaces": ["em-delivered"],
+          "register_ids": ["NOTF-06"]
+        },
+        {
+          "step": "F13.7",
+          "what": "Downloads the invoice",
+          "surfaces": ["ac-order-detail", "ac-invoice"],
+          "register_ids": ["ACCT-12"]
+        },
+        {
+          "step": "F13.8",
+          "what": "Sees an outcome other than delivery",
+          "surfaces": ["ord-status-labels"],
+          "register_ids": ["ORD-08", "ORD-13"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The timeline runs from the inline-start edge. Dates, times, order numbers and tracking numbers keep their digit order. No email is sent for out for delivery at launch (NOTF-05 is P2)."
+    },
+    {
+      "id": "F14",
+      "name": "Using the account",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-06", "JRN-09", "JRN-10"],
+      "source": "PRE-03a Flow C13",
+      "steps": [
+        {
+          "step": "F14.1",
+          "what": "Opens the account",
+          "surfaces": ["ac-dashboard", "ac-navigation"],
+          "register_ids": ["IA-17", "ACCT-01"]
+        },
+        {
+          "step": "F14.2",
+          "what": "Opens the account while signed out",
+          "surfaces": ["au-sign-in", "au-register", "sy-sign-in-required"],
+          "register_ids": ["IA-14", "IA-15"]
+        },
+        {
+          "step": "F14.3",
+          "what": "Edits profile details or changes the password",
+          "surfaces": ["ac-account-details", "ac-password"],
+          "register_ids": ["ACCT-02", "ACCT-03"]
+        },
+        {
+          "step": "F14.4",
+          "what": "Manages addresses",
+          "surfaces": ["ac-addresses"],
+          "register_ids": ["ACCT-04"]
+        },
+        {
+          "step": "F14.5",
+          "what": "Reviews orders",
+          "surfaces": ["ac-orders", "ac-order-detail"],
+          "register_ids": ["ACCT-05", "ACCT-06"]
+        },
+        {
+          "step": "F14.6",
+          "what": "Opens the saved wishlist",
+          "surfaces": ["sf-wishlist"],
+          "register_ids": ["ACCT-08", "WISH-02"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. The Arabic account addresses end in placeholder wording until the client supplies it."
+    },
+    {
+      "id": "F15",
+      "name": "After-sales: review, return, refund, support",
+      "audience": ["visitor", "customer"],
+      "stage": "S1",
+      "journey_rows": ["JRN-10"],
+      "source": "PRE-03a Flow C10",
+      "steps": [
+        {
+          "step": "F15.1",
+          "what": "Review: follows the invitation and writes a review",
+          "surfaces": ["em-delivered", "rv-form"],
+          "register_ids": ["REV-01", "REV-02", "REV-05"]
+        },
+        {
+          "step": "F15.2",
+          "what": "Review: waits for moderation",
+          "surfaces": ["rv-pending", "rv-list"],
+          "register_ids": ["REV-03", "REV-04"]
+        },
+        {
+          "step": "F15.3",
+          "what": "Return: reads the policy",
+          "surfaces": ["ct-returns-policy"],
+          "register_ids": ["CMS-07"]
+        },
+        {
+          "step": "F15.4",
+          "what": "Return: contacts the store. There is no return form and no returns area",
+          "surfaces": ["ct-contact", "ct-help", "pv-whatsapp"],
+          "register_ids": ["CMS-04", "CMS-05", "CMS-10"]
+        },
+        {
+          "step": "F15.5",
+          "what": "Refund: receives the standard refund email and sees the refunded state",
+          "surfaces": ["em-refund", "ac-order-detail", "ord-status-labels"],
+          "register_ids": ["RET-08", "NOTF-08", "ORD-12"]
+        },
+        {
+          "step": "F15.6",
+          "what": "Support: asks a question",
+          "surfaces": ["ct-contact", "ct-help"],
+          "register_ids": ["CMS-04", "CMS-05"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored. A review is shown in the language it was written in."
+    },
+    {
+      "id": "F16",
+      "name": "Reorder, second release",
+      "audience": ["visitor", "customer"],
+      "stage": "S2",
+      "journey_rows": ["JRN-11"],
+      "source": "PRE-03a Flow C11",
+      "steps": [
+        {
+          "step": "F16.1",
+          "what": "Opens a past order and chooses to reorder",
+          "surfaces": ["ac-orders", "ac-order-detail", "ac-reorder"],
+          "register_ids": ["ACCT-09"]
+        },
+        {
+          "step": "F16.2",
+          "what": "Continues to the cart",
+          "surfaces": ["sf-cart"],
+          "register_ids": ["JRN-11"]
+        }
+      ],
+      "language": "Runs identically in English and Arabic: the same surfaces at the customer's language address, mirrored.",
+      "note": "Not in the first release. The first release lets the customer view past orders and add items again by hand."
+    },
+    {
+      "id": "S01",
+      "name": "Staff: adding and editing a product",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "PRE-03a Flow S1",
+      "steps": [
+        {
+          "step": "S01.1",
+          "what": "Finds a product or starts a new one",
+          "surfaces": ["ad-list-search-additions"],
+          "register_ids": ["ADM-152", "ADM-153", "ADM-20"]
+        },
+        {
+          "step": "S01.2",
+          "what": "Enters content, media, prices and variants on the standard product screen",
+          "surfaces": ["ad-product-edit-additions"],
+          "register_ids": ["ADM-22", "ADM-29", "ADM-32"]
+        },
+        {
+          "step": "S01.3",
+          "what": "Reads stock, which comes from the ERP",
+          "surfaces": ["ad-stock-from-erp"],
+          "register_ids": ["ADM-34", "ERP-01", "ERP-07"]
+        },
+        {
+          "step": "S01.4",
+          "what": "Assigns collections, badges, the featured flag and related products",
+          "surfaces": ["ad-product-storefront-controls"],
+          "register_ids": ["SSC-22", "SSC-23", "SSC-24", "SSC-25"]
+        },
+        {
+          "step": "S01.5",
+          "what": "Sets the search engine fields",
+          "surfaces": ["ad-seo-fields", "ad-product-edit-additions"],
+          "register_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27"]
+        },
+        {
+          "step": "S01.6",
+          "what": "Reviews the price and stock change history",
+          "surfaces": ["ad-price-stock-history"],
+          "register_ids": ["ADM-50"]
+        }
+      ],
+      "language": "English only. The administration is not mirrored (ADM-159).",
+      "note": "Most steps happen on the standard WooCommerce product screen, which is not redesigned. Only the additions are surfaces."
+    },
+    {
+      "id": "S02",
+      "name": "Staff: processing an order",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "PRE-03a Flow S2",
+      "steps": [
+        {
+          "step": "S02.1",
+          "what": "Sees what needs attention",
+          "surfaces": ["ad-dashboard-attention", "ad-dashboard-sales"],
+          "register_ids": ["ADM-12"]
+        },
+        {
+          "step": "S02.2",
+          "what": "Finds the order",
+          "surfaces": ["ad-order-list-filters", "ad-list-search-additions"],
+          "register_ids": ["ADM-85", "ADM-157"]
+        },
+        {
+          "step": "S02.3",
+          "what": "Opens the order and reads its timeline",
+          "surfaces": ["ad-order-status-history"],
+          "register_ids": ["ADM-86"]
+        },
+        {
+          "step": "S02.4",
+          "what": "Moves the order to the next status",
+          "surfaces": ["ad-order-status-control", "ord-status-labels"],
+          "register_ids": ["ADM-87"]
+        },
+        {
+          "step": "S02.5",
+          "what": "Prints the packing slip and the invoice",
+          "surfaces": ["ad-packing-slip", "ad-invoice"],
+          "register_ids": ["ADM-93", "ADM-92"]
+        },
+        {
+          "step": "S02.6",
+          "what": "Dispatches the order to the carrier",
+          "surfaces": ["ad-shipment-panel"],
+          "register_ids": ["ADM-89", "SHIP-09", "SHIP-03", "SHIP-12"]
+        },
+        {
+          "step": "S02.7",
+          "what": "Checks how a carrier status maps to an order status",
+          "surfaces": ["ad-carrier-status-mapping"],
+          "register_ids": ["SHIP-14"]
+        },
+        {
+          "step": "S02.8",
+          "what": "Records cash on delivery collection and remittance",
+          "surfaces": ["ad-cod-reconciliation"],
+          "register_ids": ["SHIP-16", "ORD-14"]
+        },
+        {
+          "step": "S02.9",
+          "what": "Cancels an order with a reason",
+          "surfaces": ["ad-order-cancel"],
+          "register_ids": ["ADM-90", "ORD-08"]
+        }
+      ],
+      "language": "English only. The administration is not mirrored (ADM-159)."
+    },
+    {
+      "id": "S03",
+      "name": "Staff: recording a refund",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "PRE-03a Flow S3",
+      "steps": [
+        {
+          "step": "S03.1",
+          "what": "Opens the order and records a full or a partial refund with its payment reference",
+          "surfaces": ["ad-refund-record"],
+          "register_ids": ["ADM-124", "PAY-07", "PAY-08", "RET-08"]
+        },
+        {
+          "step": "S03.2",
+          "what": "Is refused without refund permission",
+          "surfaces": ["ad-permission-denied"],
+          "register_ids": ["ROLE-09"]
+        },
+        {
+          "step": "S03.3",
+          "what": "The customer receives the standard refund email",
+          "surfaces": ["em-refund"],
+          "register_ids": ["NOTF-08"]
+        },
+        {
+          "step": "S03.4",
+          "what": "Checks pending refunds",
+          "surfaces": ["ad-dashboard-attention"],
+          "register_ids": ["ADM-13", "ADM-06"]
+        }
+      ],
+      "language": "English only. The administration is not mirrored (ADM-159). The refund email is sent in the customer's language."
+    },
+    {
+      "id": "S04",
+      "name": "Staff: editing storefront content",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "PRE-03a Flow S4",
+      "steps": [
+        {
+          "step": "S04.1",
+          "what": "Opens a page and edits a delivered section",
+          "surfaces": ["ad-section-library"],
+          "register_ids": ["SSC-01", "SSC-02"]
+        },
+        {
+          "step": "S04.2",
+          "what": "Adds, hides, shows or reorders sections where the design allows",
+          "surfaces": ["ad-section-library"],
+          "register_ids": ["SSC-02", "SSC-03"]
+        },
+        {
+          "step": "S04.3",
+          "what": "Edits the Arabic version",
+          "surfaces": ["ad-section-library"],
+          "register_ids": ["SSC-12"]
+        },
+        {
+          "step": "S04.4",
+          "what": "Previews, publishes, and reverts if needed",
+          "surfaces": ["ad-section-library"],
+          "register_ids": ["SSC-13", "SSC-14"]
+        },
+        {
+          "step": "S04.5",
+          "what": "Edits the navigation and the footer",
+          "surfaces": ["ad-navigation-editor", "gl-footer"],
+          "register_ids": ["SSC-07", "SSC-08"]
+        },
+        {
+          "step": "S04.6",
+          "what": "Creates and schedules a promotional banner",
+          "surfaces": ["ad-promo-banner-manager", "gl-promo-banner"],
+          "register_ids": ["SSC-09"]
+        },
+        {
+          "step": "S04.7",
+          "what": "Builds an offer page from the library",
+          "surfaces": ["ct-campaign-page"],
+          "register_ids": ["SSC-11"]
+        },
+        {
+          "step": "S04.8",
+          "what": "Changes the logo or an approved colour centrally",
+          "surfaces": ["ad-global-brand-controls"],
+          "register_ids": ["SSC-01"]
+        },
+        {
+          "step": "S04.9",
+          "what": "Edits category, brand and collection content",
+          "surfaces": ["ad-catalogue-terms"],
+          "register_ids": ["ADM-55", "ADM-56", "ADM-57"]
+        }
+      ],
+      "language": "The editor is English. The content edited is bilingual: each section is edited independently in English and Arabic (SSC-12), and the Arabic preview is right to left."
+    },
+    {
+      "id": "S05",
+      "name": "Staff: promotions, rules and merchandising",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "Feature Register sections D1 to D3 and G7",
+      "steps": [
+        {
+          "step": "S05.1",
+          "what": "Creates an automatic promotion or a coupon",
+          "surfaces": ["ad-promotion-editor"],
+          "register_ids": ["ADM-110", "ADM-111", "ADM-113", "ADM-115"]
+        },
+        {
+          "step": "S05.2",
+          "what": "Sets the welcome discount, the free-shipping condition and whether they combine",
+          "surfaces": ["ad-launch-rules-settings"],
+          "register_ids": ["BR-001", "BR-002", "BR-004"]
+        },
+        {
+          "step": "S05.3",
+          "what": "Orders products by hand in a category or a collection",
+          "surfaces": ["ad-manual-product-order"],
+          "register_ids": ["MER-03"]
+        }
+      ],
+      "language": "English only. The administration is not mirrored (ADM-159).",
+      "note": "Not a flow of the sitemap companion. Listed so the rule and merchandising surfaces are reached by a flow."
+    },
+    {
+      "id": "S06",
+      "name": "Staff: accounts, search tools and reports",
+      "audience": ["staff"],
+      "stage": "S1",
+      "journey_rows": [],
+      "source": "Feature Register sections G6, G9, H and V.2",
+      "steps": [
+        {
+          "step": "S06.1",
+          "what": "Signs in with a second factor",
+          "surfaces": ["ad-two-factor"],
+          "register_ids": ["ADM-131"]
+        },
+        {
+          "step": "S06.2",
+          "what": "Searches the staff activity log",
+          "surfaces": ["ad-staff-log"],
+          "register_ids": ["ADM-132", "ADM-134"]
+        },
+        {
+          "step": "S06.3",
+          "what": "Adds an internal note on a customer, or suspends an account",
+          "surfaces": ["ad-customer-notes", "ad-customer-suspend"],
+          "register_ids": ["ADM-103", "ADM-104"]
+        },
+        {
+          "step": "S06.4",
+          "what": "Maintains the search synonym list",
+          "surfaces": ["ad-search-synonyms"],
+          "register_ids": ["SRCH-07"]
+        },
+        {
+          "step": "S06.5",
+          "what": "Creates a redirect, from the missing-page log or directly",
+          "surfaces": ["ad-missing-page-log", "ad-redirect-manager"],
+          "register_ids": ["MKT-13", "MKT-14"]
+        },
+        {
+          "step": "S06.6",
+          "what": "Sets the sitemap, robots and verification settings",
+          "surfaces": ["ad-seo-site-settings"],
+          "register_ids": ["MKT-15", "MKT-17"]
+        },
+        {
+          "step": "S06.7",
+          "what": "Reads the sales and inventory reports",
+          "surfaces": ["rp-sales", "rp-stock", "ad-dashboard-stock"],
+          "register_ids": ["RPT-01", "RPT-10"]
+        },
+        {
+          "step": "S06.8",
+          "what": "Reads funnel and traffic in Google Analytics",
+          "surfaces": ["pv-google-analytics"],
+          "register_ids": ["RPT-08", "RPT-09"]
+        }
+      ],
+      "language": "English only. The administration is not mirrored (ADM-159).",
+      "note": "Not a flow of the sitemap companion. Listed so these surfaces are reached by a flow."
+    }
+  ]
+}

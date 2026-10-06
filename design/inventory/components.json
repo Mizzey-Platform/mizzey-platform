@@ -1,0 +1,743 @@
+{
+  "about": "The structural component inventory. Structure, states and direction rules only: no brand value. register_ids name rows that require the component and are context, not ownership. section_library marks a section of the curated library the client edits (register section G11).",
+  "layers": ["foundations", "controls", "navigation", "commerce", "feedback", "content"],
+  "components": [
+    {
+      "id": "fn-type-roles",
+      "layer": "foundations",
+      "name": "Typography roles",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page", "em-shell"],
+      "brand": "neutral",
+      "note": "Roles, not faces: display, heading, body, label, caption, numeric. One neutral system typeface per script until the brand identity arrives. Arabic and Latin are sized as separate roles because their proportions differ. Numerals: Western digits 0 to 9 in both languages is the working baseline, provisional (DQ-01)."
+    },
+    {
+      "id": "fn-spacing",
+      "layer": "foundations",
+      "name": "Spacing scale",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page"],
+      "brand": "neutral",
+      "note": "One scale for every gap, padding and margin, written with logical properties so it mirrors by direction."
+    },
+    {
+      "id": "fn-grid",
+      "layer": "foundations",
+      "name": "Grid and breakpoints",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page"],
+      "brand": "neutral",
+      "note": "Mobile 360 to 767, tablet 768 to 1023, desktop 1024 and above. Columns per breakpoint are settled in the wireframes."
+    },
+    {
+      "id": "fn-colour-roles",
+      "layer": "foundations",
+      "name": "Colour roles",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page", "em-shell"],
+      "brand": "neutral",
+      "note": "Surface, raised surface, text, muted text, border, primary, on primary, accent, success, warning, danger, focus. Neutral greys only. No client colour."
+    },
+    {
+      "id": "fn-radius",
+      "layer": "foundations",
+      "name": "Radius scale",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fn-elevation",
+      "layer": "foundations",
+      "name": "Elevation levels",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["gl-mega-menu", "sf-mini-cart", "sf-filter-drawer", "gl-mobile-nav"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fn-focus",
+      "layer": "foundations",
+      "name": "Focus state",
+      "register_ids": ["NFR-11"],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page"],
+      "brand": "neutral",
+      "note": "Visible on every interactive element. Keyboard order follows the reading direction."
+    },
+    {
+      "id": "fn-motion",
+      "layer": "foundations",
+      "name": "Motion",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-mini-cart", "sf-filter-drawer", "gl-mobile-nav", "sf-pdp-gallery"],
+      "brand": "neutral",
+      "note": "Duration and easing, reduced when the visitor asks for reduced motion."
+    },
+    {
+      "id": "fn-iconography",
+      "layer": "foundations",
+      "name": "Icon set and direction rule",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page"],
+      "brand": "neutral",
+      "rtl": "Icons that imply direction mirror: arrows, chevrons, back, reply, progress. Icons that do not, stay: search, cart, heart, account, close, play."
+    },
+    {
+      "id": "ctl-button",
+      "layer": "controls",
+      "name": "Button",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "loading"],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page", "au-sign-in", "au-register"],
+      "brand": "neutral",
+      "note": "Primary, secondary and quiet. One primary action per view."
+    },
+    {
+      "id": "ctl-link",
+      "layer": "controls",
+      "name": "Link",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "visited"],
+      "used_by": ["sf-home", "sf-shop", "sf-pdp-simple", "sf-cart", "ck-checkout", "ac-dashboard", "ct-static-page", "gl-footer"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-input",
+      "layer": "controls",
+      "name": "Text field",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "error", "filled"],
+      "used_by": ["au-sign-in", "au-register", "ck-address", "ct-contact", "ac-account-details"],
+      "brand": "neutral",
+      "rtl": "Text aligns to the reading direction. Email addresses, phone numbers and codes are entered left to right in both languages."
+    },
+    {
+      "id": "ctl-textarea",
+      "layer": "controls",
+      "name": "Text area",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "error"],
+      "used_by": ["ct-contact", "rv-form", "ck-coupon-notes"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-select",
+      "layer": "controls",
+      "name": "Select",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "error", "open"],
+      "used_by": ["ck-address", "sf-listing-toolbar", "sf-pdp-variable"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-checkbox",
+      "layer": "controls",
+      "name": "Checkbox",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "checked", "error"],
+      "used_by": ["au-register", "ck-review-place-order", "sf-listing-filters", "gl-cookie-consent"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-radio",
+      "layer": "controls",
+      "name": "Radio",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "checked"],
+      "used_by": ["ck-shipping-method", "ck-payment-method", "ck-address"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-quantity",
+      "layer": "controls",
+      "name": "Quantity stepper",
+      "register_ids": ["PDP-07", "CART-02"],
+      "states": ["default", "hover", "focus", "active", "disabled", "at_minimum", "at_maximum"],
+      "used_by": ["sf-pdp-simple", "sf-cart", "sf-mini-cart"],
+      "brand": "neutral",
+      "rtl": "The minus and plus order follows the reading direction. The numeral does not change."
+    },
+    {
+      "id": "ctl-toggle",
+      "layer": "controls",
+      "name": "Toggle",
+      "register_ids": [],
+      "states": ["default", "hover", "focus", "active", "disabled", "on", "off"],
+      "used_by": ["gl-cookie-consent", "ac-notification-preferences"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-search-field",
+      "layer": "controls",
+      "name": "Search field",
+      "register_ids": ["NAV-03", "NAV-09"],
+      "states": ["default", "hover", "focus", "active", "disabled", "typing", "with_clear"],
+      "used_by": ["gl-header", "gl-header-mobile", "sf-search-results"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-rating-input",
+      "layer": "controls",
+      "name": "Star rating input",
+      "register_ids": ["REV-02"],
+      "states": ["default", "hover", "focus", "selected", "error"],
+      "used_by": ["rv-form"],
+      "brand": "neutral"
+    },
+    {
+      "id": "ctl-price-range",
+      "layer": "controls",
+      "name": "Price range filter",
+      "register_ids": ["PLP-08"],
+      "states": ["default", "hover", "focus", "active", "disabled"],
+      "used_by": ["sf-listing-filters"],
+      "brand": "neutral",
+      "rtl": "The lower bound sits at the inline-start edge. Numerals keep their digit order."
+    },
+    {
+      "id": "nv-header",
+      "layer": "navigation",
+      "name": "Header bar",
+      "register_ids": ["NAV-01", "NAV-08"],
+      "states": [],
+      "used_by": ["gl-header", "gl-header-mobile"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-mobile-nav",
+      "layer": "navigation",
+      "name": "Mobile navigation",
+      "register_ids": ["NAV-10"],
+      "states": ["closed", "open", "nested"],
+      "used_by": ["gl-mobile-nav"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-mega-menu",
+      "layer": "navigation",
+      "name": "Mega menu panel",
+      "register_ids": ["NAV-07"],
+      "states": ["closed", "open"],
+      "used_by": ["gl-mega-menu"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-breadcrumbs",
+      "layer": "navigation",
+      "name": "Breadcrumbs",
+      "register_ids": ["PLP-21"],
+      "states": [],
+      "used_by": ["gl-breadcrumbs", "sf-pdp-simple", "sf-category"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-tabs",
+      "layer": "navigation",
+      "name": "Tabs",
+      "register_ids": ["PDP-12"],
+      "states": ["default", "selected", "focus"],
+      "used_by": ["sf-pdp-simple", "au-sign-in"],
+      "brand": "neutral",
+      "note": "PDP-12 names the full description as a tab, so it stays a tab on every viewport. How the tab navigation responds on a small screen is explored (IX-08)."
+    },
+    {
+      "id": "nv-pagination",
+      "layer": "navigation",
+      "name": "Pagination",
+      "register_ids": ["PLP-16"],
+      "states": ["default", "current", "disabled"],
+      "used_by": ["sf-pagination", "ac-orders", "rv-list"],
+      "brand": "neutral",
+      "note": "The working baseline for product lists, not a decision: see DQ-02 in interaction-options.json."
+    },
+    {
+      "id": "nv-language-switcher",
+      "layer": "navigation",
+      "name": "Language switcher",
+      "register_ids": ["NAV-02"],
+      "states": [],
+      "used_by": ["gl-language-switcher", "gl-header", "gl-mobile-nav"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-account-menu",
+      "layer": "navigation",
+      "name": "Account menu",
+      "register_ids": ["ACCT-08"],
+      "states": ["default", "current"],
+      "used_by": ["ac-navigation"],
+      "brand": "neutral"
+    },
+    {
+      "id": "nv-footer",
+      "layer": "navigation",
+      "name": "Footer columns",
+      "register_ids": ["SSC-08"],
+      "states": [],
+      "used_by": ["gl-footer"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-product-card",
+      "layer": "commerce",
+      "name": "Product card",
+      "register_ids": ["PLP-01", "PLP-02", "PLP-03", "PLP-04", "PLP-05"],
+      "states": [],
+      "used_by": ["sf-product-card", "sf-home", "sf-shop", "sf-wishlist", "sf-pdp-related"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-price",
+      "layer": "commerce",
+      "name": "Price, sale price and saving",
+      "register_ids": ["PLP-02", "PDP-04"],
+      "states": ["regular", "on_sale", "range"],
+      "used_by": ["sf-product-card", "sf-pdp-simple", "sf-cart", "ck-review-place-order", "ac-order-detail"],
+      "brand": "neutral",
+      "rtl": "The amount keeps its digit order. Where the currency sits is a locale rule (NFR-04b), settled with #269.",
+      "note": "Not discount-store styling (MER-07)."
+    },
+    {
+      "id": "cm-gallery",
+      "layer": "commerce",
+      "name": "Product gallery",
+      "register_ids": ["PDP-01", "PDP-02"],
+      "states": [],
+      "used_by": ["sf-pdp-gallery"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-variant-selector",
+      "layer": "commerce",
+      "name": "Variant selector",
+      "register_ids": ["PDP-05", "PDP-06"],
+      "states": ["default", "selected", "unavailable", "focus"],
+      "used_by": ["sf-pdp-variable"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-stock-state",
+      "layer": "commerce",
+      "name": "Stock state label",
+      "register_ids": ["PLP-03", "PDP-06", "PDP-22"],
+      "states": ["in_stock", "out_of_stock", "unknown"],
+      "used_by": ["sf-pdp-stock-state", "sf-product-card", "sf-cart-revalidation", "sf-wishlist"],
+      "brand": "neutral",
+      "note": "Structural states only. Final wording, timing and mechanism are per PRE-09. No low-stock state."
+    },
+    {
+      "id": "cm-add-to-cart",
+      "layer": "commerce",
+      "name": "Add to cart, buy now and wishlist actions",
+      "register_ids": ["PDP-08", "PDP-09", "PDP-10"],
+      "states": ["default", "loading", "added", "disabled"],
+      "used_by": ["sf-pdp-simple", "sf-pdp-variable", "sf-product-card"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-cart-line",
+      "layer": "commerce",
+      "name": "Cart line",
+      "register_ids": ["CART-01", "CART-02", "CART-03", "CART-04"],
+      "states": ["default", "updating", "changed", "unavailable"],
+      "used_by": ["sf-cart", "sf-mini-cart"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-order-summary",
+      "layer": "commerce",
+      "name": "Order summary and total breakdown",
+      "register_ids": ["CART-05", "CHK-08"],
+      "states": [],
+      "used_by": ["sf-cart", "ck-checkout", "ck-review-place-order", "ck-order-received", "ac-order-detail", "em-order-confirmed"],
+      "brand": "neutral",
+      "rtl": "Labels sit at the inline-start edge and amounts at the inline-end edge. Amounts keep their digit order."
+    },
+    {
+      "id": "cm-coupon",
+      "layer": "commerce",
+      "name": "Coupon entry",
+      "register_ids": ["CART-06", "CHK-07"],
+      "states": ["default", "applied", "invalid"],
+      "used_by": ["sf-cart", "ck-coupon-notes"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-free-shipping-progress",
+      "layer": "commerce",
+      "name": "Free-shipping progress",
+      "register_ids": ["CART-07"],
+      "states": [],
+      "used_by": ["sf-free-shipping-progress", "sf-mini-cart"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-address-card",
+      "layer": "commerce",
+      "name": "Address card",
+      "register_ids": ["ACCT-04", "CHK-02"],
+      "states": ["default", "selected", "default_address"],
+      "used_by": ["ac-addresses", "ck-address", "ac-order-detail"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-status-timeline",
+      "layer": "commerce",
+      "name": "Order status timeline",
+      "register_ids": ["ORD-03", "ORD-04", "ORD-05", "ORD-06", "ORD-07"],
+      "states": [],
+      "used_by": ["ord-status-timeline", "ac-order-detail", "ac-tracking"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-status-label",
+      "layer": "commerce",
+      "name": "Order status label",
+      "register_ids": ["ORD-01", "ORD-02", "ORD-08", "ORD-12", "ORD-13", "ORD-14"],
+      "states": [],
+      "used_by": ["ord-status-labels", "ac-orders", "ac-order-detail"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-rating",
+      "layer": "commerce",
+      "name": "Rating stars",
+      "register_ids": ["REV-04"],
+      "states": [],
+      "used_by": ["sf-product-card", "rv-list", "sf-pdp-reviews"],
+      "brand": "neutral",
+      "rtl": "Stars fill from the inline-start edge."
+    },
+    {
+      "id": "cm-review-item",
+      "layer": "commerce",
+      "name": "Review item",
+      "register_ids": ["REV-01"],
+      "states": [],
+      "used_by": ["rv-list"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-product-badge",
+      "layer": "commerce",
+      "name": "Product badge",
+      "register_ids": ["MER-01"],
+      "states": [],
+      "used_by": ["sf-product-badges", "sf-product-card", "sf-pdp-simple"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-payment-method",
+      "layer": "commerce",
+      "name": "Payment method option",
+      "register_ids": ["CHK-04"],
+      "states": ["default", "selected", "unavailable"],
+      "used_by": ["ck-payment-method"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-shipping-method",
+      "layer": "commerce",
+      "name": "Shipping method option",
+      "register_ids": ["CHK-03"],
+      "states": ["default", "selected", "free"],
+      "used_by": ["ck-shipping-method"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cm-share",
+      "layer": "commerce",
+      "name": "Share buttons",
+      "register_ids": ["PDP-21"],
+      "states": [],
+      "used_by": ["sf-pdp-simple"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-notice",
+      "layer": "feedback",
+      "name": "Notice",
+      "register_ids": [],
+      "states": ["success", "error", "info", "warning"],
+      "used_by": ["sy-store-notices", "sf-cart", "ck-checkout", "ac-dashboard"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-inline-validation",
+      "layer": "feedback",
+      "name": "Inline validation",
+      "register_ids": ["DOD-03", "CHK-11"],
+      "states": ["error", "success"],
+      "used_by": ["ck-validation", "au-register", "ct-contact", "ck-address", "ac-addresses"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-toast",
+      "layer": "feedback",
+      "name": "Toast",
+      "register_ids": [],
+      "states": ["success", "error"],
+      "used_by": ["sf-product-card", "sf-wishlist"],
+      "brand": "neutral",
+      "note": "Used only where a notice in place would be missed. Whether toasts are used at all is a wireframe decision."
+    },
+    {
+      "id": "fb-skeleton",
+      "layer": "feedback",
+      "name": "Skeleton and loading",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-shop", "sf-search-results", "sf-search-suggestions", "sf-pdp-gallery", "ck-payment-handoff"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-empty-state",
+      "layer": "feedback",
+      "name": "Empty state",
+      "register_ids": ["PLP-19", "SRCH-05", "CART-11"],
+      "states": [],
+      "used_by": ["sf-listing-empty", "sf-search-no-results", "sf-cart-empty", "sf-wishlist", "ac-orders", "ac-addresses"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-error-state",
+      "layer": "feedback",
+      "name": "Error state",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sy-404", "sy-maintenance", "ck-payment-failed", "ck-erp-unavailable"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-success-state",
+      "layer": "feedback",
+      "name": "Success state",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["ck-order-received", "ct-contact", "au-email-verification"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-badge",
+      "layer": "feedback",
+      "name": "Count and status badge",
+      "register_ids": ["NAV-06"],
+      "states": [],
+      "used_by": ["gl-header", "sf-filter-drawer"],
+      "brand": "neutral"
+    },
+    {
+      "id": "fb-modal",
+      "layer": "feedback",
+      "name": "Dialog",
+      "register_ids": [],
+      "states": ["open", "closed"],
+      "used_by": ["ac-addresses", "sf-pdp-gallery"],
+      "brand": "neutral",
+      "note": "Focus is trapped and returned. The close control sits at the inline-end edge."
+    },
+    {
+      "id": "fb-drawer",
+      "layer": "feedback",
+      "name": "Drawer",
+      "register_ids": [],
+      "states": ["open", "closed"],
+      "used_by": ["gl-mobile-nav", "sf-filter-drawer", "sf-mini-cart"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cn-hero",
+      "layer": "content",
+      "name": "Hero",
+      "register_ids": ["HOME-01"],
+      "states": [],
+      "used_by": ["sf-home", "ct-campaign-page"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["image at inline-start", "image at inline-end", "full bleed"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["heading", "text", "button label and link", "image", "alt text"],
+        "locked": ["height", "type scale", "spacing", "overlay"]
+      }
+    },
+    {
+      "id": "cn-promo-banner",
+      "layer": "content",
+      "name": "Promotional banner",
+      "register_ids": ["HOME-07", "SSC-09"],
+      "states": [],
+      "used_by": ["gl-promo-banner", "sf-home", "ct-campaign-page"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["strip", "card"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["text", "link", "image", "start", "optional end", "page placement", "enabled"],
+        "locked": ["position rules", "size"]
+      }
+    },
+    {
+      "id": "cn-product-rail",
+      "layer": "content",
+      "name": "Product rail",
+      "register_ids": ["HOME-02", "HOME-03"],
+      "states": [],
+      "used_by": ["sf-home", "sf-pdp-related", "sf-pdp-recently-viewed", "sf-recently-viewed", "sf-cart", "ct-campaign-page"],
+      "brand": "neutral",
+      "rtl": "The rail starts at the inline-start edge and scrolls toward the inline-end edge.",
+      "section_library": {
+        "allowed_variants": ["manual pick", "by collection", "by category"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["heading", "source", "item count within a fixed range"],
+        "locked": ["card layout", "columns per viewport"]
+      }
+    },
+    {
+      "id": "cn-category-tiles",
+      "layer": "content",
+      "name": "Category tiles",
+      "register_ids": ["HOME-05"],
+      "states": [],
+      "used_by": ["sf-home"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["four tiles", "six tiles"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["category", "image", "label"],
+        "locked": ["grid", "aspect ratio"]
+      }
+    },
+    {
+      "id": "cn-collection-feature",
+      "layer": "content",
+      "name": "Featured collections",
+      "register_ids": ["HOME-04"],
+      "states": [],
+      "used_by": ["sf-home"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": [],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["collection", "image", "label"],
+        "locked": ["grid"]
+      }
+    },
+    {
+      "id": "cn-brand-highlights",
+      "layer": "content",
+      "name": "Brand highlights",
+      "register_ids": ["HOME-06"],
+      "states": [],
+      "used_by": ["sf-home"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": [],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["brand", "logo"],
+        "locked": ["grid"]
+      }
+    },
+    {
+      "id": "cn-rich-text",
+      "layer": "content",
+      "name": "Rich text",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["ct-static-page", "ct-about", "ct-privacy", "ct-terms"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["one column", "two columns"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["text", "headings to a fixed depth", "links"],
+        "locked": ["fonts", "colours"]
+      }
+    },
+    {
+      "id": "cn-image-text",
+      "layer": "content",
+      "name": "Image with text",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["sf-home", "ct-about", "ct-authenticity", "ct-campaign-page"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["image at inline-start", "image at inline-end", "stacked"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["image", "alt text", "heading", "text", "link"],
+        "locked": ["proportions"]
+      }
+    },
+    {
+      "id": "cn-accordion",
+      "layer": "content",
+      "name": "Accordion",
+      "register_ids": ["CMS-05"],
+      "states": ["collapsed", "expanded", "focus"],
+      "used_by": ["ct-help", "sf-pdp-simple"],
+      "brand": "neutral",
+      "rtl": "The expand indicator sits at the inline-end edge.",
+      "section_library": {
+        "allowed_variants": ["single open", "multiple open"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["question", "answer"],
+        "locked": ["styling"]
+      }
+    },
+    {
+      "id": "cn-trust-strip",
+      "layer": "content",
+      "name": "Trust strip",
+      "register_ids": ["HOME-08"],
+      "states": [],
+      "used_by": ["sf-home", "sf-pdp-simple"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": ["three items", "four items"],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["icon from a fixed set", "label", "link"],
+        "locked": ["layout"]
+      }
+    },
+    {
+      "id": "cn-signup-prompt",
+      "layer": "content",
+      "name": "Newsletter or account signup prompt",
+      "register_ids": ["HOME-09"],
+      "states": ["default", "error", "success"],
+      "used_by": ["sf-home", "gl-footer"],
+      "brand": "neutral",
+      "section_library": {
+        "allowed_variants": [],
+        "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
+        "editable": ["heading", "text", "button label"],
+        "locked": ["layout"]
+      }
+    },
+    {
+      "id": "cn-contact-form",
+      "layer": "content",
+      "name": "Contact form",
+      "register_ids": ["CMS-04"],
+      "states": ["default", "error", "sent", "failed"],
+      "used_by": ["ct-contact"],
+      "brand": "neutral"
+    },
+    {
+      "id": "cn-email-block",
+      "layer": "content",
+      "name": "Email content blocks",
+      "register_ids": [],
+      "states": [],
+      "used_by": ["em-shell", "em-order-confirmed", "em-shipped", "em-refund"],
+      "brand": "neutral",
+      "note": "Heading, text, order table, button, footer. Table-based layout for email clients, in both directions."
+    }
+  ]
+}

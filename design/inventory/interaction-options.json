@@ -1,0 +1,289 @@
+{
+  "about": "UX choices that have more than one legitimate pattern. Each entry names an outcome the signed scope requires and the normal patterns that can meet it, where neither the contract nor the platform fixes one. An entry exists only where choosing early would constrain the design for no reason. It adds no capability: it is about how a contracted capability is presented.",
+  "statuses": {
+    "open": "No pattern is preferred yet. The designer proposes, recommends one and shows the alternatives.",
+    "provisional": "A working baseline for the first wireframes. Not a requirement and not an owner-confirmed final product decision. It may change in UX review without a scope change, provided the pattern chosen still meets the requirement and the constraints.",
+    "locked": "A pattern was selected at its decision stage, and decision_source says by whom and where."
+  },
+  "decision_stages": {
+    "low_fidelity_review": "The owner's review of the low-fidelity wireframes.",
+    "high_fidelity_review": "The owner's review of the high-fidelity design.",
+    "localisation_review": "The design and localisation review of the Arabic experience."
+  },
+  "options": [
+    {
+      "id": "DQ-01",
+      "name": "Numerals in Arabic",
+      "affected_surfaces": [],
+      "requirement_outcome": "Numbers, prices and dates are formatted per locale in English and in Arabic (NFR-04b). No row names a numeral system.",
+      "candidate_patterns": [
+        "Western digits 0 to 9 in both languages", "Arabic-Indic digits on Arabic pages",
+        "Arabic-Indic digits in running Arabic text, Western digits for prices, quantities and reference numbers"
+      ],
+      "working_baseline": "Western digits 0 to 9 in both languages",
+      "status": "provisional",
+      "constrained_by": [],
+      "decision_stage": "localisation_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "Currency, number and date formatting follows the locale (NFR-04b, accepted by #269)."}
+      ],
+      "selection_criteria": [
+        "what the audience reads most easily", "order, tracking and phone numbers stay unambiguous and copyable",
+        "consistency across pages, emails and invoices", "form input behaviour", "what the platform formats natively"
+      ],
+      "selected_pattern": null,
+      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision.",
+      "applies_to": "Every customer-facing surface."
+    },
+    {
+      "id": "DQ-02",
+      "name": "Product-list continuation",
+      "affected_surfaces": ["sf-pagination", "sf-shop", "sf-category", "sf-collection", "sf-brand", "sf-search-results"],
+      "requirement_outcome": "A customer can continue through a product list beyond the first set of products and sees how many results there are (PLP-16, PLP-17). PLP-16 names pagination or infinite scroll and fixes neither.",
+      "candidate_patterns": ["Numbered pagination", "Load More", "Controlled continuous or infinite loading"],
+      "working_baseline": "Numbered pagination",
+      "status": "provisional",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "A place in a list has an address that can be shared, reopened and indexed (NFR-03)."},
+        {"type": "contract_condition", "text": "Usable by keyboard and screen reader (NFR-11)."},
+        {
+          "type": "platform",
+          "text": "The platform paginates natively. Load More and continuous loading are additions, and native comes first (constitution M-4)."
+        }
+      ],
+      "selection_criteria": [
+        "usability", "mobile behaviour", "accessibility", "SEO", "performance", "catalogue size", "native platform behaviour", "technical cost",
+        "whether the footer stays reachable"
+      ],
+      "selected_pattern": null,
+      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision."
+    },
+    {
+      "id": "DQ-03",
+      "name": "Checkout structure",
+      "affected_surfaces": ["ck-checkout", "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order"],
+      "requirement_outcome": "The customer gives an address, chooses shipping and payment, reviews the order and places it, on a mobile-optimised checkout (JRN-07, CHK-01 to CHK-10). No row says whether these are sections of one page or separate steps.",
+      "candidate_patterns": [
+        "One page with clear sections", "One page with progressive or accordion sections",
+        "Stepped checkout, only if it stays compatible with the contracted behaviour and the chosen commerce implementation"
+      ],
+      "working_baseline": "One page with clear sections",
+      "status": "provisional",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_pattern", "text": "The order of the journey is address, shipping, payment, review, place order (JRN-07). That order is not open."},
+        {
+          "type": "contract_pattern",
+          "text": "A review of the order comes before it is confirmed (CHK-05). The review cannot be dropped or moved after Place Order."
+        },
+        {"type": "contract_condition", "text": "Guest checkout is never forced into registration (AUTH-07)."},
+        {"type": "contract_condition", "text": "Place Order creates exactly one order (PAY-05)."},
+        {"type": "platform", "text": "The WooCommerce Checkout block is the native baseline, and native comes first (constitution M-4)."}
+      ],
+      "selection_criteria": [
+        "completion on mobile", "clarity of the total at every point", "error recovery", "what the native checkout supports without custom code",
+        "accessibility", "technical cost"
+      ],
+      "selected_pattern": null,
+      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision."
+    },
+    {
+      "id": "IX-01",
+      "name": "Filter placement on desktop and tablet",
+      "affected_surfaces": ["sf-listing-filters", "sf-filter-drawer", "sf-listing-toolbar"],
+      "requirement_outcome": "A customer narrows a list by category, brand, price, attribute and availability, and sees and removes each active filter (PLP-06 to PLP-10, PLP-18). No row says where the filters sit on desktop or tablet.",
+      "candidate_patterns": ["Sidebar beside the grid", "Horizontal filter bar above the grid", "Drawer on every viewport"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_pattern", "text": "On mobile the filters are a drawer: PLP-22 names it. The mobile presentation is not open."},
+        {"type": "contract_condition", "text": "Search results carry the full filter set (SRCH-04), so the pattern must work there too."},
+        {"type": "platform", "text": "The WooCommerce product filter blocks are the native baseline."}
+      ],
+      "selection_criteria": ["how many filters and options a category really has", "room left for product imagery", "discoverability", "tablet behaviour", "accessibility"],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-02",
+      "name": "Mini-cart presentation",
+      "affected_surfaces": ["sf-mini-cart", "gl-header", "gl-header-mobile"],
+      "requirement_outcome": "The header shows the cart with a live item count and a mini-cart, and the customer sees that an item was added (NAV-06, CART-12, PDP-08). No row says how the mini-cart opens.",
+      "candidate_patterns": ["Dropdown panel under the header", "Side drawer", "Drawer that opens after an add, with the count alone at other times"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_pattern", "text": "A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page."},
+        {"type": "contract_condition", "text": "The cart page remains (IA-08)."},
+        {"type": "platform", "text": "The WooCommerce mini-cart block is the native baseline."}
+      ],
+      "selection_criteria": ["mobile behaviour", "room for the free-shipping prompt (CART-07)", "how much an add interrupts browsing", "focus management", "performance"],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-03",
+      "name": "Keeping the buy actions in reach on the product page",
+      "affected_surfaces": ["sf-pdp-simple", "sf-pdp-variable"],
+      "requirement_outcome": "Add to Cart and Buy Now are available on the product page (PDP-08, PDP-09). No row says whether they stay in view while the page scrolls.",
+      "candidate_patterns": ["Buy area in the page flow only", "Sticky buy bar on mobile once the buy area has scrolled away", "Sticky buy area beside the gallery on desktop"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "A variable product needs a choice before it can be added (PDP-05)."},
+        {"type": "contract_condition", "text": "The stock state is visible wherever the action is (PDP-06, PDP-22)."},
+        {"type": "platform", "text": "The standard product template has no sticky buy area. One is an addition to it."}
+      ],
+      "selection_criteria": [
+        "length of the product page", "mobile reach", "accessibility", "performance", "whether it distracts from the product",
+        "nothing it covers: content, the consent banner, the keyboard"
+      ],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-04",
+      "name": "Gallery navigation and zoom",
+      "affected_surfaces": ["sf-pdp-gallery"],
+      "requirement_outcome": "A customer browses a product's images and video and can zoom (PDP-01, PDP-02). No row says how the gallery is navigated or how zoom works.",
+      "candidate_patterns": ["Thumbnail strip with a main image", "Swipe with a position indicator", "Image grid on desktop, swipe on mobile"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {
+          "type": "contract_condition",
+          "text": "Zoom exists (PDP-01). Its mechanism, hover magnifier, lightbox or pinch, is chosen with the navigation pattern."
+        },
+        {"type": "contract_condition", "text": "Video sits in the same gallery (PDP-02)."},
+        {"type": "platform", "text": "The WooCommerce product gallery block is the native baseline."}
+      ],
+      "selection_criteria": [
+        "number of images a product really has", "touch behaviour", "performance of large images (NFR-02)", "accessibility",
+        "reading direction: order and swipe mirror, the image never does"
+      ],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-05",
+      "name": "How the category navigation opens on desktop",
+      "affected_surfaces": ["gl-mega-menu", "gl-header"],
+      "requirement_outcome": "Customers reach categories through an admin-managed mega menu or category navigation (NAV-07). No row says how it opens.",
+      "candidate_patterns": ["Opens on hover and on keyboard focus", "Opens on click or tap"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "The structure is managed by the client (NAV-07, SSC-07), so its depth and length are not fixed."},
+        {"type": "contract_condition", "text": "Fully operable by keyboard (NFR-11)."},
+        {"type": "platform", "text": "The core navigation block is the native baseline."}
+      ],
+      "selection_criteria": ["size of the category tree", "accidental opening", "touch laptops and tablets", "accessibility"],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-06",
+      "name": "How the mobile menu shows category levels",
+      "affected_surfaces": ["gl-mobile-nav"],
+      "requirement_outcome": "On mobile the navigation carries the same category structure as on desktop (NAV-07, NAV-10). No row says how its levels are shown.",
+      "candidate_patterns": ["Drill-down: one level per panel, with a way back", "Accordion: levels expand in place"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_pattern", "text": "On mobile the navigation is a hamburger menu, reached from a menu button (NAV-10). That is not open."},
+        {"type": "platform", "text": "The core navigation block overlay is the native baseline."}
+      ],
+      "selection_criteria": [
+        "depth of the category tree", "orientation: knowing where you are", "one-handed use", "accessibility",
+        "where the language switcher and the account and wishlist entry points sit"
+      ],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-07",
+      "name": "Search interaction",
+      "affected_surfaces": ["sf-search-suggestions", "gl-header", "gl-header-mobile"],
+      "requirement_outcome": "A customer searches from the header and gets suggestions while typing (NAV-03, NAV-09, SRCH-03). No row says how the field and its suggestions behave.",
+      "candidate_patterns": ["Inline field with a suggestions panel", "Full-screen search overlay on mobile", "Field that expands in the header"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_pattern", "text": "The search bar is clear and prominent (NAV-03). Read that row before reducing it to an icon on desktop."},
+        {"type": "contract_pattern", "text": "Mobile has quick search (NAV-09)."},
+        {"type": "contract_condition", "text": "Works with Arabic input, in both reading directions (SRCH-06a)."},
+        {"type": "platform", "text": "No external search provider (SRCH-09 and INT-15 are P2). What a suggestion can contain follows what #304 selects."}
+      ],
+      "selection_criteria": ["speed to first result", "mobile keyboard behaviour", "what the suggestions can really contain", "accessibility", "performance"],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-08",
+      "name": "Product information layout, around the description tab",
+      "affected_surfaces": ["sf-pdp-simple"],
+      "requirement_outcome": "The product page carries the key features, the full description as a tab, the specifications table, delivery information, the returns summary and the authenticity statement (PDP-11 to PDP-16). The open part is how the other information is arranged around the description tab.",
+      "candidate_patterns": [
+        "Tabs for the description and for the other suitable information groups, on every viewport",
+        "The full description stays a tab on every viewport, with other information groups such as delivery, returns or authenticity in accordions or stacked blocks around it",
+        "A full-description tab and a specifications tab, with delivery, returns and authenticity presented outside the tab group"
+      ],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": ["contract", "platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {
+          "type": "contract_pattern",
+          "text": "PDP-12 reads \"Full description tab\". The full description is presented through a tab on every viewport, and every candidate keeps it. A treatment where the description itself becomes only an accordion or a stacked section, on mobile or anywhere, is not a design alternative: it would need a formal requirement decision that changes the reading of PDP-12."
+        },
+        {"type": "contract_condition", "text": "The key features are their own block, apart from the full description (PDP-11)."},
+        {"type": "contract_condition", "text": "The specifications are a table (PDP-13)."},
+        {"type": "contract_condition", "text": "Product content differs in length between English and Arabic (SSC-21)."},
+        {"type": "platform", "text": "The WooCommerce product details block renders tabs natively."}
+      ],
+      "selection_criteria": [
+        "how much content a product really has", "scanning on mobile",
+        "how the tab navigation itself responds on a small screen: horizontal scrolling or another accessible treatment, with the description still a tab",
+        "whether content is hidden from the customer or from search engines", "accessibility"
+      ],
+      "selected_pattern": null,
+      "decision_source": null
+    },
+    {
+      "id": "IX-09",
+      "name": "Home hero: one banner or a slider",
+      "affected_surfaces": ["sf-home"],
+      "requirement_outcome": "An admin-managed hero at the top of the home page (HOME-01). HOME-01 names a banner or a slider and fixes neither.",
+      "candidate_patterns": ["Single hero banner", "Slider of several banners"],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": [],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "What an editor can change is set by the curated section library (register section G11)."},
+        {"type": "contract_condition", "text": "A slider is operable by keyboard and does not move against a reduced-motion preference (NFR-11)."}
+      ],
+      "selection_criteria": ["how many campaigns run at once", "performance of the largest image", "accessibility", "editing effort for the client"],
+      "selected_pattern": null,
+      "decision_source": null
+    }
+  ]
+}

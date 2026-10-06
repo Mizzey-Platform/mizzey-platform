@@ -3,8 +3,9 @@
 A bilingual (English primary, Arabic fully supported, right to left) single-vendor store for Mizzey.com, built on
 WordPress and WooCommerce with the CoreX framework layer.
 
-**This repository is private and holds client confidential material.** Do not make it public, and do not add
-collaborators without the client's agreement.
+**This repository is temporarily public, for an owner-authorized external review period under D-08.**
+Client-confidential source documents remain outside the repository. Repository visibility must not be changed
+except by the owner, who decides when the review period ends.
 
 ---
 
@@ -19,7 +20,7 @@ collaborators without the client's agreement.
 | **Acceptance** | Functional Specification MS-SPC-2026-032 v1.2 and Acceptance and UAT Plan MS-UAT-2026-027 |
 | **Architecture** | Technical Design MS-TDD-2026-033 v1.2, refined by accepted ADRs in [`docs/adr/`](docs/adr/) |
 | **ERP** | Stock integration included. ERP-dependent (P1-E) rows wait for the ERP Integration Specification (PRE-09) |
-| **Current phase** | Engineering governance and the product-cost pilot. See [PROGRESS.md](PROGRESS.md) |
+| **Current phase** | Design first (D-14): the UX inventory in [`design/`](design/README.md), then wireframes, before further implementation. See [PROGRESS.md](PROGRESS.md) |
 
 The contract documents live outside this repository. The repository carries only what building needs: the register
 ids, scope values and stages in [`docs/scope/register-ids.json`](docs/scope/register-ids.json), generated from the
@@ -49,6 +50,7 @@ behaviour. The full rules are in the [constitution](.specify/memory/constitution
 | [docs/tooling.md](docs/tooling.md) | Spec Kit, skills, CI, the push guard, and what each check does |
 | [docs/stack-and-upgrades.md](docs/stack-and-upgrades.md) | Tested versions and the upgrade regression path |
 | [docs/scope/open-items.json](docs/scope/open-items.json) | Contract contradictions and gates that specs must cite |
+| [design/README.md](design/README.md) | The UX source of truth: surfaces, flows, components, open inputs, and what may be drawn |
 
 ## Stack
 

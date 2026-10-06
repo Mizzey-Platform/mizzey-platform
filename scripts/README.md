@@ -1,5 +1,8 @@
 # Scripts (retired, Option C)
 
+**`stories.json` is not scope and is not design authority (D-14).** Its 205 stories describe Option C, which was
+never signed. No surface, flow or wireframe is derived from it: see [`design/README.md`](../design/README.md).
+
 **Retired on 22 September 2026.** These generated the Option C board (GitHub Project #4 and its 232 issues)
 from the Option C Functional Specification. They are kept as history. Each exits immediately unless
 `MIZZEY_LEGACY_BOARD_SCRIPTS=1` is set, because `make_issues.py`, `fix_blockers.py` and `setup-project-board.py`

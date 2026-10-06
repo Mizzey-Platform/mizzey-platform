@@ -1,5 +1,10 @@
 # Task type: JOURNEY
 
+> **RETIRED. Option C, historical reference only (D-14, 6 October 2026).** Do not follow this file. Option C was
+> never signed, and `scripts/stories.json` is not scope. Design work is governed by
+> [`design/README.md`](../../design/README.md): the signed Option B scope and `docs/scope/backlog-ownership.json`
+> are the authority, and no wireframe is drawn until the owner has reviewed `design/coverage.md`.
+
 You are writing one end-to-end journey. You will be given a journey id and a one-line brief, such
 as `J-01, guest adds to cart, signs in, checks out on cash on delivery, requests a return`.
 
