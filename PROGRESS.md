@@ -21,7 +21,7 @@ Live status. First action each session: read this, then continue from **Next**.
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
   is the "Pilot closed" section of `verification.md`. **The feature was reopened once, on 6 October 2026, for one
-  repair to AC-3** (below, "#252 is under repair"); nothing else about it is reopened.
+  repair to AC-3** (below, "#252 was repaired"); nothing else about it is reopened.
 - **`main` was `8d994351f866e38c781678da26de18078e0b7c35` before the D-11 record merged**: the D-10 record
   (#264, `3f074a9`), the inventory report correction (#265, `8d99435`), and before them the pilot (#237, squash `93d647b`), its close-out
   and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12
@@ -120,7 +120,7 @@ Live status. First action each session: read this, then continue from **Next**.
   seed switches cost capture on, which it never had: until then no product on staging held a cost and the cost
   field was not on the product form. Explained in `docs/staging-environment.md`, "The same translation settings
   as development". Internal test infrastructure, no client-facing change.
-- **#252 is under repair, and `In progress` on the board (6 October 2026).** The investigation above showed that
+- **#252 was repaired and is `Verified` again (PR #334, squash `7856774`, 6 October 2026).** The investigation above showed that
   part of its verification rested on WPML's downloaded configuration: without WPML's setting for
   `_cogs_total_value`, a cost that is on the English product before its Arabic record is created does not reach
   the Arabic record in three of four cases. The update paths were never affected. The repair is one declaration,
@@ -128,9 +128,11 @@ Live status. First action each session: read this, then continue from **Next**.
   clean baseline built without the download (`MIZZEY_WPML_REMOTE_CONFIG=off`) the new scenario t29 fails 1 of 4
   before it and passes 4 of 4 after, and the suite is 25 scenarios, 0 failed; on staging reset without
   development's configuration the same four cases and the wp-admin product form pass. The record that said no
-  declaration was needed is corrected in `specs/001-product-cost-capture/`, "Reopened, 6 October 2026". **It
-  returns to Verified only after the repair is merged and passes on staging rebuilt from `main`. Contractual
-  acceptance is unchanged: pending CX-01 and OD-12, not accepted.**
+  declaration was needed is corrected in `specs/001-product-cost-capture/`, "Reopened, 6 October 2026". **After
+  the merge, staging was rebuilt from `main` at `7856774`: with no download present WPML holds the setting as
+  copy and locked from the site's own file and t29 passes 4 of 4, and after an ordinary reset the settings
+  comparison of staging and development passes. Contractual acceptance is unchanged: pending CX-01 and OD-12,
+  not accepted.** The pilot and audit work on product cost ends here; the next work is #249.
 - **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
   companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
   accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08 reads "approval pending / sent
