@@ -316,6 +316,21 @@ class PrChecks(unittest.TestCase):
         errs = self.check(body("requirement", None, "ADM-27"), [("A", "mizzey-extras/mizzey-extras.php", None)])
         self.assertError(errs, "not covered by the path policy")
 
+    def test_the_design_package_is_an_approved_path_for_three_categories(self):
+        paths = m("design/README.md", "design/inventory/surfaces.json", "design/briefs/sf-cart.md")
+        self.assertEqual(self.check(body("internal:governance"), paths), [])
+        self.assertEqual(self.check(body("internal:documentation"), paths), [])
+        self.assertEqual(self.check(body("requirement", None, "ADM-27"), paths), [])
+
+    def test_the_design_package_is_closed_to_the_other_categories(self):
+        for cls in ["internal:ci", "internal:tooling", "internal:test-infrastructure"]:
+            self.assertError(self.check(body(cls), m("design/inventory/surfaces.json")), "(design)")
+
+    def test_nothing_executable_arrives_under_design(self):
+        for path in ["design/wireframes/cart.php", "design/tokens/build.js", "design/wireframes/cart.html"]:
+            for cls in ["internal:governance", "internal:documentation"]:
+                self.assertError(self.check(body(cls), [("A", path, None)]), "not covered by the path policy")
+
     def test_a1_code_hidden_in_docs_rejected(self):
         self.assertError(self.check(body("internal:documentation"), [("A", "docs/widget.php", None)]),
                          "not covered by the path policy")
