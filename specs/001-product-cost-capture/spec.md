@@ -293,7 +293,7 @@ first time any save reaches it, including WCML's own admin sync. Price, stock, S
 
 | Id | Safeguard | Why | Custom code? |
 |---|---|---|---|
-| S-1 | Go-live check that cost capture is enabled: a runbook line, plus a scripted assertion in the deploy step | An order placed while it is off loses its cost permanently | Runbook: no. Assertion: a few lines of deploy script, no plugin code |
+| S-1 | Go-live check that cost capture is enabled, and that WPML holds the copy setting for `_cogs_total_value` (WPML applies the site's `wpml-config.xml` when an administrator first opens the Plugins screen): a runbook line, plus a scripted assertion in the deploy step | An order placed while it is off loses its cost permanently, and a translation created before the setting is applied starts without its cost | Runbook: no. Assertion: a few lines of deploy script, no plugin code |
 | S-2 | Record the enablement date and WooCommerce version in `DECISIONS.md` | Shows which orders can carry cost | No |
 | S-3 | A scripted clean baseline for the disposable runtime (`mizzey-site/tests/integration/baseline/`) | The first WPML results were wrong because the runtime had drifted. A scripted baseline makes a result repeatable | No (test tooling) |
 

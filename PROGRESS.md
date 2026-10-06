@@ -120,15 +120,17 @@ Live status. First action each session: read this, then continue from **Next**.
   seed switches cost capture on, which it never had: until then no product on staging held a cost and the cost
   field was not on the product form. Explained in `docs/staging-environment.md`, "The same translation settings
   as development". Internal test infrastructure, no client-facing change.
-- **Open, found by that investigation, and not corrected: part of #252's verified behaviour depends on the
-  downloaded configuration.** Measured on staging with one variable changed. Without WPML's setting for
+- **#252 is under repair, and `In progress` on the board (6 October 2026).** The investigation above showed that
+  part of its verification rested on WPML's downloaded configuration: without WPML's setting for
   `_cogs_total_value`, a cost that is on the English product before its Arabic record is created does not reach
-  the Arabic record in three of four cases (the creation half of t11); with the setting all four hold. A cost
-  changed afterwards through the wp-admin product form reaches the Arabic record either way, and a cost typed
-  on the Arabic record is replaced by the original's. So ADM-27 and RPT-11 stay technically verified **where the
-  configuration has been downloaded**, which is the only condition they were ever verified under, and nothing in
-  the site plugin declares the setting itself. Whether #252 is reopened to remove that dependence is Mustafa's
-  decision. It is production code and requirement work, and is not touched by the staging correction.
+  the Arabic record in three of four cases. The update paths were never affected. The repair is one declaration,
+  `mizzey-site/wpml-config.xml`, with the stored key, and no change to the logic of `CostTranslationSync`. On a
+  clean baseline built without the download (`MIZZEY_WPML_REMOTE_CONFIG=off`) the new scenario t29 fails 1 of 4
+  before it and passes 4 of 4 after, and the suite is 25 scenarios, 0 failed; on staging reset without
+  development's configuration the same four cases and the wp-admin product form pass. The record that said no
+  declaration was needed is corrected in `specs/001-product-cost-capture/`, "Reopened, 6 October 2026". **It
+  returns to Verified only after the repair is merged and passes on staging rebuilt from `main`. Contractual
+  acceptance is unchanged: pending CX-01 and OD-12, not accepted.**
 - **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
   companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
   accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08 reads "approval pending / sent

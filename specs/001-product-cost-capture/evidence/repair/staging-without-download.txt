@@ -1,0 +1,44 @@
+Staging verification of the #252 repair, 6 October 2026. A scripted check, not a person's look.
+Staging built from the repair branch at 5b8a2c7 (not merged), then reset WITHOUT development's WPML
+configuration: MIZZEY_STAGING_WPML_CARRY=off MIZZEY_CONFIRM_STAGING=yes python mizzey-site/tests/staging/staging.py reset
+
+== The reset
+WPML configuration NOT carried from development (MIZZEY_STAGING_WPML_CARRY=off)
+baseline/admin-visit.php
+  wp-admin plugins.php: HTTP 200
+  _cogs_value='unset' locked=false
+  _cogs_value_is_additive='unset' locked=false
+  _cogs_total_value=1 locked=true
+baseline/ia-endpoints.php
+seed/10-users.php: {"users":{"client_operator":"shop_manager","demo_customer":"customer"}}
+seed/15-store-settings.php: {"cod":"yes","shipping_zone":"Egypt (staging, invented price)","guest":"yes","coming_soon":"no","cost_capture":"yes"}
+seed/20-catalogue-sources.php: {"simple":12,"variable":2,"variations":6,"single_language":2,"costs_stored":15}
+seed/30-catalogue-translations.php: {"translated":15,"terms":{"product_cat":3,"product_brand":2,"product_collection":1},"pairs_holding_a_cost":15,"problems":0}
+seed/40-orders.php: {"orders":{"pending":1,"processing":3,"on-hold":1,"completed":4,"cancelled":1,"failed":1,"refunded":1},"total":12}
+seed/50-reports.php: {"orders_and_refunds":14,"in_reports":14}
+WPML settings, not required to match in this mode. Differences from development: none
+reset exit=0
+downloaded configuration held by staging after the reset: not downloaded
+
+== t29 on staging, in process
+PASS  t29-cost-before-translation  AC-3
+      Cost of Goods Sold before this scenario: on; enabled for the run and restored after.
+      Baseline: WPML downloaded configuration absent; setting for _cogs_total_value 1; mizzey-site/wpml-config.xml present
+      OK   simple product, duplicate: English 120, Arabic 120
+      OK   product with variants, duplicate: English 40/70, Arabic 40/70
+      OK   simple product, editor: English 120, Arabic 120
+      OK   product with variants, editor: English 40/70, Arabic 40/70
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+
+== The wp-admin product form on staging, over HTTP, signed in as an administrator (Workflows, channel admin-http)
+PASS  staging-cost-check-after-correction  ADM-27 RPT-11 cost equal across language records, wp-admin form, staging
+      WPML setting for _cogs_total_value: 1; cost capture on; address http://127.0.0.1:8088/wp-admin/
+      pairs: simple en#49 ar#72, seeded en 70, ar 70; variation en#62 ar#85, seeded en 90, ar 90
+      as reset. English form: field shows '70'; Arabic form: field shows '70'
+      B1. 111.25 on the English form: ok; stored en 111.25, ar 111.25; Arabic form: field shows '111.25'
+      B2. changed to 87.5 on the English form: ok; stored en 87.5, ar 87.5
+      B3. 999 typed on the ARABIC form: ok; stored en 87.5, ar 87.5
+      B4. variation, 42.75 in the English variations panel: ok; stored en 42.75, ar 42.75
+      mizzey-cost-sync log lines added by this check: ["file: 2026-10-06T09:13:20+00:00 ERROR Cost 999 was written to product 72, which is a translation of 49. The original owns the cost, so 87.5 was stored instead."]
+      put back: simple ok, variation ok; stored now ["70","70","90","90"], seeded ["70","70","90","90"]
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
