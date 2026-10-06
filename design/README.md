@@ -62,14 +62,39 @@ folder.**
 | Path | What it holds |
 |---|---|
 | `sources.json` | The authoritative documents, by reference |
+| `direction.md` | The experience target: the quality the design aims at. Not the brand identity, and not scope |
 | `inventory/surfaces.json` | **The spine.** One record for each thing that needs design, and the delivery rows that have no surface |
 | `inventory/flows.json` | The journeys as ordered steps, each pointing at surfaces |
 | `inventory/components.json` | The structural component inventory, and the curated section library |
-| `inventory/placeholders.json` | Every open decision that affects design, with its neutral placeholder rule, and the design questions the owner has decided |
+| `inventory/placeholders.json` | Every open decision that affects design, with its neutral placeholder rule, and the boundaries the owner has locked |
+| `inventory/interaction-options.json` | UX choices with more than one legitimate pattern: open, provisional or locked |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
 | `briefs/` | Empty. One brief per surface, generated when wireframing is approved |
 | `wireframes/` | Empty. Low-fidelity wireframes, after the coverage review |
 | `tokens/` | Empty. Neutral tokens first, brand values after OD-01 |
+
+## Five kinds of statement, kept apart
+
+**A wireframe must not turn a choice the contract leaves open into a permanent product decision.** Everything in
+this folder is one of five things, and each lives in its own place.
+
+| Kind | What it is | Where it lives | Who can change it |
+|---|---|---|---|
+| Contractual requirement | What the signed scope obliges | `register_ids` on a surface, read in the signed register | Change control only |
+| Technical or platform constraint | What WordPress, WooCommerce, an integration or a verified build fixes | `native_baseline`, `design_freedom`, and the `constraints` of an interaction option | Engineering evidence |
+| Locked owner decision | A boundary the owner decided | `owner_design_decisions` in `placeholders.json` | The owner |
+| Provisional UX pattern | A working baseline for the first wireframes | `interaction-options.json`, status `provisional` | UX review, with no scope change |
+| Open design choice | A pattern not yet preferred | `interaction-options.json`, status `open` | UX review |
+
+**A provisional pattern is not a requirement and not an owner-confirmed final product decision.** It is where the
+first wireframes start. It may change during UX review, provided the pattern chosen still satisfies the signed
+requirement and the constraints. The checker refuses a provisional or open option that claims a selected pattern.
+
+A requirement fixes an outcome. It rarely fixes the pattern. A row that says a customer can continue through a
+product list does not say numbered pagination, Load More or continuous loading: those are compared during design,
+unless the wording of the row or a real technical constraint settles it. The same holds for the checkout
+structure, where filters sit, how the mini-cart opens, whether the buy actions stay in reach, how the gallery and
+the menu behave, and how search responds.
 
 ## A surface
 
@@ -95,14 +120,28 @@ a validation message, a report or an addition to an admin screen is each its own
 | `responsive` | Mobile, tablet and desktop |
 | `rtl` | Whether Arabic right to left applies, what mirrors and what does not |
 | `native_baseline` | What WordPress, WooCommerce or a selected integration already renders |
-| `design_freedom` | `free`, `constrained` by a platform block, `annotate_only`, or `none` |
+| `design_freedom` | `free`, `constrained`, `annotate_only` or `none`. See below |
 | `open_items` | Ids in `placeholders.json` that this surface waits on |
-| `decisions` | Owner design decisions in `placeholders.json` that govern this surface |
+| `decisions` | Locked owner decisions in `placeholders.json` that govern this surface |
+| `interaction_options` | Open or provisional UX choices in `interaction-options.json` that bear on this surface. Derived |
 | `erp_dependency` | `none`, `partial`, or `per PRE-09` |
 | `status` | `inventoried`, `briefed`, `wireframed`, `reviewed`, `branded`, `approved`, or `not_designed` |
 | `composes` | Other surfaces this one contains |
 | `scope_note` | Why a surface outside contracted scope exists |
 | `build_note` | Why the build PBI is not the accepting PBI. Present only where they differ |
+| `implementation_origin` | Where a surface that no PBI builds comes from: `mizzey`, `corex`, `wordpress`, `woocommerce`, `provider` or `unknown` |
+
+## Design freedom
+
+`design_freedom` says how far a surface may be explored. **It controls how an existing requirement is expressed,
+never what functionality exists.** It is not a route to more scope.
+
+| Value | Meaning |
+|---|---|
+| `free` | The designer may explore composition, hierarchy, visual treatment, layout and interaction patterns, as long as the signed capability and its states remain satisfied |
+| `constrained` | A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary |
+| `annotate_only` | The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned |
+| `none` | There is no design choice to make |
 
 ## Two PBIs behind one surface
 
@@ -115,7 +154,12 @@ Accepting a row and building its screen are two different facts, and a surface r
 They are usually the same PBI. Where they differ, `build_note` says why and `coverage.md` lists the surface. The
 order confirmation is the plain case: its page row IA-10 is accepted by #242 as the route, and the screen is
 built with the checkout, #255. No row moves owner to make this convenient. Design dependency is read on
-`build_pbi`. A surface no PBI builds is a provider's interface or a platform screen the owner has not placed.
+`build_pbi`.
+
+**No PBI is invented to fill the field.** A surface outside contracted scope, such as the 404 page, the
+maintenance message, Coming Soon, the store notices or the sign-in-required state, has no `build_pbi` until there
+is a real implementation owner. `implementation_origin` says where it comes from today. A provider's interface
+has the origin `provider` and is built by nobody here.
 
 ## Scope type
 
@@ -137,26 +181,88 @@ loading, failure, return and success around it.
 built in the first release and are not wireframed in the Stage 1 pass. Where each attaches is kept free, so the
 first-release structure does not prevent the later work (DQ-04).
 
-## Owner design decisions
+## Locked owner decisions
 
-Seven questions no source answered were decided by the owner in D-14. They are in
+Four boundaries were decided by the owner in D-14, for questions no source answered. They are in
 `inventory/placeholders.json` under `owner_design_decisions`, and each surface they govern cites them in
 `decisions`. **They are owner design decisions: not client confirmations, and not scope additions.**
 
 | Id | Decision |
 |---|---|
-| DQ-01 | Western digits 0 to 9 in both languages. No Arabic-Indic digits unless the client asks |
-| DQ-02 | Numbered pagination. No infinite scroll |
-| DQ-03 | One checkout page in clear sections, with the review before Place Order. No wizard |
-| DQ-04 | S2 surfaces stay inventoried and are not wireframed in the S1 pass |
-| DQ-05 | Cash collected and remitted is a staff state. The customer sees Delivered |
+| DQ-04 | S2 surfaces stay inventoried and are not wireframed in the S1 pass. This governs the low-fidelity pass only: whether their screens are in the design presented for PRE-03b is the owner's to decide before that design is presented |
+| DQ-05 | Cash collected and remitted is a staff and accounting state. The customer sees Delivered |
 | DQ-06 | A signed-in customer may review. No verified-purchase requirement or badge |
 | DQ-07 | Accept, Decline and Preferences, within what the consent tool selected in #288 supports |
 
+## Interaction options
+
+`inventory/interaction-options.json` lists the UX choices that have more than one legitimate pattern. An entry
+exists only where the requirement defines an outcome, more than one normal pattern can meet it, neither the
+contract nor the platform fixes the pattern, and choosing early would constrain the design for no reason. It is
+not a list of every component.
+
+| Status | Meaning |
+|---|---|
+| `open` | No pattern is preferred yet. The designer proposes, recommends one and shows the alternatives |
+| `provisional` | A working baseline for the first wireframes. **Not a requirement and not an owner-confirmed final product decision.** It may change in review with no scope change |
+| `locked` | A pattern was selected at its decision stage. `selected_pattern` and `decision_source` say which, and by whom |
+
+Three are provisional today, and none is locked:
+
+| Id | Choice | Working baseline | Also candidates |
+|---|---|---|---|
+| DQ-01 | Numerals in Arabic | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
+| DQ-02 | Product-list continuation | Numbered pagination | Load More, or controlled continuous loading |
+| DQ-03 | Checkout structure | One page with clear sections, review before Place Order | Progressive or accordion sections, or a stepped checkout if it stays compatible with the contracted behaviour and the commerce implementation |
+
+Each entry carries its `constraints`, which are real limits, and its `selection_criteria`, which are what the
+review weighs. An option never adds a capability: it is about how a contracted one is presented.
+
+## The designer proposes
+
+Whoever designs is expected to work as a professional product, UI and UX designer, not to convert rows into
+boxes. Within the freedom each surface allows, the designer:
+
+- proposes professional ecommerce patterns and uses contemporary conventions;
+- notices when more than one UX solution is valid;
+- recommends one and says why;
+- shows the alternatives when the choice materially changes the experience;
+- holds to accessibility and performance;
+- adds no uncontracted functionality.
+
+**The owner is not expected to specify pixels, radii, animation curves or component internals.** The owner
+reviews the direction and chooses between meaningful alternatives. `direction.md` says what quality the work
+aims at.
+
+## Presentation is design. Capability is scope.
+
+The rule against scope expansion stands, and it is about capability, not presentation.
+
+**A designer does not add a product capability because another store has it.** A control that gives the customer
+something new to do, or gives the business a new behaviour, needs scope authority: a delivery row of the register,
+or a Change Request. Back-in-stock signup, product comparison, a returns area, a wishlist share button and a
+"verified purchase" badge are capabilities, and none of them is contracted.
+
+**Normal presentation and interaction design needs no register row of its own.** When a treatment only presents
+an action that is already authorised, it is a design decision:
+
+- hover, press and focus feedback;
+- the animation of a contracted drawer opening;
+- a skeleton for a loading operation that already exists;
+- a transition between states that already exist;
+- layout composition, spacing and hierarchy;
+- visual grouping and card treatment;
+- subtle motion;
+- responsive behaviour.
+
+The test is one question. **Does it create a new capability or business behaviour, or does it change how an
+authorised one is presented?** The first needs scope authority. The second is design.
+
 ## Rules for whoever designs
 
-1. **Draw only what a surface record lists.** A state, a field or a control that no row requires is not added
-   because a store usually has one. If it seems missing, raise it. It may be a Change Request.
+1. **Design the contracted capabilities, and no others.** The capabilities, states and fields a surface lists are
+   its scope. Do not add a capability because a store usually has one: if it seems missing, raise it, and it may
+   be a Change Request. How those capabilities are composed, presented and animated is yours to propose.
 2. **Read `excluded_ids` before drawing.** It names what the client did not buy on that screen: the returns area,
    the compare page, back-in-stock signup, section scheduling, and the rest.
 3. **Read the wording of each row in the signed register.** An id is necessary and not sufficient.
@@ -169,10 +275,13 @@ Seven questions no source answered were decided by the owner in D-14. They are i
 7. **Do not design a provider's interface.**
 8. **English is the canonical design. Arabic is the same design mirrored**, never a second layout. Every
    customer-facing surface is drawn in both. Numerals, prices, imagery and logos do not mirror. Directional icons
-   do. Numerals are Western digits in both languages (DQ-01).
+   do. Western digits in both languages is the working baseline, and it is provisional (DQ-01).
 9. **Mobile first**, then tablet and desktop.
 10. **A contradiction is escalated, not resolved.** The open points are in `placeholders.json`. A new one is
     reported to the owner, who decides it. A designer does not.
+11. **Do not lock a pattern by drawing it.** Where a surface lists an interaction option, start from the working
+    baseline if there is one, and say which pattern you recommend and what the alternatives are. A baseline drawn
+    in a wireframe is still provisional until the owner selects it at its decision stage.
 
 ## The administration is not redesigned
 

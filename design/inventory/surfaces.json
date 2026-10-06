@@ -42,13 +42,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Probe P-010, header and navigation mirroring, runs in #253."
       },
       "native_baseline": "Block theme header template part (Full Site Editing), with the WooCommerce mini-cart and customer account blocks.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-15"],
       "decisions": [],
+      "interaction_options": ["IX-02", "IX-05", "IX-07"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-language-switcher", "gl-mega-menu", "sf-search-suggestions", "sf-mini-cart"]
@@ -91,19 +92,20 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "The same header template part, at the mobile breakpoint.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
       "decisions": [],
+      "interaction_options": ["IX-02", "IX-07"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-mobile-nav", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
       "id": "gl-mobile-nav",
-      "name": "Mobile navigation drawer",
+      "name": "Mobile navigation menu",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -137,13 +139,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
-        "notes": "The drawer opens from the inline-start edge in each direction."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
+        "notes": "The menu opens from the mirrored edge in Arabic."
       },
       "native_baseline": "Core navigation block overlay.",
       "design_freedom": "free",
       "open_items": ["CR-15"],
       "decisions": [],
+      "interaction_options": ["IX-06"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -174,7 +177,11 @@
         {"state": "long_content", "note": "Many categories, long names"},
         {"state": "empty", "note": "A category with no children"}
       ],
-      "responsive": {"mobile": "Not shown. The drawer carries the same structure.", "tablet": "Decided in the wireframe.", "desktop": "Panel under the header."},
+      "responsive": {
+        "mobile": "Not shown. The mobile menu carries the same structure.",
+        "tablet": "Decided in the wireframe.",
+        "desktop": "Shown. How it opens is open (IX-05)."
+      },
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -182,12 +189,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Core navigation block. The structure is admin-managed (NAV-07, SSC-07).",
       "design_freedom": "free",
       "open_items": ["CR-15"],
       "decisions": [],
+      "interaction_options": ["IX-05"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -225,13 +233,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Each language is named in its own script. The name of the other language is not translated."
       },
       "native_baseline": "WPML language switcher. A switch lands on the same page in the other language.",
       "design_freedom": "constrained",
       "open_items": ["OP-14", "OP-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -266,12 +275,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Block theme footer template part, edited through Full Site Editing.",
       "design_freedom": "free",
       "open_items": ["OD-01", "OD-18", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253.",
@@ -308,13 +318,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "The separator mirrors. The path order follows the reading direction."
       },
       "native_baseline": "woocommerce_breadcrumb() and the core breadcrumbs block.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -352,12 +363,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A consent management tool, selected and configured in #288. Its banner is configured, not built from nothing.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": ["DQ-07"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Accept, Decline and Preferences. The layout stays within what the tool selected in #288 can produce (DQ-07)."
@@ -397,12 +409,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A section of the curated library. Scheduling is on the banner alone (CX-06, owner reading).",
       "design_freedom": "free",
       "open_items": ["CX-06", "OD-01", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -442,12 +455,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A static front page built from the curated section library in the block editor.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-05", "CR-15", "OP-12"],
       "decisions": [],
+      "interaction_options": ["IX-09"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-product-card"],
@@ -487,12 +501,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product archive template (block theme).",
       "design_freedom": "free",
       "open_items": ["CR-15"],
       "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -531,12 +546,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product category archive.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-18"],
       "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -574,12 +590,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "The site's collection taxonomy, served with the platform's product archive template.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-17", "OP-18"],
       "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
@@ -617,12 +634,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce brand taxonomy archive.",
       "design_freedom": "free",
       "open_items": ["CR-05", "CR-15", "OP-18"],
       "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
@@ -670,12 +688,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product collection block card.",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-01", "CR-05"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -705,7 +724,7 @@
         {"state": "option_unavailable", "note": "An option that would return nothing"},
         {"state": "long_content", "note": "Many options in one filter"}
       ],
-      "responsive": {"mobile": "Inside the filter drawer (sf-filter-drawer).", "tablet": "Decided in the wireframe.", "desktop": "Beside the grid."},
+      "responsive": {"mobile": "Inside the filter drawer, which PLP-22 names.", "tablet": "Open (IX-01).", "desktop": "Open: sidebar, bar or drawer (IX-01)."},
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -713,12 +732,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product filter blocks.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": ["IX-01"],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
@@ -749,7 +769,11 @@
         {"state": "applied_count"},
         {"state": "cleared"}
       ],
-      "responsive": {"mobile": "Full-height drawer.", "tablet": "Decided in the wireframe.", "desktop": "Not shown."},
+      "responsive": {
+        "mobile": "A drawer (PLP-22). Its size and edge are decided in the wireframe.",
+        "tablet": "Open (IX-01).",
+        "desktop": "Open: a drawer is one candidate (IX-01)."
+      },
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -757,13 +781,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Opens from the inline-start or inline-end edge consistently in each direction."
       },
       "native_baseline": "WooCommerce product filters overlay.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["IX-01"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -801,18 +826,19 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce catalogue sorting and results count blocks.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["IX-01"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
     {
       "id": "sf-pagination",
-      "name": "Pagination",
+      "name": "Product-list continuation",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -834,7 +860,9 @@
         {"state": "first_page"},
         {"state": "middle_page"},
         {"state": "last_page"},
-        {"state": "single_page", "note": "Nothing to page"}
+        {"state": "single_page", "note": "Nothing more to show"},
+        {"state": "loading_more", "note": "Only if a loading pattern is selected (DQ-02)"},
+        {"state": "end_of_list", "note": "Only if a loading pattern is selected (DQ-02)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -844,16 +872,17 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Previous and next mirror. Page numerals do not."
       },
       "native_baseline": "Core query pagination block.",
       "design_freedom": "free",
       "open_items": [],
-      "decisions": ["DQ-02"],
+      "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
-      "note": "Numbered pagination. No infinite scroll in the Stage 1 structural design (DQ-02)."
+      "note": "Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02)."
     },
     {
       "id": "sf-listing-empty",
@@ -887,12 +916,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce no-results block.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -928,12 +958,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce rating filter block.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -969,12 +1000,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Not built. No address yet.",
       "design_freedom": "free",
       "open_items": ["OP-13", "CR-15"],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -1015,12 +1047,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Selected in #304. No external search provider (SRCH-09 and INT-15 are P2).",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["IX-07"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1060,12 +1093,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WordPress search results template with the product listing.",
       "design_freedom": "free",
       "open_items": ["OP-15"],
       "decisions": [],
+      "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
@@ -1101,12 +1135,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce no-results block.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1146,6 +1181,7 @@
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1182,7 +1218,7 @@
         {"state": "signed_out"},
         {"state": "signed_in"}
       ],
-      "responsive": {"mobile": "Designed first. Gallery above the buy area.", "tablet": "Decided in the wireframe.", "desktop": "Gallery beside the buy area."},
+      "responsive": {"mobile": "Designed first. Decided in the wireframe.", "tablet": "Decided in the wireframe.", "desktop": "Decided in the wireframe."},
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -1190,12 +1226,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce single product template (block theme).",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-08", "OD-13", "OD-01", "CR-05", "CR-15"],
       "decisions": [],
+      "interaction_options": ["IX-03", "IX-08"],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": [
@@ -1240,12 +1277,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce add to cart with options block.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": ["IX-03"],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": [
@@ -1289,13 +1327,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Thumbnail order and swipe direction follow the reading direction. The image itself is never mirrored."
       },
       "native_baseline": "WooCommerce product image gallery block.",
       "design_freedom": "free",
       "open_items": ["CR-05"],
       "decisions": [],
+      "interaction_options": ["IX-04"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1333,12 +1372,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product stock indicator block.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
@@ -1376,12 +1416,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce related products block.",
       "design_freedom": "free",
       "open_items": ["OP-12"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1419,12 +1460,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store. The mechanism comes from #307. Its placement on the product page is #254's.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1461,12 +1503,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce product reviews block.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1510,12 +1553,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Cart block.",
       "design_freedom": "constrained",
       "open_items": ["OD-04", "PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]
@@ -1551,12 +1595,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce empty cart block.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Staging finding: the empty cart page is 8 pixels too wide. Attached to #306 by D-13, not corrected."
@@ -1596,12 +1641,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce mini-cart block.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["IX-02"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1638,13 +1684,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "The progress indicator fills from the inline-start edge in each direction."
       },
       "native_baseline": "None. Driven by the admin-configurable rule (BR-002).",
       "design_freedom": "free",
       "open_items": ["OD-04"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1681,12 +1728,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce cart notices.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
@@ -1727,12 +1775,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store. A wishlist mechanism is selected in #307.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1770,12 +1819,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["sf-product-card"]
@@ -1815,12 +1865,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account sign-in form, shown to a signed-out visitor.",
       "design_freedom": "constrained",
       "open_items": ["OP-17"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-google-entry", "au-passwordless"],
@@ -1861,12 +1912,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account registration form.",
       "design_freedom": "constrained",
       "open_items": ["OD-03", "OP-17"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-google-entry"],
@@ -1904,12 +1956,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce lost-password endpoint.",
       "design_freedom": "constrained",
       "open_items": ["CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1949,12 +2002,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce reset-password form.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -1993,12 +2047,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store. Built or selected in #305.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2037,12 +2092,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A Google sign-in integration, selected in #305. The button follows Google's own presentation rules.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-GOOGLE"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2080,12 +2136,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2121,12 +2178,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block sign-in prompt.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Guest checkout is never forced into registration. It is encouraged (FIX-09)."
@@ -2166,12 +2224,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "A password only. No re-entry of name, email, phone or address."
@@ -2203,7 +2262,7 @@
         {"state": "placing", "note": "Place Order pressed once, no second submission"},
         {"state": "long_content"}
       ],
-      "responsive": {"mobile": "Designed first (CHK-10).", "tablet": "Decided in the wireframe.", "desktop": "Form beside the order summary."},
+      "responsive": {"mobile": "Designed first (CHK-10).", "tablet": "Decided in the wireframe.", "desktop": "Decided in the wireframe."},
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -2211,19 +2270,20 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block.",
       "design_freedom": "constrained",
       "open_items": ["OP-15"],
-      "decisions": ["DQ-03"],
+      "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": [
         "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order", "ck-validation", "ck-stock-failure",
         "ck-erp-unavailable", "au-checkout-entry"
       ],
-      "note": "One page in clear sections, with the review and order summary before Place Order. No multi-page wizard (DQ-03)."
+      "note": "Working baseline: one page in clear sections, with the review before Place Order. Provisional, not a decision (DQ-03)."
     },
     {
       "id": "ck-address",
@@ -2260,13 +2320,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Phone numbers and digits keep their own order in Arabic."
       },
       "native_baseline": "WooCommerce Checkout block address form, with the Egyptian structure: governorate, city, district, street, landmark.",
       "design_freedom": "constrained",
       "open_items": ["CR-03"],
       "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2305,12 +2366,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce shipping options, on manual rate zones by governorate.",
       "design_freedom": "constrained",
       "open_items": ["CR-03"],
       "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2348,12 +2410,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce payment options block with the Paymob gateway.",
       "design_freedom": "constrained",
       "open_items": ["OD-05", "OD-19", "OP-03", "VENDOR-PAYMOB"],
       "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2391,12 +2454,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block coupon form and order note.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2433,12 +2497,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block order summary, terms and actions.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -2475,12 +2540,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce Checkout block validation.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Clear in both languages (CHK-11)."
@@ -2517,12 +2583,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce checkout notices.",
       "design_freedom": "free",
       "open_items": ["PRE-09", "OP-25"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
@@ -2558,12 +2625,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried",
       "note": "The sale is not confirmed: that is contracted. What the customer sees is set in PRE-09. Placeholder message only."
@@ -2602,12 +2670,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "The official Paymob integration for WooCommerce.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB", "OD-19"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Our side of the handoff only. The hosted card, 3-D Secure and wallet steps are the provider's."
@@ -2645,12 +2714,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce order-pay endpoint.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB", "PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -2690,12 +2760,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce order confirmation block.",
       "design_freedom": "constrained",
       "open_items": ["OP-13", "OP-15", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["au-post-order-account", "ord-status-labels"],
@@ -2733,12 +2804,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account navigation.",
       "design_freedom": "constrained",
       "open_items": ["OP-05"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "No returns entry: the returns area is deferred (ACCT-10)."
@@ -2776,12 +2848,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce My Account dashboard.",
       "design_freedom": "constrained",
       "open_items": ["OP-05"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation"]
@@ -2812,7 +2885,11 @@
         {"state": "many", "note": "Paged"},
         {"state": "long_content"}
       ],
-      "responsive": {"mobile": "Designed first. The table becomes a list of cards.", "tablet": "Decided in the wireframe.", "desktop": "Table."},
+      "responsive": {
+        "mobile": "Designed first. A wide table does not fit: the wireframe decides what replaces it.",
+        "tablet": "Decided in the wireframe.",
+        "desktop": "Decided in the wireframe."
+      },
       "rtl": {
         "applies": true,
         "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
@@ -2820,12 +2897,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce orders endpoint.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ord-status-labels"]
@@ -2870,12 +2948,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce view-order endpoint.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OP-20"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ord-status-timeline", "ord-status-labels"]
@@ -2917,12 +2996,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-address endpoint. Add, edit, delete and set default (ACCT-04) go beyond its two fixed addresses.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation"]
@@ -2961,12 +3041,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-account endpoint.",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ac-navigation", "ac-password"]
@@ -3004,12 +3085,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce edit-account endpoint, password fields.",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3047,12 +3129,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce order tracking form: lookup by order number and email.",
       "design_freedom": "constrained",
       "open_items": ["OP-20", "VENDOR-BOSTA"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ord-status-timeline", "ord-status-labels"]
@@ -3091,12 +3174,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "An invoice mechanism is selected in #280 and #308.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OD-18"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "A printable document. Legal content waits for the client's invoicing inputs."
@@ -3137,13 +3221,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "The line runs from the inline-start edge in each direction. Dates and times keep their digit order."
       },
       "native_baseline": "None. WooCommerce shows a status word only.",
       "design_freedom": "free",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "build_note": "The statuses ORD-03 to ORD-07 are accepted by #248, the status model. The timeline the customer sees is built on the order and tracking screens of #308."
@@ -3185,12 +3270,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce order status names.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-05"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Customer-facing labels are bilingual. The same states in the administration are English only. Cash collected and remitted is never shown to the customer (DQ-05)."
@@ -3227,12 +3313,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -3270,12 +3357,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "The first release provides unsubscribe links in emails. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -3313,12 +3401,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "The first release handles this manually on request. Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -3357,13 +3446,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "A review is shown in the language it was written in. Star order follows the reading direction."
       },
       "native_baseline": "WooCommerce product reviews.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3401,12 +3491,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce review form.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": ["DQ-06"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06)."
@@ -3442,12 +3533,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce comment moderation. Staff moderate on the standard reviews screen, which is not redesigned.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3482,12 +3574,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library in the block editor.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "The shared layout the eight trust and support pages use. Each stays editable without a developer (CMS-09)."
@@ -3523,12 +3616,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3564,12 +3658,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "OD-13"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3605,12 +3700,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "CR-03"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3649,12 +3745,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3690,12 +3787,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3731,12 +3829,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15", "OD-08"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"],
@@ -3773,12 +3872,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page built from the curated section library.",
       "design_freedom": "free",
       "open_items": ["CR-04", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"]
@@ -3818,12 +3918,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "A page from the section library with a contact form.",
       "design_freedom": "free",
       "open_items": ["OD-18", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["ct-static-page"],
@@ -3861,12 +3962,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Built by the client from the approved templates and the delivered section library.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-05", "CR-15"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["gl-promo-banner", "sf-product-card"],
@@ -3912,6 +4014,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-01", "CX-06"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
@@ -3951,6 +4054,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -3992,6 +4096,7 @@
       "design_freedom": "constrained",
       "open_items": ["CX-06"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4029,6 +4134,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-01"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
@@ -4070,6 +4176,7 @@
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4109,6 +4216,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4147,6 +4255,7 @@
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4185,6 +4294,7 @@
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4222,6 +4332,7 @@
       "design_freedom": "constrained",
       "open_items": ["CX-05"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
@@ -4259,6 +4370,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4296,6 +4408,7 @@
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -4335,6 +4448,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
@@ -4374,6 +4488,7 @@
       "design_freedom": "constrained",
       "open_items": ["CX-03", "PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4411,6 +4526,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Staging found a phone-format gap on ADM-157. It stays with #278."
@@ -4449,6 +4565,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4486,6 +4603,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4523,6 +4641,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4560,6 +4679,7 @@
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -4598,6 +4718,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OD-18"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4635,6 +4756,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4674,6 +4796,7 @@
       "design_freedom": "annotate_only",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4711,6 +4834,7 @@
       "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4749,6 +4873,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-05", "OD-20"],
       "decisions": ["DQ-05"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4788,6 +4913,7 @@
       "design_freedom": "annotate_only",
       "open_items": ["CX-01"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4826,6 +4952,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4864,6 +4991,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4901,6 +5029,7 @@
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -4945,6 +5074,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -4984,6 +5114,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-03", "OD-04"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5021,6 +5152,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5059,13 +5191,14 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01).",
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01).",
         "notes": "Badge position mirrors. Badge text is translated."
       },
       "native_baseline": "WooCommerce shows a sale badge only.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5100,12 +5233,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Cannot be met in a neutral wireframe. It is applied through tokens once the brand identity is supplied.",
@@ -5148,6 +5282,7 @@
       "design_freedom": "constrained",
       "open_items": ["CX-03"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes."
@@ -5188,6 +5323,7 @@
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5225,6 +5361,7 @@
       "design_freedom": "annotate_only",
       "open_items": ["CX-01", "CX-02"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5263,6 +5400,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5302,6 +5440,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5340,6 +5479,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5377,6 +5517,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5414,6 +5555,7 @@
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "per PRE-09",
       "status": "inventoried",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
@@ -5453,6 +5595,7 @@
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": ["DQ-04"],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Second release: not wireframed in the Stage 1 pass. Where it attaches is kept free (DQ-04)."
@@ -5493,6 +5636,7 @@
       "design_freedom": "annotate_only",
       "open_items": ["CX-01"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried"
     },
@@ -5532,6 +5676,7 @@
       "design_freedom": "annotate_only",
       "open_items": ["PRE-09"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "partial",
       "status": "inventoried"
     },
@@ -5567,12 +5712,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce email template.",
       "design_freedom": "constrained",
       "open_items": ["OD-01", "OD-18"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "note": "Sent in the language the customer used. Email only at launch."
@@ -5609,12 +5755,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce new-account email. Verification is added.",
       "design_freedom": "constrained",
       "open_items": ["OD-03"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5654,12 +5801,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce processing-order email.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5696,12 +5844,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "To be settled in the Native coverage table of #285: whether the standard store sends the customer a failed-payment email.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-PAYMOB"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5738,12 +5887,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5780,12 +5930,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce completed-order email.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5823,12 +5974,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "The standard WooCommerce refunded-order email, as the register names it.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5865,12 +6017,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce reset-password email.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5907,12 +6060,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "None in the standard store.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "composes": ["em-shell"],
@@ -5928,7 +6082,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
-      "build_pbi": 285,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "flow_steps": [],
@@ -5953,10 +6107,11 @@
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable.",
-      "build_note": "No row and no accepting PBI. Sent by the platform inside the shared email layout, which #285 builds."
+      "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-404",
@@ -5968,7 +6123,7 @@
       "context_ids": [],
       "excluded_ids": [],
       "owner_pbi": null,
-      "build_pbi": 253,
+      "build_pbi": null,
       "stage": null,
       "route": null,
       "route_note": "Any address that resolves to nothing, in each language.",
@@ -5990,16 +6145,17 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Block theme 404 template.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope.",
-      "build_note": "No row and no accepting PBI. A theme template of the frame, built with #253."
+      "implementation_origin": "wordpress"
     },
     {
       "id": "sy-maintenance",
@@ -6033,15 +6189,17 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WordPress maintenance mode and the server's own error page.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable."
+      "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable.",
+      "implementation_origin": "wordpress"
     },
     {
       "id": "sy-store-notices",
@@ -6077,15 +6235,17 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce store notices.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message."
+      "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message.",
+      "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-sign-in-required",
@@ -6119,15 +6279,17 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "WooCommerce account access checks.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen."
+      "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen.",
+      "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-coming-soon",
@@ -6161,15 +6323,18 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "CoreX coming-soon mode (from v0.43.0) and WooCommerce's own coming-soon page.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
-      "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14)."
+      "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14).",
+      "implementation_origin": "unknown",
+      "note": "Origin unknown until the CoreX v0.43.0 upgrade is evaluated: CoreX's coming-soon mode or WooCommerce's own page. The two were not tested together."
     },
     {
       "id": "sy-staging-marker",
@@ -6202,12 +6367,13 @@
           "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
           "media playback controls"
         ],
-        "numerals": "Western digits 0 to 9 in both languages (DQ-01)."
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
       "native_baseline": "Built in spec 005.",
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "inventoried",
       "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable.",
@@ -6242,9 +6408,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "The provider's hosted and tokenised step. No card data reaches the store. Document the handoff, loading, failure, return and success on our side (ck-payment-handoff, ck-payment-failed, ck-order-received). Do not redesign it."
+      "scope_note": "The provider's hosted and tokenised step. No card data reaches the store. Document the handoff, loading, failure, return and success on our side (ck-payment-handoff, ck-payment-failed, ck-order-received). Do not redesign it.",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-paymob-wallet",
@@ -6275,9 +6443,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "The provider's wallet step, offered only if selected and approved for the merchant account. Our side is the same handoff and return as for cards."
+      "scope_note": "The provider's wallet step, offered only if selected and approved for the merchant account. Our side is the same handoff and return as for cards.",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-google-account",
@@ -6308,9 +6478,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "Google's own screens. Our side is the entry button and the return (au-google-entry)."
+      "scope_note": "Google's own screens. Our side is the entry button and the return (au-google-entry).",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-carrier-tracking",
@@ -6341,9 +6513,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "Where a tracking number links out, the page is the carrier's. Our side is the status shown on the order and on the tracking page."
+      "scope_note": "Where a tracking number links out, the page is the carrier's. Our side is the status shown on the order and on the tracking page.",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-google-analytics",
@@ -6378,9 +6552,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "RPT-08 and RPT-09 are met in Google Analytics, in the client's own account. No report screen is built or designed in the store."
+      "scope_note": "RPT-08 and RPT-09 are met in Google Analytics, in the client's own account. No report screen is built or designed in the store.",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-whatsapp",
@@ -6411,9 +6587,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "The click-to-chat link (CMS-10) opens WhatsApp. Our side is the link."
+      "scope_note": "The click-to-chat link (CMS-10) opens WhatsApp. Our side is the link.",
+      "implementation_origin": "provider"
     },
     {
       "id": "pv-share-targets",
@@ -6444,9 +6622,11 @@
       "design_freedom": "none",
       "open_items": [],
       "decisions": [],
+      "interaction_options": [],
       "erp_dependency": "none",
       "status": "not_designed",
-      "scope_note": "The share buttons (PDP-21) open another service's dialog. Our side is the buttons."
+      "scope_note": "The share buttons (PDP-21) open another service's dialog. Our side is the buttons.",
+      "implementation_origin": "provider"
     }
   ],
   "no_surface": {

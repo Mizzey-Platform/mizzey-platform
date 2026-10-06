@@ -7,6 +7,7 @@ so a rule cannot be removed from the checker without a test noticing.
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 from pathlib import Path
 
@@ -47,12 +48,51 @@ class TheCommittedInventory(unittest.TestCase):
         committed = {p.suffix for p in (ROOT / "design").rglob("*") if p.is_file()}
         self.assertEqual(committed, {".md", ".json"})
 
-    def test_the_seven_design_questions_are_decided_and_none_is_left_open(self):
-        self.assertEqual([d["id"] for d in self.data["decisions"]], [f"DQ-0{n}" for n in range(1, 8)])
+    def test_four_design_questions_are_locked_owner_decisions(self):
+        self.assertEqual([d["id"] for d in self.data["decisions"]], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])
         self.assertFalse([p["id"] for p in self.data["placeholders"] if p["id"].startswith("DQ-")])
         self.assertFalse([s["id"] for s in self.data["surfaces"] if any(i.startswith("DQ-") for i in s["open_items"])])
         for d in self.data["decisions"]:
-            self.assertEqual((d["decided_by"], d["client_confirmed"], d["adds_scope"]), ("owner", False, False), d["id"])
+            self.assertEqual((d["status"], d["decided_by"], d["client_confirmed"], d["adds_scope"]),
+                             ("locked", "owner", False, False), d["id"])
+
+    def test_numerals_list_continuation_and_checkout_are_provisional_and_select_nothing(self):
+        """D-14: a working baseline for the first wireframes is not a requirement and not a final product decision."""
+        by_id = {o["id"]: o for o in self.data["options"]}
+        for oid, baseline in (("DQ-01", "Western digits 0 to 9 in both languages"), ("DQ-02", "Numbered pagination"),
+                              ("DQ-03", "One page with clear sections")):
+            o = by_id[oid]
+            self.assertEqual((o["status"], o["working_baseline"], o["selected_pattern"]), ("provisional", baseline, None), oid)
+            self.assertGreaterEqual(len(o["candidate_patterns"]), 3, oid)
+        self.assertIn("Load More", by_id["DQ-02"]["candidate_patterns"])
+        self.assertTrue(any("infinite" in c for c in by_id["DQ-02"]["candidate_patterns"]))
+        self.assertTrue(any(c.startswith("Stepped checkout") for c in by_id["DQ-03"]["candidate_patterns"]))
+
+    def test_no_interaction_choice_has_been_locked_before_any_wireframe_exists(self):
+        self.assertEqual([o["id"] for o in self.data["options"] if o["status"] == "locked"], [])
+        self.assertEqual([o["id"] for o in self.data["options"] if o["selected_pattern"] is not None], [])
+
+    def test_no_surface_text_states_a_provisional_pattern_as_settled(self):
+        text = json.dumps(self.data["surfaces"]) + json.dumps(self.data["components"])
+        for phrase in ("No infinite scroll", "No multi-page wizard", "No wizard"):
+            self.assertNotIn(phrase, text)
+
+    def test_platform_surfaces_have_no_invented_build_pbi(self):
+        by_id = {s["id"]: s for s in self.data["surfaces"]}
+        for sid, origin in (("sy-404", "wordpress"), ("sy-maintenance", "wordpress"), ("sy-store-notices", "woocommerce"),
+                            ("sy-sign-in-required", "woocommerce"), ("sy-coming-soon", "unknown")):
+            self.assertIsNone(by_id[sid]["build_pbi"], sid)
+            self.assertEqual(by_id[sid]["implementation_origin"], origin, sid)
+
+    def test_the_five_customer_facing_builders_are_marked_as_needing_design(self):
+        f = di.dependency_findings(self.data)
+        self.assertEqual(f["missing"], [])
+        marked = {(sl["issue"] or sl["key"]): sl["design_dependency"] for sl in self.data["slices"]}
+        for pbi in (248, 283, 285, 288, 301):
+            self.assertEqual(marked[pbi], "needs design", pbi)
+        self.assertEqual(len(f["staff_only"]), 18)
+        self.assertTrue(all(marked[k] == "none" for k, _, _ in f["staff_only"]))
+        self.assertEqual(marked[277], "needs design")
 
     def test_second_release_surfaces_stay_inventoried_and_out_of_the_first_wireframe_pass(self):
         second = [s for s in self.data["surfaces"] if s["stage"] == "S2"]
@@ -85,8 +125,8 @@ def surface(**over) -> dict:
          "route": None, "flow_steps": ["F1.1"], "acceptance": {"stories": [], "scenarios": [], "operations_checks": []},
          "states": [{"state": "default"}], "responsive": {"mobile": "a", "tablet": "b", "desktop": "c"},
          "rtl": {"applies": True, "mirrors": ["layout"], "does_not_mirror": ["numerals"]}, "native_baseline": "",
-         "design_freedom": "free", "open_items": [], "decisions": [], "erp_dependency": "none",
-         "status": "inventoried"}
+         "design_freedom": "free", "open_items": [], "decisions": [], "interaction_options": [],
+         "erp_dependency": "none", "status": "inventoried"}
     s.update(over)
     return s
 
@@ -107,21 +147,31 @@ SLICES = [{"issue": 306, "key": "E-SF-6", "title": "Cart", "ids": ["CART-01", "C
 
 
 def decision(**over) -> dict:
-    d = {"id": "DQ-02", "title": "Pagination", "question": "q", "decision": "d", "must_not": "n", "decided_by": "owner",
-         "date": "2026-10-06", "record": "DECISIONS.md D-14", "client_confirmed": False, "adds_scope": False,
-         "affected_surfaces": []}
+    d = {"id": "DQ-05", "title": "Cash collected", "status": "locked", "question": "q", "decision": "d", "must_not": "n",
+         "decided_by": "owner", "date": "2026-10-06", "record": "DECISIONS.md D-14", "client_confirmed": False,
+         "adds_scope": False, "affected_surfaces": []}
     d.update(over)
     return d
 
 
-def inventory(*surfaces, no_surface=None, flows=None, components=None, placeholders=None, decisions=None) -> dict:
+def option(**over) -> dict:
+    o = {"id": "IX-01", "name": "List continuation", "affected_surfaces": ["x-cart"], "requirement_outcome": "o",
+         "candidate_patterns": ["Numbered pagination", "Load More"], "working_baseline": None, "status": "open",
+         "decision_stage": "low_fidelity_review", "constraints": ["c"], "selection_criteria": ["usability"],
+         "selected_pattern": None, "decision_source": None}
+    o.update(over)
+    return o
+
+
+def inventory(*surfaces, no_surface=None, flows=None, components=None, placeholders=None, decisions=None,
+              options=None) -> dict:
     return {"surfaces": list(surfaces),
             "no_surface": no_surface if no_surface is not None else
             {"behaviour": {"reason": "No screen.", "ids": ["CART-02", "PLP-11", "NAV-01", "AC-01"]}},
             "flows": flows if flows is not None else
             [{"id": "F1", "steps": [{"step": "F1.1", "surfaces": ["x-cart"], "register_ids": ["CART-01"]}]}],
             "components": components or [], "placeholders": placeholders or [], "decisions": decisions or [],
-            "sources": [],
+            "options": options or [], "sources": [],
             "ids": copy.deepcopy(IDS), "slices": SLICES}
 
 
@@ -153,18 +203,20 @@ class TheCheckerRefuses(unittest.TestCase):
         self.assertRefused(inventory(surface(register_ids=["CART-01", "NAV-01"])), "is owned by 253, not by 306")
 
     def test_a_surface_outside_scope_that_cites_a_row(self):
-        s = surface(scope_type="native_required", owner_pbi=None, build_pbi=None, scope_note="Every site has one.")
+        s = surface(scope_type="native_required", owner_pbi=None, build_pbi=None, scope_note="Every site has one.",
+                    implementation_origin="wordpress")
         self.assertRefused(inventory(s), "surfaces cite no register row")
 
     def test_a_surface_outside_scope_that_does_not_say_why_it_exists(self):
-        s = surface(scope_type="internal_operational", register_ids=[], stage=None, owner_pbi=None, build_pbi=None)
+        s = surface(scope_type="internal_operational", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
+                    implementation_origin="unknown")
         self.assertRefused(inventory(s, no_surface={"behaviour": {"reason": "No screen.",
                                                                   "ids": ["CART-01", "CART-02", "PLP-11", "NAV-01", "AC-01"]}}),
                            "must say why they exist")
 
     def test_a_provider_surface_needs_no_reading_direction_of_ours(self):
         s = surface(scope_type="provider_hosted", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
-                    scope_note="Theirs.",
+                    scope_note="Theirs.", implementation_origin="provider",
                     rtl={"applies": False, "reason": "The provider's."})
         data = inventory(s, no_surface={"behaviour": {"reason": "No screen.",
                                                       "ids": ["CART-01", "CART-02", "PLP-11", "NAV-01", "AC-01"]}})
@@ -263,15 +315,15 @@ class TheCheckerRefuses(unittest.TestCase):
 
     # Owner design decisions
     def test_a_surface_may_cite_an_owner_design_decision(self):
-        data = inventory(surface(decisions=["DQ-02"]), decisions=[decision(affected_surfaces=["x-cart"])])
+        data = inventory(surface(decisions=["DQ-05"]), decisions=[decision(affected_surfaces=["x-cart"])])
         self.assertEqual(self.errors(data), [])
 
     def test_a_decision_nobody_recorded(self):
-        self.assertRefused(inventory(surface(decisions=["DQ-02"])), "is not an owner design decision")
+        self.assertRefused(inventory(surface(decisions=["DQ-05"])), "is not an owner design decision")
 
     def test_a_decided_question_left_open_on_a_surface(self):
-        data = inventory(surface(open_items=["DQ-02"]), decisions=[decision()])
-        self.assertRefused(data, "open item DQ-02 has no entry in placeholders.json")
+        data = inventory(surface(open_items=["DQ-05"]), decisions=[decision()])
+        self.assertRefused(data, "open item DQ-05 has no entry in placeholders.json")
 
     def test_a_decision_recorded_as_a_client_confirmation(self):
         data = inventory(surface(), decisions=[decision(client_confirmed=True)])
@@ -282,13 +334,94 @@ class TheCheckerRefuses(unittest.TestCase):
         self.assertRefused(data, "is not a client confirmation and adds no scope")
 
     def test_a_decision_that_is_also_an_open_placeholder(self):
-        p = {"id": "DQ-02", "affected_surfaces": [], "unknown": "a", "placeholder_allowed": "b", "must_not_assume": "c",
+        p = {"id": "DQ-05", "affected_surfaces": [], "unknown": "a", "placeholder_allowed": "b", "must_not_assume": "c",
              "replaced_by": "d"}
         self.assertRefused(inventory(surface(), placeholders=[p], decisions=[decision()]), "a decided question is not open")
 
+    def test_an_owner_decision_is_locked_or_it_is_not_a_decision(self):
+        data = inventory(surface(), decisions=[decision(status="provisional")])
+        self.assertRefused(data, "belongs in interaction-options.json")
+
+    # A provisional pattern is not a requirement and not a final decision
+    PLATFORM = {"behaviour": {"reason": "No screen.", "ids": ["CART-01", "CART-02", "PLP-11", "NAV-01", "AC-01"]}}
+
+    def with_option(self, **over):
+        return inventory(surface(interaction_options=["IX-01"]), options=[option(**over)])
+
+    def test_an_open_choice_passes(self):
+        self.assertEqual(self.errors(self.with_option()), [])
+
+    def test_a_provisional_baseline_passes_and_selects_nothing(self):
+        data = self.with_option(status="provisional", working_baseline="Numbered pagination", decision_source="Owner baseline")
+        self.assertEqual(self.errors(data), [])
+        self.assertIsNone(data["options"][0]["selected_pattern"])
+
+    def test_a_locked_choice_passes_when_it_says_what_was_selected_and_by_whom(self):
+        data = self.with_option(status="locked", working_baseline="Numbered pagination", selected_pattern="Load More",
+                                decision_source="Owner, low-fidelity review")
+        self.assertEqual(self.errors(data), [])
+
+    def test_a_baseline_is_not_a_selection(self):
+        data = self.with_option(status="provisional", working_baseline="Numbered pagination", decision_source="Owner baseline",
+                                selected_pattern="Numbered pagination")
+        self.assertRefused(data, "a baseline is not a selection")
+
+    def test_an_open_choice_with_a_baseline_is_provisional(self):
+        self.assertRefused(self.with_option(working_baseline="Load More"), "that is provisional")
+
+    def test_a_provisional_choice_without_a_baseline(self):
+        self.assertRefused(self.with_option(status="provisional", decision_source="Owner baseline"), "names no working baseline")
+
+    def test_a_provisional_choice_that_does_not_say_who_set_it(self):
+        self.assertRefused(self.with_option(status="provisional", working_baseline="Load More"), "who set the baseline")
+
+    def test_a_locked_choice_that_selected_nothing(self):
+        self.assertRefused(self.with_option(status="locked"), "does not say which pattern was selected")
+
+    def test_a_baseline_outside_the_candidates(self):
+        data = self.with_option(status="provisional", working_baseline="Carousel", decision_source="Owner baseline")
+        self.assertRefused(data, "working_baseline is not one of its candidate patterns")
+
+    def test_a_choice_with_one_pattern_is_not_a_choice(self):
+        self.assertRefused(self.with_option(candidate_patterns=["Numbered pagination"]), "at least two candidate patterns")
+
+    def test_a_status_outside_the_three(self):
+        self.assertRefused(self.with_option(status="decided"), "is not one of open, provisional, locked")
+
+    def test_a_choice_that_affects_a_surface_that_does_not_exist(self):
+        data = inventory(surface(interaction_options=["IX-01"]), options=[option(affected_surfaces=["x-cart", "x-gone"])])
+        self.assertRefused(data, "affects x-gone")
+
+    def test_a_surface_whose_options_drifted(self):
+        self.assertRefused(inventory(surface(), options=[option()]), "interaction_options differs")
+
+    def test_a_choice_cannot_also_be_a_locked_decision(self):
+        data = inventory(surface(interaction_options=["DQ-05"]), options=[option(id="DQ-05")], decisions=[decision()])
+        self.assertRefused(data, "it is one thing only")
+
+    # A surface nothing here builds
+    def test_no_pbi_is_invented_for_a_platform_surface(self):
+        s = surface(scope_type="native_required", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
+                    scope_note="Every site has one.", implementation_origin="woocommerce")
+        self.assertEqual(self.errors(inventory(s, no_surface=self.PLATFORM)), [])
+        self.assertEqual([x["id"] for x in di.dependency_findings(inventory(s, no_surface=self.PLATFORM))["unbuilt"]], ["x-cart"])
+
+    def test_an_unbuilt_surface_that_does_not_say_where_it_comes_from(self):
+        s = surface(scope_type="native_required", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
+                    scope_note="Every site has one.")
+        self.assertRefused(inventory(s, no_surface=self.PLATFORM), "implementation_origin must be one of")
+
+    def test_an_origin_on_a_surface_a_pbi_builds(self):
+        self.assertRefused(inventory(surface(implementation_origin="woocommerce")), "is for a surface no PBI builds")
+
+    def test_provider_is_the_origin_of_provider_surfaces_only(self):
+        s = surface(scope_type="native_required", register_ids=[], stage=None, owner_pbi=None, build_pbi=None,
+                    scope_note="Every site has one.", implementation_origin="provider")
+        self.assertRefused(inventory(s, no_surface=self.PLATFORM), "is for provider-hosted surfaces, and only for them")
+
     def test_a_decision_whose_surfaces_drifted(self):
-        data = inventory(surface(decisions=["DQ-02"]), decisions=[decision()])
-        self.assertRefused(data, "decision DQ-02: affected_surfaces differs")
+        data = inventory(surface(decisions=["DQ-05"]), decisions=[decision()])
+        self.assertRefused(data, "decision DQ-05: affected_surfaces differs")
 
 
 if __name__ == "__main__":

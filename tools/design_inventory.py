@@ -14,6 +14,10 @@ What it fails on:
   PBI without a `build_note` saying why.
 - A decision id on a surface that is not an owner design decision, or a decision recorded as a client confirmation
   or as added scope.
+- An interaction option with fewer than two candidate patterns, with a status outside `open`, `provisional` and
+  `locked`, with a baseline or a selection that is not one of its candidates, or that claims more than its status
+  allows: an open option has no baseline, and only a locked one has a selected pattern and a decision source.
+- A surface no PBI builds that does not say where it comes from, or a PBI named for one to fill the field.
 - A flow step, a component, a placeholder or a `composes` entry that points at a surface that does not exist.
 - A customer-facing surface that does not account for both reading directions.
 - A row whose wording names an email and that no email surface carries.
@@ -25,6 +29,12 @@ Two PBIs can stand behind one surface, and they are kept apart. `owner_pbi` is t
 register rows: one row, one accepting PBI, as `docs/scope/backlog-ownership.json` has it. `build_pbi` is the PBI
 that implements the visible surface. They are usually the same. Where they differ, nothing moves in the ownership
 file: the surface says so, and the report lists it.
+
+Five kinds of statement are kept apart, so that a wireframe cannot turn a choice the contract leaves open into a
+permanent product decision: a contractual requirement (`register_ids`), a platform constraint (`native_baseline`,
+and an option's `constraints`), a locked owner decision (`owner_design_decisions`), a provisional UX baseline and
+an open design choice (both in `interaction-options.json`). A provisional baseline is not a requirement and not an
+owner-confirmed final product decision.
 
 What it cannot check: whether a surface is the right reading of the wording of its rows. That is a review
 judgement, made against the signed register.
@@ -52,7 +62,12 @@ STATUSES = ("inventoried", "briefed", "wireframed", "reviewed", "branded", "appr
 ERP = ("none", "partial", "per PRE-09")
 FIELDS = ("id", "name", "kind", "scope_type", "audience", "register_ids", "context_ids", "excluded_ids", "owner_pbi",
           "build_pbi", "stage", "route", "flow_steps", "acceptance", "states", "responsive", "rtl", "native_baseline",
-          "design_freedom", "open_items", "decisions", "erp_dependency", "status")
+          "design_freedom", "open_items", "decisions", "interaction_options", "erp_dependency", "status")
+OPTION_STATUSES = ("open", "provisional", "locked")
+OPTION_STAGES = ("low_fidelity_review", "high_fidelity_review", "localisation_review")
+OPTION_FIELDS = ("id", "name", "affected_surfaces", "requirement_outcome", "candidate_patterns", "working_baseline",
+                 "status", "decision_stage", "constraints", "selection_criteria", "selected_pattern", "decision_source")
+ORIGINS = ("mizzey", "corex", "wordpress", "woocommerce", "provider", "unknown")
 STAGES = {"S1": "S1", "S2": "S2", "-": "per PRE-09"}
 # Rows whose register wording names an email. Each must be carried by a surface of kind `email`.
 EMAIL_ROWS = ("NOTF-01", "NOTF-02", "NOTF-03", "NOTF-04", "NOTF-06", "NOTF-08", "AUTH-04", "AUTH-05", "AUTH-12",
@@ -73,6 +88,7 @@ def load(root: Path) -> dict:
         "components": read("design", "inventory", "components.json")["components"],
         "placeholders": placeholders["placeholders"],
         "decisions": placeholders["owner_design_decisions"],
+        "options": read("design", "inventory", "interaction-options.json")["options"],
         "sources": read("design", "sources.json")["sources"],
         "ids": read("docs", "scope", "register-ids.json")["ids"],
         "slices": read("docs", "scope", "backlog-ownership.json")["slices"],
@@ -114,6 +130,15 @@ def ruled(surfaces: list[dict]) -> dict[str, list[str]]:
     for s in surfaces:
         for item in s["decisions"]:
             out.setdefault(item, []).append(s["id"])
+    return out
+
+
+def opted(options: list[dict]) -> dict[str, list[str]]:
+    """Surface -> the interaction options that bear on it."""
+    out: dict[str, list[str]] = {}
+    for o in options:
+        for sid in o["affected_surfaces"]:
+            out.setdefault(sid, []).append(o["id"])
     return out
 
 
@@ -206,6 +231,13 @@ def validate(data: dict) -> list[str]:
         if build is None:
             if s["scope_type"] == "contracted":
                 errs.append(f"surface {sid}: contracted, and no PBI builds it (build_pbi)")
+            if s.get("implementation_origin") not in ORIGINS:
+                errs.append(f"surface {sid}: no PBI builds it, so implementation_origin must be one of "
+                            f"{', '.join(ORIGINS)}")
+            elif (s["scope_type"] == "provider_hosted") != (s["implementation_origin"] == "provider"):
+                errs.append(f"surface {sid}: origin `provider` is for provider-hosted surfaces, and only for them")
+        elif "implementation_origin" in s:
+            errs.append(f"surface {sid}: implementation_origin is for a surface no PBI builds")
         elif build not in known_pbis:
             errs.append(f"surface {sid}: build_pbi {build} is not a PBI of the ownership file")
         if build is not None and build != s["owner_pbi"] and not s.get("build_note"):
@@ -276,8 +308,56 @@ def validate(data: dict) -> list[str]:
             if not p.get(field):
                 errs.append(f"placeholder {p['id']}: {field} is empty")
 
+    option_ids = [o.get("id", "?") for o in data["options"]]
+    chosen = opted([o for o in data["options"] if "affected_surfaces" in o])
+    for s in surfaces:
+        if s.get("interaction_options") != chosen.get(s["id"], []):
+            errs.append(f"surface {s['id']}: interaction_options differs from interaction-options.json")
+    for oid, n in Counter(option_ids).items():
+        if n > 1:
+            errs.append(f"interaction option {oid}: id used {n} times")
+    for o in data["options"]:
+        oid = o.get("id", "?")
+        missing = [f for f in OPTION_FIELDS if f not in o]
+        if missing:
+            errs.append(f"interaction option {oid}: missing {', '.join(missing)}")
+            continue
+        if oid in placeholder_ids or oid in decision_ids:
+            errs.append(f"interaction option {oid}: also an open input or a locked owner decision; it is one thing only")
+        if o["status"] not in OPTION_STATUSES:
+            errs.append(f"interaction option {oid}: status {o['status']!r} is not one of {', '.join(OPTION_STATUSES)}")
+        if o["decision_stage"] not in OPTION_STAGES:
+            errs.append(f"interaction option {oid}: decision_stage is not one of {', '.join(OPTION_STAGES)}")
+        if len(o["candidate_patterns"]) < 2:
+            errs.append(f"interaction option {oid}: a choice needs at least two candidate patterns")
+        for field in ("requirement_outcome", "constraints", "selection_criteria"):
+            if not o[field]:
+                errs.append(f"interaction option {oid}: {field} is empty")
+        for sid in o["affected_surfaces"]:
+            if sid not in known:
+                errs.append(f"interaction option {oid}: affects {sid}, which is not a surface")
+        if not o["affected_surfaces"] and not o.get("applies_to"):
+            errs.append(f"interaction option {oid}: names no surface and does not say what it applies to")
+        for field in ("working_baseline", "selected_pattern"):
+            if o[field] is not None and o[field] not in o["candidate_patterns"]:
+                errs.append(f"interaction option {oid}: {field} is not one of its candidate patterns")
+        if o["status"] == "open" and o["working_baseline"] is not None:
+            errs.append(f"interaction option {oid}: open, and already has a working baseline; that is provisional")
+        if o["status"] == "provisional" and o["working_baseline"] is None:
+            errs.append(f"interaction option {oid}: provisional, and names no working baseline")
+        if o["status"] != "locked" and o["selected_pattern"] is not None:
+            errs.append(f"interaction option {oid}: {o['status']}, and already has a selected pattern; a baseline is "
+                        "not a selection")
+        if o["status"] == "locked" and (o["selected_pattern"] is None or not o["decision_source"]):
+            errs.append(f"interaction option {oid}: locked, and does not say which pattern was selected and by whom")
+        if o["status"] == "provisional" and not o["decision_source"]:
+            errs.append(f"interaction option {oid}: provisional, and does not say who set the baseline")
+
     governed = ruled(surfaces)
     for d in data["decisions"]:
+        if d.get("status") != "locked":
+            errs.append(f"decision {d['id']}: an owner design decision is locked; an open or provisional pattern "
+                        "belongs in interaction-options.json")
         if d["id"] in placeholder_ids:
             errs.append(f"decision {d['id']}: also listed as an open placeholder; a decided question is not open")
         if d["affected_surfaces"] != governed.get(d["id"], []):
@@ -393,7 +473,21 @@ def render(data: dict) -> str:
                                       ["Flow steps", sum(len(f["steps"]) for f in data["flows"])],
                                       ["Components", len(data["components"])],
                                       ["Open design inputs", len(data["placeholders"])],
-                                      ["Owner design decisions", len(data["decisions"])]])
+                                      ["Locked owner decisions", len(data["decisions"])],
+                                      ["Provisional UX choices",
+                                       sum(1 for o in data["options"] if o["status"] == "provisional")],
+                                      ["Open interaction choices",
+                                       sum(1 for o in data["options"] if o["status"] == "open")],
+                                      ["Locked interaction choices",
+                                       sum(1 for o in data["options"] if o["status"] == "locked")]])
+    L += ["", "**Surfaces by design freedom.** How a contracted capability may be expressed. It never widens what "
+              "is built.", ""]
+    meaning = {"free": "Composition, hierarchy, layout and interaction patterns may be explored",
+               "constrained": "A platform block, an integration or a contractual condition limits the solution",
+               "annotate_only": "Mainly a provider's or the standard administration's: documented, not redesigned",
+               "none": "No design choice to make"}
+    freedom = Counter(s["design_freedom"] for s in surfaces)
+    L += table(["Design freedom", "Surfaces", "Meaning"], [[f"`{k}`", freedom.get(k, 0), meaning[k]] for k in FREEDOM])
     L += ["", "**Surfaces by kind**", ""]
     L += table(["Kind", "Surfaces"], counted(Counter(s["kind"] for s in surfaces), KINDS))
     L += ["", "**Surfaces by scope type**", ""]
@@ -448,7 +542,11 @@ def render(data: dict) -> str:
         ["Every contracted surface names the PBI that builds it, and says why where it is not the accepting PBI",
          f"{len(contracted)} surfaces"],
         ["No owner design decision is recorded as a client confirmation or as added scope",
-         f"{len(data['decisions'])} decisions"]])
+         f"{len(data['decisions'])} decisions"],
+        ["No interaction option claims more than its status allows: a baseline is not a selection",
+         f"{len(data['options'])} options"],
+        ["No PBI is named for a surface that nothing here builds; each says where it comes from",
+         f"{sum(1 for s in surfaces if s['build_pbi'] is None)} surfaces"]])
 
     f = dependency_findings(data)
     names = lambda ss: ", ".join(f"`{x['id']}`" for x in ss)  # noqa: E731
@@ -459,10 +557,12 @@ def render(data: dict) -> str:
     L += table(["Surface", "Accepts", "Builds", "Why"],
                [[f"`{x['id']}`", pbi_label(x["owner_pbi"]), pbi_label(x["build_pbi"]), x["build_note"]]
                 for x in f["differs"]]) if f["differs"] else ["None."]
-    L += ["", "**4.2 Surfaces no PBI builds.** A provider's interface, or a platform screen with no PBI named for it. "
-              "The second kind is for the owner to place.", ""]
-    L += table(["Surface", "Scope type", "Why it exists"],
-               [[f"`{x['id']}`", x["scope_type"], x["scope_note"]] for x in f["unbuilt"]]) if f["unbuilt"] else ["None."]
+    L += ["", "**4.2 Surfaces no PBI builds.** A provider's interface, or a platform screen. **No PBI is invented to "
+              "fill the field**: `build_pbi` stays empty until there is a real implementation owner, and "
+              "`implementation_origin` says where the surface comes from today.", ""]
+    L += table(["Surface", "Scope type", "Origin", "Why it exists"],
+               [[f"`{x['id']}`", x["scope_type"], f"`{x['implementation_origin']}`", x["scope_note"]]
+                for x in f["unbuilt"]]) if f["unbuilt"] else ["None."]
 
     L += ["", "## 5. Design dependency", "",
           "`design_dependency` in `docs/scope/backlog-ownership.json`, compared with the surfaces each PBI **builds**. "
@@ -494,14 +594,27 @@ def render(data: dict) -> str:
     L += table(["Id", "Kind", "Input", "Surfaces affected"],
                [[p["id"], p["kind"], p["title"], len(p["affected_surfaces"])] for p in data["placeholders"]])
 
-    L += ["", "## 7. Owner design decisions", "",
-          "Questions no source answered, decided by the owner in D-14. **Owner design decisions: not client "
+    L += ["", "## 7. Locked owner decisions", "",
+          "Boundaries the owner decided in D-14 for questions no source answered. **Owner design decisions: not client "
           "confirmations, and not scope additions.** No surface waits on one.", ""]
     L += table(["Id", "Question", "Decision", "Not to be done", "Surfaces"],
-               [[d["id"], d["title"], d["decision"], d["must_not"],
-                 d.get("applies_to") or names([{"id": x} for x in d["affected_surfaces"]])] for d in data["decisions"]])
+               [[d["id"], d["title"], d["decision"] + (" **Boundary:** " + d["boundary"] if d.get("boundary") else ""),
+                 d["must_not"], names([{"id": x} for x in d["affected_surfaces"]])] for d in data["decisions"]])
 
-    L += ["", "## 8. Every surface", ""]
+    L += ["", "## 8. Interaction options", "",
+          "UX choices with more than one legitimate pattern, where neither the contract nor the platform fixes one "
+          "(`design/inventory/interaction-options.json`). **A provisional baseline is not a requirement and not an "
+          "owner-confirmed final product decision.** It is where the first wireframes start, and it may change in "
+          "review without a scope change, provided the pattern chosen still meets the requirement and the constraints. "
+          "None of these adds a capability.", ""]
+    stage = {"low_fidelity_review": "Low-fidelity review", "high_fidelity_review": "High-fidelity review",
+             "localisation_review": "Design and localisation review"}
+    L += table(["Id", "Choice", "Status", "Working baseline", "Candidate patterns", "Selected at", "Surfaces"],
+               [[o["id"], o["name"], f"`{o['status']}`", o["working_baseline"] or "None yet",
+                 "; ".join(o["candidate_patterns"]), stage[o["decision_stage"]],
+                 o.get("applies_to") or names([{"id": x} for x in o["affected_surfaces"]])] for o in data["options"]])
+
+    L += ["", "## 9. Every surface", ""]
     L += table(["Id", "Surface", "Kind", "Scope type", "Accepts", "Builds", "Stage", "Rows"],
                [[f"`{s['id']}`", s["name"], s["kind"], s["scope_type"], pbi_label(s["owner_pbi"]),
                  pbi_label(s["build_pbi"]), s["stage"] or "", len(s["register_ids"])] for s in surfaces])
@@ -526,7 +639,7 @@ def main(argv: list[str] | None = None) -> int:
         print(e)
     print(f"design-inventory: {len(data['surfaces'])} surfaces, {len(data['flows'])} flows, "
           f"{len(data['components'])} components, {len(data['placeholders'])} open inputs, "
-          f"{len(data['decisions'])} decisions, {len(errs)} problems")
+          f"{len(data['decisions'])} locked decisions, {len(data['options'])} interaction options, {len(errs)} problems")
     return 1 if errs else 0
 
 

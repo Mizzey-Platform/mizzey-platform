@@ -28,6 +28,11 @@ client, then storefront implementation.
 - **No wireframe is drawn until Mustafa approves the start of the wireframe pass.** Low-fidelity wireframes are design
   artefacts in `design/`. They are not built in `mizzey-theme/`, and nothing is implemented in the theme before
   the contracted working HTML and CSS stage.
+- **Do not lock UX by drawing it.** A requirement fixes an outcome, rarely a pattern. Where more than one pattern
+  is legitimate, it is in `design/inventory/interaction-options.json` as `open` or `provisional`: a provisional
+  baseline is not a requirement and not a final owner decision. Presentation is design; a new customer capability
+  or business behaviour needs scope authority. `design/direction.md` is the experience target, and no
+  implementation library is chosen before the design.
 - **Nothing committed is approved UI or UX.** The plugin is technical foundation and the theme is a scaffold.
 - **The signed documents stay in `final docs/`, outside this repository.** `design/sources.json` points at them.
   Never copy one in, in whole or in part.

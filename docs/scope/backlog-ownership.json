@@ -447,7 +447,7 @@
     }
    ],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [
     {
      "id": "Bosta status code legend",
@@ -463,7 +463,7 @@
     "ORD-11 (DEF)",
     "RPT-06 (P2)"
    ],
-   "notes": "P-018: no structured status history natively, only prose order notes. ADR-0002 records the minimum shipment state record. D6: capture the language an order was placed in here."
+   "notes": "P-018: no structured status history natively, only prose order notes. ADR-0002 records the minimum shipment state record. D6: capture the language an order was placed in here. D-14: design-dependent for the order status labels the customer sees, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
   },
   {
    "key": "E-PRE-5",
@@ -1852,7 +1852,7 @@
     }
    ],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [
     {
      "id": "CR-01",
@@ -1890,7 +1890,7 @@
     "INT-06 (P2)",
     "INT-17 (OUT)"
    ],
-   "notes": "P-004: a repeated payment_complete for the same order was a no-op, but WooCommerce does nothing about a customer submitting checkout twice and creating two orders, or about a gateway retrying against an order meanwhile cancelled; both are PAY-05 work. P-014: the native refund ceiling holds. The backlog document records callback verification (PAY-04, PAY-16) as a gap in the Technical Design. PAY-09 and PAY-15 are capabilities conditional on OD-05 and OD-19: the register's stage cells read 'S1 if selected' and 'S1 if selected and approved', extracted as S1. PAY-17 is P1-L: a gateway refund only where the selected Paymob integration supports it, otherwise made through Paymob and recorded on the order. The native cash on delivery gateway in the local runtime has settings for enable, title, description, instructions, shipping methods and virtual orders, and none for an order-value limit or a fee (source reading, not a probe)."
+   "notes": "P-004: a repeated payment_complete for the same order was a no-op, but WooCommerce does nothing about a customer submitting checkout twice and creating two orders, or about a gateway retrying against an order meanwhile cancelled; both are PAY-05 work. P-014: the native refund ceiling holds. The backlog document records callback verification (PAY-04, PAY-16) as a gap in the Technical Design. PAY-09 and PAY-15 are capabilities conditional on OD-05 and OD-19: the register's stage cells read 'S1 if selected' and 'S1 if selected and approved', extracted as S1. PAY-17 is P1-L: a gateway refund only where the selected Paymob integration supports it, otherwise made through Paymob and recorded on the order. The native cash on delivery gateway in the local runtime has settings for enable, title, description, instructions, shipping methods and virtual orders, and none for an order-value limit or a fee (source reading, not a probe). D-14: design-dependent for the payment handoff and the payment failed experience, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
   },
   {
    "key": "E-INT-1",
@@ -1998,7 +1998,7 @@
     }
    ],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [
     {
      "id": "OD-18",
@@ -2028,7 +2028,7 @@
     "INT-06 (P2)",
     "INT-07 (P2)"
    ],
-   "notes": "Email only at launch is agreed (OD-11); WhatsApp and SMS are P2. Admin-editable templates (NOTF-14) are S2: in the first release the developer changes wording on request. NOTF-08 uses the standard WooCommerce refunded-order email. NOTF-12 is P1-L with no reduction stated. No email is contracted for Out for Delivery (NOTF-05 is P2) although ORD-06 is a P1 status. REV-05, the review invitation, is owned by E-SF-11 and NOTF-06 names the same invitation."
+   "notes": "Email only at launch is agreed (OD-11); WhatsApp and SMS are P2. Admin-editable templates (NOTF-14) are S2: in the first release the developer changes wording on request. NOTF-08 uses the standard WooCommerce refunded-order email. NOTF-12 is P1-L with no reduction stated. No email is contracted for Out for Delivery (NOTF-05 is P2) although ORD-06 is a P1 status. REV-05, the review invitation, is owned by E-SF-11 and NOTF-06 names the same invitation. D-14: design-dependent for the customer transactional emails and their shared layout, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
   },
   {
    "key": "E-RPT-1",
@@ -2163,7 +2163,7 @@
     }
    ],
    "erp_blocked": "no",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [
     {
      "id": "Google, Meta and TikTok accounts",
@@ -2190,7 +2190,7 @@
     "MKT-11 (P3)",
     "INT-11 (P2)"
    ],
-   "notes": "P-021: campaign attribution to the order record is native in WooCommerce 11.1.0, on by default and queryable by campaign, so MKT-09 needs no plugin for the capture; the product feeds still need one. MKT-05, MKT-06, MKT-09 and MKT-10 are P1-L; MKT-03, MKT-05, MKT-06 and MKT-09 are key rows. The backlog document says MKT-01, MKT-02 and MKT-03 'are built'; that repeats the register's OD-21 sentence, and no spec in this repository covers them (specs holds four features: product cost, bilingual baseline, information architecture, inventory report). Whether a feed lists a translated product once per language feed is not measured."
+   "notes": "P-021: campaign attribution to the order record is native in WooCommerce 11.1.0, on by default and queryable by campaign, so MKT-09 needs no plugin for the capture; the product feeds still need one. MKT-05, MKT-06, MKT-09 and MKT-10 are P1-L; MKT-03, MKT-05, MKT-06 and MKT-09 are key rows. The backlog document says MKT-01, MKT-02 and MKT-03 'are built'; that repeats the register's OD-21 sentence, and no spec in this repository covers them (specs holds four features: product cost, bilingual baseline, information architecture, inventory report). Whether a feed lists a translated product once per language feed is not measured. D-14: design-dependent for the consent banner, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
   },
   {
    "key": "E-ADM-7",
@@ -2975,7 +2975,7 @@
     }
    ],
    "erp_blocked": "partial",
-   "design_dependency": "none",
+   "design_dependency": "needs design",
    "inputs": [
     {
      "id": "Predecessor PBIs",
@@ -2998,7 +2998,7 @@
    "not_in_slice": [
     "ERP-09 (OUT)"
    ],
-   "notes": "P1 and a key row. OD-41 is confirmed: the store does not confirm the sale. D-10: a final sale fails closed. R-18: the store depends on the ERP's availability. AC-23 (E-ACC-2) is the provisional scenario."
+   "notes": "P1 and a key row. OD-41 is confirmed: the store does not confirm the sale. D-10: a final sale fails closed. R-18: the store depends on the ERP's availability. AC-23 (E-ACC-2) is the provisional scenario. D-14: design-dependent for the message the customer sees when stock cannot be validated, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
   },
   {
    "key": "E-SF-2",

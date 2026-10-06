@@ -396,51 +396,12 @@
       "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
     }
   ],
-  "owner_design_decisions_about": "Design questions no source answered, found while building the inventory and decided by the owner on 6 October 2026 (DECISIONS.md D-14). Owner design decisions: not client confirmations, and not scope additions. They are settled, and no surface waits on one.",
+  "owner_design_decisions_about": "Boundaries the owner decided on 6 October 2026 (DECISIONS.md D-14) for questions no source answered. Owner design decisions: not client confirmations, and not scope additions. They are locked, and no surface waits on one. A UX pattern with more than one legitimate answer is not here: it is in interaction-options.json, as open or provisional.",
   "owner_design_decisions": [
-    {
-      "id": "DQ-01",
-      "title": "Numerals in Arabic",
-      "question": "No source says whether Arabic pages show Western or Arabic-Indic digits.",
-      "decision": "Western digits 0 to 9 in both English and Arabic. Locale-aware currency, date and number formatting still follows the localisation requirements (NFR-04b).",
-      "must_not": "No Arabic-Indic digits, unless the client later asks for them explicitly.",
-      "decided_by": "owner",
-      "date": "2026-10-06",
-      "record": "DECISIONS.md D-14",
-      "client_confirmed": false,
-      "adds_scope": false,
-      "affected_surfaces": [],
-      "applies_to": "Every customer-facing surface."
-    },
-    {
-      "id": "DQ-02",
-      "title": "Pagination",
-      "question": "PLP-16 allows pagination or infinite scroll.",
-      "decision": "Numbered pagination.",
-      "must_not": "No infinite scroll in the Stage 1 structural design.",
-      "decided_by": "owner",
-      "date": "2026-10-06",
-      "record": "DECISIONS.md D-14",
-      "client_confirmed": false,
-      "adds_scope": false,
-      "affected_surfaces": ["sf-pagination"]
-    },
-    {
-      "id": "DQ-03",
-      "title": "Checkout structure",
-      "question": "JRN-07 lists an order of steps and CHK-05 asks for a review step. No source says whether they are separate screens.",
-      "decision": "One checkout page, divided into clear structural sections, with the review and order summary before Place Order.",
-      "must_not": "No multi-page checkout wizard.",
-      "decided_by": "owner",
-      "date": "2026-10-06",
-      "record": "DECISIONS.md D-14",
-      "client_confirmed": false,
-      "adds_scope": false,
-      "affected_surfaces": ["ck-checkout"]
-    },
     {
       "id": "DQ-04",
       "title": "Second-release screens",
+      "status": "locked",
       "question": "The register stages some contracted rows S2. No source says whether their screens are drawn in the first design.",
       "decision": "Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work.",
       "must_not": "No S2 wireframe in the S1 pass, and no S1 layout that leaves the S2 surface nowhere to attach.",
@@ -452,11 +413,13 @@
       "affected_surfaces": [
         "sf-filter-by-rating", "sf-brand-landing", "ac-reorder", "ac-notification-preferences", "ac-account-deletion",
         "ad-dashboard-customers-conversion", "ad-customer-metrics-export", "ad-email-template-editor"
-      ]
+      ],
+      "boundary": "This governs the low-fidelity S1 wireframe pass only. Statement of Work section 9 measures the contracted interface design by every contracted storefront screen of the register, and second-release rows are contracted. Whether their screens are part of the design presented for PRE-03b is not settled here and is the owner's to decide before that design is presented."
     },
     {
       "id": "DQ-05",
       "title": "The cash-collected state",
+      "status": "locked",
       "question": "ORD-14 is a state for the store's books. No source says whether a customer sees it.",
       "decision": "Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state.",
       "must_not": "The customer is never shown the carrier remittance or accounting state.",
@@ -470,6 +433,7 @@
     {
       "id": "DQ-06",
       "title": "Review eligibility",
+      "status": "locked",
       "question": "No row says whether a review needs an account or a purchase.",
       "decision": "The Stage 1 design assumes a signed-in customer may submit a review.",
       "must_not": "No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2).",
@@ -483,6 +447,7 @@
     {
       "id": "DQ-07",
       "title": "The consent banner",
+      "status": "locked",
       "question": "MKT-10 contracts a consent banner. The tool is selected in #288 and has its own layout limits.",
       "decision": "The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288.",
       "must_not": "No third-party banner implementation is invented that the eventual tool cannot support.",

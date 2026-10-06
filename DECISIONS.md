@@ -1388,31 +1388,71 @@ one-accepting-PBI model does not change, and no row moves owner to make the desi
 record carries `owner_pbi`, the PBI that accepts its register rows, and `build_pbi`, the PBI that implements the
 visible surface. They are usually the same. Where they differ the surface says why, and the coverage report lists
 it. The order confirmation is accepted through IA-10 by #242 and built with the checkout, #255. The brand page is
-built by #303, while #277 and #311 own the admin and editing rows that shape it. Design dependency is read on the
-PBI that builds. The eighteen PBIs that build only additions to the standard administration stay marked as having
-no design dependency: the additions stay inventoried and annotated and are not made dependent on PRE-03b.
-`docs/scope/backlog-ownership.json` is not changed by this decision.
+built by #303, while #277 and #311 own the admin and editing rows that shape it. **No PBI is invented to fill the
+field**: the 404 page, the maintenance message, Coming Soon, the store notices and the sign-in-required state
+have no build PBI until there is a real implementation owner, and each records where it comes from.
 
-**12. The seven design questions the inventory raised are decided.** These are owner design decisions. They are
-not client confirmations and they add no scope.
+**12. UX is not locked early.** A wireframe must not turn a choice the contract leaves open into a permanent
+product decision. The inventory keeps five kinds of statement apart: a contractual requirement, a technical or
+platform constraint, a locked owner decision, a provisional UX pattern and an open design choice. A requirement
+fixes an outcome and rarely a pattern. Where more than one normal pattern can meet it and neither the contract
+nor the platform fixes one, the choice is recorded in `design/inventory/interaction-options.json` as `open`,
+`provisional` or `locked`. **A provisional pattern is not a requirement and not an owner-confirmed final product
+decision**: it is where the first wireframes start, and it may change in UX review without a scope change,
+provided the pattern chosen still satisfies the signed requirement and the technical constraints.
 
-| Id | Question | Decision |
-|---|---|---|
-| DQ-01 | Numerals in Arabic | Western digits 0 to 9 in both English and Arabic. Locale-aware currency, date and number formatting still follows the localisation requirements. Arabic-Indic digits are not introduced unless the client later asks for them explicitly |
-| DQ-02 | Pagination | Numbered pagination. No infinite scroll in the Stage 1 structural design |
-| DQ-03 | Checkout structure | One checkout page, divided into clear structural sections, with the review and order summary before Place Order. No multi-page checkout wizard |
-| DQ-04 | Second-release screens | Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work |
-| DQ-05 | The cash-collected state | Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state, never the carrier remittance or accounting state |
-| DQ-06 | Review eligibility | The Stage 1 design assumes a signed-in customer may submit a review. No verified purchase is required, and no verified-purchase badge is shown, because that requirement is not contracted |
-| DQ-07 | The consent banner | The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288, and no third-party banner implementation is invented that the eventual tool cannot support |
+**13. Of the seven design questions the inventory raised, three are provisional baselines and four are locked
+owner decisions.** None is a client confirmation and none adds scope.
+
+| Id | Question | Status | Position |
+|---|---|---|---|
+| DQ-01 | Numerals in Arabic | Provisional | Working baseline: Western digits 0 to 9. The Arabic design may later choose a different locale-appropriate numeral treatment if justified in the design and localisation review and compatible with the requirements |
+| DQ-02 | Product-list continuation | Provisional | Working baseline: numbered pagination. Load More and controlled continuous or infinite loading are candidates. Selected in UX review on usability, mobile behaviour, accessibility, SEO, performance, catalogue size, native platform behaviour and technical cost |
+| DQ-03 | Checkout structure | Provisional | Working baseline: one page with clear sections and the review before Place Order. Progressive or accordion sections, and a stepped checkout that stays compatible with the contracted behaviour and the commerce implementation, are candidates |
+| DQ-04 | Second-release screens | Locked | Every S2 surface stays in the master inventory and is not wireframed during the S1 wireframe pass. Its attachment point is accounted for, so the S1 structure does not prevent the later S2 work |
+| DQ-05 | The cash-collected state | Locked | Cash collected and remitted is a staff and accounting state. The customer sees the normal delivered or completed state |
+| DQ-06 | Review eligibility | Locked | The Stage 1 design assumes a signed-in customer may submit a review. No verified purchase is required and no verified-purchase badge is shown, because that requirement is not contracted |
+| DQ-07 | The consent banner | Locked | The structural design covers Accept, Decline and Preferences. The exact visual and layout implementation stays constrained by the consent tool selected in #288 |
+
+Nine further interaction choices are recorded as open, with no baseline: where filters sit on desktop and tablet,
+how the mini-cart is presented, whether the buy actions stay in reach on the product page, gallery navigation and
+zoom, how the category navigation opens, how the mobile menu shows levels, the search interaction, the product
+information layout, and whether the home hero is one banner or a slider. The mobile filter drawer is not among
+them: PLP-22 names it.
+
+**14. The experience target is recorded, and it is not the brand identity.** `design/direction.md`: a
+contemporary, polished, modern ecommerce product, clean without being empty, simple without being generic,
+product-led, with tasteful motion and feedback, and not an old store-template appearance, a wireframe-looking
+production interface or an animation showcase. It chooses no colour, typeface, logo treatment or imagery.
+Low-fidelity wireframes stay neutral. **No implementation library is chosen**: design determines the component
+system first, and libraries are selected later against WordPress, CoreX and WooCommerce compatibility,
+accessibility, performance, right to left, maintainability and what the platform already solves. Mizzey must not
+look like a default library theme.
+
+**15. The designer proposes, and presentation is not scope.** Whoever designs works as a professional product, UI
+and UX designer: proposes patterns, recommends one, shows alternatives where the choice changes the experience,
+and adds no uncontracted functionality. The owner chooses between meaningful alternatives and does not specify
+pixels. A control that creates a new customer capability or business behaviour needs scope authority. A treatment
+that only presents an authorised capability, such as feedback states, a drawer's animation, a skeleton for an
+existing load, layout, hierarchy and responsive behaviour, is a design decision and needs no register row.
+`design_freedom` governs how a requirement is expressed, never what functionality exists.
+
+**16. Five PBIs that build a customer-facing surface in the first release are design-dependent.** #248 (the order
+status labels the customer sees), #283 (the payment handoff and failure experience), #285 (the customer
+transactional emails), #288 (the consent banner) and #301 (the message when stock cannot be validated) are marked
+`needs design` in `docs/scope/backlog-ownership.json`. Their customer-visible experience is not implemented
+visually before its design direction is established. No row, owner, dependency edge or status changes with this.
+The eighteen PBIs that build only additions to the standard administration stay `none`. #277 stays
+`needs design`: it builds an admin surface, and its rows shape the catalogue pages customers see.
 
 **Status, 6 October 2026: proposed in PR #336, reviewed by the owner, pending merge. Not applied.** The path
-policy for `design/` is prepared separately in PR #337, because a PR may not authorise its own new top-level
-directory, and #336 is rebased onto it. #336 proposes: `design/` with the authority order, `sources.json` and the
-inventory (154 surfaces, 22 flows, 72 components, 34 open design inputs and the seven decisions above);
+policy for `design/` was prepared separately and merged as PR #337 (`3937786`), because a PR may not authorise
+its own new top-level directory, and #336 is rebased onto it. #336 proposes: `design/` with the authority order,
+`sources.json`, `direction.md` and the inventory (154 surfaces, 22 flows, 72 components, 34 open design inputs,
+the four locked decisions and twelve interaction options, three of them provisional and nine open);
 `tools/design_inventory.py`, which checks the inventory against the register mirror and PBI ownership and writes
 `design/coverage.md` (of the 595 delivery rows, 409 are carried by a surface, 186 are marked as having no surface
-with a reason, and none is unaccounted for); and the amended `AGENTS.md`, structural design plan, `README.md`,
-the two Option C task templates and `scripts/README.md`. It creates no wireframe, brief or token, touches no theme
-or plugin file, leaves the CoreX pin unchanged, and alters no PBI ownership or design-dependency field. This entry
-is called applied only by a later record, made after #336 has merged.
+with a reason, and none is unaccounted for); the five `design_dependency` values of item 16; and the amended
+`AGENTS.md`, structural design plan, `README.md`, the two Option C task templates and `scripts/README.md`. It
+creates no wireframe, brief or token, touches no theme or plugin file, leaves the CoreX pin unchanged, and moves
+no register row between PBIs. This entry is called applied only by a later record, made after #336 has merged.

@@ -17,16 +17,20 @@ Live status. First action each session: read this, then continue from **Next**.
   exists**, and nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
-  owner. Seven surfaces are built by a PBI other than the accepting one, the order confirmation among them
-  (accepted by #242, built by #255).
-- **Seven design questions are decided by the owner (D-14, item 12)**: Western digits in both languages, numbered
-  pagination, a one-page checkout, second-release surfaces inventoried and not wireframed in the first pass, the
-  cash-collected state for staff only, reviews from signed-in customers with no verified-purchase badge, and a
-  consent banner within what the selected tool supports. Owner design decisions, not client confirmations.
-- **Design-dependency findings, reported and not acted on.** Read on the PBI that builds: five PBIs build a
-  customer-facing surface in the first release and are marked as having no design dependency, #248, #283, #285,
-  #288 and #301. Eighteen build additions to the standard administration only and stay marked `none` by owner
-  ruling. `docs/scope/backlog-ownership.json` is unchanged.
+  owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
+  (accepted by #242, built by #255). Six platform surfaces have no build PBI and none is invented for them.
+- **UX is not locked early (D-14, items 12 and 13).** Twelve interaction choices are recorded in
+  `design/inventory/interaction-options.json`: three provisional baselines for the first wireframes (Western
+  digits, numbered pagination, a one-page checkout) and nine open. None is locked, and a provisional baseline is
+  not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
+  out of the first wireframe pass, the cash-collected state for staff only, reviews from signed-in customers with
+  no verified-purchase badge, and the consent banner within what the selected tool supports.
+- **The experience target is `design/direction.md`**, and it is not the brand identity. No implementation library
+  is chosen.
+- **Design dependency.** #248, #283, #285, #288 and #301 build a customer-facing surface in the first release and
+  are now marked `needs design`. Eighteen PBIs that build additions to the standard administration only stay
+  `none`. **The live Project's Design dependency field for those five is not yet changed**: it follows when
+  Mustafa approves that Project change.
 - **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
   v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
@@ -210,9 +214,8 @@ Live status. First action each session: read this, then continue from **Next**.
 **Design first (D-14, pending merge in PR #336). No functional PBI starts, #249 included, until Mustafa says so.**
 In order:
 
-1. **Mustafa's ruling on the design-dependency findings** in `design/coverage.md`, section 5: the five PBIs that
-   build a customer-facing surface and are marked as having no design dependency, and where the four platform
-   screens no PBI builds are placed (section 4.2).
+1. **Mustafa's approval of the Project change** that sets the Design dependency field of #248, #283, #285, #288
+   and #301 to `needs design` on the live board, after which the board snapshot is regenerated.
 2. **Then the low-fidelity structural wireframes of the first release**, as design artefacts in `design/`, from
    generated briefs, in both reading directions, when Mustafa approves the start of that pass. Their file format
    is approved first and added to `PATH_POLICY`.
