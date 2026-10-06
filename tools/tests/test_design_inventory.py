@@ -34,19 +34,22 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertEqual(report, di.render(self.data),
                          "design/coverage.md is stale; run python tools/design_inventory.py --write")
 
-    def test_no_wireframe_and_no_brand_value_has_been_committed(self):
-        """D-14: the first wireframe waits for the coverage review, and tokens stay neutral until OD-01."""
-        for folder in ("wireframes", "briefs", "tokens"):
-            found = sorted(p.name for p in (ROOT / "design" / folder).iterdir())
-            self.assertEqual(found, ["README.md"], f"design/{folder}/ holds more than its README")
+    def test_no_token_value_and_no_brand_value_has_been_committed(self):
+        """Tokens stay empty and neutral until OD-01. Briefs and wireframes have their own checks."""
+        found = sorted(p.name for p in (ROOT / "design" / "tokens").iterdir())
+        self.assertEqual(found, ["README.md"], "design/tokens/ holds more than its README")
         self.assertTrue(all(c["brand"] == "neutral" for c in self.data["components"]))
 
     def test_the_signed_documents_are_referenced_and_not_copied(self):
         for src in self.data["sources"]:
             if src["authority_rank"] <= 4:
                 self.assertTrue(src["source"].startswith("../../final docs/"), src["id"])
-        committed = {p.suffix for p in (ROOT / "design").rglob("*") if p.is_file()}
-        self.assertEqual(committed, {".md", ".json"})
+        files = [p for p in (ROOT / "design").rglob("*") if p.is_file()]
+        self.assertLessEqual({p.suffix for p in files}, {".md", ".json", ".html", ".css"})
+        wireframes = ROOT / "design" / "wireframes"
+        for p in files:
+            if p.suffix in (".html", ".css"):
+                self.assertIn(wireframes, p.parents, f"{p.name}: HTML and CSS belong under design/wireframes/ only")
 
     def test_four_design_questions_are_locked_owner_decisions(self):
         self.assertEqual([d["id"] for d in self.data["decisions"]], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])

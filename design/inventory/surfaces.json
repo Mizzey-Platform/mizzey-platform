@@ -5,6 +5,7 @@
     {
       "id": "gl-header",
       "name": "Header, desktop",
+      "purpose": "Lets a visitor reach every part of the store from any page: the brand mark, search, the language switch, the account, the wishlist and the cart, with the category navigation.",
       "kind": "shell",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -51,12 +52,13 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-05", "IX-07"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-language-switcher", "gl-mega-menu", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
       "id": "gl-header-mobile",
       "name": "Header, mobile",
+      "purpose": "Gives a phone the same reach as the desktop header in less space: the brand mark, quick search, the cart and the way into the menu.",
       "kind": "shell",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -100,12 +102,13 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-07"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-mobile-nav", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
       "id": "gl-mobile-nav",
       "name": "Mobile navigation menu",
+      "purpose": "Lets a visitor on a phone move through the category structure and reach the language switch, the account and the wishlist.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -148,11 +151,12 @@
       "decisions": [],
       "interaction_options": ["IX-06"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "gl-mega-menu",
       "name": "Mega menu and category navigation",
+      "purpose": "Lets a visitor see the store's categories and go to one, in a structure the client manages.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -197,11 +201,12 @@
       "decisions": [],
       "interaction_options": ["IX-05"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "gl-language-switcher",
       "name": "Language switcher",
+      "purpose": "Lets a visitor read the same page in the other language.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -242,11 +247,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "gl-footer",
       "name": "Footer",
+      "purpose": "Closes every page with the links, columns and contact content the client maintains.",
       "kind": "shell",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -283,13 +289,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253.",
       "build_note": "SSC-08, the footer's editing row, is accepted by #311. The footer itself is part of the frame, built by #253."
     },
     {
       "id": "gl-breadcrumbs",
       "name": "Breadcrumbs",
+      "purpose": "Shows where the visitor is in the catalogue and gives a way back up.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -327,7 +334,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "gl-cookie-consent",
@@ -377,6 +384,7 @@
     {
       "id": "gl-promo-banner",
       "name": "Promotional banner, on the storefront",
+      "purpose": "Shows a promotion the client created, on the pages it targets, for as long as its schedule says.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -417,11 +425,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-home",
       "name": "Home page",
+      "purpose": "Introduces the store and sends a visitor into products, categories, collections and brands, through sections the client edits and reorders.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -463,7 +472,7 @@
       "decisions": [],
       "interaction_options": ["IX-09"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-product-card"],
       "note": "Section order is changeable (HOME-11), so no section may depend on its neighbour."
     },
@@ -515,6 +524,7 @@
     {
       "id": "sf-category",
       "name": "Category page",
+      "purpose": "Shows the products of one category, with its banner and description, so a visitor can narrow, sort and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -554,7 +564,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -649,6 +659,7 @@
     {
       "id": "sf-product-card",
       "name": "Product card",
+      "purpose": "Presents one product in a list well enough to choose it, add it or save it without opening it.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -696,11 +707,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-listing-filters",
       "name": "Listing filters",
+      "purpose": "Lets a visitor narrow a list by category, brand, price, attribute and availability.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -740,12 +752,13 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
     },
     {
       "id": "sf-filter-drawer",
       "name": "Filter drawer, mobile",
+      "purpose": "Gives a visitor on a phone the filters without leaving the list.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -790,11 +803,12 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-listing-toolbar",
       "name": "Listing toolbar: sort, result count, active filters",
+      "purpose": "Lets a visitor sort a list, and see how many results there are and which filters are active.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -834,11 +848,12 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-pagination",
       "name": "Product-list continuation",
+      "purpose": "Lets a visitor continue through a list beyond the first set of products.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -881,7 +896,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02)."
     },
     {
@@ -1014,6 +1029,7 @@
     {
       "id": "sf-search-suggestions",
       "name": "Search suggestions as you type",
+      "purpose": "Helps a visitor reach a product or a results page while still typing.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1055,7 +1071,7 @@
       "decisions": [],
       "interaction_options": ["IX-07"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-search-results",
@@ -1188,6 +1204,7 @@
     {
       "id": "sf-pdp-simple",
       "name": "Product details page, simple product",
+      "purpose": "Lets a visitor evaluate one product and act on it: read what it is, what it costs and whether it is available, then add it, buy it now or save it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1234,7 +1251,7 @@
       "decisions": [],
       "interaction_options": ["IX-03", "IX-08"],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": [
         "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related", "sf-pdp-recently-viewed",
         "sf-product-badges"
@@ -1243,6 +1260,7 @@
     {
       "id": "sf-pdp-variable",
       "name": "Product details page, variable product",
+      "purpose": "Lets a visitor choose the exact option of a product, see that option's price and availability, and act on it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1285,7 +1303,7 @@
       "decisions": [],
       "interaction_options": ["IX-03"],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": [
         "sf-pdp-simple", "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related",
         "sf-pdp-recently-viewed", "sf-product-badges"
@@ -1294,6 +1312,7 @@
     {
       "id": "sf-pdp-gallery",
       "name": "Product gallery with zoom and video",
+      "purpose": "Lets a visitor look closely at a product through its images and video.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1336,11 +1355,12 @@
       "decisions": [],
       "interaction_options": ["IX-04"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-pdp-stock-state",
       "name": "Stock status on the product page",
+      "purpose": "Tells a visitor whether the product, or the chosen option, can be bought now.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1380,12 +1400,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
     },
     {
       "id": "sf-pdp-related",
       "name": "Related products",
+      "purpose": "Offers products the client related to this one.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1424,7 +1445,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1474,6 +1495,7 @@
     {
       "id": "sf-pdp-reviews",
       "name": "Reviews summary on the product page",
+      "purpose": "Shows on the product page what other customers rated and wrote.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1511,11 +1533,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-cart",
       "name": "Cart",
+      "purpose": "Lets a customer review and change what they are about to buy, apply a coupon and see the full total before checkout.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1561,7 +1584,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]
     },
     {
@@ -1609,6 +1632,7 @@
     {
       "id": "sf-mini-cart",
       "name": "Mini-cart in the header",
+      "purpose": "Shows from the header what is in the cart, confirms an add, and leads to the cart or to checkout.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1649,11 +1673,12 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-free-shipping-progress",
       "name": "Free-shipping progress prompt",
+      "purpose": "Tells a customer how close the cart is to free shipping.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1693,7 +1718,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-cart-revalidation",
@@ -2238,6 +2263,7 @@
     {
       "id": "ck-checkout",
       "name": "Checkout",
+      "purpose": "Takes a customer from a cart to a placed order: address, shipping, payment, review, place order.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2278,7 +2304,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": [
         "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order", "ck-validation", "ck-stock-failure",
         "ck-erp-unavailable", "au-checkout-entry"
@@ -2288,6 +2314,7 @@
     {
       "id": "ck-address",
       "name": "Address at checkout",
+      "purpose": "Collects or confirms where the order goes, in the Egyptian address structure.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2329,11 +2356,12 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-shipping-method",
       "name": "Shipping method at checkout",
+      "purpose": "Lets the customer choose how the order is shipped and see what it costs.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2374,11 +2402,12 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-payment-method",
       "name": "Payment method at checkout",
+      "purpose": "Lets the customer choose how to pay, from the methods enabled for launch.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2418,11 +2447,12 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-coupon-notes",
       "name": "Coupon and order notes at checkout",
+      "purpose": "Lets the customer apply a coupon and leave a note with the order.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2462,11 +2492,12 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-review-place-order",
       "name": "Order review, terms and Place Order",
+      "purpose": "Shows the whole order and its total for a last check, takes acceptance of the terms, and places the order.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2505,7 +2536,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-validation",
@@ -5159,6 +5190,7 @@
     {
       "id": "sf-product-badges",
       "name": "Product badges",
+      "purpose": "Marks a product as new, trending, limited or a best seller, as the client assigned.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -5200,7 +5232,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "fd-visual-treatment",

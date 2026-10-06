@@ -72,8 +72,8 @@ folder.**
 | `inventory/placeholders.json` | Every open decision that affects design, with its neutral placeholder rule, and the boundaries the owner has locked |
 | `inventory/interaction-options.json` | UX choices with more than one legitimate pattern: open, provisional or locked |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
-| `briefs/` | Empty. One brief per surface, generated when wireframing is approved |
-| `wireframes/` | Empty. Low-fidelity wireframes, after the coverage review |
+| `briefs/` | One generated brief per surface, for the surfaces a review batch has opened. Never edited by hand |
+| `wireframes/` | The wireframe format, the production workflow and the manifest. **No wireframe exists yet** |
 | `tokens/` | Empty. Neutral tokens first, brand values after OD-01 |
 
 ## Five kinds of statement, kept apart
@@ -128,7 +128,8 @@ a validation message, a report or an addition to an admin screen is each its own
 | `decisions` | Locked owner decisions in `placeholders.json` that govern this surface |
 | `interaction_options` | Open or provisional UX choices in `interaction-options.json` that bear on this surface. Derived |
 | `erp_dependency` | `none`, `partial`, or `per PRE-09` |
-| `status` | `inventoried`, `briefed`, `wireframed`, `reviewed`, `branded`, `approved`, or `not_designed` |
+| `status` | `inventoried`, `briefed`, `wireframed`, `reviewed`, `branded`, `approved`, or `not_designed`. The finer production status is in `wireframes/manifest.json` |
+| `purpose` | The outcome the surface exists to support. Written when the surface is briefed |
 | `composes` | Other surfaces this one contains |
 | `scope_note` | Why a surface outside contracted scope exists |
 | `build_note` | Why the build PBI is not the accepting PBI. Present only where they differ |
@@ -333,10 +334,17 @@ python tools/design_inventory.py --write
 python -m unittest tools.tests.test_design_inventory
 ```
 
-The first checks the inventory against the register mirror and PBI ownership and rewrites `coverage.md`. A PR
-that touches this folder is `internal:governance`, `internal:documentation` or `requirement`
-(`PATH_POLICY` in `tools/scope_trace.py`). Only markdown and JSON are accepted here today: a wireframe file type
-is added to the policy when its format is approved.
+The first checks the inventory against the register mirror and PBI ownership and rewrites `coverage.md`. After a
+change to the inventory, regenerate the briefs and check the manifest too:
+
+```bash
+python tools/design_briefs.py --write
+python tools/design_wireframes.py
+```
+
+A PR that touches this folder is `internal:governance`, `internal:documentation` or `requirement`
+(`PATH_POLICY` in `tools/scope_trace.py`). Markdown and JSON are accepted anywhere here. Static HTML and CSS are
+accepted under `wireframes/` only, as design prototypes. Script and every other file type are refused.
 
 This folder never changes PBI ownership, a register row, a stage or an acceptance obligation. Where the inventory
 and `docs/scope/backlog-ownership.json` disagree, `coverage.md` reports it and the owner decides.

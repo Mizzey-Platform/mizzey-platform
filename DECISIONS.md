@@ -1482,3 +1482,93 @@ plugin file, left the CoreX pin unchanged, and moved no register row between PBI
 `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
 the five Design dependency values. **Applied means the decision and its records are on `main`.** No step of the
 sequence after the inventory has started: no wireframe exists, and PRE-03b is not approved and not presented.
+
+## 2026-10-06 - D-15: the wireframe format and the wireframe production workflow
+
+Decided by Mustafa on 6 October 2026, opening the wireframe-production preparation that follows D-14. **Owner
+decisions on how the low-fidelity design is produced and reviewed. None is a client confirmation, none changes the
+contract, and none draws a wireframe.**
+
+**1. The low-fidelity wireframe is a standalone static HTML and CSS file**, under `design/wireframes/`, reviewed
+in a real browser. These files are design prototypes only. They are not production frontend code, WordPress
+templates, theme code, WooCommerce overrides, the contracted working HTML and CSS of PRE-03b, or reusable
+application components. HTML and CSS only: no JavaScript, no PHP, no WordPress or WooCommerce integration, no
+framework or library (no Tailwind, Bootstrap, shadcn, GSAP, Swiper or other), no production asset, no brand
+colour, no final typography, no logo, no final imagery. Greys only, with realistic content lengths and a
+realistic ecommerce structure. `design/wireframes/_shared/wireframe.css` is a small neutral structural system
+and is not the design system.
+
+**2. The path policy accepts HTML and CSS under `design/wireframes/` only**, as approval of a design-artefact
+format and not as permission to place application code under `design/`. Script and every other file type stay
+refused anywhere under `design/`. The policy merges on its own before any file that needs it, as it did for
+`design/` itself, and no repository guard is bypassed. `tools/design_wireframes.py` checks what a path policy
+cannot: that no wireframe carries script, a server tag, an outside resource, a library, a colour or a web font.
+
+**3. Briefs are generated, never written.** `tools/design_briefs.py` produces one brief per surface from the
+inventory, the direction and the manifest. The inventory stays the source, and no requirement is typed into the
+generator. A committed brief carries ids and structure, not the wording of the signed register; working copies
+with the wording are written outside the repository only.
+
+**4. The first exercise is a calibration set, in three structural directions.** Eight frames on existing surface
+ids: the desktop frame, the mobile header and navigation, the home page, the category listing, the product page,
+the mini-cart and cart, the checkout, and one mobile shopping composition. Three directions, with descriptive
+labels only: A, Clean Premium Commerce; B, Editorial Modern Retail; C, Dynamic Contemporary Ecommerce. They are
+approaches to hierarchy, density, composition and interaction, **not three brand identities**. All three satisfy
+the same scope and keep every pattern the contract fixes. They differ in presentation and in interaction choices
+that are genuinely open, and none adds a feature. The project is committed to no composition until the owner
+selects. Arabic, right to left, is drawn for five of the eight frames (`cal-01`, `cal-02`, `cal-05`, `cal-07`,
+`cal-08`), the most direction-sensitive structures, because the calibration chooses a structural direction and
+does not complete the production wireframes. Every applicable customer-facing surface is still drawn in English
+and in Arabic in its production batch.
+
+**5. The owner reviews direction, not detail.** Not an exact radius, pixel spacing, an animation curve or the
+internals of a component, but the overall direction, hierarchy and density, whether it feels like modern
+ecommerce and polished, the meaningful alternatives, and whether the shopping experience feels right. The
+calibration result is A, B, C, or one direction with named elements from another. **Selecting a structural
+direction is not approval of the brand identity and not approval of the interface design.**
+
+**6. Motion is annotated at low fidelity, not implemented.** A motion note states the trigger, the intended
+effect, whether it is essential or decorative, and the behaviour under reduced motion. Final motion is specified
+after the high-fidelity design.
+
+**7. After the calibration, the work runs in review batches.** Lock the selected direction; resolve the
+interaction options that review decided; generate the remaining first-release briefs; wireframe the first-release
+surfaces in batches, reviewing and closing each; stabilise the structural component and interaction system;
+brief and wireframe the second-release surfaces; review the complete structural UX; receive and apply the brand
+identity; produce the high-fidelity UI and UX; specify motion and detailed interaction; produce the contracted
+working HTML and CSS design; obtain PRE-03b approval; and only then resume storefront implementation. This
+refines the order of D-14 item 1 and replaces nothing in it. The ten batches follow the shopping experience and
+not one PBI at a time, every surface stays traceable by its canonical id, the additions to the standard
+administration are annotated and not redesigned, and the second-release surfaces are their own later batch
+(DQ-04).
+
+**8. Production is tracked in `design/wireframes/manifest.json`, and it tracks nothing else.** Per surface: its
+batch, its brief, its artefacts, English and Arabic, mobile and desktop, the states covered, the interaction
+decisions pending, and the review status. It restates no requirement.
+
+**9. Two roles, kept apart.** Claude Code maintains the repository workflow: the canonical inventories, the
+generators and the checkers, the briefs, the validation of wireframe artefacts, and the manifest and status
+records after approved design work. It reports scope conflicts. It does not choose the visual or UX direction,
+does not create the calibration layouts, and does not silently resolve a design alternative. Claude Design is
+the UI and UX design executor: it reads the repository, the working briefs, the signed source wording supplied
+outside Git and `design/direction.md`, creates the calibration wireframes, proposes the three directions,
+recommends UX alternatives and produces the structural design artefacts. Claude Design does not edit the Feature
+Register, the SRS or a contract document, does not edit canonical scope ownership, does not change
+`surfaces.json` to make its design easier, does not change a contractual constraint, does not invent a customer
+or business capability, and does not resolve a scope conflict itself. A missing requirement, an apparent
+contradiction, a design need that looks like new capability, or a constraint that makes a professional solution
+impossible is reported back, not designed around. **Claude Design changes only the approved design artefacts
+under `design/wireframes/`**: not `design/inventory/`, `design/briefs/`, `docs/scope/`, `DECISIONS.md`,
+`PROGRESS.md`, a PBI or application code, unless the owner later explicitly authorises another path. It creates
+the calibration files at the paths the manifest already declares, and Claude Code updates the manifest after
+the design review. When design begins, Claude Design is given the repository, the working briefs with the
+signed wording, generated outside the repository, and the original signed documents from `final docs/` as
+read-only reference. The signed documents are never committed.
+
+**Status, 6 October 2026: proposed in PR #340, reviewed by the owner, pending merge. Not applied.** The owner
+keeps this as its own decision, separate from D-14: D-14 sets the design-first sequence and the UX source of
+truth, and D-15 sets how the wireframes are produced. The path policy is on `main` (PR #339, `e4587fa`). The
+format rules, the brief generator, the manifest, the calibration definition, the review batches and the checks
+are in the pull request that carries this entry, with the 32 briefs of the calibration surfaces. The shared
+stylesheet follows in its own pull request. **No wireframe is drawn, and the
+calibration set has not started**: it begins on the owner's instruction.
