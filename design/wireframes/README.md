@@ -75,9 +75,6 @@ CSS under `design/wireframes/` only. Script, PHP and every other file type are r
 - a visible focus state;
 - the annotation blocks described below.
 
-The stylesheet itself is added in the pull request that follows the path policy for this format, since a pull
-request may not bring in a file type it also authorises.
-
 **It is not the design system and must not become one.** It has no component library, no brand token and no
 final value. A direction or a surface may add its own small stylesheet beside its files. The checker caps the size
 of any stylesheet here, so a library cannot arrive as one.
