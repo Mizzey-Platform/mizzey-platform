@@ -110,12 +110,33 @@ t05 or t06 fails.
   follows; spec.md, verification.md and the MIG-13 operational note say what an import can and cannot be relied
   on to do (AC-3, AC-4)
 
+## Repair, 6 October 2026: the cost setting no longer depends on a download (issue #252)
+
+Reopened because staging, which makes no outside request, showed that the creation cases of T022 had passed only
+where WPML had downloaded its configuration. T020 and T024 compared a file declaring `_cogs_value`, which is not a
+stored key, so their "tried and rejected" says nothing about a declaration of the stored key.
+
+- [x] T037 [US2] A baseline without WPML's downloaded configuration:
+  `MIZZEY_WPML_REMOTE_CONFIG=off` on `mizzey-site/tests/integration/baseline/reset-runtime.sh` sets WPML's own
+  switch in the runtime's `wp-config.php`, writes nothing under `wp-content`, and is read back at the end (AC-3)
+- [x] T038 [US2] t29 `mizzey-site/tests/integration/t29-cost-before-translation.php`: the four creation cases, with
+  the baseline it ran on in its first note. Fails on that baseline before T039, 1 of 4
+  (`evidence/repair/t29-before.txt`) (AC-3)
+- [x] T039 [US2] `mizzey-site/wpml-config.xml` declares `_cogs_total_value` as copied. No change to the logic of
+  `CostTranslationSync`: the declaration alone carries all four cases (AC-3, FR-008)
+- [x] T040 `tools/tests/test_cost_field_wpml_declaration.py`: the stored key is declared and the form field's name
+  is not declared in its place. The only part of this repair CI can see
+- [x] T041 Re-run the suite on the baseline without the download, and verify once on staging reset without
+  development's configuration (`MIZZEY_STAGING_WPML_CARRY=off`). Correct spec.md, research.md and
+  verification.md where they said no declaration was needed (AC-3)
+
 ## Dependencies
 
 - T001 to T004 before every story. US1 (T005 to T007) before US2, because the orders need products with cost.
   US3 and US4 depend only on Phase 2.
 - T014 needs every scenario script. T020 depends on the T014 result. T031 depends on T027 to T030.
   T033 depends on T032, and T034 on T033. T036 came out of T034.
+- T038 needs T037, and must fail before T039. T041 follows T039.
 
 ## Parallel opportunities
 

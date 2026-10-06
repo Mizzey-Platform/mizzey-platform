@@ -34,7 +34,10 @@ run(
 		global $sitepress;
 		$s->enable_cogs();
 		$tm = $sitepress->get_setting( 'translation-management' );
-		$s->note( 'WPML setting _cogs_value=' . var_export( $tm['custom_fields_translation']['_cogs_value'] ?? 'unset', true )
+		// _cogs_total_value is the stored key. This note printed _cogs_value until 6 October 2026, which is the
+		// form field's name and never has a setting, so every run said "unset" whatever WPML held (issue #252).
+		$s->note( 'WPML setting _cogs_total_value=' . var_export( $tm['custom_fields_translation']['_cogs_total_value'] ?? 'unset', true )
+			. '; WPML downloaded configuration ' . ( is_object( get_option( 'wpml_config_index' ) ) ? 'present' : 'absent' )
 			. '; mizzey-site/wpml-config.xml ' . ( file_exists( WP_PLUGIN_DIR . '/mizzey-site/wpml-config.xml' ) ? 'present' : 'absent' ) );
 		$w      = new Workflows( $s );
 		$ok_all = true;

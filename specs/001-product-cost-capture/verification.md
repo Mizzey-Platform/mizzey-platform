@@ -99,6 +99,12 @@ stored key. So the file declared a field that does not exist in the database. An
 configuration already declares `_cogs_total_value` as copied, and locks it (`_cogs_total_value=1 locked=true` in the
 baseline output). Configuration was never the missing piece: the event was.
 
+*Corrected on 6 October 2026.* That last sentence is true of the update paths these 24 cases test, and was taken
+further than it reaches. The runs above compared a file that declared the wrong key with no file, on baselines
+that both held WPML's download, so neither run was ever without a setting for `_cogs_total_value`. For the
+creation of a translation the declaration is the piece that matters, and the download was its only source. See
+"Reopened, 6 October 2026" at the end of this record.
+
 ### The minimum correction
 
 `mizzey-site/src/Catalogue/CostTranslationSync.php` (81 lines of logic, registered on `plugins_loaded`):
@@ -438,6 +444,9 @@ work: no margin or profitability reporting is built under it (RPT-02 is P2), and
 synchronisation infrastructure is added. Later work that touches product cost cites this record rather than
 rediscovering it.
 
+*It was reopened once, on 6 October 2026, for one repair to AC-3. The status below is the status of 4 October and
+is kept as it was written. The current status is in "Reopened, 6 October 2026" at the end of this record.*
+
 **Final status, the three states reported separately:**
 
 | State | Value |
@@ -453,7 +462,7 @@ later feature does not need to re-derive it.
 |---|---|---|
 | 1 | WooCommerce native Cost of Goods Sold remains the source of truth for product cost storage. No Mizzey field, no parallel store | ADR-0001, t02, t03, research R-1 |
 | 2 | `_cogs_total_value` is the native stored product-cost meta, on products and on variations, and the same key carries the frozen cost on an order line. `_cogs_value` is the admin form field and the CRUD accessor name, not the storage key | Source read at `class-wc-product-data-store-cpt.php` (read 513, write 813) plus the database; research R-1 |
-| 3 | WPML already declares the native cost field as copied and locked for translations. No `wpml-config.xml` of our own is needed, and the one tried earlier changed no outcome | research R-4, the with-and-without runs in `evidence/` |
+| 3 | WPML already declares the native cost field as copied and locked for translations. No `wpml-config.xml` of our own is needed, and the one tried earlier changed no outcome. **Superseded on 6 October 2026:** the declaration came only from a configuration WPML downloads, a runtime without the download fails three of the four creation cases, and `mizzey-site/wpml-config.xml` now declares the stored key (see "Reopened, 6 October 2026") | research R-4, the with-and-without runs in `evidence/` |
 | 4 | The custom Mizzey code exists **only** to cover the update paths where normal WPML and WCML save synchronisation does not execute, because `WC_Product_Data_Store_CPT::update()` skips `wp_update_post()` on a meta-only save and `save_post` never fires | t11, t15, the root-cause section above |
 | 5 | The English (source-language) original is canonical for cost | the cost ownership section of `spec.md`, t12, t16 |
 | 6 | A translation must never become a second source of truth. A cost written onto a translation is replaced by the original's value and the attempt logged; synchronisation is never bidirectional | t12 case 5, t16 (ten cases) |
@@ -469,3 +478,57 @@ exposed is wider than cost: the same mechanism (a write that does not fire `save
 not a SKU) can affect stock, orders, reports and the ERP integration. That is carried as a cross-feature
 workstream, not as an extension of this feature. See
 `docs/2026-10-04-multilingual-data-integrity-workstream.md`.
+
+## Reopened, 6 October 2026: a new translation's cost depended on a download
+
+**Why.** Staging makes no outside request, and on 5 October 2026 its WPML settings were found to differ from
+development's (PR #333). The difference was the setting for `_cogs_total_value`. This record had said, three
+times, that no declaration of our own was needed. That was drawn from runs that were never without one: every
+baseline it was confirmed on held a configuration WPML downloads from its publisher, and that download was the
+only thing declaring the stored cost key.
+
+**The defect.** WooCommerce Multilingual copies a custom field to a new translation only when WPML holds a setting
+for it (`class-wcml-synchronize-variations-data.php`: a key with no setting is skipped). Without the download
+there is no setting, so a cost that is on a product before its Arabic record is created does not reach the Arabic
+record. The update paths were never affected: `CostTranslationSync` carries those and needs no setting.
+
+| The four creation cases (t29) | No download, no declaration | No download, with `mizzey-site/wpml-config.xml` |
+|---|---|---|
+| Simple product, WPML duplicate | Arabic 120 | Arabic 120 |
+| Product with variants, WPML duplicate | **Arabic none/none** | Arabic 40/70 |
+| Simple product, translation editor save | **Arabic none** | Arabic 120 |
+| Product with variants, translation editor save | **Arabic none/none** | Arabic 40/70 |
+
+**The correction.** `mizzey-site/wpml-config.xml` declares `_cogs_total_value` as copied (FR-008). It is
+configuration: no logic in `CostTranslationSync` changed, and the declaration alone carries all four cases. The
+file removed on 4 October declared `_cogs_value`, which is the form field's name and not a stored key, so its
+removal was right and the conclusion drawn from it was not.
+
+**What was run.**
+
+| Check | Where | Result |
+|---|---|---|
+| t29 before the correction | Development, clean baseline built with `MIZZEY_WPML_REMOTE_CONFIG=off` | FAIL, 1 of 4 (`evidence/repair/t29-before.txt`, `clean-baseline-before.txt`) |
+| t29 after it | The same baseline, rebuilt (`clean-baseline.txt`: `_cogs_total_value=1 locked=true`, `remote_config_index` not downloaded) | PASS, 4 of 4 |
+| The whole suite, the pilot's twelve scenarios t02 to t16 among them | The same baseline | 25 scenarios, 0 failed (`evidence/repair/final-suite.txt`). t11 records "downloaded configuration absent" and its four creation cases hold |
+| Staging, built from the repair branch and reset without development's configuration | `http://127.0.0.1:8088` | The seed's 15 translated pairs hold an equal cost; t29 PASS, 4 of 4; a cost changed on the English record through the real wp-admin product form, over HTTP and signed in, reaches the Arabic record, and one typed on the Arabic record is replaced (`evidence/repair/staging-without-download.txt`) |
+| The static check | CI | `tools/tests/test_cost_field_wpml_declaration.py` |
+
+**Not verified, and limits.**
+
+- The creation cases run in process, as t11 creates translations. A translator's own screens in a browser were
+  not driven. The staging run through a real request is the product form, which is the update path.
+- WPML applies a plugin's `wpml-config.xml` when an administrator opens the Plugins or Themes screen or one of
+  its own settings screens. On a first deployment the setting is absent until one of those is opened. The
+  go-live check S-1 is the place for it.
+- The staging run was of the repair branch. Under D-13 the issue returns to Verified only after the merge, with
+  staging rebuilt from `main` and the same check passing.
+- `_cogs_value_is_additive` is outside this repair and was not examined.
+
+**The three states, as of this repair.**
+
+| State | Value |
+|---|---|
+| Workflow | Repair complete in its pull request |
+| Technical verification | AC-1 to AC-5 verified on a clean baseline **without** the download, and AC-3's creation cases on staging without it. Returns to Verified on the board after the merge and the staging pass from `main` |
+| Contractual acceptance | **Pending client decisions**, unchanged: CX-01 for AC-6, OD-12 for AC-7 |

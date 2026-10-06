@@ -30,7 +30,9 @@ use WC_Product_Variation;
  * writes only on a difference, so running it again changes nothing and a translation missed by an earlier failure
  * is repaired by the next save.
  *
- * What it deliberately does not do: it stores no cost of its own, adds no field, and syncs nothing but cost.
+ * What it deliberately does not do: it stores no cost of its own, adds no field, and syncs nothing but cost. It
+ * also does not act while a product is being created (see noteCreation()). The cost a new translation starts with
+ * is carried by WPML and WooCommerce Multilingual, on the setting this plugin declares in wpml-config.xml.
  */
 final class CostTranslationSync
 {

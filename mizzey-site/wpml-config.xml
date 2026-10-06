@@ -1,0 +1,23 @@
+<wpml-config>
+	<!--
+		Product cost (ADM-27, RPT-11) is a property of the item, not of a language, so the Arabic record of a
+		product carries the cost of its original.
+
+		_cogs_total_value is the post meta WooCommerce stores a product's or a variation's cost in. "copy" makes
+		WPML and WooCommerce Multilingual carry it to a translation when the translation is created, which is
+		the one moment MizzeySite\Catalogue\CostTranslationSync deliberately stands aside. WooCommerce
+		Multilingual skips any custom field WPML holds no setting for, so without this line a cost that was on
+		a product before its Arabic record existed did not reach the Arabic record.
+
+		WPML's publisher serves the same declaration in a configuration WPML downloads, and until
+		6 October 2026 that download was the only place it came from. A host that cannot reach the publisher
+		never received it. Declared here, it does not depend on a download.
+
+		Do not add _cogs_value. It is the name of the admin form field and of the accessor, and nothing is
+		stored under it: declaring it changes WPML's settings and no behaviour, which is how an earlier
+		version of this file came to be removed. Evidence: specs/001-product-cost-capture, scenario t29.
+	-->
+	<custom-fields>
+		<custom-field action="copy">_cogs_total_value</custom-field>
+	</custom-fields>
+</wpml-config>

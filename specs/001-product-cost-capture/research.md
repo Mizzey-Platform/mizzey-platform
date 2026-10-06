@@ -50,6 +50,12 @@ unless stated otherwise.
 - **Outcome.** A `wpml-config.xml` was tried first and removed: it changed WPML's settings and changed no outcome.
   It declared `_cogs_value`, which is not a stored key at all, which explains why it could not have helped. The gap
   is closed by `MizzeySite\Catalogue\CostTranslationSync`, justified by the failing cases. See verification.md.
+- **Correction, 6 October 2026.** "Configuration was therefore never missing" holds for the update paths and not
+  for the creation of a translation. The baselines this finding was confirmed on all held WPML's downloaded
+  configuration, which was the only thing declaring `_cogs_total_value`. WooCommerce Multilingual copies a custom
+  field to a new translation only when WPML holds a setting for it, so on a runtime without the download three of
+  the four creation cases fail (t29, before the correction). The setting is now declared in
+  `mizzey-site/wpml-config.xml`, with the stored key, and the four cases pass without the download.
 - **Environment lesson.** A runtime that has been used for months is not a test baseline. The first conclusions in
   this pilot were wrong because of runtime drift and harness faults, not because of the product.
 - **Identity, added in the review round.** WPML answers `wpml_original_element_id` from a cache of its own that can

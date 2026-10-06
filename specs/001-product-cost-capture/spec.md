@@ -48,7 +48,12 @@ captured from day one) and US-16-02 (product cost recordable).
   request, not a build task.
 - **WPML-1 (closed)**: cost changed by code did not reach translations. Root cause found, fix implemented and
   verified (see Native coverage and verification.md). No longer open.
-- **WPML-2 (closed)**: `mizzey-site/wpml-config.xml` was shown to be unnecessary on a clean runtime and was removed.
+- **WPML-2 (closed on 4 October 2026, corrected on 6 October 2026)**: the `mizzey-site/wpml-config.xml` tried in
+  the pilot declared `_cogs_value`, which is not a stored key, and was rightly removed. The conclusion drawn from
+  it, that no declaration of our own is needed, was incomplete: the stored key `_cogs_total_value` was declared
+  only by a configuration WPML downloads from its publisher, and on a runtime without that download a cost that
+  is on a product before its Arabic record is created does not reach the Arabic record in three of four cases.
+  The site plugin now declares the stored key itself (FR-008, t29, verification.md "Reopened, 6 October 2026").
 - **PRE-09**: not relevant. No row here is P1-E; the ERP integration is stock only.
 
 ## Contractual acceptance criteria [checked]
@@ -225,7 +230,7 @@ WCML 5.5.7, PHP 8.3.6, MySQL 8.3.0). Evidence: `evidence/` and `verification.md`
 |---|---|---|
 | Cost on simple products and variations, saved and read back | t02, t03 | VERIFIED |
 | Cost frozen onto the order line; later edits do not change it | t04 (200 kept after 999) | VERIFIED |
-| Cost carried to a translation created after the cost exists, by WPML duplicate or by the WCML translation editor, for simple products and variations | t11 part 1 | VERIFIED |
+| Cost carried to a translation created after the cost exists, by WPML duplicate or by the WCML translation editor, for simple products and variations | t11 part 1, and t29 on a baseline without WPML's downloaded configuration | VERIFIED (native), on the setting `mizzey-site/wpml-config.xml` declares. Until 6 October 2026 it held only where WPML had downloaded its configuration |
 | Cost changed later through wp-admin (product form, variations AJAX) or the wp-admin CSV importer, reaching the Arabic copy | t11, all admin-http and import-http cases | VERIFIED (native) |
 | Cost changed later through the REST API, WP-CLI, or code in a front-end request | t11, rest-http, crud-cli, crud-web | **GAP in WooCommerce and WPML** (see below). Closed by `MizzeySite\Catalogue\CostTranslationSync` |
 | The hook that carries the copy in each channel, recorded inside the request that does the work | t15, ten cases | VERIFIED |
@@ -246,8 +251,12 @@ only meta, so `save_post` never fires for a cost-only change. WPML and WCML copy
 `wpml_sync_all_custom_fields`). A cost changed through REST, WP-CLI or other code therefore never reached the
 Arabic copy, and an order for the Arabic product recorded cost 0 with nothing on screen to show it. Tested with and
 without a `wpml-config.xml` declaring the cost fields as copied: the file changed WPML's settings and changed no
-outcome, so it was removed (WPML-2). WPML's own downloaded configuration already declares the real cost field,
-`_cogs_total_value`, as copied and locked, which confirms that the missing piece was never the declaration.
+outcome, so it was removed (WPML-2). That file declared `_cogs_value`, which is not the stored key, so the test
+said nothing about a declaration of the real one. For the update paths the conclusion stands: no declaration
+makes `save_post` fire. For the creation of a translation it does not stand, and the sentence that stood here,
+that the missing piece "was never the declaration", was wrong for that path: WPML's downloaded configuration
+declares the real cost field, `_cogs_total_value`, as copied and locked, and that download was the only source
+of the setting the creation path needs. `mizzey-site/wpml-config.xml` now declares it (corrected 6 October 2026).
 
 `MizzeySite\Catalogue\CostTranslationSync` closes it: after WooCommerce saves a product or variation, the
 source-language original copies its cost to its translations through WooCommerce CRUD, comparing first and writing
@@ -270,6 +279,9 @@ first time any save reaches it, including WCML's own admin sync. Price, stock, S
 - **FR-006**: Cost MUST NOT be exposed to visitors or customers through any page or interface (AC-5)
 - **FR-007**: Which staff roles may see cost follows the resolution of CX-01. Until then, native behaviour is recorded
   and no restriction is built (AC-6)
+- **FR-008**: The translation setting that carries cost to a newly created translation MUST be declared by the
+  site plugin, so that it does not depend on a configuration downloaded from a third party (AC-3). Added by the
+  repair of 6 October 2026
 
 ### Key Entities
 
@@ -281,7 +293,7 @@ first time any save reaches it, including WCML's own admin sync. Price, stock, S
 
 | Id | Safeguard | Why | Custom code? |
 |---|---|---|---|
-| S-1 | Go-live check that cost capture is enabled: a runbook line, plus a scripted assertion in the deploy step | An order placed while it is off loses its cost permanently | Runbook: no. Assertion: a few lines of deploy script, no plugin code |
+| S-1 | Go-live check that cost capture is enabled, and that WPML holds the copy setting for `_cogs_total_value` (WPML applies the site's `wpml-config.xml` when an administrator first opens the Plugins screen): a runbook line, plus a scripted assertion in the deploy step | An order placed while it is off loses its cost permanently, and a translation created before the setting is applied starts without its cost | Runbook: no. Assertion: a few lines of deploy script, no plugin code |
 | S-2 | Record the enablement date and WooCommerce version in `DECISIONS.md` | Shows which orders can carry cost | No |
 | S-3 | A scripted clean baseline for the disposable runtime (`mizzey-site/tests/integration/baseline/`) | The first WPML results were wrong because the runtime had drifted. A scripted baseline makes a result repeatable | No (test tooling) |
 

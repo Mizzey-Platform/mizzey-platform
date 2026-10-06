@@ -427,7 +427,14 @@ def cmd_reset(a) -> None:
     # The baseline files are the ones the development runtime gets, but they are not the baseline's only input:
     # WPML also works from a configuration it downloads, which staging may not fetch. It is carried across here,
     # before the wp-admin visit that applies it, and the reset ends by comparing the two runtimes.
-    carry_wpml_config()
+    #
+    # MIZZEY_STAGING_WPML_CARRY=off leaves it behind, on purpose: staging is then what a host that cannot reach
+    # WPML's publisher gets, which is the condition #252 was repaired for. The comparison is reported, not required.
+    carried = os.environ.get("MIZZEY_STAGING_WPML_CARRY", "on") != "off"
+    if carried:
+        carry_wpml_config()
+    else:
+        say("WPML configuration NOT carried from development (MIZZEY_STAGING_WPML_CARRY=off)")
     for script in ("setup.php", "admin-visit.php", "ia-endpoints.php"):
         say(f"baseline/{script}")
         say("  " + wp("eval-file", str(BASELINE / script))[-400:].replace("\n", "\n  "))
@@ -437,7 +444,12 @@ def cmd_reset(a) -> None:
     wp("cache", "flush")
     say(f"staging reset and seeded. Credentials: {STAGING / 'CREDENTIALS.json'}")
     # Last, so that a reset that fails here leaves a complete staging copy to look at.
-    require_parity()
+    if carried:
+        require_parity()
+    else:
+        found = differences(wpml_settings(DEV_APP / "wp"), wpml_settings(WP))
+        say("WPML settings, not required to match in this mode. Differences from development: "
+            + ("none" if not found else "\n  " + "\n  ".join(found[:60])))
 
 
 # ---- the same WPML settings as development ------------------------------------------------------------------
