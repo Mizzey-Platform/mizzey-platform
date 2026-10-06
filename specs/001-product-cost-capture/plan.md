@@ -78,6 +78,7 @@ specs/001-product-cost-capture/
 mizzey-site/
 ├── mizzey-site.php                    # registers the sync on plugins_loaded
 ├── src/Catalogue/CostTranslationSync.php  # the only production code (AC-3 gap)
+├── wpml-config.xml                    # declares the stored cost key as copied to translations (FR-008, repair of 6 October 2026)
 └── tests/integration/
     ├── run.py                         # runs each scenario with wp eval-file, collects JSON verdicts
     ├── _bootstrap.php                 # feature flag (FR-001 check), fixtures, cleanup, verdict

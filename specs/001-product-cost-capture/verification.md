@@ -99,6 +99,12 @@ stored key. So the file declared a field that does not exist in the database. An
 configuration already declares `_cogs_total_value` as copied, and locks it (`_cogs_total_value=1 locked=true` in the
 baseline output). Configuration was never the missing piece: the event was.
 
+*Corrected on 6 October 2026.* That last sentence is true of the update paths these 24 cases test, and was taken
+further than it reaches. The runs above compared a file that declared the wrong key with no file, on baselines
+that both held WPML's download, so neither run was ever without a setting for `_cogs_total_value`. For the
+creation of a translation the declaration is the piece that matters, and the download was its only source. See
+"Reopened, 6 October 2026" at the end of this record.
+
 ### The minimum correction
 
 `mizzey-site/src/Catalogue/CostTranslationSync.php` (81 lines of logic, registered on `plugins_loaded`):
@@ -438,6 +444,9 @@ work: no margin or profitability reporting is built under it (RPT-02 is P2), and
 synchronisation infrastructure is added. Later work that touches product cost cites this record rather than
 rediscovering it.
 
+*It was reopened once, on 6 October 2026, for one repair to AC-3. The status below is the status of 4 October and
+is kept as it was written. The current status is in "Reopened, 6 October 2026" at the end of this record.*
+
 **Final status, the three states reported separately:**
 
 | State | Value |
@@ -453,7 +462,7 @@ later feature does not need to re-derive it.
 |---|---|---|
 | 1 | WooCommerce native Cost of Goods Sold remains the source of truth for product cost storage. No Mizzey field, no parallel store | ADR-0001, t02, t03, research R-1 |
 | 2 | `_cogs_total_value` is the native stored product-cost meta, on products and on variations, and the same key carries the frozen cost on an order line. `_cogs_value` is the admin form field and the CRUD accessor name, not the storage key | Source read at `class-wc-product-data-store-cpt.php` (read 513, write 813) plus the database; research R-1 |
-| 3 | WPML already declares the native cost field as copied and locked for translations. No `wpml-config.xml` of our own is needed, and the one tried earlier changed no outcome | research R-4, the with-and-without runs in `evidence/` |
+| 3 | WPML already declares the native cost field as copied and locked for translations. No `wpml-config.xml` of our own is needed, and the one tried earlier changed no outcome. **Superseded on 6 October 2026:** the declaration came only from a configuration WPML downloads, a runtime without the download fails three of the four creation cases, and `mizzey-site/wpml-config.xml` now declares the stored key (see "Reopened, 6 October 2026") | research R-4, the with-and-without runs in `evidence/` |
 | 4 | The custom Mizzey code exists **only** to cover the update paths where normal WPML and WCML save synchronisation does not execute, because `WC_Product_Data_Store_CPT::update()` skips `wp_update_post()` on a meta-only save and `save_post` never fires | t11, t15, the root-cause section above |
 | 5 | The English (source-language) original is canonical for cost | the cost ownership section of `spec.md`, t12, t16 |
 | 6 | A translation must never become a second source of truth. A cost written onto a translation is replaced by the original's value and the attempt logged; synchronisation is never bidirectional | t12 case 5, t16 (ten cases) |

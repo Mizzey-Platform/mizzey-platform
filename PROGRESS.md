@@ -20,7 +20,8 @@ Live status. First action each session: read this, then continue from **Next**.
   fully delivered while the spec's AC-6 and AC-7 are open. The pilot's own evidence is its **12 scenarios, t02 to
   t16, 0 failed** on a clean baseline (`specs/001-product-cost-capture/evidence/final-suite.txt`); scenarios added
   afterwards are not product-cost acceptance evidence. The closure record, with the twelve findings it preserves,
-  is the "Pilot closed" section of `verification.md`. **The feature is not reopened.**
+  is the "Pilot closed" section of `verification.md`. **The feature was reopened once, on 6 October 2026, for one
+  repair to AC-3** (below, "#252 is under repair"); nothing else about it is reopened.
 - **`main` was `8d994351f866e38c781678da26de18078e0b7c35` before the D-11 record merged**: the D-10 record
   (#264, `3f074a9`), the inventory report correction (#265, `8d99435`), and before them the pilot (#237, squash `93d647b`), its close-out
   and corrected planning package (#239, `b7b3a98`), the runtime version record (#238, `2206dd6`), the B1 and A12

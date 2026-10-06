@@ -1,0 +1,10 @@
+FAIL  t29-cost-before-translation  AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Baseline: WPML downloaded configuration absent; setting for _cogs_total_value 'unset'; mizzey-site/wpml-config.xml absent
+      OK   simple product, duplicate: English 120, Arabic 120
+      FAIL product with variants, duplicate: English 40/70, Arabic none/none
+      FAIL simple product, editor: English 120, Arabic none
+      FAIL product with variants, editor: English 40/70, Arabic none/none
+versions: {"wordpress": "7.1.2", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+runner exit=1

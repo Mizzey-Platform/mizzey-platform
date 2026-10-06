@@ -106,6 +106,14 @@ What the tool does now:
 - **The backup fingerprint includes the translation settings.** They live in the options table, which the
   fingerprint otherwise leaves out as volatile, so a restore is now held to them too.
 
+- **`MIZZEY_STAGING_WPML_CARRY=off` on `reset` leaves the configuration behind**, on purpose. Staging is then what
+  a host that cannot reach the publisher gets. The comparison is reported and not required in that mode. It is how
+  the repair of #252 was checked on staging; reset again without it afterwards.
+
+Since the repair of #252 the cost field no longer depends on the download: `mizzey-site/wpml-config.xml` declares
+`_cogs_total_value` as copied, and the four creation cases hold without it (`specs/001-product-cost-capture`,
+scenario t29). The `shop_subscription` setting still arrives only by download, and nothing here uses it.
+
 Two limits. The comparison is between this machine's two runtimes, so it runs here and not in CI. And what the
 publisher's host serves can change: both runtimes then follow development's copy, and production will follow
 whatever it downloads on its own host.

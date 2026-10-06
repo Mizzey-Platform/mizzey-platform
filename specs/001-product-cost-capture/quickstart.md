@@ -55,3 +55,17 @@ contract scenario fails. Scripts clean up their fixtures, restore the feature fl
 | t14 | pass: nothing else on the Arabic post moves, including what the customer reads. Variation titles are reported as facts, because WooCommerce regenerates them on any save |
 | t15 | pass: the hook that carries the copy in each channel, recorded inside the request that does the work |
 | t16 | pass: a cost written straight onto a translation is replaced by the original's, in every channel |
+| t29 | pass: a cost on a product before its Arabic record is created reaches the Arabic record, four creation cases. It tests the site's own declaration only on the baseline built without WPML's download (below); its first note says which baseline it ran on |
+
+## The baseline without WPML's downloaded configuration
+
+WPML downloads a configuration from its publisher's host when a plugin is activated, and a host that cannot reach
+it gets different settings. To build that baseline on purpose:
+
+```bash
+MIZZEY_WPML_REMOTE_CONFIG=off MIZZEY_CONFIRM_RESET=yes sh mizzey-site/tests/integration/baseline/reset-runtime.sh ../app/wp
+```
+
+The reset ends with `WPML remote configuration: off (not downloaded)`. A reset without the variable restores the
+ordinary baseline. Staging's reset copies development's download, so reset development the ordinary way before
+resetting staging.
