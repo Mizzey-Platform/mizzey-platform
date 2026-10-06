@@ -327,9 +327,31 @@ class PrChecks(unittest.TestCase):
             self.assertError(self.check(body(cls), m("design/inventory/surfaces.json")), "(design)")
 
     def test_nothing_executable_arrives_under_design(self):
-        for path in ["design/wireframes/cart.php", "design/tokens/build.js", "design/wireframes/cart.html"]:
+        for path in ["design/wireframes/cart.php", "design/tokens/build.js", "design/wireframes/s1/cart.js",
+                     "design/wireframes/_shared/wireframe.mjs", "design/wireframes/s1/cart.ts",
+                     "design/wireframes/s1/cart.phtml", "design/wireframes/s1/cart.svg"]:
             for cls in ["internal:governance", "internal:documentation"]:
                 self.assertError(self.check(body(cls), [("A", path, None)]), "not covered by the path policy")
+
+    def test_static_html_and_css_are_accepted_as_wireframes_and_nowhere_else_under_design(self):
+        wireframes = [("A", p, None) for p in ("design/wireframes/s1/calibration/a/home-en.html",
+                                              "design/wireframes/_shared/wireframe.css",
+                                              "design/wireframes/s2/reorder-ar.html")]
+        for cls in ["internal:governance", "internal:documentation"]:
+            self.assertEqual(self.check(body(cls), wireframes), [])
+        self.assertEqual(self.check(body("requirement", None, "ADM-27"), wireframes), [])
+        for path in ["design/cart.html", "design/briefs/sf-cart.html", "design/tokens/neutral.css",
+                     "design/inventory/surfaces.html", "design/wireframes.html", "design/wireframes.css"]:
+            for cls in ["internal:governance", "internal:documentation"]:
+                self.assertError(self.check(body(cls), [("A", path, None)]), "not covered by the path policy")
+
+    def test_a_wireframe_is_a_design_artefact_and_not_site_code(self):
+        self.assertEqual(st.classify("design/wireframes/s1/home.html"), "design")
+        for cls in ["internal:ci", "internal:tooling", "internal:test-infrastructure"]:
+            self.assertError(self.check(body(cls), m("design/wireframes/s1/home.html")), "(design)")
+        # HTML and CSS stay site code where site code lives, and stay refused for internal work there.
+        self.assertEqual(st.classify("mizzey-theme/templates/home.html"), "site-code")
+        self.assertError(self.check(body("internal:governance"), m("mizzey-theme/templates/home.html")), "(site-code)")
 
     def test_a1_code_hidden_in_docs_rejected(self):
         self.assertError(self.check(body("internal:documentation"), [("A", "docs/widget.php", None)]),
