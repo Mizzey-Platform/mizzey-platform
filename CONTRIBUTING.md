@@ -71,6 +71,8 @@ python -m unittest discover -s discovery/tests -t .
 python -m unittest discover -s tools/tests -t .
 python tools/repo_checks.py
 python tools/design_inventory.py
+python tools/design_wireframes.py
+python tools/design_briefs.py
 python tools/run_trusted.py --base origin/main --body-file <your PR body>
 ```
 
