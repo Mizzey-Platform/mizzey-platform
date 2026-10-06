@@ -4,7 +4,8 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Now (6 October 2026)
 
-- **Design first: D-14 is proposed in PR #336, reviewed by the owner, and pending merge.** Functional PBI
+- **Design first: D-14 is applied.** PR #336 was approved by the owner and squash-merged on 6 October 2026 as
+  `124c064` (`124c0641cc8a33129bb0d311fe748d9c9455b267`), after the path policy for `design/` merged on its own as PR #337 (`3937786`). Functional PBI
   implementation is frozen by the owner's instruction: #249 is not started, no `006-` spec exists, and Spec Kit is
   not run for a functional PBI. The order is: signed scope and PBIs, the complete inventory of surfaces, flows and
   states, the low-fidelity pass for the first-release surfaces, a stable structural component and interaction
@@ -34,9 +35,9 @@ Live status. First action each session: read this, then continue from **Next**.
   are now marked `needs design`, as are the three second-release slices that build customer-facing surfaces
   (E-FND-2b, E-SF-3b, E-SF-9b), which stay second release. Eighteen PBIs that build additions to the standard
   administration only stay `none`. The live Project's Design dependency field was set to match for those five on 6 October 2026, on
-  Mustafa's approval, and nothing else on the board changed. **The board snapshot in
-  `docs/2026-10-04-github-project-proposal.md` still shows the earlier values** and is regenerated in a follow-up
-  after #336 merges.
+  Mustafa's approval, and nothing else on the board changed. The board snapshot in
+  `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
+  them.
 - **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
   v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
@@ -217,11 +218,10 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**Design first (D-14, pending merge in PR #336). No functional PBI starts, #249 included, until Mustafa says so.**
-In order:
+**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
+drawn and CoreX is not upgraded until he says so either.** In order:
 
-1. **A minimal follow-up after #336 merges**: the record that calls D-14 applied, and the board snapshot
-   regenerated from the live Project, which now carries the five Design dependency values.
+1. **Mustafa approves the start of the first low-fidelity wireframe pass.** Nothing is drawn before that.
 2. **Then the low-fidelity structural wireframes of the first release**, as design artefacts in `design/`, from
    generated briefs, in both reading directions, when Mustafa approves the start of that pass. Their file format
    is approved first and added to `PATH_POLICY`. The second-release surfaces get their own pass afterwards, once

@@ -1459,22 +1459,26 @@ transactional emails), #288 (the consent banner) and #301 (the message when stoc
 `needs design` in `docs/scope/backlog-ownership.json`. Their customer-visible experience is not implemented
 visually before its design direction is established. No row, owner, dependency edge or status changes with this.
 The live Project's Design dependency field was set to match for these five on 6 October 2026, on the owner's
-approval, and nothing else on the board changed; its snapshot document is regenerated in a follow-up after #336
-merges.
+approval, and nothing else on the board changed; its snapshot document was regenerated from the live Project
+after #336 merged.
 The three second-release slices that build customer-facing surfaces, E-FND-2b, E-SF-3b and E-SF-9b, are marked
 `needs design` as well, because DQ-04 puts their surfaces in the design before PRE-03b is approved; their stage,
 scope, ownership and second-release timing are unchanged, and they have no issue or board item.
 The eighteen PBIs that build only additions to the standard administration stay `none`. #277 stays
 `needs design`: it builds an admin surface, and its rows shape the catalogue pages customers see.
 
-**Status, 6 October 2026: proposed in PR #336, reviewed by the owner, pending merge. Not applied.** The path
-policy for `design/` was prepared separately and merged as PR #337 (`3937786`), because a PR may not authorise
-its own new top-level directory, and #336 is brought up to date with it. #336 proposes: `design/` with the authority order,
-`sources.json`, `direction.md` and the inventory (154 surfaces, 22 flows, 72 components, 34 open design inputs,
-the four locked decisions and twelve interaction options, three of them provisional and nine open);
-`tools/design_inventory.py`, which checks the inventory against the register mirror and PBI ownership and writes
-`design/coverage.md` (of the 595 delivery rows, 409 are carried by a surface, 186 are marked as having no surface
-with a reason, and none is unaccounted for); the five `design_dependency` values of item 16; and the amended
-`AGENTS.md`, structural design plan, `README.md`, the two Option C task templates and `scripts/README.md`. It
-creates no wireframe, brief or token, touches no theme or plugin file, leaves the CoreX pin unchanged, and moves
-no register row between PBIs. This entry is called applied only by a later record, made after #336 has merged.
+**Applied, 6 October 2026.** PR #336 was reviewed and approved by the owner and squash-merged as `124c064`
+(`124c0641cc8a33129bb0d311fe748d9c9455b267`). The path policy for `design/` was prepared separately and merged first as PR #337 (`3937786`), because
+a PR may not authorise its own new top-level directory. #336 was then brought up to date with `main` by a merge:
+the push guard refuses a non-fast-forward push, it was not bypassed, and the owner accepted the merge-based
+history. Merged: `design/` with the authority order, `sources.json`, `direction.md` and the inventory (154
+surfaces, 22 flows, 72 components, 34 open design inputs, the four locked decisions and twelve interaction
+options, three of them provisional and nine open); `tools/design_inventory.py`, which checks the inventory
+against the register mirror and PBI ownership and writes `design/coverage.md` (of the 595 delivery rows, 409 are
+carried by a surface, 186 are marked as having no surface with a reason, and none is unaccounted for); the eight
+`design_dependency` values of item 16; and the amended `AGENTS.md`, structural design plan, `README.md`, the two
+Option C task templates and `scripts/README.md`. It created no wireframe, brief or token, touched no theme or
+plugin file, left the CoreX pin unchanged, and moved no register row between PBIs. The board snapshot in
+`docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
+the five Design dependency values. **Applied means the decision and its records are on `main`.** No step of the
+sequence after the inventory has started: no wireframe exists, and PRE-03b is not approved and not presented.
