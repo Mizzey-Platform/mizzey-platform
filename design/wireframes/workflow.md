@@ -4,7 +4,15 @@ How the low-fidelity wireframes are produced, reviewed and tracked. The artefact
 [README.md](README.md). Nothing in this document has started: **no wireframe exists**, and the calibration set
 begins only on the owner's instruction.
 
-## 1. What the designer reads
+## 1. What Claude Design receives and reads
+
+The design is produced by Claude Design (section 2). When design work begins it is given three things:
+
+1. **This repository.**
+2. **The working briefs, with the signed row wording merged in.** They are generated outside the repository and
+   never committed.
+3. **The original signed source documents from `final docs/`**, as read-only reference where a brief is not
+   enough. They are never committed to Git, in whole or in part.
 
 For each surface, in this order:
 
@@ -12,8 +20,8 @@ For each surface, in this order:
    carries the surface's rows by id, its states, its components, its open inputs, the interaction options that
    bear on it and the direction. It is never edited by hand.
 2. **The wording of each row it lists**, in the signed register. The repository holds ids, not wording
-   (`../sources.json`). On the developer's machine, working copies with the wording merged in are produced
-   outside the repository:
+   (`../sources.json`). On the developer's machine, Claude Code produces working copies with the wording merged
+   in, outside the repository:
 
    ```bash
    python tools/design_briefs.py --register "<path to the signed register>" --out "<a folder outside the repository>"
@@ -26,10 +34,44 @@ For each surface, in this order:
 A brief exists for a surface when the manifest lists one. Briefs are generated for a batch when that batch opens,
 not for all 154 surfaces at once.
 
-## 2. The designer's role
+## 2. Two roles: Claude Code and Claude Design
 
-The designer works as a professional product, UI and UX designer, not as a converter of rows into rectangles.
-Within the `design_freedom` of each surface, the designer:
+Two agents work on the design, and they do different jobs. **Neither does the other's.**
+
+| | Claude Code | Claude Design |
+|---|---|---|
+| Is | The keeper of the repository workflow | The UI and UX design executor |
+| Does | Maintains the canonical inventories, the generators and the checkers. Generates the briefs. Validates wireframe artefacts. Updates the manifest and the status records after approved design work. Reports scope conflicts | Reads the repository, the working briefs, the signed source wording supplied outside Git, and `../direction.md`. Creates the calibration wireframes. Proposes directions A, B and C. Recommends UX alternatives. Produces the structural design artefacts |
+| Does not | Choose the visual or UX direction. Create the calibration layouts. Silently resolve a design alternative | Edit the Feature Register, the SRS or any contract document. Edit canonical scope ownership. Change `surfaces.json` to make its design easier. Change a contractual constraint. Invent a customer or business capability. Resolve a scope conflict itself |
+
+### What Claude Design changes
+
+**Only the approved design artefacts under `design/wireframes/`**: the HTML and CSS files of the wireframes.
+
+It does not change `design/inventory/`, `design/briefs/`, `docs/scope/`, `DECISIONS.md`, `PROGRESS.md`, a PBI
+or application code, unless the owner later explicitly authorises another path.
+
+`manifest.json` already declares the path of every calibration file, as
+`s1/calibration/<a|b|c>/<frame id>.<en|ar>.html`. Claude Design creates the files at those paths and leaves the
+manifest alone. **The manifest and the canonical status records are updated by Claude Code, after the design
+review.**
+
+### What Claude Design reports instead of changing
+
+If Claude Design finds:
+
+- a missing requirement;
+- an apparent contradiction;
+- a design need that looks like new capability;
+- a constraint that makes a professional solution impossible;
+
+it reports it back to the owner. It does not change scope, an inventory record or a constraint to get past it,
+and it does not draw around it as though it were settled.
+
+### How Claude Design works
+
+The designer, here and below, is Claude Design. The designer works as a professional product, UI and UX
+designer, not as a converter of rows into rectangles. Within the `design_freedom` of each surface, the designer:
 
 - makes professional ecommerce recommendations and uses contemporary patterns;
 - recognises when more than one solution is valid, recommends one and says why;
@@ -192,6 +234,10 @@ states and the options of a surface are in the inventory, and an entry points at
 
 The calibration set is tracked beside the entries, per frame and per direction, because one frame composes
 several surfaces.
+
+**Claude Code updates the manifest, after the design review.** Claude Design does not edit it (section 2). A
+calibration file at a path the manifest declares may therefore exist while its direction still reads
+`not_started`: the status records the review, and is set once the review has happened.
 
 `tools/design_wireframes.py` holds the manifest to the inventory and to the files on disk: one entry per surface,
 a brief wherever a surface is past `not_started`, no artefact the manifest does not list, no listed artefact that

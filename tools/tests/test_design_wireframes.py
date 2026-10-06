@@ -323,6 +323,19 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.data["manifest"]["calibration"]["frames"][0]["status"]["a"] = "drawn"
         self.assertRefused("calibration cal-01: direction a is drawn, and design/wireframes/s1/calibration/a/cal-01.en.html is missing")
 
+    def test_a_declared_calibration_file_may_exist_before_its_review_is_recorded(self):
+        """The designer creates the files and leaves the manifest alone: the status follows the review."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "design/wireframes/s1/calibration/a/cal-01.en.html"
+            path.parent.mkdir(parents=True)
+            path.write_text("<!doctype html>", encoding="utf-8")
+            stray = root / "design/wireframes/s1/calibration/a/cal-99.en.html"
+            stray.write_text("<!doctype html>", encoding="utf-8")
+            errs = dw.check_manifest(self.data, root)
+        self.assertFalse([e for e in errs if "cal-01" in e], errs[:6])
+        self.assertTrue(any("cal-99.en.html: a wireframe the manifest does not list" in e for e in errs))
+
     def test_no_direction_is_selected_before_the_calibration_is_reviewed(self):
         self.data["manifest"]["selection"]["selected_direction"] = "b"
         self.data["manifest"]["selection"]["decision_source"] = "Owner"

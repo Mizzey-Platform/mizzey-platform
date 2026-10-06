@@ -250,12 +250,9 @@ def check_manifest(data: dict, root: Path) -> list[str]:
                 errs.append(f"calibration {fid}: shows {pair}, which is not a state of a surface in the frame")
         if frame.get("interaction_options") != wanted:
             errs.append(f"calibration {fid}: interaction_options differs from the inventory")
+    # A declared calibration file may exist while its direction still reads not_started: the designer creates
+    # the files and does not edit the manifest, and the status is recorded after the design review.
     expected = calibration_artifacts(manifest)
-    for path, (fid, direction, _) in expected.items():
-        frame = next(f for f in cal["frames"] if f["id"] == fid)
-        exists = (root / path).is_file()
-        if frame["status"].get(direction) == "not_started" and exists:
-            errs.append(f"calibration {fid}: {path} exists, and direction {direction} is marked not_started")
     for frame in cal["frames"]:
         for direction, status in frame.get("status", {}).items():
             if status == "not_started":
