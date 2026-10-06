@@ -118,8 +118,17 @@ foreach ( $sources as $en_id ) {
 }
 
 // Check what was made. One commercial item is one translation group of exactly two records, and a variant of
-// one is a variant of the other with the same SKU.
-$problems = array();
+// one is a variant of the other with the same SKU and the same cost (ADM-27: the cost is the item's, whatever the
+// language). The cost is compared as read back from storage. Every pair agreed on 5 October 2026 only because
+// no record held a cost at all, so the count of pairs that do hold one is reported beside the check.
+wp_cache_flush();
+$same_cost = static function ( WC_Product $a, WC_Product $b ): bool {
+	$x = $a->get_cogs_value();
+	$y = $b->get_cogs_value();
+	return null === $x || null === $y ? $x === $y : abs( (float) $x - (float) $y ) < 0.005;
+};
+$with_cost = 0;
+$problems  = array();
 foreach ( $sources as $en_id ) {
 	$ar_id = (int) apply_filters( 'wpml_object_id', $en_id, 'product', false, 'ar' );
 	if ( 'en' !== $language( $en_id ) || 'ar' !== $language( $ar_id ) || $ar_id === $en_id ) {
@@ -131,6 +140,10 @@ foreach ( $sources as $en_id ) {
 	if ( $en->get_sku() !== $ar->get_sku() ) {
 		$problems[] = "product {$en_id}: SKU differs between the language records";
 	}
+	if ( ! $same_cost( $en, $ar ) ) {
+		$problems[] = "product {$en_id}: cost differs between the language records";
+	}
+	$with_cost += null === $en->get_cogs_value() ? 0 : 1;
 	if ( $en->is_type( 'variable' ) ) {
 		$en_children = $en->get_children();
 		$ar_children = $ar->get_children();
@@ -143,6 +156,10 @@ foreach ( $sources as $en_id ) {
 				$problems[] = "variation {$child}: its Arabic record is not a variant of the Arabic product";
 			} elseif ( wc_get_product( $child )->get_sku() !== wc_get_product( $ar_child )->get_sku() ) {
 				$problems[] = "variation {$child}: SKU differs between the language records";
+			} elseif ( ! $same_cost( wc_get_product( $child ), wc_get_product( $ar_child ) ) ) {
+				$problems[] = "variation {$child}: cost differs between the language records";
+			} else {
+				$with_cost += null === wc_get_product( $child )->get_cogs_value() ? 0 : 1;
 			}
 		}
 	}
@@ -152,4 +169,4 @@ if ( $problems ) {
 	echo implode( "\n", $problems ), "\n";
 	WP_CLI::error( "the seeded catalogue is not sound" );
 }
-echo wp_json_encode( array( 'translated' => $translated, 'terms' => array_map( 'count', $term_map ), 'problems' => 0 ) ), "\n";
+echo wp_json_encode( array( 'translated' => $translated, 'terms' => array_map( 'count', $term_map ), 'pairs_holding_a_cost' => $with_cost, 'problems' => 0 ) ), "\n";

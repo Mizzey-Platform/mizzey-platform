@@ -9,7 +9,8 @@
  *  - cash on delivery switched on: the native capability, with no value ceiling and no fee (D-11);
  *  - one shipping zone for Egypt with one flat price, so the checkout has a shipping option to offer;
  *  - guest checkout allowed;
- *  - the "coming soon" screen off, so a reviewer sees the store and not a placeholder.
+ *  - the "coming soon" screen off, so a reviewer sees the store and not a placeholder;
+ *  - cost capture on, before the catalogue and the orders are made.
  *
  * @package MizzeySite\Tests\Staging
  */
@@ -27,6 +28,12 @@ update_option( 'woocommerce_enable_guest_checkout', 'yes' );
 // to be looked at, and it is already closed to the public by the tunnel sign-in and kept out of search engines,
 // so the screen is switched off here. The first browser pass ran against that screen and proved nothing.
 update_option( 'woocommerce_coming_soon', 'no' );
+// Cost capture is the configuration of specs/001-product-cost-capture (FR-001: on in every environment before an
+// order is placed), and WooCommerce ships it off. While it is off a cost written to a product is dropped without
+// a word and the product form has no cost field. Staging ran that way until 6 October 2026: the catalogue step
+// below wrote a cost on most products, none was stored, and no order line carried one. This step runs before
+// both, in a process of its own, so the setting is in force when they start.
+update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', 'yes' );
 update_option( 'woocommerce_manage_stock', 'yes' );
 update_option( 'woocommerce_notify_low_stock_amount', 3 );
 
@@ -55,5 +62,6 @@ echo wp_json_encode(
 		'shipping_zone' => $zone_name,
 		'guest'         => get_option( 'woocommerce_enable_guest_checkout' ),
 		'coming_soon'   => get_option( 'woocommerce_coming_soon' ),
+		'cost_capture'  => get_option( 'woocommerce_feature_cost_of_goods_sold_enabled' ),
 	)
 ), "\n";
