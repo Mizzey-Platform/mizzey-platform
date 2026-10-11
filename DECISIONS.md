@@ -1575,9 +1575,13 @@ to Claude Design.
 
 ## 2026-10-11 - D-16: staging on the developer's own server, at a fixed address, built from a tagged release
 
-**Status: proposed in the pull request that adds this entry, reviewed by the owner, pending merge. Not applied.
-Nothing here is in effect until that pull request is merged. Item 5 was put to the owner as an open question
-and carries his ruling of 11 October 2026.**
+**Status: applied on `main`, 11 October 2026.** PR #344 was approved by the owner and squash-merged as `d45aca9`
+(`d45aca9310f3bc758b8fc94244f79192e92de026`), with item 5 put to him as an open question and ruled by him the
+same day. The tooling it describes followed in order, each approved by him: the release packer (#345,
+`14a8188`), the release workflow (#346, `1b21d25`) and the staging tool on the server (#347, `de5d4d8`). **What
+is applied is the decision and the tooling. Nothing has been carried out: no tag is pushed, no release is
+built, nothing is deployed, and nothing has run on the server or on MariaDB 11.4.** `stack.lock.json` is
+unchanged, as item 4 requires.
 
 Proposed on Mustafa's instruction of 11 October 2026. **Owner engineering decisions. None is a client
 confirmation, none is contractual acceptance, and none decides production hosting (OD-27, OD-14).**
