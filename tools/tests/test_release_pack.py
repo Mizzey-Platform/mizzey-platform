@@ -92,7 +92,8 @@ class Fixture(unittest.TestCase):
         return self.served[url]
 
     def pack(self, tag: str = "v0.1.0") -> dict:
-        return rp.pack(tag, self.dist, self.out, root=self.root, fetch=self.fetch, commit="a" * 40, moment=MOMENT)
+        origin = rp.Origin(root=self.root, fetch=self.fetch, commit="a" * 40, moment=MOMENT)
+        return rp.pack(tag, self.dist, self.out, origin)
 
     def refused(self, fragment: str, tag: str = "v0.1.0") -> None:
         with self.assertRaises(rp.Refused) as caught:
@@ -270,19 +271,20 @@ class FetchCore(unittest.TestCase):
         self.tarball = held.getvalue()
         self.url = rp.CORE_URL.format(version="7.1.2")
 
-    def served(self, checksum: str):
-        return {self.url: self.tarball, self.url + ".sha1": checksum.encode()}.__getitem__
+    def origin(self, checksum: str) -> rp.Origin:
+        served = {self.url: self.tarball, self.url + ".sha1": checksum.encode()}
+        return rp.Origin(root=self.root, fetch=served.__getitem__)
 
     def test_the_tested_version_is_unpacked_without_its_outer_folder(self):
         into = Path(self.tmp.name) / "wp"
-        version = rp.fetch_core(into, root=self.root, fetch=self.served(hashlib.sha1(self.tarball).hexdigest()))
+        version = rp.fetch_core(into, self.origin(hashlib.sha1(self.tarball).hexdigest()))
         self.assertEqual(version, "7.1.2")
         self.assertTrue((into / "index.php").is_file())
         self.assertTrue((into / "wp-includes" / "version.php").is_file())
 
     def test_a_download_that_does_not_match_the_published_checksum_is_refused(self):
         with self.assertRaises(rp.Refused):
-            rp.fetch_core(Path(self.tmp.name) / "wp", root=self.root, fetch=self.served("0" * 40))
+            rp.fetch_core(Path(self.tmp.name) / "wp", self.origin("0" * 40))
         self.assertFalse((Path(self.tmp.name) / "wp").exists())
 
     def test_a_place_that_already_holds_files_is_left_alone(self):
@@ -290,7 +292,7 @@ class FetchCore(unittest.TestCase):
         into.mkdir()
         (into / "wp-config.php").write_text("<?php", encoding="utf-8")
         with self.assertRaises(rp.Refused):
-            rp.fetch_core(into, root=self.root, fetch=self.served(hashlib.sha1(self.tarball).hexdigest()))
+            rp.fetch_core(into, self.origin(hashlib.sha1(self.tarball).hexdigest()))
 
 
 if __name__ == "__main__":

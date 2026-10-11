@@ -44,8 +44,9 @@ import sys
 import tarfile
 import urllib.request
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Callable
+from typing import Callable, NamedTuple
 
 ROOT = Path(__file__).resolve().parent.parent
 APP = ROOT.parent / "app"
@@ -185,7 +186,10 @@ def wordpress_version(dist: Path) -> str:
 
 
 def check_tree(dist: Path, wordpress: str) -> dict:
-    """The built tree is the one build-dist.mjs makes for this site, on the WordPress the lock records."""
+    """The built tree is the one build-dist.mjs makes for this site, on the WordPress the lock records.
+
+    Returns what it was built with: its plugins, its themes, and which CoreX vendor tree it carries.
+    """
     release = dist / "corex-release.json"
     for needed in (release, dist / "wp-includes" / "version.php", dist / "wp-content" / "plugins" / "mizzey-site",
                    dist / "wp-content" / "themes" / "mizzey-theme", dist / "vendor" / "autoload.php"):
@@ -195,7 +199,11 @@ def check_tree(dist: Path, wordpress: str) -> dict:
     found = wordpress_version(dist)
     if found != wordpress:
         raise Refused(f"the built tree holds WordPress {found}, stack.lock.json records {wordpress} as tested")
-    return json.loads(release.read_text(encoding="utf-8"))
+    built = json.loads(release.read_text(encoding="utf-8"))
+    # The builder copies CoreX's vendor tree as it finds it: with the test toolchain, or without it and without
+    # seven CLI commands (corex#201, COREX-WORKAROUNDS.md).
+    vendor = "dev" if (dist / "vendor" / "pestphp").exists() else "production"
+    return {"plugins": sorted(built.get("plugins", [])), "themes": sorted(built.get("themes", [])), "vendor": vendor}
 
 
 def refuse_forbidden(paths) -> None:
@@ -212,95 +220,142 @@ def refuse_forbidden(paths) -> None:
 
 # ---- pack ---------------------------------------------------------------------------------------------------
 
-def cached(fetch: Fetch, cache: Path | None, url: str) -> bytes:
-    if cache is None:
-        return fetch(url)
-    held = cache / re.sub(r"[^A-Za-z0-9.-]+", "_", url.split("://", 1)[1])
-    if not held.exists():
-        cache.mkdir(parents=True, exist_ok=True)
-        held.write_bytes(fetch(url))
-    return held.read_bytes()
+class Build(NamedTuple):
+    """Which build this is: its tag, the commit the tag points at, and that commit's time."""
+    tag: str
+    commit: str
+    moment: dt.datetime
 
 
-def assemble(dist: Path, lock: dict, fetch: Fetch, cache: Path | None = None) -> tuple[dict, dict, list, list]:
-    """Everything the archive will hold. Returns (files from disk, files in memory, plugin records, packs)."""
-    on_disk = tree_files(dist)
-    added: dict[str, bytes] = {}
-    plugins, packs = [], []
+@dataclass(frozen=True)
+class Origin:
+    """What a build reads besides the built tree: the repository, the network, and the commit it is a build of.
 
-    def add(files: dict[str, bytes], what: str) -> None:
-        clash = sorted((set(files) & set(on_disk)) | (set(files) & set(added)))
+    The defaults are the real ones. A test names its own, so nothing in a test touches the network or git.
+    """
+    root: Path = ROOT
+    fetch: Fetch = http_fetch
+    cache: Path | None = None
+    commit: str | None = None
+    moment: dt.datetime | None = None
+
+    def download(self, url: str) -> bytes:
+        """What the address serves, kept in the cache folder when there is one so a second build asks for nothing."""
+        if self.cache is None:
+            return self.fetch(url)
+        held = self.cache / re.sub(r"[^A-Za-z0-9.-]+", "_", url.split("://", 1)[1])
+        if not held.exists():
+            self.cache.mkdir(parents=True, exist_ok=True)
+            held.write_bytes(self.fetch(url))
+        return held.read_bytes()
+
+    def build(self, tag: str) -> Build:
+        commit = self.commit or git(self.root, "rev-parse", "HEAD")
+        moment = self.moment or dt.datetime.fromtimestamp(
+            int(git(self.root, "log", "-1", "--format=%ct", commit)), dt.timezone.utc)
+        return Build(tag, commit, moment)
+
+
+class Contents:
+    """What the archive will hold: the built tree's files, read from disk when they are written, what is added
+    to them in memory, and a record of each plugin and language pack that was added."""
+
+    def __init__(self, on_disk: dict[str, Path]):
+        self.on_disk = on_disk
+        self.added: dict[str, bytes] = {}
+        self.plugins: list[dict] = []
+        self.packs: list[dict] = []
+
+    def add(self, files: dict[str, bytes], what: str) -> None:
+        clash = sorted((set(files) & set(self.on_disk)) | (set(files) & set(self.added)))
         if clash:
             raise Refused(f"{what} would overwrite {clash[0]} and {len(clash) - 1} more")
-        added.update(files)
+        self.added.update(files)
 
+    def names(self) -> list[str]:
+        return sorted(set(self.on_disk) | set(self.added))
+
+    def read(self, name: str) -> bytes:
+        return self.added[name] if name in self.added else self.on_disk[name].read_bytes()
+
+
+def add_plugins(contents: Contents, lock: dict, origin: Origin) -> None:
     for component, (slug, main_file) in BUNDLED.items():
         version = lock["stack"][component]["version"]
         url = PLUGIN_URL.format(slug=slug, version=version)
-        data = cached(fetch, cache, url)
-        add(plugin_files(data, slug, main_file, version), f"{slug} {version}")
-        plugins.append({"slug": slug, "version": version, "main_file": f"{slug}/{main_file}",
-                        "source": url, "sha256": sha256(data)})
+        data = origin.download(url)
+        contents.add(plugin_files(data, slug, main_file, version), f"{slug} {version}")
+        contents.plugins.append({"slug": slug, "version": version, "main_file": f"{slug}/{main_file}",
+                                 "source": url, "sha256": sha256(data)})
 
-    woocommerce = lock["stack"]["woocommerce"]["version"]
+
+def language_packs(lock: dict, locale: str) -> tuple:
+    """The packs of one language: what each is called, the folder it unpacks into, and its address."""
+    wordpress, woocommerce = lock["wordpress"], lock["stack"]["woocommerce"]["version"]
+    return (
+        (f"WordPress {wordpress} {locale}", "wp-content/languages",
+         CORE_PACK_URL.format(version=wordpress, locale=locale)),
+        (f"WooCommerce {woocommerce} {locale}", "wp-content/languages/plugins",
+         PLUGIN_PACK_URL.format(slug="woocommerce", version=woocommerce, locale=locale)),
+    )
+
+
+def add_language_packs(contents: Contents, lock: dict, origin: Origin) -> None:
     for locale in LOCALES:
-        for label, folder, url in (
-            (f"WordPress {lock['wordpress']} {locale}", "wp-content/languages",
-             CORE_PACK_URL.format(version=lock["wordpress"], locale=locale)),
-            (f"WooCommerce {woocommerce} {locale}", "wp-content/languages/plugins",
-             PLUGIN_PACK_URL.format(slug="woocommerce", version=woocommerce, locale=locale)),
-        ):
-            data = cached(fetch, cache, url)
-            add(language_files(data, folder, label), label)
-            packs.append({"pack": label, "source": url, "sha256": sha256(data)})
+        for label, folder, url in language_packs(lock, locale):
+            data = origin.download(url)
+            contents.add(language_files(data, folder, label), label)
+            contents.packs.append({"pack": label, "source": url, "sha256": sha256(data)})
 
+
+def assemble(dist: Path, lock: dict, origin: Origin) -> Contents:
+    """Everything the archive will hold, except its manifest."""
+    contents = Contents(tree_files(dist))
+    add_plugins(contents, lock, origin)
+    add_language_packs(contents, lock, origin)
     for guard in ("wp-content/index.php", "wp-content/plugins/index.php", "wp-content/themes/index.php"):
-        if guard not in on_disk:
-            added[guard] = SILENCE
-    refuse_forbidden([*on_disk, *added])
-    return on_disk, added, plugins, packs
+        if guard not in contents.on_disk:
+            contents.added[guard] = SILENCE
+    refuse_forbidden([*contents.on_disk, *contents.added])
+    return contents
 
 
-def build_manifest(tag: str, commit: str, built_at: str, lock: dict, corex_release: dict, dist: Path,
-                   plugins: list, packs: list) -> dict:
+def build_manifest(build: Build, lock: dict, built: dict, contents: Contents) -> dict:
     stack, corex = lock["stack"], lock["corex"]
     return {
         "name": "mizzey-release",
         "schema": 1,
-        "tag": tag,
-        "commit": commit,
-        "built_at": built_at,
+        "tag": build.tag,
+        "commit": build.commit,
+        "built_at": build.moment.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "wordpress": lock["wordpress"],
         "php": corex.get("php"),
-        "corex": {"version": corex["version"], "commit": corex["commit"],
-                  # The builder copies CoreX's vendor tree as it finds it: with the test toolchain, or without it
-                  # and without seven CLI commands (corex#201, COREX-WORKAROUNDS.md).
-                  "vendor": "dev" if (dist / "vendor" / "pestphp").exists() else "production"},
+        "corex": {"version": corex["version"], "commit": corex["commit"], "vendor": built["vendor"]},
         "plugins": {
-            "built": sorted(corex_release.get("plugins", [])),
-            "bundled": plugins,
+            "built": built["plugins"],
+            "bundled": contents.plugins,
             "server_supplied": [
                 {"slug": slug, "version": stack[component]["version"], "main_file": f"{slug}/{main_file}"}
                 for component, (slug, main_file) in SERVER_SUPPLIED.items()],
         },
-        "themes": sorted(corex_release.get("themes", [])),
-        "language_packs": packs,
+        "themes": built["themes"],
+        "language_packs": contents.packs,
         "runtime_writable": list(RUNTIME_WRITABLE),
         "not_in_this_archive": ["wp-config.php", *RUNTIME_WRITABLE,
                                 *(f"wp-content/plugins/{slug}" for slug, _ in SERVER_SUPPLIED.values())],
     }
 
 
-def write_archive(target: Path, on_disk: dict[str, Path], in_memory: dict[str, bytes], moment: dt.datetime) -> int:
+def write_archive(target: Path, contents: Contents, moment: dt.datetime) -> int:
     """One archive, entries in path order, every file 0644 and stamped with the commit's time."""
     stamp = (max(moment.year, 1980), moment.month, moment.day, moment.hour, moment.minute, moment.second)
-    names = sorted(set(on_disk) | set(in_memory))
+    names = contents.names()
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
         for name in names:
             info = zipfile.ZipInfo(name, date_time=stamp)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = (stat.S_IFREG | 0o644) << 16
-            archive.writestr(info, in_memory[name] if name in in_memory else on_disk[name].read_bytes())
+            archive.writestr(info, contents.read(name))
     return len(names)
 
 
@@ -308,22 +363,20 @@ def git(root: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, check=True).stdout.strip()
 
 
-def pack(tag: str, dist: Path, out: Path, root: Path = ROOT, fetch: Fetch = http_fetch, cache: Path | None = None,
-         commit: str | None = None, moment: dt.datetime | None = None) -> dict:
+def pack(tag: str, dist: Path, out: Path, origin: Origin | None = None) -> dict:
+    origin = origin or Origin()
     if not TAG_RE.match(tag):
         raise Refused(f"{tag!r} is not a release tag: use vX.Y.Z")
-    lock = read_lock(root)
-    corex_release = check_tree(dist, lock["wordpress"])
-    commit = commit or git(root, "rev-parse", "HEAD")
-    moment = moment or dt.datetime.fromtimestamp(int(git(root, "log", "-1", "--format=%ct", commit)), dt.timezone.utc)
-    on_disk, added, plugins, packs = assemble(dist, lock, fetch, cache)
-    manifest = build_manifest(tag, commit, moment.strftime("%Y-%m-%dT%H:%M:%SZ"), lock, corex_release, dist,
-                              plugins, packs)
-    added[MANIFEST] = (json.dumps(manifest, indent=1) + "\n").encode("utf-8")
+    lock = read_lock(origin.root)
+    built = check_tree(dist, lock["wordpress"])
+    build = origin.build(tag)
+    contents = assemble(dist, lock, origin)
+    manifest = build_manifest(build, lock, built, contents)
+    contents.added[MANIFEST] = (json.dumps(manifest, indent=1) + "\n").encode("utf-8")
 
     out.mkdir(parents=True, exist_ok=True)
     archive = out / f"mizzey-{tag}.zip"
-    count = write_archive(archive, on_disk, added, moment)
+    count = write_archive(archive, contents, build.moment)
     digest = sha256(archive.read_bytes())
     checksum = out / f"{archive.name}.sha256"
     checksum.write_text(f"{digest}  {archive.name}\n", encoding="utf-8", newline="\n")
@@ -333,15 +386,23 @@ def pack(tag: str, dist: Path, out: Path, root: Path = ROOT, fetch: Fetch = http
 
 # ---- fetch-core ---------------------------------------------------------------------------------------------
 
-def fetch_core(into: Path, root: Path = ROOT, fetch: Fetch = http_fetch) -> str:
+def fetch_core(into: Path, origin: Origin | None = None) -> str:
     """WordPress core, at the tested version, checked against the checksum published beside it."""
-    version = read_lock(root)["wordpress"]
+    origin = origin or Origin()
+    fetch = origin.fetch
+    version = read_lock(origin.root)["wordpress"]
     if into.exists() and any(into.iterdir()):
         raise Refused(f"{into} is not empty: fetch-core only fills an empty place")
     url = CORE_URL.format(version=version)
     data, expected = fetch(url), fetch(url + ".sha1").decode("ascii", "replace").strip()
     if hashlib.sha1(data).hexdigest() != expected:
         raise Refused(f"{url} does not match the checksum wordpress.org publishes for it")
+    unpack_core(data, into, url)
+    return version
+
+
+def unpack_core(data: bytes, into: Path, url: str) -> None:
+    """Unpack the WordPress archive without the `wordpress/` folder it wraps everything in."""
     into.mkdir(parents=True, exist_ok=True)
     base = into.resolve()
     with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
@@ -355,7 +416,6 @@ def fetch_core(into: Path, root: Path = ROOT, fetch: Fetch = http_fetch) -> str:
             elif member.isfile():
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(tar.extractfile(member).read())
-    return version
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -372,7 +432,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.command == "fetch-core":
         print(f"WordPress {fetch_core(a.into)} unpacked into {a.into}")
         return 0
-    made = pack(a.tag, a.dist, a.out, cache=a.cache)
+    made = pack(a.tag, a.dist, a.out, Origin(cache=a.cache))
     print(json.dumps({k: v for k, v in made.items() if k != "manifest"}, indent=1))
     print(json.dumps(made["manifest"], indent=1))
     return 0
