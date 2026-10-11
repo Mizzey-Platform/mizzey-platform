@@ -1575,8 +1575,9 @@ to Claude Design.
 
 ## 2026-10-11 - D-16: staging on the developer's own server, at a fixed address, built from a tagged release
 
-**Status: proposed in the pull request that adds this entry, for the owner's review. Not applied. Nothing here is
-in effect until that pull request is merged, and item 5 is an open question for the owner's ruling inside it.**
+**Status: proposed in the pull request that adds this entry, reviewed by the owner, pending merge. Not applied.
+Nothing here is in effect until that pull request is merged. Item 5 was put to the owner as an open question
+and carries his ruling of 11 October 2026.**
 
 Proposed on Mustafa's instruction of 11 October 2026. **Owner engineering decisions. None is a client
 confirmation, none is contractual acceptance, and none decides production hosting (OD-27, OD-14).**
@@ -1608,9 +1609,9 @@ report, not something to code around silently. The production engine is still se
 server also offers an object cache service; the stack has no object cache component, and adding one is a stack
 change this decision does not make.
 
-**5. Open for the owner's ruling: whether staging stays up between reviews.** `docs/staging-environment.md`
-says today "Staging is not meant to be reachable when nobody is reviewing", written for a tunnel opened from the
-developer's machine behind a shared password. Two options:
+**5. Staging stays up between reviews, behind Access.** `docs/staging-environment.md` says today "Staging is
+not meant to be reachable when nobody is reviewing", written for a tunnel opened from the developer's machine
+behind a shared password. Two options were put to the owner:
 
 | | Stays up, behind Access | Up for reviews only |
 |---|---|---|
@@ -1618,9 +1619,11 @@ developer's machine behind a shared password. Two options:
 | For | The fixed address can be written into the walkthrough and acceptance documents once; the device rows of the browser matrix and the client's own checks happen at times the developer does not choose | The smallest exposure: nothing answers at all outside a review |
 | Against | A running copy of unreleased work answers a sign-in page at all times | Every review needs the developer to open it first, and a document that cites the address is wrong most of the time |
 
-Recommended: stays up, behind Access, on three conditions: the policy names individual addresses and has no
+**Ruled by the owner on 11 October 2026: the recommended option on each open question, which here is the
+first.** Staging stays up, behind Access, on three conditions: the policy names individual addresses and has no
 "everyone" or domain-wide rule, the session lasts no longer than a day, and the list is read again before each
-client review. Recorded here as the owner rules.
+client review. The sentence in `docs/staging-environment.md` goes on describing the local copy, where it still
+holds. An owner engineering decision: not a client confirmation and not a scope change.
 
 **6. Staging on the server runs a tagged release, built by CI and pulled by the server.** A tag `vX.Y.Z` on a
 commit of `main` builds the flat WordPress tree with `tools/corex-sync.mjs` and `tools/build-dist.mjs`, adds the
