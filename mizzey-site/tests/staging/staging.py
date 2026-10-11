@@ -12,6 +12,11 @@
     restore <set>               DESTRUCTIVE for staging only: put a backup set back
     restore-test                back up, destroy, restore, and compare fingerprints. Writes the evidence file
     tunnel-config <hostname>    allow a public host name and print the Cloudflare Tunnel commands
+    parity-export <folder>      write development's WPML configuration and settings, for the copy on the server
+
+On the developer's server the same commands are run by `staging_server.py`, which this file hands over to when
+its profile is `server` (DECISIONS.md D-16). The profile is `local` on Windows and `server` anywhere else, and
+`MIZZEY_STAGING_PROFILE` overrides it. Everything below describes the local copy.
 
 Staging is a separate runtime from development, on the same machine:
 
@@ -513,6 +518,23 @@ def cmd_parity(a) -> None:
     require_parity()
 
 
+def cmd_parity_export(a) -> None:
+    """Write what the copy on the server needs from development, which it cannot reach: the configuration WPML
+    downloaded here, and the settings this runtime ended its baseline with. Reads development and changes nothing."""
+    out = Path(a.folder).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    carried = out / "wpml-remote-config.json"
+    sent = json.loads(wp("eval-file", str(HERE / "wpml-remote-config.php"), "export", carried.as_posix(),
+                         path=DEV_APP / "wp").splitlines()[-1])
+    if not sent["files"]:
+        raise SystemExit("development holds no downloaded WPML configuration: nothing was written")
+    settings = out / "wpml-development-settings.json"
+    settings.write_text(json.dumps(wpml_settings(DEV_APP / "wp")) + "\n", encoding="utf-8", newline="\n")
+    say(f"written: {carried} ({', '.join(sorted(sent['files']))}) and {settings}")
+    say("Copy both files into ~/mizzey-staging/parity/ on the server. They are WPML's own configuration: keep them "
+        "out of this repository.")
+
+
 def seed() -> None:
     """Synthetic data only. Each step is its own process: sources first, translations second (finding A11)."""
     creds = load_credentials()
@@ -702,7 +724,20 @@ def cmd_tunnel_config(a) -> None:
     say("See docs/staging-environment.md, 'The Cloudflare Tunnel', for the commands that follow the sign-in.")
 
 
+def profile() -> str:
+    """Which copy this machine holds: the one on the Windows machine, or the one on the developer's server."""
+    chosen = os.environ.get("MIZZEY_STAGING_PROFILE") or ("local" if os.name == "nt" else "server")
+    if chosen not in ("local", "server"):
+        raise Refused(f"MIZZEY_STAGING_PROFILE is {chosen!r}: use local or server")
+    return chosen
+
+
 def main(argv: list[str] | None = None) -> int:
+    if profile() == "server":
+        # Imported here, and from this folder: the server module imports this file for what the two share.
+        sys.path.insert(0, str(HERE))
+        import staging_server
+        return staging_server.main(argv)
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="command", required=True)
     b = sub.add_parser("build")
@@ -714,6 +749,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("backup").add_argument("--label", default="manual")
     sub.add_parser("restore").add_argument("set")
     sub.add_parser("tunnel-config").add_argument("hostname")
+    sub.add_parser("parity-export").add_argument("folder")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")

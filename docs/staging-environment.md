@@ -218,6 +218,118 @@ forwarded request with no sign-in is refused with 401, a wrong password is refus
 allowed host name gets pages whose links are HTTPS on that host name, and a host name that is not allowed gets
 the local address. **No tunnel has been opened, and no public address exists yet.**
 
+## The copy on the developer's server
+
+D-16, proposed in pull request #344, puts the reviewed staging copy on the developer's own server at
+`https://staging.mizzey.com`, behind Cloudflare Access. This section is how the same tool is run there. **None
+of it has been run on the server yet**: it is unit-tested with a stand-in for the container
+(`tools/tests/test_staging_server.py`) and nothing more, until the first reset there is recorded.
+
+The tool hands over to `mizzey-site/tests/staging/staging_server.py` when its profile is `server`, which it is
+on anything but Windows. The commands keep their names. What differs is who owns what:
+
+| | The copy on the Windows machine | The copy on the server |
+|---|---|---|
+| Code | An export of a commit, copied | A tagged release (`docs/release-pipeline.md`), unpacked by the server's deploy, read-only to PHP |
+| PHP and WP-CLI | The machine's own | Inside the site's PHP container, through `docker exec mizzeystaging-php` |
+| Web server | Its own Apache process, started by `up` | The server's own, which the tool never starts or stops |
+| Database | MySQL 8.3.0, `mizzey_staging`, created by `db-create` | MariaDB 11.4, `mizzeystaging`, created by the server with the site. A reset empties it and does not drop it |
+| Table prefix | `mzs_` | `mzs_` |
+| Configuration | Written by `build` | The server's own `wp-config.php`. `server-config` prints the one the tool expects |
+| The staging plugin | Copied into the tree | In `staging-layer/` beside the releases, read-only to PHP, named by `WPMU_PLUGIN_DIR` |
+| Captured mail, debug log | `../app-staging/mail`, `../app-staging/logs` | `shared/mail`, `shared/logs` |
+| Credentials, backups, evidence | `../app-staging/` | `~/mizzey-staging/`, which PHP cannot see |
+| Sign-in gate | The web server, for a request that came through a tunnel | Cloudflare Access, in front of the server |
+| Translation settings of development | Read from the development runtime beside it | Carried in two files, made by `parity-export` on the development machine |
+
+**The same guards.** Every command that destroys or replaces data needs `MIZZEY_CONFIRM_STAGING=yes`, and first
+reads the running configuration back and refuses unless: `current` is a release of the pipeline under this
+site's `releases/`, the container says its site is `mizzeystaging`, the database, account, host and prefix are
+the staging ones, the environment type is `staging`, `MIZZEY_STAGING` is on, outside requests are blocked, file
+changes are disallowed, the staging plugin's folder is the one configured, and the address is a staging address.
+
+### What the server has to provide
+
+| | |
+|---|---|
+| The release | Unpacked under `releases/<tag>/`, with `current` pointing at it |
+| The five translation plugins | Added under `wp-content/plugins/`, at the versions `mizzey-release.json` lists. `build` checks each one |
+| `wp-content/uploads` and `wp-content/languages/wpml` | Linked to folders under `shared/`. Both are written at runtime. `build` checks PHP can write them, and cannot write the release |
+| `wp-config.php` | With the constants below. `python3 mizzey-site/tests/staging/staging.py server-config` prints it complete, with new keys |
+| Scheduled tasks | `docker exec mizzeystaging-php wp cron event run --due-now` on a timer, because `DISABLE_WP_CRON` is on: WordPress would otherwise call its own address, which is behind Access and does not answer |
+
+The constants the tool reads back, and refuses a copy without:
+
+| Constant | Value |
+|---|---|
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST` | From the container's environment |
+| `$table_prefix` | `mzs_` |
+| `WP_ENVIRONMENT_TYPE` | `staging` |
+| `MIZZEY_STAGING` | `true` |
+| `MIZZEY_STAGING_ROOT` | `/srv/sites/mizzeystaging/shared` |
+| `WPMU_PLUGIN_DIR` | `/srv/sites/mizzeystaging/staging-layer/staging/mu-plugins` |
+| `WP_HOME`, `WP_SITEURL` | `https://staging.mizzey.com`, or `http://mizzey-staging.localhost` for a request that names that host |
+| `WP_HTTP_BLOCK_EXTERNAL` | `true` |
+| `DISALLOW_FILE_MODS` | `true` |
+
+The printed file also sets `DISALLOW_FILE_EDIT`, `AUTOMATIC_UPDATER_DISABLED`, `WP_AUTO_UPDATE_CORE`,
+`FORCE_SSL_ADMIN` for the public address, `DISABLE_WP_CRON`, `WP_DEBUG_LOG` under `shared/logs`, and the nine
+keys.
+
+### Commands on the server
+
+From a checkout of this repository at the release's tag. The repository is public, so no sign-in is needed.
+
+```bash
+python3 mizzey-site/tests/staging/staging.py build
+```
+
+```bash
+MIZZEY_CONFIRM_STAGING=yes python3 mizzey-site/tests/staging/staging.py reset
+```
+
+```bash
+MIZZEY_CONFIRM_STAGING=yes python3 mizzey-site/tests/staging/staging.py seed
+```
+
+```bash
+python3 mizzey-site/tests/staging/staging.py check
+```
+
+| Command | What it does on the server |
+|---|---|
+| `build` | Checks the deployed release: the five plugins at their listed versions, the two writable paths, the configuration. Installs the staging plugin and the scripts WP-CLI runs into `staging-layer/`. Writes `~/mizzey-staging/BUILD.json`. Destroys nothing |
+| `reset` | Backs up, empties the database, reinstalls, carries development's translation configuration, applies the baseline, loads the invented data, and ends by comparing the translation settings with development's |
+| `seed` | Loads the invented data again |
+| `parity` | Compares the translation settings with development's file. Reads only |
+| `backup`, `restore <set>`, `restore-test` | As on the local copy. Sets are under `~/mizzey-staging/backups/`, retention seven |
+| `check` | Shows, on the running copy, that the staging plugin is loaded, a message is captured and not sent, an outside request is refused, the screens are marked, and responses tell search engines not to index. Writes an evidence file |
+| `status` | The deployed release, and whether it answers |
+| `server-config` | Prints the `wp-config.php` above |
+
+`up`, `down`, `db-create` and `tunnel-config` are refused on the server by name: the server's own stack does
+those.
+
+**Before the first reset, once:** on the development machine, with development running,
+`python mizzey-site/tests/staging/staging.py parity-export <folder>` writes `wpml-remote-config.json` and
+`wpml-development-settings.json`. Copy both into `~/mizzey-staging/parity/` on the server. They are the
+translation plugin's own configuration and stay out of this repository. `MIZZEY_STAGING_WPML_CARRY=off` resets
+without them, as on the local copy.
+
+**Pages are checked on the server itself**, at `http://mizzey-staging.localhost` through the server's own web
+server on the loopback address, so a check never passes Cloudflare and needs no Access sign-in. The wp-admin
+visit of the baseline is made the same way and not from PHP.
+
+### What is different, and not yet known
+
+- **The engine is MariaDB 11.4, and the suite has never run on it.** `stack.lock.json` records it only once the
+  reset, the seed, the restore test and the scripted passes have run there (D-16 item 4).
+- **PHP may use 256 MB there**, against 512 MB on the local copy. On 9 September 2026 a 128 MB limit was
+  exhausted with the translation and commerce plugins loaded. Watch the first reset.
+- **The object cache service the server offers is not used.** The stack has no object cache component.
+- **The browser harnesses below still point at the local copy.** Running them against the fixed address needs
+  an Access sign-in for the harness, which is not built.
+
 ## The harnesses
 
 | Tool | Use |
