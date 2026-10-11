@@ -13,7 +13,10 @@ Live status. First action each session: read this, then continue from **Next**.
   of this repository, **without the translation plugin family while the repository is public**: the manifest
   lists the five plugins and the server adds and checks them. `mizzey-site/tests/staging/staging_server.py`
   (#347, `de5d4d8`) runs the staging tool there through `docker exec`, with the guards of the local copy.
-  **Not run: the release workflow has never run, no tag exists, and nothing of the server profile has met a
+  **The first release exists.** Tag `v0.1.0` on `70b13df`, pushed on the owner's instruction on 11 October
+  2026, was built by the workflow's first run and published as the pre-release "Staging build v0.1.0": 13,965
+  files, 51.6 MB, its checksum equal to the one GitHub records for the file, no translation plugin in it, and no
+  workflow artifact or cache kept. **Not run: nothing is deployed, and nothing of the server profile has met a
   container or MariaDB 11.4.** The local copy's commands are unchanged. `stack.lock.json` is unchanged until
   the engine is tested. How: `docs/release-pipeline.md`, and `docs/staging-environment.md`, "The copy on the
   developer's server". Internal tooling and a record, no client-facing change, and not production (OD-27).
@@ -277,7 +280,7 @@ staging: `docs/2026-10-05-staging-regression-after-repairs.md`. No known enginee
    management. #247 follows #249. #268, #269, #271 and #272 are standing records kept alongside.
 4. **Owner actions that are not engineering:**
    - **Bring up staging on the server (D-16).** `cloudflared tunnel login` on the Windows machine is no longer
-     owed (D-16 item 3). In order: push the first tag `vX.Y.Z`, which is the release workflow's first run; on
+     owed (D-16 item 3). The first release, `v0.1.0`, is published. In order: on
      the development machine, with development running, `staging.py parity-export`; on the server, the five
      translation plugins, the `wp-config.php` that `staging.py server-config` prints, the deploy, the Access
      policy and the tunnel route, then `build`, `reset`, `check` and `restore-test`. Their output is the
