@@ -1624,12 +1624,14 @@ client review. Recorded here as the owner rules.
 
 **6. Staging on the server runs a tagged release, built by CI and pulled by the server.** A tag `vX.Y.Z` on a
 commit of `main` builds the flat WordPress tree with `tools/corex-sync.mjs` and `tools/build-dist.mjs`, adds the
-third-party plugins at the versions `stack.lock.json` records, and publishes one archive and its checksum to a
-private artifacts repository. The server downloads it; nothing is pushed to the server, and no self-hosted
-runner is attached to this public repository. **Nothing paid is ever placed in this repository, its releases or
-its workflow artifacts**: the plugins published on wordpress.org come from there, and the translation plugin
-family comes from the private artifacts repository. A tag is an engineering build number. It is not the
-contract's first or second release, and it claims no acceptance.
+plugins published on wordpress.org at the versions `stack.lock.json` records, and publishes one archive and its
+checksum as a release of this repository. The server downloads it; nothing is pushed to the server, and no
+self-hosted runner is attached to this public repository. **Nothing paid is ever placed in this repository, its
+releases or its workflow artifacts.** While the repository is public the release therefore does not contain the
+translation plugin family: its manifest lists those five plugins with the versions `stack.lock.json` records,
+and the server adds them at deploy time from a folder of its own and checks them against that list. Moving them
+into the release is a later pull request, made only after the owner has made the repository private. A tag is
+an engineering build number. It is not the contract's first or second release, and it claims no acceptance.
 
 **7. CoreX stays pinned at v0.42.0 for this.** The third-party plugins are added by Mizzey tooling after the
 CoreX builder has run, because that builder packages CoreX and the client source only. Nothing in CoreX is
@@ -1643,8 +1645,9 @@ separate record, made when it has been run, and is not implied by this decision.
 
 **9. The translation plugin on the server is the same unregistered test copy development and local staging
 use**, as `docs/staging-environment.md` already says of them. The client holds the production licence. The copy
-reaches the server only through the private artifacts repository.
+reaches the server by the owner's own hand, into a folder on the server, and through nothing this repository
+publishes.
 
-**Owner actions this needs, none of which the agent performs without instruction:** creating the private
-artifacts repository and the token the release workflow publishes with; uploading the translation plugin family
-to it; the Cloudflare Access policy and the tunnel route for the host name; and the commands on the server.
+**Owner actions this needs, none of which the agent performs without instruction:** placing the translation
+plugin family in the server's folder; the Cloudflare Access policy and the tunnel route for the host name; and
+the commands on the server.
