@@ -1,0 +1,74 @@
+<?php
+/**
+ * Staging and demonstration configuration for the copy on the developer's server (DECISIONS.md D-16).
+ *
+ * Printed with new keys by `staging.py server-config`. The server installs the result as its own wp-config.php:
+ * a release carries none. The result holds generated keys, so it is never committed. The database and cache
+ * settings are not in it: the PHP container's environment supplies them.
+ *
+ * `staging.py build` and every destructive command read this configuration back and refuse a copy that is not
+ * this one.
+ */
+
+define( 'DB_NAME', getenv( 'DB_NAME' ) );
+define( 'DB_USER', getenv( 'DB_USER' ) );
+define( 'DB_PASSWORD', getenv( 'DB_PASSWORD' ) );
+define( 'DB_HOST', getenv( 'DB_HOST' ) );
+define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_COLLATE', '' );
+
+define( 'AUTH_KEY', '{{SALT_1}}' );
+define( 'SECURE_AUTH_KEY', '{{SALT_2}}' );
+define( 'LOGGED_IN_KEY', '{{SALT_3}}' );
+define( 'NONCE_KEY', '{{SALT_4}}' );
+define( 'AUTH_SALT', '{{SALT_5}}' );
+define( 'SECURE_AUTH_SALT', '{{SALT_6}}' );
+define( 'LOGGED_IN_SALT', '{{SALT_7}}' );
+define( 'NONCE_SALT', '{{SALT_8}}' );
+define( 'WP_CACHE_KEY_SALT', '{{SALT_9}}' );
+
+$table_prefix = '{{TABLE_PREFIX}}';
+
+define( 'WP_ENVIRONMENT_TYPE', 'staging' );
+define( 'MIZZEY_STAGING', true );
+// The one place PHP may write besides uploads: captured mail and the debug log go here.
+define( 'MIZZEY_STAGING_ROOT', '{{IN_SHARED}}' );
+// The staging plugin is not part of a release. It sits beside the releases, where PHP can read and not write.
+define( 'WPMU_PLUGIN_DIR', '{{IN_MU_PLUGINS}}' );
+
+// Two addresses and no other. The public one is served as HTTPS, because Cloudflare ends the TLS connection and
+// forwards plain HTTP. The local one answers on the server itself, and is what `staging.py` checks pages on.
+$mizzey_public = '{{PUBLIC_HOST}}';
+$mizzey_local  = '{{LOCAL_HOST}}';
+$mizzey_host   = strtolower( $_SERVER['HTTP_HOST'] ?? $mizzey_public );
+$mizzey_host   = $mizzey_local === $mizzey_host ? $mizzey_local : $mizzey_public;
+if ( $mizzey_public === $mizzey_host ) {
+	$_SERVER['HTTPS'] = 'on';
+}
+define( 'WP_HOME', ( $mizzey_public === $mizzey_host ? 'https://' : 'http://' ) . $mizzey_host );
+define( 'WP_SITEURL', WP_HOME );
+define( 'FORCE_SSL_ADMIN', $mizzey_public === $mizzey_host );
+
+// Staging runs the release it was given and nothing else: no edits, no installs, no self-updates.
+define( 'DISALLOW_FILE_EDIT', true );
+define( 'DISALLOW_FILE_MODS', true );
+define( 'AUTOMATIC_UPDATER_DISABLED', true );
+define( 'WP_AUTO_UPDATE_CORE', false );
+
+// No request leaves the server for a real provider. A provider sandbox is allowed by name when one is wired.
+define( 'WP_HTTP_BLOCK_EXTERNAL', true );
+
+// WordPress starts its scheduled tasks by calling its own address, which here is behind Cloudflare Access and
+// would not answer. The server runs them instead: `wp cron event run --due-now` in the PHP container, on a timer.
+define( 'DISABLE_WP_CRON', true );
+
+define( 'WP_MEMORY_LIMIT', '256M' );
+define( 'WP_MAX_MEMORY_LIMIT', '256M' );
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_LOG', MIZZEY_STAGING_ROOT . '/logs/wp-debug.log' );
+define( 'WP_DEBUG_DISPLAY', false );
+
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+require_once ABSPATH . 'wp-settings.php';
