@@ -1,0 +1,110 @@
+name: release
+
+# A tag vX.Y.Z on a commit of main builds the flat WordPress tree and publishes it as a release of this
+# repository (DECISIONS.md D-16, docs/release-pipeline.md). The server downloads the release; nothing is pushed
+# to it, and no self-hosted runner is attached to this public repository.
+#
+# This repository, its releases and its workflow artifacts are public. Nothing paid is fetched or published
+# here: the translation plugin family is listed in the release manifest and added on the server. For the same
+# reason this workflow uploads no workflow artifact and keeps no cache.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # to create the release, and for nothing else
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      # The checkout sits beside the runtime the tools build in ../app, as it does on a developer's machine.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: platform
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.10'
+      - name: The tagged commit is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME points at $GITHUB_SHA, which is not on main. A release is built from main only."
+            exit 1
+          fi
+      - name: Environment
+        run: |
+          python --version
+          php --version
+          composer --version
+          node --version
+      - name: The checks a pull request runs
+        run: |
+          python -m unittest discover -s tools/tests -t .
+          python tools/repo_checks.py
+          find mizzey-site mizzey-theme -name '*.php' -print0 | xargs -0 -r -n1 php -l > /dev/null
+      - name: WordPress core, at the version stack.lock.json records as tested
+        run: python tools/release_pack.py fetch-core --into ../app/wp
+      - name: CoreX, at the commit corex.lock pins
+        run: |
+          # corex.lock names the repository by its SSH address. CoreX is public, so the runner reads it over HTTPS.
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          node tools/corex-sync.mjs
+      # Built with CoreX's development vendor tree, which is the configuration every probe and scenario ran on
+      # and keeps the CoreX CLI whole. --production is leaner and loses seven commands (corex#201,
+      # COREX-WORKAROUNDS.md). The manifest records which was built.
+      - name: Build the flat tree
+        run: node tools/build-dist.mjs
+      - name: Pack the release archive
+        run: python tools/release_pack.py pack --tag "$GITHUB_REF_NAME" --out "$RUNNER_TEMP/release" > "$RUNNER_TEMP/pack.log"
+      - name: Check the archive before anything is published
+        working-directory: ${{ runner.temp }}/release
+        run: |
+          sha256sum -c "mizzey-$GITHUB_REF_NAME.zip.sha256"
+          unzip -Z1 "mizzey-$GITHUB_REF_NAME.zip" > ../names.txt
+          paid='^wp-content/plugins/(sitepress-multilingual-cms|wpml-string-translation|wpml-media-translation|wpml-cms-nav|woocommerce-multilingual)/'
+          if grep -E -q "$paid" ../names.txt; then
+            echo "::error::the archive holds a paid plugin. Nothing is published."
+            exit 1
+          fi
+          if grep -E -q '^(wp-config\.php|wp-content/uploads/|wp-content/languages/wpml/)' ../names.txt; then
+            echo "::error::the archive holds a file the server owns. Nothing is published."
+            exit 1
+          fi
+          unzip -p "mizzey-$GITHUB_REF_NAME.zip" mizzey-release.json > ../mizzey-release.json
+          echo "$(wc -l < ../names.txt) files, $(stat -c %s "mizzey-$GITHUB_REF_NAME.zip") bytes"
+      - name: Publish the release
+        working-directory: ${{ runner.temp }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Staging build \`$GITHUB_REF_NAME\`, from commit \`$GITHUB_SHA\`. An engineering build number: it is not a contractual release and claims no acceptance (DECISIONS.md D-16)."
+            echo
+            echo "The archive is the WordPress root. It holds no \`wp-config.php\` and no uploads, and **it does not hold the translation plugin family**: the server adds these at deploy time and checks them against \`mizzey-release.json\`:"
+            echo
+            jq -r '.plugins.server_supplied[] | "- `\(.slug)` \(.version)"' mizzey-release.json
+            echo
+            echo "Bundled from wordpress.org:"
+            echo
+            jq -r '.plugins.bundled[] | "- `\(.slug)` \(.version)"' mizzey-release.json
+            echo
+            jq -r '"WordPress \(.wordpress), CoreX \(.corex.version) (\(.corex.vendor) vendor tree)."' mizzey-release.json
+          } > notes.md
+          # An existing release is never replaced: gh fails, and so does the job.
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+            --title "Staging build $GITHUB_REF_NAME" --notes-file notes.md \
+            "release/mizzey-$GITHUB_REF_NAME.zip" "release/mizzey-$GITHUB_REF_NAME.zip.sha256"
