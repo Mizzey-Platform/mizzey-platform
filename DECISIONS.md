@@ -1579,9 +1579,10 @@ to Claude Design.
 (`d45aca9310f3bc758b8fc94244f79192e92de026`), with item 5 put to him as an open question and ruled by him the
 same day. The tooling it describes followed in order, each approved by him: the release packer (#345,
 `14a8188`), the release workflow (#346, `1b21d25`) and the staging tool on the server (#347, `de5d4d8`). **What
-is applied is the decision and the tooling. Nothing has been carried out: no tag is pushed, no release is
-built, nothing is deployed, and nothing has run on the server or on MariaDB 11.4.** `stack.lock.json` is
-unchanged, as item 4 requires.
+is applied is the decision and the tooling. At the merge nothing had been carried out. Since then the first
+tag, `v0.1.0`, was pushed on the owner's instruction on 11 October 2026, and the release workflow built and
+published it on its first run. Nothing is deployed, and nothing has run on the server or on MariaDB 11.4.**
+`stack.lock.json` is unchanged, as item 4 requires.
 
 Proposed on Mustafa's instruction of 11 October 2026. **Owner engineering decisions. None is a client
 confirmation, none is contractual acceptance, and none decides production hosting (OD-27, OD-14).**
