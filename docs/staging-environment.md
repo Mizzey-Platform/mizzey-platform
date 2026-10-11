@@ -220,7 +220,7 @@ the local address. **No tunnel has been opened, and no public address exists yet
 
 ## The copy on the developer's server
 
-D-16, proposed in pull request #344, puts the reviewed staging copy on the developer's own server at
+D-16 puts the reviewed staging copy on the developer's own server at
 `https://staging.mizzey.com`, behind Cloudflare Access. This section is how the same tool is run there. **None
 of it has been run on the server yet**: it is unit-tested with a stand-in for the container
 (`tools/tests/test_staging_server.py`) and nothing more, until the first reset there is recorded.

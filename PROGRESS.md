@@ -2,8 +2,21 @@
 
 Live status. First action each session: read this, then continue from **Next**.
 
-## Now (6 October 2026)
+## Now (11 October 2026)
 
+- **Staging on the developer's own server: D-16 is applied, and nothing is carried out yet.** PR #344, approved
+  by the owner, squash-merged on 11 October 2026 as `d45aca9`. The reviewed staging copy moves to the
+  developer's server at `https://staging.mizzey.com`, behind Cloudflare Access, on MariaDB 11.4 as a second
+  engine, and stays up between reviews on the three conditions of item 5. It runs a tagged release:
+  `.github/workflows/release.yml` (#346, `1b21d25`) builds one on a tag `vX.Y.Z` of `main` with
+  `tools/release_pack.py` (#345, `14a8188`) and publishes `mizzey-<tag>.zip` and its checksum as a pre-release
+  of this repository, **without the translation plugin family while the repository is public**: the manifest
+  lists the five plugins and the server adds and checks them. `mizzey-site/tests/staging/staging_server.py`
+  (#347, `de5d4d8`) runs the staging tool there through `docker exec`, with the guards of the local copy.
+  **Not run: the release workflow has never run, no tag exists, and nothing of the server profile has met a
+  container or MariaDB 11.4.** The local copy's commands are unchanged. `stack.lock.json` is unchanged until
+  the engine is tested. How: `docs/release-pipeline.md`, and `docs/staging-environment.md`, "The copy on the
+  developer's server". Internal tooling and a record, no client-facing change, and not production (OD-27).
 - **Design first: D-14 is applied.** PR #336 was approved by the owner and squash-merged on 6 October 2026 as
   `124c064` (`124c0641cc8a33129bb0d311fe748d9c9455b267`), after the path policy for `design/` merged on its own as PR #337 (`3937786`). Functional PBI
   implementation is frozen by the owner's instruction: #249 is not started, no `006-` spec exists, and Spec Kit is
@@ -149,7 +162,8 @@ Live status. First action each session: read this, then continue from **Next**.
   `http://127.0.0.1:8088`: own web server process, database, account, keys and uploads, the code of a named
   commit, invented data only, all mail captured, every screen marked. Backed up, and **restored from its backup
   and compared: PASS**. AC-244-01 to AC-244-11 technically verified; production is not provisioned (`pending
-  OD-27`), so #244 is `In progress`. **It has no public address**: the tunnel needs one Cloudflare sign-in. How to
+  OD-27`), so #244 is `In progress`. **It has no public address**, and since D-16 it is not given one: the fixed address belongs to the copy on the
+  server. How to
   run it: `docs/staging-environment.md`.
 - **Staging found defects on its first day** (`docs/2026-10-05-staging-verification.md`), none corrected:
   #246's stock report omits an Arabic-only item outside the Arabic context and lists nothing shared inside it,
@@ -262,9 +276,12 @@ staging: `docs/2026-10-05-staging-regression-after-repairs.md`. No known enginee
    observability, #273 the data model, #275 staff accounts and the log, #276 product management, #280 order
    management. #247 follows #249. #268, #269, #271 and #272 are standing records kept alongside.
 4. **Owner actions that are not engineering:**
-   - **Run `cloudflared tunnel login` once.** It is the one manual step for the fixed staging address (D-13: a
-     named tunnel, not a temporary one), and it needs a domain in the Cloudflare account. Everything else is
-     prepared and is done after it: `docs/staging-environment.md`, "The Cloudflare Tunnel".
+   - **Bring up staging on the server (D-16).** `cloudflared tunnel login` on the Windows machine is no longer
+     owed (D-16 item 3). In order: push the first tag `vX.Y.Z`, which is the release workflow's first run; on
+     the development machine, with development running, `staging.py parity-export`; on the server, the five
+     translation plugins, the `wp-config.php` that `staging.py server-config` prints, the deploy, the Access
+     policy and the tunnel route, then `build`, `reset`, `check` and `restore-test`. Their output is the
+     evidence `stack.lock.json` waits for. `docs/staging-environment.md`, "The copy on the developer's server".
    - **Send the ERP pack**, after filling in the recipient and the dates: `docs/erp-pack/`.
    - **Send the Accountant clarification** MS-CLR-2026-037, version 1.1, for acknowledgement, **and the two PRE
      companions**, now rendered as client documents MS-CMP-2026-038 and MS-CMP-2026-039, for information. The
