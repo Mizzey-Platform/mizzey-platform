@@ -73,6 +73,18 @@ Historical files are never re-judged. The house rules look only at added lines, 
   needs a `Sensitive changes:` line, but it is not prevented. Running the checker from `main` does not make CI
   tamper-proof.
 
+## Release (`.github/workflows/release.yml`)
+
+- Runs on a tag `vX.Y.Z` and on nothing else, never on a pull request, so a fork cannot reach it. It refuses a
+  tag whose commit is not on `main`. What it builds and publishes is in `docs/release-pipeline.md` (D-16).
+- Same runner and the same pinned actions as CI. `php`, `composer` and `node` are the runner's own.
+- Its `GITHUB_TOKEN` may write repository contents, which is what creating a release needs, and it is the only
+  job in the repository that can. No other secret is used.
+- It uploads no workflow artifact and keeps no cache, and it fetches nothing paid: the repository and its
+  releases are public.
+- **Limit.** Anyone who can push a tag can publish a release. On the free plan nothing restricts that
+  server-side.
+
 ## Local push guard (`.githooks/pre-push`)
 
 Enable once per clone with `git config core.hooksPath .githooks`. It blocks pushes to `main` and non-fast-forward
