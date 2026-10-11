@@ -130,13 +130,17 @@ generation is disabled, and the agent-context skill is removed.
   `tasks/JOURNEY.md` included), `docs/discovery/`, `docs/decisions/` and Project 4 describe an engagement that was
   never signed. No scope, surface, flow or wireframe is derived from them. The signed Option B scope and
   `docs/scope/backlog-ownership.json` are what govern.
-- **Development and staging run on the developer's machine**, the staging and demonstration copy isolated, on its
-  own database, with synthetic data only, reviewed through a Cloudflare Tunnel. Production hosting stays the
-  client's written decision (OD-27). Staging is built, reset, backed up and restored with
-  `mizzey-site/tests/staging/staging.py` (`docs/staging-environment.md`); its destructive commands need
-  `MIZZEY_CONFIRM_STAGING=yes` and refuse any other environment. **A feature's DOD-04 check is run on staging
-  through the real request a browser makes**: a scenario that passes inside one process is not that check, as
-  #246 showed. A scripted pass is recorded as scripted, and is never called a person's look or acceptance.
+- **Development runs on the developer's machine, and staging on machines the developer owns** (D-10, D-16): the
+  staging and demonstration copy isolated, on its own database, with synthetic data only. The reviewed copy is
+  on the developer's server at a fixed address behind Cloudflare Access, runs a tagged release that CI built
+  and the server pulled, and uses MariaDB 11.4, a second engine beside the MySQL 8.3.0 the suite runs on. The
+  copy on the Windows machine stays as the developer's own check. Production hosting stays the client's written
+  decision (OD-27). **Nothing paid goes into this public repository, its releases or its workflow artifacts.**
+  Staging is built, reset, backed up and restored with `mizzey-site/tests/staging/staging.py`
+  (`docs/staging-environment.md`); its destructive commands need `MIZZEY_CONFIRM_STAGING=yes` and refuse any
+  other environment. **A feature's DOD-04 check is run on staging through the real request a browser makes**: a
+  scenario that passes inside one process is not that check, as #246 showed. A scripted pass is recorded as
+  scripted, and is never called a person's look or acceptance.
 - **P1-E rows** get no final criteria before PRE-09 is approved. Choose no ERP mechanism before the ERP team's input.
 - **Native first.** Custom code needs a recorded gap.
 - **The contractual stage never moves.** Engineering timing is noted separately.

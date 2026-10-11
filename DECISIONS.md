@@ -1572,3 +1572,85 @@ sets how the wireframes are produced. The shared stylesheet, `design/wireframes/
 in the pull request after #340. It is supporting preparation for execution, and this decision does not depend
 on it. **No wireframe is drawn, and the calibration set has not started**: it begins on the owner's instruction
 to Claude Design.
+
+## 2026-10-11 - D-16: staging on the developer's own server, at a fixed address, built from a tagged release
+
+**Status: proposed in the pull request that adds this entry, reviewed by the owner, pending merge. Not applied.
+Nothing here is in effect until that pull request is merged. Item 5 was put to the owner as an open question
+and carries his ruling of 11 October 2026.**
+
+Proposed on Mustafa's instruction of 11 October 2026. **Owner engineering decisions. None is a client
+confirmation, none is contractual acceptance, and none decides production hosting (OD-27, OD-14).**
+
+**1. The reviewed staging and demonstration copy is hosted on a server the developer owns and operates, at one
+fixed address, `https://staging.mizzey.com`.** It is still not production, it still holds invented data only,
+and every rule of D-10 and D-12 about staging stands. The server opens no inbound port: a request arrives through
+a Cloudflare Tunnel the server opens outwards, then the server's own web server, a PHP container, and a database
+only that container's account can reach. The server's configuration is kept in the developer's private
+repository and is not copied here.
+
+**2. The address is closed by Cloudflare Access, with a one-time code sent to a named email address.** This
+replaces, on the server, the web server sign-in the local copy asks of a request that arrived through a tunnel.
+The public host name is not routed before the Access policy exists. Every response carries the instruction to
+search engines not to index, set by the server's web server and not by WordPress, for the reason D-13 and the
+staging plugin already record: the sitemap and `robots.txt` have to stay inspectable (#242).
+
+**3. This supersedes D-13 item 4 in one respect.** The fixed address stands. The tunnel is the server's own, and
+no tunnel is opened from the Windows machine: `cloudflared tunnel login` there is no longer an owed owner
+action.
+
+**4. The server's database engine is MariaDB 11.4, and that is a second engine, not a replacement.** Every
+discovery probe and every integration scenario ran on MySQL 8.3.0, which stays the engine of the development
+runtime and of the automated suite. `stack.lock.json` records MariaDB 11.4 as a second engine only after the
+staging reset, the seed, the restore test and the scripted staging passes have run on it, with the observed PHP
+patch version of the server beside it. Until then the lock is unchanged, and a result on one engine is never
+reported as evidence for the other (constitution M-8). A difference between the two engines is a finding to
+report, not something to code around silently. The production engine is still set with hosting (OD-27). The
+server also offers an object cache service; the stack has no object cache component, and adding one is a stack
+change this decision does not make.
+
+**5. Staging stays up between reviews, behind Access.** `docs/staging-environment.md` says today "Staging is
+not meant to be reachable when nobody is reviewing", written for a tunnel opened from the developer's machine
+behind a shared password. Two options were put to the owner:
+
+| | Stays up, behind Access | Up for reviews only |
+|---|---|---|
+| How | The Access policy lists named addresses only, with a session that expires | The Access policy, or the tunnel route, is closed between reviews and opened for each one |
+| For | The fixed address can be written into the walkthrough and acceptance documents once; the device rows of the browser matrix and the client's own checks happen at times the developer does not choose | The smallest exposure: nothing answers at all outside a review |
+| Against | A running copy of unreleased work answers a sign-in page at all times | Every review needs the developer to open it first, and a document that cites the address is wrong most of the time |
+
+**Ruled by the owner on 11 October 2026: the recommended option on each open question, which here is the
+first.** Staging stays up, behind Access, on three conditions: the policy names individual addresses and has no
+"everyone" or domain-wide rule, the session lasts no longer than a day, and the list is read again before each
+client review. The sentence in `docs/staging-environment.md` goes on describing the local copy, where it still
+holds. An owner engineering decision: not a client confirmation and not a scope change.
+
+**6. Staging on the server runs a tagged release, built by CI and pulled by the server.** A tag `vX.Y.Z` on a
+commit of `main` builds the flat WordPress tree with `tools/corex-sync.mjs` and `tools/build-dist.mjs`, adds the
+plugins published on wordpress.org at the versions `stack.lock.json` records, and publishes one archive and its
+checksum as a release of this repository. The server downloads it; nothing is pushed to the server, and no
+self-hosted runner is attached to this public repository. **Nothing paid is ever placed in this repository, its
+releases or its workflow artifacts.** While the repository is public the release therefore does not contain the
+translation plugin family: its manifest lists those five plugins with the versions `stack.lock.json` records,
+and the server adds them at deploy time from a folder of its own and checks them against that list. Moving them
+into the release is a later pull request, made only after the owner has made the repository private. A tag is
+an engineering build number. It is not the contract's first or second release, and it claims no acceptance.
+
+**7. CoreX stays pinned at v0.42.0 for this.** The third-party plugins are added by Mizzey tooling after the
+CoreX builder has run, because that builder packages CoreX and the client source only. Nothing in CoreX is
+changed.
+
+**8. The copy on the Windows machine stays**, as the developer's own check before a tag. Once the server copy
+has been reset, seeded and restore-tested and that run is recorded, the server copy is the one reviews and the
+DOD-04 check of a feature are run on. Until then they stay on the local copy. The criteria of
+`specs/005-local-staging-environment` were verified on the local copy: their verification on the server is a
+separate record, made when it has been run, and is not implied by this decision.
+
+**9. The translation plugin on the server is the same unregistered test copy development and local staging
+use**, as `docs/staging-environment.md` already says of them. The client holds the production licence. The copy
+reaches the server by the owner's own hand, into a folder on the server, and through nothing this repository
+publishes.
+
+**Owner actions this needs, none of which the agent performs without instruction:** placing the translation
+plugin family in the server's folder; the Cloudflare Access policy and the tunnel route for the host name; and
+the commands on the server.
