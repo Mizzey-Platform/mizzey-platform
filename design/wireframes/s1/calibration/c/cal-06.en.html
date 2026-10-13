@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="wf-surfaces" content="sf-mini-cart sf-cart sf-free-shipping-progress">
+<meta name="wf-viewport" content="desktop">
+<meta name="wf-direction" content="c">
+<title>cal-06 Mini-cart, cart · Direction C · English LTR</title>
+<link rel="stylesheet" href="../../../_shared/wireframe.css">
+<style>
+body{padding:32px 40px 96px}
+.wf-meta{display:flex;flex-direction:column;gap:16px;max-inline-size:1660px;margin-block-end:40px;padding:20px 24px}
+.meta__eyebrow{font:600 11px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.meta__title{font-size:24px;font-weight:650;line-height:1.25;margin-block:6px 6px}
+.meta__lede{font-size:13.5px;color:#3a3a3a;max-inline-size:780px;text-wrap:pretty}
+.meta__facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 16px;margin-block-start:14px;font-size:12.5px}
+.meta__facts dt{color:#5c5c5c}.meta__facts dd{margin:0}
+.meta__facts code,.wf-note code,.attach code{font:11.5px ui-monospace,Menlo,Consolas,monospace}
+.meta__nav{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg a,.seg span{font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 9px;border:1px solid #bdbdbd;text-decoration:none;color:#1f1f1f;background:#fff}
+.seg .on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+.seg .off{color:#8a8a8a;border-style:dashed}
+.sheet{display:flex;flex-direction:column;gap:64px}
+.board{display:flex;gap:28px;align-items:flex-start}
+.board__notes{flex:none;inline-size:340px;position:sticky;inset-block-start:16px}
+.board__notes>.wf-note:first-child,.mnotes>.wf-note{margin-block-start:0}
+.mboard{display:flex;flex-direction:column;gap:20px}
+.mrow{display:flex;gap:28px;align-items:flex-start}
+.mnotes{display:grid;grid-template-columns:repeat(4,390px);gap:12px 28px;align-items:start}
+.wf-frame{position:relative}
+.wf-frame--desktop{inline-size:1280px;max-inline-size:none}
+.wf-frame--mobile{inline-size:390px;max-inline-size:none}
+.wf-frame__label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+.wf-note{font-size:12px;line-height:1.5}
+.wf-note b{font-weight:650}
+.dsq::before{content:"Design source question"}
+.rtl-note::before{content:"Right to left, decided"}
+.pin{display:inline-flex;align-items:center;justify-content:center;inline-size:20px;block-size:20px;border-radius:50%;background:#1f1f1f;color:#fff;font:700 10.5px/1 ui-monospace,Menlo,Consolas,monospace;flex:none;vertical-align:middle;margin-inline-end:6px}
+.pinat{position:absolute;z-index:6}
+.ph{position:relative;display:flex;align-items:flex-end;justify-content:flex-start;background:#e4e4e4;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.045) 0 1px,transparent 1px 11px);overflow:hidden;min-block-size:24px}
+.ph__l{position:relative;z-index:1;margin:8px;padding:2px 6px;background:rgba(255,255,255,.88);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace;max-inline-size:calc(100% - 16px)}
+.ph--dark{background:#bdbdbd;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.06) 0 1px,transparent 1px 11px)}
+.r11{aspect-ratio:1/1}.r45{aspect-ratio:4/5}.r34{aspect-ratio:3/4}.r23{aspect-ratio:2/3}.r169{aspect-ratio:16/9}.r21{aspect-ratio:2/1}.r31{aspect-ratio:3/1}.r41{aspect-ratio:4/1}.r43{aspect-ratio:4/3}.r32{aspect-ratio:3/2}.r54{aspect-ratio:5/4}
+.lns{display:flex;flex-direction:column;gap:8px}
+.ln{display:block;block-size:8px;background:#e2e2e2;border-radius:2px}
+.logo{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #8a8a8a;font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;letter-spacing:.06em;block-size:34px;padding-inline:14px;white-space:nowrap;flex:none}
+.attach{border:1px dashed #9a9a9a;padding:14px 16px;font-size:12px;color:#5c5c5c;background:#fafafa}
+.stars{letter-spacing:1px;font-size:12px;color:#1f1f1f}
+.money{white-space:nowrap}
+.chev{display:inline-block;font-weight:400}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.muted{color:#6b6b6b}.faint{color:#8a8a8a}
+.strike{text-decoration:line-through;color:#8a8a8a}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:2}
+.rel{position:relative}
+.ltr-field{direction:ltr;text-align:start}
+html[lang="ar"] .ltr-field{text-align:end}
+html[lang="ar"] .wf-frame{line-height:1.7}
+html[lang="ar"] .eyebrow{letter-spacing:0;text-transform:none}
+html[lang="ar"] .disp,html[lang="ar"] .h1,html[lang="ar"] .h2{letter-spacing:0}
+html[lang="ar"] .wf-note,html[lang="ar"] .wf-meta,html[lang="ar"] .wf-frame__label{line-height:1.5}
+
+.fC{background:#f2f2f2;color:#151515;font-size:13.5px}
+.g{padding-inline:32px}
+.box{background:#fff;border-radius:12px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.h1{font-size:34px;line-height:1.1;font-weight:750;letter-spacing:-.02em}
+.h2{font-size:22px;line-height:1.2;font-weight:750;letter-spacing:-.01em}
+.h3{font-size:16px;line-height:1.3;font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;block-size:44px;padding-inline:20px;background:#151515;color:#fff;font-size:13.5px;font-weight:700;border-radius:10px;border:1.5px solid #151515;white-space:nowrap}
+.btn--2{background:#fff;color:#151515}
+.btn--3{background:#e6e6e6;border-color:#e6e6e6;color:#151515}
+.btn--block{display:flex;inline-size:100%}
+.btn--sm{block-size:34px;padding-inline:14px;font-size:12.5px;border-radius:8px}
+.btn.dis{background:#dedede;border-color:#dedede;color:#7a7a7a}
+.pill{display:inline-flex;align-items:center;gap:6px;block-size:24px;padding-inline:9px;border-radius:999px;background:#151515;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.pill--l{background:#fff;color:#151515;border:1px solid #151515}
+.pill--g{background:#e3e3e3;color:#151515}
+.chip{display:inline-flex;align-items:center;gap:8px;block-size:34px;padding-inline:14px;border-radius:999px;border:1px solid #cfcfcf;background:#fff;font-size:12.5px;font-weight:600;white-space:nowrap}
+.chip--on{background:#151515;color:#fff;border-color:#151515}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-inline-size:18px;block-size:18px;padding-inline:5px;border-radius:9px;background:#151515;color:#fff;font-size:10.5px;font-weight:700}
+.chip--on .cnt,.btn .cnt{background:#fff;color:#151515}
+.hdC{background:#fff;position:relative;z-index:5;border-block-end:1px solid #e0e0e0}
+.hc1{display:flex;align-items:center;gap:16px;block-size:76px;padding-inline:32px}
+.allc{display:inline-flex;align-items:center;gap:10px;block-size:46px;padding-inline:16px;border-radius:10px;background:#f0f0f0;font-weight:700;font-size:13.5px;white-space:nowrap}
+.allc.on{background:#151515;color:#fff}
+.burger{inline-size:16px;block-size:11px;border-block:2px solid currentColor;position:relative;flex:none}
+.burger::after{content:"";position:absolute;inset-inline:0;inset-block-start:2.5px;border-block-start:2px solid currentColor}
+.sbar{flex:1;display:flex;align-items:center;gap:10px;block-size:48px;padding-inline:16px 6px;border-radius:12px;border:2px solid #151515;font-size:14px;color:#6b6b6b;position:relative}
+.sbar.on{color:#151515;box-shadow:0 0 0 4px rgba(0,0,0,.08)}
+.sbar .btn{block-size:36px;margin-inline-start:auto;border-radius:8px}
+.sicon{inline-size:14px;block-size:14px;border:2px solid currentColor;border-radius:50%;flex:none}
+.caret{inline-size:1.5px;block-size:20px;background:#151515}
+.ut{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;min-inline-size:56px}
+.ut i{inline-size:20px;block-size:20px;border:1.8px solid #151515;border-radius:6px;display:block}
+.ut i.r{border-radius:50%}
+.cartb{display:inline-flex;align-items:center;gap:10px;block-size:46px;padding-inline:16px;border-radius:10px;background:#151515;color:#fff;font-weight:700;white-space:nowrap}
+.cartb .cnt{background:#fff;color:#151515}
+.lang{display:inline-flex;align-items:center;block-size:32px;padding-inline:10px;border-radius:8px;border:1px solid #d6d6d6;font-size:12.5px;white-space:nowrap}
+.hc2{display:flex;gap:6px;align-items:center;padding:0 32px 12px;font-size:13px;font-weight:600;overflow:hidden}
+.hc2 a{text-decoration:none;padding:7px 12px;border-radius:999px;white-space:nowrap}
+.hc2 a.on{background:#f0f0f0}
+.promo{display:flex;justify-content:center;align-items:center;gap:14px;block-size:36px;background:#151515;color:#fff;font-size:12.5px;font-weight:600}
+.pane{position:absolute;inset-inline-start:32px;inset-block-start:8px;z-index:6;background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.22);display:grid;grid-template-columns:260px minmax(0,1fr);inline-size:1060px;overflow:hidden}
+.pane__l li{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;font-size:14px;font-weight:600}
+.pane__l li.on{background:#f0f0f0}
+.tile{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600}
+.spc{position:absolute;inset-inline:0;inset-block-start:56px;z-index:6;background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.22);padding:18px;display:grid;grid-template-columns:220px 200px minmax(0,1fr);gap:24px}
+.card{background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.card__img{position:relative}
+.card__badges{position:absolute;inset-block-start:10px;inset-inline-start:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;z-index:2}
+.card__wish{position:absolute;inset-block-start:8px;inset-inline-end:8px;z-index:2;inline-size:32px;block-size:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.card__add{position:absolute;inset-block-end:10px;inset-inline-end:10px;z-index:2;inline-size:38px;block-size:38px;border-radius:10px;background:#151515;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:400}
+.card__add.done{background:#fff;color:#151515;border:1.5px solid #151515;font-size:14px}
+.card__b{padding:10px 12px 14px;display:flex;flex-direction:column;gap:5px}
+.card__name{font-size:13px;line-height:1.35;font-weight:600}
+.card__price{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:14px;font-weight:700}
+.card--oos .ph{opacity:.5}
+.rt{display:flex;gap:4px;align-items:center;font-size:11.5px;color:#5c5c5c}
+.rail{display:grid;gap:14px}
+.arrow{inline-size:36px;block-size:36px;border-radius:50%;background:#fff;border:1px solid #d6d6d6;display:inline-flex;align-items:center;justify-content:center}
+.inp{display:flex;align-items:center;block-size:46px;padding-inline:14px;border:1.5px solid #cfcfcf;border-radius:10px;font-size:14px;background:#fff}
+.inp.pt{color:#8a8a8a}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld>label{font-size:12px;font-weight:700}
+.fld--err .inp{border:2.5px solid #151515}
+.err{font-size:12px;font-weight:700;display:flex;gap:6px;align-items:center}
+.err::before{content:"!";display:inline-flex;inline-size:16px;block-size:16px;border-radius:50%;background:#151515;color:#fff;font-size:10px;align-items:center;justify-content:center;flex:none}
+.cb{inline-size:18px;block-size:18px;border:1.5px solid #8a8a8a;border-radius:5px;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.cb--on{background:#151515;border-color:#151515;color:#fff}
+.tg{inline-size:36px;block-size:20px;border-radius:10px;background:#cfcfcf;position:relative;flex:none}
+.tg::after{content:"";position:absolute;inset-block-start:2px;inset-inline-start:2px;inline-size:16px;block-size:16px;border-radius:50%;background:#fff}
+.sw{display:flex;align-items:center;gap:8px;block-size:40px;padding-inline:6px 12px;border:1.5px solid #d6d6d6;border-radius:10px;font-size:12.5px;font-weight:600}
+.sw i{inline-size:24px;block-size:24px;border-radius:6px;background:#d6d6d6;display:block}
+.sw--on{border-color:#151515;box-shadow:inset 0 0 0 1px #151515}
+.sz{display:inline-flex;align-items:center;justify-content:center;block-size:42px;border:1.5px solid #d6d6d6;border-radius:10px;font-size:13px;font-weight:600}
+.sz--on{border-color:#151515;background:#151515;color:#fff}
+.sz--na{color:#a6a6a6;border-style:dashed;text-decoration:line-through}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #d6d6d6;border-radius:10px;block-size:44px}
+.qty span{inline-size:38px;text-align:center;font-weight:700}
+.qty--sm{block-size:34px}.qty--sm span{inline-size:30px}
+.bar{block-size:8px;background:#e3e3e3;border-radius:4px;overflow:hidden}
+.bar>i{display:block;block-size:100%;background:#151515;border-radius:4px}
+.tabs{display:flex;gap:4px;padding:4px;background:#ececec;border-radius:12px;inline-size:max-content}
+.tab{padding:9px 16px;border-radius:9px;font-size:13px;font-weight:700;color:#5c5c5c}
+.tab--on{background:#fff;color:#151515;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tbl{inline-size:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{text-align:start;padding:10px 12px;border-block-end:1px solid #ececec;font-weight:400}
+.tbl th{inline-size:40%;color:#5c5c5c}
+.tbl tr:nth-child(odd) td,.tbl tr:nth-child(odd) th{background:#f7f7f7}
+.acc{border-block-end:1px solid #ececec;padding-block:12px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;font-weight:700}
+.rc{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid #d6d6d6;border-radius:12px;font-size:14px;background:#fff}
+.rc--on{border-color:#151515;box-shadow:inset 0 0 0 1px #151515}
+.dot{inline-size:18px;block-size:18px;border-radius:50%;border:1.5px solid #8a8a8a;flex:none}
+.rc--on .dot{border:5.5px solid #151515}
+.crumbs{display:flex;gap:6px;font-size:12px;color:#5c5c5c;padding-block:14px}
+.drawer{position:absolute;inset-block:0;z-index:5;background:#fff;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,.25)}
+.drawer--end{inset-inline-end:0}.drawer--start{inset-inline-start:0}
+.dr__h{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-block-end:1px solid #ececec}
+.dr__f{padding:16px 22px;border-block-start:1px solid #ececec;display:flex;flex-direction:column;gap:10px;background:#fff}
+.x{display:inline-flex;align-items:center;justify-content:center;inline-size:34px;block-size:34px;border-radius:50%;background:#f0f0f0;font-size:14px}
+.skel{background:#e6e6e6;border-radius:12px}
+.mh{display:flex;align-items:center;gap:6px;block-size:56px;padding-inline:10px;background:#fff}
+.mh .logo{block-size:28px;font-size:9.5px;margin-inline-end:auto}
+.ib{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:10px;position:relative}
+.ib .cnt{position:absolute;inset-block-start:3px;inset-inline-end:1px;min-inline-size:16px;block-size:16px;font-size:9.5px}
+.bag{inline-size:17px;block-size:18px;border:2px solid #151515;border-radius:3px 3px 5px 5px}
+.c-bottom-sheet{position:absolute;inset-inline:0;inset-block-end:0;z-index:5;background:#fff;border-radius:18px 18px 0 0;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+.grab{display:block;inline-size:40px;block-size:4px;border-radius:2px;background:#cfcfcf;margin:10px auto 2px}
+.step{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#8a8a8a}
+.step i{display:inline-flex;align-items:center;justify-content:center;inline-size:26px;block-size:26px;border-radius:50%;border:1.5px solid #bdbdbd;font-style:normal;font-size:12px}
+.step--done{color:#151515}.step--done i{background:#151515;border-color:#151515;color:#fff}
+.step--on{color:#151515}.step--on i{border:2px solid #151515}
+.sline{flex:1;block-size:2px;background:#d6d6d6;border-radius:1px}
+.sline--done{background:#151515}
+</style>
+</head>
+<body>
+<header class="wf-meta" lang="en" dir="ltr">
+<div>
+<div class="meta__eyebrow">Mizzey · S1 low-fidelity calibration · Direction C, Dynamic Contemporary Ecommerce · English, left to right</div>
+<h1 class="meta__title">cal-06: Mini-cart and cart</h1>
+<p class="meta__lede">Energetic and efficient. A utility-forward header with a wide search and a solid cart button, white cards on a grey page, more products per row, badges and quick add on every card, filters always open and purchase actions always in reach. It shows the most utility-rich candidates.</p>
+<dl class="meta__facts">
+<dt>Surfaces</dt><dd><code>sf-mini-cart</code>, <code>sf-cart</code>, <code>sf-free-shipping-progress</code></dd>
+<dt>States drawn</dt><dd><code>sf-mini-cart:after_add</code>, <code>sf-cart:coupon_applied</code>, <code>sf-free-shipping-progress:not_qualified</code></dd>
+<dt>Interaction options</dt><dd><code>IX-02</code> Drawer that opens on its own after an add; at other times the header shows the count, and pressing it opens the same drawer.</dd>
+<dt>Viewport</dt><dd>Desktop, 1280 frame</dd>
+<dt>Status</dt><dd>Exploration. Locks no pattern and is not owner approval. Neutral: greys, system typeface, no logo, no imagery.</dd>
+</dl>
+</div>
+<nav class="meta__nav" aria-label="Calibration set">
+<div class="seg"><a href="../a/cal-06.en.html">A · Clean Premium Commerce</a><a href="../b/cal-06.en.html">B · Editorial Modern Retail</a><span class="on">C · Dynamic Contemporary Ecommerce</span></div>
+<div class="seg"><span class="on">English, LTR</span><span class="off">English only in calibration</span></div>
+<div class="seg"><a href="cal-01.en.html">cal-01 Header, search, footer</a><a href="cal-02.en.html">cal-02 Mobile header</a><a href="cal-03.en.html">cal-03 Home</a><a href="cal-04.en.html">cal-04 Category</a><a href="cal-05.en.html">cal-05 Product</a><span class="on">cal-06 Mini-cart, cart</span><a href="cal-07.en.html">cal-07 Checkout</a><a href="cal-08.en.html">cal-08 Mobile shopping</a></div>
+</nav>
+</header>
+<main class="sheet">
+<section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">sf-mini-cart: after_add · drawer opened by the add</div><div class="fC rel" style="block-size:760px;overflow:hidden"><div class="hdC">
+<div class="hc1"><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span class="allc "><span class="burger"></span>All categories</span><div class="sbar "><span class="sicon"></span><span>Search for products, brands and categories</span><span class="btn">Search</span></div><span class="lang"><span lang="ar" dir="rtl">العربية</span></span><span class="ut"><i class="r"></i>Sign in</span><span class="ut"><i></i>Wishlist</span><span class="cartb"><span class="bag" style="border-color:#ffffff"></span>Cart<span class="cnt wf-num">3</span></span></div>
+<nav class="hc2"><a href="#" class="">Clothing</a><a href="#" class="">Shoes</a><a href="#" class="">Bags & Accessories</a><a href="#" class="">Home & Living</a><a href="#" class="">Beauty</a><a href="#" class="">Collections</a><a href="#" class="">Brands</a></nav></div><div class="g" style="padding-block:16px;display:grid;grid-template-columns:7fr 5fr;gap:14px"><div class="box"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr">Page behind</span></div></div><div class="box"></div></div><div class="scrim"></div><div class="drawer drawer--end" style="inline-size:420px"><div style="background:#151515;color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center"><b>✓ Added to cart</b><span class="x" style="background:#3a3a3a;color:#fff">✕</span></div><div style="padding:16px 22px;display:flex;flex-direction:column;gap:16px;flex:1"><div style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:start;background:#f2f2f2;border-radius:12px;padding:10px;margin-inline:-10px"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:4px"><span style="font-size:13px;font-weight:600">Washed Linen Overshirt</span><span class="muted" style="font-size:12px">Sand · M</span><span class="qty qty--sm" style="margin-block-start:4px;align-self:flex-start"><span>−</span><span class="wf-num">1</span><span>+</span></span></div><b><span class="money">EGP <span class="wf-num">1,850</span></span></b></div><div class="lns" style="gap:8px"><div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700"><span>Add 1 more item for free shipping</span><span class="wf-num">1 / 2</span></div><div class="bar"><i style="inline-size:50%"></i></div></div><div style="display:flex;justify-content:space-between;align-items:center"><b>Cart <span class="cnt wf-num">3</span></b><u style="font-size:12px">View cart</u></div><div style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:start;"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:4px"><span style="font-size:13px;font-weight:600">Leather Crossbody Bag</span><span class="muted" style="font-size:12px">Black</span><span class="qty qty--sm" style="margin-block-start:4px;align-self:flex-start"><span>−</span><span class="wf-num">1</span><span>+</span></span></div><b><span class="money">EGP <span class="wf-num">3,650</span></span></b></div><div style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:start;"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:4px"><span style="font-size:13px;font-weight:600">Stoneware Mug Set</span><span class="muted" style="font-size:12px">Set of four</span><span class="qty qty--sm" style="margin-block-start:4px;align-self:flex-start"><span>−</span><span class="wf-num">1</span><span>+</span></span></div><b><span class="money">EGP <span class="wf-num">780</span></span></b></div></div><div class="dr__f"><div style="display:flex;justify-content:space-between;font-size:15px"><span>Subtotal</span><b><span class="money">EGP <span class="wf-num">6,280</span></span></b></div><div style="display:grid;grid-template-columns:1fr 1.4fr;gap:8px"><span class="btn btn--2">View cart</span><span class="btn">Checkout</span></div></div></div></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-mini-cart:after_add</b> — Opens after the add with a confirmation band, the added line marked, the free-shipping prompt, then every line with its own quantity control.</aside><aside class="wf-note wf-option" lang="en" dir="ltr"><b>IX-02 · Mini-cart presentation</b><br>Shows: Drawer that opens after an add, with the count alone at other times. Pressing the cart button also opens it, so it is never only a link (CART-12).<br>Alternatives: drawer on every press and add (A), dropdown (B).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-free-shipping-progress:not_qualified</b> — Prompt with a “1 / 2” progress read from the rule (OD-04 owner default).</aside><aside class="wf-note wf-motion" lang="en" dir="ltr" data-trigger="Item added" data-effect="Drawer slides in from the inline-end edge; the confirmation band appears first" data-role="essential" data-reduced-motion="Drawer appears in place">After add.</aside><aside class="wf-note dsq" lang="en" dir="ltr"><b>cal-06 · <code>sf-free-shipping-progress</code> · CART-07, BR-002</b><br>Missing: whether the prompt may show the rule as a count (“1 / 2”). Affects: C’s numeric progress label.</aside></div></section><section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">sf-cart: coupon_applied · sf-free-shipping-progress: not_qualified · CART-08 rail with quick add</div><div class="fC"><div class="hdC">
+<div class="hc1"><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span class="allc "><span class="burger"></span>All categories</span><div class="sbar "><span class="sicon"></span><span>Search for products, brands and categories</span><span class="btn">Search</span></div><span class="lang"><span lang="ar" dir="rtl">العربية</span></span><span class="ut"><i class="r"></i>Sign in</span><span class="ut"><i></i>Wishlist</span><span class="cartb"><span class="bag" style="border-color:#ffffff"></span>Cart<span class="cnt wf-num">3</span></span></div>
+<nav class="hc2"><a href="#" class="">Clothing</a><a href="#" class="">Shoes</a><a href="#" class="">Bags & Accessories</a><a href="#" class="">Home & Living</a><a href="#" class="">Beauty</a><a href="#" class="">Collections</a><a href="#" class="">Brands</a></nav></div><div class="g" style="padding-block:20px 0"><h1 class="h1">Cart <span class="muted wf-num" style="font-size:18px">3 items</span></h1></div>
+<div class="g" style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;padding-block:16px 0;align-items:start"><div class="lns" style="gap:14px"><div class="box rel" style="overflow:hidden"><span class="pin" lang="en">1</span><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 110px 30px;gap:16px;padding:12px 18px;background:#f7f7f7" class="eyebrow"><span>Product</span><span>Price</span><span>Quantity</span><span>Total</span><span></span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 110px 30px;gap:16px;align-items:center;padding:14px 18px;border-block-end:1px solid #ececec"><div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:3px"><b style="font-size:13.5px">Washed Linen Overshirt</b><span class="muted" style="font-size:12px">Sand · M</span><u style="font-size:12px">Move to wishlist</u></div></div><span><span class="money">EGP <span class="wf-num">1,850</span></span></span><span class="qty qty--sm"><span>−</span><span class="wf-num">1</span><span>+</span></span><b><span class="money">EGP <span class="wf-num">1,850</span></span></b><span class="x" style="inline-size:28px;block-size:28px">✕</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 110px 30px;gap:16px;align-items:center;padding:14px 18px;border-block-end:1px solid #ececec"><div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:3px"><b style="font-size:13.5px">Leather Crossbody Bag</b><span class="muted" style="font-size:12px">Black</span><u style="font-size:12px">Move to wishlist</u></div></div><span><span class="money">EGP <span class="wf-num">3,650</span></span></span><span class="qty qty--sm"><span>−</span><span class="wf-num">1</span><span>+</span></span><b><span class="money">EGP <span class="wf-num">3,650</span></span></b><span class="x" style="inline-size:28px;block-size:28px">✕</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 110px 30px;gap:16px;align-items:center;padding:14px 18px;border-block-end:1px solid #ececec"><div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:center"><div style="border-radius:8px;overflow:hidden"><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div></div><div class="lns" style="gap:3px"><b style="font-size:13.5px">Stoneware Mug Set</b><span class="muted" style="font-size:12px">Set of four</span><u style="font-size:12px">Move to wishlist</u></div></div><span><span class="money">EGP <span class="wf-num">780</span></span></span><span class="qty qty--sm"><span>−</span><span class="wf-num">1</span><span>+</span></span><b><span class="money">EGP <span class="wf-num">780</span></span></b><span class="x" style="inline-size:28px;block-size:28px">✕</span></div></div>
+<div class="box rel" style="padding:18px"><span class="pin" lang="en">3</span><div style="display:flex;align-items:center;gap:16px;margin-block-end:16px"><h2 class="h2">Add one more for free shipping</h2><span style="margin-inline-start:auto;display:flex;gap:8px"><span class="arrow chev">‹</span><span class="arrow chev">›</span></span></div><div class="rail" style="grid-template-columns:repeat(5,minmax(0,1fr))"><div class="card "><div class="card__img"><div class="card__badges"><span class="pill">Limited</span></div><span class="card__wish">♡</span><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><span class="card__add ">+</span></div><div class="card__b"><div class="card__name">Stainless Steel Bottle, 750 ml</div><div class="card__price"><span class="money">EGP <span class="wf-num">690</span></span></div></div></div><div class="card "><div class="card__img"><div class="card__badges"></div><span class="card__wish">♡</span><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><span class="card__add ">+</span></div><div class="card__b"><div class="card__name">Merino Wool Scarf</div><div class="card__price"><span class="money">EGP <span class="wf-num">1,100</span></span></div></div></div><div class="card "><div class="card__img"><div class="card__badges"><span class="pill">New</span></div><span class="card__wish">♡</span><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><span class="card__add ">+</span></div><div class="card__b"><div class="card__name">Cashmere Blend Beanie</div><div class="card__price"><span class="money">EGP <span class="wf-num">950</span></span></div></div></div><div class="card "><div class="card__img"><div class="card__badges"></div><span class="card__wish">♡</span><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><span class="card__add ">+</span></div><div class="card__b"><div class="card__name">Woven Straw Tote</div><div class="card__price"><span class="money">EGP <span class="wf-num">1,350</span></span></div></div></div><div class="card "><div class="card__img"><div class="card__badges"><span class="pill">Best seller</span></div><span class="card__wish">♡</span><div class="ph r11"><span class="ph__l" lang="en" dir="ltr"></span></div><span class="card__add ">+</span></div><div class="card__b"><div class="card__name">Organic Cotton Waffle Towel Set of Four</div><div class="card__price"><span class="money">EGP <span class="wf-num">1,250</span></span></div></div></div></div></div></div>
+<aside class="box lns rel" style="padding:20px;gap:14px;position:sticky;inset-block-start:16px"><span class="pin" lang="en">2</span><div class="lns" style="gap:8px"><div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700"><span>Add 1 more item for free shipping</span><span class="wf-num">1 / 2</span></div><div class="bar"><i style="inline-size:50%"></i></div></div><div class="lns" style="gap:6px"><span style="font-size:12px;font-weight:700">Coupon</span><div style="display:flex;gap:8px"><div class="inp pt" style="flex:1;block-size:42px">Coupon code</div><span class="btn btn--2" style="block-size:42px">Apply</span></div><span class="chip chip--on" style="align-self:flex-start">WELCOME10 · −10% ✕</span></div><div style="border-block-start:1px solid #ececec"></div>
+<div class="lns" style="gap:8px"><div style="display:flex;justify-content:space-between"><span>Subtotal</span><span class="money">EGP <span class="wf-num">6,280</span></span></div><div style="display:flex;justify-content:space-between"><span>Coupon</span><span>− <span class="money">EGP <span class="wf-num">628</span></span></span></div><div style="display:flex;justify-content:space-between"><span>Shipping</span><span class="muted">At checkout</span></div></div><div style="display:flex;justify-content:space-between;font-size:20px;font-weight:800;padding-block:6px;border-block-start:1px solid #ececec"><span>Total</span><span class="money">EGP <span class="wf-num">5,652</span></span></div><span class="btn btn--block" style="block-size:50px">Checkout</span></aside></div><footer style="background:#fff;margin-block-start:40px;border-block-start:1px solid #e0e0e0">
+<div class="g" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.6fr);gap:28px;padding-block:40px">
+<div><div class="eyebrow" style="margin-block-end:12px">Shop</div><ul><li style="padding-block:4px">Clothing</li><li style="padding-block:4px">Shoes</li><li style="padding-block:4px">Bags & Accessories</li><li style="padding-block:4px">Home & Living</li><li style="padding-block:4px">Beauty</li></ul></div><div><div class="eyebrow" style="margin-block-end:12px">Help</div><ul><li style="padding-block:4px">Contact us</li><li style="padding-block:4px">Shipping policy</li><li style="padding-block:4px">Returns policy</li><li style="padding-block:4px">Help and FAQs</li></ul></div><div><div class="eyebrow" style="margin-block-end:12px">About</div><ul><li style="padding-block:4px">About us</li><li style="padding-block:4px">Authenticity</li></ul></div><div><div class="eyebrow" style="margin-block-end:12px">Legal</div><ul><li style="padding-block:4px">Privacy policy</li><li style="padding-block:4px">Terms and conditions</li></ul></div>
+<div class="lns" style="gap:14px"><div class="box" style="background:#f2f2f2;padding:18px;display:flex;flex-direction:column;gap:10px"><b>Stay in the loop</b><span class="muted" style="font-size:12.5px">Sign-up prompt, per HOME-09.</span><div style="display:flex;gap:8px"><div class="inp pt" style="flex:1;block-size:42px">Email address</div><span class="btn" style="block-size:42px">Sign up</span></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11.5px" class="mono faint"><span>Phone · OD-18</span><span>Email · OD-18</span><span>Address · OD-18</span></div></div></div>
+<div class="g" style="display:flex;justify-content:space-between;align-items:center;padding-block:14px;border-block-start:1px solid #ececec;font-size:12px"><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span class="mono faint">© Legal entity name · OD-18</span><span class="lang"><span lang="ar" dir="rtl">العربية</span></span></div></footer></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-cart:default</b> — <span class="pin" lang="en">1</span>A table: product, price, quantity, total, remove. Dense and scannable for several lines.</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-cart:coupon_applied</b> — <span class="pin" lang="en">2</span>Field stays available; the applied coupon is a solid chip with its saving and a remove control; totals updated.</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>sf-free-shipping-progress:not_qualified</b> — Prompt at the top of the summary, close to the total it affects.</aside><aside class="wf-note wf-note" lang="en" dir="ltr"><span class="pin" lang="en">3</span>Suggestion rail (CART-08) with quick add; an add updates the progress in place.</aside><aside class="wf-note wf-motion" lang="en" dir="ltr" data-trigger="Quick add on a suggestion" data-effect="Card shows a tick; progress bar fills; the prompt changes to the qualified sentence" data-role="essential" data-reduced-motion="Values change with no animation">Qualifying (sf-free-shipping-progress: qualified).</aside><aside class="wf-note wf-recommend" lang="en" dir="ltr">The table is the fastest to scan and edit. On a phone it becomes stacked rows, so the table is a desktop treatment only.</aside></div></section>
+</main>
+</body>
+</html>
