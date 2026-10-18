@@ -90,7 +90,9 @@ class TheCommittedState(unittest.TestCase):
         self.assertLessEqual(used, known)
         self.assertEqual({f["viewport"] for f in frames}, {"mobile", "desktop"})
         briefed = {e["surface"] for e in data["manifest"]["entries"] if e["brief"]}
-        self.assertEqual(used, briefed, "the briefed surfaces are exactly those of the calibration set")
+        self.assertLessEqual(used, briefed, "every surface of the calibration set is briefed")
+        batches = {e["surface"]: e["batch"] for e in data["manifest"]["entries"]}
+        self.assertFalse([s for s in briefed if batches[s] is None], "a brief belongs to a surface in a review batch")
 
     def test_every_designable_surface_is_in_one_batch_and_the_rest_say_why(self):
         data = dw.load(ROOT)
