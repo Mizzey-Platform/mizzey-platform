@@ -132,14 +132,14 @@ WooCommerce add to cart with options block.
 
 ### IX-03: Keeping the buy actions in reach on the product page
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** Add to Cart and Buy Now are available on the product page (PDP-08, PDP-09). No row says whether they stay in view while the page scrolls.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -147,6 +147,7 @@ Candidate patterns:
 - Buy area in the page flow only
 - Sticky buy bar on mobile once the buy area has scrolled away
 - Sticky buy area beside the gallery on desktop
+- Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away
 
 | Constraint | What it is |
 |---|---|
@@ -205,14 +206,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 8 |
-| Interaction decisions pending | IX-03 |
+| Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

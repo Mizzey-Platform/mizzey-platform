@@ -70,6 +70,8 @@ Flows it serves: Arrival and discovery (`F01`); Navigation and browsing (`F02`);
 | `F06.5` | Or adds from a listing | PLP-04, PLP-05 |
 | `F07.4` | Adds one more item from a suggestion | CART-08 |
 
+**Contains:** Product badges (`sf-product-badges`).
+
 **Appears inside:** Home page (`sf-home`), Products listing (`sf-shop`), Category page (`sf-category`), Collection page (`sf-collection`), Brand page (`sf-brand`), Search results (`sf-search-results`), Related products (`sf-pdp-related`), Recently viewed, on the product page (`sf-pdp-recently-viewed`), Cart (`sf-cart`), Wishlist (`sf-wishlist`), Recently viewed products (`sf-recently-viewed`), Offer and campaign page (`ct-campaign-page`).
 
 **Components.** Structure and states only: no brand value.
@@ -193,7 +195,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Listing, filters and search (`batch-02`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |

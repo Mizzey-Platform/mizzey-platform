@@ -191,14 +191,14 @@ WooCommerce single product template (block theme).
 
 ### IX-03: Keeping the buy actions in reach on the product page
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** Add to Cart and Buy Now are available on the product page (PDP-08, PDP-09). No row says whether they stay in view while the page scrolls.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -206,6 +206,7 @@ Candidate patterns:
 - Buy area in the page flow only
 - Sticky buy bar on mobile once the buy area has scrolled away
 - Sticky buy area beside the gallery on desktop
+- Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away
 
 | Constraint | What it is |
 |---|---|
@@ -217,14 +218,14 @@ Weighed in the review: length of the product page; mobile reach; accessibility; 
 
 ### IX-08: Product information layout, around the description tab
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** The product page carries the key features, the full description as a tab, the specifications table, delivery information, the returns summary and the authenticity statement (PDP-11 to PDP-16). The open part is how the other information is arranged around the description tab.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | The full description stays a tab on every viewport, with other information groups such as delivery, returns or authenticity in accordions or stacked blocks around it |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -292,14 +293,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 12 |
-| Interaction decisions pending | IX-03, IX-08 |
+| Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

@@ -163,7 +163,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Cart and authentication (`batch-04`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |

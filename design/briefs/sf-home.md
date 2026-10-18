@@ -185,14 +185,14 @@ A static front page built from the curated section library in the block editor.
 
 ### IX-09: Home hero: one banner or a slider
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** An admin-managed hero at the top of the home page (HOME-01). HOME-01 names a banner or a slider and fixes neither.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Single hero banner |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -256,14 +256,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 7 |
-| Interaction decisions pending | IX-09 |
+| Interaction decisions pending | None |
 | Calibration frames | Home page (`cal-03`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
