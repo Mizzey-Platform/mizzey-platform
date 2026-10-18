@@ -707,7 +707,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "briefed",
+      "composes": ["sf-product-badges"]
     },
     {
       "id": "sf-listing-filters",

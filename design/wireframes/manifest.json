@@ -44,8 +44,8 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header", "gl-mega-menu", "gl-language-switcher", "sf-search-suggestions", "gl-footer"],
         "shows": ["gl-header:signed_out", "gl-header:cart_with_count", "gl-mega-menu:open", "sf-search-suggestions:suggestions"],
-        "interaction_options": ["IX-02", "IX-05", "IX-07"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-02",
@@ -54,8 +54,8 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header-mobile", "gl-mobile-nav", "gl-language-switcher", "sf-search-suggestions"],
         "shows": ["gl-header-mobile:search_open", "gl-mobile-nav:open", "gl-mobile-nav:nested_level"],
-        "interaction_options": ["IX-02", "IX-07", "IX-06"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-03",
@@ -64,8 +64,8 @@
         "languages": ["en-ltr"],
         "surfaces": ["sf-home", "gl-promo-banner", "sf-product-card", "gl-header", "gl-footer"],
         "shows": ["sf-home:default", "gl-promo-banner:active", "sf-product-card:on_sale", "sf-product-card:with_badge"],
-        "interaction_options": ["IX-09", "IX-02", "IX-05", "IX-07"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-04",
@@ -74,8 +74,8 @@
         "languages": ["en-ltr"],
         "surfaces": ["sf-category", "gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-product-card", "sf-product-badges", "sf-pagination"],
         "shows": ["sf-listing-toolbar:active_filters", "sf-listing-filters:applied", "sf-product-card:out_of_stock", "sf-pagination:middle_page"],
-        "interaction_options": ["DQ-02", "IX-01"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": ["DQ-02"],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-05",
@@ -84,8 +84,8 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["sf-pdp-variable", "sf-pdp-simple", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "sf-pdp-related"],
         "shows": ["sf-pdp-variable:selected", "sf-pdp-variable:variant_out_of_stock", "sf-pdp-gallery:many_images", "sf-pdp-simple:on_sale"],
-        "interaction_options": ["IX-03", "IX-08", "IX-04"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-06",
@@ -94,8 +94,8 @@
         "languages": ["en-ltr"],
         "surfaces": ["sf-mini-cart", "sf-cart", "sf-free-shipping-progress"],
         "shows": ["sf-mini-cart:after_add", "sf-cart:coupon_applied", "sf-free-shipping-progress:not_qualified"],
-        "interaction_options": ["IX-02"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-07",
@@ -104,8 +104,8 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["ck-checkout", "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order"],
         "shows": ["ck-checkout:guest", "ck-address:validation", "ck-payment-method:card_and_wallet", "ck-review-place-order:ready"],
-        "interaction_options": ["DQ-03"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": [],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
         "id": "cal-08",
@@ -114,15 +114,27 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header-mobile", "sf-category", "sf-filter-drawer", "sf-product-card", "sf-pdp-variable", "sf-pdp-gallery", "sf-mini-cart"],
         "shows": ["sf-filter-drawer:open", "sf-pdp-variable:no_selection", "sf-mini-cart:after_add"],
-        "interaction_options": ["IX-02", "IX-07", "DQ-02", "IX-01", "IX-03", "IX-04"],
-        "status": {"a": "not_started", "b": "not_started", "c": "not_started"}
+        "interaction_options": ["DQ-02"],
+        "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       }
     ]
   },
   "selection": {
-    "selected_direction": null,
-    "elements_from_other_directions": [],
-    "decision_source": null,
+    "selected_direction": "c",
+    "elements_from_other_directions": [
+      {"code": "A1", "direction": "a", "element": "The one-page checkout structure, presented as Direction C's checkout, with a review section that restates the address, the shipping method, the payment method, the items and the full total before Place Order. A's shipping options are not taken: express delivery is SHIP-07, P2."},
+      {"code": "A2", "direction": "a", "element": "A single hero banner. The featured collections stay their own home section."},
+      {"code": "A3", "direction": "a", "element": "The single-panel drill-down mobile menu."},
+      {"code": "A4", "direction": "a", "element": "At most four products per row beside the desktop sidebar."},
+      {"code": "A5", "direction": "a", "element": "Quick add shown on hover and keyboard focus on desktop, and always visible on touch."},
+      {"code": "B2", "direction": "b", "element": "A mobile buy bar shown only after the in-page buy area leaves the view."}
+    ],
+    "adaptations": [
+      "A6 is not taken. The checkout keeps a condensed header with the logo, search, the language switcher, the account, the wishlist and the cart with its live count.",
+      "B1, Load More, is not selected. Numbered native pagination stays the provisional baseline of DQ-02, and Load More may be reconsidered as an enhancement of the native paged links at the high-fidelity review, on evidence.",
+      "Trending and new arrivals stay two separate home sections."
+    ],
+    "decision_source": "Mustafa, owner, 18 October 2026, on Claude Design's UX decision report and Claude Code's validation of the same date. A structural low-fidelity selection: not approval of the brand identity or of the interface design (PRE-03b), not a client confirmation, and no change to the contracted scope.",
     "note": "The owner chooses a, b or c, or one of them with named elements from another. Selecting a structural direction is not approval of the brand identity and not approval of the interface design."
   },
   "batches": [
@@ -149,8 +161,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-02", "IX-05", "IX-07"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-header-mobile",
@@ -162,8 +174,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-02", "IX-07"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-mobile-nav",
@@ -175,8 +187,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-06"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-mega-menu",
@@ -188,8 +200,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-05"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-language-switcher",
@@ -202,7 +214,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-footer",
@@ -215,7 +227,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-breadcrumbs",
@@ -228,7 +240,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "gl-cookie-consent",
@@ -254,7 +266,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-home",
@@ -266,8 +278,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-09"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-shop",
@@ -293,7 +305,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-collection",
@@ -332,7 +344,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-listing-filters",
@@ -344,8 +356,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-01"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-filter-drawer",
@@ -357,8 +369,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-01"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-listing-toolbar",
@@ -370,8 +382,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-01"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pagination",
@@ -384,7 +396,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-listing-empty",
@@ -435,8 +447,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-07"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-search-results",
@@ -487,8 +499,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-03", "IX-08"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pdp-variable",
@@ -500,8 +512,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pdp-gallery",
@@ -513,8 +525,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-04"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pdp-stock-state",
@@ -527,7 +539,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pdp-related",
@@ -540,7 +552,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-pdp-recently-viewed",
@@ -566,7 +578,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-cart",
@@ -579,7 +591,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-cart-empty",
@@ -604,8 +616,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["IX-02"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-free-shipping-progress",
@@ -618,7 +630,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "sf-cart-revalidation",
@@ -786,8 +798,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-address",
@@ -799,8 +811,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-shipping-method",
@@ -812,8 +824,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-payment-method",
@@ -825,8 +837,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-coupon-notes",
@@ -838,8 +850,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-review-place-order",
@@ -851,8 +863,8 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": ["DQ-03"],
-      "review_status": "briefed"
+      "interaction_pending": [],
+      "review_status": "candidate_selected"
     },
     {
       "surface": "ck-validation",
@@ -1684,7 +1696,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "candidate_selected"
     },
     {
       "surface": "fd-visual-treatment",

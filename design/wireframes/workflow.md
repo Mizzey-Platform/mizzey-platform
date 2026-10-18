@@ -1,8 +1,9 @@
 # Wireframe production workflow
 
 How the low-fidelity wireframes are produced, reviewed and tracked. The artefact format is in
-[README.md](README.md). Nothing in this document has started: **no wireframe exists**, and the calibration set
-begins only on the owner's instruction.
+[README.md](README.md). The calibration set is drawn and reviewed, and the owner's selection is recorded in
+`manifest.json` under `selection`. **No production wireframe exists yet**: the review batches begin on the owner's
+instruction.
 
 ## 1. What Claude Design receives and reads
 
@@ -170,7 +171,7 @@ baseline drawn in a wireframe is still provisional.
 
 ## 5. After calibration
 
-Planned, not started.
+Steps 1 and 2 are recorded in `manifest.json` and `../inventory/interaction-options.json`. The rest has not started.
 
 1. Lock the selected structural direction.
 2. Resolve the interaction options that review decided.

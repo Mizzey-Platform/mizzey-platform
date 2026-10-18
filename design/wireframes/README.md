@@ -1,7 +1,8 @@
 # Wireframes: the artefact format
 
-**No wireframe exists yet.** This folder holds the format, the production manifest, the workflow and the shared
-stylesheet. The first wireframes are the calibration set, drawn when the owner says so.
+**The calibration set exists and is reviewed; no production wireframe exists yet.** This folder holds the format,
+the production manifest, the workflow, the shared stylesheet and the calibration set in `s1/calibration/`. The
+owner's selection is in [manifest.json](manifest.json) under `selection`.
 
 How the work is sequenced and reviewed is in [workflow.md](workflow.md). What is tracked is in
 [manifest.json](manifest.json).

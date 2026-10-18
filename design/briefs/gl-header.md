@@ -131,14 +131,14 @@ Block theme header template part (Full Site Editing), with the WooCommerce mini-
 
 ### IX-02: Mini-cart presentation
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** The header shows the cart with a live item count and a mini-cart, and the customer sees that an item was added (NAV-06, CART-12, PDP-08). No row says how the mini-cart opens.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Drawer that opens after an add, with the count alone at other times |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -157,14 +157,14 @@ Weighed in the review: mobile behaviour; room for the free-shipping prompt (CART
 
 ### IX-05: How the category navigation opens on desktop
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** Customers reach categories through an admin-managed mega menu or category navigation (NAV-07). No row says how it opens.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Opens on click or tap |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -182,14 +182,14 @@ Weighed in the review: size of the category tree; accidental opening; touch lapt
 
 ### IX-07: Search interaction
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer searches from the header and gets suggestions while typing (NAV-03, NAV-09, SRCH-03). No row says how the field and its suggestions behave.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -197,6 +197,7 @@ Candidate patterns:
 - Inline field with a suggestions panel
 - Full-screen search overlay on mobile
 - Field that expands in the header
+- Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile
 
 | Constraint | What it is |
 |---|---|
@@ -256,14 +257,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 7 |
-| Interaction decisions pending | IX-02, IX-05, IX-07 |
+| Interaction decisions pending | None |
 | Calibration frames | Global desktop frame: header, navigation, search and footer (`cal-01`), Home page (`cal-03`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

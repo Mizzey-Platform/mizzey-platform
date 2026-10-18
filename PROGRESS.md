@@ -36,8 +36,12 @@ Live status. First action each session: read this, then continue from **Next**.
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
   script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 32 generated
   briefs for the calibration surfaces. The shared neutral stylesheet, `design/wireframes/_shared/wireframe.css`,
-  completes the supporting preparation for execution. **No wireframe exists and the calibration set has not
-  started.**
+  completes the supporting preparation for execution. **The calibration set is drawn and reviewed.** Claude
+  Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
+  `e8373e3`). The owner selected Direction C with named elements A1 to A5 and B2, and locked DQ-03 and IX-01 to
+  IX-09; DQ-01 and DQ-02 stay provisional. **Proposed in PR #353, pending the owner's review and merge**: the
+  selection in `design/wireframes/manifest.json` and the locks in `design/inventory/interaction-options.json`. No
+  production wireframe exists yet.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
@@ -246,12 +250,10 @@ Live status. First action each session: read this, then continue from **Next**.
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
 drawn and CoreX is not upgraded until he says so either.** In order:
 
-1. **The wireframe-production preparation (D-15) is complete** with the shared stylesheet. Nothing further is
-   prepared by Claude Code before the design starts.
-2. **Then, on Mustafa's instruction to Claude Design, the calibration set**: eight frames in three structural
-   directions, from the 32 generated briefs. Claude Design draws it; Claude Code does not (D-15, item 9). He
-   selects a direction, or one with elements of another.
-3. **Then the first-release surfaces in ten review batches**, each reviewed and closed, and the second-release
+1. **The calibration review is done**: Direction C with named elements, pending the merge of PR #353.
+2. **Then batch-01**: Claude Code generates its briefs, and the working briefs with the signed wording outside
+   the repository; Claude Design draws it only on Mustafa's separate instruction (D-15, item 9).
+3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
 4. **The CoreX v0.43.0 upgrade**, evaluated and made in its own infrastructure PR, before application and

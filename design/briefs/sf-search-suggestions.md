@@ -122,14 +122,14 @@ None.
 
 ### IX-07: Search interaction
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer searches from the header and gets suggestions while typing (NAV-03, NAV-09, SRCH-03). No row says how the field and its suggestions behave.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -137,6 +137,7 @@ Candidate patterns:
 - Inline field with a suggestions panel
 - Full-screen search overlay on mobile
 - Field that expands in the header
+- Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile
 
 | Constraint | What it is |
 |---|---|
@@ -196,14 +197,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Listing, filters and search (`batch-02`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 7 |
-| Interaction decisions pending | IX-07 |
+| Interaction decisions pending | None |
 | Calibration frames | Global desktop frame: header, navigation, search and footer (`cal-01`), Mobile header and navigation (`cal-02`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

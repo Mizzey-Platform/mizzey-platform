@@ -130,14 +130,14 @@ WooCommerce payment options block with the Paymob gateway.
 
 ### DQ-03: Checkout structure
 
-Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** The customer gives an address, chooses shipping and payment, reviews the order and places it, on a mobile-optimised checkout (JRN-07, CHK-01 to CHK-10). No row says whether these are sections of one page or separate steps.
 
 |  |  |
 |---|---|
 | Working baseline | One page with clear sections |
-| Selected pattern | None |
+| Selected pattern | One page with clear sections |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -150,6 +150,7 @@ Candidate patterns:
 |---|---|
 | The order of the journey is address, shipping, payment, review, place order (JRN-07). That order is not open. | Fixed by the contract. Not a design alternative |
 | A review of the order comes before it is confirmed (CHK-05). The review cannot be dropped or moved after Place Order. | Fixed by the contract. Not a design alternative |
+| The review restates the items, the delivery address, the shipping method, the payment method and the full total breakdown before Place Order (CHK-05, US-07-04). | Contracted condition every pattern must meet |
 | Guest checkout is never forced into registration (AUTH-07). | Contracted condition every pattern must meet |
 | Place Order creates exactly one order (PAY-05). | Contracted condition every pattern must meet |
 | The WooCommerce Checkout block is the native baseline, and native comes first (constitution M-4). | Platform limit |
@@ -205,14 +206,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Checkout, payment and order received (`batch-05`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 5 |
-| Interaction decisions pending | DQ-03 |
+| Interaction decisions pending | None |
 | Calibration frames | Checkout (`cal-07`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

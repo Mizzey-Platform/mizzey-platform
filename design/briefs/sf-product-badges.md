@@ -53,7 +53,7 @@ Marks a product as new, trending, limited or a best seller, as the client assign
 
 No flow step passes through this surface.
 
-**Appears inside:** Product details page, simple product (`sf-pdp-simple`), Product details page, variable product (`sf-pdp-variable`).
+**Appears inside:** Product card (`sf-product-card`), Product details page, simple product (`sf-pdp-simple`), Product details page, variable product (`sf-pdp-variable`).
 
 **Components.** Structure and states only: no brand value.
 
@@ -160,7 +160,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `candidate_selected` |
 | Review batch | Listing, filters and search (`batch-02`) |
 | English, left to right | `not_started` |
 | Arabic, right to left | `not_started` |
