@@ -334,7 +334,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "gl-cookie-consent",
@@ -520,7 +520,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -566,7 +566,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -611,7 +611,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -656,7 +656,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
       "note": "#303 builds the customer-facing brand page. IA-05 (#242) names the page, and ADM-56 (#277) and SSC-05 (#311) own the admin and editing rows that shape its header: they are context here and stay with their owners."
     },
@@ -711,7 +711,7 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["sf-product-badges"]
     },
     {
@@ -757,7 +757,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "partial",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
     },
     {
@@ -808,7 +808,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-listing-toolbar",
@@ -853,7 +853,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-pagination",
@@ -881,8 +881,8 @@
         {"state": "middle_page"},
         {"state": "last_page"},
         {"state": "single_page", "note": "Nothing more to show"},
-        {"state": "loading_more", "note": "Only if a loading pattern is selected (DQ-02)"},
-        {"state": "end_of_list", "note": "Only if a loading pattern is selected (DQ-02)"}
+        {"state": "loading_more", "note": "As it applies to numbered pages: the next page loading into reserved space (DQ-02)"},
+        {"state": "end_of_list", "note": "As it applies to numbered pages: the end of the last page (DQ-02)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -901,8 +901,8 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
-      "note": "Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02)."
+      "status": "reviewed",
+      "note": "Numbered pagination, locked by the owner at the batch-02 review on 19 October 2026 (DQ-02). Load More and continuous loading are not launch functionality."
     },
     {
       "id": "sf-listing-empty",
@@ -945,7 +945,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-filter-by-rating",
@@ -1077,7 +1077,7 @@
       "decisions": [],
       "interaction_options": ["IX-07"],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-search-results",
@@ -1124,7 +1124,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
     },
     {
@@ -1167,7 +1167,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-search-synonyms",
@@ -5240,7 +5240,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed",
+      "note": "Owner decision at the batch-02 review, 19 October 2026: at most one merchandising badge per card, by a fixed precedence: Limited, then New, then Best Seller, then Trending. The sale saving is a price mark, shown separately where it applies. No new field, capability or urgency claim."
     },
     {
       "id": "fd-visual-treatment",

@@ -223,12 +223,12 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 13 of 13 |
 | Interaction decisions pending | None |
 | Calibration frames | Home page (`cal-03`), Category listing (`cal-04`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |

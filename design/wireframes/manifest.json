@@ -74,7 +74,7 @@
         "languages": ["en-ltr"],
         "surfaces": ["sf-category", "gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-product-card", "sf-product-badges", "sf-pagination"],
         "shows": ["sf-listing-toolbar:active_filters", "sf-listing-filters:applied", "sf-product-card:out_of_stock", "sf-pagination:middle_page"],
-        "interaction_options": ["DQ-02"],
+        "interaction_options": [],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
@@ -114,7 +114,7 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header-mobile", "sf-category", "sf-filter-drawer", "sf-product-card", "sf-pdp-variable", "sf-pdp-gallery", "sf-mini-cart"],
         "shows": ["sf-filter-drawer:open", "sf-pdp-variable:no_selection", "sf-mini-cart:after_add"],
-        "interaction_options": ["DQ-02", "IX-10"],
+        "interaction_options": ["IX-10"],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       }
     ]
@@ -233,6 +233,57 @@
             "status": "Measured at 40 px tall in the reviewed sf-home rail; the batch-02 product card draws it at 44 px. Not changed in this import. Belongs to the same consistency correction."
           }
         ]
+      },
+      "review": {
+        "status": "closed",
+        "date": "2026-10-19",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the fifteen batch-02 surfaces in English and Arabic, imported in PR #362 (f8ddd44), and approved them for internal low-fidelity closure. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Product-list continuation",
+            "refs": ["DQ-02", "PLP-16", "PLP-17", "NFR-03", "NFR-11"],
+            "decision": "Numbered pagination for first-release product listings and search results, with addressable pages, keyboard accessibility, page order following the reading direction in Arabic and a predictable return to the same place in the list. Locked in interaction-options.json. Load More and infinite scrolling are not added as launch functionality."
+          },
+          {
+            "item": "Badge precedence",
+            "refs": ["MER-01", "PLP-01", "PLP-02"],
+            "decision": "At most one primary merchandising badge per product card, in this order: Limited, then New, then Best Seller, then Trending. The sale saving may appear separately where it applies. No new merchandising capability, admin field, artificial urgency or unsupported marketing claim."
+          }
+        ],
+        "accepted": ["The single-panel mobile filter drawer with collapsible groups (IX-01).", "The variable-product quick add as a small non-modal panel anchored to the card, keeping IX-02 and the documented focus, Escape and announcement behaviour (US-03-01).", "The Arabic pagination presentation: the sequence follows the reading direction, previous and next mirror, digits do not.", "The routine interpretations: no explicit in-stock line on a card (PLP-03, wording PRE-09), no Brand filter on a brand page (PLP-07), and loading_more and end_of_list drawn for numbered pages."],
+        "deferred": [
+          {
+            "item": "Sort by relevance with no search term",
+            "refs": ["PLP-15", "MER-03", "CR-15"],
+            "status": "Drawn as the staff order, falling back to newest. The customer-facing label is CR-15 wording for #303."
+          },
+          {
+            "item": "Alternative suggestions in empty and zero-result states",
+            "refs": ["PLP-19", "SRCH-05"],
+            "status": "A structural slot. Its source is a build question for #303 and #304."
+          },
+          {
+            "item": "Search suggestion content",
+            "refs": ["SRCH-03", "IX-07"],
+            "status": "Text completions only. Anything more follows #304."
+          },
+          {
+            "item": "A single exact SKU match",
+            "refs": ["SRCH-01"],
+            "status": "Drawn as a results page. Whether it goes straight to the product is a #304 build decision."
+          },
+          {
+            "item": "Stock wording on the card",
+            "refs": ["PRE-09", "ERP-02", "PLP-03"],
+            "status": "Open client and ERP input. The slot is reserved."
+          },
+          {
+            "item": "Open inputs carried",
+            "refs": ["OD-01", "CR-05", "CR-15", "OP-15", "OP-17", "OP-18"],
+            "status": "Marked with placeholder notes and unchanged. Guest wishlist behaviour stays with #307."
+          }
+        ]
       }
     },
     {"id": "batch-03", "name": "Product page, gallery and purchase actions", "release": "S1"},
@@ -329,13 +380,13 @@
       "batch": "batch-02",
       "brief": "design/briefs/gl-breadcrumbs.md",
       "artifacts": ["design/wireframes/s1/batch-02/gl-breadcrumbs.en.html", "design/wireframes/s1/batch-02/gl-breadcrumbs.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-cookie-consent",
@@ -381,130 +432,130 @@
       "batch": "batch-02",
       "brief": "design/briefs/sf-shop.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-shop.en.html", "design/wireframes/s1/batch-02/sf-shop.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "loading", "empty", "filtered", "long_content"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-category",
       "batch": "batch-02",
       "brief": "design/briefs/sf-category.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-category.en.html", "design/wireframes/s1/batch-02/sf-category.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_banner", "empty", "filtered", "long_content"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-collection",
       "batch": "batch-02",
       "brief": "design/briefs/sf-collection.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-collection.en.html", "design/wireframes/s1/batch-02/sf-collection.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "manual_order", "long_content"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-brand",
       "batch": "batch-02",
       "brief": "design/briefs/sf-brand.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-brand.en.html", "design/wireframes/s1/batch-02/sf-brand.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_logo", "empty", "long_content"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-product-card",
       "batch": "batch-02",
       "brief": "design/briefs/sf-product-card.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-product-card.en.html", "design/wireframes/s1/batch-02/sf-product-card.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "on_sale", "out_of_stock", "with_badge", "with_rating", "in_wishlist", "adding", "added", "variable_product", "no_image", "long_content", "hover", "focus"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-listing-filters",
       "batch": "batch-02",
       "brief": "design/briefs/sf-listing-filters.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-listing-filters.en.html", "design/wireframes/s1/batch-02/sf-listing-filters.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "none_applied", "applied", "option_unavailable", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-filter-drawer",
       "batch": "batch-02",
       "brief": "design/briefs/sf-filter-drawer.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-filter-drawer.en.html", "design/wireframes/s1/batch-02/sf-filter-drawer.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
       "desktop": "not_applicable",
       "states_covered": ["default", "closed", "open", "applied_count", "cleared"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-listing-toolbar",
       "batch": "batch-02",
       "brief": "design/briefs/sf-listing-toolbar.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-listing-toolbar.en.html", "design/wireframes/s1/batch-02/sf-listing-toolbar.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_filters", "active_filters", "sorted", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pagination",
       "batch": "batch-02",
       "brief": "design/briefs/sf-pagination.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-pagination.en.html", "design/wireframes/s1/batch-02/sf-pagination.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "first_page", "middle_page", "last_page", "single_page", "loading_more", "end_of_list"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-listing-empty",
       "batch": "batch-02",
       "brief": "design/briefs/sf-listing-empty.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-listing-empty.en.html", "design/wireframes/s1/batch-02/sf-listing-empty.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty_category", "no_match_for_filters"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-filter-by-rating",
@@ -537,39 +588,39 @@
       "batch": "batch-02",
       "brief": "design/briefs/sf-search-suggestions.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-search-suggestions.en.html", "design/wireframes/s1/batch-02/sf-search-suggestions.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "typing", "loading", "suggestions", "no_suggestions", "keyboard_focus", "arabic_query"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-search-results",
       "batch": "batch-02",
       "brief": "design/briefs/sf-search-results.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-search-results.en.html", "design/wireframes/s1/batch-02/sf-search-results.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "results", "filtered", "loading", "no_results", "long_query", "corrected_query"],
-      "interaction_pending": ["DQ-02"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-search-no-results",
       "batch": "batch-02",
       "brief": "design/briefs/sf-search-no-results.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-search-no-results.en.html", "design/wireframes/s1/batch-02/sf-search-no-results.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_results"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-search-synonyms",
@@ -1785,13 +1836,13 @@
       "batch": "batch-02",
       "brief": "design/briefs/sf-product-badges.md",
       "artifacts": ["design/wireframes/s1/batch-02/sf-product-badges.en.html", "design/wireframes/s1/batch-02/sf-product-badges.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "new", "trending", "limited", "best_seller", "more_than_one"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "fd-visual-treatment",
