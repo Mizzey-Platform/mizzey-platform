@@ -339,6 +339,7 @@
     {
       "id": "gl-cookie-consent",
       "name": "Consent and cookie banner",
+      "purpose": "Asks a visitor which tracking they accept, records the choice, and keeps tracking to it.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -378,7 +379,7 @@
       "decisions": ["DQ-07"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Accept, Decline and Preferences. The layout stays within what the tool selected in #288 can produce (DQ-07)."
     },
     {
@@ -6149,6 +6150,7 @@
     {
       "id": "sy-404",
       "name": "Page not found",
+      "purpose": "Tells a visitor that an address leads nowhere, and gives them search and a way back into the store.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6186,13 +6188,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope.",
       "implementation_origin": "wordpress"
     },
     {
       "id": "sy-maintenance",
       "name": "Maintenance or site unavailable",
+      "purpose": "Tells a visitor, in both languages, that the store is briefly unavailable.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6230,7 +6233,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable.",
       "implementation_origin": "wordpress"
     },
@@ -6327,6 +6330,7 @@
     {
       "id": "sy-coming-soon",
       "name": "Coming soon",
+      "purpose": "Tells a visitor, before launch, that the store is not open yet.",
       "kind": "page",
       "scope_type": "internal_operational",
       "audience": ["visitor", "customer"],
@@ -6364,7 +6368,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14).",
       "implementation_origin": "unknown",
       "note": "Origin unknown until the CoreX v0.43.0 upgrade is evaluated: CoreX's coming-soon mode or WooCommerce's own page. The two were not tested together."
