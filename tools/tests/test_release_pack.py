@@ -71,7 +71,7 @@ class Fixture(unittest.TestCase):
             "wp-content/plugins/mizzey-site/mizzey-site.php": "<?php // site",
             "wp-content/plugins/corex-core/corex-core.php": "<?php // corex",
             "wp-content/themes/mizzey-theme/style.css": "/* theme */",
-            "vendor/autoload.php": "<?php // autoload",
+            "wp-content/vendor/autoload.php": "<?php // autoload",
             "corex-release.json": json.dumps({"plugins": ["mizzey-site", "corex-core"], "themes": ["mizzey-theme"]}),
         }.items():
             (self.dist / path).parent.mkdir(parents=True, exist_ok=True)
@@ -118,7 +118,7 @@ class TheArchive(Fixture):
         self.pack()
         with zipfile.ZipFile(self.out / "mizzey-v0.1.0.zip") as archive:
             names = set(archive.namelist())
-        for expected in ("index.php", "wp-includes/version.php", "vendor/autoload.php", "corex-release.json",
+        for expected in ("index.php", "wp-includes/version.php", "wp-content/vendor/autoload.php", "corex-release.json",
                          "mizzey-release.json", "wp-content/index.php",
                          "wp-content/plugins/mizzey-site/mizzey-site.php",
                          "wp-content/plugins/woocommerce/woocommerce.php",
@@ -238,6 +238,18 @@ class Refusals(Fixture):
     def test_a_folder_that_is_not_a_built_tree(self):
         (self.dist / "corex-release.json").unlink()
         self.refused("is not a built tree")
+
+    def test_a_tree_from_a_builder_before_corex_v0_43_4_is_refused(self):
+        # That builder left vendor/ at the root, where a host's CoreX no longer looks for it.
+        (self.dist / "wp-content" / "vendor" / "autoload.php").unlink()
+        (self.dist / "vendor").mkdir()
+        (self.dist / "vendor" / "autoload.php").write_text("<?php // autoload", encoding="utf-8")
+        self.refused("wp-content/vendor/autoload.php is missing")
+
+    def test_the_manifest_says_which_vendor_tree_the_package_carries(self):
+        self.assertEqual(self.pack()["manifest"]["corex"]["vendor"], "production")
+        (self.dist / "wp-content" / "vendor" / "pestphp").mkdir()
+        self.assertEqual(self.pack("v0.1.1")["manifest"]["corex"]["vendor"], "dev")
 
     def test_a_configuration_file_in_the_built_tree(self):
         (self.dist / "wp-config.php").write_text("<?php", encoding="utf-8")
