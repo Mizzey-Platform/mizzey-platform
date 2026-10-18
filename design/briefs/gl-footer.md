@@ -168,12 +168,12 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 2 of 2 |
 | Interaction decisions pending | None |
 | Calibration frames | Global desktop frame: header, navigation, search and footer (`cal-01`), Home page (`cal-03`) |

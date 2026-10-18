@@ -1,6 +1,6 @@
 # Wireframes: the artefact format
 
-**The calibration set exists and is reviewed. Batch-01 is drawn, in `s1/batch-01/`, and not yet reviewed.** This
+**The calibration set exists and is reviewed. Batch-01, in `s1/batch-01/`, is reviewed and closed.** This
 folder holds the format, the production manifest, the workflow, the shared stylesheet, the calibration set in
 `s1/calibration/` and the production batches. The owner's selection is in [manifest.json](manifest.json) under
 `selection`.

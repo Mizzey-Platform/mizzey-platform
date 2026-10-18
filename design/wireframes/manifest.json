@@ -154,7 +154,54 @@
     "note": "The owner chooses a, b or c, or one of them with named elements from another. Selecting a structural direction is not approval of the brand identity and not approval of the interface design."
   },
   "batches": [
-    {"id": "batch-01", "name": "Global frame, discovery and home", "release": "S1"},
+    {
+      "id": "batch-01",
+      "name": "Global frame, discovery and home",
+      "release": "S1",
+      "review": {
+        "status": "closed",
+        "date": "2026-10-19",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the twelve batch-01 surfaces in English and Arabic, accepted the focused review corrections at 38298aa, and approved the batch; merged in PR #359 as 0ee1772. This is the internal review of the low-fidelity structural wireframes only. It is not client acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "deferred": [
+          {
+            "item": "Mobile hero crop",
+            "refs": ["CR-05"],
+            "status": "Provisional. The drawn 4:3 to 16:9 centre crop is illustrative and is not a constraint; CR-05 fixes no ratio. The client's photographs replace the neutral boxes."
+          },
+          {
+            "item": "Home signup: newsletter or account signup",
+            "refs": ["HOME-09", "US-02-02", "SRS 6.2"],
+            "status": "Not settled by the register (\"Newsletter / account signup prompt\"), the specification (\"newsletter or account signup prompt\", marketing consent captured separately) or the client SRS (a marketing subscription with clear consent). The drawn email field with a separate, unticked consent box meets US-02-02 under either reading. The wording waits on client confirmation."
+          },
+          {
+            "item": "Two active promotional banners in one position",
+            "refs": ["SSC-09", "CX-06"],
+            "status": "Which one shows is not defined. A rule for #311 and the CX-06 reading; the structure shows one banner per position either way."
+          },
+          {
+            "item": "Category images in the mega menu",
+            "refs": ["NAV-07", "S4"],
+            "status": "Not contracted; open question S4 of the batch-01 instruction. The default is a text list, and the second pane leaves room for one image column without depending on it."
+          },
+          {
+            "item": "Mobile logo slot",
+            "refs": ["OD-01"],
+            "status": "A fixed 64 x 30 px structural reserve. The client's logo must fit it, or the mobile header budget is checked again when it arrives."
+          },
+          {
+            "item": "Language persistence",
+            "refs": ["US-01-02", "OP-14"],
+            "status": "Documented and unresolved. The story asks the choice to persist; the built site takes the language from the address. The address-based placeholder is kept."
+          },
+          {
+            "item": "Language switch with a part-filled form",
+            "refs": ["OP-15"],
+            "status": "Raised for the batch-05 review. No warning is drawn."
+          }
+        ]
+      }
+    },
     {"id": "batch-02", "name": "Listing, filters and search", "release": "S1"},
     {"id": "batch-03", "name": "Product page, gallery and purchase actions", "release": "S1"},
     {"id": "batch-04", "name": "Cart and authentication", "release": "S1"},
@@ -172,78 +219,78 @@
       "batch": "batch-01",
       "brief": "design/briefs/gl-header.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-header.en.html", "design/wireframes/s1/batch-01/gl-header.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "signed_out", "signed_in", "cart_empty", "cart_with_count", "long_content", "focus"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-header-mobile",
       "batch": "batch-01",
       "brief": "design/briefs/gl-header-mobile.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-header-mobile.en.html", "design/wireframes/s1/batch-01/gl-header-mobile.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
       "desktop": "not_applicable",
       "states_covered": ["default", "signed_out", "signed_in", "cart_with_count", "search_open"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-mobile-nav",
       "batch": "batch-01",
       "brief": "design/briefs/gl-mobile-nav.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-mobile-nav.en.html", "design/wireframes/s1/batch-01/gl-mobile-nav.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
       "desktop": "not_applicable",
       "states_covered": ["default", "closed", "open", "nested_level", "signed_out", "signed_in", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-mega-menu",
       "batch": "batch-01",
       "brief": "design/briefs/gl-mega-menu.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-mega-menu.en.html", "design/wireframes/s1/batch-01/gl-mega-menu.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "closed", "open", "keyboard_focus", "long_content", "empty"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-language-switcher",
       "batch": "batch-01",
       "brief": "design/briefs/gl-language-switcher.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-language-switcher.en.html", "design/wireframes/s1/batch-01/gl-language-switcher.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "on_english", "on_arabic", "in_checkout", "on_order_received"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-footer",
       "batch": "batch-01",
       "brief": "design/briefs/gl-footer.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-footer.en.html", "design/wireframes/s1/batch-01/gl-footer.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-breadcrumbs",
@@ -263,39 +310,39 @@
       "batch": "batch-01",
       "brief": "design/briefs/gl-cookie-consent.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-cookie-consent.en.html", "design/wireframes/s1/batch-01/gl-cookie-consent.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "first_visit", "accepted", "declined", "preferences_open"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "gl-promo-banner",
       "batch": "batch-01",
       "brief": "design/briefs/gl-promo-banner.md",
       "artifacts": ["design/wireframes/s1/batch-01/gl-promo-banner.en.html", "design/wireframes/s1/batch-01/gl-promo-banner.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "active", "scheduled_not_started", "ended", "disabled", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-home",
       "batch": "batch-01",
       "brief": "design/briefs/sf-home.md",
       "artifacts": ["design/wireframes/s1/batch-01/sf-home.en.html", "design/wireframes/s1/batch-01/sf-home.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "section_hidden", "empty_rail", "loading", "signup_validation", "signup_success", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-shop",
@@ -2006,26 +2053,26 @@
       "batch": "batch-01",
       "brief": "design/briefs/sy-404.md",
       "artifacts": ["design/wireframes/s1/batch-01/sy-404.en.html", "design/wireframes/s1/batch-01/sy-404.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "not_found"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sy-maintenance",
       "batch": "batch-01",
       "brief": "design/briefs/sy-maintenance.md",
       "artifacts": ["design/wireframes/s1/batch-01/sy-maintenance.en.html", "design/wireframes/s1/batch-01/sy-maintenance.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "maintenance", "unavailable"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sy-store-notices",
@@ -2058,13 +2105,13 @@
       "batch": "batch-01",
       "brief": "design/briefs/sy-coming-soon.md",
       "artifacts": ["design/wireframes/s1/batch-01/sy-coming-soon.en.html", "design/wireframes/s1/batch-01/sy-coming-soon.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "before_launch"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sy-staging-marker",
