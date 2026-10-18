@@ -195,11 +195,11 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
 | Desktop | `not_applicable` |
 | States covered | 7 of 7 |
 | Interaction decisions pending | None |
