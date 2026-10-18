@@ -45,7 +45,8 @@ Internal categories: `governance`, `ci`, `test-infrastructure`, `tooling`, `secu
 | site-tests | `mizzey-site/tests/`, `mizzey-theme/tests/` | requirement, test-infrastructure, security-maintenance |
 | delivery-tooling | `tools/build-dist.mjs`, `tools/corex-sync.mjs` | requirement, tooling, security-maintenance |
 | version-lock | `corex.lock`, `composer.*`, `package*.json` | requirement, security-maintenance |
-| governance-control | CI workflows, hooks, the checkers, constitution, `docs/scope/`, `stack.lock.json`, AGENTS, CLAUDE, CONTRIBUTING, `.gitignore` | governance, ci |
+| stack-record | `stack.lock.json`, the tested-versions record. Its CoreX and WordPress entries must equal `corex.lock`, so the categories that may move the pin can record it | requirement, governance, ci, security-maintenance |
+| governance-control | CI workflows, hooks, the checkers, constitution, `docs/scope/`, AGENTS, CLAUDE, CONTRIBUTING, `.gitignore` | governance, ci |
 | workflow-config | `.specify/`, `.claude/skills/`, `.github/` templates | governance, ci |
 | tooling | other `tools/`, `discovery/`, `scripts/` | governance, tooling, security-maintenance |
 | test-infra | `tools/tests/`, `discovery/tests/` | all except documentation |
@@ -55,11 +56,11 @@ Internal categories: `governance`, `ci`, `test-infrastructure`, `tooling`, `secu
 
 Feature specs are never deleted or moved. A new spec's directory must match the branch name.
 
-**Extra lines.** `Sensitive changes:` whenever governance-control, delivery-tooling or version-lock paths change.
-`Delivery impact:` whenever delivery-tooling or version-lock paths change, saying what changes in the deployed
-artifact or why nothing does. `security-maintenance` also needs `Security evidence:` (a CVE or GHSA id, an advisory
-or upgrade URL, or `local: <defect and how it was found>` together with a regression test in the PR) and
-`Security change:`. These lines make the change reviewable. They do not prove it safe.
+**Extra lines.** `Sensitive changes:` whenever governance-control, stack-record, delivery-tooling or version-lock
+paths change. `Delivery impact:` whenever stack-record, delivery-tooling or version-lock paths change, saying what
+changes in the deployed artifact or why nothing does. `security-maintenance` also needs `Security evidence:` (a CVE
+or GHSA id, an advisory or upgrade URL, or `local: <defect and how it was found>` together with a regression test in
+the PR) and `Security change:`. These lines make the change reviewable. They do not prove it safe.
 
 ## Checks
 

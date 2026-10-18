@@ -75,6 +75,8 @@ contracted row).
    disposable runtime.
 6. **Bilingual storefront pass**: English and Arabic, right to left, product, cart and checkout. Admin English only.
 7. **Record** the new version, status and date in `stack.lock.json`, and any behaviour change in `DECISIONS.md`.
+   For CoreX and WordPress this is the same PR as the `corex.lock` change: `tools/repo_checks.py` fails while the two
+   disagree, and `stack.lock.json` is a `stack-record` path, which both upgrade categories may change.
 8. **Revert path**: the PR is one component, so reverting it restores the previous version. For plugins, keep the
    previous plugin zip until the upgrade has run on staging.
 
