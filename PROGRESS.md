@@ -39,7 +39,7 @@ Live status. First action each session: read this, then continue from **Next**.
   completes the supporting preparation for execution. **The calibration set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
   `e8373e3`). The owner selected Direction C with named elements A1 to A5 and B2, and locked DQ-03 and IX-01 to
-  IX-09; DQ-01 and DQ-02 stay provisional. **Proposed in PR #353, pending the owner's review and merge**: the
+  IX-09; DQ-01 and DQ-02 stay provisional. **Recorded in PR #353, merged on 18 October 2026 as `c139c45`**: the
   selection in `design/wireframes/manifest.json` and the locks in `design/inventory/interaction-options.json`. No
   production wireframe exists yet.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
@@ -250,7 +250,7 @@ Live status. First action each session: read this, then continue from **Next**.
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
 drawn and CoreX is not upgraded until he says so either.** In order:
 
-1. **The calibration review is done**: Direction C with named elements, pending the merge of PR #353.
+1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`).
 2. **Then batch-01**: Claude Code generates its briefs, and the working briefs with the signed wording outside
    the repository; Claude Design draws it only on Mustafa's separate instruction (D-15, item 9).
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
