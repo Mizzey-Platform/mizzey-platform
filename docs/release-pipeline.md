@@ -40,7 +40,7 @@ It uploads no workflow artifact and keeps no cache.
 |---|---|
 | Assets | `mizzey-<tag>.zip` and `mizzey-<tag>.zip.sha256` |
 | Checksum file | One line, `<sha256>  mizzey-<tag>.zip`, which `sha256sum -c` reads |
-| Layout | The WordPress root is the archive root, with no folder around it: `index.php`, `wp-admin/`, `wp-includes/`, `wp-content/`, `vendor/`, `corex-release.json`, `mizzey-release.json` |
+| Layout | The WordPress root is the archive root, with no folder around it: `index.php`, `wp-admin/`, `wp-includes/`, `wp-content/` (CoreX's packages in `wp-content/vendor/` and its CLI in `wp-content/packages/cli/`, since CoreX v0.43.4), `corex-release.json`, `mizzey-release.json` |
 | Entries | Files only, each `0644`, in path order, stamped with the commit's time |
 
 Under `wp-content/`:
@@ -92,9 +92,10 @@ This writes the two files and publishes nothing.
 
 ## Limits, stated plainly
 
-- **The CoreX vendor tree is the development one**, with the test toolchain in it, because CoreX v0.42.0 loses
-  seven CLI commands without it (corex#201, `COREX-WORKAROUNDS.md`). The manifest records it as
-  `corex.vendor`. The server refuses every request under `/vendor/`.
+- **The CoreX vendor tree is the production one**, installed by CoreX's builder into `wp-content/vendor/`, with
+  the CLI whole (corex#201 was fixed in v0.42.1). The manifest records it as `corex.vendor`. The server must
+  refuse every request under `/wp-content/vendor/` and `/wp-content/packages/`, where it refused `/vendor/`
+  for releases built on CoreX v0.42.0.
 - **A language pack is whatever wordpress.org serves for that version on the day of the build.** Translators
   update packs after a release, so two builds of the same tag on different days can differ there, and the
   manifest records each pack's checksum.

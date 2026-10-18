@@ -89,30 +89,43 @@ function ensureCorex(lock) {
 		git(['checkout', '--detach', lock.commit], COREX);
 	}
 
-	// Dev dependencies are installed deliberately, not by oversight. CoreX v0.42.0 builds its
-	// DocsCommand eagerly in CliServiceProvider::register(), and that command needs
-	// PhpParser\ParserFactory, which reaches the tree only as a transitive dependency of
-	// pestphp/pest (require-dev) and is declared nowhere in composer.json. Under --no-dev the
-	// construction throws and every command registered after it is lost, silently: migrate,
-	// doctor, reset and version all disappear. `wp corex migrate` is step three of our upgrade
-	// path, so a --no-dev runtime cannot be upgraded. See COREX-WORKAROUNDS.md.
-	if (!existsSync(join(COREX, 'vendor', 'autoload.php'))) {
+	// The runtime is a development install, so CoreX's dev dependencies come with it. A checkout that
+	// moved keeps the vendor/ of the release it left, which can lack a package the new one needs: the
+	// tree is compared with the checkout's composer.lock, never assumed to match it.
+	const drift = vendorDrift();
+	if (drift) {
 		if (CHECK_ONLY) {
-			fail(`CoreX has no vendor/. Run without --check to install it.`);
+			fail(`CoreX vendor/ does not match its composer.lock (${drift}). Run without --check to install it.`);
 			return false;
 		}
-		actions.push('composer install (with dev, see COREX-WORKAROUNDS.md)');
+		actions.push(`composer install (${drift})`);
 		execFileSync('composer', ['install', '--no-interaction'], { cwd: COREX, stdio: 'inherit', shell: true });
-	}
-
-	if (!existsSync(join(COREX, 'vendor', 'nikic', 'php-parser'))) {
-		fail(
-			'nikic/php-parser is missing, so wp corex migrate / doctor / reset / version will not ' +
-				'register. Run composer install (without --no-dev) in ' + COREX,
-		);
-		return false;
+		const left = vendorDrift();
+		if (left) {
+			fail(`CoreX vendor/ still does not match its composer.lock after composer install (${left}).`);
+			return false;
+		}
 	}
 	return true;
+}
+
+/**
+ * How the installed vendor/ differs from the checkout's composer.lock, dev packages included, or null
+ * when every locked package is installed at its locked version.
+ */
+function vendorDrift() {
+	const installed = join(COREX, 'vendor', 'composer', 'installed.json');
+	if (!existsSync(join(COREX, 'vendor', 'autoload.php')) || !existsSync(installed)) return 'no vendor/';
+	const lock = JSON.parse(readFileSync(join(COREX, 'composer.lock'), 'utf8'));
+	const have = new Map(
+		(JSON.parse(readFileSync(installed, 'utf8')).packages ?? []).map((p) => [p.name, p.version]),
+	);
+	const wrong = [...(lock.packages ?? []), ...(lock['packages-dev'] ?? [])]
+		.filter((p) => have.get(p.name) !== p.version)
+		.map((p) => p.name);
+	if (!wrong.length) return null;
+	return `${wrong.length} package(s) missing or at another version, ${wrong.slice(0, 3).join(', ')}` +
+		(wrong.length > 3 ? ', ...' : '');
 }
 
 /** Replace whatever is at `linkPath` with a link to `target`. */
