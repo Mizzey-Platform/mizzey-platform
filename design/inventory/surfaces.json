@@ -52,7 +52,7 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-05", "IX-07"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-language-switcher", "gl-mega-menu", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
@@ -102,7 +102,7 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-07"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-mobile-nav", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
@@ -151,7 +151,7 @@
       "decisions": [],
       "interaction_options": ["IX-06"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "gl-mega-menu",
@@ -201,7 +201,7 @@
       "decisions": [],
       "interaction_options": ["IX-05"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "gl-language-switcher",
@@ -247,7 +247,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "gl-footer",
@@ -289,7 +289,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253.",
       "build_note": "SSC-08, the footer's editing row, is accepted by #311. The footer itself is part of the frame, built by #253."
     },
@@ -379,7 +379,7 @@
       "decisions": ["DQ-07"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Accept, Decline and Preferences. The layout stays within what the tool selected in #288 can produce (DQ-07)."
     },
     {
@@ -426,7 +426,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-home",
@@ -473,7 +473,7 @@
       "decisions": [],
       "interaction_options": ["IX-09"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-product-card"],
       "note": "Section order is changeable (HOME-11), so no section may depend on its neighbour."
     },
@@ -6188,7 +6188,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope.",
       "implementation_origin": "wordpress"
     },
@@ -6233,7 +6233,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable.",
       "implementation_origin": "wordpress"
     },
@@ -6368,7 +6368,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14).",
       "implementation_origin": "unknown",
       "note": "Origin unknown until the CoreX v0.43.0 upgrade is evaluated: CoreX's coming-soon mode or WooCommerce's own page. The two were not tested together."

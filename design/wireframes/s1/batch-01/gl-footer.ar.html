@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="wf-surfaces" content="gl-footer">
+<meta name="wf-viewport" content="mobile desktop">
+<title>gl-footer · Footer · batch-01 · Arabic, right to left</title>
+<link rel="stylesheet" href="../../_shared/wireframe.css">
+<style>
+body{padding:32px 40px 120px}
+.wf-meta{display:flex;flex-direction:column;gap:14px;max-inline-size:1280px;margin-block-end:48px;padding:22px 26px}
+.eb{font:600 11px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.mt{font-size:26px;font-weight:650;line-height:1.25;margin-block:6px}
+.ml{font-size:13.5px;color:#3a3a3a;max-inline-size:880px;text-wrap:pretty}
+.mf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:5px 16px;margin-block-start:14px;font-size:12.5px}
+.mf dt{color:#5c5c5c}.mf dd{margin:0}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+code{font-size:11.5px}
+.mn{display:flex;flex-direction:column;gap:6px;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg a,.seg span{white-space:nowrap;font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 9px;border:1px solid #bdbdbd;text-decoration:none;color:#1f1f1f;background:#fff}
+.seg .on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+.sheet{display:flex;flex-direction:column;gap:80px}
+.set__h{font-size:19px;font-weight:650;line-height:1.3}
+.set__p{font-size:13px;color:#4a4a4a;max-inline-size:920px;margin-block:6px 22px;text-wrap:pretty}
+.row{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.fig{display:flex;flex-direction:column}
+.fig--m{inline-size:390px}.fig--s{inline-size:360px}.fig--d{inline-size:1280px}.fig--t{inline-size:1024px}
+.fig .wf-frame{inline-size:100%;max-inline-size:none;position:relative}
+.wf-frame__label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+.notes{display:grid;gap:10px;margin-block-start:12px;align-items:start}
+.fig--d .notes,.fig--t .notes{grid-template-columns:repeat(3,minmax(0,1fr))}
+.notes .wf-note{margin:0}
+.wf-note{font-size:12px;line-height:1.5;text-wrap:pretty}
+.wf-note b{font-weight:650}
+.q::before{content:"Question raised"}
+.rtl::before{content:"Right to left"}
+.ax::before{content:"Accessibility"}
+.pf::before{content:"Performance"}
+.ed::before{content:"Editor, curated section library"}
+.tbl{border-collapse:collapse;inline-size:100%;max-inline-size:1280px;font-size:12.5px;background:#fff;border:1px solid #cfcfcf}
+.tbl th,.tbl td{text-align:start;vertical-align:top;padding:9px 12px;border-block-end:1px solid #e3e3e3;font-weight:400}
+.tbl thead th{font-weight:650;background:#f6f6f6}
+.tbl tbody th{font-weight:650}
+.pin{position:absolute;z-index:9;inset-block-start:-9px;inset-inline-start:-9px;display:inline-flex;align-items:center;justify-content:center;inline-size:20px;block-size:20px;border-radius:50%;background:#1f1f1f;color:#fff;font:700 10.5px/1 ui-monospace,Menlo,Consolas,monospace;text-decoration:none}
+.stag{position:absolute;z-index:4;inset-block-start:8px;inset-inline-start:8px;padding:3px 7px;background:#fff;border:1px dashed #8a8a8a;font:600 10px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a;white-space:nowrap}
+.ph{position:relative;display:flex;align-items:flex-end;background:#e9e9e9;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.04) 0 1px,transparent 1px 11px);overflow:hidden;min-block-size:24px}
+.ph__l{margin:8px;padding:2px 6px;background:rgba(255,255,255,.9);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace}
+.ph--load{background:#f0f0f0;background-image:none}
+.r11{aspect-ratio:1/1}.r45{aspect-ratio:4/5}.r34{aspect-ratio:3/4}.r43{aspect-ratio:4/3}.r32{aspect-ratio:3/2}.r169{aspect-ratio:16/9}.r21{aspect-ratio:2/1}.r31{aspect-ratio:3/1}
+.logo{position:relative;display:inline-flex;align-items:center;justify-content:center;border:1px dashed #8a8a8a;font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;letter-spacing:.06em;block-size:36px;padding-inline:14px;white-space:nowrap;flex:none;text-decoration:none}
+.logo--s{block-size:30px;padding-inline:6px;font-size:9px;letter-spacing:.02em}
+.pg{background:#fff;color:#151515;font-size:14px;line-height:1.45;position:relative}
+.pg[lang="ar"]{line-height:1.65}
+.pg a{color:inherit}
+.g{padding-inline:40px}.gm{padding-inline:16px}
+.h1{font-size:40px;line-height:1.12;font-weight:700;letter-spacing:-.02em}
+.h1m{font-size:27px;line-height:1.18;font-weight:700;letter-spacing:-.01em}
+.h2{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.h2m{font-size:19px;line-height:1.25;font-weight:700}
+.h3{font-size:16px;line-height:1.3;font-weight:650}
+.pg[lang="ar"] .h1,.pg[lang="ar"] .h1m,.pg[lang="ar"] .h2,.pg[lang="ar"] .h2m{letter-spacing:0;line-height:1.4}
+.mut{color:#5c5c5c}.fnt{color:#8a8a8a}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;block-size:46px;padding-inline:22px;background:#151515;color:#fff;font-size:14px;font-weight:650;border-radius:10px;border:1.5px solid #151515;white-space:nowrap;text-decoration:none}
+.pg a.btn{color:#fff}
+.btn--2,.pg a.btn--2{background:#fff;color:#151515}
+.btn--q,.pg a.btn--q{background:transparent;border-color:transparent;color:#151515;text-decoration:underline;text-underline-offset:3px;padding-inline:10px}
+.btn--s{block-size:38px;padding-inline:16px;font-size:13px;border-radius:8px}
+.btn--b{display:flex;inline-size:100%}
+.btn.busy{background:#5c5c5c;border-color:#5c5c5c}
+.lnk{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.chev{display:inline-block;flex:none;inline-size:7px;block-size:7px;border-block-start:1.6px solid currentColor;border-inline-end:1.6px solid currentColor;transform:rotate(45deg)}
+[dir="rtl"] .chev{transform:rotate(-45deg)}
+.chev--down{border-block-start:0;border-block-end:1.6px solid currentColor;margin-block-start:-4px}
+.chev--back{border-inline-end:0;border-inline-start:1.6px solid currentColor;transform:rotate(-45deg)}
+[dir="rtl"] .chev--back{transform:rotate(45deg)}
+.i{position:relative;display:inline-block;flex:none;inline-size:20px;block-size:20px}
+.i-search::before{content:"";position:absolute;left:2px;top:2px;width:11px;height:11px;border:2px solid currentColor;border-radius:50%}
+.i-search::after{content:"";position:absolute;left:13px;top:13px;width:7px;height:2px;background:currentColor;transform:rotate(45deg);transform-origin:0 0}
+.i-user::before{content:"";position:absolute;left:6px;top:1px;width:8px;height:8px;border:2px solid currentColor;border-radius:50%}
+.i-user::after{content:"";position:absolute;left:2px;top:12px;width:16px;height:8px;border:2px solid currentColor;border-bottom:0;border-radius:8px 8px 0 0}
+.i-user.fill::before,.i-user.fill::after{background:currentColor}
+.i-bag::before{content:"";position:absolute;left:3px;top:6px;width:14px;height:13px;border:2px solid currentColor;border-radius:2px 2px 4px 4px}
+.i-bag::after{content:"";position:absolute;left:7px;top:1px;width:6px;height:7px;border:2px solid currentColor;border-bottom:0;border-radius:4px 4px 0 0}
+.i-menu::before{content:"";position:absolute;left:2px;top:4px;width:16px;height:12px;border-top:2px solid currentColor;border-bottom:2px solid currentColor}
+.i-menu::after{content:"";position:absolute;left:2px;top:9px;width:16px;height:2px;background:currentColor}
+.i-heart{font-size:19px;line-height:20px;text-align:center}
+.i-ph{inline-size:30px;block-size:30px;border:1.5px dashed #8a8a8a;border-radius:50%}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-inline-size:20px;block-size:20px;padding-inline:6px;border-radius:10px;background:#151515;color:#fff;font-size:11px;font-weight:700;line-height:1}
+.hd{position:relative;z-index:5;background:#fff;border-block-end:1px solid #e6e6e6}
+.hd1{display:flex;align-items:center;gap:18px;block-size:76px;padding-inline:40px}
+.allc{position:relative;display:inline-flex;align-items:center;gap:10px;block-size:44px;padding-inline:14px;border-radius:10px;border:1px solid #d6d6d6;font-weight:650;font-size:13.5px;white-space:nowrap;flex:none}
+.allc.on{background:#151515;color:#fff;border-color:#151515}
+.sf{position:relative;flex:1;display:flex;align-items:center;gap:10px;block-size:48px;padding-inline:16px 5px;border-radius:12px;border:1.5px solid #9a9a9a;color:#6b6b6b;font-size:14px;background:#fff;min-inline-size:0}
+.sf.on{border:2px solid #151515;color:#151515}
+.sf__t{flex:1;min-inline-size:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf .btn{flex:none}
+.caret{display:inline-block;inline-size:1.5px;block-size:18px;background:#151515;vertical-align:middle;margin-inline-start:1px}
+.lang{position:relative;display:inline-flex;align-items:center;justify-content:center;block-size:44px;padding-inline:10px;border-radius:8px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:4px;white-space:nowrap;flex:none}
+.ul{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-inline-size:60px;max-inline-size:120px;block-size:52px;padding-inline:6px;font-size:11.5px;font-weight:600;text-decoration:none;border-radius:10px;flex:none}
+.ul__t{max-inline-size:108px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cartb{position:relative;display:inline-flex;align-items:center;gap:9px;block-size:44px;padding-inline:14px;border-radius:10px;border:1.5px solid #151515;font-weight:650;white-space:nowrap;text-decoration:none;flex:none}
+.hd2{display:flex;gap:2px;padding:0 30px 10px;font-size:13.5px;font-weight:600;overflow:hidden}
+.hd2 a{position:relative;padding:8px 12px;border-radius:999px;text-decoration:none;white-space:nowrap}
+.hd2 a.on{background:#f0f0f0}
+.sp{position:absolute;inset-inline:0;inset-block-start:calc(100% + 8px);z-index:7;background:#fff;border:1px solid #e0e0e0;border-radius:12px;box-shadow:0 20px 44px rgba(0,0,0,.16);padding:8px;color:#151515;font-size:14px}
+.sp li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px}
+.sp li .i{color:#8a8a8a}
+.sp li.on{background:#f0f0f0}
+.sp__h{padding:6px 12px 8px;font:500 10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#6b6b6b}
+.cut{display:flex;align-items:flex-start;padding:10px 40px;font:500 10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#6b6b6b;background:#f7f7f7;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.03) 0 1px,transparent 1px 11px)}
+.scr{position:absolute;inset:0;background:rgba(0,0,0,.3)}
+.mmw{position:relative;block-size:520px}
+.mm{position:absolute;z-index:6;inset-inline-start:40px;inset-block-start:0;inline-size:1060px;display:grid;grid-template-columns:280px minmax(0,1fr);background:#fff;border:1px solid #e3e3e3;border-block-start:0;border-radius:0 0 14px 14px;box-shadow:0 24px 48px rgba(0,0,0,.18);overflow:hidden}
+.mm__l{padding-block:10px;border-inline-end:1px solid #ececec;background:#fafafa}
+.mm__l li{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 20px;font-size:14px;font-weight:600}
+.mm__l li.on{background:#fff;border-inline-start:3px solid #151515;padding-inline-start:17px}
+.mm__r{padding:24px 28px 28px;display:flex;flex-direction:column;gap:20px}
+.mm__rh{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.mm__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.mm__g b{display:block;font-size:13.5px;margin-block-end:8px}
+.mm__g li{padding-block:5px;font-size:13.5px;color:#3a3a3a}
+.mhw{position:relative;z-index:3;background:#fff;border-block-end:1px solid #e6e6e6}
+.mh{display:flex;align-items:center;block-size:56px;padding-inline:4px}
+.mh .logo{margin-inline:4px 0}
+.mh .logo--s{inline-size:64px;padding-inline:4px;font-size:8.5px;letter-spacing:0;white-space:normal;text-align:center;line-height:1.2}
+.mh__sp{flex:1;min-inline-size:8px}
+.ib{position:relative;display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:10px;flex:none;text-decoration:none}
+.ib .cnt{position:absolute;inset-block-start:3px;inset-inline-end:3px;min-inline-size:17px;block-size:17px;font-size:10px;padding-inline:4px}
+.ib--lang{inline-size:auto;min-inline-size:44px;padding-inline:4px;font-size:12.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.mh2{padding:0 12px 10px}
+.sf--m{block-size:44px;border-width:1.5px;padding-inline:14px 0;font-size:14px}
+.clr{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;flex:none}
+.clr span{display:inline-flex;align-items:center;justify-content:center;inline-size:24px;block-size:24px;border-radius:50%;background:#e6e6e6;font-size:11px}
+.ov{position:absolute;inset:0;z-index:8;background:#fff;display:flex;flex-direction:column}
+.ov__bar{display:flex;align-items:center;gap:4px;padding:8px 8px 8px 12px;border-block-end:1px solid #ececec}
+.ov__l li{display:flex;align-items:center;gap:14px;min-block-size:50px;padding-inline:16px;border-block-end:1px solid #f0f0f0;font-size:15px}
+.ov__l li .i{color:#8a8a8a}
+.kbd{position:absolute;inset-inline:0;inset-block-end:0;block-size:250px;background:#d6d6d6;padding:10px;font:500 10px ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+.x{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:50%;font-size:15px;flex:none}
+.mnav{position:absolute;inset-block:0;inset-inline-start:0;inline-size:calc(100% - 48px);z-index:6;background:#fff;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.22)}
+.mnav__h{display:flex;align-items:center;justify-content:space-between;gap:8px;block-size:56px;padding-inline:8px 4px;border-block-end:1px solid #ececec;flex:none}
+.mnav__ht{font-size:15px;font-weight:700;padding-inline:12px}
+.mnav__t{font-size:19px;font-weight:700;padding:18px 20px 6px;line-height:1.3}
+.mnav__l{flex:1;overflow:hidden}
+.mnav__l li{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;min-block-size:52px;padding:10px 20px;font-size:15.5px;font-weight:600;border-block-end:1px solid #f2f2f2}
+.mnav__l li.all{font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.mnav__f{border-block-start:1px solid #e6e6e6;padding:12px 16px 16px;display:flex;flex-direction:column;gap:2px;background:#fafafa;flex:none}
+.mrow{display:flex;align-items:center;gap:12px;min-block-size:48px;font-size:14.5px;font-weight:600;padding-inline:4px;text-decoration:none}
+.mrow span:last-child{min-inline-size:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lseg{display:flex;gap:6px;padding-block:4px 6px}
+.lseg a{flex:1;display:flex;align-items:center;justify-content:center;block-size:44px;border-radius:10px;border:1.5px solid #cfcfcf;font-size:14px;font-weight:600;text-decoration:none;background:#fff}
+.lseg a.on{border-color:#151515;background:#151515;color:#fff}
+.bk{position:relative;display:inline-flex;align-items:center;gap:10px;min-block-size:44px;padding-inline:12px;font-size:14px;font-weight:600;border-radius:10px;min-inline-size:0}
+.card{position:relative;display:flex;flex-direction:column;gap:10px;min-inline-size:0}
+.card__i{position:relative;border-radius:8px;overflow:hidden}
+.card__w{position:absolute;z-index:2;inset-block-start:8px;inset-inline-end:8px;display:flex;align-items:center;justify-content:center;inline-size:36px;block-size:36px;border-radius:50%;background:rgba(255,255,255,.94);font-size:16px}
+.card__b{position:absolute;z-index:2;inset-block-start:10px;inset-inline-start:10px;padding:2px 8px;border-radius:999px;background:#fff;font-size:11px;font-weight:700;border:1px solid #151515}
+.card__qa{position:absolute;z-index:2;inset-inline:10px;inset-block-end:10px;display:flex}
+.card__qa .btn{flex:1;block-size:40px;font-size:13px}
+.card__qt{position:absolute;z-index:2;inset-inline-end:8px;inset-block-end:8px;display:flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:50%;background:#fff;border:1px solid #bdbdbd;font-size:22px;font-weight:300}
+.card__qt.ok{background:#151515;color:#fff;border-color:#151515;font-size:15px}
+.card__n{font-size:13.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card__p{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;font-size:14px;font-weight:650}
+.strike{text-decoration:line-through;color:#8a8a8a;font-weight:400;font-size:13px}
+.money{white-space:nowrap}
+.sk{display:block;background:#efefef;border-radius:3px;block-size:10px}
+.err{display:flex;gap:6px;align-items:flex-start;font-size:12.5px;font-weight:650;line-height:1.4}
+.err::before{content:"!";display:inline-flex;flex:none;align-items:center;justify-content:center;inline-size:16px;block-size:16px;border-radius:50%;background:#151515;color:#fff;font-size:10px;margin-block-start:1px}
+.okm{display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:650}
+.sh{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-block-end:20px}
+.sh__a{display:flex;align-items:center;gap:8px}
+.sh__a .lnk{margin-inline-end:10px}
+.rail4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.railm{display:flex;gap:12px;overflow:hidden;padding-inline:16px}
+.railm>.card{flex:0 0 46%}
+.arw{display:inline-flex;align-items:center;justify-content:center;inline-size:40px;block-size:40px;border-radius:50%;border:1px solid #cfcfcf}
+.arw.dis{color:#bdbdbd;border-color:#e6e6e6}
+.hs{position:relative}
+.sec{padding-block-start:64px}.secm{padding-block-start:40px}.sec0{padding-block-start:0}.sect{padding-block-start:24px}
+.hero__p{position:absolute;z-index:2;inset-inline-start:40px;inset-block-end:40px;max-inline-size:540px;background:#fff;padding:32px 36px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;border-radius:4px}
+.herom__t{padding:20px 16px 0;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.split{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center}
+.tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid #e6e6e6}
+.tr>a{display:flex;align-items:center;gap:14px;padding:16px 24px;font-size:14px;font-weight:600;text-decoration:none}
+.tr>a+a{border-inline-start:1px solid #e6e6e6}
+.tr .chev,.trm .chev{margin-inline-start:auto;color:#8a8a8a}
+.trm{border-block:1px solid #e6e6e6}
+.trm>a{display:flex;align-items:center;gap:12px;min-block-size:52px;padding-inline:16px;font-size:14px;font-weight:600;text-decoration:none}
+.trm>a+a{border-block-start:1px solid #f0f0f0}
+.tiles{display:grid;gap:20px}
+.tile{display:flex;flex-direction:column;gap:10px;font-size:14px;font-weight:600;text-decoration:none;line-height:1.35}
+.tile .ph{border-radius:8px}
+.cols{display:grid;gap:24px}
+.col{display:flex;flex-direction:column;gap:12px;text-decoration:none}
+.col .ph{border-radius:8px}
+.col b{display:flex;align-items:center;gap:8px;font-size:16px}
+.pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#f3f3f3;border-radius:8px;overflow:hidden}
+.pc__t{padding:40px 48px;display:flex;flex-direction:column;gap:18px;justify-content:center;align-items:flex-start}
+.pcm{background:#f3f3f3;border-radius:8px;overflow:hidden}
+.pcm .pc__t{padding:20px}
+.brs{display:grid;gap:12px}
+.br{text-decoration:none;display:flex;align-items:center;justify-content:center;aspect-ratio:3/2;border:1px solid #e6e6e6;border-radius:8px;font:500 10px ui-monospace,Menlo,Consolas,monospace;color:#6b6b6b;text-align:center;padding:6px}
+.su{background:#f3f3f3;border-radius:8px;padding:40px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.sum{background:#f3f3f3;border-radius:8px;padding:24px 20px;display:flex;flex-direction:column;gap:16px}
+.suf{display:flex;flex-direction:column;gap:12px}
+.suf__r{display:flex;gap:8px}
+.lbl{display:block;font-size:12.5px;font-weight:650;margin-block-end:6px}
+.inp{display:flex;align-items:center;flex:1;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:14px;color:#8a8a8a;min-inline-size:0}
+.inp.v{color:#151515}
+.fld--e .inp{border:2.5px solid #151515}
+.fld--e .err{margin-block-start:8px}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.pg[lang="ar"] .inp.ltr{justify-content:flex-end}
+.cbr{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
+.cb{inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:5px;flex:none;background:#fff}
+.okbox{display:flex;gap:12px;align-items:flex-start;padding:16px;background:#fff;border-radius:10px;border:1.5px solid #151515}
+.okc{display:inline-flex;align-items:center;justify-content:center;inline-size:26px;block-size:26px;border-radius:50%;background:#151515;color:#fff;font-size:13px;flex:none}
+.ft{background:#f6f6f6;border-block-start:1px solid #e6e6e6}
+.ft__su{display:flex;justify-content:space-between;align-items:center;gap:48px;padding-block:32px;border-block-end:1px solid #e3e3e3}
+.ft__su .suf{flex:0 1 520px}
+.ft__c{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.3fr);gap:32px;padding-block:40px}
+.ft__c--l{grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,1.2fr)}
+.ft__h{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c5c5c;margin-block-end:12px}
+.pg[lang="ar"] .ft__h{letter-spacing:0;text-transform:none;font-size:13px}
+.ft li{padding-block:5px;font-size:13.5px;line-height:1.4}
+.ft__b{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:18px;border-block-start:1px solid #e3e3e3;font-size:12px}
+.ftm__c{display:grid;grid-template-columns:1fr 1fr;gap:28px 20px;padding-block:28px}
+.ftm__c>div.wide{grid-column:1/-1}
+.phf{font:500 11px ui-monospace,Menlo,Consolas,monospace;color:#6b6b6b}
+.ck{position:absolute;z-index:20;inset-inline:24px;inset-block-end:24px;background:#fff;border:1px solid #cfcfcf;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.2);padding:20px 24px;display:flex;align-items:center;gap:32px}
+.ck p{font-size:13.5px;line-height:1.5;color:#3a3a3a}
+.ck--m{inset-inline:8px;inset-block-end:8px;flex-direction:column;align-items:stretch;gap:14px;padding:16px}
+.ck__a{display:flex;gap:8px;flex:none;align-items:center}
+.ck--m .ck__a{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ck--m .ck__a .btn--q{grid-column:1/-1}
+.dlgw{position:absolute;inset:0;z-index:21;display:flex;align-items:center;justify-content:center}
+.dlgw--m{align-items:flex-end}
+.dlg{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);inline-size:560px;display:flex;flex-direction:column}
+.dlgw--m .dlg{inline-size:100%;border-radius:16px 16px 0 0;max-block-size:92%}
+.dlg__h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 14px 22px;border-block-end:1px solid #ececec}
+.dlg__b{padding:6px 22px}
+.dlg__f{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 22px;border-block-start:1px solid #ececec}
+.dlg__f .btn:first-child{grid-column:1/-1}
+.cat{display:flex;gap:16px;align-items:flex-start;padding-block:16px;border-block-end:1px solid #f0f0f0}
+.cat:last-child{border-block-end:0}
+.cat p{font-size:13px;color:#5c5c5c;margin-block-start:2px}
+.tg{position:relative;inline-size:46px;block-size:28px;border-radius:14px;background:#cfcfcf;flex:none;margin-block-start:2px}
+.tg::after{content:"";position:absolute;inset-block-start:3px;inset-inline-start:3px;inline-size:22px;block-size:22px;border-radius:50%;background:#fff}
+.tg.on{background:#151515}.tg.on::after{inset-inline-start:21px}
+.tgl{font-size:12px;font-weight:650;color:#5c5c5c;white-space:nowrap;margin-block-start:5px}
+.pr{position:relative;display:flex;justify-content:center;align-items:center;gap:14px;block-size:40px;padding-inline:40px;background:#ececec;font-size:13px;font-weight:600}
+.pr__t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-inline-size:0}
+.pr__l{text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex:none}
+.pr--m{block-size:52px;padding-inline:16px;font-size:12.5px;gap:12px;justify-content:space-between}
+.pr--m .pr__t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+.pg[lang="ar"] .pr--m .pr__t{line-height:1.45}
+.res{outline:1px dashed #8a8a8a;outline-offset:-1px}
+.sys{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:72px 24px}
+.sys--d{padding:120px 40px 128px}
+.sys p{max-inline-size:520px;color:#3a3a3a}
+.sys .sf{inline-size:100%;max-inline-size:560px;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{display:inline-flex;align-items:center;block-size:40px;padding-inline:16px;border-radius:999px;border:1px solid #cfcfcf;font-size:13.5px;font-weight:600;text-decoration:none}
+.bil{display:grid;gap:40px;inline-size:100%;max-inline-size:760px}
+.bil--d{grid-template-columns:1fr 1fr}
+.bil>div{display:flex;flex-direction:column;gap:10px;align-items:center}
+</style>
+</head>
+<body>
+<header class="wf-meta" lang="en" dir="ltr">
+<div>
+<div class="eb">Mizzey · S1 low fidelity · batch-01, global frame, discovery and home · Direction C with A-inspired restraint · Arabic, right to left</div>
+<h1 class="mt"><code style="font-size:22px">gl-footer</code> Footer</h1>
+<p class="ml">The client-maintained footer: link columns, the signup prompt, customer care with the WhatsApp link, and the legal line.</p>
+<dl class="mf"><dt>Rows</dt><dd>SSC-08; shaped by CMS-10, HOME-09, NFR-12</dd><dt>States drawn</dt><dd><code>default</code>, <code>long_content</code></dd><dt>Interaction options</dt><dd><code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>OD-01</code>, <code>OD-18</code>, <code>CR-15</code></dd><dt>Viewports</dt><dd>Mobile, 390 and 360; desktop, 1280</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files.</dd></dl>
+</div>
+<nav class="mn" aria-label="Batch-01 surfaces">
+<div class="seg"><a href="gl-footer.en.html">English, LTR</a><span class="on">Arabic, RTL</span></div>
+<div class="seg"><a href="gl-header.ar.html">gl-header</a><a href="gl-header-mobile.ar.html">gl-header-mobile</a><a href="gl-mobile-nav.ar.html">gl-mobile-nav</a><a href="gl-mega-menu.ar.html">gl-mega-menu</a><a href="gl-language-switcher.ar.html">gl-language-switcher</a><span class="on">gl-footer</span><a href="gl-cookie-consent.ar.html">gl-cookie-consent</a><a href="gl-promo-banner.ar.html">gl-promo-banner</a><a href="sf-home.ar.html">sf-home</a><a href="sy-404.ar.html">sy-404</a><a href="sy-maintenance.ar.html">sy-maintenance</a><a href="sy-coming-soon.ar.html">sy-coming-soon</a></div>
+</nav>
+</header>
+<main class="sheet">
+<section class="set"><h2 class="set__h" lang="en" dir="ltr">Default</h2><p class="set__p" lang="en" dir="ltr">The footer closes every page with the columns, links and contact content the client maintains. Every policy page is reachable from it (US-01-07).</p><div class="row"><figure class="fig fig--m"><div class="wf-frame wf-frame--mobile"><div class="wf-frame__label" lang="en" dir="ltr">gl-footer · default · mobile</div><div class="pg" lang="ar" dir="rtl" style=""><div class="cut" style="block-size:80px" lang="en" dir="ltr">Page content</div><footer class="ft"><div class="gm" style="padding-block:28px;border-block-end:1px solid #e3e3e3;display:flex;flex-direction:column;gap:14px"><b class="h3">ابقَ على تواصل</b><div class="suf"><div class="fld"><span class="lbl">البريد الإلكتروني</span><div class="suf__r" style="flex-direction:column"><span class="inp ltr" dir="ltr">name@example.com</span><span class="btn">اشترك</span></div></div><div class="cbr"><span class="cb"></span><span>أرسلوا لي الأخبار والعروض بالبريد الإلكتروني. اختياري ومنفصل عن التسجيل.</span></div></div></div><div class="gm ftm__c"><div class="wide"><div class="ft__h">تسوّق</div><ul><li><a href="#" style="text-decoration:none">ملابس</a></li><li><a href="#" style="text-decoration:none">أحذية</a></li><li><a href="#" style="text-decoration:none">حقائب وإكسسوارات</a></li><li><a href="#" style="text-decoration:none">المنزل والمعيشة</a></li><li><a href="#" style="text-decoration:none">الجمال والعناية</a></li><li><a href="#" style="text-decoration:none">المجموعات</a></li><li><a href="#" style="text-decoration:none">العلامات التجارية</a></li></ul></div><div><div class="ft__h">المساعدة</div><ul><li><a href="#" style="text-decoration:none">اتصل بنا</a></li><li><a href="#" style="text-decoration:none">المساعدة والأسئلة الشائعة</a></li><li><a href="#" style="text-decoration:none">سياسة الشحن</a></li><li><a href="#" style="text-decoration:none">سياسة الإرجاع والاسترداد</a></li></ul></div><div><div class="ft__h">عن المتجر</div><ul><li><a href="#" style="text-decoration:none">من نحن</a></li><li><a href="#" style="text-decoration:none">ضمان الأصالة</a></li></ul></div><div><div class="ft__h">قانوني</div><ul><li><a href="#" style="text-decoration:none">سياسة الخصوصية</a></li><li><a href="#" style="text-decoration:none">الشروط والأحكام</a></li><li><a href="#" style="text-decoration:none">تفضيلات ملفات تعريف الارتباط</a></li></ul></div><div class="wide"><div class="ft__h">خدمة العملاء</div><ul><li><a href="#" class="lnk">تحدّث معنا عبر واتساب<span class="chev"></span></a></li><li><span class="mut">الهاتف</span> <span class="phf ltr" dir="ltr">Number · OD-18</span></li><li><span class="mut">البريد الإلكتروني</span> <span class="phf ltr" dir="ltr">Address · OD-18</span></li><li><span class="mut">العنوان</span> <span class="phf" lang="en" dir="ltr">Postal address · OD-18</span></li></ul></div></div><div class="gm ft__b" style="flex-direction:column;align-items:flex-start"><a href="#" class="logo logo--s" lang="en" dir="ltr">LOGO · OD-01</a><span class="phf" lang="en" dir="ltr">© Legal entity name and registration · OD-18</span></div></footer></div></div><div class="notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:default</b> — Signup prompt, then the link groups in two columns with Shop full width, then customer care, then the logo box and the legal line. Links are 44 px tall rows on touch.</aside><aside class="wf-note wf-recommend" lang="en" dir="ltr">Link groups stay open on mobile rather than collapsing into accordions: the footer is short enough, and every policy stays one tap away.</aside></div></figure><figure class="fig fig--d"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">gl-footer · default · desktop</div><div class="pg" lang="ar" dir="rtl" style=""><div class="cut" style="block-size:80px" lang="en" dir="ltr">Page content</div><footer class="ft"><div class="g ft__su"><div><b class="h3">ابقَ على تواصل</b><p class="mut" style="font-size:13.5px;margin-block-start:4px">نص دعوة التسجيل من المحرر.</p></div><div class="suf"><div class="fld"><span class="lbl">البريد الإلكتروني</span><div class="suf__r"><span class="inp ltr" dir="ltr">name@example.com</span><span class="btn">اشترك</span></div></div><div class="cbr"><span class="cb"></span><span>أرسلوا لي الأخبار والعروض بالبريد الإلكتروني. اختياري ومنفصل عن التسجيل.</span></div></div></div><div class="g ft__c"><div><div class="ft__h">تسوّق</div><ul><li><a href="#" style="text-decoration:none">ملابس</a></li><li><a href="#" style="text-decoration:none">أحذية</a></li><li><a href="#" style="text-decoration:none">حقائب وإكسسوارات</a></li><li><a href="#" style="text-decoration:none">المنزل والمعيشة</a></li><li><a href="#" style="text-decoration:none">الجمال والعناية</a></li><li><a href="#" style="text-decoration:none">المجموعات</a></li><li><a href="#" style="text-decoration:none">العلامات التجارية</a></li></ul></div><div><div class="ft__h">المساعدة</div><ul><li><a href="#" style="text-decoration:none">اتصل بنا</a></li><li><a href="#" style="text-decoration:none">المساعدة والأسئلة الشائعة</a></li><li><a href="#" style="text-decoration:none">سياسة الشحن</a></li><li><a href="#" style="text-decoration:none">سياسة الإرجاع والاسترداد</a></li></ul></div><div><div class="ft__h">عن المتجر</div><ul><li><a href="#" style="text-decoration:none">من نحن</a></li><li><a href="#" style="text-decoration:none">ضمان الأصالة</a></li></ul></div><div><div class="ft__h">قانوني</div><ul><li><a href="#" style="text-decoration:none">سياسة الخصوصية</a></li><li><a href="#" style="text-decoration:none">الشروط والأحكام</a></li><li><a href="#" style="text-decoration:none">تفضيلات ملفات تعريف الارتباط</a></li></ul></div><div><div class="ft__h">خدمة العملاء</div><ul><li><a href="#" class="lnk">تحدّث معنا عبر واتساب<span class="chev"></span></a></li><li><span class="mut">الهاتف</span> <span class="phf ltr" dir="ltr">Number · OD-18</span></li><li><span class="mut">البريد الإلكتروني</span> <span class="phf ltr" dir="ltr">Address · OD-18</span></li><li><span class="mut">العنوان</span> <span class="phf" lang="en" dir="ltr">Postal address · OD-18</span></li></ul></div></div><div class="g ft__b"><a href="#" class="logo logo--s" lang="en" dir="ltr">LOGO · OD-01</a><span class="phf" lang="en" dir="ltr">© Legal entity name and registration · OD-18</span></div></footer></div></div><div class="notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:default</b> — A quiet grey band. Signup prompt at the top, four link columns and customer care, then the logo box and legal line.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>OD-18</b> — Phone, email, postal address and the legal entity are labelled placeholders. No real detail.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>OD-01</b> — The logo is a labelled box.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>CR-15</b> — Link labels and column names are placeholders; the client maintains them in both languages (SSC-08).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:default</b> — The WhatsApp click-to-chat link (CMS-10) opens a conversation with the configured number, which is OD-18.</aside><aside class="wf-note wf-recommend" lang="en" dir="ltr"><b>gl-footer · HOME-09, SSC-08</b> — Batch-01 review: the footer omits its signup prompt on the home page, which already carries the signup section (HOME-09). SSC-08 contracts footer content, links and columns, not a second prompt, so nothing required is lost. Every other page keeps the footer prompt.</aside></div></figure></div></section>
+<section class="set"><h2 class="set__h" lang="en" dir="ltr">Long content</h2><p class="set__p" lang="en" dir="ltr">More columns and longer labels, in both languages.</p><div class="row"><figure class="fig fig--s"><div class="wf-frame wf-frame--mobile"><div class="wf-frame__label" lang="en" dir="ltr">gl-footer · long_content · mobile at 360</div><div class="pg" lang="ar" dir="rtl" style=""><div class="cut" style="block-size:80px" lang="en" dir="ltr">Page content</div><footer class="ft"><div class="gm" style="padding-block:28px;border-block-end:1px solid #e3e3e3;display:flex;flex-direction:column;gap:14px"><b class="h3">ابقَ على تواصل</b><div class="suf"><div class="fld"><span class="lbl">البريد الإلكتروني</span><div class="suf__r" style="flex-direction:column"><span class="inp ltr" dir="ltr">name@example.com</span><span class="btn">اشترك</span></div></div><div class="cbr"><span class="cb"></span><span>أرسلوا لي الأخبار والعروض بالبريد الإلكتروني. اختياري ومنفصل عن التسجيل.</span></div></div></div><div class="gm ftm__c"><div class="wide"><div class="ft__h">تسوّق</div><ul><li><a href="#" style="text-decoration:none">ملابس</a></li><li><a href="#" style="text-decoration:none">أحذية وأحذية رياضية</a></li><li><a href="#" style="text-decoration:none">حقائب ومحافظ ومنتجات جلدية صغيرة</a></li><li><a href="#" style="text-decoration:none">المنزل والمطبخ والمعيشة</a></li><li><a href="#" style="text-decoration:none">الجمال والعناية الشخصية</a></li><li><a href="#" style="text-decoration:none">المجوهرات والساعات</a></li><li><a href="#" style="text-decoration:none">الأطفال والرضّع</a></li><li><a href="#" style="text-decoration:none">هدايا لكل المناسبات</a></li><li><a href="#" style="text-decoration:none">الرياضة والحياة في الهواء الطلق</a></li><li><a href="#" style="text-decoration:none">القرطاسية وإكسسوارات المكتب</a></li><li><a href="#" style="text-decoration:none">السفر والأمتعة</a></li><li><a href="#" style="text-decoration:none">التخفيضات</a></li></ul></div><div><div class="ft__h">المجموعات</div><ul><li><a href="#" style="text-decoration:none">مجموعة الكتان</a></li><li><a href="#" style="text-decoration:none">أساسيات عطلة نهاية الأسبوع لكل العائلة</a></li><li><a href="#" style="text-decoration:none">متجر الهدايا</a></li><li><a href="#" style="text-decoration:none">خزفيات مصنوعة يدويًا من ورش محلية</a></li><li><a href="#" style="text-decoration:none">تريكو الشتاء</a></li><li><a href="#" style="text-decoration:none">جديد هذا الشهر</a></li></ul></div><div><div class="ft__h">المساعدة</div><ul><li><a href="#" style="text-decoration:none">اتصل بنا</a></li><li><a href="#" style="text-decoration:none">المساعدة والأسئلة الشائعة</a></li><li><a href="#" style="text-decoration:none">سياسة الشحن والتوصيل</a></li><li><a href="#" style="text-decoration:none">سياسة الإرجاع والاسترداد</a></li></ul></div><div><div class="ft__h">عن المتجر</div><ul><li><a href="#" style="text-decoration:none">من نحن</a></li><li><a href="#" style="text-decoration:none">ضمان الأصالة</a></li></ul></div><div><div class="ft__h">قانوني</div><ul><li><a href="#" style="text-decoration:none">سياسة الخصوصية</a></li><li><a href="#" style="text-decoration:none">الشروط والأحكام</a></li><li><a href="#" style="text-decoration:none">تفضيلات ملفات تعريف الارتباط</a></li></ul></div><div class="wide"><div class="ft__h">خدمة العملاء</div><ul><li><a href="#" class="lnk">تحدّث معنا عبر واتساب<span class="chev"></span></a></li><li><span class="mut">الهاتف</span> <span class="phf ltr" dir="ltr">Number · OD-18</span></li><li><span class="mut">البريد الإلكتروني</span> <span class="phf ltr" dir="ltr">Address · OD-18</span></li><li><span class="mut">العنوان</span> <span class="phf" lang="en" dir="ltr">Postal address · OD-18</span></li></ul></div></div><div class="gm ft__b" style="flex-direction:column;align-items:flex-start"><a href="#" class="logo logo--s" lang="en" dir="ltr">LOGO · OD-01</a><span class="phf" lang="en" dir="ltr">© Legal entity name and registration · OD-18</span></div></footer></div></div><div class="notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:long_content</b> — Long labels wrap within their column; the grid keeps two columns at 360 and Shop runs full width.</aside></div></figure><figure class="fig fig--d"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">gl-footer · long_content · desktop</div><div class="pg" lang="ar" dir="rtl" style=""><div class="cut" style="block-size:80px" lang="en" dir="ltr">Page content</div><footer class="ft"><div class="g ft__su"><div><b class="h3">ابقَ على تواصل</b><p class="mut" style="font-size:13.5px;margin-block-start:4px">نص دعوة التسجيل من المحرر.</p></div><div class="suf"><div class="fld"><span class="lbl">البريد الإلكتروني</span><div class="suf__r"><span class="inp ltr" dir="ltr">name@example.com</span><span class="btn">اشترك</span></div></div><div class="cbr"><span class="cb"></span><span>أرسلوا لي الأخبار والعروض بالبريد الإلكتروني. اختياري ومنفصل عن التسجيل.</span></div></div></div><div class="g ft__c ft__c--l"><div><div class="ft__h">تسوّق</div><ul><li><a href="#" style="text-decoration:none">ملابس</a></li><li><a href="#" style="text-decoration:none">أحذية وأحذية رياضية</a></li><li><a href="#" style="text-decoration:none">حقائب ومحافظ ومنتجات جلدية صغيرة</a></li><li><a href="#" style="text-decoration:none">المنزل والمطبخ والمعيشة</a></li><li><a href="#" style="text-decoration:none">الجمال والعناية الشخصية</a></li><li><a href="#" style="text-decoration:none">المجوهرات والساعات</a></li><li><a href="#" style="text-decoration:none">الأطفال والرضّع</a></li><li><a href="#" style="text-decoration:none">هدايا لكل المناسبات</a></li><li><a href="#" style="text-decoration:none">الرياضة والحياة في الهواء الطلق</a></li><li><a href="#" style="text-decoration:none">القرطاسية وإكسسوارات المكتب</a></li><li><a href="#" style="text-decoration:none">السفر والأمتعة</a></li><li><a href="#" style="text-decoration:none">التخفيضات</a></li></ul></div><div><div class="ft__h">المجموعات</div><ul><li><a href="#" style="text-decoration:none">مجموعة الكتان</a></li><li><a href="#" style="text-decoration:none">أساسيات عطلة نهاية الأسبوع لكل العائلة</a></li><li><a href="#" style="text-decoration:none">متجر الهدايا</a></li><li><a href="#" style="text-decoration:none">خزفيات مصنوعة يدويًا من ورش محلية</a></li><li><a href="#" style="text-decoration:none">تريكو الشتاء</a></li><li><a href="#" style="text-decoration:none">جديد هذا الشهر</a></li></ul></div><div><div class="ft__h">المساعدة</div><ul><li><a href="#" style="text-decoration:none">اتصل بنا</a></li><li><a href="#" style="text-decoration:none">المساعدة والأسئلة الشائعة</a></li><li><a href="#" style="text-decoration:none">سياسة الشحن والتوصيل</a></li><li><a href="#" style="text-decoration:none">سياسة الإرجاع والاسترداد</a></li></ul></div><div><div class="ft__h">عن المتجر</div><ul><li><a href="#" style="text-decoration:none">من نحن</a></li><li><a href="#" style="text-decoration:none">ضمان الأصالة</a></li></ul></div><div><div class="ft__h">قانوني</div><ul><li><a href="#" style="text-decoration:none">سياسة الخصوصية</a></li><li><a href="#" style="text-decoration:none">الشروط والأحكام</a></li><li><a href="#" style="text-decoration:none">تفضيلات ملفات تعريف الارتباط</a></li></ul></div><div><div class="ft__h">خدمة العملاء</div><ul><li><a href="#" class="lnk">تحدّث معنا عبر واتساب<span class="chev"></span></a></li><li><span class="mut">الهاتف</span> <span class="phf ltr" dir="ltr">Number · OD-18</span></li><li><span class="mut">البريد الإلكتروني</span> <span class="phf ltr" dir="ltr">Address · OD-18</span></li><li><span class="mut">العنوان</span> <span class="phf" lang="en" dir="ltr">Postal address · OD-18</span></li></ul></div></div><div class="g ft__b"><a href="#" class="logo logo--s" lang="en" dir="ltr">LOGO · OD-01</a><span class="phf" lang="en" dir="ltr">© Legal entity name and registration · OD-18</span></div></footer></div></div><div class="notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>gl-footer:long_content</b> — Five link columns and customer care. Long labels wrap; columns never truncate. Beyond six columns the grid moves to a second row.</aside><aside class="wf-note rtl" lang="en" dir="ltr">Columns run right to left in Arabic; the phone, email and any order numbers stay left to right.</aside></div></figure></div></section>
+</main>
+</body>
+</html>
