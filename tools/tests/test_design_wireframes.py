@@ -237,13 +237,19 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("sf-basket is not a surface of the inventory")
 
     def test_pending_interaction_choices_are_derived_not_typed(self):
-        self.entries["sf-pagination"]["interaction_pending"] = []
+        entry = self.entries["sf-pagination"]
+        entry["interaction_pending"] = [] if entry["interaction_pending"] else ["DQ-02"]
         self.assertRefused("manifest sf-pagination: interaction_pending differs from the inventory")
 
     def test_a_locked_choice_is_no_longer_pending(self):
+        """Holds whether DQ-02 is still provisional or already locked: the fixture sets the state it starts from."""
         option = next(o for o in self.data["options"] if o["id"] == "DQ-02")
+        option["status"] = "provisional"
+        self.entries["sf-pagination"]["interaction_pending"] = ["DQ-02"]
+        text = "manifest sf-pagination: interaction_pending differs from the inventory"
+        self.assertFalse(any(text in e for e in self.errors()))
         option["status"] = "locked"
-        self.assertRefused("manifest sf-pagination: interaction_pending differs from the inventory")
+        self.assertRefused(text)
 
     def test_a_briefed_surface_needs_its_brief_and_a_purpose(self):
         self.entries["sf-wishlist"]["review_status"] = "briefed"
