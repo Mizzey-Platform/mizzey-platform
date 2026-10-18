@@ -256,7 +256,7 @@
       "states": ["default", "current", "disabled"],
       "used_by": ["sf-pagination", "ac-orders", "rv-list"],
       "brand": "neutral",
-      "note": "The working baseline for product lists, not a decision: see DQ-02 in interaction-options.json."
+      "note": "Numbered pagination for product lists, locked at the batch-02 review: see DQ-02 in interaction-options.json."
     },
     {
       "id": "nv-language-switcher",

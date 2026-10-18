@@ -42,7 +42,7 @@
       "requirement_outcome": "A customer can continue through a product list beyond the first set of products and sees how many results there are (PLP-16, PLP-17). PLP-16 names pagination or infinite scroll and fixes neither.",
       "candidate_patterns": ["Numbered pagination", "Load More", "Controlled continuous or infinite loading"],
       "working_baseline": "Numbered pagination",
-      "status": "provisional",
+      "status": "locked",
       "constrained_by": ["platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -57,8 +57,8 @@
         "usability", "mobile behaviour", "accessibility", "SEO", "performance", "catalogue size", "native platform behaviour", "technical cost",
         "whether the footer stays reachable"
       ],
-      "selected_pattern": null,
-      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision."
+      "selected_pattern": "Numbered pagination",
+      "decision_source": "Owner decision by Mustafa, 19 October 2026, at the batch-02 low-fidelity review (manifest.json, batches, batch-02 review), on Claude Design's batch-02 recommendation and Claude Code's validation (PR #362, f8ddd44). Numbered pagination for first-release product listings and search results: addressable pages, keyboard and screen-reader use, page order following the reading direction in Arabic with digits not mirrored, and a predictable return to the same place in the list. Load More and continuous or infinite loading are not added as launch functionality. Not a client confirmation and not approval of the interface design (PRE-03b). The baseline set in D-14 on 6 October 2026, now selected."
     },
     {
       "id": "DQ-03",
@@ -108,7 +108,7 @@
       ],
       "selection_criteria": ["how many filters and options a category really has", "room left for product imagery", "discoverability", "tablet behaviour", "accessibility"],
       "selected_pattern": "Sidebar beside the grid",
-      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The drawer on tablet and mobile. Whether the drawer holds one panel or two is decided in batch-02, on Arabic evidence at 360 px."
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The drawer on tablet and mobile. Whether the drawer holds one panel or two is decided in batch-02, on Arabic evidence at 360 px. Decided at the batch-02 review by the owner, 19 October 2026: one panel with collapsible groups, chosen on the Arabic layout at 360 px."
     },
     {
       "id": "IX-02",

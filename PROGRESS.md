@@ -50,9 +50,10 @@ Live status. First action each session: read this, then continue from **Next**.
   files, twelve surfaces in English and Arabic, were imported in PR #359 (`0ee1772`), and the owner reviewed and
   approved them on 19 October 2026. The record, with the seven deferred questions and their references, is the
   batch-01 entry under `batches` in the manifest. It is the internal structural wireframe review only: not client
-  acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is drawn**: Claude Design's 30
-  files, fifteen surfaces in English and Arabic, are imported for the owner's review, `wireframed` in the manifest
-  and not yet reviewed.
+  acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is reviewed and closed**: Claude Design's 30
+  files, fifteen surfaces in English and Arabic, were imported in PR #362 (`f8ddd44`), and the owner reviewed and
+  approved them on 19 October 2026, locking DQ-02 (numbered pagination) and setting the badge precedence. The
+  record is the batch-02 entry under `batches` in the manifest, beside its import record.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
@@ -64,8 +65,8 @@ Live status. First action each session: read this, then continue from **Next**.
   (accepted by #242, built by #255). Six platform surfaces have no build PBI and none is invented for them.
 - **UX is locked only at its decision stage (D-14, items 12 and 13).** Thirteen interaction choices are recorded
   in `design/inventory/interaction-options.json`: ten locked at the calibration review (DQ-03 and IX-01 to IX-09),
-  two provisional baselines (DQ-01 Western digits, DQ-02 numbered pagination), and one open (IX-10, for
-  batch-03). A provisional baseline is not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
+  DQ-02 (numbered pagination) locked at the batch-02 review, one provisional baseline (DQ-01 Western digits),
+  and one open (IX-10, for batch-03). A provisional baseline is not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
   out of the first wireframe pass, the cash-collected state for staff only, reviews from signed-in customers with
   no verified-purchase badge, and the consent banner within what the selected tool supports.
 - **The experience target is `design/direction.md`**, and it is not the brand identity. No implementation library
@@ -267,8 +268,9 @@ drawn beyond batch-02 and CoreX is not upgraded until he says so either.** In or
    reconfirmation (`gl-header`, `gl-header-mobile`). Claude Design drew it on Mustafa's instruction; he reviewed it
    and closed it on 19 October 2026 (PR #359, with the closure record in the manifest). Batch-02 opens on his instruction
    of 19 October 2026: its fifteen surfaces are briefed, six of them newly, and Claude Design draws it from a
-   private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files are imported
-   for his review, and the batch closes when he has reviewed it (D-15, item 9). Batch-03 waits for that closure.
+   private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files were imported
+   (PR #362), and he reviewed and closed it on 19 October 2026. Next is a narrow correction of the 44 px targets
+   carried from batch-01; batch-03 waits for it.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

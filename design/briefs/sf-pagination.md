@@ -55,7 +55,7 @@ Flows it serves: Navigation and browsing (`F02`); Product search (`F03`).
 
 | Component | Layer | States | Note |
 |---|---|---|---|
-| Pagination (`nv-pagination`) | navigation | default, current, disabled | The working baseline for product lists, not a decision: see DQ-02 in interaction-options.json. |
+| Pagination (`nv-pagination`) | navigation | default, current, disabled | Numbered pagination for product lists, locked at the batch-02 review: see DQ-02 in interaction-options.json. |
 
 ## States
 
@@ -68,8 +68,8 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `middle_page` | Other |  |  |
 | `last_page` | Other |  |  |
 | `single_page` | Other |  | Nothing more to show |
-| `loading_more` | Loading |  | Only if a loading pattern is selected (DQ-02) |
-| `end_of_list` | Other |  | Only if a loading pattern is selected (DQ-02) |
+| `loading_more` | Loading |  | As it applies to numbered pages: the next page loading into reserved space (DQ-02) |
+| `end_of_list` | Other |  | As it applies to numbered pages: the end of the last page (DQ-02) |
 
 ## Responsive
 
@@ -108,14 +108,14 @@ None.
 
 ### DQ-02: Product-list continuation
 
-Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer can continue through a product list beyond the first set of products and sees how many results there are (PLP-16, PLP-17). PLP-16 names pagination or infinite scroll and fixes neither.
 
 |  |  |
 |---|---|
 | Working baseline | Numbered pagination |
-| Selected pattern | None |
+| Selected pattern | Numbered pagination |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -181,18 +181,18 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 7 of 7 |
-| Interaction decisions pending | DQ-02 |
+| Interaction decisions pending | None |
 | Calibration frames | Category listing (`cal-04`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
 
 ## Note
 
-Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02).
+Numbered pagination, locked by the owner at the batch-02 review on 19 October 2026 (DQ-02). Load More and continuous loading are not launch functionality.
