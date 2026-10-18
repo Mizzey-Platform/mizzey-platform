@@ -480,6 +480,7 @@
     {
       "id": "sf-shop",
       "name": "Products listing",
+      "purpose": "Shows the whole range in one listing, with the result count, so a visitor can browse, filter, sort and continue through it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -519,7 +520,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -571,6 +572,7 @@
     {
       "id": "sf-collection",
       "name": "Collection page",
+      "purpose": "Shows the products of one curated collection, in the order the store sets, so a visitor can browse, narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -609,12 +611,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
       "id": "sf-brand",
       "name": "Brand page",
+      "purpose": "Shows the products of one brand, with its name and its logo where one exists, so a visitor can browse, narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -653,7 +656,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
       "note": "#303 builds the customer-facing brand page. IA-05 (#242) names the page, and ADM-56 (#277) and SSC-05 (#311) own the admin and editing rows that shape its header: they are context here and stay with their owners."
     },
@@ -904,6 +907,7 @@
     {
       "id": "sf-listing-empty",
       "name": "Listing with no products",
+      "purpose": "Tells a visitor that a listing has no products, or none that match the chosen filters, and offers a way on.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -941,7 +945,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-filter-by-rating",
@@ -1078,6 +1082,7 @@
     {
       "id": "sf-search-results",
       "name": "Search results",
+      "purpose": "Shows the products that match a search, in English or Arabic, with the result count and the full filter set, so a visitor can narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1119,12 +1124,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
     },
     {
       "id": "sf-search-no-results",
       "name": "Search with no results",
+      "purpose": "Tells a visitor that a search found nothing, and offers alternative suggestions so the search does not end there.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1161,7 +1167,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-search-synonyms",

@@ -347,7 +347,7 @@
     {
       "surface": "sf-shop",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-shop.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -355,7 +355,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-category",
@@ -373,7 +373,7 @@
     {
       "surface": "sf-collection",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-collection.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -381,12 +381,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-brand",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-brand.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -394,7 +394,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-product-card",
@@ -464,7 +464,7 @@
     {
       "surface": "sf-listing-empty",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-listing-empty.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -472,7 +472,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-filter-by-rating",
@@ -516,7 +516,7 @@
     {
       "surface": "sf-search-results",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-search-results.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -524,12 +524,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": ["DQ-02"],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-search-no-results",
       "batch": "batch-02",
-      "brief": null,
+      "brief": "design/briefs/sf-search-no-results.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -537,7 +537,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-search-synonyms",
