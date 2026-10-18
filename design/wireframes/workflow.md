@@ -2,8 +2,8 @@
 
 How the low-fidelity wireframes are produced, reviewed and tracked. The artefact format is in
 [README.md](README.md). The calibration set is drawn and reviewed, and the owner's selection is recorded in
-`manifest.json` under `selection`. **No production wireframe exists yet**: the review batches begin on the owner's
-instruction.
+`manifest.json` under `selection`. **Batch-01 is drawn and not yet reviewed**; each later batch begins on the
+owner's instruction.
 
 ## 1. What Claude Design receives and reads
 
