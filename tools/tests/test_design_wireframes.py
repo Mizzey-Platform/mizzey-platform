@@ -329,6 +329,8 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
 
     def test_a_declared_calibration_file_may_exist_before_its_review_is_recorded(self):
         """The designer creates the files and leaves the manifest alone: the status follows the review."""
+        for frame in self.data["manifest"]["calibration"]["frames"]:
+            frame["status"] = {d: "not_started" for d in dw.DIRECTIONS}
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             path = root / "design/wireframes/s1/calibration/a/cal-01.en.html"
@@ -341,6 +343,7 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertTrue(any("cal-99.en.html: a wireframe the manifest does not list" in e for e in errs))
 
     def test_no_direction_is_selected_before_the_calibration_is_reviewed(self):
+        self.data["manifest"]["calibration"]["frames"][0]["status"]["a"] = "drawn"
         self.data["manifest"]["selection"]["selected_direction"] = "b"
         self.data["manifest"]["selection"]["decision_source"] = "Owner"
         self.assertRefused("a direction is selected before every calibration frame has been reviewed")

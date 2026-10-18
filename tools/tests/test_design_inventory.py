@@ -59,21 +59,31 @@ class TheCommittedInventory(unittest.TestCase):
             self.assertEqual((d["status"], d["decided_by"], d["client_confirmed"], d["adds_scope"]),
                              ("locked", "owner", False, False), d["id"])
 
-    def test_numerals_list_continuation_and_checkout_are_provisional_and_select_nothing(self):
+    def test_numerals_list_continuation_and_checkout_keep_their_baselines_until_selected(self):
         """D-14: a working baseline for the first wireframes is not a requirement and not a final product decision."""
         by_id = {o["id"]: o for o in self.data["options"]}
         for oid, baseline in (("DQ-01", "Western digits 0 to 9 in both languages"), ("DQ-02", "Numbered pagination"),
                               ("DQ-03", "One page with clear sections")):
             o = by_id[oid]
-            self.assertEqual((o["status"], o["working_baseline"], o["selected_pattern"]), ("provisional", baseline, None), oid)
+            self.assertEqual(o["working_baseline"], baseline, oid)
+            self.assertIn(o["status"], ("provisional", "locked"), oid)
+            if o["status"] == "provisional":
+                self.assertIsNone(o["selected_pattern"], oid)
             self.assertGreaterEqual(len(o["candidate_patterns"]), 3, oid)
         self.assertIn("Load More", by_id["DQ-02"]["candidate_patterns"])
         self.assertTrue(any("infinite" in c for c in by_id["DQ-02"]["candidate_patterns"]))
         self.assertTrue(any(c.startswith("Stepped checkout") for c in by_id["DQ-03"]["candidate_patterns"]))
 
-    def test_no_interaction_choice_has_been_locked_before_any_wireframe_exists(self):
-        self.assertEqual([o["id"] for o in self.data["options"] if o["status"] == "locked"], [])
-        self.assertEqual([o["id"] for o in self.data["options"] if o["selected_pattern"] is not None], [])
+    def test_no_interaction_choice_is_locked_before_the_calibration_is_reviewed(self):
+        manifest = json.loads((ROOT / "design/wireframes/manifest.json").read_text(encoding="utf-8"))
+        reviewed = manifest["selection"]["selected_direction"] is not None and all(
+            v == "reviewed" for f in manifest["calibration"]["frames"] for v in f["status"].values())
+        locked = [o for o in self.data["options"] if o["status"] == "locked"]
+        if not reviewed:
+            self.assertEqual([o["id"] for o in locked], [])
+            self.assertEqual([o["id"] for o in self.data["options"] if o["selected_pattern"] is not None], [])
+        for o in locked:
+            self.assertEqual(o["decision_stage"], "low_fidelity_review", o["id"])
 
     def test_the_description_tab_is_fixed_by_the_contract_and_no_candidate_removes_it(self):
         ix08 = next(o for o in self.data["options"] if o["id"] == "IX-08")
@@ -87,9 +97,10 @@ class TheCommittedInventory(unittest.TestCase):
             self.assertNotIn("if the owner confirms", pattern)
             self.assertNotIn("tabs on desktop", pattern.lower(), "the description is a tab on every viewport, not on desktop only")
 
-    def test_the_home_hero_is_genuinely_open(self):
+    def test_the_home_hero_had_no_baseline_before_its_review(self):
         ix09 = next(o for o in self.data["options"] if o["id"] == "IX-09")
-        self.assertEqual((ix09["status"], ix09["constrained_by"], ix09["working_baseline"]), ("open", [], None))
+        self.assertEqual((ix09["constrained_by"], ix09["working_baseline"]), ([], None))
+        self.assertIn(ix09["status"], ("open", "locked"))
         self.assertEqual(ix09["candidate_patterns"], ["Single hero banner", "Slider of several banners"])
 
     def test_second_release_surfaces_are_designed_before_pre03b_and_built_in_the_second_release(self):
