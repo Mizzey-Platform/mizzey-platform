@@ -84,7 +84,7 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["sf-pdp-variable", "sf-pdp-simple", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "sf-pdp-related"],
         "shows": ["sf-pdp-variable:selected", "sf-pdp-variable:variant_out_of_stock", "sf-pdp-gallery:many_images", "sf-pdp-simple:on_sale"],
-        "interaction_options": [],
+        "interaction_options": ["IX-10"],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
@@ -114,7 +114,7 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header-mobile", "sf-category", "sf-filter-drawer", "sf-product-card", "sf-pdp-variable", "sf-pdp-gallery", "sf-mini-cart"],
         "shows": ["sf-filter-drawer:open", "sf-pdp-variable:no_selection", "sf-mini-cart:after_add"],
-        "interaction_options": ["DQ-02"],
+        "interaction_options": ["DQ-02", "IX-10"],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       }
     ]
@@ -135,6 +135,22 @@
       "Trending and new arrivals stay two separate home sections."
     ],
     "decision_source": "Mustafa, owner, 18 October 2026, on Claude Design's UX decision report and Claude Code's validation of the same date. A structural low-fidelity selection: not approval of the brand identity or of the interface design (PRE-03b), not a client confirmation, and no change to the contracted scope.",
+    "reconfirmation": {
+      "date": "2026-10-18",
+      "decided_by": "Mustafa, owner",
+      "record": "A deliberate review and approval of the final structural UX direction, after the selection above was first recorded in #353 (c139c45). The selection stands, and the fields above are kept as first recorded. Direction C is the structural baseline, with premium A-inspired restraint applied consistently across the full storefront. Not approval of the brand colours, the typography, the imagery, the high-fidelity interface or PRE-03b, not a client confirmation, and no change to the contracted scope.",
+      "kept_from_c": "The contemporary navigation, search, product discovery and filtering, the product detail architecture, the sticky desktop purchase area, the cart, the mini-cart and the checkout presentation.",
+      "applied_throughout": "Calmer hierarchy, purposeful whitespace, reduced visual clutter, restrained card treatment and product-led composition, on every storefront surface.",
+      "refinements": [
+        "IX-02 is refined: a deliberate click or tap of the cart control opens the drawer, with focus managed and returned to the control that opened it; a successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add; a failed add shows its error, with no success message and no change to the count; an add from the cart's suggestions does not automatically open another drawer. The confirmation after Add to Cart on the product page is IX-10, open for the batch-03 review: the owner allows the drawer there and has not chosen it.",
+        "IX-08 stands as recorded: the full description stays a tab (PDP-12), the key features and the purchase information are reachable without opening several tabs, and delivery, returns and authenticity are clearly reachable.",
+        "IX-09 stands: one prominent hero, never an autoplaying carousel. Category shortcuts (HOME-05) and the featured collections (HOME-04) are separate sections, and trending (HOME-02) and new arrivals (HOME-03) are separate, independently managed sections. Purposeful motion is allowed where it never obstructs shopping or costs performance.",
+        "The checkout stands: DQ-03's one page with C's presentation, every required review item before Place Order, the condensed header with the logo, search, account, wishlist, cart and language switcher, and no express delivery in the first release (SHIP-07, P2).",
+        "DQ-01 and DQ-02 stay provisional: Western digits and native numbered pagination are the working baselines, and Load More is not newly authorised.",
+        "Motion: purposeful microinteractions, accessible overlays and meaningful feedback; no compulsory carousel motion, no scroll-jacking and no animation that delays a purchase; reduced motion and mobile performance are design constraints. A Lighthouse score of 99 to 100 is an aspirational engineering target, not a contractual guarantee.",
+        "Account, batches 04 and 06: a coherent desktop sidebar and mobile account navigation, a dashboard with recent orders and their statuses, clear profile and password sections, and accurate verification, cart-merge, recovery and account-security states. The account audit and its signed-scope validation are planning references, not authority to change the inventoried states; the account's technical and scope decisions stay with those batch reviews and do not block batch-01."
+      ]
+    },
     "note": "The owner chooses a, b or c, or one of them with named elements from another. Selecting a structural direction is not approval of the brand identity and not approval of the interface design."
   },
   "batches": [
@@ -499,7 +515,7 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": [],
+      "interaction_pending": ["IX-10"],
       "review_status": "candidate_selected"
     },
     {
@@ -512,7 +528,7 @@
       "mobile": "not_started",
       "desktop": "not_started",
       "states_covered": [],
-      "interaction_pending": [],
+      "interaction_pending": ["IX-10"],
       "review_status": "candidate_selected"
     },
     {

@@ -113,9 +113,12 @@
     {
       "id": "IX-02",
       "name": "Mini-cart presentation",
-      "affected_surfaces": ["sf-mini-cart", "gl-header", "gl-header-mobile"],
-      "requirement_outcome": "The header shows the cart with a live item count and a mini-cart, and the customer sees that an item was added (NAV-06, CART-12, PDP-08). No row says how the mini-cart opens.",
-      "candidate_patterns": ["Dropdown panel under the header", "Side drawer", "Drawer that opens after an add, with the count alone at other times"],
+      "affected_surfaces": ["sf-mini-cart", "gl-header", "gl-header-mobile", "sf-product-card", "sf-cart"],
+      "requirement_outcome": "The header shows the cart with a live item count and a mini-cart (NAV-06, CART-12), and a customer who adds from a listing or a product rail (PLP-04) or from the cart's suggestions (CART-08) sees that the item was added. No row says how the mini-cart opens or how those adds are confirmed. The product page's Add to Cart (PDP-08) is IX-10.",
+      "candidate_patterns": [
+        "Dropdown panel under the header", "Side drawer", "Drawer that opens after an add, with the count alone at other times",
+        "The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer"
+      ],
       "working_baseline": null,
       "status": "locked",
       "constrained_by": ["contract", "platform"],
@@ -123,11 +126,12 @@
       "constraints": [
         {"type": "contract_pattern", "text": "A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page."},
         {"type": "contract_condition", "text": "The cart page remains (IA-08)."},
+        {"type": "contract_condition", "text": "Every confirmation, error and drawer is operable by keyboard and perceivable by screen-reader users, and its motion respects a reduced-motion preference (NFR-11)."},
         {"type": "platform", "text": "The WooCommerce mini-cart block is the native baseline."}
       ],
       "selection_criteria": ["mobile behaviour", "room for the free-shipping prompt (CART-07)", "how much an add interrupts browsing", "focus management", "performance"],
-      "selected_pattern": "Drawer that opens after an add, with the count alone at other times",
-      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). Pressing the cart button opens the same drawer, and the cart page remains (IA-08). Whether the drawer is a side drawer or a bottom sheet on mobile is settled at high fidelity."
+      "selected_pattern": "The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). First recorded in #353 as \"Drawer that opens after an add, with the count alone at other times\", and refined at the owner's deliberate reconfirmation of the same date (manifest.json, selection, reconfirmation), as the selected pattern states. Interaction presentation and accessibility only: no capability is added. The confirmation after Add to Cart on the product page is not part of this lock: it is IX-10, open for the batch-03 review. The cart page remains (IA-08). Whether the drawer is a side drawer or a bottom sheet on mobile is settled at high fidelity."
     },
     {
       "id": "IX-03",
@@ -285,6 +289,30 @@
       "selection_criteria": ["how many campaigns run at once", "performance of the largest image", "accessibility", "editing effort for the client"],
       "selected_pattern": "Single hero banner",
       "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The featured collections stay their own home section (HOME-04)."
+    },
+    {
+      "id": "IX-10",
+      "name": "Confirmation after Add to Cart on the product page",
+      "affected_surfaces": ["sf-pdp-simple", "sf-pdp-variable"],
+      "requirement_outcome": "The customer sees that an item was added from the product page, and the header count follows (PDP-08, CART-12, NAV-06). No row says whether the mini-cart opens to confirm it.",
+      "candidate_patterns": [
+        "The mini-cart drawer opens as a focused confirmation",
+        "The add is confirmed in place on the product page and the count updates, without opening the drawer"
+      ],
+      "working_baseline": null,
+      "status": "open",
+      "constrained_by": [],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "A variable product needs a choice before it can be added (PDP-05)."},
+        {"type": "contract_condition", "text": "The confirmation is perceivable by keyboard and screen-reader users, and its motion respects a reduced-motion preference (NFR-11)."}
+      ],
+      "selection_criteria": [
+        "whether the customer continues shopping or goes to checkout next", "how much the confirmation interrupts the page",
+        "focus management", "consistency with the quick add and the sticky buy bar (IX-03)", "mobile behaviour", "performance"
+      ],
+      "selected_pattern": null,
+      "decision_source": "Recorded at the owner's reconfirmation of 18 October 2026 (manifest.json, selection, reconfirmation), for the batch-03 review. The owner allows the drawer here as a focused confirmation and has not chosen it. Separated from IX-02, whose lock does not cover the product page."
     }
   ]
 }

@@ -157,6 +157,30 @@ Candidate patterns:
 
 Weighed in the review: length of the product page; mobile reach; accessibility; performance; whether it distracts from the product; nothing it covers: content, the consent banner, the keyboard.
 
+### IX-10: Confirmation after Add to Cart on the product page
+
+Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+
+**Outcome required.** The customer sees that an item was added from the product page, and the header count follows (PDP-08, CART-12, NAV-06). No row says whether the mini-cart opens to confirm it.
+
+|  |  |
+|---|---|
+| Working baseline | None |
+| Selected pattern | None |
+| Decided at | the owner's review of the low-fidelity wireframes |
+
+Candidate patterns:
+
+- The mini-cart drawer opens as a focused confirmation
+- The add is confirmed in place on the product page and the count updates, without opening the drawer
+
+| Constraint | What it is |
+|---|---|
+| A variable product needs a choice before it can be added (PDP-05). | Contracted condition every pattern must meet |
+| The confirmation is perceivable by keyboard and screen-reader users, and its motion respects a reduced-motion preference (NFR-11). | Contracted condition every pattern must meet |
+
+Weighed in the review: whether the customer continues shopping or goes to checkout next; how much the confirmation interrupts the page; focus management; consistency with the quick add and the sticky buy bar (IX-03); mobile behaviour; performance.
+
 ### DQ-01: Numerals in Arabic
 
 Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.
@@ -213,7 +237,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Mobile | `not_started` |
 | Desktop | `not_started` |
 | States covered | 0 of 8 |
-| Interaction decisions pending | None |
+| Interaction decisions pending | IX-10 |
 | Calibration frames | Product detail page (`cal-05`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
