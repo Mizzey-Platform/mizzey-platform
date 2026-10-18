@@ -62,8 +62,9 @@ Live status. First action each session: read this, then continue from **Next**.
   Mustafa's approval, and nothing else on the board changed. The board snapshot in
   `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
   them.
-- **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
-  v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
+- **CoreX stays a separate, pinned, disposable checkout.** The merged `sites/` layout is not adopted. The upgrade
+  D-14 calls for is made to v0.46.1, the latest release, in its own infrastructure PR (#351); the pin moves from
+  v0.42.0 when the owner merges it, after the policy PR it is stacked on.
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
   templates under `discovery/tasks/` are marked as not to be used for design.
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
@@ -254,8 +255,8 @@ drawn and CoreX is not upgraded until he says so either.** In order:
 3. **Then the first-release surfaces in ten review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
-4. **The CoreX v0.43.0 upgrade**, evaluated and made in its own infrastructure PR, before application and
-   storefront implementation resumes.
+4. **The CoreX upgrade**, to v0.46.1, in its own infrastructure PR (#351), before application and storefront
+   implementation resumes. Its description lists the server-side items the new release layout needs.
 5. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
    Mustafa's decision. The queue is kept as the order they would follow.
 
