@@ -245,7 +245,7 @@
     {
       "surface": "gl-cookie-consent",
       "batch": "batch-01",
-      "brief": null,
+      "brief": "design/briefs/gl-cookie-consent.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -253,7 +253,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "gl-promo-banner",
@@ -1988,7 +1988,7 @@
     {
       "surface": "sy-404",
       "batch": "batch-01",
-      "brief": null,
+      "brief": "design/briefs/sy-404.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1996,12 +1996,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-maintenance",
       "batch": "batch-01",
-      "brief": null,
+      "brief": "design/briefs/sy-maintenance.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2009,7 +2009,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-store-notices",
@@ -2040,7 +2040,7 @@
     {
       "surface": "sy-coming-soon",
       "batch": "batch-01",
-      "brief": null,
+      "brief": "design/briefs/sy-coming-soon.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2048,7 +2048,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-staging-marker",
