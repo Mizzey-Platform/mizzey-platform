@@ -35,8 +35,9 @@ Live status. First action each session: read this, then continue from **Next**.
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
   script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 36 generated
-  briefs: the calibration surfaces and the rest of batch-01 (PR #356, `52d8600`). The shared
-  neutral stylesheet, `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration set is drawn and reviewed.** Claude
+  briefs: the calibration surfaces and the rest of batch-01 (PR #356, `52d8600`). The shared neutral stylesheet,
+  `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
+  set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
   `e8373e3`). The owner selected Direction C with named elements A1 to A5 and B2, and locked DQ-03 and IX-01 to
   IX-09; DQ-01 and DQ-02 stay provisional. **Recorded in PR #353, merged on 18 October 2026 as `c139c45`**: the
