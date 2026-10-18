@@ -50,12 +50,14 @@ Live status. First action each session: read this, then continue from **Next**.
   files, twelve surfaces in English and Arabic, were imported in PR #359 (`0ee1772`), and the owner reviewed and
   approved them on 19 October 2026. The record, with the seven deferred questions and their references, is the
   batch-01 entry under `batches` in the manifest. It is the internal structural wireframe review only: not client
-  acceptance, not brand or high-fidelity approval, and not PRE-03b.
+  acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is drawn**: Claude Design's 30
+  files, fifteen surfaces in English and Arabic, are imported for the owner's review, `wireframed` in the manifest
+  and not yet reviewed.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 is drawn**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 and batch-02 are drawn**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -257,7 +259,7 @@ Live status. First action each session: read this, then continue from **Next**.
 ## Next
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-01 and CoreX is not upgraded until he says so either.** In order:
+drawn beyond batch-02 and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -265,7 +267,8 @@ drawn beyond batch-01 and CoreX is not upgraded until he says so either.** In or
    reconfirmation (`gl-header`, `gl-header-mobile`). Claude Design drew it on Mustafa's instruction; he reviewed it
    and closed it on 19 October 2026 (PR #359, with the closure record in the manifest). Batch-02 opens on his instruction
    of 19 October 2026: its fifteen surfaces are briefed, six of them newly, and Claude Design draws it from a
-   private manual-transfer package built from `main` after the opening merges.
+   private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files are imported
+   for his review, and the batch closes when he has reviewed it (D-15, item 9). Batch-03 waits for that closure.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
