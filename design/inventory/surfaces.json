@@ -334,7 +334,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "gl-cookie-consent",
@@ -520,7 +520,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -566,7 +566,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -611,7 +611,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -656,7 +656,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
       "note": "#303 builds the customer-facing brand page. IA-05 (#242) names the page, and ADM-56 (#277) and SSC-05 (#311) own the admin and editing rows that shape its header: they are context here and stay with their owners."
     },
@@ -711,7 +711,7 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["sf-product-badges"]
     },
     {
@@ -757,7 +757,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
     },
     {
@@ -808,7 +808,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-listing-toolbar",
@@ -853,7 +853,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-pagination",
@@ -901,7 +901,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02)."
     },
     {
@@ -945,7 +945,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-filter-by-rating",
@@ -1077,7 +1077,7 @@
       "decisions": [],
       "interaction_options": ["IX-07"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-search-results",
@@ -1124,7 +1124,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
     },
     {
@@ -1167,7 +1167,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-search-synonyms",
@@ -5240,7 +5240,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "fd-visual-treatment",

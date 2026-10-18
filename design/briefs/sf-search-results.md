@@ -205,13 +205,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `wireframed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 7 |
+| English, left to right | `drawn` |
+| Arabic, right to left | `drawn` |
+| Mobile | `drawn` |
+| Desktop | `drawn` |
+| States covered | 7 of 7 |
 | Interaction decisions pending | DQ-02 |
 | Calibration frames | None |
 
