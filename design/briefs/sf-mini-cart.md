@@ -126,7 +126,7 @@ Status `locked`. Selected. Draw the selected pattern.
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | Drawer that opens after an add, with the count alone at other times |
+| Selected pattern | Drawer opened from the cart control; a quick add from a listing or a product rail, and an add from the cart's suggestions, confirm in place and update the count without opening it |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -134,6 +134,7 @@ Candidate patterns:
 - Dropdown panel under the header
 - Side drawer
 - Drawer that opens after an add, with the count alone at other times
+- Drawer opened from the cart control; a quick add from a listing or a product rail, and an add from the cart's suggestions, confirm in place and update the count without opening it
 
 | Constraint | What it is |
 |---|---|

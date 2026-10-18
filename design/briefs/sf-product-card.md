@@ -146,6 +146,33 @@ WooCommerce product collection block card.
 
 ## Interaction options
 
+### IX-02: Mini-cart presentation
+
+Status `locked`. Selected. Draw the selected pattern.
+
+**Outcome required.** The header shows the cart with a live item count and a mini-cart, and the customer sees that an item was added (NAV-06, CART-12, PDP-08). No row says how the mini-cart opens.
+
+|  |  |
+|---|---|
+| Working baseline | None |
+| Selected pattern | Drawer opened from the cart control; a quick add from a listing or a product rail, and an add from the cart's suggestions, confirm in place and update the count without opening it |
+| Decided at | the owner's review of the low-fidelity wireframes |
+
+Candidate patterns:
+
+- Dropdown panel under the header
+- Side drawer
+- Drawer that opens after an add, with the count alone at other times
+- Drawer opened from the cart control; a quick add from a listing or a product rail, and an add from the cart's suggestions, confirm in place and update the count without opening it
+
+| Constraint | What it is |
+|---|---|
+| A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page. | Fixed by the contract. Not a design alternative |
+| The cart page remains (IA-08). | Contracted condition every pattern must meet |
+| The WooCommerce mini-cart block is the native baseline. | Platform limit |
+
+Weighed in the review: mobile behaviour; room for the free-shipping prompt (CART-07); how much an add interrupts browsing; focus management; performance.
+
 ### DQ-01: Numerals in Arabic
 
 Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.

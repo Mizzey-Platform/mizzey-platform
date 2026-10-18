@@ -706,7 +706,7 @@
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-01", "CR-05"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
       "status": "briefed",
       "composes": ["sf-product-badges"]
@@ -1251,7 +1251,7 @@
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-08", "OD-13", "OD-01", "CR-05", "CR-15"],
       "decisions": [],
-      "interaction_options": ["IX-03", "IX-08"],
+      "interaction_options": ["IX-03", "IX-08", "IX-10"],
       "erp_dependency": "partial",
       "status": "briefed",
       "composes": [
@@ -1303,7 +1303,7 @@
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
-      "interaction_options": ["IX-03"],
+      "interaction_options": ["IX-03", "IX-10"],
       "erp_dependency": "partial",
       "status": "briefed",
       "composes": [
@@ -1584,7 +1584,7 @@
       "design_freedom": "constrained",
       "open_items": ["OD-04", "PRE-09"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
       "status": "briefed",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]

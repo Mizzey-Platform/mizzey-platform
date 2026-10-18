@@ -214,13 +214,16 @@ not a list of every component.
 | `provisional` | A working baseline for the first wireframes. **Not a requirement and not an owner-confirmed final product decision.** It may change in review with no scope change |
 | `locked` | A pattern was selected at its decision stage. `selected_pattern` and `decision_source` say which, and by whom |
 
-Three are provisional today, and none is locked:
+Thirteen are recorded. **Ten are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
+review of the calibration set on 18 October 2026 and reconfirmed the same day (`wireframes/manifest.json`,
+`selection`). Each lock's `selected_pattern` and `decision_source` are in the file, and `coverage.md` lists them.
+Three are not locked:
 
-| Id | Choice | Working baseline | Also candidates |
-|---|---|---|---|
-| DQ-01 | Numerals in Arabic | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
-| DQ-02 | Product-list continuation | Numbered pagination | Load More, or controlled continuous loading |
-| DQ-03 | Checkout structure | One page with clear sections, review before Place Order | Progressive or accordion sections, or a stepped checkout if it stays compatible with the contracted behaviour and the commerce implementation |
+| Id | Choice | Status | Working baseline | Also candidates |
+|---|---|---|---|---|
+| DQ-01 | Numerals in Arabic | `provisional` | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
+| DQ-02 | Product-list continuation | `provisional` | Numbered pagination | Load More, or controlled continuous loading |
+| IX-10 | Confirmation after Add to Cart on the product page | `open` | None | The drawer opens as a focused confirmation, or the add is confirmed in place. Decided at the batch-03 review |
 
 Each entry carries its `selection_criteria`, which are what the review weighs, and its `constraints`, which are
 real limits. An option never adds a capability: it is about how a contracted one is presented.
@@ -237,8 +240,8 @@ An option with no `contract_pattern` and no `platform` constraint is genuinely o
 layout (IX-08) shows the difference. PDP-12 words the full description as a tab, so the tab is a
 `contract_pattern`: the description stays a tab on every viewport. The designer explores how the other
 information sits around that tab, and how the tab navigation responds on a small screen, and does not propose a
-layout in which the description is no longer a tab. The home hero (IX-09) is genuinely open, because
-HOME-01 names a banner or a slider and fixes neither. **A contractual constraint is never an invitation to
+layout in which the description is no longer a tab. The home hero (IX-09) was genuinely open, because
+HOME-01 names a banner or a slider and fixes neither, and the owner chose a single banner in review. **A contractual constraint is never an invitation to
 redesign the requirement.**
 
 ## The designer proposes
