@@ -1599,6 +1599,7 @@
     {
       "id": "sf-cart-empty",
       "name": "Empty cart",
+      "purpose": "Tells a visitor that the cart is empty, and offers suggestions so the visit does not end there.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1635,7 +1636,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Staging finding: the empty cart page is 8 pixels too wide. Attached to #306 by D-13, not corrected."
     },
     {
@@ -1732,6 +1733,7 @@
     {
       "id": "sf-cart-revalidation",
       "name": "Cart line changed on re-validation",
+      "purpose": "Tells a visitor, when the cart is viewed, which line changed after stock was re-validated and how it changed.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1770,7 +1772,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
@@ -1867,6 +1869,7 @@
     {
       "id": "au-sign-in",
       "name": "Sign in",
+      "purpose": "Lets a returning customer sign in to their account, with login attempts rate limited.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1907,13 +1910,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["au-google-entry", "au-passwordless"],
       "note": "Sign in and register share one address (OP-17)."
     },
     {
       "id": "au-register",
       "name": "Registration",
+      "purpose": "Lets a visitor create an account with no more than email, password and consent, with marketing consent asked for separately.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1954,13 +1958,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["au-google-entry"],
       "note": "No more than email, password and consent are mandatory (AUTH-14)."
     },
     {
       "id": "au-lost-password",
       "name": "Lost password",
+      "purpose": "Lets a customer who has forgotten their password ask for a link to reset it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1998,11 +2003,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "au-reset-password",
       "name": "Set a new password",
+      "purpose": "Lets a customer set a new password from a reset link that works once and only for a limited time.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2044,11 +2050,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "au-passwordless",
       "name": "Passwordless sign-in link",
+      "purpose": "Lets a customer sign in through a link sent by email, instead of remembering a password.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2089,11 +2096,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "au-google-entry",
       "name": "Google sign-in entry",
+      "purpose": "Lets a visitor sign in or register with a Google account, and keeps one account when the same email is already registered.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2134,11 +2142,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "au-email-verification",
       "name": "Email verification states",
+      "purpose": "Tells a new customer whether their email address is verified, and how to complete the verification or ask for it again.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2178,11 +2187,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "au-checkout-entry",
       "name": "Guest, sign-in or register choice before checkout",
+      "purpose": "Lets a visitor choose, before checkout, to continue as a guest or to sign in or register, without being forced to register.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2220,12 +2230,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Guest checkout is never forced into registration. It is encouraged (FIX-09)."
     },
     {
       "id": "au-post-order-account",
       "name": "Create an account from the order confirmation",
+      "purpose": "Lets a guest who has just ordered become a registered customer by setting a password only.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2266,7 +2277,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "A password only. No re-entry of name, email, phone or address."
     },
     {
@@ -6294,6 +6305,7 @@
     {
       "id": "sy-sign-in-required",
       "name": "Sign-in required, or not your order",
+      "purpose": "Tells a visitor that the page needs them to sign in, or that the order they opened is not theirs.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6331,7 +6343,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen.",
       "implementation_origin": "woocommerce"
     },

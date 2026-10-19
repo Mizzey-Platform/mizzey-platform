@@ -956,7 +956,7 @@
     {
       "surface": "sf-cart-empty",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/sf-cart-empty.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -964,7 +964,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-mini-cart",
@@ -995,7 +995,7 @@
     {
       "surface": "sf-cart-revalidation",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/sf-cart-revalidation.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1003,7 +1003,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-wishlist",
@@ -1034,7 +1034,7 @@
     {
       "surface": "au-sign-in",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-sign-in.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1042,12 +1042,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-register",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-register.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1055,12 +1055,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-lost-password",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-lost-password.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1068,12 +1068,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-reset-password",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-reset-password.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1081,12 +1081,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-passwordless",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-passwordless.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1094,12 +1094,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-google-entry",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-google-entry.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1107,12 +1107,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-email-verification",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-email-verification.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1120,12 +1120,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-checkout-entry",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-checkout-entry.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1133,12 +1133,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-post-order-account",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/au-post-order-account.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1146,7 +1146,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-checkout",
@@ -2387,7 +2387,7 @@
     {
       "surface": "sy-sign-in-required",
       "batch": "batch-04",
-      "brief": null,
+      "brief": "design/briefs/sy-sign-in-required.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2395,7 +2395,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-coming-soon",

@@ -34,9 +34,9 @@ Live status. First action each session: read this, then continue from **Next**.
   for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
-  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 43 generated
-  briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02 and the rest of
-  batch-03. The shared neutral stylesheet,
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 55 generated
+  briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02, the rest of
+  batch-03 and the rest of batch-04. The shared neutral stylesheet,
   `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
   set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
@@ -265,7 +265,7 @@ Live status. First action each session: read this, then continue from **Next**.
 ## Next
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-03 and CoreX is not upgraded until he says so either.** In order:
+drawn beyond batch-04 and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -282,7 +282,9 @@ drawn beyond batch-03 and CoreX is not upgraded until he says so either.** In or
    inline confirmation for IX-10. The focused correction he directed merged in PR #369 (`91f54be`): a mobile
    buy-bar confirmation without a timeout, and 44 px targets for the reused header, logos and footer. He then
    closed the batch on 19 October 2026, with IX-10 locked (the closure record in the manifest). DQ-01 stays
-   provisional. Batch-04 opens only on his instruction.
+   provisional. Batch-04 (cart and authentication) opens on his instruction of 19 October 2026: its fifteen
+   surfaces are briefed, twelve of them newly, and Claude Design draws it from a private manual-transfer package
+   built from `main` after the opening merges. IX-02 and IX-10 stay locked, and DQ-01 stays provisional.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
