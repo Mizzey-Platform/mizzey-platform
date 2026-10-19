@@ -763,7 +763,7 @@
     {
       "surface": "sf-pdp-recently-viewed",
       "batch": "batch-03",
-      "brief": null,
+      "brief": "design/briefs/sf-pdp-recently-viewed.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -771,7 +771,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-pdp-reviews",

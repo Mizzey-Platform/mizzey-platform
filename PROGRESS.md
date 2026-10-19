@@ -34,8 +34,9 @@ Live status. First action each session: read this, then continue from **Next**.
   for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
-  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 42 generated
-  briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`) and the rest of batch-02. The shared neutral stylesheet,
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 43 generated
+  briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02 and the rest of
+  batch-03. The shared neutral stylesheet,
   `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
   set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
@@ -260,7 +261,7 @@ Live status. First action each session: read this, then continue from **Next**.
 ## Next
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-02 and CoreX is not upgraded until he says so either.** In order:
+drawn beyond batch-03 and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -271,7 +272,9 @@ drawn beyond batch-02 and CoreX is not upgraded until he says so either.** In or
    private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files were imported
    (PR #362), and he reviewed and closed it on 19 October 2026. A narrow correction of the 44 px targets carried
    from batch-01 followed (the `corrections` record on the batch-01 entry in the manifest). Batch-03 opens on his
-   instruction.
+   instruction of 19 October 2026: its seven surfaces are briefed, one of them newly (`sf-pdp-recently-viewed`),
+   and Claude Design draws it from a private manual-transfer package built from `main` after the opening merges.
+   IX-10 stays open for the batch-03 review, and DQ-01 stays provisional.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
