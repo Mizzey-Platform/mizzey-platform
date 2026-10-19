@@ -1259,7 +1259,7 @@
       "decisions": [],
       "interaction_options": ["IX-03", "IX-08", "IX-10"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": [
         "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related", "sf-pdp-recently-viewed",
         "sf-product-badges"
@@ -1311,7 +1311,7 @@
       "decisions": [],
       "interaction_options": ["IX-03", "IX-10"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": [
         "sf-pdp-simple", "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related",
         "sf-pdp-recently-viewed", "sf-product-badges"
@@ -1363,7 +1363,7 @@
       "decisions": [],
       "interaction_options": ["IX-04"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-pdp-stock-state",
@@ -1408,7 +1408,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
     },
     {
@@ -1453,7 +1453,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1498,7 +1498,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1542,7 +1542,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-cart",
