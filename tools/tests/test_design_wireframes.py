@@ -259,7 +259,6 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
 
     def test_the_manifest_and_the_inventory_status_cannot_disagree(self):
         self.entries["sf-cart"]["review_status"] = "reviewed"
-        self.surfaces["sf-cart"]["status"] = "briefed"
         self.assertRefused("review status reviewed and the inventory status briefed disagree")
 
     def test_a_surface_is_not_reviewed_while_a_required_state_is_uncovered(self):
@@ -273,16 +272,16 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("covers state gift_wrapped, which the surface does not list")
 
     def test_a_listed_artefact_that_does_not_exist(self):
-        self.entries["sf-wishlist"]["artifacts"] = ["design/wireframes/s1/batch-07/sf-wishlist.en.html"]
-        self.assertRefused("artefact design/wireframes/s1/batch-07/sf-wishlist.en.html does not exist")
+        self.entries["sf-cart"]["artifacts"] = ["design/wireframes/s1/batch-04/sf-cart.en.html"]
+        self.assertRefused("artefact design/wireframes/s1/batch-04/sf-cart.en.html does not exist")
 
     def test_an_artefact_filed_under_the_wrong_release_or_name(self):
         self.entries["sf-cart"]["artifacts"] = ["design/wireframes/s2/batch-10/sf-cart.en.html"]
         self.assertRefused("is not design/wireframes/s1/<batch>/sf-cart.en.html or .ar.html")
 
     def test_marked_drawn_with_nothing_to_show(self):
-        self.entries["sf-wishlist"]["en_ltr"] = "drawn"
-        self.assertRefused("manifest sf-wishlist: en_ltr marked drawn, and no artefact is listed")
+        self.entries["sf-cart"]["en_ltr"] = "drawn"
+        self.assertRefused("manifest sf-cart: en_ltr marked drawn, and no artefact is listed")
 
     def test_the_administration_is_not_drawn_in_arabic(self):
         self.entries["ad-staff-log"]["ar_rtl"] = "not_started"
