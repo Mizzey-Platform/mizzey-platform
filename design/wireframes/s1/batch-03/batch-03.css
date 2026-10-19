@@ -132,3 +132,8 @@
 .bb .btn{block-size:48px;padding-inline:16px;flex:none}
 .bb .cf{padding:10px 12px;border-width:1px}
 .bb .cf__a a{min-block-size:44px}
+.bb .cf--bb{flex-direction:row;align-items:center;gap:8px;padding-block:0;padding-inline:10px 0}
+.cf--bb .okc{inline-size:22px;block-size:22px;font-size:11px}
+.cf__s{font-size:13.5px;white-space:nowrap}
+.cf--bb .cf__a{flex:1;flex-wrap:nowrap;gap:0 14px;min-inline-size:0}
+.cf--bb .x{margin-inline-start:auto}

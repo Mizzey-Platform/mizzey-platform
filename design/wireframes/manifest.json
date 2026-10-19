@@ -259,6 +259,33 @@
               "change": "The previous entry stated 44 px. That was wrong: an absolutely positioned ::after is sized inside the 1.5 px border, so inset -3px gave a 41 to 42 px target, depending on how the browser rounds the 1.5 px border. Corrected to inset -4.5px, which gives 44 to 45 px, in the 24 batch-01 files and in batch-02.css."
             }
           ]
+        },
+        {
+          "date": "2026-10-19",
+          "decided_by": "Mustafa, owner",
+          "kind": "controlled structural consistency correction",
+          "record": "The inherited target defects measured at the batch-03 import (batches[batch-03].import.carried_findings), corrected on the owner's instruction of 19 October 2026 at the batch-03 review. Verified in Chromium by elementFromPoint hit detection on every affected link in the 24 batch-01, 30 batch-02 and 14 batch-03 files, in English and Arabic, and by border-box geometry: 2,516 targets, none under 44 x 44 px, none overlapping (each point resolves to one target), and 632 frames, none overflowing. 126 targets that a drawn state covers with an overlay (a dialog, the mobile menu, the search overlay, the mega menu, the filter drawer) were excluded. The visible controls, the composition, the states, the decisions and the scope are unchanged, except the footer's row spacing below, and the batch stays closed.",
+          "changes": [
+            {
+              "item": "Desktop quick-row category links",
+              "surface": "gl-header",
+              "refs": ["NFR-11"],
+              "change": "36 to 38 px tall, with no border, in a .hd2 row that clips at the links' top edge. The visible pill is unchanged and gains a hit area reaching 9 px down into the row's own 10 px bottom padding (.hd2 a::after): 44.6 px in English and 47.3 px in Arabic, inside the row, with the 2 px gap between links unchanged."
+            },
+            {
+              "item": "Logo links: desktop header, mobile header and footer",
+              "surface": "gl-header, gl-header-mobile, gl-footer",
+              "refs": ["NFR-11", "OD-01"],
+              "change": "The 36 px desktop logo (34 px inside its 1 px border) and the 30 px mobile and footer logo (28 px inside) gain a 45 px tall hit area (.logo::after, inset -5.5px 0; .logo--s::after, inset -8.5px 0). The visible boxes are unchanged, including the 64 x 30 px mobile reserve deferred under OD-01, and the mobile hit area stays inside the 56 px header. The footer logo shares the .logo--s rule and was below 44 px on the same measurement, so it is corrected with it."
+            },
+            {
+              "item": "Footer list links",
+              "surface": "gl-footer",
+              "refs": ["NFR-11"],
+              "change": "18 to 20 px tall on a 29 px row pitch. Each link is now its own row, at least 44 x 44 px (.ft li>a), and a list item that holds a link drops its 5 px padding, so the pitch is exactly 44 px and the targets meet without overlapping. Rows without a link (phone, email, address) keep their spacing; the columns, headings, order and content are unchanged. The footer grows, as the owner authorised, measured on the listing page: desktop 551 to 657 px in English and 557 to 663 px in Arabic; mobile 1,117 to 1,343 px and 1,157 to 1,365 px."
+            }
+          ],
+          "where": "The shared style block of the 24 batch-01 files. batch-02.css is at the checker's 24 KB limit, so the 30 batch-02 and 14 batch-03 files take the same rules from batch-02-targets.css, linked straight after batch-02.css."
         }
       ]
     },
@@ -344,7 +371,15 @@
             "status": "Marked with placeholder notes and unchanged. Guest wishlist behaviour stays with #307."
           }
         ]
-      }
+      },
+      "corrections": [
+        {
+          "date": "2026-10-19",
+          "decided_by": "Mustafa, owner",
+          "kind": "controlled structural consistency correction",
+          "record": "The reused batch-01 frame corrections (batches[batch-01].corrections, the 19 October entry for the quick row, logos and footer) reach the 30 batch-02 files through batch-02-targets.css, linked straight after batch-02.css, which is at the 24 KB limit. No batch-02 component changes. The product-card link stays as reviewed: one link for the image and the name in the build, an implementation-level requirement (batches[batch-03].import.carried_findings). The batch stays closed."
+        }
+      ]
     },
     {
       "id": "batch-03",
@@ -386,7 +421,29 @@
           {"item": "Product-card name link", "surface": "sf-product-card", "batch": "batch-02", "refs": ["NFR-11"], "classification": "implementation-level semantics", "status": "The drawn link is the name alone, 19 or 38 px tall. The reviewed card annotation already fixes one link per card, the image and the name together, whose target in the build is well over 44 px. Not a structural defect, and no wireframe correction is needed; the build wraps both in one link."},
           {"item": "Footer list links and desktop logo, also measured", "surface": "gl-footer, gl-header", "batch": "batch-01", "refs": ["NFR-11"], "classification": "reported, not classified here", "status": "Not in the handoff. The same hit-test found the footer list links 18 to 20 px tall on a 29 px row pitch, and the desktop logo at 107 x 37 px in a 76 px row. The logo has room for a 44 px hit area; the footer links do not without changing the row spacing, which is a composition change. Recorded for the owner, outside this import."}
         ]
-      }
+      },
+      "corrections": [
+        {
+          "date": "2026-10-19",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner review correction, before closure",
+          "record": "At the batch-03 review the owner selected the inline confirmation for IX-10 and directed that the mobile buy bar's confirmation must not time out. IX-10 is locked, and the sf-pdp-simple:added inventory note aligned, in the closure PR, not here.",
+          "changes": [
+            {
+              "item": "Mobile buy-bar confirmation",
+              "surface": "sf-pdp-simple",
+              "refs": ["IX-10", "IX-03", "NFR-11"],
+              "change": "The collapse after about five seconds, or on scroll, is removed. The bar's confirmation is one compact row above its button (the tick, Added, View cart, Checkout and Dismiss) and stays until the visitor dismisses it or takes the next purchase action: changes the quantity or adds again. Dismiss is a 44 px button that returns focus to the bar's Add to cart; the links and Dismiss are ordinary tab stops, read by screen readers; the page reserves the bar's full height. Measured at 390 px in English and Arabic: the bar is 388 x 127 px with the confirmation (388 x 197 before), the links 44.75 px tall and Dismiss 44.5 x 44.5 px by hit detection, nothing overflowing. The state note, the motion note and the comparison row are updated in both files. Buy Now and the in-page confirmation are unchanged."
+            },
+            {
+              "item": "Reused frame targets",
+              "surface": "gl-header, gl-header-mobile, gl-footer",
+              "refs": ["NFR-11"],
+              "change": "The 14 files link batch-02-targets.css after batch-02.css (batches[batch-01].corrections, the 19 October entry for the quick row, logos and footer)."
+            }
+          ]
+        }
+      ]
     },
     {"id": "batch-04", "name": "Cart and authentication", "release": "S1"},
     {"id": "batch-05", "name": "Checkout, payment and order received", "release": "S1"},

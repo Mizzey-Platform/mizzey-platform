@@ -51,6 +51,8 @@ code{font-size:11.5px}
 .r11{aspect-ratio:1/1}.r45{aspect-ratio:4/5}.r34{aspect-ratio:3/4}.r43{aspect-ratio:4/3}.r32{aspect-ratio:3/2}.r169{aspect-ratio:16/9}.r21{aspect-ratio:2/1}.r31{aspect-ratio:3/1}
 .logo{position:relative;display:inline-flex;align-items:center;justify-content:center;border:1px dashed #8a8a8a;font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;letter-spacing:.06em;block-size:36px;padding-inline:14px;white-space:nowrap;flex:none;text-decoration:none}
 .logo--s{block-size:30px;padding-inline:6px;font-size:9px;letter-spacing:.02em}
+.logo::after{content:"";position:absolute;inset:-5.5px 0}
+.logo--s::after{inset:-8.5px 0}
 .pg{background:#fff;color:#151515;font-size:14px;line-height:1.45;position:relative}
 .pg[lang="ar"]{line-height:1.65}
 .pg a{color:inherit}
@@ -106,6 +108,7 @@ code{font-size:11.5px}
 .hd2{display:flex;gap:2px;padding:0 30px 10px;font-size:13.5px;font-weight:600;overflow:hidden}
 .hd2 a{position:relative;padding:8px 12px;border-radius:999px;text-decoration:none;white-space:nowrap}
 .hd2 a.on{background:#f0f0f0}
+.hd2 a::after{content:"";position:absolute;inset:0 0 -9px}
 .sp{position:absolute;inset-inline:0;inset-block-start:calc(100% + 8px);z-index:7;background:#fff;border:1px solid #e0e0e0;border-radius:12px;box-shadow:0 20px 44px rgba(0,0,0,.16);padding:8px;color:#151515;font-size:14px}
 .sp li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px}
 .sp li{min-block-size:44px}
@@ -230,6 +233,8 @@ code{font-size:11.5px}
 .ft__h{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c5c5c;margin-block-end:12px}
 .pg[lang="ar"] .ft__h{letter-spacing:0;text-transform:none;font-size:13px}
 .ft li{padding-block:5px;font-size:13.5px;line-height:1.4}
+.ft li:has(>a){padding-block:0}
+.ft li>a{display:inline-flex;align-items:center;min-block-size:44px;min-inline-size:44px}
 .ft__b{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:18px;border-block-start:1px solid #e3e3e3;font-size:12px}
 .ftm__c{display:grid;grid-template-columns:1fr 1fr;gap:28px 20px;padding-block:28px}
 .ftm__c>div.wide{grid-column:1/-1}
