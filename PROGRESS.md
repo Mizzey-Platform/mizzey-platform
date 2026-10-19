@@ -269,8 +269,9 @@ drawn beyond batch-02 and CoreX is not upgraded until he says so either.** In or
    and closed it on 19 October 2026 (PR #359, with the closure record in the manifest). Batch-02 opens on his instruction
    of 19 October 2026: its fifteen surfaces are briefed, six of them newly, and Claude Design draws it from a
    private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files were imported
-   (PR #362), and he reviewed and closed it on 19 October 2026. Next is a narrow correction of the 44 px targets
-   carried from batch-01; batch-03 waits for it.
+   (PR #362), and he reviewed and closed it on 19 October 2026. A narrow correction of the 44 px targets carried
+   from batch-01 followed (the `corrections` record on the batch-01 entry in the manifest). Batch-03 opens on his
+   instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
