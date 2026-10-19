@@ -1593,7 +1593,7 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]
     },
     {
@@ -1636,7 +1636,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Staging finding: the empty cart page is 8 pixels too wide. Attached to #306 by D-13, not corrected."
     },
     {
@@ -1683,7 +1683,7 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-free-shipping-progress",
@@ -1728,7 +1728,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-cart-revalidation",
@@ -1772,7 +1772,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
@@ -1910,7 +1910,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["au-google-entry", "au-passwordless"],
       "note": "Sign in and register share one address (OP-17)."
     },
@@ -1958,7 +1958,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["au-google-entry"],
       "note": "No more than email, password and consent are mandatory (AUTH-14)."
     },
@@ -2003,7 +2003,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "au-reset-password",
@@ -2050,7 +2050,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "au-passwordless",
@@ -2096,7 +2096,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "au-google-entry",
@@ -2142,7 +2142,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "au-email-verification",
@@ -2187,7 +2187,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "au-checkout-entry",
@@ -2230,7 +2230,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Guest checkout is never forced into registration. It is encouraged (FIX-09)."
     },
     {
@@ -2277,7 +2277,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "A password only. No re-entry of name, email, phone or address."
     },
     {
@@ -6343,7 +6343,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen.",
       "implementation_origin": "woocommerce"
     },
