@@ -1,0 +1,6 @@
+/* Mizzey: 44 px hit areas for the reused batch-01 frame (NFR-11). Linked after batch-02.css, which is at the size cap. */
+.hd2 a::after{content:"";position:absolute;inset:0 0 -9px}
+.logo::after{content:"";position:absolute;inset:-5.5px 0}
+.logo--s::after{inset:-8.5px 0}
+.ft li:has(>a){padding-block:0}
+.ft li>a{display:inline-flex;align-items:center;min-block-size:44px;min-inline-size:44px}
