@@ -67,8 +67,8 @@ code{font-size:11.5px}
 .btn--2,.pg a.btn--2{background:#fff;color:#151515}
 .btn--q,.pg a.btn--q{background:transparent;border-color:transparent;color:#151515;text-decoration:underline;text-underline-offset:3px;padding-inline:10px}
 .btn--s{block-size:38px;padding-inline:16px;font-size:13px;border-radius:8px}
-.sf .btn--s::after{content:"";position:absolute;inset:-3px 0}
-.mm__r .btn--s::after{content:"";position:absolute;inset:-3px 0}
+.sf .btn--s::after{content:"";position:absolute;inset:-4.5px 0}
+.mm__r .btn--s::after{content:"";position:absolute;inset:-4.5px 0}
 .btn--b{display:flex;inline-size:100%}
 .btn.busy{background:#5c5c5c;border-color:#5c5c5c}
 .lnk{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
@@ -180,6 +180,8 @@ code{font-size:11.5px}
 .railm>.card{flex:0 0 46%}
 .arw{display:inline-flex;align-items:center;justify-content:center;inline-size:40px;block-size:40px;border-radius:50%;border:1px solid #cfcfcf}
 .arw.dis{color:#bdbdbd;border-color:#e6e6e6}
+.arw{position:relative}
+.arw::after{content:"";position:absolute;inset:-3px}
 .hs{position:relative}
 .sec{padding-block-start:64px}.secm{padding-block-start:40px}.sec0{padding-block-start:0}.sect{padding-block-start:24px}
 .hero__p{position:absolute;z-index:2;inset-inline-start:40px;inset-block-end:40px;max-inline-size:540px;background:#fff;padding:32px 36px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;border-radius:4px}
@@ -267,6 +269,8 @@ code{font-size:11.5px}
 .sys .sf{inline-size:100%;max-inline-size:560px;flex:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .chip{display:inline-flex;align-items:center;block-size:40px;padding-inline:16px;border-radius:999px;border:1px solid #cfcfcf;font-size:13.5px;font-weight:600;text-decoration:none}
+.chip{position:relative}
+.chip::after{content:"";position:absolute;inset:-3px 0}
 .bil{display:grid;gap:40px;inline-size:100%;max-inline-size:760px}
 .bil--d{grid-template-columns:1fr 1fr}
 .bil>div{display:flex;flex-direction:column;gap:10px;align-items:center}

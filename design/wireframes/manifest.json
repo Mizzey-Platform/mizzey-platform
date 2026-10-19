@@ -233,6 +233,32 @@
               "change": "Measured at 38 px tall in English and Arabic. The visible button is unchanged and gains a 44 px hit area (.mm__r .btn--s::after), the same treatment as the header Search button; its neighbours are 20 px away. Applied in the 24 batch-01 files, which share one style block."
             }
           ]
+        },
+        {
+          "date": "2026-10-19",
+          "decided_by": "Mustafa, owner",
+          "kind": "controlled structural consistency correction",
+          "record": "The last two known batch-01 targets below 44 px, identified by the owner, and a correction to the previous entry. Measured in a browser by hit-testing, before and after, in English and Arabic. The visible controls are unchanged; the composition, the states, the decisions and the scope are unchanged, and the batch stays closed.",
+          "changes": [
+            {
+              "item": "Product-rail previous and next controls",
+              "surface": "sf-home",
+              "refs": ["NFR-11"],
+              "change": "40 x 40 px, drawn in sf-home and in the home page behind gl-cookie-consent. Each keeps its visible circle and gains a 44 x 44 px hit area (.arw::after). The pair are 8 px apart, so 4 px stays clear between the hit areas. The disabled control keeps its visual-only disabled treatment (.arw.dis)."
+            },
+            {
+              "item": "Category links on the 404 page",
+              "surface": "sy-404",
+              "refs": ["NFR-11"],
+              "change": "40 px tall, 63 to 150 px wide. Each keeps its visible pill and gains a 44 px tall hit area (.chip::after). Wrapped rows are 8 px apart, so 4 px stays clear."
+            },
+            {
+              "item": "Header Search and mega-menu Shop all hit areas, corrected",
+              "surface": "gl-header, gl-mega-menu",
+              "refs": ["NFR-11"],
+              "change": "The previous entry stated 44 px. That was wrong: an absolutely positioned ::after is sized inside the 1.5 px border, so inset -3px gave a 41 to 42 px target, depending on how the browser rounds the 1.5 px border. Corrected to inset -4.5px, which gives 44 to 45 px, in the 24 batch-01 files and in batch-02.css."
+            }
+          ]
         }
       ]
     },
