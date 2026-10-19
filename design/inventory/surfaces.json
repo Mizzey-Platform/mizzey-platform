@@ -1234,7 +1234,7 @@
         {"state": "on_sale", "requires": "PDP-04", "note": "Price, sale price and saving"},
         {"state": "out_of_stock", "requires": "PDP-22", "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."},
         {"state": "adding", "requires": "PDP-08"},
-        {"state": "added", "requires": "PDP-08", "note": "Mini-cart shown"},
+        {"state": "added", "requires": "PDP-08", "note": "Confirmed in place in the buy area, with View cart and Checkout; the header count steps up and the mini-cart does not open. On the mobile buy bar a compact confirmation stays until it is dismissed or the next purchase action (IX-10)"},
         {"state": "in_wishlist", "requires": "PDP-10"},
         {"state": "no_delivery_estimate", "requires": "PDP-14", "note": "Shown where available"},
         {"state": "no_specifications"},
@@ -1259,7 +1259,7 @@
       "decisions": [],
       "interaction_options": ["IX-03", "IX-08", "IX-10"],
       "erp_dependency": "partial",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": [
         "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related", "sf-pdp-recently-viewed",
         "sf-product-badges"
@@ -1311,7 +1311,7 @@
       "decisions": [],
       "interaction_options": ["IX-03", "IX-10"],
       "erp_dependency": "partial",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": [
         "sf-pdp-simple", "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related",
         "sf-pdp-recently-viewed", "sf-product-badges"
@@ -1363,7 +1363,7 @@
       "decisions": [],
       "interaction_options": ["IX-04"],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-pdp-stock-state",
@@ -1408,7 +1408,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
     },
     {
@@ -1453,7 +1453,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1498,7 +1498,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1542,7 +1542,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-cart",

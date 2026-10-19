@@ -173,12 +173,12 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 5 of 5 |
 | Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`) |

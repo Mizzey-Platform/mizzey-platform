@@ -73,7 +73,7 @@ folder.**
 | `inventory/interaction-options.json` | UX choices with more than one legitimate pattern: open, provisional or locked |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
 | `briefs/` | One generated brief per surface, for the surfaces a review batch has opened. Never edited by hand |
-| `wireframes/` | The wireframe format, the production workflow, the manifest, the reviewed calibration set and the batch-01 wireframes, reviewed by the owner and closed, and the batch-02 wireframes, reviewed and closed, and the batch-03 wireframes, drawn and not yet reviewed |
+| `wireframes/` | The wireframe format, the production workflow, the manifest, the reviewed calibration set and the batch-01 wireframes, reviewed by the owner and closed, and the batch-02 and batch-03 wireframes, each reviewed and closed |
 | `tokens/` | Empty. Neutral tokens first, brand values after OD-01 |
 
 ## Five kinds of statement, kept apart
@@ -214,16 +214,15 @@ not a list of every component.
 | `provisional` | A working baseline for the first wireframes. **Not a requirement and not an owner-confirmed final product decision.** It may change in review with no scope change |
 | `locked` | A pattern was selected at its decision stage. `selected_pattern` and `decision_source` say which, and by whom |
 
-Thirteen are recorded. **Eleven are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
+Thirteen are recorded. **Twelve are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
 review of the calibration set on 18 October 2026 and reconfirmed the same day (`wireframes/manifest.json`,
-`selection`), and DQ-02, numbered pagination, selected at the batch-02 review on 19 October 2026. Each lock's
-`selected_pattern` and `decision_source` are in the file, and `coverage.md` lists them. Two are not locked:
+`selection`); DQ-02, numbered pagination, selected at the batch-02 review on 19 October 2026; and IX-10, the add
+confirmed in place on the product page, selected at the batch-03 review on 19 October 2026. Each lock's
+`selected_pattern` and `decision_source` are in the file, and `coverage.md` lists them. One is not locked:
 
 | Id | Choice | Status | Working baseline | Also candidates |
 |---|---|---|---|---|
 | DQ-01 | Numerals in Arabic | `provisional` | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
-| IX-10 | Confirmation after Add to Cart on the product page | `open` | None | The drawer opens as a focused confirmation, or the add is confirmed in place. Decided at the batch-03 review |
-
 Each entry carries its `selection_criteria`, which are what the review weighs, and its `constraints`, which are
 real limits. An option never adds a capability: it is about how a contracted one is presented.
 

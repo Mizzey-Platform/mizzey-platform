@@ -54,12 +54,11 @@ Live status. First action each session: read this, then continue from **Next**.
   acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is reviewed and closed**: Claude Design's 30
   files, fifteen surfaces in English and Arabic, were imported in PR #362 (`f8ddd44`), and the owner reviewed and
   approved them on 19 October 2026, locking DQ-02 (numbered pagination) and setting the badge precedence. The
-  record is the batch-02 entry under `batches` in the manifest, beside its import record. **Batch-03 is drawn**:
-  Claude Design's 14 files, seven surfaces in English and Arabic, were imported in PR #368 (`8b96f03`) and are
-  `wireframed` in the manifest. **Batch-03 is not closed.** The owner selected the inline confirmation for IX-10
-  at his review, but the lock is not yet recorded: IX-10 is still `open` in `interaction-options.json`. PR #369
-  carries the corrections he directed. The IX-10 lock, the `sf-pdp-simple:added` note alignment and the formal
-  closure come in a later closure PR.
+  record is the batch-02 entry under `batches` in the manifest, beside its import record. **Batch-03 is reviewed and
+  closed**: Claude Design's 14 files, seven surfaces in English and Arabic, were imported in PR #368 (`8b96f03`)
+  and corrected on the owner's direction in PR #369 (`91f54be`). He reviewed and approved them on 19 October 2026,
+  locking IX-10: the add is confirmed in place, with a persistent confirmation on the mobile buy bar. The record is
+  the batch-03 entry under `batches` in the manifest, beside its import and correction records.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
@@ -71,8 +70,8 @@ Live status. First action each session: read this, then continue from **Next**.
   (accepted by #242, built by #255). Six platform surfaces have no build PBI and none is invented for them.
 - **UX is locked only at its decision stage (D-14, items 12 and 13).** Thirteen interaction choices are recorded
   in `design/inventory/interaction-options.json`: ten locked at the calibration review (DQ-03 and IX-01 to IX-09),
-  DQ-02 (numbered pagination) locked at the batch-02 review, one provisional baseline (DQ-01 Western digits),
-  and one open (IX-10, for batch-03). A provisional baseline is not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
+  DQ-02 (numbered pagination) locked at the batch-02 review, IX-10 (the product-page add confirmation) locked at
+  the batch-03 review, and one provisional baseline (DQ-01 Western digits). A provisional baseline is not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
   out of the first wireframe pass, the cash-collected state for staff only, reviews from signed-in customers with
   no verified-purchase badge, and the consent banner within what the selected tool supports.
 - **The experience target is `design/direction.md`**, and it is not the brand identity. No implementation library
@@ -280,11 +279,10 @@ drawn beyond batch-03 and CoreX is not upgraded until he says so either.** In or
    instruction of 19 October 2026: its seven surfaces are briefed, one of them newly (`sf-pdp-recently-viewed`),
    and Claude Design draws it from a private manual-transfer package built from `main` at `5aefe22`. Claude Design
    drew it; the 14 files were imported (PR #368, `8b96f03`) and he reviewed them on 19 October 2026, selecting the
-   inline confirmation for IX-10. The focused correction he directed is PR #369 (a mobile buy-bar confirmation
-   without a timeout, and 44 px targets for the reused header, logos and footer). After it, a separate closure PR
-   records the IX-10 lock, aligns the `sf-pdp-simple:added` note and marks the seven surfaces `reviewed`. Until then
-   the surfaces stay `wireframed`, IX-10 stays `open`, and batch-03 is not closed. DQ-01 stays provisional.
-   Batch-04 waits for that closure.
+   inline confirmation for IX-10. The focused correction he directed merged in PR #369 (`91f54be`): a mobile
+   buy-bar confirmation without a timeout, and 44 px targets for the reused header, logos and footer. He then
+   closed the batch on 19 October 2026, with IX-10 locked (the closure record in the manifest). DQ-01 stays
+   provisional. Batch-04 opens only on his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

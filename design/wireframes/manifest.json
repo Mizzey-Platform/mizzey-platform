@@ -84,7 +84,7 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["sf-pdp-variable", "sf-pdp-simple", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "sf-pdp-related"],
         "shows": ["sf-pdp-variable:selected", "sf-pdp-variable:variant_out_of_stock", "sf-pdp-gallery:many_images", "sf-pdp-simple:on_sale"],
-        "interaction_options": ["IX-10"],
+        "interaction_options": [],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       },
       {
@@ -114,7 +114,7 @@
         "languages": ["en-ltr", "ar-rtl"],
         "surfaces": ["gl-header-mobile", "sf-category", "sf-filter-drawer", "sf-product-card", "sf-pdp-variable", "sf-pdp-gallery", "sf-mini-cart"],
         "shows": ["sf-filter-drawer:open", "sf-pdp-variable:no_selection", "sf-mini-cart:after_add"],
-        "interaction_options": ["IX-10"],
+        "interaction_options": [],
         "status": {"a": "reviewed", "b": "reviewed", "c": "reviewed"}
       }
     ]
@@ -443,7 +443,63 @@
             }
           ]
         }
-      ]
+      ],
+      "review": {
+        "status": "closed",
+        "date": "2026-10-19",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the seven batch-03 surfaces in English and Arabic, imported in PR #368 (8b96f03), and directed a focused correction before closure, merged in PR #369 (91f54be). With it, he approves them for internal low-fidelity closure. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Confirmation after Add to Cart on the product page",
+            "refs": ["IX-10", "PDP-08", "CART-12", "NAV-06", "NFR-11"],
+            "decision": "Inline confirmation in the product purchase area. The header count updates on success only; the success is announced accessibly, with View cart and Checkout; keyboard focus stays where it was; a failure shows in place with no change to the count; the mini-cart opens only on a deliberate activation of the header cart control. On the mobile sticky buy bar, a compact, persistent confirmation that stays until it is dismissed or the next purchase action, never removed because time passes or the customer scrolls. Locked in interaction-options.json. IX-02, IX-03, IX-04 and IX-08 are unchanged, and Buy Now keeps its checkout behaviour."
+          }
+        ],
+        "accepted": [
+          "The mobile buy bar stays hidden while the cookie-consent banner is visible, and consent is not required to purchase (IX-03, gl-cookie-consent).",
+          "From 768 to 1023 px the product page is the single column with the conditional purchase bar; the sticky buy area beside the gallery starts at 1024 px (IX-03).",
+          "On the product page the batch-02 merchandising badge precedence applies: at most one merchandising badge, plus the sale saving (MER-01).",
+          "The corrections merged in PR #369: the persistent mobile buy-bar confirmation (this entry's corrections) and the 44 px targets of the reused header, logos and footer (batches[batch-01].corrections)."
+        ],
+        "deferred": [
+          {
+            "item": "Unknown stock and Add to cart",
+            "refs": ["PRE-09", "ERP-05"],
+            "status": "Drawn with Add to cart available and the cart and checkout validating again. If PRE-09 says an unknown state blocks the add, the actions take the out-of-stock form."
+          },
+          {
+            "item": "Quantity limit without a stock figure",
+            "refs": ["US-04-03", "PRE-09"],
+            "status": "The plus control stops at the variant's stock and reveals the figure indirectly. Acceptability and wording wait on PRE-09."
+          },
+          {
+            "item": "A long-valued attribute as a select",
+            "refs": ["ADM-30"],
+            "status": "Which attributes are options and which a select is a build setting. Nothing is added."
+          },
+          {
+            "item": "Review list and review form",
+            "refs": ["batch-07"],
+            "status": "Placements only on the product page; batch-07 owns them."
+          },
+          {
+            "item": "Product-card link",
+            "refs": ["NFR-11"],
+            "status": "Implementation-level: the build wraps the image and the name in one accessible product link, as the reviewed card annotation says."
+          },
+          {
+            "item": "Digits in Arabic",
+            "refs": ["DQ-01"],
+            "status": "Provisional and unchanged: Western digits, isolated left to right."
+          },
+          {
+            "item": "Open inputs carried",
+            "refs": ["OD-01", "CR-05", "CR-15", "OD-08", "OD-13", "OP-12", "SHIP-04", "PDP-21"],
+            "status": "Placeholders unchanged: the logo, imagery, wording, the delivery estimate where it applies, and which share networks appear."
+          }
+        ]
+      }
     },
     {"id": "batch-04", "name": "Cart and authentication", "release": "S1"},
     {"id": "batch-05", "name": "Checkout, payment and order received", "release": "S1"},
@@ -798,91 +854,91 @@
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-simple.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-simple.en.html", "design/wireframes/s1/batch-03/sf-pdp-simple.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "on_sale", "out_of_stock", "adding", "added", "in_wishlist", "no_delivery_estimate", "no_specifications", "no_reviews", "long_content", "signed_out", "signed_in"],
-      "interaction_pending": ["IX-10"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-variable",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-variable.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-variable.en.html", "design/wireframes/s1/batch-03/sf-pdp-variable.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_selection", "selected", "variant_out_of_stock", "combination_unavailable", "price_changes_with_variant", "image_changes_with_variant", "many_options"],
-      "interaction_pending": ["IX-10"],
-      "review_status": "wireframed"
+      "interaction_pending": [],
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-gallery",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-gallery.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-gallery.en.html", "design/wireframes/s1/batch-03/sf-pdp-gallery.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "single_image", "many_images", "with_video", "zoom_open", "no_image", "loading"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-stock-state",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-stock-state.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-stock-state.en.html", "design/wireframes/s1/batch-03/sf-pdp-stock-state.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "in_stock", "out_of_stock", "variant_out_of_stock", "stock_unknown"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-related",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-related.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-related.en.html", "design/wireframes/s1/batch-03/sf-pdp-related.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "few", "many"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-recently-viewed",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-recently-viewed.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-recently-viewed.en.html", "design/wireframes/s1/batch-03/sf-pdp-recently-viewed.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "few", "many"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-pdp-reviews",
       "batch": "batch-03",
       "brief": "design/briefs/sf-pdp-reviews.md",
       "artifacts": ["design/wireframes/s1/batch-03/sf-pdp-reviews.en.html", "design/wireframes/s1/batch-03/sf-pdp-reviews.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "no_reviews", "with_reviews"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-cart",

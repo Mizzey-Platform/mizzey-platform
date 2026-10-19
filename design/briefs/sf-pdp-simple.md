@@ -137,7 +137,7 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `on_sale` | Other | `PDP-04` | Price, sale price and saving |
 | `out_of_stock` | Stock | `PDP-22` | Stock wording, timing and mechanism are per PRE-09. Draw the structural state only. |
 | `adding` | Loading | `PDP-08` |  |
-| `added` | Success | `PDP-08` | Mini-cart shown |
+| `added` | Success | `PDP-08` | Confirmed in place in the buy area, with View cart and Checkout; the header count steps up and the mini-cart does not open. On the mobile buy bar a compact confirmation stays until it is dismissed or the next purchase action (IX-10) |
 | `in_wishlist` | Other | `PDP-10` |  |
 | `no_delivery_estimate` | Empty | `PDP-14` | Shown where available |
 | `no_specifications` | Empty |  |  |
@@ -246,20 +246,21 @@ Weighed in the review: how much content a product really has; scanning on mobile
 
 ### IX-10: Confirmation after Add to Cart on the product page
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** The customer sees that an item was added from the product page, and the header count follows (PDP-08, CART-12, NAV-06). No row says whether the mini-cart opens to confirm it.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | The add is confirmed in place in the product purchase area, and the mini-cart drawer opens only when the customer deliberately activates the header cart control. A success updates the header count, is announced accessibly and offers View cart and Checkout; keyboard focus stays where it was. A failure is shown in place, with no change to the count. On the mobile sticky buy bar the confirmation is compact and persistent: it stays until it is dismissed or the next purchase action, is never removed because time passes or the customer scrolls, keeps its actions keyboard and screen-reader accessible, and the sticky area does not obscure content |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
 
 - The mini-cart drawer opens as a focused confirmation
 - The add is confirmed in place on the product page and the count updates, without opening the drawer
+- The add is confirmed in place in the product purchase area, and the mini-cart drawer opens only when the customer deliberately activates the header cart control. A success updates the header count, is announced accessibly and offers View cart and Checkout; keyboard focus stays where it was. A failure is shown in place, with no change to the count. On the mobile sticky buy bar the confirmation is compact and persistent: it stays until it is dismissed or the next purchase action, is never removed because time passes or the customer scrolls, keeps its actions keyboard and screen-reader accessible, and the sticky area does not obscure content
 
 | Constraint | What it is |
 |---|---|
@@ -317,14 +318,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 12 of 12 |
-| Interaction decisions pending | IX-10 |
+| Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
