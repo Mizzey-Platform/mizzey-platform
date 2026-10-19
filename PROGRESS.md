@@ -54,12 +54,15 @@ Live status. First action each session: read this, then continue from **Next**.
   acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is reviewed and closed**: Claude Design's 30
   files, fifteen surfaces in English and Arabic, were imported in PR #362 (`f8ddd44`), and the owner reviewed and
   approved them on 19 October 2026, locking DQ-02 (numbered pagination) and setting the badge precedence. The
-  record is the batch-02 entry under `batches` in the manifest, beside its import record.
+  record is the batch-02 entry under `batches` in the manifest, beside its import record. **Batch-03 is drawn**:
+  Claude Design's 14 files, seven surfaces in English and Arabic, are imported for the owner's review,
+  `wireframed` in the manifest and not yet reviewed. IX-10 is still open; Claude Design's recommendation is
+  recorded on the batch-03 entry, not locked.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 and batch-02 are drawn**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 to batch-03 are drawn**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -273,8 +276,9 @@ drawn beyond batch-03 and CoreX is not upgraded until he says so either.** In or
    (PR #362), and he reviewed and closed it on 19 October 2026. A narrow correction of the 44 px targets carried
    from batch-01 followed (the `corrections` record on the batch-01 entry in the manifest). Batch-03 opens on his
    instruction of 19 October 2026: its seven surfaces are briefed, one of them newly (`sf-pdp-recently-viewed`),
-   and Claude Design draws it from a private manual-transfer package built from `main` after the opening merges.
-   IX-10 stays open for the batch-03 review, and DQ-01 stays provisional.
+   and Claude Design draws it from a private manual-transfer package built from `main` at `5aefe22`. Claude Design
+   drew it; the 14 files are imported for his review, and the batch closes when he has reviewed it (D-15, item 9).
+   IX-10 stays open for the batch-03 review, and DQ-01 stays provisional. Batch-04 waits for that closure.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
