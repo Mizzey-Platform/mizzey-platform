@@ -200,7 +200,41 @@
             "status": "Raised for the batch-05 review. No warning is drawn."
           }
         ]
-      }
+      },
+      "corrections": [
+        {
+          "date": "2026-10-19",
+          "decided_by": "Mustafa, owner",
+          "kind": "controlled structural consistency correction",
+          "record": "A narrow correction of four interactive targets below the 44 px minimum (NFR-11): three carried from the reviewed batch-01 frame and recorded in batches[batch-02].import.carried_findings, and the mega-menu Shop all button, found by measurement during this correction and added on the owner's instruction. Measured in a browser before and after. Two controls grow by a few pixels; the composition, the states, the decisions and the scope are unchanged, and the batch stays closed.",
+          "changes": [
+            {
+              "item": "Desktop header Search button",
+              "surface": "gl-header",
+              "refs": ["NFR-11"],
+              "change": "The visible button stays 38 px tall inside the 48 px field, so the approved header is unchanged, and gains a 44 px hit area (.sf .btn--s::after), as the batch-02 wishlist does. Applied in the 24 batch-01 files and in batch-02.css: 140 reused instances measured at 44 px."
+            },
+            {
+              "item": "Home rail quick add",
+              "surface": "sf-home",
+              "refs": ["NFR-11", "PLP-04"],
+              "change": "40 px to 44 px tall, matching the batch-02 product card."
+            },
+            {
+              "item": "Desktop search suggestion rows",
+              "surface": "gl-header",
+              "refs": ["NFR-11", "SRCH-03"],
+              "change": "Measured at 40 px in English and 43 px in Arabic; now at least 44 px, the rule batch-02 already uses. The mobile overlay rows (50 px) were already compliant."
+            },
+            {
+              "item": "Mega-menu Shop all button",
+              "surface": "gl-mega-menu",
+              "refs": ["NFR-11"],
+              "change": "Measured at 38 px tall in English and Arabic. The visible button is unchanged and gains a 44 px hit area (.mm__r .btn--s::after), the same treatment as the header Search button; its neighbours are 20 px away. Applied in the 24 batch-01 files, which share one style block."
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "batch-02",

@@ -22,6 +22,7 @@
 .btn--2,.pg a.btn--2{background:#fff;color:#151515}
 .btn--q,.pg a.btn--q{background:transparent;border-color:transparent;color:#151515;text-decoration:underline;text-underline-offset:3px;padding-inline:10px}
 .btn--s{block-size:38px;padding-inline:16px;font-size:13px;border-radius:8px}
+.sf .btn--s::after{content:"";position:absolute;inset:-3px 0}
 .btn--b{display:flex;inline-size:100%}
 .btn.busy{background:#5c5c5c;border-color:#5c5c5c}
 .lnk{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
