@@ -71,11 +71,17 @@ Live status. First action each session: read this, then continue from **Next**.
   20 October 2026: phone required at checkout, landmark optional pending confirmation, the handoff notes no longer
   promising what stays filled in, and one narrowed shared rule. The record is the batch-05 entry under `batches`
   in the manifest: import, corrections and review, with the platform additions and the open inputs it names.
+  **Batch-06 is reviewed and closed**: Claude Design's 22 files, eleven surfaces in English and Arabic (the hub-led
+  account, orders, tracking, the address book, profile and invoice), were imported with the owner's corrections in
+  one closure on 20 October 2026: the email change confirmed from the new address before it takes effect (US-10-05
+  kept), no silent default when the default address is deleted, and a required display name. US-10-01's returns
+  route is to be corrected in the Functional Specification before the Stage 1 submission (ACCT-10 is DEF). The
+  record is the batch-06 entry under `batches` in the manifest.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-05 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 to batch-06 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -307,7 +313,9 @@ drawn beyond batch-06 and CoreX is not upgraded until he says so either.** In or
    opens on his instruction of 20 October 2026, with three decisions: the hub-led account (IX-11, locked), the
    account inventory corrected on platform evidence, and the ACCT-04 address book kept consistent with checkout's
    saved addresses. Its eleven surfaces are briefed, and Claude Design draws it from a private manual-transfer
-   package built from the opening. Batch-07 opens only on his instruction.
+   package built from the opening. Claude Design drew it, and he reviewed and closed it on 20 October 2026 with his
+   corrections in one PR (the import, correction and closure records in the manifest). Batch-07 opens only on his
+   instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

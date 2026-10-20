@@ -121,3 +121,46 @@
 /* cm-address-card: a saved address (CHK-02, ACCT-04), first drawn in batch-05 (ck-address); also for ac-addresses and ac-order-detail. At checkout it is a ctl-radio card, .rcd.adc, in a radiogroup: the name as .rcd__t, the address lines, landmark and phone in .rcd__d, and the default address tagged with .adc__tag at the inline end. States: default, selected (.rcd.on), default_address (.adc__tag). */
 .adc__tag{grid-column:3;grid-row:1;justify-self:end;display:inline-flex;align-items:center;block-size:22px;padding-inline:8px;border:1px solid #6b6b6b;border-radius:999px;background:#fff;font-size:11px;font-weight:700;white-space:nowrap}
 .adc .rcd__d{line-height:1.55}
+/* cm-status-label: an order's status as the customer sees it, first drawn in batch-06 (ord-status-labels); used in ac-orders, ac-order-detail and ac-tracking, and for batch-07 and batch-08. One pill, .osl: a shape mark .osl__m (aria-hidden) and the status name as text. The name carries the meaning and the shape repeats it, never colour alone (greys only). Groups: .osl--pend pending payment (dashed, dashed ring); .osl--fail payment failed (heavy border, filled square); .osl--prog confirmed, preparing, shipped, out for delivery (half-filled ring); .osl--done delivered (filled pill, filled dot); .osl--end cancelled (grey, hollow square); .osl--rto returned to origin (grey, heavy border, filled diamond: never the delivered shape, ORD-13); .osl--ref refunded, fully or partly (double ring). COD collected, awaiting remittance is never a customer label: the customer sees Delivered (DQ-05). */
+.osl{display:inline-flex;align-self:flex-start;align-items:center;gap:7px;min-block-size:26px;padding:3px 10px;border:1.5px solid #151515;border-radius:999px;background:#fff;color:#151515;font-size:12.5px;font-weight:700;line-height:1.3;max-inline-size:100%}
+.osl__m{flex:none;inline-size:10px;block-size:10px;border:1.5px solid currentColor;border-radius:50%}
+.osl--pend{border-style:dashed;border-color:#5c5c5c}
+.osl--pend .osl__m{border-style:dashed}
+.osl--fail,.osl--rto{border-width:2.5px;padding:2px 9px}
+.osl--fail .osl__m{border-radius:2px;background:currentColor}
+.osl--prog .osl__m{background:linear-gradient(to top,currentColor 50%,transparent 50%)}
+.osl--done{background:#151515;color:#fff}
+.osl--done .osl__m{background:currentColor}
+.osl--end,.osl--rto{background:#ececec;color:#1f1f1f}
+.osl--end{border-color:#6b6b6b}
+.osl--end .osl__m{border-radius:1px}
+.osl--rto .osl__m{border-radius:1px;background:currentColor;transform:rotate(45deg) scale(.82)}
+.osl--ref .osl__m{border:3px double currentColor}
+/* cm-status-timeline: how far an order has gone (ORD-03 to ORD-07), as the customer sees it, first drawn in batch-06 (ord-status-timeline); used in ac-order-detail and ac-tracking, and for batch-07 and batch-08. An ordered list, ol.otl > li.otl__s: the mark .otl__d (aria-hidden), the step name .otl__t and an optional line .otl__x. Vertical by default, the line running from the inline start in both directions; .otl--h runs the same steps along the inline axis where there is room. Steps: reached (.otl__s--done, filled mark), current (.otl__s--cur, heavy ring, aria-current="step"), to come (no modifier, hollow grey mark, muted name), and the step that ends an interrupted line (.otl__s--end: cancelled or returned to origin, a square mark; no step is drawn after it). .otb is the compact form for the order card: five segments, the reached ones filled, with the status label beside it. Only statuses recorded on the order are drawn as reached; no carrier status that the mapping has not fixed (VENDOR-BOSTA). */
+.otl{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;min-inline-size:0}
+.otl__s{position:relative;display:flex;flex-direction:column;gap:2px;min-block-size:44px;padding-inline-start:34px;padding-block-end:12px;font-size:14px;color:#6b6b6b;overflow-wrap:anywhere}
+.otl__s::before{content:"";position:absolute;inset-inline-start:10px;inset-block:21px -1px;inline-size:2px;background:#d6d6d6}
+.otl__s:last-child{min-block-size:22px;padding-block-end:0}
+.otl__s:last-child::before{content:none}
+.otl__d{position:absolute;inset-inline-start:3px;inset-block-start:2px;inline-size:16px;block-size:16px;border:2px solid #9a9a9a;border-radius:50%;background:#fff}
+.otl__t{font-weight:600;line-height:1.45}
+.otl__x{font-size:12.5px;color:#5c5c5c}
+.otl__s--done,.otl__s--cur,.otl__s--end{color:#151515}
+.otl__s--done::before{background:#151515}
+.otl__s--done .otl__d{border-color:#151515;background:#151515}
+.otl__s--cur .otl__d{border:5px solid #151515}
+.otl__s--cur .otl__t,.otl__s--end .otl__t{font-weight:750}
+.otl__s--end .otl__d{border:3px solid #151515;border-radius:3px}
+.otl--h{flex-direction:row}
+.otl--h .otl__s{flex:0 0 20%;min-block-size:0;padding:28px 8px 0 0;padding-inline:0 8px;font-size:13.5px}
+.otl--h .otl__s::before{inset-block:11px auto;inset-inline:18px 0;inline-size:auto;block-size:2px}
+.otl--h .otl__d{inset-inline-start:0;inset-block-start:2px}
+.otb{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;min-inline-size:0}
+.otb>span{block-size:6px;border-radius:3px;background:#e0e0e0}
+.otb>.on{background:#151515}
+/* cm-address-card, address-book variant (.adc--bk), first drawn in batch-06 (ac-addresses, and read-only in ac-order-detail): the batch-05 card without the radio mark, so not a radio (no role, no aria-checked). The name .rcd__t, the lines, landmark and phone in .rcd__d, the default tag .adc__tag at the inline end, and the card's own actions in .adc__a under the lines (Edit, Delete; 44 px each). */
+.rcd.adc--bk{grid-template-columns:minmax(0,1fr) auto}
+.adc--bk .rcd__d,.adc__a{grid-column:1/-1}
+.adc--bk .adc__tag{grid-column:2}
+.adc__a{display:flex;flex-wrap:wrap;gap:0 8px;margin-block:4px -10px;margin-inline-start:-6px}
+.adc__a>a{display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#151515}
