@@ -50,7 +50,7 @@
       "authority_rank": 3,
       "role": "Functional Specification. Stories and acceptance criteria per requirement. Issued for the Stage 1 review; approval pending. The register governs where it differs.",
       "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Functional-Specification.md",
-      "sha256": "de3ed2ac6a787f881ecebc07e5b9bd6091948a316426e9ae0350564b169c7d3f",
+      "sha256": "43010fdc2d50ba1fddc0f11aac2f3a6ee89a62067b3718b3c888c69730f3d6db",
       "in_repository": null
     },
     {
@@ -100,7 +100,7 @@
       "authority_rank": 7,
       "role": "Verified sitemap and flows. Adds no scope. Its section 7 lists the open points it does not resolve.",
       "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Sitemap-and-User-Flows.md",
-      "sha256": "bfab5cf5d7ed39bcf3eb41035631b748a25296e6fdb56731be50d4249432ddd9",
+      "sha256": "72734116ffcec27b2165cbc40d3e0686b7489c6b380efa13e081972fda89c801",
       "in_repository": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md is the internal working copy."
     },
     {
