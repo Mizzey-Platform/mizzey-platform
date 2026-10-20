@@ -463,7 +463,7 @@
     "ORD-11 (DEF)",
     "RPT-06 (P2)"
    ],
-   "notes": "P-018: no structured status history natively, only prose order notes. ADR-0002 records the minimum shipment state record. D6: capture the language an order was placed in here. D-14: design-dependent for the order status labels the customer sees, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
+   "notes": "P-018: no structured status history natively, only prose order notes. ADR-0002 records the minimum shipment state record. D6: capture the language an order was placed in here. D-14: design-dependent for the order status labels the customer sees, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this. D-17: #309's review eligibility reads from this model which statuses mean Delivered and when ORD-14 (cash collected, awaiting remittance) follows an established delivery, so that set must be queryable. Returned to origin, cancelled and the pre-delivery statuses never count as delivered."
   },
   {
    "key": "E-PRE-5",
@@ -736,7 +736,7 @@
     "PDP-20 (P2)",
     "PDP-23 (P2)"
    ],
-   "notes": "PDP-06 and PDP-22 read stock from the ERP (ERP-02): their ERP half is pending PRE-09. The price development rule from t20 is recorded on this issue."
+   "notes": "PDP-06 and PDP-22 read stock from the ERP (ERP-02): their ERP half is pending PRE-09. The price development rule from t20 is recorded on this issue. D-17: on sf-pdp-reviews the entry to the review form (Write a review, Write the first review) is offered only to an eligible customer; signed out, Sign in to write a review stays. The eligibility check itself is #309's."
   },
   {
    "key": "E-SF-8",
@@ -2028,7 +2028,7 @@
     "INT-06 (P2)",
     "INT-07 (P2)"
    ],
-   "notes": "Email only at launch is agreed (OD-11); WhatsApp and SMS are P2. Admin-editable templates (NOTF-14) are S2: in the first release the developer changes wording on request. NOTF-08 uses the standard WooCommerce refunded-order email. NOTF-12 is P1-L with no reduction stated. No email is contracted for Out for Delivery (NOTF-05 is P2) although ORD-06 is a P1 status. REV-05, the review invitation, is owned by E-SF-11 and NOTF-06 names the same invitation. D-14: design-dependent for the customer transactional emails and their shared layout, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this."
+   "notes": "Email only at launch is agreed (OD-11); WhatsApp and SMS are P2. Admin-editable templates (NOTF-14) are S2: in the first release the developer changes wording on request. NOTF-08 uses the standard WooCommerce refunded-order email. NOTF-12 is P1-L with no reduction stated. No email is contracted for Out for Delivery (NOTF-05 is P2) although ORD-06 is a P1 status. REV-05, the review invitation, is owned by E-SF-11 and NOTF-06 names the same invitation. D-14: design-dependent for the customer transactional emails and their shared layout, which is not implemented visually before its design direction is established. Work with no customer-facing presentation is not held by this. D-17: the delivered email's review invitation may go to a guest purchaser, worded so that signing in or creating an account with the same email and verifying it comes first; the invitation never makes anyone eligible. How it is drawn is settled at the batch-08 import."
   },
   {
    "key": "E-RPT-1",
@@ -3639,8 +3639,8 @@
     },
     {
      "ref": "#248",
-     "reason": "The Delivered state that triggers REV-05",
-     "blocking": false
+     "reason": "The Delivered state that triggers REV-05, and the set of statuses that make a review eligible (D-17): Delivered, and ORD-14 only once delivery is established",
+     "blocking": true
     },
     {
      "ref": "#285",
@@ -3665,10 +3665,15 @@
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
+    },
+    {
+     "id": "DQ-06 (D-17)",
+     "class": "Blocks final acceptance",
+     "note": "The purchase-eligibility criteria of US-11-01 and US-11-03 are an owner decision presented as a clarification in the Functional Specification v1.4. They are provisional until the client signs the Stage 1 Approval Record; not a client confirmation"
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery.",
+   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery. Eligibility (D-17), on staging through real requests: a delivered order (and ORD-14 once delivered) allows a review; processing, shipped, out for delivery, cancelled, returned to origin and a fully refunded line do not; a guest order is refused until linked by a verified email, and a billing email match alone is refused; a variation qualifies its parent; a purchase in one language qualifies the other; a second review is refused while one is pending or approved, in either language, and allowed after a moderator removes a rejected one; an ineligible account is refused with no comment created on the classic form post, POST /wp/v2/comments with a valid nonce and XML-RPC wp.newComment; the beta review-request route and action are absent; moderation, the required rating and text and the display name are unchanged, and no verified-owner text appears in either language.",
    "not_in_slice": [
     "REV-06 (P2)",
     "REV-07 (P2)",
@@ -3676,7 +3681,7 @@
     "REV-09 (P2)",
     "PLP-11 (P1-L, stage S2, owned by E-SF-3b)"
    ],
-   "notes": "Part One 1.2: star ratings and text, moderated before publication; no photo or video reviews, verified-purchase badge, voting or questions. A review attaches to one language record of a product: whether a review left on the Arabic product shows on the English one, and whether the average of REV-04 combines both, is not measured and is not in the data-integrity workstream."
+   "notes": "Part One 1.2: star ratings and text, moderated before publication; no photo or video reviews, verified-purchase badge, voting or questions. A review attaches to one language record of a product: whether a review left on the Arabic product shows on the English one, and whether the average of REV-04 combines both, is not measured and is not in the data-integrity workstream. D-17 (owner decision, 20 October 2026): a review needs a delivered purchase, enforced on the server on every submission route. WooCommerce 11.1's verified-owner check covers only the classic form post and counts processing orders; the REST comments endpoint and XML-RPC bypass it, and its beta review request lets a guest review by order key, so it stays off. Turn on woocommerce_review_rating_verification_required and turn off woocommerce_review_rating_verification_label (on by default, it would be the REV-07 badge). One eligibility check decides after WooCommerce Multilingual's woocommerce_pre_customer_bought_product filter (priority 10), which recognises purchases across translations but re-runs the native query. A custom check also avoids the native result cached against the customer's order count, which a cancellation does not change. Open: the delivered status set (#248), whether email-verified guest-order linking is active at launch, and whether XML-RPC is disabled outright."
   },
   {
    "key": "E-SF-12",

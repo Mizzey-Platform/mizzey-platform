@@ -384,6 +384,15 @@
    "date": "2026-10-05",
    "decision": "The cash on delivery capability is built and tested as PAY-09 requires: native, with a configurable switch, and restricted by shipping method or zone where that is native. D-11: no value ceiling and no fee is contracted. No PAY, CHK, ADM or BR row supports one, so neither is built, and either would be a later scope decision. The example limit and fee recorded under D-10 are withdrawn.",
    "still_gates": "The launch switch stays the client's: PAY-09 is enabled at launch only if the client selects it."
+  },
+  "DQ-06": {
+   "title": "Review eligibility: a review needs a delivered purchase",
+   "class": "blocks-acceptance",
+   "decided_by": "owner",
+   "client_confirmed": false,
+   "date": "2026-10-20",
+   "decision": "A review can be submitted only by a signed-in customer whose account holds a delivered order for the product, its variations or its other-language version; guest orders only once linked by a verified email; one active review per product; enforced on the server on every submission route. A clarification of REV-01 and REV-02, not REV-07 (DECISIONS.md D-17).",
+   "still_gates": "Final acceptance of the eligibility criteria of US-11-01 and US-11-03 until the client signs the Stage 1 Approval Record for the Functional Specification v1.4. Development is not blocked."
   }
  }
 }
