@@ -114,6 +114,12 @@ WooCommerce product reviews block.
 
 None.
 
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-06` Review eligibility | A review can be submitted only by a signed-in customer whose account holds an order for the product, any of its variations or its version in the other language, with delivery confirmed (ORD-07; ORD-14 only once delivery is established). Processing, shipped, out-for-delivery, cancelled, returned-to-origin orders and fully refunded lines do not qualify. A guest order qualifies once linked to the account after its email is verified. One active review per customer and product across variations and languages. An ineligible customer sees a short explanation instead of the form (not_eligible); a customer who has reviewed sees already_reviewed. Enforced on the server on every submission route. | No verified-purchase badge or label anywhere (REV-07 is P2). No guest review by order key, and no review form shown to a customer who is not eligible. An invitation never makes a customer eligible. |
+
 ## Interaction options
 
 ### DQ-01: Numerals in Arabic
@@ -176,3 +182,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Calibration frames | Product detail page (`cal-05`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
+
+## Note
+
+The entry to the review form (Write a review, Write the first review) is offered only to a customer who is eligible under DQ-06 as revised by D-17; signed out, Sign in to write a review stays. An ineligible or already-reviewed customer reaches the rv-form not_eligible or already_reviewed state. The batch-03 frames' DQ-06 note (a signed-in customer may submit) is superseded and is corrected by the follow-up drawing after batch-08; no state is added here.

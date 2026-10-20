@@ -2223,7 +2223,7 @@
       "desktop": "reviewed",
       "states_covered": ["default", "signed_out", "form", "validation", "submitted"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
     },
     {
       "surface": "rv-pending",

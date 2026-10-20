@@ -1659,3 +1659,49 @@ publishes.
 **Owner actions this needs, none of which the agent performs without instruction:** placing the translation
 plugin family in the server's folder; the Cloudflare Access policy and the tunnel route for the host name; and
 the commands on the server.
+
+## 2026-10-20 - D-17: a review needs a delivered purchase, and DQ-06 is revised
+
+**Status: proposed, 20 October 2026.** Not applied until the owner approves the PR that carries it and it is merged.
+
+Owner decision of Mustafa, 20 October 2026. **Not a client confirmation, adds no scope, and not contractual
+acceptance.** It is presented to the client as a clarification of REV-01 and REV-02 in the Functional
+Specification MS-SPC-2026-032 version 1.4 change note, and is acknowledged only when the client signs the Stage 1
+Approval Record. Until then the Feature Register reads exactly as signed.
+
+**1. What changes.** DQ-06, locked on 6 October 2026 under D-14, said that a signed-in customer may submit a review
+and that no purchase is required. It is revised: a review can be submitted only by a signed-in customer whose
+account holds an order for the product, for any of its variations or for its version in the other language,
+whose delivery has been confirmed. D-14's table is not edited; it is the record of what was decided then. The
+inventory keeps the earlier text in DQ-06's `history`.
+
+**2. Why it is a clarification and not a change.** The register contracts review submission (REV-01, REV-02) and
+says nothing about who may submit. Its reduced boundary excludes only the verified-purchase *badge* (REV-07, P2),
+and the client's SRS section 6.11 ties "verified" to delivered orders. No row is added or moved, and the fee and
+timeline do not change (Change Control MS-CHG-2026-028 section 2.1). **REV-07 is not added: no badge is shown.**
+
+**3. The policy, as the owner approved it.**
+
+- An authenticated account and a qualifying purchase of the specific product.
+- Delivery confirmed. ORD-14 (cash collected, awaiting remittance) qualifies only where delivery is already
+  established. Processing, Shipped, Out for Delivery, Cancelled, Returned to Origin and fully refunded order lines
+  do not qualify.
+- A guest order qualifies only once it is linked to the account after the account's email address is verified. A
+  matching billing email alone does not.
+- One active review per customer and product, across variations and both languages. Pending and approved reviews
+  block a second; a rejected one stays with the moderator, who may remove it to allow a new submission.
+- An ineligible customer sees a short explanation instead of the form; a customer who has reviewed sees that.
+- Enforced on the server on every submission route: the classic form post, the REST comments endpoint, XML-RPC,
+  and WooCommerce's beta review request, which stays off. Administrative moderation is unaffected.
+- Moderation, the required rating and text, and the display name are unchanged.
+- A delivered-order invitation may reach a guest purchaser; it does not make anyone eligible.
+
+**4. What it does to the design record.** `rv-form` gains two states, `not_eligible` and `already_reviewed`, and is
+`wireframed` until they are drawn and reviewed: it is not described as reviewed before then. Batch-07's closure
+record and the original Claude Design archive are not changed. The DQ-06 notes drawn in the batch-07 `rv-form`
+and batch-03 `sf-pdp-reviews` frames are superseded and are corrected by a follow-up drawing after batch-08.
+
+**5. What stays open, recorded as dependencies of #309 rather than decided here.** Which WooCommerce statuses carry
+Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email verification that links guest
+orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
+filter; and whether XML-RPC is disabled outright.

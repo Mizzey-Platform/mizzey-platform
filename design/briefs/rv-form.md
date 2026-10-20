@@ -75,6 +75,8 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `form` | Other |  |  |
 | `validation` | Validation |  |  |
 | `submitted` | Success |  |  |
+| `not_eligible` | Other |  | Signed in, without a delivered purchase of this product: a short explanation in place of the form (DQ-06) |
+| `already_reviewed` | Other |  | Signed in, with a pending or approved review of this product in either language: no form, and the customer is told they have reviewed it (DQ-06) |
 
 ## Responsive
 
@@ -112,7 +114,7 @@ None.
 
 | Decision | What was decided | Not to be done |
 |---|---|---|
-| `DQ-06` Review eligibility | The Stage 1 design assumes a signed-in customer may submit a review. | No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2). |
+| `DQ-06` Review eligibility | A review can be submitted only by a signed-in customer whose account holds an order for the product, any of its variations or its version in the other language, with delivery confirmed (ORD-07; ORD-14 only once delivery is established). Processing, shipped, out-for-delivery, cancelled, returned-to-origin orders and fully refunded lines do not qualify. A guest order qualifies once linked to the account after its email is verified. One active review per customer and product across variations and languages. An ineligible customer sees a short explanation instead of the form (not_eligible); a customer who has reviewed sees already_reviewed. Enforced on the server on every submission route. | No verified-purchase badge or label anywhere (REV-07 is P2). No guest review by order key, and no review form shown to a customer who is not eligible. An invitation never makes a customer eligible. |
 
 ## Interaction options
 
@@ -165,13 +167,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `reviewed` |
+| Review status | `wireframed` |
 | Review batch | Wishlist, reviews, content and trust (`batch-07`) |
 | English, left to right | `reviewed` |
 | Arabic, right to left | `reviewed` |
 | Mobile | `reviewed` |
 | Desktop | `reviewed` |
-| States covered | 5 of 5 |
+| States covered | 5 of 7 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
@@ -179,4 +181,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02).
+Star rating and text only. No photo or video (REV-06 is P2). Only a signed-in customer with a delivered purchase of the product may submit, one active review per product across variations and languages, checked on the server; no verified-purchase badge is shown (DQ-06 as revised by D-17, REV-07 is P2). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02). Wireframed, not reviewed: five states were drawn and reviewed in batch-07, whose closure stands; not_eligible and already_reviewed are added by D-17 and wait for a follow-up drawing after batch-08. The batch-07 frames' DQ-06 notes (any signed-in customer, no purchase check) are superseded.
