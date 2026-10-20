@@ -59,15 +59,19 @@ Live status. First action each session: read this, then continue from **Next**.
   and corrected on the owner's direction in PR #369 (`91f54be`). He reviewed and approved them on 19 October 2026,
   locking IX-10: the add is confirmed in place, with a persistent confirmation on the mobile buy bar. The record is
   the batch-03 entry under `batches` in the manifest, beside its import and correction records. **Batch-04 is
-  drawn**: Claude Design's 30 files, fifteen surfaces in English and Arabic, are imported for the owner's review,
-  `wireframed` in the manifest and not yet reviewed. The import record on the batch-04 entry holds the browser
-  measurements and the open points: the US-05-02 difference, the free-shipping sample against OD-04 (a focused
-  correction is proposed before closure), and the provisional AUTH-02, AUTH-12 and authentication assumptions.
+  reviewed and closed**: Claude Design's 30 files, fifteen surfaces in English and Arabic, were imported in PR #372
+  (`238c4fc`). Before closing, the owner directed two corrections: the free-shipping prompt as a rule-neutral
+  placement in the sample carts (OD-04), and decisions D1 to D6, made on 20 October 2026 after the pre-batch-05
+  quality-gate review. These are one form-and-notice pattern, one order summary with five variants, desktop sign-in
+  in one column, a return line when sign-in starts from a context, the order summary on the checkout entry, and a
+  shared component layer, `design/wireframes/_shared/components.css`, that batch-05 onward link. He approved
+  closure on 20 October 2026. The record is the batch-04 entry under `batches` in the manifest, beside its import
+  and correction records.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-04 are drawn**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 to batch-04 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -288,8 +292,11 @@ drawn beyond batch-04 and CoreX is not upgraded until he says so either.** In or
    closed the batch on 19 October 2026, with IX-10 locked (the closure record in the manifest). DQ-01 stays
    provisional. Batch-04 (cart and authentication) opens on his instruction of 19 October 2026: its fifteen
    surfaces are briefed, twelve of them newly, and Claude Design draws it from a private manual-transfer package
-   built from `main` at `fcadab5`. Claude Design drew it; the 30 files are imported for his review, and the batch
-   closes when he has reviewed it (D-15, item 9). IX-02 and IX-10 stay locked, and DQ-01 stays provisional.
+   built from `main` at `fcadab5`. Claude Design drew it; the 30 files were imported (PR #372, `238c4fc`). He
+   directed the free-shipping correction and decisions D1 to D6, which Claude Design carried out in one review
+   round, and closed the batch on 20 October 2026 (the correction and closure records in the manifest). IX-02 and
+   IX-10 stay locked, and DQ-01 stays provisional. Batch-05 opens only on his instruction, linking the shared
+   component layer.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

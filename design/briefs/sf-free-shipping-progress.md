@@ -163,12 +163,12 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Cart and authentication (`batch-04`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
-| Mobile | `drawn` |
-| Desktop | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
 | States covered | 4 of 4 |
 | Interaction decisions pending | None |
 | Calibration frames | Mini-cart and cart (`cal-06`) |

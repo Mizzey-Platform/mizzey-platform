@@ -1,7 +1,7 @@
 # Wireframes: the artefact format
 
 **The calibration set exists and is reviewed. Batch-01, in `s1/batch-01/`, is reviewed and closed. Batch-02, in
-`s1/batch-02/`, is reviewed and closed. Batch-03, in `s1/batch-03/`, is reviewed and closed. Batch-04, in `s1/batch-04/`, is drawn and not yet reviewed.** This
+`s1/batch-02/`, is reviewed and closed. Batch-03, in `s1/batch-03/`, is reviewed and closed. Batch-04, in `s1/batch-04/`, is reviewed and closed.** This
 folder holds the format, the production manifest, the workflow, the shared stylesheet, the calibration set in
 `s1/calibration/` and the production batches. The owner's selection is in [manifest.json](manifest.json) under
 `selection`.
@@ -35,6 +35,7 @@ design/wireframes/
   manifest.json        design-production status, one entry per surface
   _shared/
     wireframe.css      the small neutral structural system every wireframe links
+    components.css     the shared low-fidelity components, linked from batch-04 onward
   s1/                  first-release surfaces
     calibration/<a|b|c>/<frame id>.<en|ar>.html
     <batch id>/<surface id>.<en|ar>.html
@@ -81,6 +82,13 @@ CSS under `design/wireframes/` only. Script, PHP and every other file type are r
 **It is not the design system and must not become one.** It has no component library, no brand token and no
 final value. A direction or a surface may add its own small stylesheet beside its files. The checker caps the size
 of any stylesheet here, so a library cannot arrive as one.
+
+`_shared/components.css` holds the low-fidelity components that more than one batch uses: the form fields, the
+inline validation, the notices, the coupon entry and the order summary with its five variants. Each block is
+headed with its id from `design/inventory/components.json`. The owner set it up at the batch-04 review (D6, 20
+October 2026). Batch-04 links it, batch-05 onward link it and add shared components to it, and batch-01 to
+batch-03 move onto it at stabilisation. Like `wireframe.css`, it is greys only, with no brand token and no final
+value, and it is not the design system.
 
 ## What every wireframe file declares
 

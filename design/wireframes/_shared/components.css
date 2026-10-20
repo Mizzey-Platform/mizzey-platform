@@ -1,0 +1,114 @@
+/* Mizzey shared component layer (D6, batch-04 review round). Loaded after ../batch-03/batch-03.css and before each batch stylesheet. Shared components only; each block is headed with its canonical id from design/inventory/components.json. Frame, header, footer and review-sheet rules stay where they are. Prototype only; greys, system type. */
+/* ctl-input: text field. A visible label above every field, 48 px field, hint under it. Only an optional field is marked (.fd__o "Optional"); a form with more than one field opens with one line, .frq, "All fields are required unless marked optional." Phone treatment: .fd--tel with .ip.tel and its value in a .ltr span, isolated left to right in both languages (DQ-01 provisional; AUTH-02 optional). States: default, focus (.is-focus), filled, read-only (.ip--ro), error (fb-inline-validation). */
+.frq{font-size:12.5px;line-height:1.45;color:#5c5c5c;margin-block-end:-6px}
+.fd{display:flex;flex-direction:column;gap:6px;min-inline-size:0}
+.fd__l{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;font-weight:650}
+.fd__o{font-size:12.5px;font-weight:400;color:#5c5c5c;white-space:nowrap}
+.fd__h{font-size:12.5px;color:#5c5c5c}
+.ip{display:flex;align-items:center;gap:8px;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;color:#151515;min-inline-size:0}
+.ip>span:first-child{flex:1;min-inline-size:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ip__d{letter-spacing:2px}
+.pg[lang="ar"] .ip>.ltr{text-align:right}
+.ip--ro{background:#f3f3f3;border-color:#d6d6d6}
+.shw{display:inline-flex;align-items:center;justify-content:center;min-inline-size:44px;block-size:44px;margin-inline-end:-11px;padding-inline:10px;font-size:13px;font-weight:650;text-decoration:underline;text-underline-offset:3px;flex:none}
+.tel>.ltr{font-variant-numeric:tabular-nums}
+/* ctl-select: defined for batch-05, not drawn in batch-04. Markup: .fd > label.fd__l + .cs > span (the value, or a prompt with .cs--ph). States: default, focus (.is-focus), disabled (.is-disabled), error (.fd--e). Dependent select (CHK-01: governorate, then city, then district): waiting, .cs--wait, looks disabled until the select before it is answered and says what to choose first in .fd__h; ready is the default state, with its prompt. */
+.cs{display:flex;align-items:center;gap:10px;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;color:#151515;min-inline-size:0}
+.cs>span:first-child{flex:1;min-inline-size:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs::after{content:"";flex:none;inline-size:8px;block-size:8px;margin-block-start:-4px;border-right:1.5px solid #3a3a3a;border-bottom:1.5px solid #3a3a3a;transform:rotate(45deg)}
+.cs--ph>span:first-child{color:#6b6b6b}
+.cs.is-disabled,.cs--wait{background:#f3f3f3;border-color:#d6d6d6;color:#6b6b6b}
+.cs.is-disabled::after,.cs--wait::after{border-color:#bdbdbd}
+.cs.is-focus{outline-offset:2px}
+/* ctl-checkbox: a 22 px box inside a 44 px row, the label beside it; links on their own line (.cxl), outside the label. States: default, checked (.cx__b.on), error (fb-inline-validation). */
+.cx{display:flex;gap:12px;align-items:flex-start;min-block-size:44px;padding-block:11px;font-size:13.5px;line-height:1.5}
+.cx__b{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:5px;background:#fff;font-size:12px}
+.cx__b.on{background:#151515;border-color:#151515;color:#fff}
+.cxg{display:flex;flex-direction:column}
+.cxl{display:flex;flex-wrap:wrap;gap:0 18px;padding-inline-start:34px}
+.cxl a{display:inline-flex;align-items:center;min-block-size:44px;font-size:13px;font-weight:600;text-underline-offset:3px}
+/* ctl-radio: radio card, defined for batch-05 (shipping and payment methods), not drawn in batch-04. .rcg (radiogroup) > .rcd (radio, aria-checked): .rcd__b mark, .rcd__t title, optional .rcd__d detail line, optional .rcd__p price at the inline end. States: unselected, selected (.rcd.on), focus (.is-focus), disabled (.is-disabled). */
+.rcg{display:flex;flex-direction:column;gap:8px}
+.rcd{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:2px 12px;align-items:start;min-block-size:56px;padding:15px 16px;border:1.5px solid #bdbdbd;border-radius:10px;background:#fff;font-size:14.5px}
+.rcd__b{grid-row:span 2;inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:50%;background:#fff}
+.rcd__t{font-weight:650;min-inline-size:0}
+.rcd__d{grid-column:2;font-size:13px;color:#5c5c5c}
+.rcd__p{grid-column:3;grid-row:1;font-weight:700;white-space:nowrap;text-align:end}
+.rcd.on{border:2.5px solid #151515;padding:14px 15px}
+.rcd.on .rcd__b{border:7px solid #151515}
+.rcd.is-disabled{opacity:.5}
+/* fb-inline-validation: the field error (.fd--e with aria-invalid on the field and the batch-02 .err message under it, tied by aria-describedby) and the error summary shown on submit (.esum, role alert, one link per error to its field). */
+.fd--e .ip{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+.cx--e .cx__b{border:2.5px solid #151515}
+.cxg .err{margin-block:-4px 6px;padding-inline-start:34px}
+.esum{display:flex;flex-direction:column;gap:0;padding:14px 16px 6px;border:2.5px solid #151515;border-radius:10px;background:#fff}
+.esum b{font-size:14px}
+.esum a{display:flex;align-items:center;min-block-size:44px;font-size:13.5px;font-weight:600;text-underline-offset:3px}
+.fd--e .cs{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+/* fb-notice: one notice block for every page and form notice. Variants: success .nt--ok (check mark), information .nt--i, warning .nt--w (square mark), error .nt--e (heavier border, role alert). Body .nt__b, actions .nt__a. Not used for the in-place add confirmations governed by IX-02 and IX-10. */
+.nt{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1.5px solid #151515;border-radius:10px;background:#fff;font-size:13.5px;line-height:1.5}
+.nt__i{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border-radius:50%;background:#151515;color:#fff;font-size:11px;font-weight:700;margin-block-start:1px}
+.nt__b{display:flex;flex-direction:column;gap:2px;min-inline-size:0;flex:1}
+.nt__a{display:flex;flex-wrap:wrap;gap:0 18px;margin-block-end:-8px}
+.nt__a a{display:inline-flex;align-items:center;gap:6px;min-block-size:44px;font-weight:650;text-underline-offset:3px}
+.nt--ok{border-color:#151515}
+.nt--i{border-color:#bdbdbd;background:#f6f6f6}
+.nt--i .nt__i{background:#fff;color:#151515;border:1.5px solid #5c5c5c}
+.nt--w{border-color:#5c5c5c;background:#f6f6f6}
+.nt--w .nt__i{border-radius:4px;background:#fff;color:#151515;border:2px solid #151515}
+.nt--e{border-width:2.5px;padding:11px 13px}
+/* cm-coupon: the coupon entry. A disclosure (.cpd, aria-expanded; open .cpd--o), the field and Apply (.cpf, .cpf__r), and the applied code (.cpc). States: default, applied, invalid. A single field: no required line. */
+.cpd{display:flex;align-items:center;justify-content:space-between;gap:8px;min-block-size:44px;font-size:14px;font-weight:650;border-block-start:1px solid #e0e0e0;padding-block-start:4px}
+.cpd .chev--down{margin-inline-end:8px}
+.cpd--o .chev--down{transform:rotate(225deg);margin-block-start:6px}
+[dir="rtl"] .cpd--o .chev--down{transform:rotate(135deg)}
+.cpf{display:flex;flex-direction:column;gap:8px}
+.cpf__r{display:flex;gap:8px}
+.cpf__r .ip{flex:1}
+.cpf__r .btn{block-size:48px;padding-inline:16px}
+.cpc{display:flex;align-items:center;gap:10px;min-block-size:48px;padding-inline:12px 4px;border:1.5px solid #151515;border-radius:10px;background:#fff;font-size:13.5px}
+.cpc__c{font-weight:700;letter-spacing:.04em}
+.cpc .ln__a{margin-inline-start:auto}
+/* cm-order-summary: one summary, five variants, one row order: heading; items (checkout, review, as charged); the context blocks (cart: free-shipping slot first, then cm-coupon; checkout: cm-coupon); review: address, shipping method, payment method, each with Change; the breakdown rows in .sm__rs (Subtotal; Discount per code; Shipping; a further charge only where a configured charge applies) and the Total (.sm__t); as charged: payment method, refunds, net paid; the note (.sm__x); the actions. Layout: .sm--m mobile, .sm--t tablet two columns. */
+.sm{display:flex;flex-direction:column;gap:18px;padding:24px;border-radius:12px;background:#f6f6f6;min-inline-size:0}
+.sm--m{padding:20px 16px}
+.sm--t{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 32px}
+.sm--t .sm__h{grid-column:1/-1}
+.sm__h{font-size:17px;font-weight:700}
+.sm__a,.sm__z{display:flex;flex-direction:column;gap:14px;min-inline-size:0}
+.sm__rs{display:flex;flex-direction:column;gap:10px}
+.sm__r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px}
+.sm__r>span:last-child{white-space:nowrap;text-align:end}
+.sm__t{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-block-start:14px;border-block-start:1px solid #d6d6d6;font-size:17px;font-weight:700}
+.sm__x{font-size:12.5px;color:#5c5c5c}
+.sm--cart .sm__z .btn{block-size:52px}
+.sm .lnk{align-self:center;min-block-size:44px}
+.sm .err{font-weight:600}
+/* cm-order-summary, cart variant (.sm--cart): editable context, Shipping "Calculated at checkout", Checkout and Continue shopping. Drawn in sf-cart, sf-cart-revalidation, sf-free-shipping-progress, au-sign-in, au-google-entry. */
+/* cm-order-summary, mini-cart foot variant (.sm--mini, on the drawer foot): Subtotal, one note, View cart and Checkout. */
+.sm--mini{gap:0;padding:0;border-radius:0}
+.sm--mini>.sm__r{padding:14px 20px 0;font-size:15px;font-weight:700}
+.sm--mini>.sm__x{padding:2px 20px 0}
+/* cm-order-summary, checkout variant (.sm--co): collapsible items (.sm__it), cm-coupon, the full breakdown; sticky at the inline end on desktop; on mobile the collapsed total bar (.sm--bar), total always visible (DQ-03). */
+.sm__it{display:flex;flex-direction:column;gap:12px}
+.sm__itd{border-block-start:0;padding-block-start:0}
+.sm__ls{display:flex;flex-direction:column;gap:14px}
+.sm__l{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:start;font-size:13.5px}
+.sm__l .ph{border-radius:6px}
+.sm__n{display:flex;flex-direction:column;gap:2px;min-inline-size:0;overflow-wrap:anywhere}
+.sm__n>b{font-weight:650}
+.sm__n>span{font-size:12.5px;color:#5c5c5c}
+.sm__lp{font-weight:700;white-space:nowrap;text-align:end}
+.sm--bar{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:6px 16px;border-radius:0;border-block-end:1px solid #d6d6d6}
+.sm__bt{display:inline-flex;align-items:center;gap:10px;min-block-size:44px;font-size:14px;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.sm__bp{font-size:16px;white-space:nowrap}
+/* cm-order-summary, review variant (.sm--rv), first drawn in batch-05 (ck-review-place-order): items, then .sm__sec for the delivery address, the shipping method and the payment method, each with its Change (.sm__chg) at the inline end, then the full breakdown. Terms and Place order follow on the page. */
+.sm__sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding-block-start:14px;border-block-start:1px solid #e0e0e0;font-size:13.5px}
+.sm__sec>b{font-size:14px}
+.sm__sec>span{grid-column:1;color:#3a3a3a;overflow-wrap:anywhere}
+.sm__chg{grid-column:2;grid-row:1/span 2;display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;margin-block:-10px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+/* cm-order-summary, as-charged variant (.sm--paid), first drawn in batch-05 (ck-order-received) and batch-06 (ac-order-detail, ac-invoice): read-only items at the prices charged, the breakdown as charged, then the payment method (.sm__pm), one row per refund where one applies (.sm__rf), and the net paid (.sm__t--net). No Change, no actions inside. */
+.sm--paid{background:#fff;border:1.5px solid #d6d6d6}
+.sm__pm{padding-block-start:12px;border-block-start:1px solid #e0e0e0}
+.sm__rf>span:first-child{color:#3a3a3a}
+.sm__t--net{border-block-start-style:dashed}

@@ -550,6 +550,179 @@
         ],
         "handoff_corrections": "Claude Design reports these routine corrections as made before delivery, and the measurements above agree with them: the Arabic Remove line action brought to 44 px; the negative margin that made the policy links overlap the terms consent removed, with the links on their own line outside the label; the coupon chevron's open rotation set per direction; left-to-right values (email addresses, codes, password dots) at the inline start in Arabic fields; the free-shipping review label moved after its sentence; the free_shipping_applied crop shown without the checkout bar; and clipped state captions replaced.",
         "blockers": "None. Every difference above is recorded, not resolved, and none prevents the owner's review."
+      },
+      "corrections": [
+        {
+          "date": "2026-10-20",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner correction before review: the free-shipping representation",
+          "record": "Closes the import finding \"Free-shipping sample and OD-04\" (import.source_differences). Claude Design worked from the private correction package v1, built from 238c4fc, and returned mizzey-batch-04-correction-output.zip (SHA-256 9fed2bb074ac2edce13acae1b868eab993794bf7d5e5f83dc0a6168fccc3c94d). Claude Code validated it before it became the baseline of the review round: every file hash matched the handoff; with the slots and the note sentence reversed, the files were byte-identical to 238c4fc; the wireframe checker reported 0 problems. The import record counted 39 frames per language; measured again for the correction, 36 (the two sf-cart:updating frames show a loading skeleton, and \"the prompt on its own\" shows no cart).",
+          "changes": [
+            {
+              "item": "Free-shipping prompt in sample carts",
+              "surface": "sf-cart, sf-cart-revalidation, sf-free-shipping-progress, sf-mini-cart",
+              "refs": ["OD-04", "CART-07", "BR-002", "US-05-04"],
+              "change": "In 36 frames per language the prompt is replaced by a rule-neutral placement slot of the same component, at the same place and size (86.6 px block size, full inline size), labelled in English as sf-free-shipping-progress, position only, its state and wording set by the configured rule (OD-04), with no sentence, number, bar or role: 37 slots per language (sf-cart 21, sf-cart-revalidation 8, sf-free-shipping-progress 3 in 2 frames, sf-mini-cart 5). The OD-04 note's last sentence is replaced in 3 places per language. The frames that show a state (not_qualified with one unit; qualified, free_shipping_applied and after_add with two to four) agree with the owner's working default without stating a threshold. No sample value changed and no rule is fixed."
+            }
+          ]
+        },
+        {
+          "date": "2026-10-20",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner review round, before closure: D1 to D6",
+          "record": "The owner decided D1 to D6 on 20 October 2026, after his own review of Claude Design's independent quality-gate review and Claude Code's scope consultation, and directed one review round to carry them into batch-04 with the free-shipping correction folded in. Claude Design worked from the private review-round package v1 (SHA-256 861f5885e78ca8c0899cadd40d70274267594fe7d64918e19c9ac780eef98a63), built from 238c4fc with the validated free-shipping files, and returned mizzey-batch-04-round-2-output.zip (SHA-256 8859671609cd8e6cd3d5824fdd03130c3f7a8e6143e520dfdc6cead8ebdf8874; handoff 7455f665aa61167f098390d09170f4276419b0e69e677a991cf8d32399a53a5d). Thirty HTML files, batch-04.css and the new design/wireframes/_shared/components.css. The handoff and the packages stay private and are not committed.",
+          "changes": [
+            {
+              "item": "D6, the shared component layer",
+              "surface": "all fifteen batch-04 surfaces",
+              "refs": ["D6"],
+              "change": "New design/wireframes/_shared/components.css (12,322 bytes), linked by all 30 batch-04 files after ../batch-03/batch-03.css and before batch-04.css. Eight blocks, each headed with its canonical component id: ctl-input, ctl-select, ctl-checkbox, ctl-radio, fb-inline-validation, fb-notice, cm-coupon and cm-order-summary. 53 rules moved from batch-04.css byte for byte, 90 kept unchanged there, and 9 removed (the two-column sign-in rules, the old mini-cart foot rules, and .sm .btn, narrowed to .sm--cart .sm__z .btn). batch-04.css is 8,594 bytes, from 13,191. No other stylesheet and no batch-01 to batch-03 or calibration file changed; moving them onto the layer is a stabilisation step."
+            },
+            {
+              "item": "D1, one form-and-notice pattern",
+              "surface": "au-sign-in, au-register, au-google-entry, au-passwordless, au-lost-password, au-reset-password, au-post-order-account, au-email-verification, sf-cart-revalidation, sf-cart",
+              "refs": ["D1", "AUTH-14", "NFR-11"],
+              "change": "Only optional fields are marked: 102 Required markers removed per language, and the line \"All fields are required unless marked optional.\" placed before the first field of the 35 forms per language with more than one field. Single-field forms carry neither (lost password, the passwordless request, reset password, the coupon entry, and au-post-order-account, whose email is read-only). The notes stating the old rule are corrected; required fields carry aria-required. Every page and form notice uses fb-notice: success, information, warning (the six sf-cart-revalidation notices, same wording and role status) and error (role alert). The in-place add confirmations of IX-02 and IX-10 are unchanged. Select, dependent select, radio card and the phone treatment are defined for batch-05; the phone field in au-register is isolated left to right and stays empty and optional (AUTH-02, DQ-01)."
+            },
+            {
+              "item": "D2, one order summary",
+              "surface": "sf-cart, sf-cart-revalidation, sf-free-shipping-progress, sf-mini-cart, au-sign-in, au-google-entry, au-checkout-entry",
+              "refs": ["D2", "CART-05", "CHK-08", "US-07-04", "US-10-02", "ACCT-06", "DQ-03"],
+              "change": "One cm-order-summary with one row order (heading; items; context blocks; for review, address, shipping method and payment method with Change; Subtotal, Discount per code, Shipping, any further configured charge where one applies, Total; for as charged, payment method, refunds and net paid; note; actions). Drawn: the cart variant (41 summaries per language), the mini-cart foot (10) and the checkout variant (au-checkout-entry). Defined for batch-05 and batch-06: review and as charged. No amount, quantity or Shipping wording changed in any existing frame."
+            },
+            {
+              "item": "D3, desktop sign-in in one column",
+              "surface": "au-sign-in, au-register, au-google-entry, au-passwordless",
+              "refs": ["D3", "OP-17"],
+              "change": "The 14 desktop frames per language that showed sign in and registration side by side use the single centred 440 px column with the Sign in / Create an account tab list, the active tab's form unchanged inside; au-register frames show Create an account active. OP-17 kept: one address, both forms on one screen through the tabs at every width; its note is corrected. The page heading uses the h2 scale in the column and remains the page's h1."
+            },
+            {
+              "item": "D4, return to the context",
+              "surface": "au-sign-in, au-register, sy-sign-in-required",
+              "refs": ["D4", "AUTH-07", "CART-13", "CART-14"],
+              "change": "Four new frames per language under the existing default states: au-sign-in from the checkout (390 and 1280), au-register from the checkout (390) and au-sign-in from a review (390). The tab the entry chose is active and one line under the heading names the return (\"You'll return to your checkout.\"; for a review, to the product). The rule is annotated once, with the cart and protected-page lines and the header exception (no return line). The page route is kept: no sign-in form, sheet or dialog in the cart or the checkout. The sy-sign-in-required note names the protected-page return line. 77 states per language, unchanged; 177 frames per language."
+            },
+            {
+              "item": "D5, the checkout entry with the summary",
+              "surface": "au-checkout-entry",
+              "refs": ["D5", "DQ-03", "CHK-08"],
+              "change": "Desktop default and guest: the entry in the checkout's main column (770 px) with the checkout variant beside it at the inline end (380 px, sticky; on the left in Arabic), items open. Mobile default and guest: the total was not visible, so the collapsed total bar is added (total EGP 5,580 visible). Shipping reads \"After the delivery address\" with the note \"Shipping is added once the delivery address is known.\" The signed_in frames are unchanged; no checkout section is drawn and the checkout header is batch-05's."
+            },
+            {
+              "item": "Coupon Apply height after the move",
+              "surface": "sf-cart",
+              "refs": ["D6", "NFR-11"],
+              "change": "Found by Claude Code's browser comparison: in components.css the cm-coupon block precedes cm-order-summary, so .sm--cart .btn (52 px) overrode .cpf__r .btn (48 px) and the Apply button stood 52 px beside its 48 px field in sf-cart coupon_invalid (the summary frame at 390 and the 1280 frame, both languages), moving the summary 4 px. Corrected by Claude Code on the owner's approval of 20 October 2026: the selector is .sm--cart .sm__z .btn, which reaches only Checkout. Measured: every sf-cart, sf-cart-revalidation and sf-free-shipping-progress frame then matches the baseline height exactly."
+            }
+          ],
+          "validation": "Claude Code, 20 October 2026, on the 32 files with the coupon correction: design_wireframes, design_inventory, design_briefs and repo_checks 0 problems; discovery.check clean; tools/tests and discovery/tests passing. Headless Chromium 155 over local HTTP with the real stylesheets, each frame at its labelled width, baseline (238c4fc with the free-shipping correction) against output: 354 frames, 0 horizontal overflow, 0 elements outside their frame, 0 overlapping hit areas, no new target under 44 x 44 px (only the carried product-card name link and footer email field); the 74 free-shipping slots unchanged to 0.00 px; every wf-num sequence in every existing frame unchanged; 15 D3 columns per language at 440 px with tabs; the phone value direction ltr with unicode-bidi isolate; notices role status, errors role alert."
+        }
+      ],
+      "review": {
+        "status": "closed",
+        "date": "2026-10-20",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the fifteen batch-04 surfaces in English and Arabic, imported in PR #372 (238c4fc). His review was complete apart from decisions D1 to D6, which he made after his own review of the quality-gate review and the scope consultation. The free-shipping correction and the D1 to D6 round are the corrections entries of this batch, imported with this closure. He approved closure on 20 October 2026, accepting Claude Design's three choices and the coupon correction. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Shared form-and-notice pattern",
+            "refs": ["D1", "AUTH-14", "NFR-11"],
+            "decision": "The batch-04 authentication pattern is the only form-and-notice pattern. Only optional fields are marked, with one line, \"All fields are required unless marked optional\", before a form with more than one field. Select, radio card, dependent select and phone with left-to-right isolation are defined once, for batch-05."
+          },
+          {
+            "item": "Order summary",
+            "refs": ["D2", "CART-05", "CHK-08", "US-07-04", "US-10-02", "ACCT-06"],
+            "decision": "One cm-order-summary with five variants (cart, mini-cart foot, checkout, review, as charged) and one row order everywhere."
+          },
+          {
+            "item": "Sign-in composition",
+            "refs": ["D3", "OP-17"],
+            "decision": "Desktop uses the same single 440 px column with tabs as mobile and tablet."
+          },
+          {
+            "item": "Return to the context",
+            "refs": ["D4", "AUTH-07"],
+            "decision": "The entry chooses the tab and one return line says where the customer goes back. The page route is kept: no sign-in inside the cart or the checkout."
+          },
+          {
+            "item": "Checkout header and the calibration differences",
+            "refs": ["D5", "DQ-03", "SHIP-07"],
+            "decision": "Batch-05 is briefed from the recorded selection: one page (DQ-03, A1) and the condensed header keeping the logo, search, language, account, wishlist and cart count. Not carried: cal-07 C's steps and full header, cal-07 A's express delivery (SHIP-07, P2) and its review without restatement. In batch-04, au-checkout-entry on desktop shows the order summary."
+          },
+          {
+            "item": "Where the shared parts live",
+            "refs": ["D6"],
+            "decision": "One shared component stylesheet, design/wireframes/_shared/components.css. Batch-05 onward link it and add shared components to it."
+          },
+          {
+            "item": "Revalidation notices",
+            "refs": ["US-05-07", "CART-10", "PRE-09"],
+            "decision": "Accepted as warnings: same wording and polite status. The item_unavailable block on Checkout was already drawn and follows US-05-07; nothing new is blocked."
+          },
+          {
+            "item": "Single-field forms",
+            "refs": ["D1", "AUTH-11"],
+            "decision": "Accepted: no required-fields line on a form with one field to fill, including au-post-order-account, whose email is read-only."
+          },
+          {
+            "item": "Phone input",
+            "refs": ["AUTH-02", "DQ-01"],
+            "decision": "Accepted: digits isolated left to right, with no country code, format or validation chosen. AUTH-02 stays open."
+          }
+        ],
+        "accepted": [
+          "The free-shipping placement slot in the 36 frames per language, and the rule-neutral OD-04 note (this entry's corrections).",
+          "In the D3 column the page heading uses the h2 scale and remains the page's h1.",
+          "In au-checkout-entry the items are open on desktop and closed inside the mobile total bar; Shipping reads \"After the delivery address\".",
+          "The coupon correction made by Claude Code (this entry's corrections)."
+        ],
+        "deferred": [
+          {
+            "item": "US-05-02 and the locked add confirmation",
+            "refs": ["US-05-02", "IX-02", "IX-10"],
+            "status": "The specification's \"shows the mini cart\" against the locked in-place confirmation is unchanged; the Functional Specification v1.2 is under the Stage 1 review."
+          },
+          {
+            "item": "Provisional assumptions carried",
+            "refs": ["AUTH-02", "AUTH-12", "AUTH-15", "AUTH-16", "ADM-104", "OD-03", "IX-02"],
+            "status": "Unchanged from the import record: the optional phone field, the passwordless link policies, email_in_use enumeration, the account_suspended check order, rate limits and protection, the welcome discount, and the full-height mobile mini-cart."
+          },
+          {
+            "item": "Available quantity and stock wording",
+            "refs": ["PRE-09", "US-05-07"],
+            "status": "As drawn; wording, timing and mechanism come from the ERP Integration Specification."
+          },
+          {
+            "item": "Free-shipping rule",
+            "refs": ["OD-04"],
+            "status": "No threshold, amount or unit is drawn; the rule stays open."
+          },
+          {
+            "item": "Undo on the removal confirmation",
+            "refs": ["CART-03"],
+            "status": "Not drawn and not added."
+          },
+          {
+            "item": "Product-card name link and footer email field",
+            "refs": ["NFR-11"],
+            "status": "Carried findings: the card link is implementation-level; the footer email field is a batch-01 correction for stabilisation."
+          },
+          {
+            "item": "Earlier batches on the shared layer",
+            "refs": ["D6"],
+            "status": "Batch-01 to batch-03 move onto components.css at stabilisation, with the unused .sm__itd rule removed then."
+          },
+          {
+            "item": "Components defined but not drawn",
+            "refs": ["D1", "D2"],
+            "status": "Select, dependent select, radio card and the review and as-charged summaries are first drawn and reviewed in batch-05 and batch-06."
+          },
+          {
+            "item": "Digits in Arabic",
+            "refs": ["DQ-01"],
+            "status": "Provisional and unchanged: Western digits, isolated left to right."
+          }
+        ]
       }
     },
     {"id": "batch-05", "name": "Checkout, payment and order received", "release": "S1"},
@@ -995,65 +1168,65 @@
       "batch": "batch-04",
       "brief": "design/briefs/sf-cart.md",
       "artifacts": ["design/wireframes/s1/batch-04/sf-cart.en.html", "design/wireframes/s1/batch-04/sf-cart.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "updating", "item_removed", "moved_to_wishlist", "coupon_applied", "coupon_invalid", "free_shipping_applied", "empty", "signed_out", "signed_in", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-cart-empty",
       "batch": "batch-04",
       "brief": "design/briefs/sf-cart-empty.md",
       "artifacts": ["design/wireframes/s1/batch-04/sf-cart-empty.en.html", "design/wireframes/s1/batch-04/sf-cart-empty.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-mini-cart",
       "batch": "batch-04",
       "brief": "design/briefs/sf-mini-cart.md",
       "artifacts": ["design/wireframes/s1/batch-04/sf-mini-cart.en.html", "design/wireframes/s1/batch-04/sf-mini-cart.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "closed", "open", "empty", "after_add", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-free-shipping-progress",
       "batch": "batch-04",
       "brief": "design/briefs/sf-free-shipping-progress.md",
       "artifacts": ["design/wireframes/s1/batch-04/sf-free-shipping-progress.en.html", "design/wireframes/s1/batch-04/sf-free-shipping-progress.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "not_qualified", "qualified", "rule_off"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-cart-revalidation",
       "batch": "batch-04",
       "brief": "design/briefs/sf-cart-revalidation.md",
       "artifacts": ["design/wireframes/s1/batch-04/sf-cart-revalidation.en.html", "design/wireframes/s1/batch-04/sf-cart-revalidation.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "quantity_reduced", "item_unavailable", "price_changed"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-wishlist",
@@ -1086,117 +1259,117 @@
       "batch": "batch-04",
       "brief": "design/briefs/au-sign-in.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-sign-in.en.html", "design/wireframes/s1/batch-04/au-sign-in.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "validation", "wrong_credentials", "rate_limited", "account_suspended", "success"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-register",
       "batch": "batch-04",
       "brief": "design/briefs/au-register.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-register.en.html", "design/wireframes/s1/batch-04/au-register.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "validation", "email_in_use", "success", "welcome_discount_shown", "consent_unticked"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-lost-password",
       "batch": "batch-04",
       "brief": "design/briefs/au-lost-password.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-lost-password.en.html", "design/wireframes/s1/batch-04/au-lost-password.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "validation", "sent"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-reset-password",
       "batch": "batch-04",
       "brief": "design/briefs/au-reset-password.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-reset-password.en.html", "design/wireframes/s1/batch-04/au-reset-password.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "valid_link", "validation", "expired_link", "used_link", "success"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-passwordless",
       "batch": "batch-04",
       "brief": "design/briefs/au-passwordless.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-passwordless.en.html", "design/wireframes/s1/batch-04/au-passwordless.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "request", "validation", "sent", "expired_link", "signed_in"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-google-entry",
       "batch": "batch-04",
       "brief": "design/briefs/au-google-entry.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-google-entry.en.html", "design/wireframes/s1/batch-04/au-google-entry.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "button", "returning", "cancelled", "failed", "matched_existing_account"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-email-verification",
       "batch": "batch-04",
       "brief": "design/briefs/au-email-verification.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-email-verification.en.html", "design/wireframes/s1/batch-04/au-email-verification.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "pending", "verified", "invalid_or_expired_link", "resent"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-checkout-entry",
       "batch": "batch-04",
       "brief": "design/briefs/au-checkout-entry.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-checkout-entry.en.html", "design/wireframes/s1/batch-04/au-checkout-entry.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "guest", "signed_in"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-post-order-account",
       "batch": "batch-04",
       "brief": "design/briefs/au-post-order-account.md",
       "artifacts": ["design/wireframes/s1/batch-04/au-post-order-account.en.html", "design/wireframes/s1/batch-04/au-post-order-account.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "offer", "validation", "success", "declined", "email_has_account"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-checkout",
@@ -2439,13 +2612,13 @@
       "batch": "batch-04",
       "brief": "design/briefs/sy-sign-in-required.md",
       "artifacts": ["design/wireframes/s1/batch-04/sy-sign-in-required.en.html", "design/wireframes/s1/batch-04/sy-sign-in-required.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "sign_in_required", "not_permitted"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sy-coming-soon",
