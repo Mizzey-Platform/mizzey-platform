@@ -73,7 +73,7 @@ folder.**
 | `inventory/interaction-options.json` | UX choices with more than one legitimate pattern: open, provisional or locked |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
 | `briefs/` | One generated brief per surface, for the surfaces a review batch has opened. Never edited by hand |
-| `wireframes/` | The wireframe format, the production workflow, the manifest, the reviewed calibration set and the batch-01 wireframes, reviewed by the owner and closed, and the batch-02 and batch-03 wireframes, each reviewed and closed, and the batch-04 wireframes, drawn and not yet reviewed |
+| `wireframes/` | The wireframe format, the production workflow, the manifest, the reviewed calibration set and the batch-01 wireframes, reviewed by the owner and closed, and the batch-02, batch-03 and batch-04 wireframes, each reviewed and closed |
 | `tokens/` | Empty. Neutral tokens first, brand values after OD-01 |
 
 ## Five kinds of statement, kept apart
