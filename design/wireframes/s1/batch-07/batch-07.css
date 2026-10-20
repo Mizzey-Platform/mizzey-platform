@@ -80,12 +80,12 @@
 .fqt{display:flex;flex-direction:column;gap:8px;max-inline-size:760px;min-inline-size:0}
 .fqt+.fqt{margin-block-start:24px}
 .acc__b p{line-height:1.6;text-wrap:pretty}
-/* ct-contact: the form (.cfo, at a 560 px measure) beside the other routes (.cfa: WhatsApp click-to-chat and the support details, .cfk a labelled value); on mobile one column, the routes after the form (.cf). */
-.cf{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:start}
-.cf--m{grid-template-columns:minmax(0,1fr);gap:28px}
+/* ct-contact: the form (.cfo, at a 560 px measure) beside the other routes (.cfa: WhatsApp click-to-chat and the support details, .cfk a labelled value); on mobile one column, the routes after the form (.ctf, .ctf--m). */
+.ctf{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:start}
+.ctf--m{grid-template-columns:minmax(0,1fr);gap:28px}
 .cfo{display:flex;flex-direction:column;gap:16px;max-inline-size:560px;min-inline-size:0}
 .cfo>.btn{align-self:flex-start}
-.cf--m .cfo>.btn{align-self:stretch}
+.ctf--m .cfo>.btn{align-self:stretch}
 .cfa{display:flex;flex-direction:column;gap:14px;padding:20px;border:1.5px solid #d6d6d6;border-radius:12px;min-inline-size:0}
 .cfk{display:flex;flex-direction:column;gap:2px;font-size:13.5px;overflow-wrap:anywhere}
 .cfk>span:first-child{color:#5c5c5c}
