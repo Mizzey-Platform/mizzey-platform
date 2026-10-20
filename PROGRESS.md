@@ -34,9 +34,9 @@ Live status. First action each session: read this, then continue from **Next**.
   for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
-  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 87 generated
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 98 generated
   briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02, the rest of
-  batch-03, the rest of batch-04, the rest of batch-05, batch-06 and batch-07. The shared neutral stylesheet,
+  batch-03, the rest of batch-04, the rest of batch-05, batch-06, batch-07 and batch-08. The shared neutral stylesheet,
   `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
   set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
@@ -328,7 +328,10 @@ drawn beyond batch-07 and CoreX is not upgraded until he says so either.** In or
    Design draws it from a private manual-transfer package built from the opening. The design sources now name the
    Functional Specification version 1.3 and the Sitemap version 1.1. Claude Design drew it, and he reviewed and
    closed it on 20 October 2026 with his corrections in one PR (the import, correction and closure records in the
-   manifest). Batch-08 opens only on his instruction.
+   manifest). Batch-08 (transactional emails and customer messages) is prepared for opening on his instruction of
+   20 October 2026: its eleven surfaces are briefed, and a private manual-transfer package is built from the opening
+   for his review. It opens when he approves the opening PR and issues the package. US-01-07's sender
+   acknowledgement stays unresolved, and no email surface is added for it.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
