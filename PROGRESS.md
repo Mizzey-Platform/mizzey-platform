@@ -83,7 +83,9 @@ Live status. First action each session: read this, then continue from **Next**.
   layout class renamed so it no longer inherits the batch-03 confirmation card, one labelled Remove action on the
   wishlist cards (the heart removed there only), and REV-01 traced to the review form. US-01-07's sender
   acknowledgement stays open for Stage 1, and the batch-01 promotional link (18 px) is a stabilisation item. The
-  record is the batch-07 entry under `batches` in the manifest.
+  record is the batch-07 entry under `batches` in the manifest. **D-17 (proposed, 20 October 2026)** revises DQ-06:
+  a review needs a delivered purchase. `rv-form` gains `not_eligible` and `already_reviewed` and is `wireframed`,
+  5 of 7 states, until a follow-up drawing after batch-08; the batch-07 closure is unchanged.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
