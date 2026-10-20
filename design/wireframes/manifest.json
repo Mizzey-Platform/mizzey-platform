@@ -2931,7 +2931,7 @@
     {
       "surface": "em-shell",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-shell.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2939,12 +2939,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-welcome",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-welcome.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2952,12 +2952,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-order-confirmed",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-order-confirmed.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2965,12 +2965,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-payment-failed",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-payment-failed.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2978,12 +2978,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-shipped",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-shipped.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2991,12 +2991,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-delivered",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-delivered.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3004,12 +3004,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-refund",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-refund.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3017,12 +3017,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-password-reset",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-password-reset.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3030,12 +3030,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-passwordless",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-passwordless.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3043,12 +3043,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-staff-native",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/em-staff-native.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -3056,7 +3056,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-404",
@@ -3087,7 +3087,7 @@
     {
       "surface": "sy-store-notices",
       "batch": "batch-08",
-      "brief": null,
+      "brief": "design/briefs/sy-store-notices.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3095,7 +3095,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sy-sign-in-required",

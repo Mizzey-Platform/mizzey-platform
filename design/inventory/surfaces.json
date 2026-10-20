@@ -5770,6 +5770,7 @@
     {
       "id": "em-shell",
       "name": "Email layout: header, footer, consent and sender details",
+      "purpose": "The layout every customer email shares, sent under the transactional and marketing consent rules and within the email provider's policies.",
       "kind": "shell",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5807,12 +5808,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-welcome",
       "name": "Account created: welcome, verification, discount details",
+      "purpose": "Welcomes a new customer, asks them to verify their email address, and gives the details of their welcome discount.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5850,13 +5852,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-order-confirmed",
       "name": "Order confirmed",
+      "purpose": "Confirms an order to the customer with its order number and a summary.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5896,13 +5899,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-payment-failed",
       "name": "Payment failed, with a retry prompt",
+      "purpose": "Tells the customer that their payment failed, and prompts them to retry.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5939,13 +5943,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-shipped",
       "name": "Shipped: carrier and tracking number",
+      "purpose": "Tells the customer that their order has shipped, with the carrier and the tracking number.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5982,13 +5987,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-delivered",
       "name": "Delivered, with a review invitation",
+      "purpose": "Confirms to the customer that their order was delivered, and invites a review.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6025,13 +6031,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-refund",
       "name": "Refund completed",
+      "purpose": "Tells the customer that their refund is complete, using the standard refunded-order email.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6069,13 +6076,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-password-reset",
       "name": "Password reset link",
+      "purpose": "Sends a customer who has forgotten their password a link to reset it.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6112,13 +6120,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-passwordless",
       "name": "Passwordless sign-in link",
+      "purpose": "Sends a customer a link that signs them in without a password.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6155,13 +6164,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-staff-native",
       "name": "WooCommerce's own emails to staff",
+      "purpose": "The platform's own emails to the store's staff, left as the platform sends them inside the shared email layout.",
       "kind": "email",
       "scope_type": "native_required",
       "audience": ["staff"],
@@ -6196,7 +6206,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable.",
       "implementation_origin": "woocommerce"
     },
@@ -6293,6 +6303,7 @@
     {
       "id": "sy-store-notices",
       "name": "Store notices: added, removed, undo, session expired",
+      "purpose": "The platform's own store notices, styled once so that no flow shows an unstyled platform message.",
       "kind": "message",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6332,7 +6343,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message.",
       "implementation_origin": "woocommerce"
     },
