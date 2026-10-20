@@ -2561,6 +2561,7 @@
     {
       "id": "ck-validation",
       "name": "Checkout validation messages",
+      "purpose": "Tells the customer, in both languages, what is wrong in the checkout and how to correct it.",
       "kind": "message",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2599,12 +2600,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Clear in both languages (CHK-11)."
     },
     {
       "id": "ck-stock-failure",
       "name": "Stock no longer available when the order is placed",
+      "purpose": "Tells the customer which line could not be confirmed when stock was re-validated at the point of placing the order.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2642,12 +2644,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
       "id": "ck-erp-unavailable",
       "name": "Stock cannot be validated when the order is placed",
+      "purpose": "Tells the customer that the order was not placed because the stock could not be validated as available, including when the stock system cannot be reached.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2684,12 +2687,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "The sale is not confirmed: that is contracted. What the customer sees is set in PRE-09. Placeholder message only."
     },
     {
       "id": "ck-payment-handoff",
       "name": "Handing off to the payment provider and returning",
+      "purpose": "Takes the customer through the secure hosted payment, by card with 3-D Secure or by a mobile wallet where one is enabled, and back to the store.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2729,12 +2733,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Our side of the handoff only. The hosted card, 3-D Secure and wallet steps are the provider's."
     },
     {
       "id": "ck-payment-failed",
       "name": "Payment failed or cancelled, with a way to retry",
+      "purpose": "Tells the customer that a payment in the secure hosted payment flow did not complete.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2773,11 +2778,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ck-order-received",
       "name": "Order confirmation",
+      "purpose": "Confirms to the customer that the order was placed.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2819,7 +2825,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["au-post-order-account", "ord-status-labels"],
       "build_note": "IA-10, the page row, is accepted by #242 as the route, and JRN-08 by #322 as the journey record. The visible checkout completion screen is built with the checkout, #255."
     },
