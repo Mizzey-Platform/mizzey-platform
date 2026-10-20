@@ -105,10 +105,19 @@
 /* cm-order-summary, review variant (.sm--rv), first drawn in batch-05 (ck-review-place-order): items, then .sm__sec for the delivery address, the shipping method and the payment method, each with its Change (.sm__chg) at the inline end, then the full breakdown. Terms and Place order follow on the page. */
 .sm__sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding-block-start:14px;border-block-start:1px solid #e0e0e0;font-size:13.5px}
 .sm__sec>b{font-size:14px}
-.sm__sec>span{grid-column:1;color:#3a3a3a;overflow-wrap:anywhere}
+.sm__sec>span:not(.sm__chg){grid-column:1;color:#3a3a3a;overflow-wrap:anywhere}
 .sm__chg{grid-column:2;grid-row:1/span 2;display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;margin-block:-10px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 /* cm-order-summary, as-charged variant (.sm--paid), first drawn in batch-05 (ck-order-received) and batch-06 (ac-order-detail, ac-invoice): read-only items at the prices charged, the breakdown as charged, then the payment method (.sm__pm), one row per refund where one applies (.sm__rf), and the net paid (.sm__t--net). No Change, no actions inside. */
 .sm--paid{background:#fff;border:1.5px solid #d6d6d6}
 .sm__pm{padding-block-start:12px;border-block-start:1px solid #e0e0e0}
 .sm__rf>span:first-child{color:#3a3a3a}
 .sm__t--net{border-block-start-style:dashed}
+/* nv-header (condensed checkout variant), added in batch-05: the reviewed batch-01 header bar with the same controls and the same 44 px targets (logo, search, language switcher, account, wishlist, cart with its live count; NAV-01 to NAV-06), without the All categories control, the category row (.hd2) and the promotional banner (selection adaptation A6; D5). Desktop .hd.hd--co; mobile and tablet .mhw.mhw--co, without the menu button. Used by every checkout, payment and order-received surface. */
+.hd--co .sf{flex:0 1 560px;margin-inline:auto}
+.mhw--co .mh{padding-inline:8px 4px}
+/* ctl-textarea: a multi-line text field, first drawn in batch-05 (the order note, CHK-06); also for ct-contact and rv-form. Markup as ctl-input: .fd > label.fd__l + .ta, hint .fd__h under it; Optional marked only where a form needs it (D1). At least 112 px tall, growing with its text. States: default, focus (.is-focus), filled, error (.fd--e .ta). */
+.ta{display:block;min-block-size:112px;padding:12px 14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;line-height:1.5;color:#151515;overflow-wrap:anywhere}
+.fd--e .ta{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+/* cm-address-card: a saved address (CHK-02, ACCT-04), first drawn in batch-05 (ck-address); also for ac-addresses and ac-order-detail. At checkout it is a ctl-radio card, .rcd.adc, in a radiogroup: the name as .rcd__t, the address lines, landmark and phone in .rcd__d, and the default address tagged with .adc__tag at the inline end. States: default, selected (.rcd.on), default_address (.adc__tag). */
+.adc__tag{grid-column:3;grid-row:1;justify-self:end;display:inline-flex;align-items:center;block-size:22px;padding-inline:8px;border:1px solid #6b6b6b;border-radius:999px;background:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.adc .rcd__d{line-height:1.55}

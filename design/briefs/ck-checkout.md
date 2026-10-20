@@ -216,13 +216,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `candidate_selected` |
+| Review status | `reviewed` |
 | Review batch | Checkout, payment and order received (`batch-05`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 6 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 6 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | Checkout (`cal-07`) |
 
