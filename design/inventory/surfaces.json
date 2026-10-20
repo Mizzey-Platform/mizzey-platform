@@ -1778,6 +1778,7 @@
     {
       "id": "sf-wishlist",
       "name": "Wishlist",
+      "purpose": "Lets a shopper add products to a wishlist and remove them, keeps the list for a signed-in customer and temporarily for a guest, and moves an item from the wishlist to the cart.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1819,12 +1820,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
+      "note": "One list per visitor, with save, view, remove and move to cart only. No sharing (WISH-05), price-drop alerts (WISH-06), product comparison (WISH-08) or multiple lists, which the register's reduced boundary also excludes. The transfer of a guest list on sign-in is CART-17.",
       "composes": ["sf-product-card"]
     },
     {
       "id": "sf-recently-viewed",
       "name": "Recently viewed products",
+      "purpose": "Shows a visitor the products they viewed recently.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1863,7 +1866,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["sf-product-card"]
     },
     {
@@ -3483,6 +3486,7 @@
     {
       "id": "rv-list",
       "name": "Review list and average rating",
+      "purpose": "Shows the star ratings customers have given a product, and its average rating.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3523,11 +3527,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed",
+      "note": "Each review shows the author's display name (owner decision at the batch-06 review, ACCT-02: kept, required, shown with reviews), its star rating, its date and its text, in the language it was written in. Store-owner replies to reviews are not shown at launch, with comment threading off (owner decision of 20 October 2026, recorded for batch-07; no register row covers them). No photo or video reviews, verified-purchase badge, helpfulness voting or customer questions and answers (REV-06 to REV-09, P2; DQ-06)."
     },
     {
       "id": "rv-form",
       "name": "Write a review",
+      "purpose": "Lets a customer write a review of a product.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3567,12 +3573,13 @@
       "decisions": ["DQ-06"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
-      "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06)."
+      "status": "briefed",
+      "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02)."
     },
     {
       "id": "rv-pending",
       "name": "Review held for moderation",
+      "purpose": "Tells a customer that their review is moderated before it is published.",
       "kind": "message",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3609,11 +3616,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ct-static-page",
       "name": "Static and policy page layout",
+      "purpose": "The layout the trust and policy pages share, each of them editable without a developer.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3650,12 +3658,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "The shared layout the eight trust and support pages use. Each stays editable without a developer (CMS-09)."
     },
     {
       "id": "ct-about",
       "name": "About",
+      "purpose": "Tells visitors about the store.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3692,12 +3701,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-authenticity",
       "name": "Authenticity guarantee",
+      "purpose": "States the store's authenticity guarantee.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3734,12 +3744,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-shipping-policy",
       "name": "Shipping policy",
+      "purpose": "Sets out the store's shipping policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3776,12 +3787,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-help",
       "name": "Help and FAQ",
+      "purpose": "Answers customers' common questions, as an FAQ and help centre.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3821,12 +3833,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-privacy",
       "name": "Privacy policy",
+      "purpose": "Sets out the store's privacy policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3863,12 +3876,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-returns-policy",
       "name": "Return and refund policy",
+      "purpose": "Sets out the store's return and refund policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3905,13 +3919,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"],
       "note": "No return request form and no returns area: returns go through the support channels (AC-14)."
     },
     {
       "id": "ct-terms",
       "name": "Terms and conditions",
+      "purpose": "Sets out the store's terms and conditions.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3948,12 +3963,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-contact",
       "name": "Contact us",
+      "purpose": "Lets a visitor contact the store through a form, or start a WhatsApp chat with it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3994,13 +4010,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["ct-static-page"],
       "note": "The WhatsApp link is click-to-chat only (CMS-10). Automated WhatsApp messages are not contracted."
     },
     {
       "id": "ct-campaign-page",
       "name": "Offer and campaign page",
+      "purpose": "A campaign or offer landing page, built without a developer from the approved templates and the delivered section library.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -4038,7 +4055,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "composes": ["gl-promo-banner", "sf-product-card"],
       "note": "A template, not a one-off design: staff assemble it from library sections."
     },

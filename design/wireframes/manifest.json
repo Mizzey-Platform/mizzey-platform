@@ -1517,7 +1517,7 @@
     {
       "surface": "sf-wishlist",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/sf-wishlist.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1525,12 +1525,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-recently-viewed",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/sf-recently-viewed.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1538,7 +1538,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "au-sign-in",
@@ -1998,7 +1998,7 @@
     {
       "surface": "rv-list",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/rv-list.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2006,12 +2006,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "rv-form",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/rv-form.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2019,12 +2019,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "rv-pending",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/rv-pending.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2032,12 +2032,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-static-page",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-static-page.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2045,12 +2045,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-about",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-about.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2058,12 +2058,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-authenticity",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-authenticity.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2071,12 +2071,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-shipping-policy",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-shipping-policy.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2084,12 +2084,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-help",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-help.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2097,12 +2097,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-privacy",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-privacy.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2110,12 +2110,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-returns-policy",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-returns-policy.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2123,12 +2123,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-terms",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-terms.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2136,12 +2136,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-contact",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-contact.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2149,12 +2149,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ct-campaign-page",
       "batch": "batch-07",
-      "brief": null,
+      "brief": "design/briefs/ct-campaign-page.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -2162,7 +2162,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-section-library",
