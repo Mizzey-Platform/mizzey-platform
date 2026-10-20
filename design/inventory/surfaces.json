@@ -1539,10 +1539,11 @@
       "native_baseline": "WooCommerce product reviews block.",
       "design_freedom": "free",
       "open_items": [],
-      "decisions": [],
+      "decisions": ["DQ-06"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed"
+      "status": "reviewed",
+      "note": "The entry to the review form (Write a review, Write the first review) is offered only to a customer who is eligible under DQ-06 as revised by D-17; signed out, Sign in to write a review stays. An ineligible or already-reviewed customer reaches the rv-form not_eligible or already_reviewed state. The batch-03 frames' DQ-06 note (a signed-in customer may submit) is superseded and is corrected by the follow-up drawing after batch-08; no state is added here."
     },
     {
       "id": "sf-cart",
@@ -3555,7 +3556,9 @@
         {"state": "signed_out", "note": "Asked to sign in"},
         {"state": "form"},
         {"state": "validation"},
-        {"state": "submitted"}
+        {"state": "submitted"},
+        {"state": "not_eligible", "note": "Signed in, without a delivered purchase of this product: a short explanation in place of the form (DQ-06)"},
+        {"state": "already_reviewed", "note": "Signed in, with a pending or approved review of this product in either language: no form, and the customer is told they have reviewed it (DQ-06)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -3573,8 +3576,8 @@
       "decisions": ["DQ-06"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed",
-      "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02)."
+      "status": "wireframed",
+      "note": "Star rating and text only. No photo or video (REV-06 is P2). Only a signed-in customer with a delivered purchase of the product may submit, one active review per product across variations and languages, checked on the server; no verified-purchase badge is shown (DQ-06 as revised by D-17, REV-07 is P2). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02). Wireframed, not reviewed: five states were drawn and reviewed in batch-07, whose closure stands; not_eligible and already_reviewed are added by D-17 and wait for a follow-up drawing after batch-08. The batch-07 frames' DQ-06 notes (any signed-in customer, no purchase check) are superseded."
     },
     {
       "id": "rv-pending",
