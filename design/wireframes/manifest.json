@@ -1674,7 +1674,7 @@
     {
       "surface": "ac-navigation",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-navigation.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1682,12 +1682,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-dashboard",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-dashboard.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1695,12 +1695,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-orders",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-orders.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1708,12 +1708,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-order-detail",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-order-detail.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1721,12 +1721,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-addresses",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-addresses.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1734,12 +1734,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-account-details",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-account-details.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1747,12 +1747,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-password",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-password.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1760,12 +1760,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-tracking",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-tracking.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1773,12 +1773,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-invoice",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ac-invoice.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1786,12 +1786,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ord-status-timeline",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ord-status-timeline.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1799,12 +1799,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ord-status-labels",
       "batch": "batch-06",
-      "brief": null,
+      "brief": "design/briefs/ord-status-labels.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1812,7 +1812,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-reorder",

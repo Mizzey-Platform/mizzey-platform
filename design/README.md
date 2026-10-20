@@ -214,10 +214,11 @@ not a list of every component.
 | `provisional` | A working baseline for the first wireframes. **Not a requirement and not an owner-confirmed final product decision.** It may change in review with no scope change |
 | `locked` | A pattern was selected at its decision stage. `selected_pattern` and `decision_source` say which, and by whom |
 
-Thirteen are recorded. **Twelve are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
+Fourteen are recorded. **Thirteen are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
 review of the calibration set on 18 October 2026 and reconfirmed the same day (`wireframes/manifest.json`,
 `selection`); DQ-02, numbered pagination, selected at the batch-02 review on 19 October 2026; and IX-10, the add
-confirmed in place on the product page, selected at the batch-03 review on 19 October 2026. Each lock's
+confirmed in place on the product page, selected at the batch-03 review on 19 October 2026; and IX-11, the hub-led
+account, selected when batch-06 opened on 20 October 2026. Each lock's
 `selected_pattern` and `decision_source` are in the file, and `coverage.md` lists them. One is not locked:
 
 | Id | Choice | Status | Working baseline | Also candidates |

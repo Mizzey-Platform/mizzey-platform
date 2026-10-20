@@ -314,6 +314,39 @@
       ],
       "selected_pattern": "The add is confirmed in place in the product purchase area, and the mini-cart drawer opens only when the customer deliberately activates the header cart control. A success updates the header count, is announced accessibly and offers View cart and Checkout; keyboard focus stays where it was. A failure is shown in place, with no change to the count. On the mobile sticky buy bar the confirmation is compact and persistent: it stays until it is dismissed or the next purchase action, is never removed because time passes or the customer scrolls, keeps its actions keyboard and screen-reader accessible, and the sticky area does not obscure content",
       "decision_source": "Owner decision by Mustafa, 19 October 2026, at the batch-03 low-fidelity review (manifest.json, batches, batch-03 review), on Claude Design's batch-03 recommendation and Claude Code's validation (PR #368, 8b96f03), with the persistent mobile buy-bar confirmation he directed (PR #369, 91f54be). First recorded open at the owner's reconfirmation of 18 October 2026, with the drawer allowed and not chosen. Interaction presentation and accessibility only: no capability is added. IX-02, IX-03, IX-04 and IX-08 are unchanged, and Buy Now keeps its checkout behaviour (US-04-04). Not a client confirmation and not approval of the interface design (PRE-03b)."
+    },
+    {
+      "id": "IX-11",
+      "name": "The account structure",
+      "affected_surfaces": ["ac-navigation", "ac-dashboard", "ac-orders", "ac-order-detail", "ac-addresses", "ac-account-details"],
+      "requirement_outcome": "A signed-in customer reaches the account overview, order history and detail with tracking and invoice, the address book, profile and password, and the saved wishlist (ACCT-01 to ACCT-08, ACCT-12). No row says how the account is structured or what its overview leads with.",
+      "candidate_patterns": ["A permanent navigation list beside every account page, the WooCommerce My Account default", "A hub-led account: the account home leads with the customer's recent orders, their status and tracking, with clear routes to the other contracted account areas, and each area is a focused inner page, consistent across mobile, tablet and desktop"],
+      "working_baseline": null,
+      "status": "locked",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {
+          "type": "contract_condition",
+          "text": "No returns entry in the account: customer returns are deferred to the Operations Platform (ACCT-10, OP-05)."
+        },
+        {
+          "type": "contract_condition",
+          "text": "Reorder, notification preferences and account deletion are second-release surfaces (ACCT-09, ACCT-11, ACCT-13; DQ-04) and are not drawn in the first-release pass."
+        },
+        {
+          "type": "platform",
+          "text": "The account endpoints, their addresses, the sign-in requirement and the order view permission are fixed; their presentation is not (templates/myaccount/my-account.php and navigation.php are replaceable)."
+        },
+        {
+          "type": "contract_condition",
+          "text": "Order tracking stays both on the order and as the lookup without signing in (OP-20)."
+        }
+      ],
+      "selection_criteria": ["what a returning customer comes to the account for", "reaching every contracted account area in one step from the account home", "mobile behaviour at 360 to 390 px", "consistency with the storefront's components", "accessibility and focus order"],
+      "selected_pattern": "A hub-led account: the account home leads with the customer's recent orders, their status and tracking, with clear routes to the other contracted account areas, and each area is a focused inner page, consistent across mobile, tablet and desktop",
+      "decision_source": "Owner decision by Mustafa, 20 October 2026, approving batch-06's direction on the independent quality-gate review's recommendation (B1 to B3) and Claude Code's verification. The standard WooCommerce My Account sidebar and dashboard template is not reproduced with different styling. All contracted functionality, accessibility and the existing authentication behaviour are kept, and no deferred account capability is added. Recorded with his authorisation to correct the account inventory on platform evidence and to keep the ACCT-04 address book (add, edit, delete, default) consistent with checkout's saved-address selection, with no storage mechanism decided in the wireframes. Not a client confirmation and not approval of the interface design (PRE-03b).",
+      "applies_to": "All first-release account surfaces"
     }
   ]
 }
