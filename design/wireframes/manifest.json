@@ -1452,7 +1452,7 @@
     {
       "surface": "ck-validation",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-validation.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1460,12 +1460,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-stock-failure",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-stock-failure.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1473,12 +1473,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-erp-unavailable",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-erp-unavailable.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1486,12 +1486,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-payment-handoff",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-payment-handoff.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1499,12 +1499,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-payment-failed",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-payment-failed.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1512,12 +1512,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ck-order-received",
       "batch": "batch-05",
-      "brief": null,
+      "brief": "design/briefs/ck-order-received.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -1525,7 +1525,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ac-navigation",

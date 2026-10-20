@@ -34,9 +34,9 @@ Live status. First action each session: read this, then continue from **Next**.
   for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
-  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 55 generated
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 61 generated
   briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02, the rest of
-  batch-03 and the rest of batch-04. The shared neutral stylesheet,
+  batch-03, the rest of batch-04 and the rest of batch-05. The shared neutral stylesheet,
   `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
   set is drawn and reviewed.** Claude
   Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
@@ -273,7 +273,7 @@ Live status. First action each session: read this, then continue from **Next**.
 ## Next
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-04 and CoreX is not upgraded until he says so either.** In order:
+drawn beyond batch-05 and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -295,8 +295,10 @@ drawn beyond batch-04 and CoreX is not upgraded until he says so either.** In or
    built from `main` at `fcadab5`. Claude Design drew it; the 30 files were imported (PR #372, `238c4fc`). He
    directed the free-shipping correction and decisions D1 to D6, which Claude Design carried out in one review
    round, and closed the batch on 20 October 2026 (the correction and closure records in the manifest). IX-02 and
-   IX-10 stay locked, and DQ-01 stays provisional. Batch-05 opens only on his instruction, linking the shared
-   component layer.
+   IX-10 stay locked, and DQ-01 stays provisional. Batch-05 (checkout, payment and order received) opens on his
+   instruction of 20 October 2026: its twelve surfaces are briefed, six of them newly, and Claude Design draws it
+   from a private manual-transfer package built from the opening, linking the shared component layer. DQ-03 stays
+   locked (one page), and batch-06 opens only on his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
