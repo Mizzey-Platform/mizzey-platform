@@ -164,3 +164,19 @@
 .adc--bk .adc__tag{grid-column:2}
 .adc__a{display:flex;flex-wrap:wrap;gap:0 8px;margin-block:4px -10px;margin-inline-start:-6px}
 .adc__a>a{display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#151515}
+/* ctl-rating-input: the star rating input (REV-01, REV-02), first drawn in batch-07 (rv-form). A radio group of five options under a visible label (.fd__l, as ctl-input): .rti > .fd__l + .rti__g (role radiogroup, aria-required) > .rti__o (role radio, aria-checked, named "1 star" to "5 stars"), 44 x 44 px each, one tab stop (roving tabindex), the arrow keys move and select, in the reading direction. The options fill from the inline start up to the one chosen (.on); the glyph is decorative, the name carries the meaning. .rti__v repeats the choice in words. States: default, hover (.is-hover, the fill previews up to it), focus (.is-focus), selected (.on, aria-checked on one option), error (.rti--e, with the batch-02 .err message tied by aria-describedby). */
+.rti{display:flex;flex-direction:column;gap:6px;min-inline-size:0}
+.rti__g{display:flex;flex-wrap:wrap;gap:4px;align-self:flex-start;border-radius:10px}
+.rti__o{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:8px;font-size:26px;line-height:1;color:#8a8a8a}
+.rti__o.on{color:#151515}
+.rti__o.is-hover{background:#efefef}
+.rti__v{font-size:12.5px;color:#5c5c5c}
+.rti--e .rti__g{box-shadow:0 0 0 1.5px #151515;padding-inline:2px}
+/* cm-review-item: one review (REV-01, PDP-17), first drawn in batch-07 (rv-list, rv-pending). A list item, li.rvi: the head .rvi__h with the author's display name .rvi__n (R1), the batch-02 stars (aria-hidden) with "Rated N out of 5" for assistive technology, and the date .rvi__d; then the text .rvi__t in the language it was written in (lang, dir="auto"), shown in full. No reply, photo, badge or vote (R2 to R4). The author's own review awaiting approval, shown to the author only: .rvi--p with its line .rvi__p. */
+.rvi{display:flex;flex-direction:column;gap:6px;padding-block:18px;border-block-end:1px solid #e3e3e3;min-inline-size:0}
+.rvi__h{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px}
+.rvi__n{font-size:14px;font-weight:650;overflow-wrap:anywhere}
+.rvi__d{font-size:12.5px;color:#5c5c5c}
+.rvi__t{display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:#262626;overflow-wrap:anywhere;text-wrap:pretty}
+.rvi--p{padding:14px 16px;border:1.5px dashed #6b6b6b;border-radius:10px;background:#f6f6f6}
+.rvi__p{font-size:12.5px;font-weight:700}
