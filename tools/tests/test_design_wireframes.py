@@ -276,15 +276,21 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("covers state gift_wrapped, which the surface does not list")
 
     def test_a_listed_artefact_that_does_not_exist(self):
+        """Holds before and after sf-wishlist is drawn: checked against an empty folder, where no artefact exists."""
         self.entries["sf-wishlist"]["artifacts"] = ["design/wireframes/s1/batch-07/sf-wishlist.en.html"]
-        self.assertRefused("artefact design/wireframes/s1/batch-07/sf-wishlist.en.html does not exist")
+        with tempfile.TemporaryDirectory() as tmp:
+            errs = dw.check_manifest(self.data, Path(tmp))
+        text = "artefact design/wireframes/s1/batch-07/sf-wishlist.en.html does not exist"
+        self.assertTrue(any(text in e for e in errs), f"expected {text!r} in {errs[:6]}")
 
     def test_an_artefact_filed_under_the_wrong_release_or_name(self):
         self.entries["sf-cart"]["artifacts"] = ["design/wireframes/s2/batch-10/sf-cart.en.html"]
         self.assertRefused("is not design/wireframes/s1/<batch>/sf-cart.en.html or .ar.html")
 
     def test_marked_drawn_with_nothing_to_show(self):
-        self.entries["sf-wishlist"]["en_ltr"] = "drawn"
+        """Holds before and after sf-wishlist is drawn: the fixture sets its artefacts and cells itself."""
+        self.entries["sf-wishlist"].update(artifacts=[], en_ltr="drawn", ar_rtl="not_started", mobile="not_started",
+                                           desktop="not_started")
         self.assertRefused("manifest sf-wishlist: en_ltr marked drawn, and no artefact is listed")
 
     def test_the_administration_is_not_drawn_in_arabic(self):
