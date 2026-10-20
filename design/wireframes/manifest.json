@@ -870,7 +870,149 @@
         ]
       }
     },
-    {"id": "batch-06", "name": "Account, orders and tracking", "release": "S1"},
+    {
+      "id": "batch-06",
+      "name": "Account, orders and tracking",
+      "release": "S1",
+      "import": {
+        "status": "reviewed",
+        "date": "2026-10-20",
+        "source": "Claude Design, mizzey-batch-06-output.zip (SHA-256 43db72875c4c58443c78d91453a1a56c846c4fd910694e813ceff13d256b619b; handoff 8965ffb8602fe9981a786678c2f8c1d9e0d05268472fa31927a32feea88e0de8), drawn on 20 October 2026 from the batch-06 design package v1 (SHA-256 4ff5454c0b7abd9480c149182077530a19c0d379871ccb88263f76498a370ea1), built from the opening commit 7a074de (PR #377, merged as c966256 with an identical tree) and issued by the owner. The handoff and the package stay private and are not committed.",
+        "record": "Twenty-two files, eleven surfaces in English and Arabic, the new design/wireframes/s1/batch-06/batch-06.css (13,049 bytes) and design/wireframes/_shared/components.css with appended blocks (cm-status-label, cm-status-timeline, and the address-book variant of cm-address-card); the 14,206 bytes already on main are kept byte for byte at its start (19,566 bytes now). Every file hash matched the handoff. All 64 listed states are covered in each language, counted from the wf-state labels against the inventory, none missing or extra; 148 frames per language; no table in any file. 21 rules are copied from batch-04.css and batch-05.css into batch-06.css with identical declarations. Imported with the owner's corrections in the same closure (corrections).",
+        "status_before_import": {
+          "briefed": ["ac-navigation", "ac-dashboard", "ac-orders", "ac-order-detail", "ac-addresses", "ac-account-details", "ac-password", "ac-tracking", "ac-invoice", "ord-status-timeline", "ord-status-labels"],
+          "note": "All eleven were briefed when batch-06 opened (PR #377), with IX-11 locked and the account inventory corrected on platform evidence."
+        },
+        "provisional": "IX-11 (the hub-led account), DQ-02, DQ-05 and DQ-06 are drawn as locked; DQ-01 stays provisional. Tracking is a labelled link out to the carrier's page with only the contracted statuses (VENDOR-BOSTA); the invoice has labelled seller, numbering and tax regions (OD-18, OD-09).",
+        "measurements": "Claude Code, headless Chromium 155 over local HTTP with the real stylesheet links, each frame at its labelled width, 296 frames: 0 horizontal overflow, 0 elements outside their frame, 0 overlapping hit areas; no target under 44 x 44 px except the carried footer email field; no table and no persistent side navigation column; reused sizes equal to batches 04 and 05 (fields and selects 48, checkbox rows 44, address card at least 56, summary rows 14 px, Total 17 px with 14 px padding, header 76 and 56); Returned to origin always carries its own label and never Delivered's; every timeline starts at the inline start; every refunded frame shows refund rows and the net paid; no digit outside a left-to-right isolate in Arabic. With the new components.css, all 354 batch-04 and 242 batch-05 frames keep identical element geometry. Validators: with the manifest updated, 0 problems; before it, exactly the 22 expected unlisted lines.",
+        "additions_to_the_platform": [
+          {
+            "item": "The address book",
+            "refs": ["ACCT-04", "CHK-02", "US-10-04"],
+            "status": "One billing and one shipping address natively; several addresses with add, edit, delete and a default are an addition. Storage is decided at implementation (#308)."
+          },
+          {
+            "item": "The status timeline",
+            "refs": ["ORD-03", "ORD-07"],
+            "status": "Not native: WooCommerce shows a status word only."
+          },
+          {
+            "item": "Customer-facing tracking",
+            "refs": ["ACCT-07", "VENDOR-BOSTA"],
+            "status": "The Bosta plugin keeps the tracking number and carrier state in admin-only order meta; the customer display and the status mapping are #248 / #291."
+          },
+          {
+            "item": "The invoice document",
+            "refs": ["ACCT-12", "ADM-92", "OD-09"],
+            "status": "No customer invoice document natively; the mechanism is #280 / #308."
+          },
+          {
+            "item": "Email-change verification",
+            "refs": ["US-10-05", "ACCT-02"],
+            "status": "Kept by the owner. The platform saves an email change at once and WordPress mails the old address; confirming the new address first is an addition (#308)."
+          }
+        ]
+      },
+      "corrections": [
+        {
+          "date": "2026-10-20",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner review corrections, applied by Claude Code in the closure",
+          "record": "Made by Claude Code on the owner's rulings of 20 October 2026, on the files as delivered. Measured afterwards over 296 frames: 0 overflow, 0 outside, 0 overlaps, fields 48 px; only the 18 ac-account-details frames per both languages (one more field, 114 to 139 px taller) and the two delete-the-default dialogs changed.",
+          "changes": [
+            {
+              "item": "Email change waits for confirmation (C)",
+              "surface": "ac-account-details",
+              "refs": ["US-10-05", "ACCT-02", "OP-19"],
+              "change": "In the two email_change frames per language, the saved notice becomes an information notice: a link was sent to the new address, and sign-in stays with the current address until it is opened; the email field keeps the current address. The OP-19 note and the surface notes now record that US-10-05 is kept and that the mechanism is an addition (#308)."
+            },
+            {
+              "item": "No silent default (E)",
+              "surface": "ac-addresses",
+              "refs": ["ACCT-04", "US-10-04", "CHK-02"],
+              "change": "The delete-the-default dialog says that no default remains until the customer chooses one; the two undecided outcomes are replaced by the owner's rule: deleting the default never makes another address the default, and the checkout preselects nothing until the customer chooses one."
+            },
+            {
+              "item": "Display name kept (G)",
+              "surface": "ac-account-details",
+              "refs": ["ACCT-02"],
+              "change": "A required Display name field, with the hint \"Shown with your reviews.\", is added before the email in all nine forms per language (the platform requires it by default; WordPress shows it as the author of a signed-in customer's review, batch-07). Autocomplete nickname is noted."
+            }
+          ]
+        }
+      ],
+      "review": {
+        "status": "closed",
+        "date": "2026-10-20",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the eleven batch-06 surfaces in English and Arabic on Claude Code's validation and decision sheet of 20 October 2026, ruled on items A to H, and approved one import-and-closure PR with the corrections. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Payment method placement (A)",
+            "refs": ["US-10-02", "D2"],
+            "decision": "Accepted as drawn: the payment method is a row of the shared as-charged summary; US-10-02 sets no order."
+          },
+          {
+            "item": "Returns route (B)",
+            "refs": ["ACCT-10", "OP-05", "US-10-01"],
+            "decision": "No returns route: ACCT-10 is DEF in the signed register. US-10-01's \"routes to ... returns\" is to be corrected in the Functional Specification before the Stage 1 submission."
+          },
+          {
+            "item": "Email-change verification (C)",
+            "refs": ["US-10-05", "ACCT-02"],
+            "decision": "US-10-05 is kept: the new address is confirmed before the change takes effect; the pending state is drawn and the mechanism is an addition."
+          },
+          {
+            "item": "Invoice availability (D)",
+            "refs": ["ACCT-12", "ADM-92", "OD-09"],
+            "decision": "Accepted: availability on cancelled and returned orders, and refunds against a credit document, stay labelled placeholders for #280 / #308 and OD-09. Nothing is promised."
+          },
+          {
+            "item": "Deleting the default address (E)",
+            "refs": ["ACCT-04", "US-10-04", "CHK-02"],
+            "decision": "No silent default: the customer chooses a new default; the checkout preselects nothing until then."
+          },
+          {
+            "item": "Retry after a failed payment (F)",
+            "refs": ["US-08-04", "PAY-05"],
+            "decision": "Accepted: Try the payment again only on Payment failed. At implementation, the native Pay action is hidden on pending orders and the native customer Cancel action is not offered (#283, #308)."
+          },
+          {
+            "item": "Display name (G)",
+            "refs": ["ACCT-02"],
+            "decision": "Kept, required, shown with reviews."
+          },
+          {
+            "item": "Shared dialog and copied CSS (H)",
+            "refs": ["D6"],
+            "decision": "Deferred: the dialog becomes fb-modal in components.css when a second batch uses it; the copied rules are consolidated at stabilisation, measured before and after."
+          }
+        ],
+        "accepted": ["The corrections in this entry.", "The components.css additions: cm-status-label, cm-status-timeline, the address-book variant of cm-address-card.", "The hub-led account as drawn against IX-11: the latest order first, compact recent orders, route rows or tiles, Sign out last; inner pages with a back link on mobile and one row of section links on tablet and desktop.", "Tracking without signing in limited to status, timeline and tracking; the template's ability to limit the native result is confirmed at implementation."],
+        "deferred": [
+          {
+            "item": "Functional Specification corrections for the Stage 1 submission",
+            "refs": ["US-10-01", "ACCT-10"],
+            "status": "US-10-01 drops the returns route (ACCT-10 is DEF). An owner action on the specification, outside the design artefacts."
+          },
+          {
+            "item": "Open inputs carried",
+            "refs": ["OD-09", "OD-18", "OP-05", "OP-19", "OP-20", "VENDOR-BOSTA", "CR-03", "CR-15"],
+            "status": "Placeholders as drawn: no tax rate or registration number, no legal entity, no returns entry, both tracking routes, only contracted statuses, invented address lists and content."
+          },
+          {
+            "item": "Integration facts unverified",
+            "refs": ["#248", "#280", "#291", "#308"],
+            "status": "Carrier status mapping and timestamps, the invoice mechanism, address-book storage, the email-change confirmation mechanism, and limiting the native tracking result."
+          },
+          {
+            "item": "Digits in Arabic",
+            "refs": ["DQ-01"],
+            "status": "Provisional and unchanged."
+          }
+        ]
+      }
+    },
     {"id": "batch-07", "name": "Wishlist, reviews, content and trust", "release": "S1"},
     {"id": "batch-08", "name": "Transactional emails and customer messages", "release": "S1"},
     {"id": "batch-09", "name": "Additions to the standard administration, and reports", "release": "S1"},
@@ -1675,144 +1817,144 @@
       "surface": "ac-navigation",
       "batch": "batch-06",
       "brief": "design/briefs/ac-navigation.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-navigation.en.html", "design/wireframes/s1/batch-06/ac-navigation.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "current_item", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-dashboard",
       "batch": "batch-06",
       "brief": "design/briefs/ac-dashboard.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-dashboard.en.html", "design/wireframes/s1/batch-06/ac-dashboard.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "new_customer", "returning_customer", "signed_out"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-orders",
       "batch": "batch-06",
       "brief": "design/briefs/ac-orders.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-orders.en.html", "design/wireframes/s1/batch-06/ac-orders.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "list", "many", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-order-detail",
       "batch": "batch-06",
       "brief": "design/briefs/ac-order-detail.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-order-detail.en.html", "design/wireframes/s1/batch-06/ac-order-detail.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "each_status", "tracking_not_yet", "tracking_available", "refunded_partly", "refunded_fully", "cancelled", "returned_to_origin", "invoice_available", "invoice_not_available", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-addresses",
       "batch": "batch-06",
       "brief": "design/briefs/ac-addresses.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-addresses.en.html", "design/wireframes/s1/batch-06/ac-addresses.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "list", "default_marked", "add_or_edit_form", "validation", "delete_confirm", "saved"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-account-details",
       "batch": "batch-06",
       "brief": "design/briefs/ac-account-details.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-account-details.en.html", "design/wireframes/s1/batch-06/ac-account-details.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "validation", "saved", "email_change"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-password",
       "batch": "batch-06",
       "brief": "design/briefs/ac-password.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-password.en.html", "design/wireframes/s1/batch-06/ac-password.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "validation", "wrong_current_password", "saved"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-tracking",
       "batch": "batch-06",
       "brief": "design/briefs/ac-tracking.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-tracking.en.html", "design/wireframes/s1/batch-06/ac-tracking.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "lookup_form", "validation", "not_found", "found"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-invoice",
       "batch": "batch-06",
       "brief": "design/briefs/ac-invoice.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ac-invoice.en.html", "design/wireframes/s1/batch-06/ac-invoice.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "full_order", "with_discount", "refunded_partly", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ord-status-timeline",
       "batch": "batch-06",
       "brief": "design/briefs/ord-status-timeline.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ord-status-timeline.en.html", "design/wireframes/s1/batch-06/ord-status-timeline.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "confirmed", "preparing", "shipped", "out_for_delivery", "delivered", "interrupted"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ord-status-labels",
       "batch": "batch-06",
       "brief": "design/briefs/ord-status-labels.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-06/ord-status-labels.en.html", "design/wireframes/s1/batch-06/ord-status-labels.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "pending_payment", "payment_failed", "cancelled", "refunded_fully", "refunded_partly", "returned_to_origin", "cod_collected_awaiting_remittance"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-reorder",

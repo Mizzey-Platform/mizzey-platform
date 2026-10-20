@@ -2870,7 +2870,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "No returns entry: the returns area is deferred (ACCT-10)."
     },
     {
@@ -2915,7 +2915,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ac-navigation"]
     },
     {
@@ -2965,7 +2965,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ord-status-labels"]
     },
     {
@@ -3017,7 +3017,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ord-status-timeline", "ord-status-labels"]
     },
     {
@@ -3066,7 +3066,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ac-navigation"]
     },
     {
@@ -3112,7 +3112,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ac-password"]
     },
     {
@@ -3157,7 +3157,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ac-tracking",
@@ -3202,7 +3202,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["ord-status-timeline", "ord-status-labels"]
     },
     {
@@ -3248,7 +3248,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "A printable document. Legal content waits for the client's invoicing inputs."
     },
     {
@@ -3297,7 +3297,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "build_note": "The statuses ORD-03 to ORD-07 are accepted by #248, the status model. The timeline the customer sees is built on the order and tracking screens of #308."
     },
     {
@@ -3346,7 +3346,7 @@
       "decisions": ["DQ-05"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Customer-facing labels are bilingual. The same states in the administration are English only. Cash collected and remitted is never shown to the customer (DQ-05)."
     },
     {
