@@ -252,8 +252,11 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused(text)
 
     def test_a_briefed_surface_needs_its_brief_and_a_purpose(self):
+        """Holds before and after sf-wishlist is briefed: the fixture removes the brief and the purpose itself."""
         self.entries["sf-wishlist"]["review_status"] = "briefed"
+        self.entries["sf-wishlist"]["brief"] = None
         self.surfaces["sf-wishlist"]["status"] = "briefed"
+        self.surfaces["sf-wishlist"].pop("purpose", None)
         self.assertRefused("manifest sf-wishlist: briefed, and has no brief")
         self.assertRefused("manifest sf-wishlist: briefed, and the inventory gives the surface no purpose")
 
