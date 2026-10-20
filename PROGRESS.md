@@ -66,12 +66,16 @@ Live status. First action each session: read this, then continue from **Next**.
   in one column, a return line when sign-in starts from a context, the order summary on the checkout entry, and a
   shared component layer, `design/wireframes/_shared/components.css`, that batch-05 onward link. He approved
   closure on 20 October 2026. The record is the batch-04 entry under `batches` in the manifest, beside its import
-  and correction records.
+  and correction records. **Batch-05 is reviewed and closed**: Claude Design's 24 files, twelve surfaces in English
+  and Arabic (checkout, payment and order received), were imported with the owner's corrections in one closure on
+  20 October 2026: phone required at checkout, landmark optional pending confirmation, the handoff notes no longer
+  promising what stays filled in, and one narrowed shared rule. The record is the batch-05 entry under `batches`
+  in the manifest: import, corrections and review, with the platform additions and the open inputs it names.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-04 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 to batch-05 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -297,8 +301,9 @@ drawn beyond batch-05 and CoreX is not upgraded until he says so either.** In or
    round, and closed the batch on 20 October 2026 (the correction and closure records in the manifest). IX-02 and
    IX-10 stay locked, and DQ-01 stays provisional. Batch-05 (checkout, payment and order received) opens on his
    instruction of 20 October 2026: its twelve surfaces are briefed, six of them newly, and Claude Design draws it
-   from a private manual-transfer package built from the opening, linking the shared component layer. DQ-03 stays
-   locked (one page), and batch-06 opens only on his instruction.
+   from a private manual-transfer package built from the opening, linking the shared component layer. Claude Design
+   drew it, and he reviewed and closed it on 20 October 2026 with his corrections in one PR (the import, correction
+   and closure records in the manifest). DQ-03 stays locked (one page), and batch-06 opens only on his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

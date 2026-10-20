@@ -725,7 +725,151 @@
         ]
       }
     },
-    {"id": "batch-05", "name": "Checkout, payment and order received", "release": "S1"},
+    {
+      "id": "batch-05",
+      "name": "Checkout, payment and order received",
+      "release": "S1",
+      "import": {
+        "status": "reviewed",
+        "date": "2026-10-20",
+        "source": "Claude Design, mizzey-batch-05-output.zip (SHA-256 edc769fe54eb8f8d5051633bdeb6143590d2e8dee9fb800e09aef58bc9aca666; handoff b776f36da1e826e6d3a3e6a56644b2f871466a04958dc2c2874ffcc21b35899b), drawn on 20 October 2026 from the batch-05 design package v1 (SHA-256 6b27e01c9d70fc022a13752092840fcabedbf050719d7508804facf485cc9ed9), built from the opening commit a832523 (PR #375, merged as f83614d with an identical tree) and issued by the owner. The handoff and the package stay private and are not committed.",
+        "record": "Twenty-four files, twelve surfaces in English and Arabic, the new design/wireframes/s1/batch-05/batch-05.css (6,306 bytes) and design/wireframes/_shared/components.css with three appended blocks (nv-header condensed checkout variant, ctl-textarea, cm-address-card); the 12,322 bytes already on main are kept byte for byte at its start. Every file hash matched the handoff. All 57 listed states are covered in each language, counted from the wf-state labels against the inventory, none missing or extra; 121 frames per language. 20 rules are copied from batch-04.css into batch-05.css with identical declarations, because batch-05 composes batch-04's checkout entry and post-order offer without linking batch-04.css. Imported with the owner's corrections in the same closure (corrections).",
+        "status_before_import": {
+          "candidate_selected": ["ck-checkout", "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order"],
+          "briefed": ["ck-validation", "ck-stock-failure", "ck-erp-unavailable", "ck-payment-handoff", "ck-payment-failed", "ck-order-received"],
+          "note": "The six calibration surfaces carried the selection (A1, A6 adaptation) from cal-07; the six others were briefed when batch-05 opened (PR #375). The batch-05 brief carried D5: cal-07 C's steps and full header and cal-07 A's express delivery and non-restating review are not used."
+        },
+        "provisional": "DQ-03, IX-02, IX-07 and IX-10 are drawn as locked; DQ-01 stays provisional (Western digits, isolated left to right in Arabic). The wallet is drawn conditional on OD-19 (owner default: cards and wallets launch-capable) and Cash on Delivery conditional on OD-05, with both card_only and with_cash_on_delivery drawn. Rates, zones, city and district names and the estimate are invented staging content (CR-03).",
+        "measurements": "Claude Code, headless Chromium 155 over local HTTP with the real stylesheet links, each frame at its labelled width, 242 frames: 0 horizontal overflow, 0 elements outside their frame, 0 overlapping hit areas; no target under 44 x 44 px except the carried footer email field; reused sizes equal to batch-04 measured on the batch-04 files (field 48, coupon Apply 48, coupon disclosure 44, summary bar toggle 44, desktop header 76, mobile header 56); selects 48, radio cards at least 56, the note 112, Place order 52. The total is visible in every checkout frame (sticky summary on desktop, bar on mobile; the order line on the payment handoff), except ck-checkout:empty_cart and ck-order-received:revisited_later by design. Every frame with Place order shows the review with three sections, items and total above it, Change at the inline end in both languages. No digit outside a left-to-right isolated element in Arabic. Validators: with the manifest updated, 0 problems; before it, exactly the 24 expected unlisted lines.",
+        "additions_to_the_platform": [
+          {
+            "item": "The restating review before Place Order",
+            "refs": ["CHK-05", "US-07-04"],
+            "status": "Not native; which Checkout block inner-block area hosts it is decided at #255."
+          },
+          {
+            "item": "City follows governorate, district follows city",
+            "refs": ["CHK-01", "US-07-01"],
+            "status": "No native field takes its options from another; the route is decided at #255, the lists are CR-03 / OP-13."
+          },
+          {
+            "item": "Saved-address selection at checkout",
+            "refs": ["CHK-02", "ACCT-04", "US-07-01"],
+            "status": "Not native: WooCommerce 11.1 keeps one address per customer and has no address book. The handoff's statement that it follows native behaviour is corrected here. Built with the address book (#255, batch-06 ac-addresses)."
+          },
+          {
+            "item": "The condensed checkout header",
+            "refs": ["NAV-01", "NAV-06"],
+            "status": "A replacement of the platform's checkout-header template part, which holds only the site title and a cart link."
+          }
+        ]
+      },
+      "corrections": [
+        {
+          "date": "2026-10-20",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner review corrections, applied by Claude Code in the closure",
+          "record": "Made by Claude Code on the owner's approval of 20 October 2026, on the files as delivered. Measured afterwards: 242 frames, 0 overflow, 0 outside, 0 overlaps; frame heights unchanged; in Arabic the phone and landmark label rows exchange a 0.36 px height as the Optional mark moves, and English is identical.",
+          "changes": [
+            {
+              "item": "Phone at checkout required",
+              "surface": "ck-address, ck-checkout, ck-validation",
+              "refs": ["ADM-157", "AUTH-11", "US-06-07", "CHK-01"],
+              "change": "The Optional mark is removed from the phone field in 26 frames per language. ADM-157 (order search by customer phone number, key) and AUTH-11 / US-06-07 (name, email, phone and address carried into the account) depend on a phone on every order. AUTH-02 concerns registration, not checkout. The ck-address rule note is corrected."
+            },
+            {
+              "item": "Landmark optional, pending confirmation",
+              "refs": ["CHK-01", "US-07-01"],
+              "surface": "ck-address, ck-checkout, ck-validation",
+              "change": "The Optional mark is added to the landmark field in 26 frames per language. CHK-01, US-07-01 and the sitemap require the field to be captured, and no signed source makes it mandatory. Whether it becomes required is the owner's or the client's confirmation; no validation frame shows an empty-landmark error."
+            },
+            {
+              "item": "What stays filled in after a failed handoff",
+              "refs": ["VENDOR-PAYMOB", "US-07-07", "US-08-04"],
+              "surface": "ck-payment-handoff, ck-erp-unavailable",
+              "change": "Annotation only. \"Back on the checkout with every entry kept\" (provider_unavailable, and timeout by reference) and \"The page keeps every entry\" (cannot_validate) now say that what stays filled in follows the platform and the gateway, unverified. Reusing the same order and no duplicate remain, per US-07-07 and US-08-04."
+            },
+            {
+              "item": "Review section rule narrowed",
+              "refs": ["D2", "D6"],
+              "surface": "design/wireframes/_shared/components.css",
+              "change": ".sm__sec>span is narrowed to .sm__sec>span:not(.sm__chg), so a Change rendered as a span keeps its inline-end column. Measured on a scratch copy before the change: 0 of 242 batch-05 frames move. components.css is 14,206 bytes."
+            }
+          ]
+        }
+      ],
+      "review": {
+        "status": "closed",
+        "date": "2026-10-20",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the twelve batch-05 surfaces in English and Arabic on Claude Code's validation and decision sheet of 20 October 2026, ruled on the open items and approved one import-and-closure PR with the corrections. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Phone at checkout",
+            "refs": ["ADM-157", "AUTH-11"],
+            "decision": "Required."
+          },
+          {
+            "item": "Landmark",
+            "refs": ["CHK-01", "US-07-01"],
+            "decision": "Optional, pending the owner's or the client's confirmation."
+          },
+          {
+            "item": "Stock quantity on a placement failure",
+            "refs": ["US-07-06", "PRE-09", "ERP-05", "BR-003"],
+            "decision": "Accepted: no available quantity is shown. US-07-06's provisional criterion (\"what quantity is available\") is deferred to PRE-09, whose placeholder rule shows no stock quantity to customers. The sale stays blocked and no payment is taken."
+          },
+          {
+            "item": "Order note behind a disclosure",
+            "refs": ["CHK-06", "D1"],
+            "decision": "Accepted as drawn: \"Add a note to your order\" opens a single optional field, as the cm-coupon precedent."
+          },
+          {
+            "item": "Conditional payment methods",
+            "refs": ["OD-19", "OD-05", "PAY-15", "PAY-09"],
+            "decision": "Accepted: wallet and Cash on Delivery are drawn as conditional states, never as confirmed launch methods."
+          },
+          {
+            "item": "Retry after a failed or cancelled payment",
+            "refs": ["US-08-04", "US-07-07", "VENDOR-PAYMOB"],
+            "decision": "Accepted: the platform's order-pay route with the same order, the status text following the order (gateway-dependent)."
+          },
+          {
+            "item": "Copied batch-04 rules",
+            "refs": ["D6"],
+            "decision": "Deferred to stabilisation: moving them into the shared layer changes batch-04's cascade and is done there with a measured before-and-after."
+          }
+        ],
+        "accepted": ["The corrections in this entry.", "The components.css additions: nv-header (condensed checkout variant), ctl-textarea, cm-address-card.", "Stock and ERP notices as warnings that take focus (role alert) at placement; server, provider-unavailable and timeout notices as errors.", "The payment handoff drawn neutral to a redirect or an embedded card step, with the provider's pages not drawn."],
+        "deferred": [
+          {
+            "item": "Open inputs carried",
+            "refs": ["OD-05", "OD-09", "OD-19", "OP-03", "OP-13", "OP-15", "OP-25", "CR-03", "CR-15", "PRE-09", "VENDOR-PAYMOB"],
+            "status": "Placeholders as drawn: no Cash on Delivery fee or limit, no VAT row, invented rates and zones, no stock figure or timer, no provider screen or error code."
+          },
+          {
+            "item": "Integration facts unverified",
+            "refs": ["VENDOR-PAYMOB", "#255", "#283"],
+            "status": "Paymob on the Checkout block, redirect or embedded card step, the CHK-05 review's inner-block area, the dependent-select route, and WPML and WCML at runtime (right to left, labels, the language kept through payment)."
+          },
+          {
+            "item": "Order received on a later visit",
+            "refs": ["IA-10", "AUTH-08"],
+            "status": "Drawn from the platform source (session, 10-minute grace period, email check); not measured at runtime."
+          },
+          {
+            "item": "Status labels",
+            "refs": ["ord-status-labels"],
+            "status": "Plain text here; the component is batch-06's."
+          },
+          {
+            "item": "Digits in Arabic",
+            "refs": ["DQ-01"],
+            "status": "Provisional and unchanged."
+          }
+        ]
+      }
+    },
     {"id": "batch-06", "name": "Account, orders and tracking", "release": "S1"},
     {"id": "batch-07", "name": "Wishlist, reviews, content and trust", "release": "S1"},
     {"id": "batch-08", "name": "Transactional emails and customer messages", "release": "S1"},
@@ -1375,157 +1519,157 @@
       "surface": "ck-checkout",
       "batch": "batch-05",
       "brief": "design/briefs/ck-checkout.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-checkout.en.html", "design/wireframes/s1/batch-05/ck-checkout.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "guest", "signed_in", "empty_cart", "placing", "long_content"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-address",
       "batch": "batch-05",
       "brief": "design/briefs/ck-address.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-address.en.html", "design/wireframes/s1/batch-05/ck-address.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty_form", "saved_address_selected", "new_address", "validation", "dependent_fields"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-shipping-method",
       "batch": "batch-05",
       "brief": "design/briefs/ck-shipping-method.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-shipping-method.en.html", "design/wireframes/s1/batch-05/ck-shipping-method.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "no_address_yet", "methods_listed", "free_shipping_applied", "no_method_for_zone", "with_delivery_estimate"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-payment-method",
       "batch": "batch-05",
       "brief": "design/briefs/ck-payment-method.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-payment-method.en.html", "design/wireframes/s1/batch-05/ck-payment-method.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "card_only", "card_and_wallet", "with_cash_on_delivery", "method_unavailable"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-coupon-notes",
       "batch": "batch-05",
       "brief": "design/briefs/ck-coupon-notes.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-coupon-notes.en.html", "design/wireframes/s1/batch-05/ck-coupon-notes.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "collapsed", "coupon_applied", "coupon_invalid", "note_entered"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-review-place-order",
       "batch": "batch-05",
       "brief": "design/briefs/ck-review-place-order.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-review-place-order.en.html", "design/wireframes/s1/batch-05/ck-review-place-order.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "terms_unticked", "ready", "placing"],
       "interaction_pending": [],
-      "review_status": "candidate_selected"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-validation",
       "batch": "batch-05",
       "brief": "design/briefs/ck-validation.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-validation.en.html", "design/wireframes/s1/batch-05/ck-validation.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "field_error", "summary_error", "server_error"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-stock-failure",
       "batch": "batch-05",
       "brief": "design/briefs/ck-stock-failure.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-stock-failure.en.html", "design/wireframes/s1/batch-05/ck-stock-failure.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "quantity_unavailable", "item_unavailable"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-erp-unavailable",
       "batch": "batch-05",
       "brief": "design/briefs/ck-erp-unavailable.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-erp-unavailable.en.html", "design/wireframes/s1/batch-05/ck-erp-unavailable.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "cannot_validate"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-payment-handoff",
       "batch": "batch-05",
       "brief": "design/briefs/ck-payment-handoff.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-payment-handoff.en.html", "design/wireframes/s1/batch-05/ck-payment-handoff.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "redirecting", "verifying_return", "provider_unavailable", "timeout"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-payment-failed",
       "batch": "batch-05",
       "brief": "design/briefs/ck-payment-failed.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-payment-failed.en.html", "design/wireframes/s1/batch-05/ck-payment-failed.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "failed", "cancelled_by_customer", "outcome_unknown"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ck-order-received",
       "batch": "batch-05",
       "brief": "design/briefs/ck-order-received.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-05/ck-order-received.en.html", "design/wireframes/s1/batch-05/ck-order-received.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "paid", "cash_on_delivery", "guest", "signed_in", "payment_pending", "revisited_later"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-navigation",

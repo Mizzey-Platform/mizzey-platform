@@ -2324,7 +2324,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": [
         "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order", "ck-validation", "ck-stock-failure",
         "ck-erp-unavailable", "au-checkout-entry"
@@ -2376,7 +2376,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-shipping-method",
@@ -2422,7 +2422,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-payment-method",
@@ -2467,7 +2467,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-coupon-notes",
@@ -2512,7 +2512,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-review-place-order",
@@ -2556,7 +2556,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-validation",
@@ -2600,7 +2600,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Clear in both languages (CHK-11)."
     },
     {
@@ -2644,7 +2644,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
@@ -2687,7 +2687,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "The sale is not confirmed: that is contracted. What the customer sees is set in PRE-09. Placeholder message only."
     },
     {
@@ -2733,7 +2733,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Our side of the handoff only. The hosted card, 3-D Secure and wallet steps are the provider's."
     },
     {
@@ -2778,7 +2778,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-order-received",
@@ -2825,7 +2825,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["au-post-order-account", "ord-status-labels"],
       "build_note": "IA-10, the page row, is accepted by #242 as the route, and JRN-08 by #322 as the journey record. The visible checkout completion screen is built with the checkout, #255."
     },
