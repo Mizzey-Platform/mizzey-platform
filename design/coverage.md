@@ -589,8 +589,8 @@ UX choices with more than one legitimate pattern, where neither the contract nor
 | `ac-reorder` | Reorder from order history | component | contracted | E-SF-9b | E-SF-9b | S2 | 1 |
 | `ac-notification-preferences` | Notification preferences | page | contracted | E-SF-9b | E-SF-9b | S2 | 1 |
 | `ac-account-deletion` | Account deletion request | component | contracted | E-SF-9b | E-SF-9b | S2 | 1 |
-| `rv-list` | Review list and average rating | component | contracted | #309 | #309 | S1 | 2 |
-| `rv-form` | Write a review | component | contracted | #309 | #309 | S1 | 1 |
+| `rv-list` | Review list and average rating | component | contracted | #309 | #309 | S1 | 1 |
+| `rv-form` | Write a review | component | contracted | #309 | #309 | S1 | 2 |
 | `rv-pending` | Review held for moderation | message | contracted | #309 | #309 | S1 | 1 |
 | `ct-static-page` | Static and policy page layout | page | contracted | #310 | #310 | S1 | 1 |
 | `ct-about` | About | page | contracted | #310 | #310 | S1 | 1 |

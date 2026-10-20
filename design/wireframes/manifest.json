@@ -1013,7 +1013,211 @@
         ]
       }
     },
-    {"id": "batch-07", "name": "Wishlist, reviews, content and trust", "release": "S1"},
+    {
+      "id": "batch-07",
+      "name": "Wishlist, reviews, content and trust",
+      "release": "S1",
+      "import": {
+        "status": "reviewed",
+        "date": "2026-10-20",
+        "source": "Claude Design, mizzey-batch-07-output.zip (SHA-256 96e0d8580946a59bf8b4d85884acdd7bdc8a4ba508a0617aeea988a5c0404867; handoff 597f6f1d61c050cb784c985ce3681e661d0159d8206c9ae65b46f742f3adae4f), drawn on 20 October 2026 from the batch-07 design package v1 (SHA-256 8f1da1c57f8bd25baca6cffe9e37907e8c7102565c1c40ebd419449792f06ca9), built from the opening commit bbbf661 (PR #380, merged as 390d950 with an identical tree) and issued by the owner. The output archive, the handoff and the package stay private and are not committed; the archive is kept unchanged as evidence.",
+        "record": "Thirty files, fifteen surfaces in English and Arabic, the new design/wireframes/s1/batch-07/batch-07.css and design/wireframes/_shared/components.css with two appended blocks (ctl-rating-input, cm-review-item); the 19,566 bytes already on main are kept byte for byte at its start (21,905 bytes now). Every one of the 32 file hashes matched the handoff, and the files were first committed exactly as delivered. All 51 listed states are covered in each language, counted from the wf-state labels against the inventory, none missing or extra; 118 frames per language. 30 rules in batch-07.css are carried from batch-06.css and the batch-01 inline sheets with identical declarations, because batch-07 does not link them. Nine files were then corrected on the owner's rulings (corrections); their SHA-256 as delivered and as committed are in corrected_files.",
+        "status_before_import": {
+          "briefed": ["sf-wishlist", "sf-recently-viewed", "rv-list", "rv-form", "rv-pending", "ct-static-page", "ct-about", "ct-authenticity", "ct-shipping-policy", "ct-help", "ct-privacy", "ct-returns-policy", "ct-terms", "ct-contact", "ct-campaign-page"],
+          "note": "All fifteen were briefed when batch-07 opened (PR #380), with the review and wishlist boundaries recorded on rv-list, rv-form and sf-wishlist."
+        },
+        "provisional": "DQ-02, DQ-06, DQ-07, IX-02 and IX-11 are drawn as locked; DQ-01 stays provisional. Policy, help and campaign text are labelled placeholders (CR-04, CR-15, OD-13, CR-03, OD-04, OD-18, OD-01, CR-05); the return window is a configured value slot (OD-08).",
+        "measurements": "Claude Code, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed (corrected) files: all 236 frames, each resized to every width of its family (mobile frames at 360 and 390, tablet at 768, desktop at 1024 and 1280), 444 measurements in all: 0 horizontal overflow, 0 elements escaping their frame, no clipped text other than the visually hidden text, no target under 44 x 44 px except the inherited product-card name link, no digit outside a left-to-right isolate in Arabic; every review text keeps its own language and computed direction; the rating input is a required radio group of five 44 x 44 px options with one tab stop, ordered in the reading direction. The only overlapping hit areas are the batch-02 Choose options panel drawn open over its own card's Move to cart and its neighbour (sf-wishlist moved_to_cart, options first), the layering batch-02 accepted. Reused sizes equal the reviewed batches: fields 48, text area at least 112, accordion rows 52 (63 where a question wraps), header 76 and 56, pagination 44, card image ratio 1.25. With the new components.css, all 892 frames of the 76 batch-04 to batch-06 files that link it keep identical element geometry. The handoff reported 204 frames measured; the files hold 236, and the difference could not be attributed from the handoff, so every frame was measured here. Validators: before the manifest was updated, exactly the 30 expected unlisted lines; after it, 0 problems.",
+        "corrected_files": [
+          {
+            "file": "design/wireframes/s1/batch-07/batch-07.css",
+            "delivered": "58eb6270461a6d28a10df46b292a2a8e36d172a08fea2fc7518cef185a004079",
+            "committed": "38a9dbcbda8a554548574579d02521fed367fdd64457965a3e312a055c459718"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/ct-contact.en.html",
+            "delivered": "ad4c1bf0c1cc4b32b4ddffe926b5cd436a7bb85bd9610830809f67eed02df9cb",
+            "committed": "e32389866c8c00399273b0ad3749c3104d528d4f27a25d257d068eb794b896f1"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/ct-contact.ar.html",
+            "delivered": "1a969d6ff8b017f4a9a47d713c768076efd5b9ca9ffcfb6403d8ba31ef4ed90b",
+            "committed": "8581f3ee971920493ef5dfaa30618e4de12e72d603cef9c87d72ff4272c2ddf1"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/sf-wishlist.en.html",
+            "delivered": "6a311c9224abc1b92ad8e31e697cf0407f2e3e42949fb3e4347b2196bb0f29ab",
+            "committed": "e744a5e006c46fff902fd9489f6ef5654ef5a654fbffd31207adf983491c2496"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/sf-wishlist.ar.html",
+            "delivered": "7f6125218a58c5b7d90d75a14d0cd3bab8abf9d6e24a3883fa41669de82832ac",
+            "committed": "da448ec8267f8ac35879c7fb618d1cb0c5789ba1cc7efb069166661adccc5a18"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/rv-list.en.html",
+            "delivered": "6ec74b756ce891e174cdef4ac7a34fac3a396b4127a0b14a0ba05b61adc900ef",
+            "committed": "1c59bf36767c46411b09fd1ee2ce33f1190239fdf6dbfbbd3233ed2edadcb252"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/rv-list.ar.html",
+            "delivered": "59d2332200dbb6101a00deb6f46fcee0d9ba91f4d97db3699ed48cf3f3422518",
+            "committed": "b101893d99b87fcc55167dce8a0d165215a7d0a16d2a1af57786d9b59e6cf5a3"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/rv-form.en.html",
+            "delivered": "68106ca61b8c3bf406be138356dd43a712739f4342b636e369068f21ade5f96a",
+            "committed": "060ce16e99928704691b8d641a857f69d21dc6de4d37d013194fe1022d8c7e14"
+          },
+          {
+            "file": "design/wireframes/s1/batch-07/rv-form.ar.html",
+            "delivered": "410bf26e186e1cdc1aceaaf935b593f26890b1146e647dee0f8fb86c7b4d8e3a",
+            "committed": "d8288ba8687211c3f43dd5f5978311e4cbe31ed238aeac67d6bae126e4fedfba"
+          }
+        ],
+        "additions_to_the_platform": [
+          {
+            "item": "The wishlist",
+            "refs": ["WISH-01", "WISH-04", "CART-17"],
+            "status": "WooCommerce 11.1 has none. The mechanism, a saved item's variant, the guest carrier and the merge on sign-in are #307's; nothing drawn depends on them."
+          },
+          {
+            "item": "Recently viewed kept for a signed-in customer",
+            "refs": ["WISH-07", "US-11-07"],
+            "status": "Natively a session cookie written only by the legacy widget; persistence across sessions is #307's."
+          },
+          {
+            "item": "The contact form",
+            "refs": ["CMS-04"],
+            "status": "Neither WordPress nor WooCommerce has one; the mechanism and bot protection are #310's."
+          },
+          {
+            "item": "The automatic contents list",
+            "refs": ["CMS-09", "US-22-07"],
+            "status": "Template behaviour, generated from the page's own headings; no editor-managed component (#310)."
+          }
+        ]
+      },
+      "corrections": [
+        {
+          "date": "2026-10-20",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner review corrections, applied by Claude Code in the closure",
+          "record": "Made by Claude Code on the owner's rulings of 20 October 2026, on the files as delivered. Measured afterwards over all 236 frames at their family widths (444 measurements): no new issue. Element geometry changed only in the 13 ct-contact frames and 14 of the 16 sf-wishlist frames per language (the two empty-state frames have no card); the rv-list and rv-form changes are in the document header text only.",
+          "changes": [
+            {
+              "item": "Contact layout class collision",
+              "surface": "ct-contact",
+              "refs": ["CMS-04"],
+              "change": "batch-07.css named the contact layout .cf, the batch-03 class of the IX-10 add confirmation, so every contact frame also took that card's border, 12 px radius and 14 by 16 px padding. Renamed .ctf and .ctf--m in batch-07.css (three rules and its comment) and in both contact files (six elements each); batch-03 and the shared layer are unchanged. Measured afterwards on all 26 contact wrappers: border, radius, padding and background 0."
+            },
+            {
+              "item": "One removal action on the wishlist (decision 8)",
+              "surface": "sf-wishlist",
+              "refs": ["WISH-01", "NFR-11"],
+              "change": "The filled-heart toggle is removed from the 65 wishlist cards in each language; the labelled Remove action, named with its product, stays on every card. Two annotations now say so. The batch-02 product card keeps its heart everywhere else."
+            },
+            {
+              "item": "REV-01 traced to the form (decision R)",
+              "surface": "rv-form, rv-list",
+              "refs": ["REV-01", "REV-04", "US-11-01"],
+              "change": "REV-01 (star rating submission) moves from rv-list's register_ids to rv-form's, and stays in rv-list's context_ids; both purposes are restated from their own rows and the two briefs are regenerated. The Rows line of the four wireframes follows. The accepting PBI stays #309 and no row changes scope or stage."
+            }
+          ]
+        }
+      ],
+      "review": {
+        "status": "closed",
+        "date": "2026-10-20",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed the fifteen batch-07 surfaces in English and Arabic on Claude Code's validation and decision sheet of 20 October 2026, ruled on decisions 1 to 9 and R, and approved one import-and-closure PR with the corrections. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, and not PRE-03b.",
+        "decisions": [
+          {
+            "item": "Full review list (1)",
+            "refs": ["PDP-17", "REV-04", "US-04-07"],
+            "decision": "In place in the product page's reviews section, with numbered pagination. The page size stays configurable; ten is illustrative."
+          },
+          {
+            "item": "Rating required (2)",
+            "refs": ["REV-01", "US-11-01"],
+            "decision": "Star-rating submission is required (the WooCommerce ratings-required setting, #309)."
+          },
+          {
+            "item": "Move to cart (3)",
+            "refs": ["WISH-04", "US-11-05"],
+            "decision": "A successfully moved item leaves the wishlist; the confirmation in its place is kept."
+          },
+          {
+            "item": "Wishlist pagination (4)",
+            "refs": ["DQ-02"],
+            "decision": "Numbered pagination at 24, consistent with the approved listing page size."
+          },
+          {
+            "item": "Contact form field (5)",
+            "refs": ["CMS-04", "AC-14", "NFR-12"],
+            "decision": "Optional Order number, as drawn."
+          },
+          {
+            "item": "Contents list on long policy pages (6)",
+            "refs": ["CMS-09", "US-22-07"],
+            "decision": "Generated automatically from the page's headings. No editor-managed contents component."
+          },
+          {
+            "item": "Sender acknowledgement (7)",
+            "refs": ["US-01-07", "CMS-04"],
+            "decision": "Unresolved, for clarification at Stage 1. The on-page confirmation stays; an acknowledgement email is neither required nor excluded, and no batch-08 email surface is added."
+          },
+          {
+            "item": "Wishlist removal control (8)",
+            "refs": ["WISH-01"],
+            "decision": "The redundant filled heart is removed from wishlist cards only; the labelled Remove action stays. Batch-02 cards are unchanged."
+          },
+          {
+            "item": "Promotional link hit area (9)",
+            "refs": ["NFR-11"],
+            "decision": "Accepted in batch-07 (.pr__l::after, 46 to 49 px tall, no visible change). The inherited batch-01 target is a stabilisation item (deferred)."
+          },
+          {
+            "item": "REV-01 traceability (R)",
+            "refs": ["REV-01", "#309"],
+            "decision": "Moved from rv-list to rv-form, kept as context on rv-list; same PBI and signed scope."
+          }
+        ],
+        "accepted": ["The corrections in this entry.", "The components.css additions: ctl-rating-input and cm-review-item.", "The review boundaries as drawn: the display name, no store-owner replies, no photo or video, verified badge, vote, questions and answers, sort or star filter.", "The contracted reduced wishlist as drawn: view, remove, move to cart, the guest notice and the transfer on sign-in (CART-17); a guest's Sign in returns to the wishlist, consistent with D4.", "The library variants proposed in the drawings: a two-column rich text section and a multiple-open accordion.", "Recently viewed on the product page only."],
+        "deferred": [
+          {
+            "item": "Sender acknowledgement",
+            "refs": ["US-01-07"],
+            "status": "No notification row covers one. For the owner's clarification at Stage 1; nothing drawn or excluded."
+          },
+          {
+            "item": "Batch-01 promotional link target",
+            "refs": ["NFR-11", "gl-promo-banner", "sf-home", "gl-cookie-consent"],
+            "status": "The \"Shop the offer\" link in the reviewed batch-01 files is 18 px tall with no hit area. A controlled batch-01 target correction at stabilisation, on the owner's instruction."
+          },
+          {
+            "item": "Shared CSS consolidation",
+            "refs": ["D6"],
+            "status": "The 30 rules carried into batch-07.css from batch-06.css and the batch-01 inline sheets are consolidated at stabilisation, measured before and after, with the fb-modal promotion."
+          },
+          {
+            "item": "Open inputs carried",
+            "refs": ["CR-04", "CR-15", "OD-13", "OD-08", "OD-04", "CR-03", "OD-18", "OD-01", "CR-05"],
+            "status": "Placeholders as drawn: no policy, guarantee or legal wording, no return window, rate or free-shipping number, no contact details, no brand or imagery."
+          },
+          {
+            "item": "Implementation decisions",
+            "refs": ["#307", "#309", "#310"],
+            "status": "The wishlist mechanism, variant, guest carrier, merge and cross-language items; the review page size, ratings-required setting, reply suppression and the invitation link; the contact form mechanism and bot protection; whether an ended campaign page is withdrawn or redirected."
+          },
+          {
+            "item": "Digits in Arabic",
+            "refs": ["DQ-01"],
+            "status": "Provisional and unchanged."
+          }
+        ]
+      }
+    },
     {"id": "batch-08", "name": "Transactional emails and customer messages", "release": "S1"},
     {"id": "batch-09", "name": "Additions to the standard administration, and reports", "release": "S1"},
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
@@ -1518,27 +1722,27 @@
       "surface": "sf-wishlist",
       "batch": "batch-07",
       "brief": "design/briefs/sf-wishlist.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/sf-wishlist.en.html", "design/wireframes/s1/batch-07/sf-wishlist.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "guest", "signed_in", "item_out_of_stock", "moved_to_cart", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-recently-viewed",
       "batch": "batch-07",
       "brief": "design/briefs/sf-recently-viewed.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/sf-recently-viewed.en.html", "design/wireframes/s1/batch-07/sf-recently-viewed.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "few", "many"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "au-sign-in",
@@ -1999,170 +2203,170 @@
       "surface": "rv-list",
       "batch": "batch-07",
       "brief": "design/briefs/rv-list.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/rv-list.en.html", "design/wireframes/s1/batch-07/rv-list.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "no_reviews", "few", "many", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "rv-form",
       "batch": "batch-07",
       "brief": "design/briefs/rv-form.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/rv-form.en.html", "design/wireframes/s1/batch-07/rv-form.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "signed_out", "form", "validation", "submitted"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "rv-pending",
       "batch": "batch-07",
       "brief": "design/briefs/rv-pending.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/rv-pending.en.html", "design/wireframes/s1/batch-07/rv-pending.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "awaiting_moderation"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-static-page",
       "batch": "batch-07",
       "brief": "design/briefs/ct-static-page.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-static-page.en.html", "design/wireframes/s1/batch-07/ct-static-page.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-about",
       "batch": "batch-07",
       "brief": "design/briefs/ct-about.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-about.en.html", "design/wireframes/s1/batch-07/ct-about.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-authenticity",
       "batch": "batch-07",
       "brief": "design/briefs/ct-authenticity.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-authenticity.en.html", "design/wireframes/s1/batch-07/ct-authenticity.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-shipping-policy",
       "batch": "batch-07",
       "brief": "design/briefs/ct-shipping-policy.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-shipping-policy.en.html", "design/wireframes/s1/batch-07/ct-shipping-policy.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-help",
       "batch": "batch-07",
       "brief": "design/briefs/ct-help.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-help.en.html", "design/wireframes/s1/batch-07/ct-help.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content", "collapsed", "expanded", "many_questions"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-privacy",
       "batch": "batch-07",
       "brief": "design/briefs/ct-privacy.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-privacy.en.html", "design/wireframes/s1/batch-07/ct-privacy.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-returns-policy",
       "batch": "batch-07",
       "brief": "design/briefs/ct-returns-policy.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-returns-policy.en.html", "design/wireframes/s1/batch-07/ct-returns-policy.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-terms",
       "batch": "batch-07",
       "brief": "design/briefs/ct-terms.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-terms.en.html", "design/wireframes/s1/batch-07/ct-terms.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-contact",
       "batch": "batch-07",
       "brief": "design/briefs/ct-contact.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-contact.en.html", "design/wireframes/s1/batch-07/ct-contact.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "form", "validation", "sent", "send_failed", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ct-campaign-page",
       "batch": "batch-07",
       "brief": "design/briefs/ct-campaign-page.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-07/ct-campaign-page.en.html", "design/wireframes/s1/batch-07/ct-campaign-page.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "no_active_offer", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-section-library",
