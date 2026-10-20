@@ -1,5 +1,5 @@
 {
-  "about": "Where the authority for design lives. The signed and issued documents stay outside this public repository (D-03, D-08): this file points at them and copies none. `source` is relative to this folder, on the developer's machine. `sha256` is of the file named, taken on 6 October 2026; the Functional Specification (version 1.3) and the Sitemap (version 1.1) were taken again on 20 October 2026, when their new versions were issued. The order of authority is in design/README.md.",
+  "about": "Where the authority for design lives. The signed and issued documents stay outside this public repository (D-03, D-08): this file points at them and copies none. `source` is relative to this folder, on the developer's machine. `sha256` is of the file named, taken on 6 October 2026; the Functional Specification (version 1.4) and the Sitemap (version 1.2) were taken again on 20 October 2026, when those versions were prepared for the Stage 1 review. Versions 1.3 and 1.1, taken earlier that day, were never issued. The order of authority is in design/README.md.",
   "pack": {
     "name": "Mizzey Launch Platform Pack MZ-02 REV4",
     "source": "../../final docs/Client/Mizzey-Launch-Platform-Pack-MZ-02-REV4-FINAL.zip",
@@ -46,11 +46,11 @@
     {
       "id": "MS-SPC-2026-032",
       "name": "Functional Specification: User Stories and Acceptance Criteria",
-      "version": "1.3",
+      "version": "1.4",
       "authority_rank": 3,
       "role": "Functional Specification. Stories and acceptance criteria per requirement. Issued for the Stage 1 review; approval pending. The register governs where it differs.",
       "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Functional-Specification.md",
-      "sha256": "981b5c3d598eef282fa68d6d959fde10d216c0d03def5c96740fcb0f7dd85646",
+      "sha256": "1c31788a9d661ea163f314a877f53b279ed6b3d9347f43caab26fb0197e5266b",
       "in_repository": null
     },
     {
@@ -96,11 +96,11 @@
     {
       "id": "MS-CMP-2026-038",
       "name": "Sitemap and Principal User Flows, companion to the Functional Specification",
-      "version": "1.1",
+      "version": "1.2",
       "authority_rank": 7,
       "role": "Verified sitemap and flows. Adds no scope. Its section 7 lists the open points it does not resolve.",
       "source": "../../final docs/Client/Branded/Mizzey-Launch-Platform-Sitemap-and-User-Flows.md",
-      "sha256": "376b9c98b7e2412f91ff8d2551d7057d5c4bd3de203dcd7a2eaa968e5ae35897",
+      "sha256": "0b89d55f621704126ea3a9d1b089e3ac1fc132aeaae06bd02943ce14b25100eb",
       "in_repository": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md is the internal working copy."
     },
     {
