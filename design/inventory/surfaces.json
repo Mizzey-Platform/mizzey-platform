@@ -5811,7 +5811,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
@@ -5855,7 +5855,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -5902,7 +5902,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -5946,7 +5946,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -5990,7 +5990,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -6034,7 +6034,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -6079,7 +6079,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -6123,7 +6123,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -6167,7 +6167,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
@@ -6209,7 +6209,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable.",
       "implementation_origin": "woocommerce"
     },
@@ -6346,7 +6346,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message.",
       "implementation_origin": "woocommerce"
     },
