@@ -113,13 +113,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 6 |
+| Desktop | `drawn` |
+| States covered | 6 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
@@ -127,4 +127,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes.
+Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes. The one business-facing staff log: CoreX's own framework logs (login protection, access audit, activity) stay framework diagnostics under COREX FRAMEWORK and are not redrawn. Cross-reference: MKT-25 (third-party administrative actions recorded in the audit log) is met by entries in this log; MKT-25 keeps its accepting PBI, #298, and its no_surface behaviour classification.
