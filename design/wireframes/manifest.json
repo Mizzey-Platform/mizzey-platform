@@ -1340,7 +1340,85 @@
         ]
       }
     },
-    {"id": "batch-09", "name": "Additions to the standard administration, and reports", "release": "S1"},
+    {
+      "id": "batch-09",
+      "name": "Additions to the standard administration, and reports",
+      "release": "S1",
+      "opening": {
+        "status": "briefed",
+        "date": "2026-10-21",
+        "instruction": "The owner's instruction of 21 October 2026: open batch-09 in five review groups, with parallel drawing after the shared administration foundation is accepted, without changing contractual scope, bypassing validation or starting functional implementation.",
+        "record": "All forty surfaces are briefed together, each with a purpose restating only its own register rows (sy-staging-marker, internal, says why it exists), and each assigned to exactly one review group. States, rows, owners, open items, design freedom and notes are unchanged: 166 states across the forty surfaces.",
+        "sequence": "09-A is drawn and reviewed first. When the owner accepts it, its patterns and stylesheet are frozen, with their SHA-256 recorded on this batch. 09-B to 09-E are then drawn from that one frozen baseline, independently and in parallel if the owner chooses. Their outputs are integrated by Claude Code through sequential pull requests, one at a time, each validated before it opens; no group output changes the frozen 09-A files. Each group is reviewed in one sitting with one decision sheet.",
+        "language": "English, desktop, presented consistently across the standard screens and the screens this engagement builds (ADM-159; ADM-159a, an Arabic administration, is not contracted; ADM-160 asks a phone only for order status checks and stock updates on the standard screens). Bilingual content fields are drawn with their Arabic value right to left inside the English administration. sy-staging-marker is drawn in English and Arabic.",
+        "groups": [
+          {
+            "id": "09-A",
+            "name": "Shared administration foundation",
+            "role": "Sets the shared administration patterns every other group reuses: the annotated standard screen, a list with search, filters and empty and no-result states, a settings form with validation and a saved notice, a panel added to a standard screen, an action that requires a reason, the permission refusal, and the staging marker. Drawn and reviewed first. Once the owner accepts it, its patterns and stylesheet are frozen as the baseline for 09-B to 09-E.",
+            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-staff-log", "ad-redirect-manager", "ad-order-list-filters", "ad-list-search-additions", "ad-customer-notes", "ad-customer-suspend"],
+            "state_count": 30,
+            "erp_dependent": []
+          },
+          {
+            "id": "09-B",
+            "name": "Storefront content, catalogue structure and search",
+            "role": "The block editor section library, navigation, the promotional banner, brand controls, catalogue terms, manual product order and the search synonym list.",
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-catalogue-terms", "ad-manual-product-order", "ad-search-synonyms"],
+            "state_count": 36,
+            "erp_dependent": []
+          },
+          {
+            "id": "09-C",
+            "name": "Product, stock and search engine controls",
+            "role": "Additions to the standard product screen, price and stock history, ERP stock figures, and the search engine controls.",
+            "surfaces": ["ad-product-storefront-controls", "ad-product-edit-additions", "ad-price-stock-history", "ad-stock-from-erp", "ad-seo-fields", "ad-missing-page-log", "ad-seo-site-settings"],
+            "state_count": 28,
+            "erp_dependent": ["ad-product-storefront-controls", "ad-price-stock-history", "ad-stock-from-erp"]
+          },
+          {
+            "id": "09-D",
+            "name": "Orders, shipping, refunds and documents",
+            "role": "Additions to the standard order screen: status control and history, cancellation, the invoice and packing slip, the shipment panel, the carrier status mapping, cash-on-delivery reconciliation, and the refund record.",
+            "surfaces": ["ad-order-status-control", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-shipment-panel", "ad-carrier-status-mapping", "ad-cod-reconciliation", "ad-refund-record"],
+            "state_count": 33,
+            "erp_dependent": ["ad-order-cancel"]
+          },
+          {
+            "id": "09-E",
+            "name": "Dashboard, reports, promotions and sign-in security",
+            "role": "The dashboard additions, the sales and stock reports, the promotion editor, the launch rule settings, and two-factor sign-in.",
+            "surfaces": ["ad-dashboard-sales", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions", "rp-sales", "rp-stock", "ad-promotion-editor", "ad-launch-rules-settings", "ad-two-factor"],
+            "state_count": 39,
+            "erp_dependent": ["ad-dashboard-stock", "rp-stock"]
+          }
+        ],
+        "treatment": {
+          "native": {
+            "meaning": "A standard screen already does the work. The addition is a filter, a field, a count or a link, drawn in place on an annotated standard screen.",
+            "surfaces": ["ad-order-list-filters", "ad-list-search-additions", "ad-catalogue-terms", "ad-manual-product-order", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-control", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions"]
+          },
+          "constrained": {
+            "meaning": "A platform mechanism (the block editor, global styles, the standard product, coupon or order screen, or the document mechanism selected in its PBI) shapes a real addition. Drawn inside that mechanism.",
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
+          },
+          "annotate_only": {
+            "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
+            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-shipment-panel", "ad-refund-record", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor"]
+          },
+          "custom": {
+            "meaning": "No standard screen exists. A new screen or panel, drawn in the standard administration idiom, never a bespoke administration interface.",
+            "surfaces": ["ad-staff-log", "ad-redirect-manager", "ad-customer-notes", "ad-customer-suspend", "ad-search-synonyms", "ad-price-stock-history", "ad-seo-fields", "ad-missing-page-log", "ad-carrier-status-mapping", "ad-cod-reconciliation", "ad-launch-rules-settings"]
+          }
+        },
+        "treatment_note": "A production classification for drawing effort, derived from each surface's native_baseline and design_freedom. It changes neither, and it adds no capability.",
+        "limited_rows": "Twenty-two of the rows these surfaces are drawn for are P1-L, and ten more of their context rows. Register section 1.2 sets out the launch reduction for some (ADM-132 among the drawn rows; SRCH-06, ADM-59 and ADM-60 among the context rows); the rest are drawn to their own row wording through the standard mechanism, and no reduction or extension is inferred. Where a reduction matters to a drawing and is not written, it is raised at review, not resolved in the drawing.",
+        "erp": {
+          "surfaces": ["ad-product-storefront-controls", "ad-price-stock-history", "ad-stock-from-erp", "ad-order-cancel", "ad-dashboard-stock", "rp-stock"],
+          "boundary": "Stock only (ERP-01; EX-35 excludes synchronising orders, customers, prices, product details or accounting data). Drawn as structural states with neutral placeholder wording, per PRE-09 and ERP-07: no timing, no mechanism, no reservation, no admin stock editing behaviour. Nothing implies another exchange with the ERP. The stock released on cancellation (BR-007, ERP-06) is drawn as a note on ad-order-cancel, not as a control."
+        }
+      }
+    },
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
   ],
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
@@ -1673,7 +1751,7 @@
     {
       "surface": "ad-search-synonyms",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-search-synonyms.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -1681,7 +1759,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-pdp-simple",
@@ -2492,7 +2570,7 @@
     {
       "surface": "ad-section-library",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-section-library.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2500,12 +2578,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-navigation-editor",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-navigation-editor.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2513,12 +2591,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-promo-banner-manager",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-promo-banner-manager.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2526,12 +2604,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-global-brand-controls",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-global-brand-controls.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2539,12 +2617,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-product-storefront-controls",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-product-storefront-controls.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2552,12 +2630,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-catalogue-terms",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-catalogue-terms.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2565,12 +2643,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-dashboard-sales",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-dashboard-sales.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2578,12 +2656,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-dashboard-stock",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-dashboard-stock.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2591,12 +2669,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-dashboard-attention",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-dashboard-attention.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2604,12 +2682,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-dashboard-quick-actions",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-dashboard-quick-actions.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2617,7 +2695,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-dashboard-customers-conversion",
@@ -2635,7 +2713,7 @@
     {
       "surface": "ad-product-edit-additions",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-product-edit-additions.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2643,12 +2721,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-price-stock-history",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-price-stock-history.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2656,12 +2734,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-list-search-additions",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-list-search-additions.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2669,12 +2747,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-order-status-control",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-order-status-control.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2682,12 +2760,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-order-status-history",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-order-status-history.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2695,12 +2773,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-order-list-filters",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-order-list-filters.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2708,12 +2786,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-order-cancel",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-order-cancel.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2721,12 +2799,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-invoice",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-invoice.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2734,12 +2812,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-packing-slip",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-packing-slip.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2747,12 +2825,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-shipment-panel",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-shipment-panel.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2760,12 +2838,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-carrier-status-mapping",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-carrier-status-mapping.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2773,12 +2851,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-cod-reconciliation",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-cod-reconciliation.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2786,12 +2864,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-refund-record",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-refund-record.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2799,12 +2877,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-customer-notes",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-customer-notes.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2812,12 +2890,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-customer-suspend",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-customer-suspend.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2825,7 +2903,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-customer-metrics-export",
@@ -2843,7 +2921,7 @@
     {
       "surface": "ad-promotion-editor",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-promotion-editor.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2851,12 +2929,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-launch-rules-settings",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-launch-rules-settings.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2864,12 +2942,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-manual-product-order",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-manual-product-order.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2877,7 +2955,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "sf-product-badges",
@@ -2909,7 +2987,7 @@
     {
       "surface": "ad-staff-log",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-staff-log.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2917,12 +2995,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-two-factor",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-two-factor.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2930,12 +3008,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-permission-denied",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-permission-denied.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2943,12 +3021,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-seo-fields",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-seo-fields.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2956,12 +3034,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-redirect-manager",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-redirect-manager.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2969,12 +3047,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-missing-page-log",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-missing-page-log.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2982,12 +3060,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-seo-site-settings",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-seo-site-settings.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -2995,12 +3073,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-stock-from-erp",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/ad-stock-from-erp.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -3008,7 +3086,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "ad-email-template-editor",
@@ -3026,7 +3104,7 @@
     {
       "surface": "rp-sales",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/rp-sales.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -3034,12 +3112,12 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "rp-stock",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/rp-stock.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_applicable",
@@ -3047,7 +3125,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "em-shell",
@@ -3247,7 +3325,7 @@
     {
       "surface": "sy-staging-marker",
       "batch": "batch-09",
-      "brief": null,
+      "brief": "design/briefs/sy-staging-marker.md",
       "artifacts": [],
       "en_ltr": "not_started",
       "ar_rtl": "not_started",
@@ -3255,7 +3333,7 @@
       "desktop": "not_started",
       "states_covered": [],
       "interaction_pending": [],
-      "review_status": "not_started"
+      "review_status": "briefed"
     },
     {
       "surface": "pv-paymob-card",
