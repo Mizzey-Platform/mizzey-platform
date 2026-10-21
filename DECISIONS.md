@@ -1712,7 +1712,7 @@ filter; and whether XML-RPC is disabled outright.
 
 ## 2026-10-21 - D-18: CoreX v0.47.0 is the proposed legacy target, and one authority per capability
 
-**Status: proposed in PR #PRNUM, pending the owner's review and merge.** Not applied until merged.
+**Status: proposed in PR #396, pending the owner's review and merge.** Not applied until merged.
 
 Owner decision of Mustafa, 21 October 2026, on architecture and framework versioning. **Not a client confirmation,
 adds no scope, changes no register row, stage, acceptance obligation or accepting PBI, and approves no upgrade or
