@@ -1164,8 +1164,8 @@
         {
           "date": "2026-10-21",
           "decided_by": "Mustafa, owner",
-          "kind": "owner correction after closure, D-17: who may write a review (drawn, awaiting the owner's review)",
-          "status": "awaiting_owner_review",
+          "kind": "owner correction after closure, D-17: who may write a review",
+          "status": "reviewed",
           "record": "D-17 (DQ-06 as revised, PR #385) added two states to rv-form and superseded the DQ-06 notes drawn in batch-07. The owner accepted Claude Code's validation on 21 October 2026 and authorised this correction for review; rv-form stays wireframed until he reviews the two new states. Claude Design returned mizzey-batch-07-correction-output.zip (SHA-256 619b0597a5165f31da5b9edbcc333e3af14d286ac89b599ba4e6665cbff3c951; handoff 07de541199d66b150df365b47766777eebc07952fbae8f3a4e120b13988ddc5d), drawn from the private batch-07 correction package v1 (SHA-256 8657e4df766a4501c2c61c166332ca66a4345d7187f72a41d85f70ef1cbbcf56), built from main at 70af5fa; the four files were unchanged on main up to c2a0b4f. The archive and handoff stay private and are not committed. Claude Code checked them before import: every file hash matched the handoff, and a token diff against main shows only the listed notes, the header list and the appended sets, with no markup change elsewhere. The batch-07 closure record (review) and the original batch-07 archive are not changed.",
           "changes": [
             {
@@ -1191,7 +1191,8 @@
             {"item": "Guest orders", "refs": ["D-17", "#309"], "status": "Not written in the rv-form frames and covered by D-17 and #309: a guest order qualifies only once it is linked to the customer's account through a secure link after the account's email address is verified; a matching billing email alone does not."},
             {"item": "Orders and lines that do not qualify", "refs": ["D-17", "#309"], "status": "Not written in the rv-form frames and covered by D-17 and #309: cancelled orders, orders returned to origin, and fully refunded orders or order lines do not qualify. The frames say \"delivered purchase\" and nothing more."}
           ],
-          "validation": "Claude Code, 21 October 2026, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed files: every frame at every width of its family (mobile 360 and 390, desktop 1024 and 1280). rv-form: 15 frames per language, 0 horizontal overflow, 0 elements escaping a frame, 0 targets under 44 x 44 px, 0 overlapping hit areas, 0 digits outside a left-to-right isolate in Arabic. The new line sits where the entry sits (the same top and the same 16 px mobile and 40 px desktop inline-start inset, right-aligned in Arabic), with the same 21 px gap to the list; on mobile the list moves up 5.4 px in English and 22.9 px in Arabic because the line is shorter than the 46 px entry. The 11 existing frames per language keep identical element geometry. Validators 0 problems; only the rv-form brief is regenerated."
+          "validation": "Claude Code, 21 October 2026, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed files: every frame at every width of its family (mobile 360 and 390, desktop 1024 and 1280). rv-form: 15 frames per language, 0 horizontal overflow, 0 elements escaping a frame, 0 targets under 44 x 44 px, 0 overlapping hit areas, 0 digits outside a left-to-right isolate in Arabic. The new line sits where the entry sits (the same top and the same 16 px mobile and 40 px desktop inline-start inset, right-aligned in Arabic), with the same 21 px gap to the list; on mobile the list moves up 5.4 px in English and 22.9 px in Arabic because the line is shorter than the 46 px entry. The 11 existing frames per language keep identical element geometry. Validators 0 problems; both rv-form.md and sf-pdp-reviews.md were regenerated because their inventory notes changed.",
+          "review": {"date": "2026-10-21", "decided_by": "Mustafa, owner", "record": "The owner approved the merge of PR #390 (squash-merged as a5db4e1) and approved the two new rv-form states, not_eligible and already_reviewed, on 21 October 2026; rv-form is reviewed with all seven states. This is the internal review of the low-fidelity structural wireframes only. It is not client approval or contractual acceptance: D-17 is an owner working decision, and final acceptance of the US-11-01 and US-11-03 eligibility criteria waits for the client's signed Stage 1 Approval Record. The implementation dependencies stay open with #309: which WooCommerce statuses carry Delivered and ORD-14 (#248), whether the email verification that links guest orders is active at launch, the order of the purchase check after WooCommerce Multilingual's filter, and whether XML-RPC is disabled. Not the high-fidelity design, not PRE-03b, and no functional implementation starts (D-14)."}
         }
       ],
       "review": {
@@ -2343,7 +2344,7 @@
       "desktop": "reviewed",
       "states_covered": ["default", "signed_out", "form", "validation", "submitted", "not_eligible", "already_reviewed"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "rv-pending",
