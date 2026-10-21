@@ -343,7 +343,10 @@ drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In or
    (PR #383); Claude Design drew it from the private package, the final corrected files were imported for his
    review in PR #388, and he reviewed and closed it on 21 October 2026, with nine items left open in the
    manifest. US-01-07's sender acknowledgement stays unresolved, and no email surface is added for it. Batch-09
-   opens only on his instruction.
+   (additions to the standard administration, and reports) opens on his instruction of 21 October 2026 in five
+   review groups: its forty surfaces are briefed, each in one group, in English on desktop (the staging marker also in Arabic). 09-A sets the shared
+   administration patterns and is drawn and reviewed first; 09-B to 09-E are drawn from it only after he accepts it,
+   and their outputs come in one pull request at a time.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

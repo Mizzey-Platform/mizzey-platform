@@ -1172,6 +1172,7 @@
     {
       "id": "ad-search-synonyms",
       "name": "Synonym and correction list",
+      "purpose": "Lets staff manage the synonym and correction list that the store search uses, from the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -1207,7 +1208,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-pdp-simple",
@@ -4065,6 +4066,7 @@
     {
       "id": "ad-section-library",
       "name": "Curated section library in the block editor",
+      "purpose": "Lets staff edit the home page sections and the static and policy pages, including the FAQ: their content, images, calls to action and order, and whether each section is shown, in English and Arabic independently, with a preview before a change goes live and a revert to the previous version.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4104,12 +4106,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
     },
     {
       "id": "ad-navigation-editor",
       "name": "Header navigation and mega menu structure",
+      "purpose": "Lets staff edit the structure of the header navigation and the mega menu.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4144,11 +4147,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-promo-banner-manager",
       "name": "Promotional banner: create, schedule, target, remove",
+      "purpose": "Lets staff create a promotional banner, schedule it, target it to a page, and remove it.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4186,11 +4190,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-global-brand-controls",
       "name": "Global brand controls: logo and approved colour tokens",
+      "purpose": "Lets staff change the storefront's logo and its approved colour tokens from the administration, so that nothing a customer reads is locked in code.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4224,12 +4229,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
     },
     {
       "id": "ad-product-storefront-controls",
       "name": "Per-product storefront controls",
+      "purpose": "Adds to the standard product screen the storefront controls it lacks: badges, the featured flag, collection placement and position, related products, visibility (published, hidden or scheduled), the search engine override, and the shipping and tax treatment. The stock field follows the ERP integration specification (PRE-09).",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4266,11 +4272,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-catalogue-terms",
       "name": "Category, brand and collection management",
+      "purpose": "Lets staff manage categories and subcategories with their ordering, images and search engine fields, brand pages with their logo, description and search engine fields, and manually curated collections.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4306,11 +4313,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-dashboard-sales",
       "name": "Dashboard: sales figures, charts, top products",
+      "purpose": "Shows staff revenue, orders, units sold and average order value, with charts by day, week, month or a custom range, and the top products.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4345,11 +4353,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-dashboard-stock",
       "name": "Dashboard: low and out-of-stock counts",
+      "purpose": "Shows staff on the dashboard the counts of products low in stock and out of stock, as reported by the ERP.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4384,11 +4393,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-dashboard-attention",
       "name": "Dashboard: orders needing action, pending refunds",
+      "purpose": "Shows staff on the dashboard the counts of orders requiring action and of pending returns and refunds, each linking to the standard filtered order list.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4422,12 +4432,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
     },
     {
       "id": "ad-dashboard-quick-actions",
       "name": "Dashboard: quick actions",
+      "purpose": "Gives staff quick actions from the dashboard: add a product, create a coupon, and view pending orders.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4460,7 +4471,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-dashboard-customers-conversion",
@@ -4504,6 +4515,7 @@
     {
       "id": "ad-product-edit-additions",
       "name": "Product screen: fields the standard screen may lack",
+      "purpose": "Adds to the standard product screen the fields it may lack: images and video, a compare-at price, a barcode per variant, the search engine slug, title, description, canonical and robots override, badges and collection assignment.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4538,12 +4550,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
     },
     {
       "id": "ad-price-stock-history",
       "name": "Price and stock change history",
+      "purpose": "Shows staff the history of a product's price and stock changes, with the user and the time of each. The stock part follows the ERP integration specification (PRE-09).",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4578,11 +4591,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-list-search-additions",
       "name": "Product and order list: search by barcode and by phone",
+      "purpose": "Lets staff find any product by SKU, title or barcode, and find an order by the customer's phone number, from the standard lists.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4616,12 +4630,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Staging found a phone-format gap on ADM-157. It stays with #278."
     },
     {
       "id": "ad-order-status-control",
       "name": "Order status change with validation",
+      "purpose": "Lets staff change an order's status, with the change validated.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4655,11 +4670,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-order-status-history",
       "name": "Order timeline and status history",
+      "purpose": "Adds to the standard order detail the order's timeline: a history of its status changes.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4693,11 +4709,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-order-list-filters",
       "name": "Order list search and filters",
+      "purpose": "Lets staff search and filter the order list by order number, customer, phone, email, status, payment, date and carrier.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4731,11 +4748,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-order-cancel",
       "name": "Cancel an order with a recorded reason",
+      "purpose": "Lets staff cancel an order, with the reason recorded.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4769,11 +4787,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-invoice",
       "name": "Invoice, printed or downloaded by staff",
+      "purpose": "Lets staff print or download an order's invoice.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4808,11 +4827,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-packing-slip",
       "name": "Packing slip",
+      "purpose": "Lets staff print or download an order's packing slip, one order at a time.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4846,11 +4866,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-shipment-panel",
       "name": "Shipment, tracking and pickup on the order",
+      "purpose": "Shows staff, on the order, the shipment created through the carrier integration: the tracking code returned automatically, the pickup request, and the carrier status reflected on the order.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4886,11 +4907,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-carrier-status-mapping",
       "name": "Carrier status to order status mapping, visible in admin",
+      "purpose": "Shows staff the explicit mapping from each carrier status to an order status, documented and visible in the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4924,11 +4946,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-cod-reconciliation",
       "name": "Cash on delivery: collected and remitted, per order",
+      "purpose": "Records, per order, the cash on delivery collected and the cash remitted.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4963,11 +4986,12 @@
       "decisions": ["DQ-05"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-refund-record",
       "name": "Record a refund with its payment reference",
+      "purpose": "Lets staff record a full or partial refund, with its payment reference, from the standard order screen.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5003,11 +5027,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-customer-notes",
       "name": "Internal notes on a customer",
+      "purpose": "Lets staff keep internal notes on a customer that the customer never sees.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5042,11 +5067,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-customer-suspend",
       "name": "Suspend an account with a reason",
+      "purpose": "Lets staff disable or suspend a customer account, with the reason recorded.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5081,7 +5107,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-customer-metrics-export",
@@ -5125,6 +5151,7 @@
     {
       "id": "ad-promotion-editor",
       "name": "Promotions and coupons",
+      "purpose": "Lets staff create automatic promotions or coupon codes with their conditions, rewards, limits and exclusions and the combination setting, schedule their start and end, and pause or deactivate one without deleting its usage history.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5164,11 +5191,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-launch-rules-settings",
       "name": "Launch rule settings: welcome discount, free shipping, combining",
+      "purpose": "Lets staff set the launch rules: the welcome discount's value, cap, expiry and eligibility, the free-shipping condition for two or more items, and whether the welcome discount, a coupon and free shipping can combine.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5204,11 +5232,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-manual-product-order",
       "name": "Manual product ordering in categories and collections",
+      "purpose": "Lets staff order products manually within a category or a collection.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5242,7 +5271,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "sf-product-badges",
@@ -5338,6 +5367,7 @@
     {
       "id": "ad-staff-log",
       "name": "Staff activity log",
+      "purpose": "Shows staff a searchable log of admin activity, sign-ins and significant security events, which ordinary users cannot delete from the interface.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5374,12 +5404,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes."
     },
     {
       "id": "ad-two-factor",
       "name": "Two-factor sign-in for admin accounts",
+      "purpose": "Protects admin accounts with two-factor authentication at sign-in.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5415,11 +5446,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-permission-denied",
       "name": "Action not permitted for this staff account",
+      "purpose": "Tells a staff member that an action is not permitted for their account, under role-based access in which no staff account receives owner-level access by default.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5453,11 +5485,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-seo-fields",
       "name": "Title, description and canonical on products, categories and pages",
+      "purpose": "Lets staff edit the search engine title, description and canonical tag of every product, category and page.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5492,11 +5525,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-redirect-manager",
       "name": "Redirect manager",
+      "purpose": "Lets staff create permanent redirects from the administration without a developer.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5532,11 +5566,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-missing-page-log",
       "name": "Missing-page log",
+      "purpose": "Shows staff a log of missing-page errors in the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5571,11 +5606,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-seo-site-settings",
       "name": "Sitemap, robots and search console verification",
+      "purpose": "Lets staff control the XML sitemap and the robots file, and verify the site with Google Search Console and Bing Webmaster.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5609,11 +5645,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "ad-stock-from-erp",
       "name": "Stock on hand and available, from the ERP",
+      "purpose": "Shows staff a product's stock on hand and stock available, as supplied by the ERP. How stock appears in the administration is set by the ERP integration specification (PRE-09); until then it is a placeholder.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5647,7 +5684,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "per PRE-09",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
     },
     {
@@ -5693,6 +5730,7 @@
     {
       "id": "rp-sales",
       "name": "Sales report",
+      "purpose": "Gives staff the sales report: revenue, net sales, orders, units, average order value, discounts and shipping.",
       "kind": "report",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5728,11 +5766,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "rp-stock",
       "name": "Inventory report: low and out of stock",
+      "purpose": "Gives staff the standard low-stock and out-of-stock report, on the figures the ERP supplies.",
       "kind": "report",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5768,7 +5807,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "briefed"
     },
     {
       "id": "em-shell",
@@ -6444,6 +6483,7 @@
     {
       "id": "sy-staging-marker",
       "name": "Staging marker on every screen",
+      "purpose": "Marks the staging and demonstration copy on every screen so that it is never mistaken for the live store. Already built with the staging environment (#244).",
       "kind": "component",
       "scope_type": "internal_operational",
       "audience": ["staff", "developer"],
@@ -6480,7 +6520,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable.",
       "build_note": "No row and no accepting PBI. Already built with the staging environment, #244."
     },
