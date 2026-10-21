@@ -86,11 +86,18 @@ Live status. First action each session: read this, then continue from **Next**.
   record is the batch-07 entry under `batches` in the manifest. **D-17 (proposed, 20 October 2026)** revises DQ-06:
   a review needs a delivered purchase. `rv-form` gains `not_eligible` and `already_reviewed` and is `wireframed`,
   5 of 7 states, until a follow-up drawing after batch-08; the batch-07 closure is unchanged.
+  **Batch-08 is reviewed and closed**: Claude Design's final corrected files, eleven surfaces (the email layout,
+  the eight customer emails and the store notices in English and Arabic, the platform's staff emails in English),
+  were imported for review in PR #388 with the batch-04 Undo correction, and the owner approved them as
+  low-fidelity structural wireframes on 21 October 2026. The shipped, payment-failed and delivered emails carry
+  his three clarifications. Nine items stay open and undecided, among them the review-invitation consent, the
+  email-change verification (US-10-05) and the native email configuration (#285). The record is the batch-08
+  entry under `batches` in the manifest.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-07 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  batch-01 to batch-08 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -292,7 +299,7 @@ Live status. First action each session: read this, then continue from **Next**.
 ## Next
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-07 and CoreX is not upgraded until he says so either.** In order:
+drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -330,10 +337,11 @@ drawn beyond batch-07 and CoreX is not upgraded until he says so either.** In or
    Design draws it from a private manual-transfer package built from the opening. The design sources now name the
    Functional Specification version 1.3 and the Sitemap version 1.1. Claude Design drew it, and he reviewed and
    closed it on 20 October 2026 with his corrections in one PR (the import, correction and closure records in the
-   manifest). Batch-08 (transactional emails and customer messages) is prepared for opening on his instruction of
-   20 October 2026: its eleven surfaces are briefed, and a private manual-transfer package is built from the opening
-   for his review. It opens when he approves the opening PR and issues the package. US-01-07's sender
-   acknowledgement stays unresolved, and no email surface is added for it.
+   manifest). Batch-08 (transactional emails and customer messages) opened on his instruction of 20 October 2026
+   (PR #383); Claude Design drew it from the private package, the final corrected files were imported for his
+   review in PR #388, and he reviewed and closed it on 21 October 2026, with nine items left open in the
+   manifest. US-01-07's sender acknowledgement stays unresolved, and no email surface is added for it. Batch-09
+   opens only on his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
