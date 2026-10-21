@@ -1710,13 +1710,15 @@ Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email 
 orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
 filter; and whether XML-RPC is disabled outright.
 
-## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, and how the site is opened and closed
+## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, how the site is opened and closed, and the CoreX v0.47.0 legacy target
 
-**Status: approved by the owner on 21 October 2026; in force on `main` when the pull request that carries it is
-merged.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the read-only CoreX
-architecture audit. **An internal architecture decision: not a client confirmation, adds no scope, changes no signed
-document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade stays the PR #350
-and #351 chain under its own security and regression review.
+**Status: approved by the owner on 21 October 2026. Sections 1 to 5 are carried by PR #395; sections 6 to 9 are
+proposed in PR #396, which is stacked on #395. Each part is in force on `main` only when the pull request that
+carries it is merged.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the
+read-only CoreX architecture audit. **An internal architecture decision: not a client confirmation, adds no scope,
+changes no signed document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade
+is made only in its own infrastructure PR under its own security and regression review (section 6). PRs #350 and
+#351 are not changed.
 
 **1. Ownership.** Verified against the pinned CoreX v0.42.0 (`corex.lock`), WordPress 7.1 and WooCommerce 11.1.0.
 
@@ -1777,3 +1779,31 @@ Implementation decisions (owner, before the work they block):
 
 Client decisions, not presented as approved: the consent wording for HOME-09 signups, and production hosting
 (OD-27, hosting outside Egypt, which blocks launch).
+
+**6. The CoreX target.** CoreX v0.47.0 (commit `3a5476593b5fdab3975ecf47d327b3cacb43b71d`, published on 21 October
+2026, https://github.com/MustafaShaaban/corex/releases/tag/v0.47.0) is the proposed final release of the current
+CoreX generation and the version Mizzey's next upgrade moves to. It replaces the v0.43.0 target named in D-14 item
+4; the rest of D-14 item 4 stands, and D-14 itself is not edited. The pin stays at v0.42.0, and `corex.lock` and
+`stack.lock.json` are unchanged, until a separate upgrade PR is approved and made under D-14 and
+`docs/stack-and-upgrades.md`. A future CoreX revamp has no released version or API, and nothing is built against it.
+
+**7. The architecture rule.** ADR-0003: framework fixes and capabilities belong to CoreX, contracted behaviour and
+thin adapters to `mizzey-site/`, presentation to `mizzey-theme/`, native WordPress and WooCommerce first; no patch
+to the CoreX checkout; one authority per setting or business concept, with derived assets rather than duplicate
+uploads; a hidden control is not a disabled capability; `corex-kit-woo` stays inactive (section 1); contracted
+operational conditions use CoreX's existing inbox and no second notification system; no new paid dependency without
+written approval; a feature flag is never a version switch.
+
+**8. The evidence.** `docs/2026-10-21-corex-mizzey-ownership-audit.md` and
+`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`, both static source reviews. The Bosta plugin writes stock
+through a webhook route and a manual sync, against the ERP invariant; that needs the PBIs that own it (#291, #317)
+and is not resolved here. The second coming-soon mechanism CoreX adds from v0.43.0 is settled by section 2:
+WooCommerce owns Coming Soon and CoreX's stays off.
+
+**9. Also open, from the ownership audit (section 5 of the audit).** The roles that see the CoreX inbox; the
+generator tag; the staff log's storage (#275); how two-factor sign-in is provided (ADM-131: the Technical Design
+names WP 2FA, free tier, which is evaluated before any paid component is raised); and the redirect and missing-page
+log mechanism (MKT-13, MKT-14: the Technical Design names Redirection, a free component, and the frozen 09-A design
+draws a custom screen). Whether PR #351 (v0.42.0 to v0.46.1) is retargeted to v0.47.0 or closed, and PR #350 with
+it. The sign-in identity is the branding item in section 5. Whether corex-ui is active follows section 3. Each is
+the owner's to decide, before the work it blocks.
