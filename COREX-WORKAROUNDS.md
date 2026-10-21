@@ -11,6 +11,12 @@ ships in a tag, bump `corex.lock`, delete the workaround, and delete the row.
 |---|---|---|
 | [corex#201](https://github.com/MustafaShaaban/corex/issues/201) | v0.42.0 | php-parser is a declared runtime dependency, or DocsCommand is built lazily |
 
+**Status on 21 October 2026.** corex#201 was closed on 4 October 2026 and fixed in CoreX v0.42.1. Both delete
+conditions hold in the v0.47.0 source: `nikic/php-parser` is in `require` (`composer.json:10`) and `DocsCommand` is
+built inside the `docs:generate` handler (`packages/cli/src/CliServiceProvider.php:393-409`). **The workaround stays
+while the pin is v0.42.0.** It is deleted in the upgrade PR, after the reproduction below passes on a `--no-dev`
+build of the new pin (`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`).
+
 ---
 
 ## The CLI loses half its commands under `composer install --no-dev`

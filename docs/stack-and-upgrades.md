@@ -58,6 +58,17 @@ compatibility guarantee. Production differs in PHP build, database engine, cachi
 Known gaps at 22 September 2026: the database engine behind the local runtime is not recorded, and no payment
 plugin is selected.
 
+## The CoreX versions to keep apart
+
+| | Version | Where it is recorded |
+|---|---|---|
+| Current pin | v0.42.0 | `corex.lock`, `stack.lock.json` |
+| Proposed frozen legacy target | v0.47.0 (`3a54765`) | D-18, ADR-0003, `docs/2026-10-21-corex-v0.47.0-migration-readiness.md` |
+| Future CoreX revamp | Not released | Nothing is built against it until it publishes a version and an API |
+
+The target is not tested for Mizzey. It becomes the pin only through the upgrade PR, by the path below, and that PR
+is the only change that edits either lock file.
+
 ## Regression path for any upgrade
 
 WordPress, WooCommerce, CoreX, WPML, WCML, a payment or shipping plugin, or PHP: each is upgraded on its own branch,

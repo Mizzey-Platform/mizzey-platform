@@ -1709,3 +1709,34 @@ and batch-03 `sf-pdp-reviews` frames are superseded and are corrected by a follo
 Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email verification that links guest
 orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
 filter; and whether XML-RPC is disabled outright.
+
+## 2026-10-21 - D-18: CoreX v0.47.0 is the proposed legacy target, and one authority per capability
+
+**Status: proposed in PR #PRNUM, pending the owner's review and merge.** Not applied until merged.
+
+Owner decision of Mustafa, 21 October 2026, on architecture and framework versioning. **Not a client confirmation,
+adds no scope, changes no register row, stage, acceptance obligation or accepting PBI, and approves no upgrade or
+functional work.**
+
+**1. The CoreX target.** CoreX v0.47.0 (commit `3a5476593b5fdab3975ecf47d327b3cacb43b71d`, published on
+21 October 2026, https://github.com/MustafaShaaban/corex/releases/tag/v0.47.0) is the proposed final release of
+the current CoreX generation and the version Mizzey's next upgrade moves to. It replaces the v0.43.0 target named
+in D-14 item 4; the rest of D-14 item 4 stands, and D-14 itself is not edited. The pin stays at v0.42.0, and
+`corex.lock` and `stack.lock.json` are unchanged, until a separate upgrade PR is approved and made under D-14 and
+`docs/stack-and-upgrades.md`. A future CoreX revamp has no released version or API, and nothing is built against it.
+
+**2. The architecture.** ADR-0003: framework fixes and capabilities belong to CoreX, contracted behaviour and thin
+adapters to `mizzey-site/`, presentation to `mizzey-theme/`, native WordPress and WooCommerce first; no patch to
+the CoreX checkout; one authority per setting or business concept, with derived assets rather than duplicate
+uploads; a hidden control is not a disabled capability; `corex-kit-woo` stays inactive; contracted operational
+conditions use CoreX's existing inbox and no second notification system; no new paid dependency without written
+approval; a feature flag is never a version switch.
+
+**3. The evidence.** `docs/2026-10-21-corex-mizzey-ownership-audit.md` and
+`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`, both static source reviews. Two findings need the PBIs that
+own them: the Bosta plugin writes stock through a webhook route and a manual sync, against the ERP invariant (#291,
+#317); and from v0.43.0 CoreX adds a second coming-soon mechanism beside WooCommerce's. Neither is resolved here.
+
+**4. Still the owner's to decide**, listed in the audit's section 5: the login identity, the roles that see the
+inbox, the generator tag, the coming-soon mechanism, the staff log's storage (#275), whether corex-ui stays active,
+and how two-factor sign-in is provided.
