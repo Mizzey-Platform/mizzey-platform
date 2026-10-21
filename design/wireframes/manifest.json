@@ -542,7 +542,7 @@
           {"item": "Rate limits, password rules and automated sign-up protection", "surface": "au-sign-in, au-register, au-passwordless, au-google-entry", "refs": ["AUTH-15", "AUTH-16"], "status": "No attempt count, lockout time, session length, password rule list, CAPTCHA or provider is drawn. The protection is a labelled reserved slot, and whether Google and the emailed link pause with a rate-limited password sign in is left to the same setting."}
         ],
         "not_drawn": [
-          {"item": "Undo on the removal confirmation", "surface": "sf-cart:item_removed", "refs": ["CART-03"], "status": "Recommended by Claude Design. No row contracts it and the owner has not approved it. It is not drawn and is not added."}
+          {"item": "Undo on the removal confirmation", "surface": "sf-cart:item_removed", "refs": ["CART-03"], "status": "Recommended by Claude Design. No row contracts it and the owner has not approved it. It is not drawn and is not added. Superseded on 21 October 2026: drawn as a batch-04 correction on the owner's direction (corrections, 21 October 2026)."}
         ],
         "carried_findings": [
           {"item": "Product-card name link", "surface": "sf-product-card", "batch": "batch-02", "refs": ["NFR-11"], "classification": "implementation-level semantics", "status": "Measured at 18.9 to 38 px tall, 122 visible instances in the cart, empty-cart and mini-cart suggestion frames (the handoff counts 136, including cards scrolled out of a rail). The existing requirement stands: in the build one accessible link covers the image and the product name, well over 44 px. The reviewed batch-02 card is not redesigned."},
@@ -616,6 +616,21 @@
             }
           ],
           "validation": "Claude Code, 20 October 2026, on the 32 files with the coupon correction: design_wireframes, design_inventory, design_briefs and repo_checks 0 problems; discovery.check clean; tools/tests and discovery/tests passing. Headless Chromium 155 over local HTTP with the real stylesheets, each frame at its labelled width, baseline (238c4fc with the free-shipping correction) against output: 354 frames, 0 horizontal overflow, 0 elements outside their frame, 0 overlapping hit areas, no new target under 44 x 44 px (only the carried product-card name link and footer email field); the 74 free-shipping slots unchanged to 0.00 px; every wf-num sequence in every existing frame unchanged; 15 D3 columns per language at 440 px with tabs; the phone value direction ltr with unicode-bidi isolate; notices role status, errors role alert."
+        },
+        {
+          "date": "2026-10-21",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner correction after closure, from the batch-08 review: Undo on the cart removal confirmation",
+          "record": "The owner's direction of 20 October 2026 in the batch-08 review: \"Use the existing Batch 04 confirmation pattern with an Undo action. Do not introduce a second confirmation. Treat any change to the previously approved Batch 04 as an explicit correction.\" On 21 October 2026 he accepted the drawn correction for structural integration with batch-08; his approval of the integration pull request confirms it. Claude Design returned the two files in the batch-08 integration package; Claude Code checked them against main: the originals match the correction note's prior hashes, and the word diff is exactly the Undo link and two note sentences per language. Closes import.not_drawn \"Undo on the removal confirmation\".",
+          "changes": [
+            {
+              "item": "Undo on the removal confirmation",
+              "surface": "sf-cart:item_removed",
+              "refs": ["CART-03"],
+              "change": "In the two item_removed frames per language, an Undo link (batch-04's own line action .ln__a, at the inline end as the moved_to_wishlist frame's View wishlist) after the confirmation text inside .ln--gone; the mobile note says Undo puts the line back where it was and focus goes to the restored line's name, and the desktop note says it is drawn as on mobile. No stylesheet, state or other frame changes. design/wireframes/s1/batch-04/sf-cart.en.html 1e21d5091aaca7cdcc9be3e56679dabfd1a74ce03c3594411444281f33f05268 to 77df9c11762e40afaba38e73c2ca12a36023f9aba051407423884c68fad7b3d5; sf-cart.ar.html dedbcf1c877fe5421aa9ba93fd34a91fdff7a01f857df65ae655da66365a5d87 to c84badb4b28530eb947c03a1ce337d79ce41a08a1c757fafc0ba3f505228d7c7."
+            }
+          ],
+          "validation": "Claude Code, 21 October 2026, headless Chromium 155: Undo is 44 x 44 px at the inline end of the confirmation in English and Arabic; the removed-line row grows from 64 to 69 px (69.5 in Arabic on mobile), the moved_to_wishlist row's height; all 29 frames per language keep 0 overflow and 0 overlapping targets, and the targets under 44 px are the same before and after (only the inherited product-card name link). Of the 1,128 frames in the 106 batch-04 to batch-07 files that link components.css, the four item_removed frames are the only ones whose element geometry changes."
         }
       ],
       "review": {
@@ -1218,7 +1233,34 @@
         ]
       }
     },
-    {"id": "batch-08", "name": "Transactional emails and customer messages", "release": "S1"},
+    {
+      "id": "batch-08",
+      "name": "Transactional emails and customer messages",
+      "release": "S1",
+      "import": {
+        "status": "awaiting_owner_review",
+        "date": "2026-10-21",
+        "source": "Claude Design, final corrected files supplied by the owner on 21 October 2026 as Mizzey-Batch08-ClaudeCode-Integration-READY.zip (SHA-256 e89d21cd45d64dd9d274f4dc73e4fecc9f7307826baf8b4ecff7782eca61d0ac; all 25 design-file hashes matched its SHA256SUMS.txt), drawn from the batch-08 design package v1 (SHA-256 ae70dd1c159740771ab8ebb03d2563e3e24c815cb6e63ff703f760fbeed0e8fe), built from the opening commit 1704889 (PR #383, merged as b5a2b55 with an identical tree) and issued by the owner. The earlier mizzey-batch-08-output files are superseded and not used. Integrated onto main at 70af5fa by targeted edits, keeping the D-17 and source-reference changes made since. The canonical final export and handoff (mizzey-batch-08-final-export-2026-10-21.zip, SHA-256 86f4b6c44ca7ac94edc2ba3b65b0cc1c931e6c552540af9647bec6c3f37655df; handoff b609ce57aeb9669727a520a0decabde5ada580876ddb80615eae4110ffebb505) list every file's size and hash and supersede the earlier handoff's figures. The archives and handoffs stay private and are not committed.",
+        "record": "Twenty-one files: ten surfaces in English and Arabic and em-staff-native in English only (desktop and annotation), the new design/wireframes/s1/batch-08/batch-08.css (4,100 bytes) and design/wireframes/_shared/components.css with one appended block (cn-email-block, .xm and its parts); the 21,905 bytes already on main are kept byte for byte at its start (24,297 bytes now). The files were committed exactly as delivered. All listed states are covered: 33 in English and 29 in Arabic, counted from the wf-state labels against the inventory, none missing or extra; 93 frames in English and 89 in Arabic, 182 in all. Conditionally accepted by the owner on 21 October 2026, subject to three clarifications, drawn before this record: em-shipped default carries the carrier and the tracking number as copyable values, and the email is sent only once both are recorded (NOTF-04, US-12-04); em-payment-failed default states the retry route against the existing order and the duplicate-charge guard (payment is offered only while the order awaits payment); em-delivered aligns the review invitation with DQ-06 as revised by D-17: delivered-purchase eligibility checked on the server at the form, fully refunded lines left out, guest orders only once linked to an account after email verification, and the emailed link grants nothing by itself. Not reviewed until the owner confirms in the pull request.",
+        "status_before_import": {
+          "briefed": ["em-shell", "em-welcome", "em-order-confirmed", "em-payment-failed", "em-shipped", "em-delivered", "em-refund", "em-password-reset", "em-passwordless", "em-staff-native", "sy-store-notices"],
+          "note": "All eleven were briefed when batch-08 opened (PR #383)."
+        },
+        "provisional": "DQ-01 stays provisional. DQ-06 is drawn as revised by D-17. Wording, sender details and the logo are labelled placeholders (CR-15, OD-18, OD-01). The classic email template is the launch baseline, to be confirmed by #285.",
+        "measurements": "Claude Code, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed files: all 182 frames, each resized to every width of its family (mobile frames at 360 and 390, tablet at 768, desktop at 1024 and 1280), 354 measurements in all: every stylesheet loaded, 0 horizontal overflow, 0 elements escaping their frame, no clipped text other than the visually hidden text, no target under 44 x 44 px, 0 overlapping hit areas, no digit outside a left-to-right isolate in Arabic. Email buttons (.xm__b) are 48 px tall at least; email text links (.xm__l) 44 px. With the new components.css, the 1,128 frames of the 106 batch-04 to batch-07 files that link it keep identical element geometry, apart from the four sf-cart item_removed frames of the batch-04 Undo correction (corrections, 21 October 2026). Validators: before the manifest was updated, exactly the 21 expected unlisted lines; after it, 0 problems.",
+        "pending": [
+          {"item": "Review-invitation consent classification", "surface": "em-delivered:with_review_invitation", "refs": ["REV-05", "NOTF-06", "US-11-03", "NOTF-11", "US-12-07"], "status": "Owner decision. The block is drawn as contracted and separable; no consent gating is drawn."},
+          {"item": "Email-change verification", "surface": null, "refs": ["US-10-05", "#308"], "status": "Required by US-10-05; inventory surface and mechanism undefined. Not drawn."},
+          {"item": "Native email configuration", "surface": "em-staff-native", "refs": ["#285"], "status": "Recommended enable and disable table in the handoff; final configuration is the Native coverage decision of #285."},
+          {"item": "Authentication link lifetimes", "surface": "em-password-reset, em-passwordless", "refs": ["AUTH-12"], "status": "Single use and time limited; no lifetime is printed until the value is set."},
+          {"item": "Refund reference source", "surface": "em-refund", "refs": ["#306"], "status": "The row is shown only when a valid reference exists and omitted otherwise."},
+          {"item": "Contact-form sender acknowledgement", "surface": null, "refs": ["US-01-07"], "status": "Carried from batch-07 (ISSUED, item 1). No email surface is drawn for it; not an exclusion."},
+          {"item": "Native review-request beta", "surface": "em-delivered:with_review_invitation", "refs": ["DQ-06", "D-17"], "status": "WooCommerce 11.1's beta, off by default, sends after a delay to a guest-accessible Review Order page, which conflicts with DQ-06 as revised by D-17. It stays off unless the owner decides otherwise (ISSUED, item 4)."},
+          {"item": "Email layout system and implementation mechanism", "surface": "em-shell", "refs": ["#285"], "status": "The drawing is structural; the template mechanism is decided at #285 (ISSUED, item 6)."},
+          {"item": "em-payment-failed native baseline", "surface": "em-payment-failed", "refs": ["#285"], "status": "The inventory's native_baseline still reads 'To be settled in the Native coverage table of #285'. WooCommerce 11.1 has a native customer failed-order email without the contracted retry link. Reconciled only with the owner's approval; not changed here."}
+        ]
+      }
+    },
     {"id": "batch-09", "name": "Additions to the standard administration, and reports", "release": "S1"},
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
   ],
@@ -2932,131 +2974,131 @@
       "surface": "em-shell",
       "batch": "batch-08",
       "brief": "design/briefs/em-shell.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-shell.en.html", "design/wireframes/s1/batch-08/em-shell.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "transactional", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-welcome",
       "batch": "batch-08",
       "brief": "design/briefs/em-welcome.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-welcome.en.html", "design/wireframes/s1/batch-08/em-welcome.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "with_discount", "without_discount"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-order-confirmed",
       "batch": "batch-08",
       "brief": "design/briefs/em-order-confirmed.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-order-confirmed.en.html", "design/wireframes/s1/batch-08/em-order-confirmed.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "guest", "account_holder", "cash_on_delivery", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-payment-failed",
       "batch": "batch-08",
       "brief": "design/briefs/em-payment-failed.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-payment-failed.en.html", "design/wireframes/s1/batch-08/em-payment-failed.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "retry_available"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-shipped",
       "batch": "batch-08",
       "brief": "design/briefs/em-shipped.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-shipped.en.html", "design/wireframes/s1/batch-08/em-shipped.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "with_tracking"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-delivered",
       "batch": "batch-08",
       "brief": "design/briefs/em-delivered.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-delivered.en.html", "design/wireframes/s1/batch-08/em-delivered.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "with_review_invitation"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-refund",
       "batch": "batch-08",
       "brief": "design/briefs/em-refund.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-refund.en.html", "design/wireframes/s1/batch-08/em-refund.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "full_refund", "partial_refund"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-password-reset",
       "batch": "batch-08",
       "brief": "design/briefs/em-password-reset.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-password-reset.en.html", "design/wireframes/s1/batch-08/em-password-reset.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "link"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-passwordless",
       "batch": "batch-08",
       "brief": "design/briefs/em-passwordless.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-passwordless.en.html", "design/wireframes/s1/batch-08/em-passwordless.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "link"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "em-staff-native",
       "batch": "batch-08",
       "brief": "design/briefs/em-staff-native.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-08/em-staff-native.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "new_order", "cancelled_order", "failed_order"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "sy-404",
@@ -3088,14 +3130,14 @@
       "surface": "sy-store-notices",
       "batch": "batch-08",
       "brief": "design/briefs/sy-store-notices.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/sy-store-notices.en.html", "design/wireframes/s1/batch-08/sy-store-notices.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "success", "error", "info", "with_undo"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "sy-sign-in-required",

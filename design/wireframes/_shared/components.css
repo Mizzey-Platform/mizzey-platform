@@ -180,3 +180,18 @@
 .rvi__t{display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:#262626;overflow-wrap:anywhere;text-wrap:pretty}
 .rvi--p{padding:14px 16px;border:1.5px dashed #6b6b6b;border-radius:10px;background:#f6f6f6}
 .rvi__p{font-size:12.5px;font-weight:700}
+/* cn-email-block: the blocks every customer email shares, first drawn in batch-08 (em-shell and the eight customer emails). A structural drawing of the table-based build: .xm the message, one column, 600 px at most; .xm__hd the header with the logo box (OD-01); .xm__bd the body; .xm__h the heading; .xm__p text; .xm__s the small print; .xm__b the button, a link 48 px tall at least (.xm__b--2 secondary), scoped under .xm so that wireframe.css's .pg a, which makes links inherit their colour, does not turn its label the colour of its fill; .xm__l a text link, 44 px; .xm__k a labelled value (order number, tracking number); .xm__o a block that can be left out, outlined dashed; .xm__ft the footer: sender details as value slots (OD-18) and why it was sent (.xm__why). The order table is cm-order-summary as charged (.sm--paid). */
+.xm{display:flex;flex-direction:column;inline-size:100%;max-inline-size:600px;margin-inline:auto;background:#fff;color:#151515;font-size:15px;overflow-wrap:anywhere}
+.xm__hd{display:flex;align-items:center;justify-content:center;gap:6px;padding:18px 16px;border-block-end:1px solid #e0e0e0}
+.xm__bd{display:flex;flex-direction:column;gap:16px;padding:28px 20px 32px}
+.xm__h{font-size:22px;line-height:1.3;font-weight:700}
+.xm__p{text-wrap:pretty}
+.xm__s{font-size:13px;line-height:1.5;color:#5c5c5c}
+.xm .xm__b{display:flex;align-items:center;justify-content:center;gap:8px;align-self:flex-start;min-inline-size:min(100%,240px);min-block-size:48px;padding:12px 22px;border:1.5px solid #151515;border-radius:10px;background:#151515;color:#fff;font-weight:650;text-align:center;text-decoration:none}
+.xm .xm__b--2{background:#fff;color:#151515}
+.xm__l{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-block-size:44px;font-weight:650;text-underline-offset:3px}
+.xm__k{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:2px 12px;min-block-size:44px;padding-block:8px;border-block-end:1px solid #e0e0e0;font-size:14px}
+.xm__k>span:first-child{color:#5c5c5c}
+.xm__o{display:flex;flex-direction:column;gap:12px;padding:18px 16px;border:1.5px dashed #6b6b6b;border-radius:10px}
+.xm__ft{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:24px 20px;background:#f3f3f3;font-size:12.5px;color:#3a3a3a}
+.xm__why{align-self:stretch;padding-block-start:10px;border-block-start:1px solid #d6d6d6}
