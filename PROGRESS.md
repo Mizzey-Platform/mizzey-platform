@@ -83,8 +83,9 @@ Live status. First action each session: read this, then continue from **Next**.
   layout class renamed so it no longer inherits the batch-03 confirmation card, one labelled Remove action on the
   wishlist cards (the heart removed there only), and REV-01 traced to the review form. US-01-07's sender
   acknowledgement stays open for Stage 1, and the batch-01 promotional link (18 px) is a stabilisation item. The
-  record is the batch-07 entry under `batches` in the manifest. **D-17 (proposed, 20 October 2026)** revises DQ-06:
-  a review needs a delivered purchase. `rv-form` gains `not_eligible` and `already_reviewed`, drawn by the D-17
+  record is the batch-07 entry under `batches` in the manifest. **D-17 (applied 20 October 2026 as an owner working
+  decision; client acceptance pending at Stage 1)** revises DQ-06: a review needs a delivered purchase. `rv-form`
+  gains `not_eligible` and `already_reviewed`, drawn by the D-17
   correction (PR #390) and reviewed by the owner on 21 October 2026: it is `reviewed`, 7 of 7 states. The batch-07
   and batch-03 closures are unchanged, and client acceptance of the eligibility criteria waits for Stage 1.
   **Batch-08 is reviewed and closed**: Claude Design's final corrected files, eleven surfaces (the email layout,

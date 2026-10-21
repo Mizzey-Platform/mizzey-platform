@@ -1662,7 +1662,11 @@ the commands on the server.
 
 ## 2026-10-20 - D-17: a review needs a delivered purchase, and DQ-06 is revised
 
-**Status: proposed, 20 October 2026.** Not applied until the owner approves the PR that carries it and it is merged.
+**Status: applied on `main`, 20 October 2026, as an owner working decision; client acceptance pending.** PR #385 was
+approved by the owner and squash-merged as `67fd6b8` (`67fd6b88a23289265f6f93eb32ed2c3b77dbb153`), and
+PR #386 (`6a1abf5`) records DQ-06 in `docs/scope/open-items.json` as decided by the owner, not client-confirmed,
+and blocking acceptance. Final acceptance of the US-11-01 and US-11-03 eligibility criteria waits for the client's
+signed Stage 1 Approval Record.
 
 Owner decision of Mustafa, 20 October 2026. **Not a client confirmation, adds no scope, and not contractual
 acceptance.** It is presented to the client as a clarification of REV-01 and REV-02 in the Functional
