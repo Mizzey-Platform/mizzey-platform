@@ -1710,33 +1710,100 @@ Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email 
 orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
 filter; and whether XML-RPC is disabled outright.
 
-## 2026-10-21 - D-18: CoreX v0.47.0 is the proposed legacy target, and one authority per capability
+## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, how the site is opened and closed, and the CoreX v0.47.0 legacy target
 
-**Status: proposed in PR #396, pending the owner's review and merge.** Not applied until merged.
+**Status: approved by the owner on 21 October 2026. Sections 1 to 5 are carried by PR #395; sections 6 to 9 are
+proposed in PR #396, which is stacked on #395. Each part is in force on `main` only when the pull request that
+carries it is merged.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the
+read-only CoreX architecture audit. **An internal architecture decision: not a client confirmation, adds no scope,
+changes no signed document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade
+is made only in its own infrastructure PR under its own security and regression review (section 6). PRs #350 and
+#351 are not changed.
 
-Owner decision of Mustafa, 21 October 2026, on architecture and framework versioning. **Not a client confirmation,
-adds no scope, changes no register row, stage, acceptance obligation or accepting PBI, and approves no upgrade or
-functional work.**
+**1. Ownership.** Verified against the pinned CoreX v0.42.0 (`corex.lock`), WordPress 7.1 and WooCommerce 11.1.0.
 
-**1. The CoreX target.** CoreX v0.47.0 (commit `3a5476593b5fdab3975ecf47d327b3cacb43b71d`, published on
-21 October 2026, https://github.com/MustafaShaaban/corex/releases/tag/v0.47.0) is the proposed final release of
-the current CoreX generation and the version Mizzey's next upgrade moves to. It replaces the v0.43.0 target named
-in D-14 item 4; the rest of D-14 item 4 stands, and D-14 itself is not edited. The pin stays at v0.42.0, and
-`corex.lock` and `stack.lock.json` are unchanged, until a separate upgrade PR is approved and made under D-14 and
+| Component | Owns | Does not own |
+|---|---|---|
+| CoreX | The framework, shared services, the security foundation, technical operations (planned maintenance) and framework administration under COREX FRAMEWORK | Commerce, the storefront, Mizzey business controls |
+| WooCommerce | The commerce engine: products, variations, orders, checkout, commerce records, the native commerce administration, the customer account and the transactional customer emails | A bespoke replacement administration |
+| mizzey-site | Mizzey's contracted business rules, integrations and administration extensions | Framework services |
+| mizzey-theme | The standalone storefront presentation | Anything in wp-admin |
+| corex-kit-woo | Nothing: disabled and excluded from the intended launch package unless a demonstrated requirement changes this | |
+
+There is one commerce engine. No second engine or application framework is introduced.
+
+**2. Environments and operating modes are separate.** The environment (development, staging, production) is fixed per
+server in its configuration. The operating mode is chosen at runtime:
+
+| Mode | Owner | Who gets through |
+|---|---|---|
+| Live | WooCommerce Site Visibility set to live, CoreX mode production | everyone |
+| Coming Soon | **WooCommerce Site Visibility**, with search engines discouraged at the same time | `manage_woocommerce`, the share link |
+| Planned maintenance | **CoreX** maintenance mode (503) | `manage_options` |
+| Emergency maintenance | **Hosting**: a 503 before WordPress loads | nobody |
+| Staging access | **Hosting**: the server login on local staging, Cloudflare Access on server staging (D-16), and a no-index header | testers |
+
+Rules: CoreX's own Coming Soon mode (from v0.43.0) is not used while WooCommerce owns Coming Soon. No mechanism is
+switched on automatically because another is off. Hosting's controls fail closed; CoreX maintenance fails open if
+corex-config is unavailable; neither CoreX nor WooCommerce closes the WooCommerce Store API, `wc-ajax` or `wc-api`.
+
+**3. Add-ons.** Required: corex-core, corex-config. Conditional, kept only on a demonstrated requirement or
+dependency: corex-forms, corex-email, corex-blocks, corex-media, corex-captcha. Not enabled because they exist:
+corex-guides, corex-ui, corex-newsletter, corex-profile, corex-kit-woo and the unrelated kits. Before any deployment,
+the release is packaged from an explicit allowlist with its dependencies checked and a rollback, instead of every
+CoreX plugin the builder copies. Nothing is activated, deactivated or removed by this decision.
+
+**4. The administration boundary.** CoreX framework screens stay under COREX FRAMEWORK and administrator-only
+framework capabilities stay restricted. Mizzey business controls sit in the standard WordPress and WooCommerce menus,
+which stay recognisable. Mizzey administration styles are scoped to Mizzey's own screens; mizzey-theme never restyles
+wp-admin. CoreX's admin footer and sign-in branding are reviewed for a Mizzey or neutral presentation through
+supported configuration or hooks, never by hiding them with CSS or editing the framework. The batch-09 design record
+already follows this (09-A, PR #394, merged as `2618d88`).
+
+**5. Open, and not decided here.**
+
+Implementation decisions (owner, before the work they block):
+
+- **Transaction control during maintenance, before production readiness:** how order creation and checkout are
+  stopped when required, without blocking payment callbacks or integrations.
+- The explicit release allowlist and the production activation list, with dependency checks and rollback.
+- Whether the contact page (CMS-04) uses corex-forms, and with it corex-email and corex-captcha; until then its public
+  submission endpoint stays as the framework ships it.
+- Whether corex-media's WebP copies are served (NFR-02), or the feature is turned off.
+- **HOME-09:** the signup prompt stays contracted; the minimal storage and consent behaviour is decided at
+  implementation, not with corex-newsletter and without campaign automation (INT-06 is P2).
+- The CoreX footer and sign-in branding settings.
+- A read-only check that flags conflicting visibility settings, and the hosting-level emergency maintenance page.
+- Aligning the `sy-coming-soon` and `sy-maintenance` design baselines with section 2 (batch-01 is closed; a separate
+  design follow-up).
+
+Client decisions, not presented as approved: the consent wording for HOME-09 signups, and production hosting
+(OD-27, hosting outside Egypt, which blocks launch).
+
+**6. The CoreX target.** CoreX v0.47.0 (commit `3a5476593b5fdab3975ecf47d327b3cacb43b71d`, published on 21 October
+2026, https://github.com/MustafaShaaban/corex/releases/tag/v0.47.0) is the proposed final release of the current
+CoreX generation and the version Mizzey's next upgrade moves to. It replaces the v0.43.0 target named in D-14 item
+4; the rest of D-14 item 4 stands, and D-14 itself is not edited. The pin stays at v0.42.0, and `corex.lock` and
+`stack.lock.json` are unchanged, until a separate upgrade PR is approved and made under D-14 and
 `docs/stack-and-upgrades.md`. A future CoreX revamp has no released version or API, and nothing is built against it.
 
-**2. The architecture.** ADR-0003: framework fixes and capabilities belong to CoreX, contracted behaviour and thin
-adapters to `mizzey-site/`, presentation to `mizzey-theme/`, native WordPress and WooCommerce first; no patch to
-the CoreX checkout; one authority per setting or business concept, with derived assets rather than duplicate
-uploads; a hidden control is not a disabled capability; `corex-kit-woo` stays inactive; contracted operational
-conditions use CoreX's existing inbox and no second notification system; no new paid dependency without written
-approval; a feature flag is never a version switch.
+**7. The architecture rule.** ADR-0003: framework fixes and capabilities belong to CoreX, contracted behaviour and
+thin adapters to `mizzey-site/`, presentation to `mizzey-theme/`, native WordPress and WooCommerce first; no patch
+to the CoreX checkout; one authority per setting or business concept, with derived assets rather than duplicate
+uploads; a hidden control is not a disabled capability; `corex-kit-woo` stays inactive (section 1); contracted
+operational conditions use CoreX's existing inbox and no second notification system; no new paid dependency without
+written approval; a feature flag is never a version switch.
 
-**3. The evidence.** `docs/2026-10-21-corex-mizzey-ownership-audit.md` and
-`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`, both static source reviews. Two findings need the PBIs that
-own them: the Bosta plugin writes stock through a webhook route and a manual sync, against the ERP invariant (#291,
-#317); and from v0.43.0 CoreX adds a second coming-soon mechanism beside WooCommerce's. Neither is resolved here.
+**8. The evidence.** `docs/2026-10-21-corex-mizzey-ownership-audit.md` and
+`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`, both static source reviews. The Bosta plugin writes stock
+through a webhook route and a manual sync, against the ERP invariant; that needs the PBIs that own it (#291, #317)
+and is not resolved here. The second coming-soon mechanism CoreX adds from v0.43.0 is settled by section 2:
+WooCommerce owns Coming Soon and CoreX's stays off.
 
-**4. Still the owner's to decide**, listed in the audit's section 5: the login identity, the roles that see the
-inbox, the generator tag, the coming-soon mechanism, the staff log's storage (#275), whether corex-ui stays active,
-and how two-factor sign-in is provided.
+**9. Also open, from the ownership audit (section 5 of the audit).** The roles that see the CoreX inbox; the
+generator tag; the staff log's storage (#275); how two-factor sign-in is provided (ADM-131: the Technical Design
+names WP 2FA, free tier, which is evaluated before any paid component is raised); and the redirect and missing-page
+log mechanism (MKT-13, MKT-14: the Technical Design names Redirection, a free component, and the frozen 09-A design
+draws a custom screen). Whether PR #351 (v0.42.0 to v0.46.1) is retargeted to v0.47.0 or closed, and PR #350 with
+it. The sign-in identity is the branding item in section 5. Whether corex-ui is active follows section 3. Each is
+the owner's to decide, before the work it blocks.
