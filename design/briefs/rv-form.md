@@ -173,7 +173,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Arabic, right to left | `reviewed` |
 | Mobile | `reviewed` |
 | Desktop | `reviewed` |
-| States covered | 5 of 7 |
+| States covered | 7 of 7 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
@@ -181,4 +181,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-Star rating and text only. No photo or video (REV-06 is P2). Only a signed-in customer with a delivered purchase of the product may submit, one active review per product across variations and languages, checked on the server; no verified-purchase badge is shown (DQ-06 as revised by D-17, REV-07 is P2). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02). Wireframed, not reviewed: five states were drawn and reviewed in batch-07, whose closure stands; not_eligible and already_reviewed are added by D-17 and wait for a follow-up drawing after batch-08. The batch-07 frames' DQ-06 notes (any signed-in customer, no purchase check) are superseded.
+Star rating and text only. No photo or video (REV-06 is P2). Only a signed-in customer with a delivered purchase of the product may submit, one active review per product across variations and languages, checked on the server; no verified-purchase badge is shown (DQ-06 as revised by D-17, REV-07 is P2). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02). Wireframed, not reviewed: five states were drawn and reviewed in batch-07, whose closure stands; not_eligible and already_reviewed, added by D-17, are drawn by the 21 October 2026 correction (batches[batch-07].corrections) and await the owner's review. The batch-07 frames' DQ-06 notes (any signed-in customer, no purchase check) are corrected by the same correction.
