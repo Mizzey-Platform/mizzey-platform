@@ -3,7 +3,7 @@
  * standard WordPress 7.1 and WooCommerce 11.1 administration: not theme code, not the brand, not a restyle.
  * Greys only, no url(), no @import. Every class starts with adm-. Linked after _shared/wireframe.css, never with
  * _shared/components.css. 09-B to 09-E reuse it unchanged; group-only rules go in adm-b- to adm-e- files.
- * "Recommended" choices are provisional until the owner's 09-A review.
+ * Accepted by the owner's 09-A review (21 Oct 2026, structural only, not client approval): frozen for 09-B to 09-E.
  */
 
 /* adm-frame: the admin frame around every admin state. Markup: div.adm-frame > div.adm-bar (toolbar:
@@ -200,8 +200,8 @@ select.adm-form__ctl { inline-size: auto; min-inline-size: 10rem; }
 .adm-status--plain { font-weight: 400; color: #3a3a3a; background: #f0f0f0; border-color: #a8a8a8; border-radius: 3px; }
 .adm-status--plain::before { display: none; }
 
-/* adm-refusal: the capability refusal. Markup: div.adm-refusal (WordPress's own refusal message box, drawn as
-   context: p.adm-refusal__msg with WordPress's wording, p.adm-refusal__code the HTTP status, annotation only);
+/* adm-refusal: the capability refusal. Markup: div.adm-refusal (a full-page refusal: CoreX's standalone page, drawn
+   as context: p.adm-refusal__msg its explanation, p.adm-refusal__code notes and the HTTP status);
    span.adm-refusal__absent where a control is not rendered for the role (an annotation of absence, plainly not
    interface: dashed, hatched, monospaced, no control inside). States: refused screen, absent control. */
 .adm-refusal { display: flex; flex-direction: column; gap: 0.5rem; inline-size: 100%; max-inline-size: 44rem; margin: 1.5rem auto; padding: 1.5rem 1.75rem; background: #fff; border: 1px solid #cfcfcf; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.13); }

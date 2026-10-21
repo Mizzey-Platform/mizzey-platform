@@ -132,12 +132,12 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `wireframed` |
+| Review status | `reviewed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `drawn` |
-| Arabic, right to left | `drawn` |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
 | Mobile | `not_applicable` |
-| Desktop | `drawn` |
+| Desktop | `reviewed` |
 | States covered | 2 of 2 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
