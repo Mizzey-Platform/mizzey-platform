@@ -185,4 +185,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-The entry to the review form (Write a review, Write the first review) is offered only to a customer who is eligible under DQ-06 as revised by D-17; signed out, Sign in to write a review stays. An ineligible or already-reviewed customer reaches the rv-form not_eligible or already_reviewed state. The batch-03 frames' DQ-06 note (a signed-in customer may submit) is superseded and is corrected by the follow-up drawing after batch-08; no state is added here.
+The entry to the review form (Write a review, Write the first review) is offered only to a customer who is eligible under DQ-06 as revised by D-17; signed out, Sign in to write a review stays. An ineligible or already-reviewed customer reaches the rv-form not_eligible or already_reviewed state. The batch-03 frames' DQ-06 notes (a signed-in customer may submit) are corrected by the 21 October 2026 correction (batches[batch-03].corrections); no state is added here, and the rv-form states it points to await the owner's review.

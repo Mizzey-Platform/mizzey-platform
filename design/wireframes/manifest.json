@@ -442,6 +442,27 @@
               "change": "The 14 files link batch-02-targets.css after batch-02.css (batches[batch-01].corrections, the 19 October entry for the quick row, logos and footer)."
             }
           ]
+        },
+        {
+          "date": "2026-10-21",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner correction after closure, D-17: the review-entry notes",
+          "record": "D-17 (DQ-06 as revised, PR #385) superseded the DQ-06 notes drawn in batch-03's sf-pdp-reviews. Four notes are corrected in English and Arabic; no frame, state or status changes, and sf-pdp-reviews stays reviewed. Claude Design returned mizzey-batch-07-correction-output.zip (SHA-256 619b0597a5165f31da5b9edbcc333e3af14d286ac89b599ba4e6665cbff3c951; handoff 07de541199d66b150df365b47766777eebc07952fbae8f3a4e120b13988ddc5d), drawn from the private batch-07 correction package v1 (SHA-256 8657e4df766a4501c2c61c166332ca66a4345d7187f72a41d85f70ef1cbbcf56), built from main at 70af5fa; the four files were unchanged on main up to c2a0b4f. The archive and handoff stay private and are not committed. Claude Code checked them before import: every file hash matched the handoff, and a token diff against main shows only the listed notes, the header list and the appended sets, with no markup change elsewhere. The batch-03 closure record (review) is not changed.",
+          "changes": [
+            {
+              "item": "Four review-entry notes",
+              "surface": "sf-pdp-reviews",
+              "refs": ["D-17", "DQ-06", "US-04-07"],
+              "change": "Replaced word for word in both languages: the default mobile note, the two no_reviews notes (mobile and desktop) and the DQ-06 box. The entry is offered to an eligible customer; signed in without a delivered purchase, the rv-form not_eligible line replaces it."
+            },
+            {
+              "item": "Files",
+              "surface": "sf-pdp-reviews",
+              "refs": [],
+              "change": "design/wireframes/s1/batch-03/sf-pdp-reviews.en.html 3157f7b5acda356ada934c0a54178930cd62f468eecb9d886a3cab89d75c35e3 (17,511 bytes) to 35a2671feed074aca18d6fb2f28e280106b86621ca76423b59ddbe94f0b0b4c4 (17,865); sf-pdp-reviews.ar.html ec15553ef051538d49a23250fe3e9d85d95842a044e29edf123312ee8f57e5fd (17,852) to fc670b1348fbcbfb007feda016784d02f11a7cf2eeb3436b831d530663e03318 (18,206)."
+            }
+          ],
+          "validation": "Claude Code, 21 October 2026, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed files: every frame at every width of its family (mobile 360 and 390, desktop 1024 and 1280). sf-pdp-reviews: 6 frames per language, element geometry identical to main, 0 overflow, 0 targets under 44 x 44 px, 0 overlaps."
         }
       ],
       "review": {
@@ -1139,6 +1160,38 @@
               "change": "REV-01 (star rating submission) moves from rv-list's register_ids to rv-form's, and stays in rv-list's context_ids; both purposes are restated from their own rows and the two briefs are regenerated. The Rows line of the four wireframes follows. The accepting PBI stays #309 and no row changes scope or stage."
             }
           ]
+        },
+        {
+          "date": "2026-10-21",
+          "decided_by": "Mustafa, owner",
+          "kind": "owner correction after closure, D-17: who may write a review (drawn, awaiting the owner's review)",
+          "status": "awaiting_owner_review",
+          "record": "D-17 (DQ-06 as revised, PR #385) added two states to rv-form and superseded the DQ-06 notes drawn in batch-07. The owner accepted Claude Code's validation on 21 October 2026 and authorised this correction for review; rv-form stays wireframed until he reviews the two new states. Claude Design returned mizzey-batch-07-correction-output.zip (SHA-256 619b0597a5165f31da5b9edbcc333e3af14d286ac89b599ba4e6665cbff3c951; handoff 07de541199d66b150df365b47766777eebc07952fbae8f3a4e120b13988ddc5d), drawn from the private batch-07 correction package v1 (SHA-256 8657e4df766a4501c2c61c166332ca66a4345d7187f72a41d85f70ef1cbbcf56), built from main at 70af5fa; the four files were unchanged on main up to c2a0b4f. The archive and handoff stay private and are not committed. Claude Code checked them before import: every file hash matched the handoff, and a token diff against main shows only the listed notes, the header list and the appended sets, with no markup change elsewhere. The batch-07 closure record (review) and the original batch-07 archive are not changed.",
+          "changes": [
+            {
+              "item": "Two new states",
+              "surface": "rv-form:not_eligible, rv-form:already_reviewed",
+              "refs": ["D-17", "DQ-06", "US-11-01", "US-11-03"],
+              "change": "Two sets appended after Submitted, in English and Arabic, each with a mobile 390 and a desktop 1280 frame (already_reviewed: pending on mobile, approved on desktop). In each, one plain line in the file's language replaces the Write a review entry under the average; no button, link, form, field, role or badge. Coverage is 7 of 7 states in each language; 15 frames per language (11 + 4)."
+            },
+            {
+              "item": "Seven notes and the header list",
+              "surface": "rv-form",
+              "refs": ["D-17", "DQ-06"],
+              "change": "Replaced word for word in both languages: the header line, the Default set line, the default mobile note, the DQ-06 box, the default invitation note, the signed_out mobile note and the submitted mobile note; States drawn reads All 7 with not_eligible and already_reviewed appended. Every other note is unchanged."
+            },
+            {
+              "item": "Files",
+              "surface": "rv-form",
+              "refs": [],
+              "change": "design/wireframes/s1/batch-07/rv-form.en.html 060ce16e99928704691b8d641a857f69d21dc6de4d37d013194fe1022d8c7e14 (55,992 bytes) to c3aa04c3af6d9ec22717fc9c9f83dd1817466d961846802ed898f8a2a2c5f320 (71,388); rv-form.ar.html d8288ba8687211c3f43dd5f5978311e4cbe31ed238aeac67d6bae126e4fedfba (61,533) to d90bb934b16d2bc93c137d34ff75f1daa699c3a1f5b551247b1557588772afcb (78,518). No stylesheet changes."
+            }
+          ],
+          "covered_elsewhere": [
+            {"item": "Guest orders", "refs": ["D-17", "#309"], "status": "Not written in the rv-form frames and covered by D-17 and #309: a guest order qualifies only once it is linked to the customer's account through a secure link after the account's email address is verified; a matching billing email alone does not."},
+            {"item": "Orders and lines that do not qualify", "refs": ["D-17", "#309"], "status": "Not written in the rv-form frames and covered by D-17 and #309: cancelled orders, orders returned to origin, and fully refunded orders or order lines do not qualify. The frames say \"delivered purchase\" and nothing more."}
+          ],
+          "validation": "Claude Code, 21 October 2026, headless Chromium 155 over local HTTP with the real stylesheet links, on the committed files: every frame at every width of its family (mobile 360 and 390, desktop 1024 and 1280). rv-form: 15 frames per language, 0 horizontal overflow, 0 elements escaping a frame, 0 targets under 44 x 44 px, 0 overlapping hit areas, 0 digits outside a left-to-right isolate in Arabic. The new line sits where the entry sits (the same top and the same 16 px mobile and 40 px desktop inline-start inset, right-aligned in Arabic), with the same 21 px gap to the list; on mobile the list moves up 5.4 px in English and 22.9 px in Arabic because the line is shorter than the 46 px entry. The 11 existing frames per language keep identical element geometry. Validators 0 problems; only the rv-form brief is regenerated."
         }
       ],
       "review": {
@@ -2288,7 +2341,7 @@
       "ar_rtl": "reviewed",
       "mobile": "reviewed",
       "desktop": "reviewed",
-      "states_covered": ["default", "signed_out", "form", "validation", "submitted"],
+      "states_covered": ["default", "signed_out", "form", "validation", "submitted", "not_eligible", "already_reviewed"],
       "interaction_pending": [],
       "review_status": "wireframed"
     },
