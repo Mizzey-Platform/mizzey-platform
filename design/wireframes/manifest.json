@@ -1417,7 +1417,85 @@
           "surfaces": ["ad-product-storefront-controls", "ad-price-stock-history", "ad-stock-from-erp", "ad-order-cancel", "ad-dashboard-stock", "rp-stock"],
           "boundary": "Stock only (ERP-01; EX-35 excludes synchronising orders, customers, prices, product details or accounting data). Drawn as structural states with neutral placeholder wording, per PRE-09 and ERP-07: no timing, no mechanism, no reservation, no admin stock editing behaviour. Nothing implies another exchange with the ERP. The stock released on cancellation (BR-007, ERP-06) is drawn as a note on ad-order-cancel, not as a control."
         }
-      }
+      },
+      "group_imports": [
+        {
+          "group": "09-A",
+          "status": "accepted",
+          "date": "2026-10-21",
+          "source": "Claude Design, returned as Mizzey UX decision synthesis (16).zip (SHA-256 e8e5525e3dba30113d0e9f6dafd8a2ba419f736aa44d984cc5452d9c90af41aa), folder mizzey-batch-09-a-output, from the private package mizzey-batch-09-a-design-package-v1-2026-10-21.zip (SHA-256 0dfb1fa98b370f4f4f4589d544d8f5e6abe0d526c526cf447cf62854a8cc650b, built from da01901). Handoff batch-09-a-handoff.md, SHA-256 4ac84e3774ae1153bf659462cbed13d5aba099dac714bf9da114e2d9804ecfda, not committed.",
+          "record": "Ten files: the eight 09-A surfaces in English, sy-staging-marker also in Arabic, and batch-09.css (24,049 bytes). 30 English states and 2 Arabic, each one desktop frame. Committed first exactly as delivered, then corrected.",
+          "delivered": {
+            "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "c7be4f60b8ae523f3385a8842ad3ff755277461c9675f88f6a1d5cdddd1ad0f5",
+            "design/wireframes/s1/batch-09/sy-staging-marker.en.html": "f86f7df6c7a6dd3afd37a5279ed40715efba800e1b07065e88c4ce9d52bc4a64",
+            "design/wireframes/s1/batch-09/sy-staging-marker.ar.html": "61d46bc05320d4c872fdedebacac6f0fd68ef7b1d105af75cbb3d76231a3ac5b",
+            "design/wireframes/s1/batch-09/ad-staff-log.en.html": "01c2759d03ac797daead1d44a566ac766f6680e758c33b40671e3df227a7c517",
+            "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "f535834337a03732e2d847e6610f0c211fb75af8bf1ec2e11b6aa6dcfa3b6c20",
+            "design/wireframes/s1/batch-09/ad-order-list-filters.en.html": "33ed2607715b6b85c128ddae8d951e5b8b0ad06a52300a3edc2a78f56579acf3",
+            "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "559d0bb657d24ca4d56fb0e3da0285fe4305aa44890245f72ed1984d51813568",
+            "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "26c7a72dc7c5eaa69c83430a9714011da442bfcab793d1d7833dd9c05f8ca093",
+            "design/wireframes/s1/batch-09/ad-customer-suspend.en.html": "bbdad2f44a5348b905354057c8b28aabb0ac4afffe57380f0bbbc1f88f39318e",
+            "design/wireframes/s1/batch-09/batch-09.css": "855536ae2463a571bd3f9000b8905952ef3bbbc73f0f5f2a885a4b4f50d0646a"
+          },
+          "corrected": {
+            "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "06ab0aa67cb88dde39746610a87a69f0c68ee62245e2d25f74edb68dc252315d",
+            "design/wireframes/s1/batch-09/sy-staging-marker.en.html": "907456bfb9287e7a10c18a572c8fd7860332554a7c65293de55501a82ff024b0",
+            "design/wireframes/s1/batch-09/ad-staff-log.en.html": "398a53d74c794e4d676b0a1a88a396840590e7a3855dc93b13960bc64a230928",
+            "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "ef344d47553e88b18251c9beb48e5aa6647719234d0fe987db9a6b499d96aa58",
+            "design/wireframes/s1/batch-09/ad-order-list-filters.en.html": "f5579309b4c79bead58c2c80ce6e772ceafaee0395bdadca794cfff46b0da2d7",
+            "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "27ef2bbdbdb3fb7fbda4976cdc4a070a4143841e65659169d98e3a6690940c78",
+            "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "ed9008d027e6d932584e944d0f5f09074621a55f6ac28d97c21a1fd10782016e",
+            "design/wireframes/s1/batch-09/ad-customer-suspend.en.html": "c2cbd6fe9c62648f7ecc7b5a122453eda6bf9f4f13151793ecbbb7441c9c9835",
+            "design/wireframes/s1/batch-09/batch-09.css": "1e28e7d47525fe93e4dad04223001298b8e7267cee37f7b6becdafc3c277ab3d"
+          },
+          "corrected_note": "batch-09.css was corrected at acceptance in its documentation comments only: the header records the owner's acceptance and the adm-refusal comment names CoreX's standalone page. With comments removed the file is byte-identical to the delivery (855536ae); 24,087 bytes.",
+          "corrections": [
+            {
+              "id": "A",
+              "what": "Administrator menus list Bosta (after Payments), COREX FRAMEWORK (after Marketing) and WPML (last), as the active plugins register them. The restricted staff frames (ad-permission-denied:control_hidden and action_refused, ad-staff-log:delete_refused) are drawn for WooCommerce's shop manager, the only restricted staff role today (P-013; launch roles in #251): Plugins and Settings removed (no manage_options or activate_plugins); Bosta, WPML and COREX FRAMEWORK not listed, the last as at launch without corex-guides.",
+              "files": ["all eight English files"]
+            },
+            {
+              "id": "B",
+              "what": "Full-page admin refusals drawn as CoreX's standalone page (corex-core AdminDieHandler, pinned v0.42.0, unchanged at v0.46.1): no toolbar or menu, its title and explanation, WordPress's original message quoted, Back to Dashboard, HTTP 403.",
+              "files": ["design/wireframes/s1/batch-09/ad-permission-denied.en.html"]
+            },
+            {
+              "id": "C",
+              "what": "ad-staff-log:delete_refused checked before replacing: panel 1, the inline case (no delete control), unchanged; panel 2, a request sent directly, is a full-page refusal and now shows CoreX's page; a note says an AJAX or REST request would be refused inline as an error notice instead (#275).",
+              "files": ["design/wireframes/s1/batch-09/ad-staff-log.en.html"]
+            }
+          ],
+          "owner_rulings": ["D: one business-facing staff log, ad-staff-log; CoreX's framework logs stay framework diagnostics (inventory note).", "E: MKT-25 cross-referenced on ad-staff-log in its inventory note; its accepting PBI (#298) and its no_surface behaviour classification unchanged.", "F: the 09-A pattern recommendations accepted: the ADDED marker (outline and tag), the inline reason by default, the staff log under Users, the redirect form above its list, the customer panels at the end of the profile, an absent control for a role without the capability, visible labels on added filters.", "G: batch-09.css unchanged; no correction required it."],
+          "measurements": "Delivered files: all repository checks 0 with the import simulated; Chromium 155 over local HTTP, 32 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, 0 targets under 24 px, 0 controls under 40 px (32 compact), 0 overlaps, labels and ARIA correct, greys only. The corrected frames were measured again the same way.",
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-21",
+            "record": "Frozen by the owner's acceptance of 09-A on 21 October 2026. 09-B to 09-E are drawn from these ten files and change none of them; a group output that differs from a hash here is rejected. Proposed in the first review commit with batch-09.css at 855536ae; that file's hash changed only by the two comment corrections above.",
+            "files": {
+              "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "06ab0aa67cb88dde39746610a87a69f0c68ee62245e2d25f74edb68dc252315d",
+              "design/wireframes/s1/batch-09/sy-staging-marker.en.html": "907456bfb9287e7a10c18a572c8fd7860332554a7c65293de55501a82ff024b0",
+              "design/wireframes/s1/batch-09/sy-staging-marker.ar.html": "61d46bc05320d4c872fdedebacac6f0fd68ef7b1d105af75cbb3d76231a3ac5b",
+              "design/wireframes/s1/batch-09/ad-staff-log.en.html": "398a53d74c794e4d676b0a1a88a396840590e7a3855dc93b13960bc64a230928",
+              "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "ef344d47553e88b18251c9beb48e5aa6647719234d0fe987db9a6b499d96aa58",
+              "design/wireframes/s1/batch-09/ad-order-list-filters.en.html": "f5579309b4c79bead58c2c80ce6e772ceafaee0395bdadca794cfff46b0da2d7",
+              "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "27ef2bbdbdb3fb7fbda4976cdc4a070a4143841e65659169d98e3a6690940c78",
+              "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "ed9008d027e6d932584e944d0f5f09074621a55f6ac28d97c21a1fd10782016e",
+              "design/wireframes/s1/batch-09/ad-customer-suspend.en.html": "c2cbd6fe9c62648f7ecc7b5a122453eda6bf9f4f13151793ecbbb7441c9c9835",
+              "design/wireframes/s1/batch-09/batch-09.css": "1e28e7d47525fe93e4dad04223001298b8e7267cee37f7b6becdafc3c277ab3d"
+            }
+          },
+          "follow_up": ["Not changed here: the native baselines of sy-coming-soon and sy-maintenance (batch-01, closed) are to be aligned with the owner's operating policy of 21 October 2026 (WooCommerce Site Visibility owns Coming Soon, CoreX owns planned maintenance, hosting owns emergency maintenance) in a separate follow-up."],
+          "review": {
+            "status": "closed",
+            "date": "2026-10-21",
+            "decided_by": "Mustafa, owner",
+            "record": "The owner reviewed the eight 09-A surfaces, imported for his review in PR #394 with the corrections he approved, and on 21 October 2026 approved the reviewed 09-A low-fidelity design and authorised completing and merging PR #394. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14).",
+            "accepted": ["The structural wireframes of the eight 09-A surfaces as corrected in PR #394: 30 states in English and 2 in Arabic (sy-staging-marker), 32 frames.", "The 09-A shared administration patterns in batch-09.css, as drawn, with the pattern choices of rulings F.", "Corrections A to C as applied; rulings D, E and G."],
+            "not_changed": "09-B to 09-E stay briefed. Batch-01 to batch-08 and their closure records are unchanged."
+          }
+        }
+      ]
     },
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
   ],
@@ -2740,14 +2818,14 @@
       "surface": "ad-list-search-additions",
       "batch": "batch-09",
       "brief": "design/briefs/ad-list-search-additions.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-list-search-additions.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "results", "no_results"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-order-status-control",
@@ -2779,14 +2857,14 @@
       "surface": "ad-order-list-filters",
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-list-filters.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-order-list-filters.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "filtered", "no_results"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-order-cancel",
@@ -2883,27 +2961,27 @@
       "surface": "ad-customer-notes",
       "batch": "batch-09",
       "brief": "design/briefs/ad-customer-notes.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-customer-notes.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "list", "added"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-customer-suspend",
       "batch": "batch-09",
       "brief": "design/briefs/ad-customer-suspend.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-customer-suspend.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "active", "reason_required", "suspended"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-customer-metrics-export",
@@ -2988,14 +3066,14 @@
       "surface": "ad-staff-log",
       "batch": "batch-09",
       "brief": "design/briefs/ad-staff-log.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-staff-log.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "list", "search", "no_results", "delete_refused"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-two-factor",
@@ -3014,14 +3092,14 @@
       "surface": "ad-permission-denied",
       "batch": "batch-09",
       "brief": "design/briefs/ad-permission-denied.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-permission-denied.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "control_hidden", "action_refused"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-seo-fields",
@@ -3040,14 +3118,14 @@
       "surface": "ad-redirect-manager",
       "batch": "batch-09",
       "brief": "design/briefs/ad-redirect-manager.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-redirect-manager.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "list", "validation", "saved"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-missing-page-log",
@@ -3326,14 +3404,14 @@
       "surface": "sy-staging-marker",
       "batch": "batch-09",
       "brief": "design/briefs/sy-staging-marker.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/sy-staging-marker.en.html", "design/wireframes/s1/batch-09/sy-staging-marker.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "shown"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "pv-paymob-card",

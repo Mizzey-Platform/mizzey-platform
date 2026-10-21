@@ -99,7 +99,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-WordPress capability checks.
+WordPress capability checks. A full-page refusal in wp-admin is rendered by CoreX's standalone error page (corex-core AdminDieHandler, pinned v0.42.0), without the admin toolbar or menu.
 
 ## Open inputs
 
@@ -122,13 +122,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `reviewed` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 3 |
+| Desktop | `reviewed` |
+| States covered | 3 of 3 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

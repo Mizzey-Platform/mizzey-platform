@@ -4630,7 +4630,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Staging found a phone-format gap on ADM-157. It stays with #278."
     },
     {
@@ -4748,7 +4748,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-cancel",
@@ -5067,7 +5067,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-customer-suspend",
@@ -5107,7 +5107,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-customer-metrics-export",
@@ -5404,8 +5404,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
-      "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes."
+      "status": "reviewed",
+      "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes. The one business-facing staff log: CoreX's own framework logs (login protection, access audit, activity) stay framework diagnostics under COREX FRAMEWORK and are not redrawn. Cross-reference: MKT-25 (third-party administrative actions recorded in the audit log) is met by entries in this log; MKT-25 keeps its accepting PBI, #298, and its no_surface behaviour classification."
     },
     {
       "id": "ad-two-factor",
@@ -5479,13 +5479,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WordPress capability checks.",
+      "native_baseline": "WordPress capability checks. A full-page refusal in wp-admin is rendered by CoreX's standalone error page (corex-core AdminDieHandler, pinned v0.42.0), without the admin toolbar or menu.",
       "design_freedom": "annotate_only",
       "open_items": ["CX-01", "CX-02"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-seo-fields",
@@ -5566,7 +5566,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-missing-page-log",
@@ -6520,7 +6520,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable.",
       "build_note": "No row and no accepting PBI. Already built with the staging environment, #244."
     },
