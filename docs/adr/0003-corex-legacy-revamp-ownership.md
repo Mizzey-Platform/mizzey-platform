@@ -115,5 +115,6 @@ small.
 - **Hide duplicate inputs without disabling their writers**: inconsistent data and invisible side effects.
 - **Activate `corex-kit-woo` by default**: no evidenced benefit on Mizzey.
 - **Switch CoreX versions from an admin setting**: unsafe schema and dependency changes on a live site.
-- **Stay on v0.42.0 indefinitely**: the target generation fixes corex#201 and is the last of the current line;
-  staying would leave Mizzey on an unsupported intermediate.
+- **Stay on v0.42.0 indefinitely**: corex#201 is fixed only in later releases, and v0.47.0 is the last release of
+  the generation Mizzey is built on, so staying would keep Mizzey on an intermediate release with a known CLI
+  defect, without the fourteen releases published since.
