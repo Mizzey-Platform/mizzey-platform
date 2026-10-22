@@ -127,3 +127,10 @@
    by assistive technology, not shown; the row's aria-describedby names it). States: none. */
 .adm-b-eye { font-size: 0.75rem; color: #5c5c5c; }
 .adm-b-vh { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* adm-b-tag2, adm-b-nw: text that stays whole (correction round 3, F1 to F3). adm-b-tag2: on a block .adm-add whose
+   ADDED tag runs to two lines in a narrow column; the box keeps room at its top for both lines, so the tag never
+   covers the first child. adm-b-nw: on a table cell whose text must not break (a short column header, a product code
+   such as MZ-P16); the Name column absorbs the width. States: none. */
+.adm-add.adm-b-tag2 { padding-block-start: 2.75rem; }
+.adm-table__t .adm-b-nw { white-space: nowrap; }
