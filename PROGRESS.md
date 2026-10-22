@@ -348,7 +348,9 @@ drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In or
    administration patterns and is drawn and reviewed first; 09-B to 09-E are drawn from it only after he accepts it,
    and their outputs come in one pull request at a time. Claude Design drew 09-A, and it is imported for his review
    with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
-   page for a full-page refusal); its baseline is frozen only when he accepts it.
+   page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
+   09-B from that baseline in two controlled correction rounds on his rulings of 21 and 22 October 2026, and it is
+   imported for his review; it is not accepted until he says so.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

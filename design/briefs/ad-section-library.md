@@ -115,7 +115,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned.
+The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned. A section is hidden with WordPress's native block Hide (since 6.9; owner ruling D1): the Hide block dialog with Omit from published content, the block then absent from the canvas and marked hidden in List View; per-viewport hiding stays native and is not a Mizzey control (owner ruling, 22 Oct 2026).
 
 ## Open inputs
 
@@ -138,13 +138,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 9 |
+| Desktop | `drawn` |
+| States covered | 9 of 9 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

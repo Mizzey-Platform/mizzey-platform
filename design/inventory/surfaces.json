@@ -1208,7 +1208,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-pdp-simple",
@@ -4100,13 +4100,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned.",
+      "native_baseline": "The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned. A section is hidden with WordPress's native block Hide (since 6.9; owner ruling D1): the Hide block dialog with Omit from published content, the block then absent from the canvas and marked hidden in List View; per-viewport hiding stays native and is not a Mizzey control (owner ruling, 22 Oct 2026).",
       "design_freedom": "constrained",
       "open_items": ["OD-01", "CX-06"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
     },
     {
@@ -4147,7 +4147,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-promo-banner-manager",
@@ -4190,7 +4190,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-global-brand-controls",
@@ -4229,7 +4229,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
     },
     {
@@ -4313,7 +4313,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-dashboard-sales",
@@ -5265,13 +5265,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WooCommerce product sorting.",
+      "native_baseline": "WooCommerce product sorting. Its menu_order is one number per product, so it orders products inside a category only; the per-collection position is an addition (owner ruling D2, #282), one stored value with ad-product-storefront-controls:collection_position_set.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "sf-product-badges",

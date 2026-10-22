@@ -1396,11 +1396,11 @@
         "treatment": {
           "native": {
             "meaning": "A standard screen already does the work. The addition is a filter, a field, a count or a link, drawn in place on an annotated standard screen.",
-            "surfaces": ["ad-order-list-filters", "ad-list-search-additions", "ad-catalogue-terms", "ad-manual-product-order", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-control", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions"]
+            "surfaces": ["ad-order-list-filters", "ad-list-search-additions", "ad-catalogue-terms", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-control", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions"]
           },
           "constrained": {
             "meaning": "A platform mechanism (the block editor, global styles, the standard product, coupon or order screen, or the document mechanism selected in its PBI) shapes a real addition. Drawn inside that mechanism.",
-            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-manual-product-order", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
           },
           "annotate_only": {
             "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
@@ -1493,6 +1493,74 @@
             "record": "The owner reviewed the eight 09-A surfaces, imported for his review in PR #394 with the corrections he approved, and on 21 October 2026 approved the reviewed 09-A low-fidelity design and authorised completing and merging PR #394. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14).",
             "accepted": ["The structural wireframes of the eight 09-A surfaces as corrected in PR #394: 30 states in English and 2 in Arabic (sy-staging-marker), 32 frames.", "The 09-A shared administration patterns in batch-09.css, as drawn, with the pattern choices of rulings F.", "Corrections A to C as applied; rulings D, E and G."],
             "not_changed": "09-B to 09-E stay briefed. Batch-01 to batch-08 and their closure records are unchanged."
+          }
+        },
+        {
+          "group": "09-B",
+          "status": "awaiting_owner_review",
+          "date": "2026-10-22",
+          "source": "Claude Design, three returns, each from a private package built by Claude Code from 2618d88: (1) mizzey-batch-09-b-output.zip (SHA-256 23de84ef090933c40670ed2d21027c49b9343d4bc91767c12a1bd291af22bac1), from mizzey-batch-09-b-design-package-v1.1-2026-10-21.zip (SHA-256 aeaa569946405c0d0fbfa4464074bc15fc41f0d12a045444aefa4aab2208fbb6), handoff batch-09-b-handoff.md SHA-256 e6a1914a5edb6b913b1da287b7696c28ae6de4f80e354dc6e80330ed005561be; (2) mizzey-batch-09-b-correction-output.zip (SHA-256 af8ea85c17dbebf56b83caa96d581157fa4216c74d3ff4902430670784c2c606), from mizzey-batch-09-b-correction-round-package-v1-2026-10-21.zip (SHA-256 0180fa632c8e84d36469a00e05fed29824d6fd899e93eda1eba7d62a8575c342), handoff batch-09-b-correction-handoff.md SHA-256 ad42a6d20a54d30989a6d00f5f9082e5e8f153d8b1a6f7c5078ceecb108dd03c; (3) mizzey-batch-09-b-correction-round-2-output.zip (SHA-256 3170299c276045cace9af8821bcee9421ef718daa03d5c6579a1e0e1ed4b9520), from mizzey-batch-09-b-correction-round-2-package-v1-2026-10-22.zip (SHA-256 1f8eff7fc368d62abdf968351ff4ad517d9baa6d92922e4a89dded8d8e9bf271), handoff batch-09-b-correction-round-2-handoff.md SHA-256 b5b8d406158cfab6fc34b0c1ef009dd9a9e3cc9dd45801b70cb9f1a49c7cd9ba. Packages and handoffs not committed.",
+          "record": "Eight files: the seven 09-B surfaces in English and the group-only batch-09-b.css (12,758 bytes). 36 English states, each one desktop frame. Committed exactly as delivered, then each correction round exactly as returned; every committed hash equals its handoff. Claude Code changed no wireframe. No frozen 09-A file and not wireframe.css changed.",
+          "delivered": {
+            "design/wireframes/s1/batch-09/ad-section-library.en.html": "0135089fc3a417a6d03ac2b54376338f4ae6d7e1c3cb6b5148cf892dd0b13728",
+            "design/wireframes/s1/batch-09/ad-navigation-editor.en.html": "a49767bac9a2535e0a808f5773353cfe58473c16ad839764d9fde9c7d5d5ca6b",
+            "design/wireframes/s1/batch-09/ad-promo-banner-manager.en.html": "5c588772a2a8ed623035055b7270aacc8bd93f719b8e3b11278c968dfa484573",
+            "design/wireframes/s1/batch-09/ad-global-brand-controls.en.html": "4ec43c1c13493556e39ecae7fdd6f323576dc6b6e51a45330071b3796ad94654",
+            "design/wireframes/s1/batch-09/ad-catalogue-terms.en.html": "b11cab5f3455d05a1825fb78a04ad2f71c4d669d2aa7ab45aad421c955a729f7",
+            "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "7edb27e28bb0818f01999e5543d8adde3ac08b963c17f6edf5df78362da3e44d",
+            "design/wireframes/s1/batch-09/ad-search-synonyms.en.html": "61b6f7b356930616d50a094c19085f7da2835599739874bc905d8cab579dc3a7",
+            "design/wireframes/s1/batch-09/batch-09-b.css": "e15f7c8dc296c0811f499fd445f1125961d01d97780afbaf3227523298caef44"
+          },
+          "corrected": {
+            "design/wireframes/s1/batch-09/ad-section-library.en.html": "cfc5b6e64fd64c97053726a71aaadeec074c101372e4762172b69710b7cb684b",
+            "design/wireframes/s1/batch-09/ad-promo-banner-manager.en.html": "6219fd848d50b862b21414f7e221bbdc9e4dac2f859600aa3d07d64d46b26249",
+            "design/wireframes/s1/batch-09/ad-global-brand-controls.en.html": "0b85d1846fc2247735d49e31e2db36e7c08dab116067891b53a16c05968bba54",
+            "design/wireframes/s1/batch-09/ad-catalogue-terms.en.html": "a991687bdcdba0e96f535c90020f496ad8e30eefbc6c52bbf4a283a3ab694754",
+            "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "af24d05cd93fcc9951ff643549555630ac7ae3001178c8877ecd943d15665f4e",
+            "design/wireframes/s1/batch-09/ad-search-synonyms.en.html": "b4c2bf086df1f60df1497e14087be00db3c2769bf5ea1cb801a1a4a9f1da61cf",
+            "design/wireframes/s1/batch-09/batch-09-b.css": "e27251175b734a05da33a02a568568ece35df8c1964a860962f5e6f02cab3e1c"
+          },
+          "correction_rounds": [
+            {
+              "round": 1,
+              "date": "2026-10-21",
+              "what": "C1 to C9 on the owner's rulings D1 to D8 of 21 October 2026: C1 native block Hide in place of an added visibility checkbox (D1); C2 the per-collection position drawn apart from the native category Sorting, as an addition (D2, #282); C3 empty search engine fields generated from the category name; C4 the open two-banner question from gl-promo-banner, the off-site link refusal removed; C5 the Site Logo is the storefront logo only, CoreX brand settings stay with D-18 section 5; C6 what Kind does on the storefront; C7 page placement as the native link search; C8 a neutral Arabic slug sample; C9 the D3 accessibility safeguard drawn. ad-navigation-editor unchanged.",
+              "files": {
+                "design/wireframes/s1/batch-09/ad-section-library.en.html": "c7e7aee392891ecc99ebe098d5a191a6f5a8f53dfd1458220f18778d370a2988",
+                "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "b4b049819c70d3bb4bc976bcfba698165026f6a638539863d5dd5d019316a21b",
+                "design/wireframes/s1/batch-09/ad-catalogue-terms.en.html": "a991687bdcdba0e96f535c90020f496ad8e30eefbc6c52bbf4a283a3ab694754",
+                "design/wireframes/s1/batch-09/ad-promo-banner-manager.en.html": "6219fd848d50b862b21414f7e221bbdc9e4dac2f859600aa3d07d64d46b26249",
+                "design/wireframes/s1/batch-09/ad-global-brand-controls.en.html": "0b85d1846fc2247735d49e31e2db36e7c08dab116067891b53a16c05968bba54",
+                "design/wireframes/s1/batch-09/ad-search-synonyms.en.html": "b4c2bf086df1f60df1497e14087be00db3c2769bf5ea1cb801a1a4a9f1da61cf",
+                "design/wireframes/s1/batch-09/batch-09-b.css": "8452ecc9bf24b2d05b2106ea905bed2bc397dfb12e87abb812baca6d94970348"
+              }
+            },
+            {
+              "round": 2,
+              "date": "2026-10-22",
+              "what": "The owner's rulings R2-a to R2-c of 22 October 2026. R2-a: ad-section-library:hidden_section draws WordPress 7.1.3's native Hide accurately: the options menu in native order, the Hide block dialog with Omit from published content, then the block gone from the editor canvas, marked hidden in List View, the toolbar's Hidden button, the sidebar badge and the snackbar (round 1's C1 instruction had the block stay hatched on the canvas, which WordPress does not do). R2-b: per-viewport hiding stays native, annotated, not drawn as a choice and not a Mizzey control. R2-c: ad-manual-product-order reads constrained in its three frame labels and header. batch-09-b.css: one block appended (adm-b-eye, adm-b-vh), 511 bytes.",
+              "files": {
+                "design/wireframes/s1/batch-09/ad-section-library.en.html": "cfc5b6e64fd64c97053726a71aaadeec074c101372e4762172b69710b7cb684b",
+                "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "af24d05cd93fcc9951ff643549555630ac7ae3001178c8877ecd943d15665f4e",
+                "design/wireframes/s1/batch-09/batch-09-b.css": "e27251175b734a05da33a02a568568ece35df8c1964a860962f5e6f02cab3e1c"
+              }
+            }
+          ],
+          "owner_rulings": [
+            "D1: WordPress's native block Hide; no second visibility control.",
+            "D2: an independent per-collection product position, one stored value shared with 09-C ad-product-storefront-controls:collection_position_set (#282); category order stays native. The treatment of ad-manual-product-order moves from native to constrained in batches[batch-09].opening.treatment, in this pull request.",
+            "D3: the native category order can be changed only by dragging (WCAG 2.2: 2.1.1, 2.5.7). This platform limitation is recorded here and not silently accepted. The keyboard-operable Move up and Move down drawn on ad-catalogue-terms:ordered is an accessibility safeguard, separately gated: not an approved build, and no PBI, ticket or build follows from the drawing.",
+            "D4: navigation order and category order are independent.",
+            "D5: the handoff's administration patterns approved; Menu order orders products inside a category, not categories.",
+            "D6: no robots override on terms; products only (ADM-41).",
+            "D7: promotion of the group-only adm-b- patterns is decided at the batch-09 closure.",
+            "D8: the unrelated product fixtures in the frozen 09-A files are corrected at the batch-09 closure; 09-A stays frozen.",
+            "R2-a to R2-c: as correction round 2."
+          ],
+          "measurements": "Final files, by Claude Code: all repository checks 0 with the import recorded; Chromium 155 over local HTTP, 36 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow (the visually hidden adm-b-vh text excepted, by design), 0 overlaps, 0 controls under 40 px (32 compact) other than the D3 row actions at the baseline's 24 px row-action floor, one target under 24 px (ad-search-synonyms:list Edit, 21.8 x 25.5 px; nearest target 18.9 px from its centre, so the spacing exception holds), stylesheets in order, greys only. hidden_section screen 3: no product rail on the canvas.",
+          "review": {
+            "status": "open",
+            "record": "Imported for the owner's 09-B review. Not accepted, not frozen, not merged. The 09-B surfaces stay wireframed until he accepts them."
           }
         }
       ]
@@ -1830,14 +1898,14 @@
       "surface": "ad-search-synonyms",
       "batch": "batch-09",
       "brief": "design/briefs/ad-search-synonyms.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-search-synonyms.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "empty", "list", "validation", "saved"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "sf-pdp-simple",
@@ -2649,53 +2717,53 @@
       "surface": "ad-section-library",
       "batch": "batch-09",
       "brief": "design/briefs/ad-section-library.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-section-library.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "choose_section", "edit_content", "choose_variant", "hidden_section", "reordered", "arabic_version", "preview", "revert"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-navigation-editor",
       "batch": "batch-09",
       "brief": "design/briefs/ad-navigation-editor.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-navigation-editor.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "edit_structure", "nested_levels", "arabic_version"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-promo-banner-manager",
       "batch": "batch-09",
       "brief": "design/briefs/ad-promo-banner-manager.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-promo-banner-manager.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "create", "scheduled", "active", "ended", "disabled", "validation"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-global-brand-controls",
       "batch": "batch-09",
       "brief": "design/briefs/ad-global-brand-controls.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-global-brand-controls.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "logo_changed", "colour_changed"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-product-storefront-controls",
@@ -2714,14 +2782,14 @@
       "surface": "ad-catalogue-terms",
       "batch": "batch-09",
       "brief": "design/briefs/ad-catalogue-terms.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-catalogue-terms.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "image_set", "ordered", "seo_fields", "arabic_version"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-dashboard-sales",
@@ -3026,14 +3094,14 @@
       "surface": "ad-manual-product-order",
       "batch": "batch-09",
       "brief": "design/briefs/ad-manual-product-order.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-manual-product-order.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "ordered", "new_product_unplaced"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "sf-product-badges",
