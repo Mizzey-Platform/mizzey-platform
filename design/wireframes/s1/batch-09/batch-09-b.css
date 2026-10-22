@@ -121,3 +121,9 @@
 .adm-b-ra[aria-disabled="true"] { color: #5c5c5c; background: #f0f0f0; border: 1px dashed #5c5c5c; text-decoration: none; cursor: not-allowed; }
 .adm-b-ra { display: inline-flex; align-items: center; white-space: nowrap; min-block-size: 1.5rem; min-inline-size: 1.5rem; padding: 0 0.375rem; font: inherit; color: #1f1f1f; text-decoration: underline; text-underline-offset: 0.2em; background: none; border: 1px solid transparent; border-radius: 2px; cursor: pointer; }
 .adm-b-live { padding: 0.375rem 0.625rem; font-weight: 600; color: #1f1f1f; background: #fff; border: 1px dashed #1f1f1f; }
+
+/* adm-b-eye, adm-b-vh: a native List View row's decorative icon and its text alternative (correction round 2: the
+   hidden block's eye-slash). Markup: span.adm-b-eye[aria-hidden=true] (a small muted glyph), span.adm-b-vh (text read
+   by assistive technology, not shown; the row's aria-describedby names it). States: none. */
+.adm-b-eye { font-size: 0.75rem; color: #5c5c5c; }
+.adm-b-vh { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
