@@ -98,8 +98,8 @@ Live status. First action each session: read this, then continue from **Next**.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
-  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-08 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-08 are drawn, each reviewed and closed, and in batch-09 the
+  09-A and 09-B groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -300,8 +300,8 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In order:
+**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. Batch-09 is
+imported one review group at a time on his instruction, and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -348,7 +348,9 @@ drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In or
    administration patterns and is drawn and reviewed first; 09-B to 09-E are drawn from it only after he accepts it,
    and their outputs come in one pull request at a time. Claude Design drew 09-A, and it is imported for his review
    with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
-   page for a full-page refusal); its baseline is frozen only when he accepts it.
+   page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
+   09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
+   it on 22 October 2026 (PR #397) and its eight files are frozen. 09-C to 09-E follow on his separate instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

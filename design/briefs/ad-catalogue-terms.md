@@ -118,14 +118,18 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `reviewed` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 5 |
+| Desktop | `reviewed` |
+| States covered | 5 of 5 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
+
+## Note
+
+The native category order can be changed only by dragging (WCAG 2.2: 2.1.1, 2.5.7), a platform limitation recorded by the owner (D3). The Move up and Move down drawn on the ordered state are a separately gated accessibility safeguard, not an approved build or implementation requirement: no PBI, ticket or build follows from the drawing.
