@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -51,8 +52,14 @@ class TheCommittedInventory(unittest.TestCase):
             if p.suffix in (".html", ".css"):
                 self.assertIn(wireframes, p.parents, f"{p.name}: HTML and CSS belong under design/wireframes/ only")
 
-    def test_four_design_questions_are_locked_owner_decisions(self):
-        self.assertEqual([d["id"] for d in self.data["decisions"]], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])
+    def test_design_questions_are_locked_owner_decisions(self):
+        """D-14 locked four (DQ-04 to DQ-07). A later owner decision follows them, under its own DECISIONS entry."""
+        ids = [d["id"] for d in self.data["decisions"]]
+        self.assertEqual(ids[:4], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])
+        self.assertTrue(all(re.fullmatch(r"DQ-\d{2}", i) for i in ids), ids)
+        self.assertEqual(ids, sorted(set(ids)), "decision ids are unique and in order")
+        for d in self.data["decisions"]:
+            self.assertRegex(d["record"], r"^DECISIONS\.md D-\d{2}$", d["id"])
         self.assertFalse([p["id"] for p in self.data["placeholders"] if p["id"].startswith("DQ-")])
         self.assertFalse([s["id"] for s in self.data["surfaces"] if any(i.startswith("DQ-") for i in s["open_items"])])
         for d in self.data["decisions"]:
