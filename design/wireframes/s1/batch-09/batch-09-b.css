@@ -1,0 +1,109 @@
+/*
+ * Mizzey batch-09, group 09-B: group-only rules. Storefront content, catalogue structure and search. Low-fidelity
+ * structure, not theme code, not the brand. Greys only, no url(), no @import. Every class starts with adm-b-.
+ * Linked after _shared/wireframe.css and the frozen batch-09.css, which it never overrides. Promoting any block to
+ * the shared set is the owner's decision at the batch-09 closure.
+ */
+
+/* adm-b-ed: the block editor or the site editor, drawn as muted context inside the admin frame (not redrawn).
+   Markup: div.adm-b-ed.adm-native > div.adm-b-ed__top (the editor toolbar: span items, span.adm-b-ed__doc the
+   document title), div.adm-b-ed__body (--l with a left panel and the settings sidebar, --n with a left panel and no
+   sidebar) > div.adm-b-ed__left (inserter, list view or navigation), div.adm-b-ed__canvas, div.adm-b-ed__side
+   (settings sidebar: div.adm-b-ed__tabs with span.adm-b-ed__tab--cur, then panels, h3.adm-b-ed__h). States: canvas
+   and sidebar; with a left panel; left panel and canvas only. */
+.adm-b-ed { display: flex; flex-direction: column; min-inline-size: 0; background: #fff; border: 1px solid #cfcfcf; }
+.adm-b-ed__top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem 0.5rem; padding: 0.375rem 0.5rem; border-block-end: 1px solid #cfcfcf; }
+.adm-b-ed__doc { flex: 1 1 8rem; text-align: center; font-weight: 600; }
+.adm-b-ed__body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(13rem, 16rem); min-inline-size: 0; }
+.adm-b-ed__body--l { grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr) minmax(13rem, 16rem); }
+.adm-b-ed__body--n { grid-template-columns: minmax(14rem, 19rem) minmax(0, 1fr); }
+.adm-b-ed__left,
+.adm-b-ed__side { display: flex; flex-direction: column; gap: 0.625rem; min-inline-size: 0; padding: 0.625rem; background: #fff; }
+.adm-b-ed__left { border-inline-end: 1px solid #cfcfcf; }
+.adm-b-ed__side { border-inline-start: 1px solid #cfcfcf; }
+.adm-b-ed__canvas { display: flex; flex-direction: column; gap: 0.5rem; min-inline-size: 0; padding: 0.75rem; background: #e9e9e9; }
+.adm-b-ed__tabs { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; padding-block-end: 0.375rem; border-block-end: 1px solid #e4e4e4; }
+.adm-b-ed__tab--cur { font-weight: 700; color: #1f1f1f; text-decoration: underline; text-underline-offset: 0.3em; }
+.adm-b-ed__h { font-size: 0.8125rem; font-weight: 600; color: #3a3a3a; }
+
+/* adm-b-sec: a delivered section as it sits on the editor canvas: muted, its layout fixed in code. Markup:
+   div.adm-b-sec (--sel the selected one, --off hidden on the storefront, --moved just moved) > div.adm-b-sec__bar
+   (span.adm-b-sec__name the section and its type, span.adm-b-sec__tag a short annotation), then div.adm-b-sec__txt (the content, wrapping
+   long words) with span.adm-b-sec__img an image box; div.adm-b-ins marks an insertion point. Arabic content carries
+   lang="ar" dir="rtl" on the content, never on the bar. States: plain, selected, hidden, moved. */
+.adm-b-sec { display: flex; flex-direction: column; gap: 0.375rem; min-inline-size: 0; padding: 0.5rem 0.625rem; color: #5c5c5c; background: #fff; border: 1px solid #cfcfcf; }
+.adm-b-sec__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
+.adm-b-sec__name { font-weight: 600; color: #3a3a3a; }
+.adm-b-sec__tag { padding: 0 0.375rem; font: 0.6875rem/1.5 ui-monospace, Menlo, Consolas, monospace; color: #3a3a3a; border: 1px solid #8a8a8a; }
+.adm-b-sec__img { display: flex; align-items: center; justify-content: center; min-block-size: 3rem; padding: 0.25rem 0.5rem; font-size: 0.75rem; text-align: center; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 8px); border: 1px dashed #a8a8a8; }
+.adm-b-sec__txt { color: #3a3a3a; overflow-wrap: anywhere; }
+.adm-b-sec--sel { color: #3a3a3a; border: 2px solid #1f1f1f; }
+.adm-b-sec--off { background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 8px); border-style: dashed; border-color: #5c5c5c; }
+.adm-b-sec--off .adm-b-sec__tag { color: #fff; background: #1f1f1f; border-color: #1f1f1f; }
+.adm-b-sec--moved { border-inline-start: 4px solid #1f1f1f; }
+.adm-b-ins { padding: 0.125rem 0.5rem; font: 0.6875rem/1.5 ui-monospace, Menlo, Consolas, monospace; color: #1f1f1f; border-block: 2px solid #1f1f1f; text-align: center; }
+
+/* adm-b-lib: the curated section set as the inserter offers it, and nothing else. Markup: ul.adm-b-lib > li >
+   button.adm-b-lib__i (--cur the one in focus) > span.adm-b-lib__n (name), span.adm-b-lib__d (what it holds).
+   40 px rows. States: list, one in focus. */
+.adm-b-lib { display: flex; flex-direction: column; gap: 0.25rem; }
+.adm-b-lib__i { display: flex; flex-direction: column; align-items: flex-start; gap: 0.0625rem; inline-size: 100%; min-block-size: 2.5rem; padding: 0.375rem 0.5rem; font: inherit; text-align: start; color: #1f1f1f; background: #fff; border: 1px solid #8a8a8a; border-radius: 3px; cursor: pointer; }
+.adm-b-lib__i--cur { border: 2px solid #1f1f1f; outline: 2px solid #1f1f1f; outline-offset: 2px; }
+.adm-b-lib__n { font-weight: 600; }
+.adm-b-lib__d { font-size: 0.75rem; color: #5c5c5c; }
+
+/* adm-b-tree: a nested structure drawn as context: the editor's List View or a navigation menu. Markup:
+   ul.adm-b-tree > li > div.adm-b-tree__i (--sel, --new, --moved) with the item text and span.adm-b-tree__lv (its
+   level or kind); a nested ul.adm-b-tree inside the li for the next level. Direction follows the content: an Arabic
+   menu sets dir="rtl" on the outer list. States: collapsed, expanded, selected, new, moved. */
+.adm-b-tree { display: flex; flex-direction: column; gap: 0.125rem; min-inline-size: 0; }
+.adm-b-tree .adm-b-tree { margin-block-start: 0.125rem; padding-inline-start: 1.25rem; border-inline-start: 1px dotted #8a8a8a; }
+.adm-b-tree__i { display: flex; flex-wrap: wrap; align-items: center; gap: 0.125rem 0.5rem; min-block-size: 2rem; padding: 0.125rem 0.375rem; color: #3a3a3a; background: #fff; border: 1px solid #e4e4e4; overflow-wrap: anywhere; }
+.adm-b-tree__i--sel { color: #1f1f1f; border: 2px solid #1f1f1f; }
+.adm-b-tree__i--new,
+.adm-b-tree__i--moved { color: #1f1f1f; border-inline-start: 4px solid #1f1f1f; }
+.adm-b-tree__lv { margin-inline-start: auto; font: 0.6875rem/1.5 ui-monospace, Menlo, Consolas, monospace; color: #5c5c5c; }
+
+/* adm-b-choice: a checkbox or a radio group in an addition, the box itself a 24 px target in a 40 px row.
+   Markup: fieldset.adm-b-choice > legend.adm-form__label, label.adm-b-choice__o > input.adm-b-choice__in + text;
+   a single checkbox uses div.adm-b-choice. States: on, off, one chosen. */
+.adm-b-choice { display: flex; flex-direction: column; gap: 0.125rem; min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.adm-b-choice > legend { padding-block-end: 0.25rem; }
+.adm-b-choice__o { display: flex; align-items: center; gap: 0.5rem; min-block-size: 2.5rem; }
+.adm-b-choice__in { flex: none; inline-size: 1.5rem; block-size: 1.5rem; margin: 0; accent-color: #1f1f1f; }
+
+/* adm-b-token and adm-b-logo: brand placeholders (OD-01). A colour token is shown by its name beside a hatched
+   box that carries no colour; the logo is a labelled box. Markup: span.adm-b-token > span.adm-b-token__sw + name;
+   span.adm-b-logo with its label. States: none. */
+.adm-b-token { display: inline-flex; align-items: center; gap: 0.375rem; }
+.adm-b-token__sw { flex: none; inline-size: 1.5rem; block-size: 1.5rem; background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 6px); border: 1px solid #5c5c5c; }
+.adm-b-logo { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 8rem; min-block-size: 2.5rem; padding: 0.25rem 0.625rem; font: 0.6875rem/1.4 ui-monospace, Menlo, Consolas, monospace; text-align: center; color: #3a3a3a; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 8px); border: 1px dashed #5c5c5c; }
+
+/* adm-b-split: the two-column standard term screen (Products > Categories, Brands, Collections): the add form at the
+   inline start, the list table at the inline end. Markup: div.adm-b-split > div, div. Also span.adm-b-thumb (a
+   term or product image box in a table), span.adm-b-grip (the native drag handle, drawn), tr.adm-b-moved (a row
+   just moved: an edge, and the word Moved). States: none. */
+.adm-b-split { display: grid; grid-template-columns: minmax(13rem, 17rem) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.adm-b-split > * { display: flex; flex-direction: column; gap: 0.5rem; min-inline-size: 0; }
+.adm-b-thumb { display: inline-flex; align-items: center; justify-content: center; inline-size: 2.5rem; block-size: 2.5rem; font-size: 0.625rem; color: #5c5c5c; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 6px); border: 1px solid #a8a8a8; }
+.adm-b-grip { display: inline-block; white-space: nowrap; font-weight: 700; letter-spacing: -0.1em; color: #5c5c5c; cursor: move; }
+.adm-b-moved { box-shadow: inset 4px 0 0 #1f1f1f; }
+.adm-b-moved td:first-child { padding-inline-start: 0.875rem; }
+
+/* adm-b-pop, adm-b-snack, adm-b-ref: native editor pieces drawn as context. adm-b-pop: a native dropdown drawn
+   open (span items, span.adm-b-pop__cur). adm-b-snack: the editor's own snackbar after a save. adm-b-ref: the
+   pointer to a reviewed storefront wireframe that a preview shows, by file name; the storefront is not redrawn.
+   States: none. */
+.adm-b-pop { display: flex; flex-direction: column; align-self: flex-end; min-inline-size: min(12rem, 100%); overflow-wrap: anywhere; padding: 0.25rem; background: #fff; border: 1px solid #5c5c5c; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+.adm-b-pop > span { padding: 0.375rem 0.5rem; }
+.adm-b-pop__cur { font-weight: 700; color: #1f1f1f; }
+.adm-b-snack { align-self: flex-start; padding: 0.5rem 0.75rem; color: #fff; background: #3a3a3a; border-radius: 2px; }
+.adm-b-ref { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem 1.25rem; color: #3a3a3a; background: #fff; border: 1px dashed #5c5c5c; }
+.adm-b-ref code { overflow-wrap: anywhere; }
+
+/* adm-b-st: two more shapes for adm-status, for the promotional banner's four states, so none is told by colour
+   or text alone. Markup: span.adm-status.adm-b-st--wait (Scheduled: hollow circle) or span.adm-status.adm-b-st--end
+   (Ended: a bar). Showing uses adm-status--on, Switched off uses adm-status--off. States: each. */
+.adm-status.adm-b-st--wait::before { background: transparent; border: 2px solid #1f1f1f; border-radius: 50%; }
+.adm-status.adm-b-st--end { background: #f0f0f0; }
+.adm-status.adm-b-st--end::before { block-size: 0.1875rem; background: #1f1f1f; }
