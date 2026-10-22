@@ -1208,7 +1208,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-pdp-simple",
@@ -4106,7 +4106,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
     },
     {
@@ -4147,7 +4147,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-promo-banner-manager",
@@ -4190,7 +4190,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-global-brand-controls",
@@ -4229,7 +4229,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
     },
     {
@@ -4313,7 +4313,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed",
+      "note": "The native category order can be changed only by dragging (WCAG 2.2: 2.1.1, 2.5.7), a platform limitation recorded by the owner (D3). The Move up and Move down drawn on the ordered state are a separately gated accessibility safeguard, not an approved build or implementation requirement: no PBI, ticket or build follows from the drawing."
     },
     {
       "id": "ad-dashboard-sales",
@@ -5271,7 +5272,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "sf-product-badges",
