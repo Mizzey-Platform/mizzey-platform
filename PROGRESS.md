@@ -99,7 +99,7 @@ Live status. First action each session: read this, then continue from **Next**.
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-08 are drawn, each reviewed and closed, and in batch-09 the
-  09-A and 09-B groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  09-A, 09-B and 09-C groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -351,8 +351,9 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
    09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
    it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
-   with one controlled correction round on his review of 22 October 2026, and it is imported for his review; it is
-   not accepted until he says so. 09-D and 09-E follow on his separate instruction.
+   with one controlled correction round on his review of 22 October 2026; he accepted it on 23 October 2026 (PR #399),
+   with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
+   open pending D-19. 09-D and 09-E follow on his separate instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

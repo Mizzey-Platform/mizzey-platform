@@ -1396,11 +1396,11 @@
         "treatment": {
           "native": {
             "meaning": "A standard screen already does the work. The addition is a filter, a field, a count or a link, drawn in place on an annotated standard screen.",
-            "surfaces": ["ad-order-list-filters", "ad-list-search-additions", "ad-catalogue-terms", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-control", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions"]
+            "surfaces": ["ad-order-list-filters", "ad-list-search-additions", "ad-catalogue-terms", "ad-order-status-control", "ad-dashboard-stock", "ad-dashboard-attention", "ad-dashboard-quick-actions"]
           },
           "constrained": {
             "meaning": "A platform mechanism (the block editor, global styles, the standard product, coupon or order screen, or the document mechanism selected in its PBI) shapes a real addition. Drawn inside that mechanism.",
-            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-manual-product-order", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-manual-product-order", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
           },
           "annotate_only": {
             "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
@@ -1602,10 +1602,10 @@
         },
         {
           "group": "09-C",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-23",
           "source": "Claude Design, two returns, each from a private package built by Claude Code: (1) mizzey-batch-09-c-output.zip (SHA-256 d796a8bc01e6cc1ff41c498f383f654457f3c33de7358f18ac49f912805ad0cd), inside the Claude Design export Mizzey UX decision synthesis (19).zip, from mizzey-batch-09-c-design-package-v1.2-2026-10-21.zip (SHA-256 66c6d3066ff149e10407af8b1faa324f9d5f64e86fcdc54b916ad7fe0b54857d, built from 2618d88) with the owner's message of 21 October 2026, handoff batch-09-c-handoff.md SHA-256 955595866649cddb5651c0b8200d4739197d16bd17bbc9d7648fbcdeb3c50c2b; (2) mizzey-batch-09-c-correction-round-1-output.zip (SHA-256 abc4050071c61789e077df4a85f09d66fac1df572230457ab294f8d7c88f359d), from mizzey-batch-09-c-correction-round-1-package-v1-2026-10-22.zip (SHA-256 ac42c7c33e07ae3a0c0d5c19a2ca166a340d8f6549b961f0a2cba99cbaf81ac5, built from 7e3e94c), handoff batch-09-c-correction-round-1-handoff.md SHA-256 cb51eb3920b9446bc07d0df1992990f4d757ab01261eefb11e3f6b99ec4706ad. Packages and handoffs not committed.",
-          "record": "Eight files: the seven 09-C surfaces in English and the group-only batch-09-c.css (7,244 bytes). 28 English states, each one desktop frame. Committed exactly as delivered, then correction round 1 exactly as returned; every committed hash equals its handoff. Claude Code changed no wireframe. No frozen 09-A or 09-B file and not wireframe.css changed.",
+          "record": "Eight files: the seven 09-C surfaces in English and the group-only batch-09-c.css (7,244 bytes). 28 English states, each one desktop frame. Committed exactly as delivered, then correction round 1 exactly as returned; every committed hash equals its handoff. Claude Code changed no wireframe until acceptance, when three files were corrected in text only on the owner's authorisation (corrected_note). No frozen 09-A or 09-B file and not wireframe.css changed.",
           "delivered": {
             "design/wireframes/s1/batch-09/ad-product-storefront-controls.en.html": "061beb4540252d5b158d97c10d9b61a2e5c7b5efa13b7a50dc114286bdb4766d",
             "design/wireframes/s1/batch-09/ad-product-edit-additions.en.html": "20be480e5de2de300f4d530ab85e1705fa5bb43627a7ca77d4c3ad0453b03d7d",
@@ -1620,10 +1620,13 @@
             "design/wireframes/s1/batch-09/ad-product-storefront-controls.en.html": "678e5d2b4bbb1c5676a6e895b855ea53a95f24f00d3e4615af2d0cb183e70caf",
             "design/wireframes/s1/batch-09/ad-product-edit-additions.en.html": "c897ba612679d80ba8a280f90ae1b9ab81109159b638e6f41689e4e7f7c78f74",
             "design/wireframes/s1/batch-09/ad-price-stock-history.en.html": "5b1ee6a1989396f76fc0772c0e9a3614b57d27f497632bc9b0ea524d48f746c4",
-            "design/wireframes/s1/batch-09/ad-stock-from-erp.en.html": "deb398341b2cea42b12615069488a91d4a75b4e8ebc7cca37a24efd5c5e40db2",
+            "design/wireframes/s1/batch-09/ad-stock-from-erp.en.html": "a12d9452798b9045505d1068b85a31ad8d9a28b9167084bab3894e4a0508a5e3",
             "design/wireframes/s1/batch-09/ad-seo-fields.en.html": "1eeee2abbb8d8a3459377b80732afd5d468ee4b3ffdd0e7924ac03c2bd35f741",
-            "design/wireframes/s1/batch-09/batch-09-c.css": "ee056a593132395a5973d4e6f92129bef338f857aca1d088d8b6c895e35474ae"
+            "design/wireframes/s1/batch-09/batch-09-c.css": "ee056a593132395a5973d4e6f92129bef338f857aca1d088d8b6c895e35474ae",
+            "design/wireframes/s1/batch-09/ad-missing-page-log.en.html": "7faac17cab8903701586f47ae5ec54b1fe7c99e8b811fec2a6276fd51cdbecf4",
+            "design/wireframes/s1/batch-09/ad-seo-site-settings.en.html": "a193b5c6513af9f1dc4653c90e797d723568860a545e6b551f8a5811391540c6"
           },
+          "corrected_note": "Corrected at acceptance by Claude Code, text only, on the owner's authorisation of 23 October 2026, as the 09-A batch-09.css comment correction was: ad-missing-page-log's Treatment line and its four frame labels now read annotate only (F1), where they said custom and \"the inventory says custom\" (MC-1, five strings); ad-stock-from-erp's and ad-seo-site-settings' Treatment lines and three frame labels each now read constrained, where they said native (MC-2, eight strings). No markup, class, state or layout changed. Hashes before this correction (as delivered, or as returned in round 1 for ad-stock-from-erp): ad-missing-page-log.en.html 282519c2, ad-stock-from-erp.en.html deb39834, ad-seo-site-settings.en.html 00feb9f9.",
           "correction_rounds": [
             {
               "round": 1,
@@ -1643,18 +1646,49 @@
             "F1 (21 October 2026): ad-missing-page-log is drawn annotate-only on Redirection's own 404 log, the component the Technical Design names for MKT-13 and MKT-14, with its own Add Redirect action; a redirect added from the log passes the same refusal rule as ad-redirect-manager, through a thin Mizzey adapter that is not proven until tested at build. Its treatment moves from custom to annotate_only in batches[batch-09].opening.treatment, and its inventory native baseline and design freedom follow, in this pull request. The frozen 09-A ad-redirect-manager still draws a custom screen and form; it is corrected at the batch-09 closure.",
             "F2: the search engine field set is drawn in full once, in ad-seo-fields, and shown closed with a pointer elsewhere; the robots override is on products only (ADM-41); the labels are 09-B's.",
             "F3 (21 October 2026): one position per product per collection, held by mizzey-site (#282), the same stored value 09-B's ad-manual-product-order orders, independent of category order; changed by the position field and Move up and Move down, never only by dragging.",
-            "F4: stock stays a structural placeholder in the three ERP surfaces until PRE-09; stock updates from a phone (ADM-160) are not drawn."
+            "F4: stock stays a structural placeholder in the three ERP surfaces until PRE-09; stock updates from a phone (ADM-160) are not drawn.",
+            "23 October 2026, at the 09-C review: hidden is WooCommerce's native Catalog visibility: Hidden.",
+            "23 October 2026: the price and stock history is a read-only panel on the standard product screen.",
+            "23 October 2026: the search engine site settings are a section added to Settings › Reading.",
+            "23 October 2026: ad-stock-from-erp and ad-seo-site-settings are constrained, as 09-B ruling D2 did for ad-manual-product-order, because each draws an added block on a standard screen. They move from native to constrained in batches[batch-09].opening.treatment, and their header and frame labels follow (MC-2).",
+            "23 October 2026: compare-at validation stays as drawn (the whole update is refused) and is recorded open for #276.",
+            "23 October 2026: the related-products mechanism is not decided in this review. It stays open pending D-19, which is under revision. The drawn recommendation (WooCommerce's Upsells field) and its drawn alternative (a separate field added by mizzey-site) are kept as delivered; if D-19 settles a different mechanism, the frame is corrected at the batch-09 closure."
           ],
-          "measurements": "Committed files, by Claude Code on 23 October 2026: all repository checks 0 with the import recorded (design inventory, wireframes, briefs after regeneration, repo checks, house rules); 389 tool tests and 126 discovery tests pass. Headless Chromium 155 over local HTTP, 28 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, 0 overlaps, 0 targets or controls under the baseline floors, labels and ARIA correct, greys only, stylesheets wireframe.css, batch-09.css and batch-09-c.css in that order, no script and no external address. The package's text-check.js reports nothing in any of the seven files (on the delivered files it gave 12, 39, 31, 6 and 0 lines in the five corrected ones). The history table fits at 1024 px with text spacing with 2 px to spare (404 of 406 px).",
+          "measurements": "Committed files, by Claude Code on 23 October 2026: all repository checks 0 with the import recorded (design inventory, wireframes, briefs after regeneration, repo checks, house rules); 389 tool tests and 126 discovery tests pass. Headless Chromium 155 over local HTTP, 28 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, 0 overlaps, 0 targets or controls under the baseline floors, labels and ARIA correct, greys only, stylesheets wireframe.css, batch-09.css and batch-09-c.css in that order, no script and no external address. The package's text-check.js reports nothing in any of the seven files (on the delivered files it gave 12, 39, 31, 6 and 0 lines in the five corrected ones). The history table fits at 1024 px with text spacing with 2 px to spare (404 of 406 px). After the acceptance corrections, the three corrected files were measured again the same way, with the same results: 0 overflow, overlap or undersized control, and no text-check line.",
+          "follow_up": [
+            "Related products (ad-product-storefront-controls, default, screen 2): the mechanism waits for D-19. If D-19 settles anything other than the drawn Upsells field, the frame and its note are corrected at the batch-09 closure, together with the role of the Cross-sells field, which is drawn without a note."
+          ],
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-23",
+            "record": "Frozen by the owner's acceptance of 09-C on 23 October 2026, at the hashes of the files as returned in correction round 1, three of them after the text-only corrections recorded in corrected_note. 09-D and 09-E change none of these eight files, the eight 09-B files or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
+            "files": {
+              "design/wireframes/s1/batch-09/ad-product-storefront-controls.en.html": "678e5d2b4bbb1c5676a6e895b855ea53a95f24f00d3e4615af2d0cb183e70caf",
+              "design/wireframes/s1/batch-09/ad-product-edit-additions.en.html": "c897ba612679d80ba8a280f90ae1b9ab81109159b638e6f41689e4e7f7c78f74",
+              "design/wireframes/s1/batch-09/ad-price-stock-history.en.html": "5b1ee6a1989396f76fc0772c0e9a3614b57d27f497632bc9b0ea524d48f746c4",
+              "design/wireframes/s1/batch-09/ad-stock-from-erp.en.html": "a12d9452798b9045505d1068b85a31ad8d9a28b9167084bab3894e4a0508a5e3",
+              "design/wireframes/s1/batch-09/ad-seo-fields.en.html": "1eeee2abbb8d8a3459377b80732afd5d468ee4b3ffdd0e7924ac03c2bd35f741",
+              "design/wireframes/s1/batch-09/ad-missing-page-log.en.html": "7faac17cab8903701586f47ae5ec54b1fe7c99e8b811fec2a6276fd51cdbecf4",
+              "design/wireframes/s1/batch-09/ad-seo-site-settings.en.html": "a193b5c6513af9f1dc4653c90e797d723568860a545e6b551f8a5811391540c6",
+              "design/wireframes/s1/batch-09/batch-09-c.css": "ee056a593132395a5973d4e6f92129bef338f857aca1d088d8b6c895e35474ae"
+            }
+          },
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's 09-C review. Not accepted, not frozen, not merged. The 09-C surfaces stay wireframed until he accepts them.",
-            "open_decisions": [
-              "The four recommendations in the 09-C handoff: related products as WooCommerce's Upsells field; hidden as Catalog visibility Hidden; the price and stock history as a panel on the product screen; the search engine site settings as a section in Settings › Reading. Recommended by Claude Code: accept as drawn.",
-              "The treatment of ad-stock-from-erp and ad-seo-site-settings, native in batches[batch-09].opening.treatment while each draws an added block. Recommended: constrained, as 09-B ruling D2 did for ad-manual-product-order. Not changed here.",
-              "Compare-at price validation: the frame refuses the whole product update, where WooCommerce's own pattern saves the rest and flags the field. Recommended: leave as drawn and record it open for #276."
+            "status": "closed",
+            "date": "2026-10-23",
+            "decided_by": "Mustafa, owner",
+            "record": "The owner reviewed the seven 09-C surfaces, imported for his review in PR #399 from one delivery and one controlled correction round, and on 23 October 2026 accepted Batch 09-C as structurally complete, with the rulings above and the text-only corrections MC-1 and MC-2. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). It decides no ERP mechanism (PRE-09) and does not decide the related-products mechanism (D-19).",
+            "accepted": [
+              "The structural wireframes of the seven 09-C surfaces as imported in PR #399: 28 states in English, 28 frames.",
+              "The 09-C group-only patterns in batch-09-c.css as drawn; their promotion is decided at the batch-09 closure.",
+              "Rulings F1 to F4 as applied; correction round 1 (C1 to C7); the owner's rulings of 23 October 2026.",
+              "The three ERP surfaces as structural placeholders only: no stock figure, timing, mechanism, reservation or editing is approved (PRE-09). A screen that displays stock enforces nothing."
             ],
-            "raised": "The handoff's open questions stay with their owning PBIs and are not decided by this import: badge dates, compare-at against sale price, featured prominence, where a product lands when it joins a collection, generated-value sources, sitemap contents, robots per language, and Redirection's capability and log settings (#276, #282, #287, #311, PRE-09). The unwritten P1-L reductions (SSC-28, ADM-29, ADM-50, MKT-14) stay raised; signed scope is not touched."
+            "open": [
+              "The related-products mechanism and the role of the Cross-sells field, pending D-19 (follow_up).",
+              "Compare-at validation: whole-update refusal as drawn, or WooCommerce's save-and-flag pattern (#276)."
+            ],
+            "not_changed": "09-D and 09-E stay briefed and are imported one pull request at a time on the owner's separate instruction. The frozen 09-A and 09-B files, batch-01 to batch-08 and their closure records are unchanged. The handoff's open questions stay with #276, #282, #287, #311 and PRE-09, and the unwritten P1-L reductions (SSC-28, ADM-29, ADM-50, MKT-14) stay raised; signed scope is not touched."
           }
         }
       ]
@@ -2864,13 +2898,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-product-storefront-controls.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-product-storefront-controls.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "badge_assigned", "featured", "collection_position_set", "scheduled", "hidden"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-catalogue-terms",
@@ -2955,26 +2989,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-product-edit-additions.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-product-edit-additions.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "simple_product", "per_variant", "validation"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-price-stock-history",
       "batch": "batch-09",
       "brief": "design/briefs/ad-price-stock-history.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-price-stock-history.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list", "filtered"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-list-search-additions",
@@ -3268,13 +3302,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-seo-fields.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-seo-fields.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "defaults", "overridden", "arabic_version"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-redirect-manager",
@@ -3294,39 +3328,39 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-missing-page-log.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-missing-page-log.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list", "create_redirect_from_entry"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-seo-site-settings",
       "batch": "batch-09",
       "brief": "design/briefs/ad-seo-site-settings.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-seo-site-settings.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "defaults", "saved"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-stock-from-erp",
       "batch": "batch-09",
       "brief": "design/briefs/ad-stock-from-erp.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-stock-from-erp.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "figure_shown", "figure_unavailable"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-email-template-editor",

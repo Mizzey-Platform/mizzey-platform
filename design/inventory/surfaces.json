@@ -4272,7 +4272,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "wireframed"
+      "status": "reviewed",
+      "note": "Related products: the mechanism is open pending D-19. The frame draws WooCommerce's Upsells field as the recommendation and a separate mizzey-site field as the alternative; neither is decided by the 09-C acceptance."
     },
     {
       "id": "ad-catalogue-terms",
@@ -4551,7 +4552,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
     },
     {
@@ -4592,7 +4593,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-list-search-additions",
@@ -5526,7 +5527,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-redirect-manager",
@@ -5607,7 +5608,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-seo-site-settings",
@@ -5646,7 +5647,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-stock-from-erp",
@@ -5685,7 +5686,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "per PRE-09",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
     },
     {
