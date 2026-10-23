@@ -65,3 +65,16 @@
    span.adm-c-img with its label; div.adm-c-gal holds several. States: none. */
 .adm-c-img { display: inline-flex; align-items: center; justify-content: center; inline-size: 4rem; block-size: 4rem; padding: 0.125rem; font-size: 0.625rem; text-align: center; color: #5c5c5c; overflow-wrap: anywhere; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 6px); border: 1px solid #a8a8a8; }
 .adm-c-gal { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+
+/* adm-c-tag2, adm-c-ww, adm-c-nw: room for a two-line tag, and text that stays whole (correction round 1, C5 to C7).
+   adm-c-tag2: on a block .adm-add whose ADDED tag runs to two lines in a narrow column; the box keeps room at its top
+   for both lines, so the tag never covers the first child. adm-c-ww: on the history table (table.adm-table__t), its
+   header cells, row headers and cells wrap at spaces only, never inside a word, with tighter inline padding so the
+   six columns still fit at 1024 px with text spacing; an ERP placeholder wraps inside one dashed box. adm-c-nw: a
+   code or number that never wraps (a GTIN; span.adm-c-nw around "PRE-09" in a sentence, a cell or a placeholder).
+   Markup: a class on the existing element, or that span. States: none. */
+.adm-add.adm-c-tag2 { padding-block-start: 2.75rem; }
+.adm-table__t.adm-c-ww th,
+.adm-table__t.adm-c-ww td { padding-inline: 0.375rem; overflow-wrap: normal; word-break: normal; }
+.adm-table__t.adm-c-ww .adm-c-erp__v { display: inline-block; padding-inline: 0.25rem; font-size: 0.6875rem; overflow-wrap: normal; }
+.adm-c-nw { white-space: nowrap; overflow-wrap: normal; }
