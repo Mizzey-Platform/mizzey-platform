@@ -350,7 +350,9 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
    page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
    09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
-   it on 22 October 2026 (PR #397) and its eight files are frozen. 09-C to 09-E follow on his separate instruction.
+   it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
+   with one controlled correction round on his review of 22 October 2026, and it is imported for his review; it is
+   not accepted until he says so. 09-D and 09-E follow on his separate instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

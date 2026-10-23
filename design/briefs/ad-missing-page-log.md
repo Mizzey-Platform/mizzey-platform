@@ -79,13 +79,13 @@ Arabic right to left does not apply. The administration is English only (ADM-159
 
 ## Design freedom
 
-`constrained`: A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary.
+`annotate_only`: The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned.
 
 It governs how the contracted capability is expressed, never what functionality exists.
 
 ## Native baseline
 
-None.
+Redirection's own 404 log, the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling F1, 21 October 2026).
 
 ## Open inputs
 
@@ -105,13 +105,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 4 |
+| Desktop | `drawn` |
+| States covered | 4 of 4 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

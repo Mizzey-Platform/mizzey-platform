@@ -4272,7 +4272,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-catalogue-terms",
@@ -4551,7 +4551,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
     },
     {
@@ -4592,7 +4592,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-list-search-additions",
@@ -5526,7 +5526,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-redirect-manager",
@@ -5601,13 +5601,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own 404 log, the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling F1, 21 October 2026).",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-seo-site-settings",
@@ -5646,7 +5646,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-stock-from-erp",
@@ -5685,7 +5685,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "per PRE-09",
-      "status": "briefed",
+      "status": "wireframed",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
     },
     {
