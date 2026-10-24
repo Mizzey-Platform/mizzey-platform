@@ -1709,3 +1709,71 @@ and batch-03 `sf-pdp-reviews` frames are superseded and are corrected by a follo
 Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email verification that links guest
 orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
 filter; and whether XML-RPC is disabled outright.
+
+## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, and how the site is opened and closed
+
+**Status: approved by the owner on 21 October 2026; in force on `main` when the pull request that carries it is
+merged.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the read-only CoreX
+architecture audit. **An internal architecture decision: not a client confirmation, adds no scope, changes no signed
+document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade stays the PR #350
+and #351 chain under its own security and regression review.
+
+**1. Ownership.** Verified against the pinned CoreX v0.42.0 (`corex.lock`), WordPress 7.1 and WooCommerce 11.1.0.
+
+| Component | Owns | Does not own |
+|---|---|---|
+| CoreX | The framework, shared services, the security foundation, technical operations (planned maintenance) and framework administration under COREX FRAMEWORK | Commerce, the storefront, Mizzey business controls |
+| WooCommerce | The commerce engine: products, variations, orders, checkout, commerce records, the native commerce administration, the customer account and the transactional customer emails | A bespoke replacement administration |
+| mizzey-site | Mizzey's contracted business rules, integrations and administration extensions | Framework services |
+| mizzey-theme | The standalone storefront presentation | Anything in wp-admin |
+| corex-kit-woo | Nothing: disabled and excluded from the intended launch package unless a demonstrated requirement changes this | |
+
+There is one commerce engine. No second engine or application framework is introduced.
+
+**2. Environments and operating modes are separate.** The environment (development, staging, production) is fixed per
+server in its configuration. The operating mode is chosen at runtime:
+
+| Mode | Owner | Who gets through |
+|---|---|---|
+| Live | WooCommerce Site Visibility set to live, CoreX mode production | everyone |
+| Coming Soon | **WooCommerce Site Visibility**, with search engines discouraged at the same time | `manage_woocommerce`, the share link |
+| Planned maintenance | **CoreX** maintenance mode (503) | `manage_options` |
+| Emergency maintenance | **Hosting**: a 503 before WordPress loads | nobody |
+| Staging access | **Hosting**: the server login on local staging, Cloudflare Access on server staging (D-16), and a no-index header | testers |
+
+Rules: CoreX's own Coming Soon mode (from v0.43.0) is not used while WooCommerce owns Coming Soon. No mechanism is
+switched on automatically because another is off. Hosting's controls fail closed; CoreX maintenance fails open if
+corex-config is unavailable; neither CoreX nor WooCommerce closes the WooCommerce Store API, `wc-ajax` or `wc-api`.
+
+**3. Add-ons.** Required: corex-core, corex-config. Conditional, kept only on a demonstrated requirement or
+dependency: corex-forms, corex-email, corex-blocks, corex-media, corex-captcha. Not enabled because they exist:
+corex-guides, corex-ui, corex-newsletter, corex-profile, corex-kit-woo and the unrelated kits. Before any deployment,
+the release is packaged from an explicit allowlist with its dependencies checked and a rollback, instead of every
+CoreX plugin the builder copies. Nothing is activated, deactivated or removed by this decision.
+
+**4. The administration boundary.** CoreX framework screens stay under COREX FRAMEWORK and administrator-only
+framework capabilities stay restricted. Mizzey business controls sit in the standard WordPress and WooCommerce menus,
+which stay recognisable. Mizzey administration styles are scoped to Mizzey's own screens; mizzey-theme never restyles
+wp-admin. CoreX's admin footer and sign-in branding are reviewed for a Mizzey or neutral presentation through
+supported configuration or hooks, never by hiding them with CSS or editing the framework. The batch-09 design record
+already follows this (09-A, PR #394, merged as `2618d88`).
+
+**5. Open, and not decided here.**
+
+Implementation decisions (owner, before the work they block):
+
+- **Transaction control during maintenance, before production readiness:** how order creation and checkout are
+  stopped when required, without blocking payment callbacks or integrations.
+- The explicit release allowlist and the production activation list, with dependency checks and rollback.
+- Whether the contact page (CMS-04) uses corex-forms, and with it corex-email and corex-captcha; until then its public
+  submission endpoint stays as the framework ships it.
+- Whether corex-media's WebP copies are served (NFR-02), or the feature is turned off.
+- **HOME-09:** the signup prompt stays contracted; the minimal storage and consent behaviour is decided at
+  implementation, not with corex-newsletter and without campaign automation (INT-06 is P2).
+- The CoreX footer and sign-in branding settings.
+- A read-only check that flags conflicting visibility settings, and the hosting-level emergency maintenance page.
+- Aligning the `sy-coming-soon` and `sy-maintenance` design baselines with section 2 (batch-01 is closed; a separate
+  design follow-up).
+
+Client decisions, not presented as approved: the consent wording for HOME-09 signups, and production hosting
+(OD-27, hosting outside Egypt, which blocks launch).
