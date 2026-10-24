@@ -387,6 +387,26 @@ class PrChecks(unittest.TestCase):
         errs = self.check(body("internal:governance", sensitive="x", delivery="y"), m("corex.lock"))
         self.assertError(errs, "(version-lock)")
 
+    def test_framework_upgrade_records_its_tested_version_in_the_same_pr(self):
+        # repo_checks.py requires stack.lock.json's corex entry to equal corex.lock, so the PR that moves the pin
+        # has to be able to record it. Before stack-record, no category could change both.
+        self.assertEqual(st.classify("stack.lock.json"), "stack-record")
+        b = body("internal:security-maintenance", "none", evidence="https://github.com/example/corex/releases/tag/v2",
+                 security="takes the framework's security fixes", sensitive="pin and record", delivery="new CoreX")
+        self.assertEqual(self.check(b, m("corex.lock", "stack.lock.json")), [])
+        req = body("requirement", ids="ADM-27", sensitive="pin and record", delivery="new CoreX")
+        self.assertEqual(self.check(req, m("corex.lock", "stack.lock.json")), [])
+
+    def test_stack_record_stays_sensitive_and_closed_to_other_categories(self):
+        b = body("internal:governance", sensitive="records an observed runtime", delivery="fetch-core reads it")
+        self.assertEqual(self.check(b, m("stack.lock.json")), [])
+        self.assertError(self.check(body("internal:governance"), m("stack.lock.json")), "add 'Sensitive changes:'")
+        self.assertError(self.check(body("internal:governance", sensitive="x"), m("stack.lock.json")),
+                         "add 'Delivery impact:'")
+        for cls in ("internal:documentation", "internal:tooling", "internal:test-infrastructure"):
+            errs = self.check(body(cls, sensitive="x", delivery="y"), m("stack.lock.json"))
+            self.assertError(errs, "(stack-record)")
+
     def test_a8_spec_deletion_rejected(self):
         self.assertError(st.check_deletions([("D", "specs/001-x/spec.md", None)]), "never deleted")
         self.assertError(self.check(body("internal:documentation"), [("D", "specs/001-x/spec.md", None)]),
