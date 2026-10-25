@@ -355,8 +355,9 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
    open pending D-19. Claude Design drew 09-D from the frozen baseline (version 2 package, 25 October 2026), and it
    is imported for his review. On 26 October 2026 he ruled D1 and D2 (the shipment and refund surfaces become
-   constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redraws the two
-   surfaces before he decides on acceptance. 09-E is being prepared on his authorisation and is not drawn yet.
+   constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redrew the two
+   surfaces in one correction round, imported for his acceptance decision. 09-E is prepared on his authorisation
+   and imported only after 09-D is decided.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
