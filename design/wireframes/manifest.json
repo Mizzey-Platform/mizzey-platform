@@ -1400,11 +1400,11 @@
           },
           "constrained": {
             "meaning": "A platform mechanism (the block editor, global styles, the standard product, coupon or order screen, or the document mechanism selected in its PBI) shapes a real addition. Drawn inside that mechanism.",
-            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-manual-product-order", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor"]
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-manual-product-order", "ad-product-storefront-controls", "ad-product-edit-additions", "ad-stock-from-erp", "ad-seo-site-settings", "ad-order-status-history", "ad-order-cancel", "ad-invoice", "ad-packing-slip", "ad-promotion-editor", "ad-shipment-panel", "ad-refund-record"]
           },
           "annotate_only": {
             "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
-            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-shipment-panel", "ad-refund-record", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log"]
+            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log"]
           },
           "custom": {
             "meaning": "No standard screen exists. A new screen or panel, drawn in the standard administration idiom, never a bespoke administration interface.",
@@ -1718,15 +1718,25 @@
           ],
           "review": {
             "status": "open",
-            "record": "Imported for the owner's 09-D review. Not accepted, not frozen, not merged. The 09-D surfaces stay wireframed until he accepts them.",
+            "record": "Imported for the owner's 09-D review. His rulings of 26 October 2026 are recorded; correction round 1 for D1 and D2 is requested. Not accepted, not frozen, not merged. The 09-D surfaces stay wireframed until he accepts the corrected result.",
             "open_decisions": [
-              "D1, ad-shipment-panel: Claude Design recommends moving it from annotate_only to constrained (one Send to Bosta entry in WooCommerce's Order actions select and one read-only shipment record). Not changed here. If the owner moves it, the surface is redrawn before acceptance.",
-              "D2, ad-refund-record: Claude Design recommends moving it from annotate_only to constrained for one Payment reference field, unless #293 shows Paymob records the reference on every route. Not changed here.",
-              "The ADDED-marker exception for six annotate_only frames (exceptions).",
-              "D4: one cancellation route (the panel), with WooCommerce's own routes (the status select, the list's bulk Change status to cancelled, REST) refusing a cancellation without a reason as a build requirement of #248 and #280; otherwise ORD-08 is not met for those routes.",
-              "The ORD-14 boundary (implementation_boundaries), confirmed as the rule for #248 and #291."
+              "Acceptance of the corrected ad-shipment-panel and ad-refund-record after correction round 1, and of the group."
             ],
             "raised": "Left with their owning PBIs or inputs, not decided by this import: D3 transition matrix (#248); D5 document placement and packing-slip content (#280); D6 the source of collected (#291, OD-20); D7 mapping location and warning clearance (#291); D8 pattern promotion (batch-09 closure); D9 the inventory design freedom of ad-order-status-control, ad-carrier-status-mapping and ad-cod-reconciliation reads constrained against treatments native, custom, custom (record correction at the closure); D10 the unwritten P1-L reductions of ADM-92, ADM-93, SHIP-09, SHIP-12, SHIP-13, SHIP-16 (written clarification or change control, never a drawing); D11 credit note or amended invoice and invoice language (OD-09, #280); D12 correcting a wrong tracking code (#291); D13 Restock refunded items while the ERP owns stock (PRE-09, #293); D14 the over-refund message and a per-line ceiling (#290, #293). Signed scope is not touched."
+          },
+          "owner_rulings": [
+            "D1 (26 October 2026): ad-shipment-panel moves from annotate_only to constrained in batches[batch-09].opening.treatment, and its inventory design freedom and native baseline follow, in this pull request. The intended design is one single-order Send to Bosta action within WooCommerce's own Order actions mechanism, plus a read-only shipment record on the order. A UX direction only: it does not confirm that the installed Bosta integration supports it. The plugin and HPOS investigation stays in #291; no Bosta API, carrier status or shipping capability is invented.",
+            "D2 (26 October 2026): ad-refund-record moves from annotate_only to constrained, and its inventory design freedom and native baseline follow, in this pull request. Design the minimum payment-reference capture ADM-124 needs where the native refund screen does not provide it, distinguishing a reference returned by the gateway from one entered by staff. No Paymob behaviour is assumed until #293 verifies it.",
+            "D4 (26 October 2026): a cancellation always carries a recorded reason, from every entry point. The designed cancellation panel is the preferred staff workflow; the native status select, the order list's bulk change to cancelled and API actions must not bypass the reason. Implementation obligations for #248 and #280, recorded there; not implemented here.",
+            "ADDED-marker exception (26 October 2026): approved, limited to annotate_only states with no added interface. No control or marker is invented to suggest functionality that does not exist. The six frames it covered belong to ad-shipment-panel and ad-refund-record, which D1 and D2 move to constrained; it applies to any of them that still has no addition after correction round 1.",
+            "ORD-14 (26 October 2026): the staff-only boundary recorded under implementation_boundaries is approved. Customers see Delivered in the storefront, the account, tracking and emails; internal cash-on-delivery collection and remittance changes trigger no customer notification. The authoritative source of collection data stays open under #291 and OD-20.",
+            "D5 and D7 (26 October 2026): the Documents panel (ad-invoice, ad-packing-slip) and the carrier status mapping under WooCommerce, Settings, Shipping (ad-carrier-status-mapping) are accepted as working structural UX decisions, subject to their signed requirements.",
+            "Remaining (26 October 2026): D3, D6 and D8 to D14 stay with their PBIs, client and vendor inputs, the batch-09 closure or the formal clarification process. P1-L scope is neither expanded nor reduced. D9: inventory design_freedom and manifest treatment are distinct fields and are not made equal automatically."
+          ],
+          "correction_round_1": {
+            "status": "requested",
+            "date": "2026-10-26",
+            "scope": "ad-shipment-panel.en.html and ad-refund-record.en.html redrawn as constrained under D1 and D2, and batch-09-d.css append-only if needed. The seven other 09-D files and the 26 frozen 09-A, 09-B and 09-C files unchanged. Issued to Claude Design by the owner from a private package built by Claude Code."
           }
         }
       ]

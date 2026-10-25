@@ -94,13 +94,13 @@ Arabic right to left does not apply. The administration is English only (ADM-159
 
 ## Design freedom
 
-`annotate_only`: The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned.
+`constrained`: A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary.
 
 It governs how the contracted capability is expressed, never what functionality exists.
 
 ## Native baseline
 
-The official Bosta integration for WooCommerce.
+The official Bosta integration for WooCommerce: its own pages, order-list columns and order box. One single-order Send to Bosta entry in WooCommerce's Order actions and a read-only shipment record on the order are additions (owner ruling D1, 26 October 2026); whether the installed integration supports a single-order send is verified in #291.
 
 ## Open inputs
 

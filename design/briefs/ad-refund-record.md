@@ -98,13 +98,13 @@ Arabic right to left does not apply. The administration is English only (ADM-159
 
 ## Design freedom
 
-`annotate_only`: The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned.
+`constrained`: A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary.
 
 It governs how the contracted capability is expressed, never what functionality exists.
 
 ## Native baseline
 
-The standard WooCommerce refund panel.
+The standard WooCommerce refund panel. Capturing the refund's payment reference, where the panel does not provide it, is the addition (owner ruling D2, 26 October 2026): a reference the gateway returns is shown, a manual refund's reference is entered by staff; Paymob's behaviour is verified in #293.
 
 ## Open inputs
 
