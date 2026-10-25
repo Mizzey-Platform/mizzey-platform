@@ -361,7 +361,10 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
    lines are not marked as additions); Claude Design corrected that one file, and he accepted 09-E on 26 October
    2026 (PR #402), E1 to E4 as working structural decisions: its ten files are frozen. All five batch-09 groups
-   are accepted; the batch-09 closure and batch-10 wait for his instruction.
+   are accepted. For the batch-09 closure he chose, on 26 October 2026, a pattern catalogue only (no CSS
+   consolidation) and one Claude Design correction round (ad-redirect-manager redrawn annotate-only on
+   Redirection, the unrelated sample rows replaced, WooCommerce's Apply button added in eight 09-D files), with
+   related products open pending D-19. Batch-10 waits for his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

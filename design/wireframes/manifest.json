@@ -1404,11 +1404,11 @@
           },
           "annotate_only": {
             "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
-            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log"]
+            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log", "ad-redirect-manager"]
           },
           "custom": {
             "meaning": "No standard screen exists. A new screen or panel, drawn in the standard administration idiom, never a bespoke administration interface.",
-            "surfaces": ["ad-staff-log", "ad-redirect-manager", "ad-customer-notes", "ad-customer-suspend", "ad-search-synonyms", "ad-price-stock-history", "ad-seo-fields", "ad-carrier-status-mapping", "ad-cod-reconciliation", "ad-launch-rules-settings"]
+            "surfaces": ["ad-staff-log", "ad-customer-notes", "ad-customer-suspend", "ad-search-synonyms", "ad-price-stock-history", "ad-seo-fields", "ad-carrier-status-mapping", "ad-cod-reconciliation", "ad-launch-rules-settings"]
           }
         },
         "treatment_note": "A production classification for drawing effort, derived from each surface's native_baseline and design_freedom. It changes neither, and it adds no capability.",
@@ -1870,7 +1870,23 @@
             "Scope of the acceptance (26 October 2026): E5 to E8 and E10 to E15 stay with their PBIs, external inputs, contractual clarifications or the batch-09 closure. The acceptance approves no unresolved ERP behaviour, no production default, no client acceptance, no functional implementation and no P1-L scope reduction."
           ]
         }
-      ]
+      ],
+      "closure": {
+        "status": "correction_requested",
+        "date": "2026-10-26",
+        "owner_rulings": [
+          "Option A (26 October 2026): pattern stabilisation by catalogue only. One canonical name per batch-09 pattern is recorded at the closure for the high-fidelity design and PRE-03b; no group stylesheet, shared stylesheet or HTML file is changed to consolidate patterns, and batch-09.css stays as frozen.",
+          "K1 to K3 (26 October 2026): one controlled closure correction round by Claude Design. K1: ad-redirect-manager is redrawn annotate-only on Redirection's own screens (ruling R1 of 21 October 2026; 09-C ruling F1), with the thin adapter's refusal as the marked extension; its treatment moves from custom to annotate_only in opening.treatment, and its inventory design freedom and native baseline follow, on this branch. K2: the unrelated fashion sample rows in ad-list-search-additions and ad-redirect-manager are replaced from PRODUCT-FIXTURES (09-B ruling D8). K3: WooCommerce's native Apply button is added as muted context beside the Order actions select in the eight 09-D files that draw the box without it.",
+          "K3 record correction (26 October 2026): the 09-D follow_up says ad-shipment-panel and ad-refund-record draw the Apply button and seven other 09-D files do not. In fact only ad-shipment-panel draws it; eight files draw the box without it, ad-refund-record included. This closure record supersedes that sentence.",
+          "K4 (26 October 2026): batch-09 closes with the related-products mechanism (09-C ad-product-storefront-controls) open pending D-19; if D-19 settles a mechanism other than the drawn Upsells field, that frame is corrected afterwards in its own controlled correction.",
+          "K5 (26 October 2026): the inventory's design_freedom (how much design latitude a surface has) and the manifest's treatment (how its frame is produced) are distinct fields. They differ for ad-order-status-control, ad-carrier-status-mapping, ad-cod-reconciliation, ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings; no value is changed for that.",
+          "K6 (26 October 2026): the native baselines of sy-coming-soon and sy-maintenance (batch-01) against the operating policy of 21 October 2026 stay outside batch-09, as the 09-A follow_up records."
+        ],
+        "correction_round_1": {
+          "status": "requested",
+          "scope": "K1 and K2: ad-redirect-manager.en.html redrawn, ad-list-search-additions.en.html text only. K3: ad-order-status-control, ad-order-status-history, ad-order-cancel, ad-invoice, ad-packing-slip, ad-carrier-status-mapping, ad-cod-reconciliation and ad-refund-record (.en.html), the native Apply button added. Ten frozen files, changed under this closure and refrozen at their new hashes on the owner's approval. No stylesheet changes; the other 36 frozen files unchanged. Issued to Claude Design by the owner from a private package built by Claude Code."
+        }
+      }
     },
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
   ],

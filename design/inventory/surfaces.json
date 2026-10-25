@@ -5562,8 +5562,8 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own redirect screens (Tools › Redirection), the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling R1, 21 October 2026, applied at the batch-09 closure on 26 October 2026). The refusal of a loop or a missing internal target is a thin Mizzey adapter on its own validation filter, not proven until tested at build under #287.",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
