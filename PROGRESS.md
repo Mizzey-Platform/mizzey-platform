@@ -99,7 +99,7 @@ Live status. First action each session: read this, then continue from **Next**.
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
   (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-08 are drawn, each reviewed and closed, and in batch-09 the
-  09-A, 09-B, 09-C and 09-D groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  09-A to 09-E groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -359,8 +359,9 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
    The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
    and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
-   lines are not marked as additions); Claude Design corrected that one file, imported for his acceptance
-   decision.
+   lines are not marked as additions); Claude Design corrected that one file, and he accepted 09-E on 26 October
+   2026 (PR #402), E1 to E4 as working structural decisions: its ten files are frozen. All five batch-09 groups
+   are accepted; the batch-09 closure and batch-10 wait for his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).

@@ -1787,7 +1787,7 @@
         },
         {
           "group": "09-E",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-26",
           "source": "Claude Design, one return: mizzey-batch-09-e-output.zip (SHA-256 1fe88c5418b5c1dac2752cf01c987b6b69fb043949c5757327c5e8fc3c80e384), from the private package mizzey-batch-09-e-design-package-v2-2026-10-26.zip (SHA-256 8b135590e8dc20528bbcfd7f71087dd891249a196952e64dea10505cdea95fb9, built by Claude Code from a487e62 on the owner's authorisation of 26 October 2026), handoff batch-09-e-handoff.md SHA-256 46d0b2040b8852892a7a8556847c4ead28bf57bf00d9dd541189f1821fcd3b38, decision sheet batch-09-e-decision-sheet.md SHA-256 2c71c213c2da888c801c112cc248910663d694eca0c6f5b1eef99ec447affdbf. The handoff states Claude Design's own unimported output of 22 October 2026 (SHA-256 611aecdc...) was reused only where it meets version 2. The package listed 26 frozen files, as 09-D was frozen after it was built; the return was validated against all 36. Package, handoff and decision sheet not committed.",
           "record": "Ten files: the nine 09-E surfaces in English and the group-only batch-09-e.css (9,844 bytes). 39 English states, each one desktop frame. Committed exactly as delivered; every committed hash equals the handoff. Claude Code changed no wireframe. No frozen 09-A, 09-B, 09-C or 09-D file and not wireframe.css changed. No treatment in opening.treatment changed.",
@@ -1821,17 +1821,53 @@
           "exceptions": [
             "22 frames carry no ADDED marker, each labelled \"Nothing is added in this state\": the 19 annotate_only frames under the owner's rule of 26 October 2026 (ad-dashboard-sales 4, rp-sales 5, rp-stock 5, ad-two-factor 5) and ad-dashboard-stock default, zero and counts_with_links under his ruling E9, which extends that rule to these states of this native surface. The other 17 frames mark their additions."
           ],
+          "follow_up": [
+            "For the batch-09 closure: E8, the adm-e- patterns that duplicate 09-B, 09-C and 09-D classes (adm-e-ww, adm-e-nw, adm-e-st--wait, adm-e-st--end, adm-e-key, adm-e-pin) and their promotion or merge (09-B ruling D7); E10, the inventory design freedom of ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings against their treatments, distinct fields not made equal. The frozen files are not changed before the closure."
+          ],
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-26",
+            "record": "Frozen by the owner's acceptance of 09-E on 26 October 2026, at the hashes of the files as delivered, with ad-dashboard-stock as returned in correction round 1 (E9), and batch-09-e.css. No later work changes these ten files or the 36 frozen 09-A, 09-B, 09-C and 09-D files; a file that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
+            "files": {
+              "design/wireframes/s1/batch-09/ad-dashboard-sales.en.html": "73035b604f8110595d884471e136e9ccb540b46eeb311ef204bff7b76c3e0a74",
+              "design/wireframes/s1/batch-09/ad-dashboard-stock.en.html": "19e11d506398fe389398603a7409be8ebdc33c79eed725d3231d239872a6dfce",
+              "design/wireframes/s1/batch-09/ad-dashboard-attention.en.html": "fcf53f6ace1bd5fc55a5590d4f1cccc28dc9ffa906b53d0bd298ca401e9b423f",
+              "design/wireframes/s1/batch-09/ad-dashboard-quick-actions.en.html": "02d70b83a5af542762fe726692034f00d1eedaf29dfcc2591d6917ed37cf0336",
+              "design/wireframes/s1/batch-09/rp-sales.en.html": "7486e6603b2a0e39cc1f75cb8c49ce0f60ed7f1b690bf3db6bd10ff9627148c1",
+              "design/wireframes/s1/batch-09/rp-stock.en.html": "966db7541f6da6f27ab25d28a9e93cf569e6257ad98951ead0f02fd6796c1a00",
+              "design/wireframes/s1/batch-09/ad-promotion-editor.en.html": "ecd1e6144dad4ee968af6a4453313fcd5887341f0351498caf45597816aa55b7",
+              "design/wireframes/s1/batch-09/ad-launch-rules-settings.en.html": "dd714786c71b892deb4e7080a066c2ff26c72da7c9ac2998d46f8607f13b96d8",
+              "design/wireframes/s1/batch-09/ad-two-factor.en.html": "f49b600d1b7333be6f511b73a6d408cfe7da6088c6568dce4bd2ccf61ee87f9d",
+              "design/wireframes/s1/batch-09/batch-09-e.css": "923df3875f3d38c17ba3f18a88938152c177d4d609a556f8a1c62ee103c26784"
+            }
+          },
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's 09-E review. His E9 ruling of 26 October 2026 is applied: correction round 1 is returned, validated and committed. Not accepted, not frozen, not merged. The 09-E surfaces stay wireframed until he accepts the group.",
-            "open_decisions": [
-              "E1 to E4: the promotion structure (start date beside the native expiry, code or automatic, a Pause and Resume panel, statuses with 09-B's shapes); the launch rules as a WooCommerce Settings tab; the welcome discount as a rule with OD-03 variables; the counts on WooCommerce's own Status widget with one added line and one quick-actions widget. Recommended by Claude Code: accept as drawn, as working structural decisions, the mechanisms staying with #289, #290 and #294.",
-              "The owner's acceptance of the 09-E group and the freeze of its ten files."
+            "status": "closed",
+            "date": "2026-10-26",
+            "decided_by": "Mustafa, owner",
+            "record": "The owner reviewed the nine 09-E surfaces, imported for his review in PR #402 from one delivery and one controlled correction round (E9), and on 26 October 2026 accepted Batch 09-E as corrected and validated, and approved freezing its ten files. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). It decides no ERP behaviour (PRE-09), no production default (OD-03, OD-04) and no P1-L scope reduction.",
+            "accepted": [
+              "The structural wireframes of the nine 09-E surfaces as imported in PR #402: 39 states in English, 39 frames.",
+              "ad-dashboard-stock as corrected under E9: WooCommerce's native stock lines unmarked in default, zero and counts_with_links; ADDED on figures_unavailable alone.",
+              "E1 to E4 as working structural UX decisions, their mechanisms with #289, #290 and #294.",
+              "The 09-E group-only patterns in batch-09-e.css as drawn; their promotion is decided at the batch-09 closure (E8).",
+              "WP 2FA free tier drawn annotate-only on its own screens (owner ruling R2): a drawing of the candidate, not an installation or a verification."
             ],
-            "raised": "Left with their owning PBIs or inputs, not decided by this import: E5 what low stock means while the ERP owns stock (#246, PRE-09); E6 the WP 2FA staging checks (#275); E7 the report roles (#251, #286, #294; CX-01); E8 pattern merges, now including 09-D's accepted adm-d-key and adm-d-pin (batch-09 closure); E10 inventory design freedom against manifest treatment for ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings: distinct fields, not made equal; E11 the unwritten P1-L reductions of ADM-04, ADM-06, ADM-08, ADM-111, RPT-01, RPT-10 (written clarification or change control, never a drawing); E12 the statuses the dashboard counts (#294, #248); E13 WooCommerce's Individual use only beside BR-004 (#289, #290); E14 the shipped combination default and welcome-discount eligibility (OD-03, OD-04, #290); E15 hiding Analytics' native comparison, ADM-14 being P2 (#286, #294). Signed scope is not touched."
+            "open": [
+              "E5 what low stock means while the ERP owns stock (#246, PRE-09).",
+              "E6 the WP 2FA staging checks: CoreX sign-in, My Account sign-in, the missing Arabic translation, notices and upsells, the exclusion-list wipe (#275).",
+              "E7 the report roles (#251, #286, #294; CX-01).",
+              "E8 pattern merges and E10 design freedom against treatment (follow_up), at the batch-09 closure.",
+              "E11 the unwritten P1-L reductions of ADM-04, ADM-06, ADM-08, ADM-111, RPT-01, RPT-10: written clarification or change control, never a drawing.",
+              "E12 the statuses the dashboard counts (#294, #248); E13 WooCommerce's Individual use only beside BR-004 (#289, #290); E14 the shipped combination default and welcome-discount eligibility (OD-03, OD-04, #290); E15 hiding Analytics' native comparison, ADM-14 being P2 (#286, #294)."
+            ],
+            "not_changed": "All five batch-09 groups are now accepted. The frozen 09-A, 09-B, 09-C and 09-D files, batch-01 to batch-08 and their closure records are unchanged. The batch-09 closure (shared pattern stabilisation) and batch-10 start only on the owner's separate instruction. Signed scope is not touched."
           },
           "owner_rulings": [
-            "E9 (26 October 2026): in ad-dashboard-stock, WooCommerce's native low-stock and out-of-stock lines are not marked ADDED in default, zero and counts_with_links; those frames say \"Nothing is added in this state\" and keep the note that the counts rest on the ERP's figures (PRE-09). The ADDED marker is used only on figures_unavailable, the state WooCommerce lacks. This extends the owner's ADDED-marker rule of 26 October 2026, for this native surface, to states that add no interface; no control or marker is invented. The manifest treatment stays native."
+            "E9 (26 October 2026): in ad-dashboard-stock, WooCommerce's native low-stock and out-of-stock lines are not marked ADDED in default, zero and counts_with_links; those frames say \"Nothing is added in this state\" and keep the note that the counts rest on the ERP's figures (PRE-09). The ADDED marker is used only on figures_unavailable, the state WooCommerce lacks. This extends the owner's ADDED-marker rule of 26 October 2026, for this native surface, to states that add no interface; no control or marker is invented. The manifest treatment stays native.",
+            "Acceptance (26 October 2026): the owner accepted Batch 09-E as corrected and validated: all nine surfaces and their 39 states, the E9 correction in ad-dashboard-stock, and the freeze of the ten 09-E design files including batch-09-e.css.",
+            "E1 to E4 (26 October 2026): accepted as the working structural UX decisions shown in the reviewed wireframes (the promotion structure in the coupon screen; the launch rules as a WooCommerce Settings tab; the welcome discount as a rule with OD-03 variables; the counts on WooCommerce's own Status widget with one quick-actions widget), their implementation mechanisms remaining with #289, #290 and #294.",
+            "Scope of the acceptance (26 October 2026): E5 to E8 and E10 to E15 stay with their PBIs, external inputs, contractual clarifications or the batch-09 closure. The acceptance approves no unresolved ERP behaviour, no production default, no client acceptance, no functional implementation and no P1-L scope reduction."
           ]
         }
       ]
@@ -3067,52 +3103,52 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-dashboard-sales.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-dashboard-sales.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty_range", "date_range", "permission_denied"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-dashboard-stock",
       "batch": "batch-09",
       "brief": "design/briefs/ad-dashboard-stock.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-dashboard-stock.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "zero", "counts_with_links", "figures_unavailable"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-dashboard-attention",
       "batch": "batch-09",
       "brief": "design/briefs/ad-dashboard-attention.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-dashboard-attention.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "zero", "counts_with_links"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-dashboard-quick-actions",
       "batch": "batch-09",
       "brief": "design/briefs/ad-dashboard-quick-actions.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-dashboard-quick-actions.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "links"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-dashboard-customers-conversion",
@@ -3340,26 +3376,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-promotion-editor.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-promotion-editor.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "create", "scheduled", "active", "paused", "validation"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-launch-rules-settings",
       "batch": "batch-09",
       "brief": "design/briefs/ad-launch-rules-settings.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-launch-rules-settings.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "defaults", "validation", "saved", "rule_off"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-manual-product-order",
@@ -3419,13 +3455,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-two-factor.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-two-factor.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "setup", "challenge", "wrong_code", "recovery"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-permission-denied",
@@ -3523,26 +3559,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/rp-sales.md",
       "artifacts": ["design/wireframes/s1/batch-09/rp-sales.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty_range", "date_range", "exported", "permission_denied"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "rp-stock",
       "batch": "batch-09",
       "brief": "design/briefs/rp-stock.md",
       "artifacts": ["design/wireframes/s1/batch-09/rp-stock.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list", "filtered", "figures_pending"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "em-shell",

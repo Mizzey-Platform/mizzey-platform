@@ -4355,7 +4355,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-stock",
@@ -4395,7 +4395,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-attention",
@@ -4434,7 +4434,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
     },
     {
@@ -4473,7 +4473,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-customers-conversion",
@@ -5193,7 +5193,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-launch-rules-settings",
@@ -5234,7 +5234,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-manual-product-order",
@@ -5448,7 +5448,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-permission-denied",
@@ -5768,7 +5768,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "rp-stock",
@@ -5809,7 +5809,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "em-shell",
