@@ -1690,6 +1690,44 @@
             ],
             "not_changed": "09-D and 09-E stay briefed and are imported one pull request at a time on the owner's separate instruction. The frozen 09-A and 09-B files, batch-01 to batch-08 and their closure records are unchanged. The handoff's open questions stay with #276, #282, #287, #311 and PRE-09, and the unwritten P1-L reductions (SSC-28, ADM-29, ADM-50, MKT-14) stay raised; signed scope is not touched."
           }
+        },
+        {
+          "group": "09-D",
+          "status": "awaiting_owner_review",
+          "date": "2026-10-26",
+          "source": "Claude Design, one return: mizzey-batch-09-d-output.zip (SHA-256 e32f26d4a484faeb99c6b476fbb9dfeb7e0cbff27d1561ea283a55584ea19ba5), from the private package mizzey-batch-09-d-design-package-v2-2026-10-25.zip (SHA-256 e5bafaa2d358d4795df7a209c3985c13d3acede9d87051a1e105eafdc4c45f51, built by Claude Code from a487e62 on the owner's instruction of 25 October 2026), handoff batch-09-d-handoff.md SHA-256 19de09e6989aebdc79c7f0b0e993203cda4f0cc0e2ecc77a32c6667f63a945ed, decision sheet batch-09-d-decision-sheet.md SHA-256 a7045df62b21558a9dfc16023d82393df456745c83eb76cfba8bd41cdefb6a72. The handoff states the files were rebuilt from the version 2 package and reuse Claude Design's own unimported output of 22 October 2026 (SHA-256 4ae84302...) only where it meets version 2. A candidate made outside Claude Design (SHA-256 393a3ca7...) was validated on 25 October 2026 and not imported under D-15; it is not the source of these files. Packages, handoff and decision sheet not committed.",
+          "record": "Ten files: the nine 09-D surfaces in English and the group-only batch-09-d.css (11,683 bytes). 33 English states, each one desktop frame. Committed exactly as delivered; every committed hash equals the handoff. Claude Code changed no wireframe. No frozen 09-A, 09-B or 09-C file and not wireframe.css changed. No treatment in opening.treatment changed.",
+          "delivered": {
+            "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "b505d036134b03b5779c6f4ab05633f0d7abdf6a97d4947bd077afc16a2c98bb",
+            "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "9e03d6a34c5e6dc8776574203303e115a1e79b348db5a6c8d6e2a20d423874e1",
+            "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "b6f2b3d945a5a37fc8934698374683104ed10b49f94fb9cb614c35ed23296496",
+            "design/wireframes/s1/batch-09/ad-invoice.en.html": "91aeee4bc1caf3861316c5004e87abc4127404c253636aa9b9ca881ecc46cfba",
+            "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "de8a8ac4ff356e9d191bb342eb67bdf43b40af8149c8cf35f9a43882b1a35e4e",
+            "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "5b72c6d3724db04de59fc2dbbd3968d483394a6b79d49c7de1e543c236ad97c7",
+            "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "732f80d8147920f8ce2e2cdc8662e05078fbb017777acd956e80c4827b4ff784",
+            "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "85c1828330dbf3c4451f4b9c12f1960b1b5d9528b8ace41fe2576796a6c9c1b7",
+            "design/wireframes/s1/batch-09/ad-refund-record.en.html": "13945008a17f3e9ae401cbb16c15bb2ebffab4e4d5597e7d79bb1baabb26652a",
+            "design/wireframes/s1/batch-09/batch-09-d.css": "9399aacadb6c3a88a9110da50cd5a4bdadb30fa00b7e79b83a0c44dc95d1882d"
+          },
+          "measurements": "By Claude Code on 26 October 2026, on main a487e62 with the import recorded: design inventory, wireframes, briefs after regeneration, repo checks and house rules all 0; 398 tool tests (1 skipped) and 126 discovery tests pass; the 26 frozen files equal their freezes. Headless Chrome 155 over local HTTP, 33 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, clipping, scroll container or overlap, 0 targets or controls under the baseline floors, labels and ARIA correct, greys only, stylesheets wireframe.css, batch-09.css and batch-09-d.css in that order, no script and no external address. The package's text-check.js rules: no TAG and no SPLIT line in any pass. The defects found in the rejected candidate (M1 to M4, m1 to m6) are absent.",
+          "exceptions": [
+            "Six frames carry no ADDED marker, against the EXPECTED-OUTPUT checklist line that asks for the addition marked in every frame: ad-shipment-panel default, not_sent, sent_with_tracking, pickup_requested and ad-refund-record full_refund, partial_refund. Both surfaces are annotate_only and these states add nothing; each frame label says so and numbered pins mark what is annotated. Precedent: the frozen, accepted 09-A frames sy-staging-marker default and shown (English and Arabic) and ad-permission-denied action_refused carry no marker. Recommended by Claude Code: accept as a narrow, documented exception, limited to annotate_only states with no addition. Not approved: the owner rules at the review."
+          ],
+          "implementation_boundaries": [
+            "ORD-14, COD collected, awaiting remittance, is a contracted order status (register ORD-14, P1-L) and is drawn as one, staff-facing, in the native status select, the status history and mapping row E. Per DQ-05 and the accepted ord-status-labels (batch-06), the customer is never shown it: storefront, My Account, tracking and every customer email show Delivered, and entering or leaving ORD-14 sends no customer notification. The order status and the cash-on-delivery panel must not disagree: one of them is the record (D6). No new public order status is drawn or implied. For #248 and #291; raised, not decided."
+          ],
+          "review": {
+            "status": "open",
+            "record": "Imported for the owner's 09-D review. Not accepted, not frozen, not merged. The 09-D surfaces stay wireframed until he accepts them.",
+            "open_decisions": [
+              "D1, ad-shipment-panel: Claude Design recommends moving it from annotate_only to constrained (one Send to Bosta entry in WooCommerce's Order actions select and one read-only shipment record). Not changed here. If the owner moves it, the surface is redrawn before acceptance.",
+              "D2, ad-refund-record: Claude Design recommends moving it from annotate_only to constrained for one Payment reference field, unless #293 shows Paymob records the reference on every route. Not changed here.",
+              "The ADDED-marker exception for six annotate_only frames (exceptions).",
+              "D4: one cancellation route (the panel), with WooCommerce's own routes (the status select, the list's bulk Change status to cancelled, REST) refusing a cancellation without a reason as a build requirement of #248 and #280; otherwise ORD-08 is not met for those routes.",
+              "The ORD-14 boundary (implementation_boundaries), confirmed as the rule for #248 and #291."
+            ],
+            "raised": "Left with their owning PBIs or inputs, not decided by this import: D3 transition matrix (#248); D5 document placement and packing-slip content (#280); D6 the source of collected (#291, OD-20); D7 mapping location and warning clearance (#291); D8 pattern promotion (batch-09 closure); D9 the inventory design freedom of ad-order-status-control, ad-carrier-status-mapping and ad-cod-reconciliation reads constrained against treatments native, custom, custom (record correction at the closure); D10 the unwritten P1-L reductions of ADM-92, ADM-93, SHIP-09, SHIP-12, SHIP-13, SHIP-16 (written clarification or change control, never a drawing); D11 credit note or amended invoice and invoice language (OD-09, #280); D12 correcting a wrong tracking code (#291); D13 Restock refunded items while the ERP owns stock (PRE-09, #293); D14 the over-refund message and a per-line ceiling (#290, #293). Signed scope is not touched."
+          }
         }
       ]
     },
@@ -3027,27 +3065,27 @@
       "surface": "ad-order-status-control",
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-status-control.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-order-status-control.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "allowed_change", "refused_change"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-order-status-history",
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-status-history.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-order-status-history.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "empty", "list"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-order-list-filters",
@@ -3066,92 +3104,92 @@
       "surface": "ad-order-cancel",
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-cancel.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-order-cancel.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "reason_required", "cancelled"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-invoice",
       "batch": "batch-09",
       "brief": "design/briefs/ad-invoice.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-invoice.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "full_order", "refunded_partly", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-packing-slip",
       "batch": "batch-09",
       "brief": "design/briefs/ad-packing-slip.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-packing-slip.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "single_order", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-shipment-panel",
       "batch": "batch-09",
       "brief": "design/briefs/ad-shipment-panel.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-shipment-panel.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-carrier-status-mapping",
       "batch": "batch-09",
       "brief": "design/briefs/ad-carrier-status-mapping.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "mapping_table", "unmapped_status"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-cod-reconciliation",
       "batch": "batch-09",
       "brief": "design/briefs/ad-cod-reconciliation.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "collected_not_remitted", "remitted", "not_applicable"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-refund-record",
       "batch": "batch-09",
       "brief": "design/briefs/ad-refund-record.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-refund-record.en.html"],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": ["default", "full_refund", "partial_refund", "exceeds_paid_amount", "permission_denied"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-customer-notes",

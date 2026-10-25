@@ -353,7 +353,8 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
    with one controlled correction round on his review of 22 October 2026; he accepted it on 23 October 2026 (PR #399),
    with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
-   open pending D-19. 09-D and 09-E follow on his separate instruction.
+   open pending D-19. Claude Design drew 09-D from the frozen baseline (version 2 package, 25 October 2026), and it
+   is imported for his review; it is not accepted until he says so. 09-E follows on his separate instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
