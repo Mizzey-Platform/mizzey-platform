@@ -1803,27 +1803,36 @@
             "design/wireframes/s1/batch-09/ad-two-factor.en.html": "f49b600d1b7333be6f511b73a6d408cfe7da6088c6568dce4bd2ccf61ee87f9d",
             "design/wireframes/s1/batch-09/batch-09-e.css": "923df3875f3d38c17ba3f18a88938152c177d4d609a556f8a1c62ee103c26784"
           },
-          "measurements": "By Claude Code on 26 October 2026, on main c15c333 with the import recorded: design inventory, wireframes, briefs after regeneration, repo checks and house rules all 0; 398 tool tests (1 skipped) and 126 discovery tests pass; the 36 frozen files equal their freezes. Headless Chrome 155 over local HTTP, 39 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, clipping (input values included), scroll container or overlap, 0 targets or controls under the baseline floors, labels and ARIA correct, greys only, stylesheets wireframe.css, batch-09.css and batch-09-e.css in that order, no script and no external address; no TAG or SPLIT line. Every frame label names the manifest treatment. The four defects of the 22 October output (covered tags, splits, clipped fields, no decision sheet) are absent.",
+          "corrected": {
+            "design/wireframes/s1/batch-09/ad-dashboard-stock.en.html": "19e11d506398fe389398603a7409be8ebdc33c79eed725d3231d239872a6dfce"
+          },
+          "correction_rounds": [
+            {
+              "round": 1,
+              "date": "2026-10-26",
+              "what": "E9 under the owner's ruling of 26 October 2026, presentation only. In ad-dashboard-stock's default, zero and counts_with_links, the ADDED wrapper around WooCommerce's native low-stock and out-of-stock lines became adm-native: the lines are muted like the widget's other native lines, with numbered pins and an in-frame key (adm-e-key, adm-e-pin) saying where ADM-10 and ADM-11 are met, and the frame labels say \"Nothing is added in this state\". figures_unavailable keeps the ADDED marker, its note naming it the one addition. ADDED markers per frame: 1, 1, 1, 1 before; 0, 0, 0, 1 after. States, links (the same two href values), the focused link, notes and the native treatment unchanged; one sentence added to the file header's status line. batch-09-e.css not returned, unchanged.",
+              "source": "Claude Design, mizzey-batch-09-e-correction-round-1-output.zip (SHA-256 f45141ec97b6fd21d197fa37f544b4210c59f095430cd68f661019466b13d58c), handoff batch-09-e-correction-round-1-handoff.md (SHA-256 4bdc942fb52ce5577dd4c4878ffc2dfcd08d2255438d3bbaf510eed9147385c1), from the issued package mizzey-batch-09-e-correction-round-1-package-v1-2026-10-26.zip (SHA-256 293fc50b00509f3ee48e2d68e77d9d3c70d41914d74800582fd2afecf4ae9ec0, built from 70bcd44); the handoff confirms no other copy was used. Correction to the handoff, recorded here only: its line \"09-D (PR #401) is still undecided\" is out of date; 09-D was accepted, frozen and merged as c15c333 (PR #401) before this round. The delivered HTML is not changed for it. Not committed.",
+              "files": {
+                "design/wireframes/s1/batch-09/ad-dashboard-stock.en.html": "19e11d506398fe389398603a7409be8ebdc33c79eed725d3231d239872a6dfce"
+              }
+            }
+          ],
+          "measurements": "By Claude Code on 26 October 2026, on main c15c333 with the import recorded: design inventory, wireframes, briefs after regeneration, repo checks and house rules all 0; 398 tool tests (1 skipped) and 126 discovery tests pass; the 36 frozen files equal their freezes. Headless Chrome 155 over local HTTP, 39 frames at 1280 and 1024 px, each with and without the WCAG 1.4.12 text-spacing override: 0 overflow, clipping (input values included), scroll container or overlap, 0 targets or controls under the baseline floors, labels and ARIA correct, greys only, stylesheets wireframe.css, batch-09.css and batch-09-e.css in that order, no script and no external address; no TAG or SPLIT line. Every frame label names the manifest treatment. The four defects of the 22 October output (covered tags, splits, clipped fields, no decision sheet) are absent. Correction round 1, by Claude Code on 26 October 2026, on the branch with the corrected file committed: all repository checks 0, 398 tool tests (1 skipped) and 126 discovery tests pass; the 36 frozen files, the eight other 09-E files, batch-09-e.css and wireframe.css equal their recorded hashes; Chrome 155 over local HTTP in a 1,440 px window, all 39 09-E frames at 1280 and 1024 px with and without the text-spacing override: 0 overflow, clipping, scroll container, overlap, undersized target or control, label or colour fault, no TAG or SPLIT line; states, labels and stylesheet order correct.",
           "exceptions": [
-            "19 annotate_only frames carry no ADDED marker, each labelled \"Nothing is added in this state\", under the owner's rule of 26 October 2026: ad-dashboard-sales (4), rp-sales (5), rp-stock (5), ad-two-factor (5). Every other frame (20) marks its additions."
+            "22 frames carry no ADDED marker, each labelled \"Nothing is added in this state\": the 19 annotate_only frames under the owner's rule of 26 October 2026 (ad-dashboard-sales 4, rp-sales 5, rp-stock 5, ad-two-factor 5) and ad-dashboard-stock default, zero and counts_with_links under his ruling E9, which extends that rule to these states of this native surface. The other 17 frames mark their additions."
           ],
           "review": {
             "status": "open",
-            "record": "Imported for the owner's 09-E review. Not accepted, not frozen, not merged. The 09-E surfaces stay wireframed until he accepts them.",
+            "record": "Imported for the owner's 09-E review. His E9 ruling of 26 October 2026 is applied: correction round 1 is returned, validated and committed. Not accepted, not frozen, not merged. The 09-E surfaces stay wireframed until he accepts the group.",
             "open_decisions": [
               "E1 to E4: the promotion structure (start date beside the native expiry, code or automatic, a Pause and Resume panel, statuses with 09-B's shapes); the launch rules as a WooCommerce Settings tab; the welcome discount as a rule with OD-03 variables; the counts on WooCommerce's own Status widget with one added line and one quick-actions widget. Recommended by Claude Code: accept as drawn, as working structural decisions, the mechanisms staying with #289, #290 and #294.",
-              "Acceptance of the corrected ad-dashboard-stock after correction round 1 (E9), and of the group."
+              "The owner's acceptance of the 09-E group and the freeze of its ten files."
             ],
             "raised": "Left with their owning PBIs or inputs, not decided by this import: E5 what low stock means while the ERP owns stock (#246, PRE-09); E6 the WP 2FA staging checks (#275); E7 the report roles (#251, #286, #294; CX-01); E8 pattern merges, now including 09-D's accepted adm-d-key and adm-d-pin (batch-09 closure); E10 inventory design freedom against manifest treatment for ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings: distinct fields, not made equal; E11 the unwritten P1-L reductions of ADM-04, ADM-06, ADM-08, ADM-111, RPT-01, RPT-10 (written clarification or change control, never a drawing); E12 the statuses the dashboard counts (#294, #248); E13 WooCommerce's Individual use only beside BR-004 (#289, #290); E14 the shipped combination default and welcome-discount eligibility (OD-03, OD-04, #290); E15 hiding Analytics' native comparison, ADM-14 being P2 (#286, #294). Signed scope is not touched."
           },
           "owner_rulings": [
             "E9 (26 October 2026): in ad-dashboard-stock, WooCommerce's native low-stock and out-of-stock lines are not marked ADDED in default, zero and counts_with_links; those frames say \"Nothing is added in this state\" and keep the note that the counts rest on the ERP's figures (PRE-09). The ADDED marker is used only on figures_unavailable, the state WooCommerce lacks. This extends the owner's ADDED-marker rule of 26 October 2026, for this native surface, to states that add no interface; no control or marker is invented. The manifest treatment stays native."
-          ],
-          "correction_round_1": {
-            "status": "requested",
-            "date": "2026-10-26",
-            "scope": "ad-dashboard-stock.en.html only, presentation: the ADDED marker removed from the native stock lines in default, zero and counts_with_links and kept on figures_unavailable, frame labels following. batch-09-e.css append-only if needed. The eight other 09-E files and the 36 frozen files unchanged. Issued to Claude Design by the owner from a private package built by Claude Code."
-          }
+          ]
         }
       ]
     },

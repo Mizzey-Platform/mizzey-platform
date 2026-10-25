@@ -359,7 +359,8 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
    The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
    and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
-   lines are not marked as additions); Claude Design corrects that one file before he decides on acceptance.
+   lines are not marked as additions); Claude Design corrected that one file, imported for his acceptance
+   decision.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
