@@ -1693,7 +1693,7 @@
         },
         {
           "group": "09-D",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-26",
           "source": "Claude Design, one return: mizzey-batch-09-d-output.zip (SHA-256 e32f26d4a484faeb99c6b476fbb9dfeb7e0cbff27d1561ea283a55584ea19ba5), from the private package mizzey-batch-09-d-design-package-v2-2026-10-25.zip (SHA-256 e5bafaa2d358d4795df7a209c3985c13d3acede9d87051a1e105eafdc4c45f51, built by Claude Code from a487e62 on the owner's instruction of 25 October 2026), handoff batch-09-d-handoff.md SHA-256 19de09e6989aebdc79c7f0b0e993203cda4f0cc0e2ecc77a32c6667f63a945ed, decision sheet batch-09-d-decision-sheet.md SHA-256 a7045df62b21558a9dfc16023d82393df456745c83eb76cfba8bd41cdefb6a72. The handoff states the files were rebuilt from the version 2 package and reuse Claude Design's own unimported output of 22 October 2026 (SHA-256 4ae84302...) only where it meets version 2. A candidate made outside Claude Design (SHA-256 393a3ca7...) was validated on 25 October 2026 and not imported under D-15; it is not the source of these files. Packages, handoff and decision sheet not committed.",
           "record": "Ten files: the nine 09-D surfaces in English and the group-only batch-09-d.css (11,683 bytes). 33 English states, each one desktop frame. Committed exactly as delivered; every committed hash equals the handoff. Claude Code changed no wireframe. No frozen 09-A, 09-B or 09-C file and not wireframe.css changed. No treatment in opening.treatment changed.",
@@ -1732,13 +1732,48 @@
           "implementation_boundaries": [
             "ORD-14, COD collected, awaiting remittance, is a contracted order status (register ORD-14, P1-L) and is drawn as one, staff-facing, in the native status select, the status history and mapping row E. Per DQ-05 and the accepted ord-status-labels (batch-06), the customer is never shown it: storefront, My Account, tracking and every customer email show Delivered, and entering or leaving ORD-14 sends no customer notification. The order status and the cash-on-delivery panel must not disagree: one of them is the record (D6). No new public order status is drawn or implied. For #248 and #291; raised, not decided."
           ],
+          "follow_up": [
+            "Fidelity, for the batch-09 closure: WooCommerce 11.1's Order actions box has an Apply button beside its select. ad-shipment-panel and ad-refund-record draw it; the seven other 09-D files draw the box as muted context without it. A controlled correction at the closure, on the owner's approval; the frozen files are not changed before then."
+          ],
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-26",
+            "record": "Frozen by the owner's acceptance of 09-D on 26 October 2026, at the hashes of the files as delivered, with ad-shipment-panel and ad-refund-record as returned in correction round 1. 09-E changes none of these ten files, the eight 09-C, the eight 09-B or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
+            "files": {
+              "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "b505d036134b03b5779c6f4ab05633f0d7abdf6a97d4947bd077afc16a2c98bb",
+              "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "9e03d6a34c5e6dc8776574203303e115a1e79b348db5a6c8d6e2a20d423874e1",
+              "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "b6f2b3d945a5a37fc8934698374683104ed10b49f94fb9cb614c35ed23296496",
+              "design/wireframes/s1/batch-09/ad-invoice.en.html": "91aeee4bc1caf3861316c5004e87abc4127404c253636aa9b9ca881ecc46cfba",
+              "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "de8a8ac4ff356e9d191bb342eb67bdf43b40af8149c8cf35f9a43882b1a35e4e",
+              "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "69fefa25d081f3dda66e90dcc97e39a12ccd968f37e041da7685cafd2e93c516",
+              "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "732f80d8147920f8ce2e2cdc8662e05078fbb017777acd956e80c4827b4ff784",
+              "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "85c1828330dbf3c4451f4b9c12f1960b1b5d9528b8ace41fe2576796a6c9c1b7",
+              "design/wireframes/s1/batch-09/ad-refund-record.en.html": "4d0f1cadbf7b384bea0560b3e6906dc80bb4029ee88ce609977ca25149259631",
+              "design/wireframes/s1/batch-09/batch-09-d.css": "9399aacadb6c3a88a9110da50cd5a4bdadb30fa00b7e79b83a0c44dc95d1882d"
+            }
+          },
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's 09-D review. His rulings of 26 October 2026 are recorded and correction round 1 (D1, D2) is returned, validated and committed. Not accepted, not frozen, not merged. The 09-D surfaces stay wireframed until he accepts the group.",
-            "open_decisions": [
-              "The owner's acceptance of the corrected 09-D group and the freeze of its ten files."
+            "status": "closed",
+            "date": "2026-10-26",
+            "decided_by": "Mustafa, owner",
+            "record": "The owner reviewed the nine 09-D surfaces, imported for his review in PR #401 from one delivery and one controlled correction round (D1, D2), and on 26 October 2026 accepted Batch 09-D as corrected and approved freezing its ten files. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). It decides no ERP mechanism (PRE-09) and does not confirm any Bosta or Paymob capability (#291, #293).",
+            "accepted": [
+              "The structural wireframes of the nine 09-D surfaces as imported in PR #401: 33 states in English, 33 frames.",
+              "ad-shipment-panel and ad-refund-record as constrained (rulings D1 and D2), as redrawn in correction round 1: one single-order Send to Bosta entry in WooCommerce's Order actions with a read-only Shipment record; one Payment reference field in WooCommerce's refund panel, required for a manual refund, the gateway-returned reference a placeholder.",
+              "The 09-D group-only patterns in batch-09-d.css as drawn; their promotion is decided at the batch-09 closure (D8).",
+              "The owner's rulings of 26 October 2026 as recorded in owner_rulings: D4, the ADDED-marker rule, the ORD-14 boundary, D5 and D7 as working structural decisions."
             ],
-            "raised": "Left with their owning PBIs or inputs, not decided by this import: D3 transition matrix (#248); D5 document placement and packing-slip content (#280); D6 the source of collected (#291, OD-20); D7 mapping location and warning clearance (#291); D8 pattern promotion (batch-09 closure); D9 the inventory design freedom of ad-order-status-control, ad-carrier-status-mapping and ad-cod-reconciliation reads constrained against treatments native, custom, custom (record correction at the closure); D10 the unwritten P1-L reductions of ADM-92, ADM-93, SHIP-09, SHIP-12, SHIP-13, SHIP-16 (written clarification or change control, never a drawing); D11 credit note or amended invoice and invoice language (OD-09, #280); D12 correcting a wrong tracking code (#291); D13 Restock refunded items while the ERP owns stock (PRE-09, #293); D14 the over-refund message and a per-line ceiling (#290, #293). Signed scope is not touched. Observed at correction round 1, not changed: WooCommerce 11.1's Order actions box has an Apply button beside its select; the two corrected files draw it, the seven other 09-D files draw the box as muted context without it (fidelity only, for the batch-09 closure). The payment reference is required only on the manual route, so its label says so in words rather than with \"(required)\" and aria-required."
+            "open": [
+              "D1 implementation: whether the installed Bosta integration supports a single-order send, the plugin's HPOS behaviour, its bulk-action policy and pickup granularity (#291).",
+              "D2 implementation: the Paymob refund route and whether it returns a reference (#293).",
+              "D3 transition table (#248); D4's reason on every cancellation route and ORD-14's customer label and notification rule as build obligations (#248, #280).",
+              "D6 the source of collected (#291, OD-20); D7 how the unrecognised-status warning is cleared (#291).",
+              "D8 pattern promotion and the Order actions Apply fidelity point (follow_up), at the batch-09 closure.",
+              "D9 the inventory design freedom of ad-order-status-control, ad-carrier-status-mapping and ad-cod-reconciliation against their treatments: distinct fields, not made equal.",
+              "D10 the unwritten P1-L reductions of ADM-92, ADM-93, SHIP-09, SHIP-12, SHIP-13, SHIP-16: written clarification or change control, never a drawing.",
+              "D11 credit note or amended invoice and invoice language (OD-09, #280); D12 correcting a wrong tracking code (#291); D13 Restock refunded items while the ERP owns stock (PRE-09, #293); D14 the over-refund message and a per-line ceiling (#290, #293)."
+            ],
+            "not_changed": "09-E stays briefed and is imported in its own pull request on the owner's instruction. The frozen 09-A, 09-B and 09-C files, batch-01 to batch-08 and their closure records are unchanged. Signed scope is not touched; P1-L scope is neither expanded nor reduced."
           },
           "owner_rulings": [
             "D1 (26 October 2026): ad-shipment-panel moves from annotate_only to constrained in batches[batch-09].opening.treatment, and its inventory design freedom and native baseline follow, in this pull request. The intended design is one single-order Send to Bosta action within WooCommerce's own Order actions mechanism, plus a read-only shipment record on the order. A UX direction only: it does not confirm that the installed Bosta integration supports it. The plugin and HPOS investigation stays in #291; no Bosta API, carrier status or shipping capability is invented.",
@@ -3087,26 +3122,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-status-control.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-order-status-control.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "allowed_change", "refused_change"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-order-status-history",
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-status-history.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-order-status-history.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-order-list-filters",
@@ -3126,91 +3161,91 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-order-cancel.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-order-cancel.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "reason_required", "cancelled"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-invoice",
       "batch": "batch-09",
       "brief": "design/briefs/ad-invoice.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-invoice.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "full_order", "refunded_partly", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-packing-slip",
       "batch": "batch-09",
       "brief": "design/briefs/ad-packing-slip.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-packing-slip.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "single_order", "long_content"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-shipment-panel",
       "batch": "batch-09",
       "brief": "design/briefs/ad-shipment-panel.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-shipment-panel.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-carrier-status-mapping",
       "batch": "batch-09",
       "brief": "design/briefs/ad-carrier-status-mapping.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "mapping_table", "unmapped_status"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-cod-reconciliation",
       "batch": "batch-09",
       "brief": "design/briefs/ad-cod-reconciliation.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "collected_not_remitted", "remitted", "not_applicable"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-refund-record",
       "batch": "batch-09",
       "brief": "design/briefs/ad-refund-record.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-refund-record.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "full_refund", "partial_refund", "exceeds_paid_amount", "permission_denied"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-customer-notes",
