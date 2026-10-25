@@ -1811,10 +1811,18 @@
             "status": "open",
             "record": "Imported for the owner's 09-E review. Not accepted, not frozen, not merged. The 09-E surfaces stay wireframed until he accepts them.",
             "open_decisions": [
-              "E9, ad-dashboard-stock: the native Status widget's low and out-of-stock lines are marked ADDED in default, zero and counts_with_links, though WooCommerce draws them; only figures_unavailable shows what WooCommerce lacks. Recommended by Claude Code: the lines unmarked in those three states, labelled \"Nothing is added in this state\" with the ERP-source note kept, and ADDED only on figures_unavailable, by a presentational correction from Claude Design. The owner's ADDED rule of 26 October 2026 covers annotate_only states only and every accepted native frame carries a marker, so this needs his ruling extending the rule to this native surface. Not decided here.",
-              "E1 to E4: the promotion structure (start date beside the native expiry, code or automatic, a Pause and Resume panel, statuses with 09-B's shapes); the launch rules as a WooCommerce Settings tab; the welcome discount as a rule with OD-03 variables; the counts on WooCommerce's own Status widget with one added line and one quick-actions widget. Recommended by Claude Code: accept as drawn, as working structural decisions, the mechanisms staying with #289, #290 and #294."
+              "E1 to E4: the promotion structure (start date beside the native expiry, code or automatic, a Pause and Resume panel, statuses with 09-B's shapes); the launch rules as a WooCommerce Settings tab; the welcome discount as a rule with OD-03 variables; the counts on WooCommerce's own Status widget with one added line and one quick-actions widget. Recommended by Claude Code: accept as drawn, as working structural decisions, the mechanisms staying with #289, #290 and #294.",
+              "Acceptance of the corrected ad-dashboard-stock after correction round 1 (E9), and of the group."
             ],
             "raised": "Left with their owning PBIs or inputs, not decided by this import: E5 what low stock means while the ERP owns stock (#246, PRE-09); E6 the WP 2FA staging checks (#275); E7 the report roles (#251, #286, #294; CX-01); E8 pattern merges, now including 09-D's accepted adm-d-key and adm-d-pin (batch-09 closure); E10 inventory design freedom against manifest treatment for ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings: distinct fields, not made equal; E11 the unwritten P1-L reductions of ADM-04, ADM-06, ADM-08, ADM-111, RPT-01, RPT-10 (written clarification or change control, never a drawing); E12 the statuses the dashboard counts (#294, #248); E13 WooCommerce's Individual use only beside BR-004 (#289, #290); E14 the shipped combination default and welcome-discount eligibility (OD-03, OD-04, #290); E15 hiding Analytics' native comparison, ADM-14 being P2 (#286, #294). Signed scope is not touched."
+          },
+          "owner_rulings": [
+            "E9 (26 October 2026): in ad-dashboard-stock, WooCommerce's native low-stock and out-of-stock lines are not marked ADDED in default, zero and counts_with_links; those frames say \"Nothing is added in this state\" and keep the note that the counts rest on the ERP's figures (PRE-09). The ADDED marker is used only on figures_unavailable, the state WooCommerce lacks. This extends the owner's ADDED-marker rule of 26 October 2026, for this native surface, to states that add no interface; no control or marker is invented. The manifest treatment stays native."
+          ],
+          "correction_round_1": {
+            "status": "requested",
+            "date": "2026-10-26",
+            "scope": "ad-dashboard-stock.en.html only, presentation: the ADDED marker removed from the native stock lines in default, zero and counts_with_links and kept on figures_unavailable, frame labels following. batch-09-e.css append-only if needed. The eight other 09-E files and the 36 frozen files unchanged. Issued to Claude Design by the owner from a private package built by Claude Code."
           }
         }
       ]
