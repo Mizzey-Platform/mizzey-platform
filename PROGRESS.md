@@ -357,8 +357,8 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    is imported for his review. On 26 October 2026 he ruled D1 and D2 (the shipment and refund surfaces become
    constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redrew the two
    surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
-   The Bosta and Paymob mechanisms stay with #291 and #293. 09-E is prepared on his authorisation and imported in
-   its own pull request.
+   The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
+   and it is imported for his review in its own pull request; it is not accepted until he says so.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
