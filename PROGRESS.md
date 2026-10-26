@@ -364,7 +364,8 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    are accepted. For the batch-09 closure he chose, on 26 October 2026, a pattern catalogue only (no CSS
    consolidation) and one Claude Design correction round (ad-redirect-manager redrawn annotate-only on
    Redirection, the unrelated sample rows replaced, WooCommerce's Apply button added in eight 09-D files), with
-   related products open pending D-19. Batch-10 waits for his instruction.
+   related products open pending D-19. Claude Design returned the round; it is validated and imported for his
+   review, with the ten new hashes proposed, not frozen. Batch-10 waits for his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
