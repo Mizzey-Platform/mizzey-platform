@@ -1477,12 +1477,20 @@
               "design/wireframes/s1/batch-09/sy-staging-marker.en.html": "907456bfb9287e7a10c18a572c8fd7860332554a7c65293de55501a82ff024b0",
               "design/wireframes/s1/batch-09/sy-staging-marker.ar.html": "61d46bc05320d4c872fdedebacac6f0fd68ef7b1d105af75cbb3d76231a3ac5b",
               "design/wireframes/s1/batch-09/ad-staff-log.en.html": "398a53d74c794e4d676b0a1a88a396840590e7a3855dc93b13960bc64a230928",
-              "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "ef344d47553e88b18251c9beb48e5aa6647719234d0fe987db9a6b499d96aa58",
+              "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "30e6e2a7ef3b356603f7b428b41f213a65316aeb98b1d4d574b9df92687ae452",
               "design/wireframes/s1/batch-09/ad-order-list-filters.en.html": "f5579309b4c79bead58c2c80ce6e772ceafaee0395bdadca794cfff46b0da2d7",
-              "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "27ef2bbdbdb3fb7fbda4976cdc4a070a4143841e65659169d98e3a6690940c78",
+              "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "2441cb9f4c617ee667b1352c8f6af83661fe1426a651ebd00d2fc15dc5f99323",
               "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "ed9008d027e6d932584e944d0f5f09074621a55f6ac28d97c21a1fd10782016e",
               "design/wireframes/s1/batch-09/ad-customer-suspend.en.html": "c2cbd6fe9c62648f7ecc7b5a122453eda6bf9f4f13151793ecbbb7441c9c9835",
               "design/wireframes/s1/batch-09/batch-09.css": "1e28e7d47525fe93e4dad04223001298b8e7267cee37f7b6becdafc3c277ab3d"
+            },
+            "corrected_at_closure": {
+              "date": "2026-10-26",
+              "record": "Re-frozen on the owner's acceptance of the batch-09 closure on 26 October 2026: 2 files corrected in the closure round (K1 to K3, PR #403) now carry the hashes in files; their previous approved hashes are kept here.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "ef344d47553e88b18251c9beb48e5aa6647719234d0fe987db9a6b499d96aa58",
+                "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "27ef2bbdbdb3fb7fbda4976cdc4a070a4143841e65659169d98e3a6690940c78"
+              }
             }
           },
           "follow_up": ["Not changed here: the native baselines of sy-coming-soon and sy-maintenance (batch-01, closed) are to be aligned with the owner's operating policy of 21 October 2026 (WooCommerce Site Visibility owns Coming Soon, CoreX owns planned maintenance, hosting owns emergency maintenance) in a separate follow-up."],
@@ -1740,16 +1748,30 @@
             "date": "2026-10-26",
             "record": "Frozen by the owner's acceptance of 09-D on 26 October 2026, at the hashes of the files as delivered, with ad-shipment-panel and ad-refund-record as returned in correction round 1. 09-E changes none of these ten files, the eight 09-C, the eight 09-B or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
             "files": {
-              "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "b505d036134b03b5779c6f4ab05633f0d7abdf6a97d4947bd077afc16a2c98bb",
-              "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "9e03d6a34c5e6dc8776574203303e115a1e79b348db5a6c8d6e2a20d423874e1",
-              "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "b6f2b3d945a5a37fc8934698374683104ed10b49f94fb9cb614c35ed23296496",
-              "design/wireframes/s1/batch-09/ad-invoice.en.html": "91aeee4bc1caf3861316c5004e87abc4127404c253636aa9b9ca881ecc46cfba",
-              "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "de8a8ac4ff356e9d191bb342eb67bdf43b40af8149c8cf35f9a43882b1a35e4e",
+              "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "93dfe847ef1f70459bc0f4042928020a5cd3eb16205aafd981202f358819950e",
+              "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "233c363deebaccbbe3c9663bf5ab35cd42542062abc201350d72bfdc3bcadbcd",
+              "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "2bd9830a50dae80cf5d30ddfb3591923d810d1f12a307339287fcb0a9dc0fd4c",
+              "design/wireframes/s1/batch-09/ad-invoice.en.html": "20bef3ab463226dac5a999e1b39974dadfc678f1b02b0937cafcc74bf0bd76e4",
+              "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "af2440d57641d8d9d328df2810cf5076f5817357c51f7b4473fd90a98b3e8217",
               "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "69fefa25d081f3dda66e90dcc97e39a12ccd968f37e041da7685cafd2e93c516",
-              "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "732f80d8147920f8ce2e2cdc8662e05078fbb017777acd956e80c4827b4ff784",
-              "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "85c1828330dbf3c4451f4b9c12f1960b1b5d9528b8ace41fe2576796a6c9c1b7",
-              "design/wireframes/s1/batch-09/ad-refund-record.en.html": "4d0f1cadbf7b384bea0560b3e6906dc80bb4029ee88ce609977ca25149259631",
+              "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "eafe627b34d6e0c7705124e39d1fb00f099226c4b28ff3ae838337c750594246",
+              "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "d6023346dfd149d268b2562bced3188c274982ffa10eed757434c38dda2027ca",
+              "design/wireframes/s1/batch-09/ad-refund-record.en.html": "2dc6795f771a10b83483cfc50cd88aa33bf0ab61ca3f0fff881adef826f3b3a8",
               "design/wireframes/s1/batch-09/batch-09-d.css": "9399aacadb6c3a88a9110da50cd5a4bdadb30fa00b7e79b83a0c44dc95d1882d"
+            },
+            "corrected_at_closure": {
+              "date": "2026-10-26",
+              "record": "Re-frozen on the owner's acceptance of the batch-09 closure on 26 October 2026: 8 files corrected in the closure round (K1 to K3, PR #403) now carry the hashes in files; their previous approved hashes are kept here.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "b505d036134b03b5779c6f4ab05633f0d7abdf6a97d4947bd077afc16a2c98bb",
+                "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "9e03d6a34c5e6dc8776574203303e115a1e79b348db5a6c8d6e2a20d423874e1",
+                "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "b6f2b3d945a5a37fc8934698374683104ed10b49f94fb9cb614c35ed23296496",
+                "design/wireframes/s1/batch-09/ad-invoice.en.html": "91aeee4bc1caf3861316c5004e87abc4127404c253636aa9b9ca881ecc46cfba",
+                "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "de8a8ac4ff356e9d191bb342eb67bdf43b40af8149c8cf35f9a43882b1a35e4e",
+                "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "732f80d8147920f8ce2e2cdc8662e05078fbb017777acd956e80c4827b4ff784",
+                "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "85c1828330dbf3c4451f4b9c12f1960b1b5d9528b8ace41fe2576796a6c9c1b7",
+                "design/wireframes/s1/batch-09/ad-refund-record.en.html": "4d0f1cadbf7b384bea0560b3e6906dc80bb4029ee88ce609977ca25149259631"
+              }
             }
           },
           "review": {
@@ -1872,7 +1894,7 @@
         }
       ],
       "closure": {
-        "status": "awaiting_owner_review",
+        "status": "accepted",
         "date": "2026-10-26",
         "owner_rulings": [
           "Option A (26 October 2026): pattern stabilisation by catalogue only. One canonical name per batch-09 pattern is recorded at the closure for the high-fidelity design and PRE-03b; no group stylesheet, shared stylesheet or HTML file is changed to consolidate patterns, and batch-09.css stays as frozen.",
@@ -1880,7 +1902,8 @@
           "K3 record correction (26 October 2026): the 09-D follow_up says ad-shipment-panel and ad-refund-record draw the Apply button and seven other 09-D files do not. In fact only ad-shipment-panel draws it; eight files draw the box without it, ad-refund-record included. This closure record supersedes that sentence.",
           "K4 (26 October 2026): batch-09 closes with the related-products mechanism (09-C ad-product-storefront-controls) open pending D-19; if D-19 settles a mechanism other than the drawn Upsells field, that frame is corrected afterwards in its own controlled correction.",
           "K5 (26 October 2026): the inventory's design_freedom (how much design latitude a surface has) and the manifest's treatment (how its frame is produced) are distinct fields. They differ for ad-order-status-control, ad-carrier-status-mapping, ad-cod-reconciliation, ad-dashboard-stock, ad-dashboard-attention, ad-dashboard-quick-actions and ad-launch-rules-settings; no value is changed for that.",
-          "K6 (26 October 2026): the native baselines of sy-coming-soon and sy-maintenance (batch-01) against the operating policy of 21 October 2026 stay outside batch-09, as the 09-A follow_up records."
+          "K6 (26 October 2026): the native baselines of sy-coming-soon and sy-maintenance (batch-01) against the operating policy of 21 October 2026 stay outside batch-09, as the 09-A follow_up records.",
+          "Acceptance (26 October 2026): the owner accepted the batch-09 closure as corrected, adopted recommendations C1 to C5 as recommended, and approved re-freezing the ten corrected files at their proposed hashes. Batch-09 is closed."
         ],
         "correction_round_1": {
           "status": "returned_validated",
@@ -1902,8 +1925,8 @@
           }
         },
         "proposed_freeze": {
-          "status": "proposed",
-          "record": "The ten files changed by the closure round, with their approved frozen hashes and the proposed replacements. Until the owner accepts the closure, the freeze records of 09-A and 09-D stay as they are, the historical approved baseline; on his acceptance the proposed hashes replace them in those records. The repository checks do not read freeze records, so this review-stage state passes them without any check being bypassed.",
+          "status": "applied",
+          "record": "Applied on the owner's acceptance of 26 October 2026: the ten proposed hashes replaced the frozen ones in the 09-A and 09-D freeze records, whose corrected_at_closure keeps the previous hashes.",
           "files": {
             "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": {
               "group": "09-A",
@@ -2113,9 +2136,31 @@
           "C1 fixture-neutral SKU codes and C2 the brief's validation note, later text-only follow-ups; C4 at staging under #287."
         ],
         "review": {
-          "status": "open",
-          "record": "The closure round is returned, validated and committed for the owner's review. Not accepted: the ten files are not re-frozen and batch-09 is not closed until he approves."
-        }
+          "status": "closed",
+          "date": "2026-10-26",
+          "decided_by": "Mustafa, owner",
+          "record": "The owner accepted the closure round and the closure records in PR #403."
+        },
+        "recommendations_status": "C1 to C5 adopted by the owner as recommended (26 October 2026)."
+      },
+      "review": {
+        "status": "closed",
+        "date": "2026-10-26",
+        "decided_by": "Mustafa, owner",
+        "record": "The owner reviewed batch-09 group by group (09-A to 09-E, PRs #394, #397, #399, #401, #402, each accepted and frozen) and on 26 October 2026 accepted its closure in PR #403: the pattern catalogue (Option A, no CSS consolidated), the correction round K1 to K3 with ad-redirect-manager now annotate-only on Redirection, recommendations C1 to C5, and the re-freeze of the ten corrected files. All 40 batch-09 surfaces are reviewed and 46 files are frozen. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14).",
+        "accepted": [
+          "The five accepted batch-09 groups and their frozen files, with the closure round's ten files at their new hashes.",
+          "The batch-09 pattern catalogue (closure.pattern_catalogue) as the naming for the high-fidelity design and PRE-03b.",
+          "Recommendations C1 to C5 as recorded in closure.recommendations."
+        ],
+        "deferred": [
+          "K4: the related-products mechanism in ad-product-storefront-controls, pending D-19.",
+          "K6: the native baselines of sy-coming-soon and sy-maintenance (batch-01), outside batch-09.",
+          "C1: fixture-neutral SKU codes in ad-list-search-additions, a later text-only follow-up.",
+          "C2: the brief's validation note for ad-redirect-manager, aligned only after #287 confirms the adapter's scope.",
+          "C4: Redirection's wording and behaviour, confirmed on staging under #287.",
+          "Each group's open items stay with their PBIs, external inputs and contractual clarifications, as recorded in its review."
+        ]
       }
     },
     {"id": "batch-10", "name": "Contracted second-release surfaces", "release": "S2"}
