@@ -149,13 +149,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `exploration` |
 | Review batch | Contracted second-release surfaces (`batch-10`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 3 |
+| English, left to right | `drawn` |
+| Arabic, right to left | `drawn` |
+| Mobile | `drawn` |
+| Desktop | `drawn` |
+| States covered | 3 of 3 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

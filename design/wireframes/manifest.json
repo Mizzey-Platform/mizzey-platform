@@ -2265,7 +2265,43 @@
             }
           ]
         }
-      }
+      },
+      "group_imports": [
+        {
+          "group": "10-A",
+          "status": "awaiting_owner_review",
+          "date": "2026-10-27",
+          "source": "Claude Design, returned as mizzey-batch-10-a-output.zip (SHA-256 6b899a433aaf2a4c365d48c0adbbb4d0af0c74f0c746597ab26e1aa3681ae606, 13 files), from the private package mizzey-batch-10-design-package-v1.1-2026-10-26.zip (SHA-256 25b66f4194df2ab09e7501b57d694610e774fb330463272d1424575e1b9a0fb1, built from d9ec127). Handoff batch-10-a-handoff.md, SHA-256 4158e9a96294ad93531d18f8ffc8fddf2fcabbf97846d4dee3f19ff7a430c5c2, and decision sheet batch-10-a-decision-sheet.md, SHA-256 eb0eda5f68967916aff0748f7afb60ad813c5183f71d7afe2c7dd055c8040524, not committed.",
+          "record": "Eleven files imported byte for byte, every hash equal to the handoff: the five 10-A surfaces in English and Arabic and batch-10-a.css (11,636 bytes, 118 rules, every selector scoped by an s2- class). 15 states per language, 30 in all, each in at least one 360 px mobile frame and one 1280 px desktop frame. A review-only import: the five entries are exploration with drawn cells, and their inventory status stays briefed. Nothing is reviewed, accepted or frozen, and no file of batches 01 to 09 and no shared stylesheet changes.",
+          "delivered": {
+            "design/wireframes/s2/batch-10/ac-account-deletion.ar.html": "670ead803c6530396fe4b2aab2335b6bcd23e15c54a1d50e1315fb431a0bdb4b",
+            "design/wireframes/s2/batch-10/ac-account-deletion.en.html": "fdb64d15676357e627be4d716a0eaeeb81bb9e046c69f36bbfd9761a2b49961d",
+            "design/wireframes/s2/batch-10/ac-notification-preferences.ar.html": "6b97d41e08946dc05ad04888055a7e55134813c289ef0798727ea2eb94a588ba",
+            "design/wireframes/s2/batch-10/ac-notification-preferences.en.html": "b20014a49fb9ddea47f22c18306aede0c305f477bf9159258ca6f387e3c4ed0f",
+            "design/wireframes/s2/batch-10/ac-reorder.ar.html": "6235db9802398f4426c44a34a33c98267b2d7757825daff2c1054371e7cf2ef2",
+            "design/wireframes/s2/batch-10/ac-reorder.en.html": "9a6014c6fedc82e147db3c9555390b9166883ea032da64f8de59cb5da7b2df93",
+            "design/wireframes/s2/batch-10/batch-10-a.css": "8671259d3edbea83a0eebb5f5406af2e7118a3b25ed8f012638be2369dc253b3",
+            "design/wireframes/s2/batch-10/sf-brand-landing.ar.html": "728e873022697249f698eb5356d3b6d349d691bbcb526e36dd74502081660c5a",
+            "design/wireframes/s2/batch-10/sf-brand-landing.en.html": "095c7f6e33b8ef9fa56fa39cbe398f2c92358cf2f145b8e36baa26b52996e3a1",
+            "design/wireframes/s2/batch-10/sf-filter-by-rating.ar.html": "ce4e9746f27f21508adc7343fd6705b17570c3ac4f1dffa8ff340aaf4b905572",
+            "design/wireframes/s2/batch-10/sf-filter-by-rating.en.html": "2e5758d3f26d980c5507e88f34f3f20b6942f4413154d9e40ff6eed71a6acdd4"
+          },
+          "measurements": "Independent, by Claude Code on 27 October 2026. tools/design_wireframes.py reports 0 problems with the import; the 46 frozen batch-09 files, wireframe.css and components.css equal the package record. Chromium through Playwright over file addresses: every mobile frame at 360, 390 and 768 px and every desktop frame at 1024 and 1280 px, each with and without the WCAG 1.4.12 text-spacing override, compared with the frozen batch-02, batch-06 and batch-07 files under the same harness. No element escapes a frame; no control is cut in the drawer or dialog windows; every target is 44 px by hit testing apart from the inherited exceptions; keyboard order follows the document with a visible focus in all ten files; every digit in Arabic text is isolated left to right, Western digits only.",
+          "exceptions": [
+            "Inherited, the batch-06 account mobile header (#253). In the Arabic account pages at 360 px with text spacing, the eight-item header has no room left (a 346 px content box; the English link widens by about 10.5 px) and its last item reaches the frame edge: 1 px here, 10.6 px with a wider system font, which reproduces the handoff's finding. The reviewed s1/batch-06 Arabic files measure the same, and the 10-A headers are byte-identical to batch-06 apart from the cart count. Not corrected here. A 10-A rule letting the logo box shrink (.s2-body .mh .logo--s{flex:0 1 64px;inline-size:auto;min-inline-size:44px}) was validated in the harness and fixes every case, but it would fork a closed shared header: an owner decision.",
+            "Inherited, as reviewed: the batch-06 back link's -8 px margin under the page heading; the batch-02 card name link (about 20 px tall) and the logo link; the card's two-line name clamp hiding the end of the long names P7 and P19; the batch-03 mobile rail cut at the frame edge; the batch-01 desktop search placeholder truncated at 1024 px; the batch-02 breadcrumb's current item truncated with text spacing; the batch-01 footer address label touching its value at 1024 px with text spacing.",
+            "Wireframe conventions, as in batches 04, 05 and 07: controls drawn as span elements with role button and no keyboard focus, which the build replaces with real buttons; the review sheet keeps fixed 360 and 1280 px figures, so it scrolls sideways below about 1360 px."
+          ],
+          "open_decisions": "A1 to A11 of the decision sheet are recommendations and none is ruled. Acceptance of the drawing waits for A1, A3, A4, A5, A6 and A7. A2, A8, A9 and A10, and the build questions inside A4 to A7, block only their build slices (E-SF-3b, E-FND-2b, E-SF-9b). A11 would need scope authority. OP-13 and CR-15 stay open.",
+          "follow_up": [
+            "design/wireframes/s2/README.md still says no wireframe exists; it is corrected when 10-A is accepted, not in this review import."
+          ],
+          "review": {
+            "status": "open",
+            "record": "Imported for the owner's single review sitting of 10-A, as a draft pull request into documentation/open-batch-10. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+          }
+        }
+      ]
     }
   ],
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
@@ -2534,27 +2570,27 @@
       "surface": "sf-filter-by-rating",
       "batch": "batch-10",
       "brief": "design/briefs/sf-filter-by-rating.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s2/batch-10/sf-filter-by-rating.en.html", "design/wireframes/s2/batch-10/sf-filter-by-rating.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "applied", "no_reviews_yet"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "sf-brand-landing",
       "batch": "batch-10",
       "brief": "design/briefs/sf-brand-landing.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s2/batch-10/sf-brand-landing.en.html", "design/wireframes/s2/batch-10/sf-brand-landing.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "sf-search-suggestions",
@@ -3210,40 +3246,40 @@
       "surface": "ac-reorder",
       "batch": "batch-10",
       "brief": "design/briefs/ac-reorder.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s2/batch-10/ac-reorder.en.html", "design/wireframes/s2/batch-10/ac-reorder.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "available", "item_no_longer_available"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "ac-notification-preferences",
       "batch": "batch-10",
       "brief": "design/briefs/ac-notification-preferences.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s2/batch-10/ac-notification-preferences.en.html", "design/wireframes/s2/batch-10/ac-notification-preferences.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "saved", "all_marketing_off"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "ac-account-deletion",
       "batch": "batch-10",
       "brief": "design/briefs/ac-account-deletion.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s2/batch-10/ac-account-deletion.en.html", "design/wireframes/s2/batch-10/ac-account-deletion.ar.html"],
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
+      "states_covered": ["default", "request", "confirm", "requested"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "rv-list",
