@@ -367,7 +367,9 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    2026 (PR #403), adopting recommendations C1 to C5 and re-freezing the ten corrected files: batch-09 is closed.
    Batch-10 (the eight contracted second-release surfaces) opens on his instruction of 26 October 2026 in two
    review groups, 10-A customer-facing (English and Arabic, mobile first) and 10-B administration (English): its
-   eight surfaces and 25 states are briefed and stay stage S2 (DQ-04), and none is drawn.
+   eight surfaces and 25 states are briefed and stay stage S2 (DQ-04). Claude Design drew 10-A, imported for his
+   review in its own pull request (PR #406); he ruled A1 to A11 on 27 October 2026, and Claude Design corrects
+   four of its surfaces before he decides on acceptance. 10-B is not drawn.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
