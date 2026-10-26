@@ -950,6 +950,7 @@
     {
       "id": "sf-filter-by-rating",
       "name": "Filter by rating",
+      "purpose": "Lets a shopper filter a product listing by rating, so that only products at or above the selected rating are shown.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -987,12 +988,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "sf-brand-landing",
       "name": "Brand landing page",
+      "purpose": "Gives a brand a landing page of its own, listed with the campaign and search engine pages of the information architecture.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1029,7 +1031,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -3357,6 +3359,7 @@
     {
       "id": "ac-reorder",
       "name": "Reorder from order history",
+      "purpose": "Lets a returning customer repeat a previous order from their order history in one action: a cart is built from its items at current availability and current prices, and items no longer available are reported rather than silently left out.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3394,12 +3397,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-notification-preferences",
       "name": "Notification preferences",
+      "purpose": "Gives a signed-in customer a page in their account where they manage their notification preferences.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3438,12 +3442,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "The first release provides unsubscribe links in emails. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-account-deletion",
       "name": "Account deletion request",
+      "purpose": "Lets a signed-in customer ask, from their account page, for their account to be deleted. The request is recorded with a timestamp and is visible to the team, and its handling respects the order records the client must keep.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3482,7 +3487,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "The first release handles this manually on request. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -4478,6 +4483,7 @@
     {
       "id": "ad-dashboard-customers-conversion",
       "name": "Dashboard, second release: customers and conversion rate",
+      "purpose": "Adds to the dashboard the number of new and returning customers, and the conversion rate through Google Analytics 4.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4511,7 +4517,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
@@ -5114,6 +5120,7 @@
     {
       "id": "ad-customer-metrics-export",
       "name": "Customers, second release: lifetime metrics and data export",
+      "purpose": "Shows staff each customer's total spend, average order value, returns and coupon usage, and lets staff export a customer's data under privacy controls.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5147,7 +5154,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
@@ -5692,6 +5699,7 @@
     {
       "id": "ad-email-template-editor",
       "name": "Notifications, second release: admin-editable templates",
+      "purpose": "Lets staff change the wording of the notification email templates themselves, in English and Arabic, without an edit being able to break the variables an email depends on.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5726,7 +5734,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "briefed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
