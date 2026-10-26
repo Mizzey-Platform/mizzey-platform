@@ -3391,7 +3391,7 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "None.",
+      "native_baseline": "WooCommerce's \"Order again\" button on the order detail, for completed orders only. It empties the cart first, adds items at current prices, and reports the items it cannot add only as a count.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
@@ -3481,7 +3481,7 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "None.",
+      "native_baseline": "No customer-facing request form. WordPress records erasure requests created in the administration (Tools > Erase Personal Data), and WooCommerce's erasers anonymise an order's personal data while keeping the order.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
@@ -5148,7 +5148,7 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WooCommerce Analytics customers report.",
+      "native_baseline": "WooCommerce Analytics customers report: total spend and AOV per customer, with no returns or coupon usage per customer. WordPress personal data export (Tools > Export Personal Data): one person's data, on a confirmed request, as a download that expires.",
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": ["DQ-04"],

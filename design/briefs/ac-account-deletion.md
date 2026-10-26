@@ -87,7 +87,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-None.
+No customer-facing request form. WordPress records erasure requests created in the administration (Tools > Erase Personal Data), and WooCommerce's erasers anonymise an order's personal data while keeping the order.
 
 ## Open inputs
 

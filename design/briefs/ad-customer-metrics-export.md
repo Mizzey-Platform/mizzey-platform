@@ -75,7 +75,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-WooCommerce Analytics customers report.
+WooCommerce Analytics customers report: total spend and AOV per customer, with no returns or coupon usage per customer. WordPress personal data export (Tools > Export Personal Data): one person's data, on a confirmed request, as a download that expires.
 
 ## Open inputs
 

@@ -2171,7 +2171,7 @@
         "status": "briefed",
         "date": "2026-10-26",
         "instruction": "The owner's instruction of 26 October 2026, after batch-09 closed (PR #403, 6b07607): start the batch-10 design preparation phase under D-14 and D-15, in two review groups, customer-facing and administration, without changing signed scope, promoting any surface to the first release or starting functional implementation.",
-        "record": "All eight surfaces are briefed together, each with a purpose restating only its own register rows and the acceptance criteria of the stories that trace them, and each in exactly one review group. States, rows, owners, stages, open items, design freedom, native baselines and notes are unchanged: 25 states across the eight surfaces.",
+        "record": "All eight surfaces are briefed together, each with a purpose restating only its own register rows and the acceptance criteria of the stories that trace them, and each in exactly one review group. States, rows, owners, stages, open items, design freedom and notes are unchanged: 25 states across the eight surfaces. Three native baselines are corrected as factual clarifications on the owner's approval (P-1 to P-3 under owner_rulings).",
         "staging": "Every row these surfaces are drawn for is contracted and staged S2 (register Part One 1.1), and every surface stays stage S2. Designing them now is sequencing under DQ-04: they are drawn before PRE-03b is approved and built in the second release by their own slices (E-SF-3b, E-FND-2b, E-SF-9b, E-ADM-1b, E-ADM-6b, E-NOTF-1b). No first-release stand-in is drawn. What the first release does instead is the register's own column in Part One 1.1; for IA-33 it is not stated, and OP-13 stays open.",
         "sequence": "The two groups share no file and no stylesheet. Each is drawn from the closed baseline of batches 01 to 09 and returned on its own, with one decision sheet. Claude Code validates each return and imports it in its own pull request, one at a time, 10-A first unless the owner orders otherwise. No batch-10 output changes a file of batches 01 to 09 or a shared stylesheet.",
         "language": "10-A: English left to right and Arabic right to left, every surface in both files, mobile designed first (NFR-01). 10-B: English, desktop (ADM-159; ADM-159a, an Arabic administration, is P2); bilingual content values are drawn with their Arabic value right to left inside the English administration, as batch-09 drew them.",
@@ -2179,7 +2179,7 @@
           {
             "id": "10-A",
             "name": "Customer-facing second-release surfaces",
-            "role": "English left to right and Arabic right to left, mobile designed first, on the reviewed storefront frame and the shared component layer. Each surface attaches where the closed first-release surfaces left room for it: the listing filters and the review list (filter by rating), the brand page (brand landing), the order list and order detail (reorder), and the account navigation and hub (notification preferences and account deletion).",
+            "role": "English left to right and Arabic right to left, mobile designed first, on the reviewed storefront frame and the shared component layer. Each surface attaches where the closed first-release surfaces left room for it: the product listing filters, in the desktop sidebar and the mobile filter drawer (filter by rating; PLP-11 contracts no review-list filter), the brand page (brand landing), the order list and order detail (reorder), and the account navigation and hub (notification preferences and account deletion).",
             "surfaces": ["sf-filter-by-rating", "sf-brand-landing", "ac-reorder", "ac-notification-preferences", "ac-account-deletion"],
             "state_count": 15
           },
@@ -2203,7 +2203,68 @@
         },
         "treatment_note": "Administration only, as in batch-09: a production classification for drawing effort, derived from each surface's native_baseline and design_freedom. It changes neither, and it adds no capability. The customer-facing surfaces are free within the reviewed storefront frame and component layer.",
         "limited_rows": "All ten rows these surfaces are drawn for (PLP-11, IA-33, ACCT-09, ACCT-11, ACCT-13, ADM-05, ADM-07, ADM-101, ADM-105, NOTF-14) are P1-L and staged S2. Their boundary is their own row wording and the acceptance criteria of the stories that trace them; no reduction or extension is inferred. Where a reduction matters to a drawing and is not written, it is raised at review, not resolved in the drawing.",
-        "open_inputs": "OP-13 (what the first release provides in place of IA-33) and CR-15 (storefront content in both languages) bear on sf-brand-landing and stay open. No other open input is recorded on these surfaces."
+        "open_inputs": "OP-13 (what the first release provides in place of IA-33) and CR-15 (storefront content in both languages) bear on sf-brand-landing and stay open. No other open input is recorded on these surfaces.",
+        "owner_rulings": {
+          "date": "2026-10-26",
+          "decided_by": "Mustafa, owner",
+          "record": "The owner reviewed the batch-10 package (version 1) and approved O-1 to O-8 as recommended, with the boundaries below, and P-1 to P-4. All eight surfaces remain S2. These are design working decisions: they approve no implementation, change no signed scope and are not client confirmations.",
+          "decisions": [
+            {
+              "id": "O-1",
+              "ruling": "Customer-facing product examples come from the working product fixtures (Beauty, Wellness, Accessories), as batch-09 used them."
+            },
+            {
+              "id": "O-2",
+              "ruling": "The brand landing page is a page in its own right for one brand, composed only from the existing library sections and the brand's products, with a route to the unchanged brand archive. Its address is not set, and nothing is said about what the first release provides instead (OP-13 stays open)."
+            },
+            {
+              "id": "O-3",
+              "ruling": "Reorder keeps the existing cart and adds the eligible items at current prices, naming each unavailable item individually, offered on delivered orders. A contracted second-release design direction: WooCommerce does not do this natively (it empties the cart and reports a count), and the gap is E-SF-9b's."
+            },
+            {
+              "id": "O-4",
+              "ruling": "Notification preferences hold one marketing email consent, the consent registration asks for, with order, payment, delivery and account emails stated as always sent. Email only; no topics and no frequency setting."
+            },
+            {
+              "id": "O-5",
+              "ruling": "The conversion rate is a dashboard figure sourced from Google Analytics 4, drawn as a labelled structural figure with its source and date range. No live figure is invented and no integration is assumed as verified; the mechanism is E-ADM-1b's."
+            },
+            {
+              "id": "O-6",
+              "ruling": "The customer privacy export uses WordPress's personal data export: request confirmation, staff access permissions and the export's expiry and retention constraints. The Analytics Customers report CSV is not a substitute."
+            },
+            {
+              "id": "O-7",
+              "ruling": "Email templates take WooCommerce's email settings as the structural baseline. Editable bilingual body wording and protected variables must satisfy US-12-08; what the platform does not provide natively stays with E-NOTF-1b."
+            },
+            {
+              "id": "O-8",
+              "ruling": "Two controlled returns from one package: 10-A first, 10-B in a fresh session, each with its own decision sheet and imported in its own pull request."
+            }
+          ],
+          "inventory_corrections": [
+            {
+              "id": "P-1",
+              "status": "applied",
+              "ruling": "ac-reorder native_baseline clarified: WooCommerce \"Order again\"."
+            },
+            {
+              "id": "P-2",
+              "status": "applied",
+              "ruling": "ac-account-deletion native_baseline clarified: no customer form; WordPress erasure requests and WooCommerce erasers."
+            },
+            {
+              "id": "P-3",
+              "status": "applied",
+              "ruling": "ad-customer-metrics-export native_baseline clarified: the Analytics customers report and the WordPress personal data export."
+            },
+            {
+              "id": "P-4",
+              "status": "approved, deferred",
+              "ruling": "The batch-07 rv-list note that leaves room above the review list for the rating filter is corrected later, text only, in a controlled correction. The reviewed batch-07 files are not changed now."
+            }
+          ]
+        }
       }
     }
   ],

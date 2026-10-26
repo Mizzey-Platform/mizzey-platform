@@ -92,7 +92,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-None.
+WooCommerce's "Order again" button on the order detail, for completed orders only. It empties the cart first, adds items at current prices, and reports the items it cannot add only as a count.
 
 ## Open inputs
 
