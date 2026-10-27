@@ -2292,16 +2292,17 @@
             "Inherited, as reviewed: the batch-06 back link's -8 px margin under the page heading; the batch-02 card name link (about 20 px tall) and the logo link; the card's two-line name clamp hiding the end of the long names P7 and P19; the batch-03 mobile rail cut at the frame edge; the batch-01 desktop search placeholder truncated at 1024 px; the batch-02 breadcrumb's current item truncated with text spacing; the batch-01 footer address label touching its value at 1024 px with text spacing.",
             "Wireframe conventions, as in batches 04, 05 and 07: controls drawn as span elements with role button and no keyboard focus, which the build replaces with real buttons; the review sheet keeps fixed 360 and 1280 px figures, so it scrolls sideways below about 1360 px."
           ],
-          "open_decisions": "A1 to A11 ruled on 27 October 2026 (owner_rulings). Open: acceptance of 10-A after correction round 1. OP-13 and CR-15 stay open.",
+          "open_decisions": "A1 to A11 ruled on 27 October 2026 (owner_rulings); correction round 1 returned and imported. Open: A12 (correction_round_1.new_questions) and acceptance of 10-A. OP-13 and CR-15 stay open.",
           "follow_up": [
             "A6: a failed save of the marketing switch (the switch back to its previous state, with an error) is not a state of the inventory. E-SF-9b needs it designed before it is built: add it then as a controlled inventory change.",
             "A7: WordPress's erasure-confirmation email and the page its link opens are customer-facing, in both languages, and are not inventory surfaces. Their language, presentation and whether the link lands on the WordPress login screen are settled with E-SF-9b and the native email configuration (#285).",
+            "A7, for the build (E-SF-9b): a WordPress erasure request stays Pending when its confirmation link expires (it is not marked expired), and wp_create_user_request refuses a new request while one for the same address is Pending or Confirmed (duplicate_request; checked in WordPress 6.8 core). The drawn 'ask again' after expiry (the added 360 px default frame) therefore needs defined build handling, for example sending a new confirmation for the existing request, or closing it before creating a new one; the customer uses the same entry either way. It is not native behaviour.",
             "H: the shared-component correction of the mobile account header (#253), in its own pull request on the owner's authorisation; it changes s1/batch-02/batch-02-targets.css, which every storefront frame links.",
             "design/wireframes/s2/README.md still says no wireframe exists; it is corrected when 10-A is accepted, not in this review import."
           ],
           "review": {
             "status": "open",
-            "record": "Imported for the owner's single review sitting of 10-A, as a draft pull request into documentation/open-batch-10. He ruled A1 to A11 and H on 27 October 2026; Claude Design corrects four surfaces in correction round 1 before he decides on acceptance. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+            "record": "Imported for the owner's single review sitting of 10-A, as a draft pull request into documentation/open-batch-10. He ruled A1 to A11 and H on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (3232678) and validated by Claude Code. Open: A12 and his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
           },
           "owner_rulings": [
             "A1 (27 October 2026): approved as drawn. Four minimum levels, 4 and up to 1 and up, as one radio group named Rating after Price, in the desktop sidebar and the mobile and tablet drawer, with its chip, Clear all and the page address; the group is not shown when no product in the list is rated.",
@@ -2319,9 +2320,30 @@
             "These are the owner's design decisions on low-fidelity wireframes. They are not client confirmations, change no signed scope, move nothing into the first release and start no implementation (D-14)."
           ],
           "correction_round_1": {
-            "status": "requested",
+            "status": "returned",
             "date": "2026-10-27",
-            "scope": "Presentation and annotation only, English and Arabic: ac-account-deletion redrawn for A7 (and its A11 note); notes only in ac-reorder (A4, A5), ac-notification-preferences (A6, A10) and sf-filter-by-rating (A8). No state added or removed. sf-brand-landing, the mobile header and every file outside design/wireframes/s2/batch-10/ unchanged; batch-10-a.css append-only if needed. Issued to Claude Design by the owner from a private package built by Claude Code."
+            "scope": "Presentation and annotation only, English and Arabic: ac-account-deletion redrawn for A7 (and its A11 note); notes only in ac-reorder (A4, A5), ac-notification-preferences (A6, A10) and sf-filter-by-rating (A8). No state added or removed. sf-brand-landing, the mobile header and every file outside design/wireframes/s2/batch-10/ unchanged; batch-10-a.css append-only if needed. Issued to Claude Design by the owner from a private package built by Claude Code.",
+            "returned": "2026-10-27",
+            "source": "Claude Design, returned as mizzey-batch-10-a-correction-round-1-output.zip (SHA-256 b3cd785023620cbe1a02bd6a4c5b1bd3a061abe8bb6cfc9321b299be6e10d83e, 9 files under one top-level folder: the eight HTML files and the handoff; batch-10-a.css not returned, nothing appended), from the private package mizzey-batch-10-a-correction-round-1-package-v2.zip (SHA-256 888e49cdd351eeacdc7418399073710597c49d4abbb560986741c8d62e145cf3, 57 entries, built from be85cdc; version 1, SHA-256 256d0042d37f8d429f1628b6e0ef9d7e95c2c645798fddaa5d0ed35885019a49, was refused by the upload at its 500-entry limit and never received). Handoff batch-10-a-correction-round-1-handoff.md, SHA-256 84dabee1741cbc97c10a58f4b09818ebaf51bc80851515eb648b3961a25d7232, not committed.",
+            "files": {
+              "design/wireframes/s2/batch-10/ac-account-deletion.en.html": "a4692e9f839b8663534dd332a8a058d70ded2adfdf001ea7453f003ae4b9aab6",
+              "design/wireframes/s2/batch-10/ac-account-deletion.ar.html": "f725d18376147892802a72aca376ada0a755448d103a3dd52babe5d1be00b30a",
+              "design/wireframes/s2/batch-10/ac-reorder.en.html": "1fb77cfe6751e80b385ae0612950aa697aa0619c7df235a1e50b3f6570d488b3",
+              "design/wireframes/s2/batch-10/ac-reorder.ar.html": "8f53fbf095802d8713c6417c434280afcd53186d0edb1ffff4ae85e5e230bfb7",
+              "design/wireframes/s2/batch-10/ac-notification-preferences.en.html": "f8c8ed2e5e6074042a75aae3f0109eb3fda75a9597cad680b1073f3ab6643de5",
+              "design/wireframes/s2/batch-10/ac-notification-preferences.ar.html": "21c7da9ef5bcacab152ed0a31b14b683da19be5caa9c94ea73e65286cf26e558",
+              "design/wireframes/s2/batch-10/sf-filter-by-rating.en.html": "3b4400007b821a049df6d827d64abdc9715bff0577e85ef85ea1882780045b9c",
+              "design/wireframes/s2/batch-10/sf-filter-by-rating.ar.html": "9019d8995385aeb3f9d6a33c4474b8e07f6009a9f030c8794d1e102f737dd9c5"
+            },
+            "record": "Eight files imported byte for byte in 3232678, every hash equal to the handoff. Each changes only as sections 2 and 3 of the correction start file ask, plus its header status line. ac-account-deletion: the A7 interface text and notes and the A11 note; one added 360 px default frame (after an unconfirmed request expired, the same entry and one line, no resend control) and two added requested frames (a later visit, confirmed, at 360 and 1280 px): 10 frames become 13 per language. ac-reorder, ac-notification-preferences, sf-filter-by-rating: the ruled notes only; frames, controls and interface text unchanged. The same 15 states per language, each in at least one 360 px and one 1280 px frame. No new class, control kind, script, style or image; the head and every site header and footer block byte-identical to the base. sf-brand-landing, batch-10-a.css, the shared and reviewed stylesheets and the 46 frozen batch-09 files unchanged.",
+            "measurements": "Independent, by Claude Code on 27 October 2026, with the return in place and compared with be85cdc under the same harness: Chromium through Playwright over file addresses, every mobile frame at 360, 390 and 768 px and every desktop frame at 1024 and 1280 px, with and without the WCAG 1.4.12 text-spacing override, all ten files. sf-brand-landing and the three notes-only surfaces measure exactly as at be85cdc. In ac-account-deletion the added frames carry only the inherited findings their sibling frames carry (the batch-06 back link, the desktop search placeholder at 1024 px); the confirm dialog and its three actions sit inside the window in all 20 cases (both languages, five widths, with and without spacing), each action at least 44 px. The Arabic account header at 360 px with text spacing measures as at be85cdc (ruling H). The keyboard reaches every focusable element of all ten files in document order with a visible focus; the email address, digits and time are isolated left to right in Arabic. tools/design_wireframes.py reports 0 problems.",
+            "notes": [
+              "Packaging: the ZIP holds its files under one top-level folder instead of at its root; the contents are exact, so the difference was accepted at import.",
+              "The 360 px confirm frame: the 700 px window crops the page behind the bottom sheet, which is one point longer now, as text spacing already did at be85cdc. The sheet and its actions are whole."
+            ],
+            "new_questions": [
+              "A12 (the handoff), not blocking: the Arabic ac-reorder file has no partial-quantity note to carry 'Ruled (A5)'. In the original delivery the Arabic file gives five of the English notes' places to its right-to-left notes, and this is one of them; the Arabic frames draw the same partial quantity. Drawn: left as it is. Claude Code recommends leaving it: A5 is recorded in owner_rulings and annotated in the English file, the notes are review aids, not interface, and adding the note would take another Claude Design round. Alternative: add the English note, ending 'Ruled (A5)', to the Arabic file in a later controlled round. Owner to rule; nothing changed for it."
+            ]
           }
         }
       ]
