@@ -113,6 +113,13 @@ The standard WooCommerce product screen. Only what it lacks is added.
 |---|---|---|---|---|
 | `PRE-09` ERP Integration Specification | erp | When and how the store reads stock, what the customer sees when stock cannot be validated, how reservation works, and how stock appears in the admin. | Structural stock states: in stock, out of stock, unknown or cannot validate, and a changed cart line. Neutral placeholder wording. | No timing, no mechanism, no 'only N left', no reservation timer, no stock quantity shown to customers, no admin stock editing behaviour. No P1-E surface beyond a placeholder. |
 
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-08` Merchandising badges | New, Trending, Limited and Best Seller are assigned per product by the staff. None is calculated from dates, sales or stock, and none expires by itself. At most one merchandising badge shows on a card, by the fixed precedence Limited, then New, then Best Seller, then Trending (batch-02 review, 19 October 2026). | No automatic, scheduled or date-limited badge, and no badge derived from sales or stock figures, without Change Control. |
+| `DQ-10` Related products and cart suggestions | Related products are the products the staff assign, stored in WooCommerce's Upsells field and shown through it on the product page. WooCommerce's automatic Related Products rail is not shown, and no rail shows when nothing is assigned. Cart suggestions read the same assignment from the products in the cart; the Cross-sells field is not used at launch. | No automatic category or tag fallback without a client clarification or Change Control, and no second list for staff to keep in the Cross-sells field. |
+
 ## Interaction options
 
 None recorded for this surface.
@@ -141,4 +148,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-Related products: the mechanism is open pending D-19. The frame draws WooCommerce's Upsells field as the recommendation and a separate mizzey-site field as the alternative; neither is decided by the 09-C acceptance.
+Related products: D-19 (DQ-10) settles the mechanism, effective when D-19 is merged: WooCommerce's Upsells field, which the frame draws as the recommendation. The separate mizzey-site field drawn as the alternative is superseded and is not built; the Cross-sells field is not used at launch.
