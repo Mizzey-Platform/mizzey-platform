@@ -60,7 +60,7 @@ The layout every customer email shares, sent under the transactional and marketi
 
 No flow step passes through this surface.
 
-**Appears inside:** Account created: welcome, verification, discount details (`em-welcome`), Order confirmed (`em-order-confirmed`), Payment failed, with a retry prompt (`em-payment-failed`), Shipped: carrier and tracking number (`em-shipped`), Delivered, with a review invitation (`em-delivered`), Refund completed (`em-refund`), Password reset link (`em-password-reset`), Passwordless sign-in link (`em-passwordless`).
+**Appears inside:** Account created: welcome, verification, discount details (`em-welcome`), Order confirmed (`em-order-confirmed`), Payment failed, with a retry prompt (`em-payment-failed`), Shipped: carrier and tracking number (`em-shipped`), Delivered, with a review invitation (`em-delivered`), Refund completed (`em-refund`), Password reset link (`em-password-reset`), New email address verification (`em-email-change`), Passwordless sign-in link (`em-passwordless`).
 
 **Components.** Structure and states only: no brand value.
 

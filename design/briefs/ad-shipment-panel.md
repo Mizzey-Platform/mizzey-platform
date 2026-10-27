@@ -79,6 +79,7 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `sent_with_tracking` | Success |  |  |
 | `pickup_requested` | Other |  |  |
 | `carrier_error` | Error |  |  |
+| `tracking_corrected` | Other |  | US-18-04: staff correct a wrong tracking code; how Bosta returns and stores it is #291's |
 
 ## Responsive
 
@@ -128,7 +129,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
 | Desktop | `reviewed` |
-| States covered | 5 of 5 |
+| States covered | 6 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
