@@ -40,6 +40,7 @@ Flows it serves: Staff: adding and editing a product (`S01`).
 | `ADM-40` | P1 | S1 | #276 |
 | `ADM-41` | P1 | S1 | #276 |
 | `SSC-27` | P1 | S1 | #311 |
+| `MKT-13` | P1 | S1 | #287 |
 
 **What must not be invented.**
 
@@ -68,6 +69,7 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `defaults` | Other |  |  |
 | `overridden` | Other |  |  |
 | `arabic_version` | Other |  |  |
+| `slug_changed` | Other |  | US-16-06: changing a slug offers a redirect from the old address, through Redirection (R1); its behaviour is unverified until it is installed (#287) |
 
 ## Responsive
 
@@ -109,13 +111,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `reviewed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `reviewed` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `reviewed` |
-| States covered | 4 of 4 |
+| Desktop | `drawn` |
+| States covered | 4 of 5 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

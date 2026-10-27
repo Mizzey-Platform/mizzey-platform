@@ -3101,7 +3101,9 @@
         {"state": "default"},
         {"state": "validation"},
         {"state": "saved"},
-        {"state": "email_change", "note": "May need verification"}
+        {"state": "email_change", "note": "Verification of the new address is required (US-10-05); the current address stays in use until the new one is confirmed"},
+        {"state": "email_change_confirmed", "note": "The customer followed the link in em-email-change: the new address is now the account email"},
+        {"state": "email_change_link_invalid", "note": "The link has expired or was already used: nothing changes, and the customer can ask again"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -3119,7 +3121,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "reviewed",
+      "status": "wireframed",
       "composes": ["ac-navigation", "ac-password"]
     },
     {
@@ -4122,7 +4124,7 @@
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["SSC-07"],
-      "context_ids": ["NAV-07"],
+      "context_ids": ["NAV-07", "SSC-08"],
       "excluded_ids": [],
       "owner_pbi": 311,
       "build_pbi": 311,
@@ -4138,7 +4140,8 @@
         {"state": "default"},
         {"state": "edit_structure"},
         {"state": "nested_levels"},
-        {"state": "arabic_version"}
+        {"state": "arabic_version"},
+        {"state": "footer", "note": "Flow S04.5: where staff edit the footer's content, links and columns in both languages, on the native site editor"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -4152,7 +4155,45 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed"
+      "status": "wireframed"
+    },
+    {
+      "id": "ad-translation-status",
+      "name": "Missing translations report",
+      "purpose": "Shows staff which content, menus and interface text are missing in one language, before launch and after.",
+      "kind": "admin_extension",
+      "scope_type": "contracted",
+      "audience": ["staff"],
+      "register_ids": ["SSC-12"],
+      "context_ids": ["SSC-01", "SSC-07"],
+      "excluded_ids": [],
+      "owner_pbi": 311,
+      "build_pbi": 311,
+      "stage": "S1",
+      "route": null,
+      "flow_steps": ["S04.3"],
+      "acceptance": {
+        "stories": ["US-01-03", "US-22-06", "US-22-09"],
+        "scenarios": [],
+        "operations_checks": []
+      },
+      "states": [
+        {"state": "default", "note": "Everything is translated"},
+        {"state": "missing", "note": "A page, a navigation menu, a product and interface text listed as missing in Arabic"}
+      ],
+      "responsive": {
+        "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
+        "tablet": "As the standard administration.",
+        "desktop": "Primary."
+      },
+      "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
+      "native_baseline": "WPML 4.9.7 Translation Management's Translation Dashboard (pages, products and navigation menus, filtered by Not translated or needs updating) and WPML String Translation 3.5.4 (interface text, filtered by Translation needed). A link removed only from an independently edited Arabic menu is not detected natively: open with #311.",
+      "design_freedom": "annotate_only",
+      "open_items": [],
+      "decisions": [],
+      "interaction_options": [],
+      "erp_dependency": "none",
+      "status": "briefed"
     },
     {
       "id": "ad-promo-banner-manager",
@@ -4901,7 +4942,8 @@
         {"state": "not_sent"},
         {"state": "sent_with_tracking"},
         {"state": "pickup_requested"},
-        {"state": "carrier_error"}
+        {"state": "carrier_error"},
+        {"state": "tracking_corrected", "note": "US-18-04: staff correct a wrong tracking code; how Bosta returns and stores it is #291's"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -4915,7 +4957,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed"
+      "status": "wireframed"
     },
     {
       "id": "ad-carrier-status-mapping",
@@ -5045,7 +5087,7 @@
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["ADM-103"],
-      "context_ids": ["ADM-100"],
+      "context_ids": ["ADM-100", "NOTF-11"],
       "excluded_ids": [],
       "owner_pbi": 279,
       "build_pbi": 279,
@@ -5053,7 +5095,7 @@
       "route": null,
       "flow_steps": ["S06.3"],
       "acceptance": {
-        "stories": ["US-19-02"],
+        "stories": ["US-19-02", "US-12-07"],
         "scenarios": [],
         "operations_checks": []
       },
@@ -5075,7 +5117,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed"
+      "status": "wireframed"
     },
     {
       "id": "ad-customer-suspend",
@@ -5504,7 +5546,7 @@
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["MKT-12"],
-      "context_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27"],
+      "context_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27", "MKT-13"],
       "excluded_ids": [],
       "owner_pbi": 287,
       "build_pbi": 287,
@@ -5520,7 +5562,8 @@
         {"state": "default"},
         {"state": "defaults"},
         {"state": "overridden"},
-        {"state": "arabic_version"}
+        {"state": "arabic_version"},
+        {"state": "slug_changed", "note": "US-16-06: changing a slug offers a redirect from the old address, through Redirection (R1); its behaviour is unverified until it is installed (#287)"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -5534,7 +5577,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "reviewed"
+      "status": "wireframed"
     },
     {
       "id": "ad-redirect-manager",
@@ -6177,6 +6220,49 @@
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
+      "id": "em-email-change",
+      "name": "New email address verification",
+      "purpose": "Asks a customer who changed their account email to confirm the new address before it replaces the old one.",
+      "kind": "email",
+      "scope_type": "contracted",
+      "audience": ["customer"],
+      "register_ids": ["ACCT-02"],
+      "context_ids": [],
+      "excluded_ids": [],
+      "owner_pbi": 308,
+      "build_pbi": 308,
+      "stage": "S1",
+      "route": null,
+      "flow_steps": ["F14.3"],
+      "acceptance": {
+        "stories": ["US-10-05"],
+        "scenarios": [],
+        "operations_checks": []
+      },
+      "states": [
+        {"state": "default"}
+      ],
+      "responsive": {"mobile": "Single column, readable without zooming.", "tablet": "As mobile.", "desktop": "Single fixed-width column."},
+      "rtl": {
+        "applies": true,
+        "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
+        "does_not_mirror": [
+          "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
+          "media playback controls"
+        ],
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
+      },
+      "native_baseline": "None for customers: WooCommerce's account details save a new email at once, and WordPress core verifies a changed address only from the administration profile (send_confirmation_on_profile_email). The mechanism is #308's and is unverified.",
+      "design_freedom": "constrained",
+      "open_items": [],
+      "decisions": [],
+      "interaction_options": [],
+      "erp_dependency": "none",
+      "status": "briefed",
+      "composes": ["em-shell"],
+      "note": "Sent to the new address, in the language the customer used, with a single-use, time-limited link. Email only at launch."
+    },
+    {
       "id": "em-passwordless",
       "name": "Passwordless sign-in link",
       "purpose": "Sends a customer a link that signs them in without a password.",
@@ -6342,7 +6428,7 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WordPress maintenance mode and the server's own error page.",
+      "native_baseline": "CoreX planned maintenance for a planned window, and the hosting provider's own page for emergency maintenance, under the owner's operating policy of 21 October 2026.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
@@ -6479,7 +6565,7 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "CoreX coming-soon mode (from v0.43.0) and WooCommerce's own coming-soon page.",
+      "native_baseline": "WooCommerce Site Visibility (its Coming soon mode and page), which owns Coming Soon under the owner's operating policy of 21 October 2026.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],

@@ -36,6 +36,7 @@ Flows it serves: Staff: editing storefront content (`S04`).
 | Row | Scope | Stage | Accepting PBI |
 |---|---|---|---|
 | `NAV-07` | P1 | S1 | #253 |
+| `SSC-08` | P1 | S1 | #311 |
 
 **What must not be invented.**
 
@@ -64,6 +65,7 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `edit_structure` | Other |  |  |
 | `nested_levels` | Interaction |  |  |
 | `arabic_version` | Other |  |  |
+| `footer` | Other |  | Flow S04.5: where staff edit the footer's content, links and columns in both languages, on the native site editor |
 
 ## Responsive
 
@@ -105,13 +107,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `reviewed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `reviewed` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `reviewed` |
-| States covered | 4 of 4 |
+| Desktop | `drawn` |
+| States covered | 4 of 5 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 

@@ -4,7 +4,7 @@ This folder is the single place the design of the Mizzey Launch Platform is work
 decision D-14 on 6 October 2026.
 
 **Nothing here is approved UI or UX, and nothing here is a client deliverable.** It is an inventory: what needs
-design, in what states, on which signed rows. No screen has been drawn. The contracted interface design is
+design, in what states, on which signed rows, and the low-fidelity wireframes drawn from it. The contracted interface design is
 PRE-03b, owned by #250, delivered as working HTML and CSS after the brand identity is approved. This folder is how
 that work is prepared, and it changes no contract term.
 
@@ -14,9 +14,9 @@ that work is prepared, and it changes no contract term.
 |---|---|
 | 1. Signed scope and PBIs | Done. Register MS-ANX-2026-006 version 1.5, and `docs/scope/` |
 | 2. Complete inventory of surfaces, flows and states | **This folder.** Reported in `coverage.md` |
-| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Not started. The first is drawn only when the owner approves the start of the wireframe pass |
-| 4. Structural component and interaction system, established and stable | Not started |
-| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Not started |
+| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Done: batches 01 to 09 reviewed and closed (`wireframes/manifest.json`) |
+| 4. Structural component and interaction system, established and stable | Under way: `wireframes/manifest.json`, `stabilisation` |
+| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Batch-10: 10-A reviewed and frozen, 10-B imported for review |
 | 6. Brand identity received and applied | Waiting on the client (OD-01) |
 | 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
 | 8. The contracted working HTML and CSS design | Not started |

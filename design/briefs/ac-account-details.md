@@ -67,7 +67,9 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `default` | Default |  |  |
 | `validation` | Validation |  |  |
 | `saved` | Success |  |  |
-| `email_change` | Other |  | May need verification |
+| `email_change` | Other |  | Verification of the new address is required (US-10-05); the current address stays in use until the new one is confirmed |
+| `email_change_confirmed` | Other |  | The customer followed the link in em-email-change: the new address is now the account email |
+| `email_change_link_invalid` | Error |  | The link has expired or was already used: nothing changes, and the customer can ask again |
 
 ## Responsive
 
@@ -180,13 +182,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `reviewed` |
+| Review status | `wireframed` |
 | Review batch | Account, orders and tracking (`batch-06`) |
-| English, left to right | `reviewed` |
-| Arabic, right to left | `reviewed` |
-| Mobile | `reviewed` |
-| Desktop | `reviewed` |
-| States covered | 4 of 4 |
+| English, left to right | `drawn` |
+| Arabic, right to left | `drawn` |
+| Mobile | `drawn` |
+| Desktop | `drawn` |
+| States covered | 4 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
