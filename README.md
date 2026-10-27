@@ -20,7 +20,7 @@ except by the owner, who decides when the review period ends.
 | **Acceptance** | Functional Specification MS-SPC-2026-032 v1.2 and Acceptance and UAT Plan MS-UAT-2026-027 |
 | **Architecture** | Technical Design MS-TDD-2026-033 v1.2, refined by accepted ADRs in [`docs/adr/`](docs/adr/) |
 | **ERP** | Stock integration included. ERP-dependent (P1-E) rows wait for the ERP Integration Specification (PRE-09) |
-| **Current phase** | Design first (D-14): the UX inventory in [`design/`](design/README.md), then wireframes, before further implementation. See [PROGRESS.md](PROGRESS.md) |
+| **Current phase** | Design first (D-14): low-fidelity wireframes closed on 28 October 2026 under delegated review ([`design/`](design/README.md)); the brand identity awaits OD-01. PRE-03b and implementation permission remain outstanding. See [PROGRESS.md](PROGRESS.md) |
 
 The contract documents live outside this repository. The repository carries only what building needs: the register
 ids, scope values and stages in [`docs/scope/register-ids.json`](docs/scope/register-ids.json), generated from the
