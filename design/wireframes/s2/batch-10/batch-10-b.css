@@ -151,3 +151,27 @@
 .adm-s2-mail--mini .adm-s2-mail__body h2 { font-size: 1rem; }
 .adm-s2-mail--mini .adm-s2-mail__ftr { padding: 0.5rem 0.625rem; }
 .adm-s2-mail--mini .adm-s2-mail__logo { min-block-size: 2rem; margin-block: 0.5rem; }
+
+/* Correction round 1, 27 October 2026 (B9). adm-s2-tscroll: native-table-scroll. The WooCommerce Analytics report
+   table when its columns do not fit: it scrolls sideways inside its own wrapper, never the frame or the page, with
+   a fade at the edge that has more (the start fade appears once scrolled, the end fade goes at the end) and keyboard
+   focus on the wrapper. Its cells stay on one line, as the native report table keeps them, an inline ADDED tag with its label included. Markup: div.adm-s2-tscroll
+   > div.adm-s2-tscroll__edge (the annotation pin, at the scrolling edge), div.adm-s2-tscroll__box >
+   div.adm-s2-tscroll__vp[role=group][aria-labelledby][tabindex=0] > table.adm-table__t > caption.adm-s2-vh
+   ("... (scroll to see more)"), then span.adm-s2-tscroll__fade--start and --end. The fades follow the wrapper's own
+   scroll position and show only while it can scroll; without scroll-driven animation the end fade is drawn.
+   States: fits (no fade), scrolls (end fade), scrolled (both, then start only). */
+.adm-s2-tscroll { display: flex; flex-direction: column; gap: 0.25rem; min-inline-size: 0; }
+.adm-s2-tscroll__edge { display: flex; justify-content: flex-end; }
+.adm-s2-tscroll__box { position: relative; min-inline-size: 0; timeline-scope: --adm-s2-tx; }
+.adm-s2-tscroll__vp { max-inline-size: 100%; overflow-x: auto; scroll-timeline: --adm-s2-tx inline; }
+.adm-s2-tscroll__vp:focus-visible { outline: 2px solid #1f1f1f; outline-offset: 2px; }
+.adm-s2-tscroll__vp .adm-table__t th,
+.adm-s2-tscroll__vp .adm-table__t td { white-space: nowrap; }
+.adm-s2-tscroll__vp .adm-add--inline { flex-wrap: nowrap; }
+.adm-s2-tscroll__fade { position: absolute; inset-block: 1px; inline-size: 3rem; pointer-events: none; opacity: 0; animation: linear both; animation-timeline: --adm-s2-tx; }
+.adm-s2-tscroll__fade--start { inset-inline-start: 1px; background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0)); animation-name: adm-s2-fade-start; }
+.adm-s2-tscroll__fade--end { inset-inline-end: 1px; background: linear-gradient(to left, #fff, rgba(255, 255, 255, 0)); animation-name: adm-s2-fade-end; }
+@keyframes adm-s2-fade-start { 0% { opacity: 0; } 8%, 100% { opacity: 1; } }
+@keyframes adm-s2-fade-end { 0%, 92% { opacity: 1; } 100% { opacity: 0; } }
+@supports not (animation-timeline: scroll()) { .adm-s2-tscroll__fade--end { opacity: 1; } }
