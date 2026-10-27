@@ -2269,7 +2269,7 @@
       "group_imports": [
         {
           "group": "10-A",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-27",
           "source": "Claude Design, returned as mizzey-batch-10-a-output.zip (SHA-256 6b899a433aaf2a4c365d48c0adbbb4d0af0c74f0c746597ab26e1aa3681ae606, 13 files), from the private package mizzey-batch-10-design-package-v1.1-2026-10-26.zip (SHA-256 25b66f4194df2ab09e7501b57d694610e774fb330463272d1424575e1b9a0fb1, built from d9ec127). Handoff batch-10-a-handoff.md, SHA-256 4158e9a96294ad93531d18f8ffc8fddf2fcabbf97846d4dee3f19ff7a430c5c2, and decision sheet batch-10-a-decision-sheet.md, SHA-256 eb0eda5f68967916aff0748f7afb60ad813c5183f71d7afe2c7dd055c8040524, not committed.",
           "record": "Eleven files imported byte for byte, every hash equal to the handoff: the five 10-A surfaces in English and Arabic and batch-10-a.css (11,636 bytes, 118 rules, every selector scoped by an s2- class). 15 states per language, 30 in all, each in at least one 360 px mobile frame and one 1280 px desktop frame. A review-only import: the five entries are exploration with drawn cells, and their inventory status stays briefed. Nothing is reviewed, accepted or frozen, and no file of batches 01 to 09 and no shared stylesheet changes.",
@@ -2292,17 +2292,26 @@
             "Inherited, as reviewed: the batch-06 back link's -8 px margin under the page heading; the batch-02 card name link (about 20 px tall) and the logo link; the card's two-line name clamp hiding the end of the long names P7 and P19; the batch-03 mobile rail cut at the frame edge; the batch-01 desktop search placeholder truncated at 1024 px; the batch-02 breadcrumb's current item truncated with text spacing; the batch-01 footer address label touching its value at 1024 px with text spacing.",
             "Wireframe conventions, as in batches 04, 05 and 07: controls drawn as span elements with role button and no keyboard focus, which the build replaces with real buttons; the review sheet keeps fixed 360 and 1280 px figures, so it scrolls sideways below about 1360 px."
           ],
-          "open_decisions": "A1 to A11 ruled on 27 October 2026 (owner_rulings); correction round 1 returned and imported. Open: A12 (correction_round_1.new_questions) and acceptance of 10-A. OP-13 and CR-15 stay open.",
+          "open_decisions": "None for 10-A: A1 to A12 ruled (owner_rulings) and the group accepted on 27 October 2026. OP-13 and CR-15 stay open, outside 10-A.",
           "follow_up": [
             "A6: a failed save of the marketing switch (the switch back to its previous state, with an error) is not a state of the inventory. E-SF-9b needs it designed before it is built: add it then as a controlled inventory change.",
             "A7: WordPress's erasure-confirmation email and the page its link opens are customer-facing, in both languages, and are not inventory surfaces. Their language, presentation and whether the link lands on the WordPress login screen are settled with E-SF-9b and the native email configuration (#285).",
             "A7, for the build (E-SF-9b): a WordPress erasure request stays Pending when its confirmation link expires (it is not marked expired), and wp_create_user_request refuses a new request while one for the same address is Pending or Confirmed (duplicate_request; checked in WordPress 6.8 core). The drawn 'ask again' after expiry (the added 360 px default frame) therefore needs defined build handling, for example sending a new confirmation for the existing request, or closing it before creating a new one; the customer uses the same entry either way. It is not native behaviour.",
-            "H: the shared-component correction of the mobile account header (#253), in its own pull request on the owner's authorisation; it changes s1/batch-02/batch-02-targets.css, which every storefront frame links.",
-            "design/wireframes/s2/README.md still says no wireframe exists; it is corrected when 10-A is accepted, not in this review import."
+            "H: the shared-component correction of the mobile account header (#253), in its own pull request on the owner's authorisation; it changes s1/batch-02/batch-02-targets.css, which every storefront frame links."
           ],
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's single review sitting of 10-A, as a draft pull request into documentation/open-batch-10. He ruled A1 to A11 and H on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (3232678) and validated by Claude Code. Open: A12 and his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+            "status": "closed",
+            "date": "2026-10-27",
+            "decided_by": "Mustafa, owner",
+            "record": "The owner reviewed the five 10-A surfaces, imported for his review in PR #406 from one delivery and one controlled correction round, and on 27 October 2026 ruled A12 (left as drawn) and accepted Batch 10-A on the validated correction round 1 at a39b7b0. Merging PR #406 waits for his separate approval. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). All five surfaces stay stage S2 and are built in the second release by their own slices.",
+            "accepted": [
+              "The structural wireframes of the five 10-A surfaces as imported in PR #406: 15 states in English and 15 in Arabic, 43 frames per language, each state in at least one 360 px and one 1280 px frame.",
+              "The 10-A group-only classes in batch-10-a.css as delivered (11,636 bytes, every selector scoped by s2-).",
+              "Rulings A1 to A12 and H as applied; correction round 1 (A7 redrawn, the A4, A5, A6, A8, A10 and A11 notes).",
+              "The inherited findings recorded under exceptions, as reviewed in batches 01 to 07."
+            ],
+            "not_accepted": "Acceptance does not close the inherited Arabic mobile account header at 360 px with text spacing: it stays an open accessibility defect of the shared header, corrected once on #253 under ruling H. The follow-ups stay open: A6 failed save, the A7 confirmation email and page, and the A7 build handling of an expired Pending erasure request (all E-SF-9b).",
+            "not_changed": "10-B stays briefed and is drawn and imported in its own pull request on the owner's separate instruction. The files of batches 01 to 09, the 46 frozen batch-09 files, wireframe.css, components.css and the reviewed stylesheets are unchanged. OP-13, CR-15 and first-release scope are unchanged; every batch-10 surface stays S2."
           },
           "owner_rulings": [
             "A1 (27 October 2026): approved as drawn. Four minimum levels, 4 and up to 1 and up, as one radio group named Rating after Price, in the desktop sidebar and the mobile and tablet drawer, with its chip, Clear all and the page address; the group is not shown when no product in the list is rated.",
@@ -2317,6 +2326,7 @@
             "A10 (27 October 2026): turning marketing email back on follows the consent evidence and confirmation mechanism of registration (AUTH-09, au-register): the consent is recorded against the customer with its time and no separate confirmation step, as registration records it today, so the drawing (effective with the saved notice) stands. If registration later adds a confirmation step (#285, E-SF-9b), the same applies here, and its pending state is a controlled inventory change.",
             "A11 (27 October 2026): out of scope. No withdrawal is drawn; a later request for one goes through Change Control.",
             "H (27 October 2026): the inherited Arabic mobile account header at 360 px with text spacing is corrected once, as a separate controlled shared-component correction (the shared frame stylesheet s1/batch-02/batch-02-targets.css, #253), under its own authorisation and pull request. No frozen file is altered and no 10-A-only workaround is applied.",
+            "A12 (27 October 2026): left as drawn. The Arabic ac-reorder file carries no partial-quantity note; A5 is recorded here and annotated in the English file, and no further Claude Design correction is required.",
             "These are the owner's design decisions on low-fidelity wireframes. They are not client confirmations, change no signed scope, move nothing into the first release and start no implementation (D-14)."
           ],
           "correction_round_1": {
@@ -2342,8 +2352,26 @@
               "The 360 px confirm frame: the 700 px window crops the page behind the bottom sheet, which is one point longer now, as text spacing already did at be85cdc. The sheet and its actions are whole."
             ],
             "new_questions": [
-              "A12 (the handoff), not blocking: the Arabic ac-reorder file has no partial-quantity note to carry 'Ruled (A5)'. In the original delivery the Arabic file gives five of the English notes' places to its right-to-left notes, and this is one of them; the Arabic frames draw the same partial quantity. Drawn: left as it is. Claude Code recommends leaving it: A5 is recorded in owner_rulings and annotated in the English file, the notes are review aids, not interface, and adding the note would take another Claude Design round. Alternative: add the English note, ending 'Ruled (A5)', to the Arabic file in a later controlled round. Owner to rule; nothing changed for it."
+              "A12 (the handoff), not blocking: the Arabic ac-reorder file has no partial-quantity note to carry 'Ruled (A5)'. In the original delivery the Arabic file gives five of the English notes' places to its right-to-left notes, and this is one of them; the Arabic frames draw the same partial quantity. Drawn: left as it is. Claude Code recommends leaving it: A5 is recorded in owner_rulings and annotated in the English file, the notes are review aids, not interface, and adding the note would take another Claude Design round. Alternative: add the English note, ending 'Ruled (A5)', to the Arabic file in a later controlled round. Owner to rule; nothing changed for it. Ruled on 27 October 2026: left as drawn (A12, owner_rulings)."
             ]
+          },
+          "freeze": {
+            "status": "proposed",
+            "date": "2026-10-27",
+            "record": "Proposed with the owner's acceptance of 10-A on 27 October 2026, at the hashes of the eleven 10-A files as accepted: the eight returned in correction round 1 and, as first delivered, the two sf-brand-landing files and batch-10-a.css. None changed at acceptance. It comes into force when the owner approves merging PR #406: the status then moves to in_force in this pull request before the merge. Until then nothing is frozen by this record. 10-B changes none of these files; a later change comes only through a controlled correction the owner approves, such as the shared header correction (#253), which touches no 10-A file. The repository checks do not read freeze records, so this proposed state passes them without any check being bypassed.",
+            "files": {
+              "design/wireframes/s2/batch-10/ac-account-deletion.ar.html": "f725d18376147892802a72aca376ada0a755448d103a3dd52babe5d1be00b30a",
+              "design/wireframes/s2/batch-10/ac-account-deletion.en.html": "a4692e9f839b8663534dd332a8a058d70ded2adfdf001ea7453f003ae4b9aab6",
+              "design/wireframes/s2/batch-10/ac-notification-preferences.ar.html": "21c7da9ef5bcacab152ed0a31b14b683da19be5caa9c94ea73e65286cf26e558",
+              "design/wireframes/s2/batch-10/ac-notification-preferences.en.html": "f8c8ed2e5e6074042a75aae3f0109eb3fda75a9597cad680b1073f3ab6643de5",
+              "design/wireframes/s2/batch-10/ac-reorder.ar.html": "8f53fbf095802d8713c6417c434280afcd53186d0edb1ffff4ae85e5e230bfb7",
+              "design/wireframes/s2/batch-10/ac-reorder.en.html": "1fb77cfe6751e80b385ae0612950aa697aa0619c7df235a1e50b3f6570d488b3",
+              "design/wireframes/s2/batch-10/batch-10-a.css": "8671259d3edbea83a0eebb5f5406af2e7118a3b25ed8f012638be2369dc253b3",
+              "design/wireframes/s2/batch-10/sf-brand-landing.ar.html": "728e873022697249f698eb5356d3b6d349d691bbcb526e36dd74502081660c5a",
+              "design/wireframes/s2/batch-10/sf-brand-landing.en.html": "095c7f6e33b8ef9fa56fa39cbe398f2c92358cf2f145b8e36baa26b52996e3a1",
+              "design/wireframes/s2/batch-10/sf-filter-by-rating.ar.html": "9019d8995385aeb3f9d6a33c4474b8e07f6009a9f030c8794d1e102f737dd9c5",
+              "design/wireframes/s2/batch-10/sf-filter-by-rating.en.html": "3b4400007b821a049df6d827d64abdc9715bff0577e85ef85ea1882780045b9c"
+            }
           }
         }
       ]
@@ -2616,26 +2644,26 @@
       "batch": "batch-10",
       "brief": "design/briefs/sf-filter-by-rating.md",
       "artifacts": ["design/wireframes/s2/batch-10/sf-filter-by-rating.en.html", "design/wireframes/s2/batch-10/sf-filter-by-rating.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "applied", "no_reviews_yet"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-brand-landing",
       "batch": "batch-10",
       "brief": "design/briefs/sf-brand-landing.md",
       "artifacts": ["design/wireframes/s2/batch-10/sf-brand-landing.en.html", "design/wireframes/s2/batch-10/sf-brand-landing.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "long_content"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "sf-search-suggestions",
@@ -3292,39 +3320,39 @@
       "batch": "batch-10",
       "brief": "design/briefs/ac-reorder.md",
       "artifacts": ["design/wireframes/s2/batch-10/ac-reorder.en.html", "design/wireframes/s2/batch-10/ac-reorder.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "available", "item_no_longer_available"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-notification-preferences",
       "batch": "batch-10",
       "brief": "design/briefs/ac-notification-preferences.md",
       "artifacts": ["design/wireframes/s2/batch-10/ac-notification-preferences.en.html", "design/wireframes/s2/batch-10/ac-notification-preferences.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "saved", "all_marketing_off"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-account-deletion",
       "batch": "batch-10",
       "brief": "design/briefs/ac-account-deletion.md",
       "artifacts": ["design/wireframes/s2/batch-10/ac-account-deletion.en.html", "design/wireframes/s2/batch-10/ac-account-deletion.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "request", "confirm", "requested"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "rv-list",

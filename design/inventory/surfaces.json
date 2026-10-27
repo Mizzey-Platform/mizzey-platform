@@ -988,7 +988,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -1031,7 +1031,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -3397,7 +3397,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -3442,7 +3442,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "The first release provides unsubscribe links in emails. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -3487,7 +3487,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "The first release handles this manually on request. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
