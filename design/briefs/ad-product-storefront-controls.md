@@ -148,4 +148,4 @@ Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `rev
 
 ## Note
 
-Related products: the mechanism is open pending D-19. The frame draws WooCommerce's Upsells field as the recommendation and a separate mizzey-site field as the alternative; neither is decided by the 09-C acceptance.
+Related products: D-19 (DQ-10) settles the mechanism, effective when D-19 is merged: WooCommerce's Upsells field, which the frame draws as the recommendation. The separate mizzey-site field drawn as the alternative is superseded and is not built; the Cross-sells field is not used at launch.

@@ -1788,9 +1788,12 @@ The product rail's proposed sources add "newest" and "by badge". OP-12's placeho
 hand-picked. The files of closed batches are not edited; their superseded notes are listed here instead:
 `batch-01/sf-home` traces HOME-02 to MER-02 and lists only manual, collection and category sources (DQ-09 governs);
 `batch-02/sf-product-badges` gives "Expires by itself" as the reason New ranks second (DQ-08: no badge expires).
-`batch-03/sf-pdp-related` (its empty state) and `batch-04/sf-cart` (the suggestions rail) already agree. For 09-C,
-whose correction round is built and not sent, the import records state that the Cross-sells field is not used at
-launch and that `ad-stock-from-erp` displays figures and enforces nothing.
+`batch-03/sf-pdp-related` (its empty state) and `batch-04/sf-cart` (the suggestions rail) already agree. Group 09-C
+was accepted and frozen on 23 October 2026 with the related-products mechanism left open; this decision settles it.
+`ad-product-storefront-controls` draws the Upsells field as the recommendation, which is the mechanism chosen here;
+the separate site field it draws as the alternative is superseded and is not built, and the Cross-sells field is not
+used at launch. `ad-stock-from-erp` displays figures and enforces nothing. The frozen 09-C files are not redrawn for
+this; batch-09's K4 closes on this record when it is merged.
 
 **9. What stays open, and where.** #282: how badges are stored, the label staff see on the Upsells field, where a
 product lands when it joins a collection, and how the featured flag affects prominence. #302: the order of products
