@@ -1609,7 +1609,8 @@
               "design/wireframes/s1/batch-09/ad-catalogue-terms.en.html": "770a1585f1de264cb632e349cb5242132ce0e03860405978a3b94490a6ead414",
               "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "19f98f6219becfc03c249e7e304e9e702967b8bc2a4edf6e65d528998a3586bb",
               "design/wireframes/s1/batch-09/ad-search-synonyms.en.html": "b4c2bf086df1f60df1497e14087be00db3c2769bf5ea1cb801a1a4a9f1da61cf",
-              "design/wireframes/s1/batch-09/batch-09-b.css": "92bd47520b8178e4175d4d17f646c7c4ed3484af61b23e5a232ac6861dec8115"
+              "design/wireframes/s1/batch-09/batch-09-b.css": "92bd47520b8178e4175d4d17f646c7c4ed3484af61b23e5a232ac6861dec8115",
+              "design/wireframes/s1/batch-09/ad-translation-status.en.html": "469f5665be2b246eceb29117eb0b0bfccc6f2d9f483e31ff64b1046e1859de43"
             }
           },
           "review": {
@@ -2408,7 +2409,7 @@
         },
         {
           "group": "10-B",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-27",
           "source": "Claude Design, returned as Mizzey UX decision synthesis (22).zip (SHA-256 99fd0c597bcc70f9fdc305a9593ab22d587f1edb080194e353fc942e57c9c38f, six files under one top-level folder, against the contract's ZIP root) and normalised outside Claude Design as mizzey-batch-10-b-output-normalized.zip (SHA-256 5e49a42c6ec688d9783d6766a54626ca350be98e25690087255473a6e39ec80c, the same six files byte for byte at the root), from the private package mizzey-batch-10-b-design-package-v1.2.zip (SHA-256 efcc53f6ea6460ebc5630aed9dab2930a111dd4b900a0fb04a34ffbf95e43249, built from 754ad2f). Handoff batch-10-b-handoff.md, SHA-256 d291b8fb252f53844566da288ddc58d166b00dbc28b5b073f18a39064a8bab08, and decision sheet batch-10-b-decision-sheet.md, SHA-256 7631db38e8a2e1c30cc794045e524d3fd511fa8f10b419580696fe20b4771533, not committed.",
           "record": "Four files imported byte for byte in 4f490a9, every hash equal to the handoff: the three 10-B surfaces in English and batch-10-b.css (15,497 bytes, every selector scoped by an adm-s2- class, no collision with wireframe.css or batch-09.css, no adm-b- to adm-e- class). 10 states, each in one 1280 px desktop frame, exactly the inventory's. Links wireframe.css, batch-09.css and batch-10-b.css only. Every addition marked ADDED with its own row (ADM-05, ADM-07, ADM-101, ADM-105, NOTF-14). A review-only import: the three entries are exploration with drawn cells, and their inventory status stays briefed. Nothing is reviewed, accepted or frozen, and no batch-09 or 10-A file and no shared stylesheet changes.",
@@ -2423,7 +2424,7 @@
             "The native Customers report (ad-customer-metrics-export:default and empty) is drawn with eight native columns hidden through the table's own column menu (Email, Username, Last active, Date registered, Country / Region, City, Region, Postal code), so the two added columns fit at 1024 px with text spacing. The facility is native in WooCommerce 11.1: the report table's menu \"Choose which values to display\" lists every column except the required Name as a checkbox, and the choice is stored per user (customers_report_columns). It is not the native default: Name, Last active, Date registered, Email, Orders, Total spend, AOV and Country / Region show by default (Username, City, Region and Postal code are hidden by default), and the native table scrolls sideways (overflow-x) when its columns do not fit. Ruled by the owner as B9 on 27 October 2026: the native default columns are drawn, with the native table's own sideways scroll at 1024 px; corrected in correction round 1.",
             "Wireframe conventions, as in batch-09: native context controls at their native size and labelled native; illustrative names, figures and dates, Western digits (DQ-01)."
           ],
-          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings); correction rounds 1 and 2 returned and imported, B10 and B11 closed. Open: acceptance of 10-B. OP-13, CR-15, CR-05 and OD-01 stay open.",
+          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings); correction rounds 1 to 3 returned and imported, B10 and B11 closed; 10-B accepted on 28 October 2026 (review). OP-13, CR-15, CR-05 and OD-01 stay open.",
           "new_questions": [
             "B9 (Claude Code, at import): whether the Customers report is drawn in a per-user column choice (eight native columns, Email included, hidden through the native column menu) or in the native default column set, with the two added columns joining it and the native table scrolling sideways at 1024 px where they do not fit. The first is a reachable native state but not what staff see by default; the second is the platform as it is and needs the owner to accept a native scroll container as an exception to the 10-B check. Ruled on 27 October 2026 (B9, owner_rulings)."
           ],
@@ -2436,8 +2437,28 @@
             "design/wireframes/s2/README.md says 10-B is not drawn yet; it is corrected when 10-B is accepted, not in this review import."
           ],
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's single review sitting of 10-B, as a draft pull request into documentation/open-batch-10. He ruled B1 to B9 on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (8491ee4) and validated by Claude Code. He ruled B10 and B11 the same day; Claude Design returned correction round 2, imported here (18b87ac) and validated by Claude Code, closing both. Open: his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+            "status": "closed",
+            "date": "2026-10-28",
+            "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+            "record": "10-B was imported in PR #407 from one delivery and three controlled correction rounds: round 1 on the owner's rulings B1 to B9, round 2 on B10 and B11, round 3 the four native-fidelity findings of the Codex review (stabilisation part A). Each return was validated by Claude Code and reviewed by Codex. With every owner ruling applied and no finding open, 10-B is accepted and frozen. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). All three surfaces stay stage S2 and are built in the second release by their own slices.",
+            "accepted": [
+              "The structural wireframes of the three 10-B surfaces as imported in PR #407: 10 states, each in one 1280 px desktop frame, English only (ADM-159).",
+              "The 10-B group-only classes in batch-10-b.css as delivered (every selector scoped by adm-s2-).",
+              "Rulings B1 to B11 as applied, and correction rounds 1 to 3.",
+              "The exceptions as recorded, the native table's own sideways scroll at 1024 px (B9) included."
+            ],
+            "not_accepted": "Nothing here adopts a ruling the owner did not make. The follow-ups for the build stay open (B3, B6, B7, B8, B9), with OP-13, CR-15, CR-05 and OD-01."
+          },
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-28",
+            "record": "Frozen on the acceptance of 10-B on 28 October 2026 at these hashes: the three surfaces as returned in correction rounds 2 and 3 and batch-10-b.css as first delivered. A later change comes only through a controlled correction.",
+            "files": {
+              "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html": "021bafe5a58408d0375b0af365431fa355a9dfab18b7b6cd405ac8cf97613f65",
+              "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html": "a7bd2afda224486e711bed5a35d13a28f2777b8d161112e463ec656ec27d0778",
+              "design/wireframes/s2/batch-10/ad-email-template-editor.en.html": "b3d9406c1f97c1599d9fc2f279d5cd52c2d9caaf508b8061fdf0955207be705b",
+              "design/wireframes/s2/batch-10/batch-10-b.css": "0bd68d6f184131b4cfc183ae4357fb1169af0453753b864a19a87fe3e60686cb"
+            }
           },
           "owner_rulings": [
             "B1 (27 October 2026): approved. New and returning customers in their own added block under the native Performance tiles, with the two routes to Analytics Orders filtered by customer type; the native tiles unchanged.",
@@ -2509,11 +2530,28 @@
             ]
           }
         }
-      ]
+      ],
+      "closure": {
+        "status": "accepted",
+        "date": "2026-10-28",
+        "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+        "record": "Both groups are accepted and frozen: 10-A by the owner on 27 October 2026 (PR #406), 10-B on 28 October 2026 (PR #407). All eight contracted second-release surfaces are reviewed: 25 states, 10-A in English and Arabic, 10-B in English. The shared header correction H (#253) reached the 10-A files through batch-02-targets.css (PR #410) and changed none of them. Workflow step 7 is complete. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14)."
+      }
     }
   ],
   "stabilisation": {
-    "status": "returned",
+    "status": "closed",
+    "supplementary_review": {
+      "date": "2026-10-28",
+      "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+      "record": "The seven surfaces the closure preparation reopened or added were reviewed on their imported files (PR #411): em-email-change, ad-translation-status, ac-account-details, ad-customer-notes, ad-shipment-panel, ad-seo-fields and ad-navigation-editor, every inventory state covered in every required language and viewport. They are reviewed. ad-translation-status joins the 09-B freeze; the six batch-09 files corrected in this round carry their new hashes in their groups' freezes (corrected_in_stabilisation). The two design recommendations are recorded as Claude Design's, not as owner rulings: the tracking correction typed by staff from the Shipment record, and the redirect offered after a slug change. The dated batch reviews stay the historical acceptance of their original artefacts. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14)."
+    },
+    "phase_closure": {
+      "date": "2026-10-28",
+      "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+      "record": "The low-fidelity wireframe phase is closed: workflow section 5, steps 3 to 8. Every contracted surface the inventory assigns to a wireframe batch is reviewed in batches 01 to 10, every state in every required language and viewport (tools/design_wireframes.py holds the manifest to the inventory and the files). Step 6, the structural component and interaction system, was stabilised in this round: the shared corrections of part B, the completeness additions of part C, the text corrections of part D and the partial shared-layer consolidation of part E, with the rest of D6 deferred in the residual register. Step 7 closed with batch-10. Step 8, the review of the complete structural UX, rests on the coverage audit of 27 October 2026 (595 delivery rows each accounted for once; the gaps it found were added and are now drawn and reviewed), the targeted Chromium measurements of every storefront frame and the checks of this round. What remains is in residual: build items, fidelity-round items, client and content inputs, and owner input. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). The next step is 9, the brand identity, which waits on the client (OD-01).",
+      "next": "Workflow section 5, step 9: receive and apply the brand identity (OD-01, client). Steps 10 to 13 follow; storefront implementation stays frozen until PRE-03b (D-14)."
+    },
     "date": "2026-10-27",
     "return": {
       "date": "2026-10-28",
@@ -3643,13 +3681,13 @@
       "batch": "batch-06",
       "brief": "design/briefs/ac-account-details.md",
       "artifacts": ["design/wireframes/s1/batch-06/ac-account-details.en.html", "design/wireframes/s1/batch-06/ac-account-details.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default", "validation", "saved", "email_change", "email_change_confirmed", "email_change_link_invalid"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-password",
@@ -3942,26 +3980,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-navigation-editor.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-navigation-editor.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "edit_structure", "nested_levels", "arabic_version", "footer"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-translation-status",
       "batch": "batch-09",
       "brief": "design/briefs/ad-translation-status.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-translation-status.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "missing"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-promo-banner-manager",
@@ -4071,20 +4109,14 @@
       "surface": "ad-dashboard-customers-conversion",
       "batch": "batch-10",
       "brief": "design/briefs/ad-dashboard-customers-conversion.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "empty_range",
-        "date_range"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty_range", "date_range"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-product-edit-additions",
@@ -4208,13 +4240,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-shipment-panel.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-shipment-panel.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error", "tracking_corrected"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-carrier-status-mapping",
@@ -4260,13 +4292,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-customer-notes.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-customer-notes.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list", "added"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-customer-suspend",
@@ -4285,20 +4317,14 @@
       "surface": "ad-customer-metrics-export",
       "batch": "batch-10",
       "brief": "design/briefs/ad-customer-metrics-export.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "empty",
-        "export_ready"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "export_ready"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-promotion-editor",
@@ -4410,13 +4436,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-seo-fields.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-seo-fields.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "defaults", "overridden", "arabic_version", "slug_changed"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-redirect-manager",
@@ -4474,21 +4500,14 @@
       "surface": "ad-email-template-editor",
       "batch": "batch-10",
       "brief": "design/briefs/ad-email-template-editor.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-email-template-editor.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-email-template-editor.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "edit",
-        "arabic_version",
-        "preview"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "edit", "arabic_version", "preview"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "rp-sales",
@@ -4638,13 +4657,13 @@
       "batch": "batch-08",
       "brief": "design/briefs/em-email-change.md",
       "artifacts": ["design/wireframes/s1/batch-08/em-email-change.en.html", "design/wireframes/s1/batch-08/em-email-change.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
       "states_covered": ["default"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "em-staff-native",

@@ -3121,7 +3121,7 @@
       "decisions": [],
       "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ac-password"]
     },
     {
@@ -4155,7 +4155,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-translation-status",
@@ -4193,7 +4193,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-promo-banner-manager",
@@ -4558,7 +4558,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
@@ -4957,7 +4957,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-carrier-status-mapping",
@@ -5117,7 +5117,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "note": "Show the customer's marketing email consent as a read-only line on the staff customer record (US-12-07). NOTF-11 stays accepted by #285; no consent-editing control is added."
     },
     {
@@ -5197,7 +5197,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
@@ -5578,7 +5578,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "reviewed"
     },
     {
       "id": "ad-redirect-manager",
@@ -5778,7 +5778,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
@@ -6259,7 +6259,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent to the new address, in the language the customer used, with a single-use, time-limited link. Email only at launch."
     },
