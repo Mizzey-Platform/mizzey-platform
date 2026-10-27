@@ -36,6 +36,7 @@ Flows it serves: Staff: accounts, search tools and reports (`S06`).
 | Row | Scope | Stage | Accepting PBI |
 |---|---|---|---|
 | `ADM-100` | P1 | S1 | #279 |
+| `NOTF-11` | P1 | S1 | #285 |
 
 **What must not be invented.**
 
@@ -44,7 +45,7 @@ Flows it serves: Staff: accounts, search tools and reports (`S06`).
 
 **Acceptance references.**
 
-- Functional Specification stories that trace these rows: US-19-02.
+- Functional Specification stories that trace these rows: US-19-02, US-12-07.
 
 ## Structure
 
@@ -105,14 +106,18 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `reviewed` |
+| Review status | `wireframed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `reviewed` |
+| English, left to right | `drawn` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `reviewed` |
+| Desktop | `drawn` |
 | States covered | 4 of 4 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
+
+## Note
+
+Show the customer's marketing email consent as a read-only line on the staff customer record (US-12-07). NOTF-11 stays accepted by #285; no consent-editing control is added.

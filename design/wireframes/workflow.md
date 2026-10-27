@@ -171,7 +171,10 @@ baseline drawn in a wireframe is still provisional.
 
 ## 5. After calibration
 
-Steps 1 and 2 are recorded in `manifest.json` and `../inventory/interaction-options.json`. The rest has not started.
+Steps 1 and 2 are recorded. The original first-release batches 01 to 09 were reviewed and closed; closure
+preparation has reopened five surfaces and added two briefed, undrawn surfaces, so steps 3 to 5 have supplementary
+work pending. Step 7 is drawn: 10-A is reviewed and frozen, and 10-B awaits acceptance. Steps 6 and 8 are under way
+in `manifest.json`, `stabilisation`. Steps 9 onward have not started.
 
 1. Lock the selected structural direction.
 2. Resolve the interaction options that review decided.
@@ -202,8 +205,8 @@ together. Every surface stays traceable by its canonical id, and `manifest.json`
 | `batch-05` | Checkout, payment and order received: the checkout and its sections, validation, the stock and ERP failure states, the payment handoff and failure, and the order confirmation | 12 |
 | `batch-06` | Account, orders and tracking: the account screens, order history and detail, tracking, the invoice, and the status timeline and labels | 11 |
 | `batch-07` | Wishlist, reviews, content and trust: the wishlist, recently viewed, the review list and form, and the content, policy, contact and campaign pages | 15 |
-| `batch-08` | Transactional emails and customer messages: the email layout, the eight customer emails, the platform's staff emails, and the store notices | 11 |
-| `batch-09` | Additions to the standard administration, and reports: annotated, not redesigned | 40 |
+| `batch-08` | Transactional emails and customer messages: the email layout, the eight customer emails, the new-address verification, the platform's staff emails, and the store notices | 12 |
+| `batch-09` | Additions to the standard administration, and reports: annotated, not redesigned | 41 |
 | `batch-10` | Contracted second-release surfaces, in their own pass after the first-release system is stable (DQ-04) | 8 |
 
 Eight surfaces are in no batch: the seven provider-hosted interfaces, which are not ours to draw, and the premium

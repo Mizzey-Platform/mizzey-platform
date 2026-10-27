@@ -1307,7 +1307,7 @@
           {"item": "Email-change verification", "surface": null, "refs": ["US-10-05", "#308"], "status": "Required by US-10-05; inventory surface and mechanism undefined. Not drawn."},
           {"item": "Native email configuration", "surface": "em-staff-native", "refs": ["#285"], "status": "Recommended enable and disable table in the handoff; final configuration is the Native coverage decision of #285."},
           {"item": "Authentication link lifetimes", "surface": "em-password-reset, em-passwordless", "refs": ["AUTH-12"], "status": "Single use and time limited; no lifetime is printed until the value is set."},
-          {"item": "Refund reference source", "surface": "em-refund", "refs": ["#306"], "status": "The row is shown only when a valid reference exists and omitted otherwise."},
+          {"item": "Refund reference source", "surface": "em-refund", "refs": ["#293", "#285"], "status": "The row is shown only when a valid reference exists and omitted otherwise."},
           {"item": "Contact-form sender acknowledgement", "surface": null, "refs": ["US-01-07"], "status": "Carried from batch-07 (ISSUED, item 1). No email surface is drawn for it; not an exclusion."},
           {"item": "Native review-request beta", "surface": "em-delivered:with_review_invitation", "refs": ["DQ-06", "D-17"], "status": "WooCommerce 11.1's beta, off by default, sends after a delay to a guest-accessible Review Order page, which conflicts with DQ-06 as revised by D-17. It stays off unless the owner decides otherwise (ISSUED, item 4)."},
           {"item": "Email layout system and implementation mechanism", "surface": "em-shell", "refs": ["#285"], "status": "The drawing is structural; the template mechanism is decided at #285 (ISSUED, item 6)."},
@@ -1330,7 +1330,7 @@
           {"item": "Email-change verification", "refs": ["US-10-05", "#308"], "status": "Open; not decided or approved by this closure. Required by US-10-05; inventory surface and mechanism undefined. Not drawn."},
           {"item": "Native email configuration", "refs": ["#285"], "status": "Open; not decided or approved by this closure. Recommended enable and disable table in the handoff; final configuration is the Native coverage decision of #285."},
           {"item": "Authentication link lifetimes", "refs": ["AUTH-12"], "status": "Open; not decided or approved by this closure. Single use and time limited; no lifetime is printed until the value is set."},
-          {"item": "Refund reference source", "refs": ["#306"], "status": "Open; not decided or approved by this closure. The row is shown only when a valid reference exists and omitted otherwise."},
+          {"item": "Refund reference source", "refs": ["#293", "#285"], "status": "Open; not decided or approved by this closure. The row is shown only when a valid reference exists and omitted otherwise."},
           {"item": "Contact-form sender acknowledgement", "refs": ["US-01-07"], "status": "Open; not decided or approved by this closure. Carried from batch-07 (ISSUED, item 1). No email surface is drawn for it; not an exclusion."},
           {"item": "Native review-request beta", "refs": ["DQ-06", "D-17"], "status": "Open; not decided or approved by this closure. WooCommerce 11.1's beta, off by default, sends after a delay to a guest-accessible Review Order page, which conflicts with DQ-06 as revised by D-17. It stays off unless the owner decides otherwise (ISSUED, item 4)."},
           {"item": "Email layout system and implementation mechanism", "refs": ["#285"], "status": "Open; not decided or approved by this closure. The drawing is structural; the template mechanism is decided at #285 (ISSUED, item 6)."},
@@ -1364,7 +1364,7 @@
             "id": "09-B",
             "name": "Storefront content, catalogue structure and search",
             "role": "The block editor section library, navigation, the promotional banner, brand controls, catalogue terms, manual product order and the search synonym list.",
-            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-catalogue-terms", "ad-manual-product-order", "ad-search-synonyms"],
+            "surfaces": ["ad-section-library", "ad-navigation-editor", "ad-promo-banner-manager", "ad-global-brand-controls", "ad-catalogue-terms", "ad-manual-product-order", "ad-search-synonyms", "ad-translation-status"],
             "state_count": 36,
             "erp_dependent": []
           },
@@ -1404,7 +1404,7 @@
           },
           "annotate_only": {
             "meaning": "The interface belongs to the standard administration, a provider or an existing build. Only the states, the handoff or the extension are annotated. Not redrawn.",
-            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log", "ad-redirect-manager"]
+            "surfaces": ["ad-permission-denied", "sy-staging-marker", "ad-dashboard-sales", "rp-sales", "rp-stock", "ad-two-factor", "ad-missing-page-log", "ad-redirect-manager", "ad-translation-status"]
           },
           "custom": {
             "meaning": "No standard screen exists. A new screen or panel, drawn in the standard administration idiom, never a bespoke administration interface.",
@@ -1412,6 +1412,7 @@
           }
         },
         "treatment_note": "A production classification for drawing effort, derived from each surface's native_baseline and design_freedom. It changes neither, and it adds no capability.",
+        "amendment_note": "On 27 October 2026, ad-translation-status was added to group 09-B's current assignment and the annotate_only treatment for closure preparation. It was not part of the original seven-surface, 36-state 09-B acceptance. The group surface lists show current assignments; state_count keeps the original opening snapshot.",
         "limited_rows": "Twenty-two of the rows these surfaces are drawn for are P1-L, and ten more of their context rows. Register section 1.2 sets out the launch reduction for some (ADM-132 among the drawn rows; SRCH-06, ADM-59 and ADM-60 among the context rows); the rest are drawn to their own row wording through the standard mechanism, and no reduction or extension is inferred. Where a reduction matters to a drawing and is not written, it is raised at review, not resolved in the drawing.",
         "erp": {
           "surfaces": ["ad-product-storefront-controls", "ad-price-stock-history", "ad-stock-from-erp", "ad-order-cancel", "ad-dashboard-stock", "rp-stock"],
@@ -2464,6 +2465,192 @@
       ]
     }
   ],
+  "stabilisation": {
+    "status": "requested",
+    "date": "2026-10-27",
+    "authority": "The owner's instruction of 27 October 2026 to close the wireframe phase (workflow section 5, steps 6 to 8), worked between Claude Code and Codex as an independent reviewer, each checking the other; the owner carries packages to Claude Design and pastes its prompt. This record is no owner acceptance, approves no implementation (D-14), changes no signed scope and is not PRE-03b.",
+    "reviews": [
+      "Codex (gpt-6.1-sol), 27 October 2026, read-only at 4612968: the 10-B review (acceptable with notes: four native-fidelity findings in ad-customer-metrics-export), the coverage audit (595 delivery rows each accounted for once; acceptance outcomes the inventory never listed), the plan review (sound with changes), and the complete-UX preflight over the 22 flows (ready after listed fixes). Every finding adopted here was checked by Claude Code against the specification, the files and the installed WordPress, WooCommerce and WPML sources.",
+      "Claude Code, 27 October 2026, at 4612968: all 655 states then assigned to wireframe batches were drawn in every required language; targeted Chromium measurements covered every storefront frame, with and without the WCAG 1.4.12 override. Closure preparation adds eight required states that remain undrawn (663 required in batches; 679 inventory states in all)."
+    ],
+    "reopened": {
+      "ac-account-details": "US-10-05: the outcome of verifying a new email address is not drawn (states email_change_confirmed and email_change_link_invalid added).",
+      "ad-customer-notes": "US-12-07: the customer's marketing email consent is not visible on the staff customer record (one read-only line is to be added to the existing frames; NOTF-11 stays with #285).",
+      "ad-shipment-panel": "US-18-04: correcting a shipment whose carrier returned a wrong code is not drawn (state tracking_corrected added).",
+      "ad-seo-fields": "US-16-06: the redirect offered when a slug changes is not drawn (state slug_changed added).",
+      "ad-navigation-editor": "Flow S04.5 edits the footer, and no frame shows where (state footer added)."
+    },
+    "added_surfaces": {
+      "em-email-change": "US-10-05 requires the new address to be verified, and no email surface existed (batch-08 pending item 'Email-change verification'). Added to batch-08.",
+      "ad-translation-status": "US-01-03, US-22-06 and US-22-09 require missing translations to be reported, and ad-section-library and ad-navigation-editor say 'Not drawn; raised' (09-B Q2). Added to batch-09, annotate_only, with group 09-B's surfaces."
+    },
+    "package": {
+      "A": "10-B correction round 3, ad-customer-metrics-export only: export_ready shows WordPress 7.1.3's native row actions for a Confirmed request (Download personal data, Complete request; Remove request only as the Next steps link once Completed) and its label 'Send export link'; the expiry note says the file becomes eligible for WordPress's hourly cleanup once older than its lifetime (three days by default, filterable), not deleted at an exact time; empty draws no Download (WooCommerce renders it only when the report has results).",
+      "B": "Shared corrections, NFR-11 and NFR-01: the footer signup field (212 instances under 48 px in 76 storefront files, batch-01 inline and batch-02 onward through s1/batch-02/batch-02-targets.css); the batch-01 link targets about 20 px tall (View all, All brands, Shop all, Shop the offer, both languages); batch-02 Read more and Read less; the Arabic mobile header at 360 px with text spacing, 1 px past its box (ruling H, batch-02-targets.css); sy-404 drawn with the canonical footer (signup and Cookie preferences), as gl-footer requires of every page but the home page.",
+      "C": "Completeness: em-email-change; ac-account-details email_change_confirmed and email_change_link_invalid; ad-translation-status; the consent line in ad-customer-notes; ad-shipment-panel tracking_corrected; ad-seo-fields slug_changed; ad-navigation-editor footer.",
+      "D": "Text only: the superseded DQ-06 note (D-17) in sf-pdp-simple, both languages (sf-pdp-reviews and rv-form already follow D-17 and are left unchanged); the sf-pdp-simple inventory note on added (IX-10 locked); the stale IX-10 'Open' notes in sf-pdp-simple and sf-pdp-variable and the DQ-02 'provisional' notes in sf-pagination (both locked); P-4 in rv-list (and its stale S2 and DQ-04 notes); the Accountant wording in ad-permission-denied (CX-01 closed: the role exists at launch; ROLE-06 as registered); C1 fixture-neutral SKU codes in ad-list-search-additions; the 'Not drawn; raised' notes in ad-section-library, ad-navigation-editor, ad-seo-fields and ad-shipment-panel pointing at the new states and surface.",
+      "E": "D6 stabilisation of the shared layer, as the owner's batch-04 to batch-07 rulings record it: batch-01 to batch-03 onto the shared components, .sm__itd removed, the copied batch-04, batch-06 and batch-07 rules consolidated and fb-modal promoted, measured before and after (identical element geometry), within the 24 KB cap, without removing a rule from any stylesheet a frozen file links. Separable: imported in its own pull request, or not at all if it cannot meet those constraints."
+    },
+    "import_boundaries": "One package, one return: parts A to D at the ZIP root, ruling H alone under h-only/, part E under part-e/, each file whole. Imported byte for byte in separate pull requests: A on #407; H alone (#253, from h-only/); the other B items with C and D as the stabilisation import; E alone (from part-e/). Every frozen batch-09 file a part changes is named in the package, and its freeze record keeps its history and gains the new hash.",
+    "record_only": [
+      "K4 (batch-09 closure): D-19 settles related products as the staff's assignment in the Upsells field, which ad-product-storefront-controls draws; K4 closes with no drawing when D-19 is merged. D-19 item 8 keeps the superseded notes of closed-batch files and lists them; they are not redrawn.",
+      "ac-reorder (10-A, frozen, accepted): the available and item_no_longer_available frames show abridged cart lines (quantity and Remove). The canonical cart is sf-cart, which keeps Move to wishlist (CART-04); nothing in reorder changes it.",
+      "09-B Q1 to Q13 (review of 21 October 2026), dispositions: Q1 interface design (mandatory section fields); Q2's inventory gap is addressed by the briefed ad-translation-status surface (its annotation, review and #311's missing-link reporting gap remain open); Q3, Q4, Q11 and Q12 client, Stage 1; Q5 client, OD-01; Q6 (collection search fields and image, US-03-09), Q7 (category banner source, SSC-04) and Q10 (synonym entries editable) drawn as working defaults, the owner's confirmation open; Q8 build, a WPML setting; Q9 staging, #282; Q13 staging check of WPML in the site editor."
+    ],
+    "residual": [
+      {
+        "item": "A6 failed save of the marketing switch; A7 confirmation email and page; an expired Pending erasure request",
+        "class": "build",
+        "refs": [
+          "E-SF-9b",
+          "#285"
+        ],
+        "note": "Owner rulings of 27 October 2026. Codex would have drawn A6 and annotated A7's page; the rulings stand."
+      },
+      {
+        "item": "ERP-dependent screens",
+        "class": "client input",
+        "refs": [
+          "PRE-09",
+          "ADM-75",
+          "AC-25"
+        ],
+        "note": "Which experiences are Mizzey's and which the ERP's is decided in PRE-09; zero uncovered rows is not proof that those screens are designed."
+      },
+      {
+        "item": "US-05-02 says an add shows the mini cart; IX-02 and IX-10 lock the in-place confirmation",
+        "class": "owner action on the specification",
+        "refs": [
+          "US-05-02",
+          "IX-02",
+          "IX-10"
+        ]
+      },
+      {
+        "item": "Review-invitation consent classification",
+        "class": "owner decision",
+        "refs": [
+          "REV-05",
+          "NOTF-06"
+        ]
+      },
+      {
+        "item": "Contact-form sender acknowledgement",
+        "class": "client clarification",
+        "refs": [
+          "US-01-07"
+        ],
+        "note": "The on-page confirmation is drawn."
+      },
+      {
+        "item": "Native email configuration, layout mechanism, failed-payment baseline, link lifetimes, further editable templates",
+        "class": "build",
+        "refs": [
+          "#285",
+          "#305",
+          "E-NOTF-1b"
+        ]
+      },
+      {
+        "item": "Integration facts to verify on staging",
+        "class": "build",
+        "refs": [
+          "#255",
+          "#283",
+          "#291",
+          "#293",
+          "#287",
+          "#275",
+          "#304"
+        ]
+      },
+      {
+        "item": "Placeholders",
+        "class": "content input",
+        "refs": [
+          "OD-01",
+          "OD-03",
+          "OD-04",
+          "OD-05",
+          "OD-08",
+          "OD-09",
+          "OD-18",
+          "CR-03",
+          "CR-04",
+          "CR-05",
+          "CR-15",
+          "OP-13",
+          "OP-14",
+          "OP-15"
+        ]
+      },
+      {
+        "item": "Arabic digits",
+        "class": "provisional choice",
+        "refs": [
+          "DQ-01"
+        ]
+      },
+      {
+        "item": "Unwritten P1-L reductions",
+        "class": "client clarification",
+        "refs": [
+          "ADM-92",
+          "ADM-93",
+          "SHIP-09",
+          "SHIP-12",
+          "SHIP-13",
+          "SHIP-16",
+          "ADM-04",
+          "ADM-06",
+          "ADM-08",
+          "ADM-111",
+          "RPT-01",
+          "RPT-10",
+          "SSC-28",
+          "ADM-29",
+          "ADM-50",
+          "MKT-14"
+        ]
+      },
+      {
+        "item": "Batch-09 group decisions left to their PBIs (09-C to 09-E open lists)",
+        "class": "build",
+        "note": "As each group's review.open records; unchanged."
+      },
+      {
+        "item": "C2: the ad-redirect-manager validation brief still says 'Loop or duplicate'",
+        "class": "build",
+        "refs": [
+          "#287"
+        ],
+        "note": "Aligned only after #287 confirms the adapter's refusal scope; duplicate-source refusal is not inferred from the brief."
+      },
+      {
+        "item": "09-B D3: the drawn keyboard Move up and Move down on the native category order",
+        "class": "separately gated safeguard",
+        "refs": [
+          "09-B D3"
+        ],
+        "note": "Not an approved build; it creates no implementation authority."
+      },
+      {
+        "item": "Earlier-batch review.deferred items",
+        "class": "carried residuals",
+        "refs": [
+          "#303",
+          "#304",
+          "#305",
+          "#307",
+          "#308",
+          "#309",
+          "#310"
+        ],
+        "note": "Unresolved batch-01 to batch-08 deferred items stay carried unless explicitly superseded: the #308 email-verification and address-book mechanisms, #307 wishlist behaviour, #309 review settings, #310 contact form and campaign handling, and the search, authentication and integration decisions."
+      }
+    ],
+    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. They do not accept the additions requested on 27 October 2026. ac-account-details, ad-customer-notes, ad-shipment-panel, ad-seo-fields and ad-navigation-editor need supplementary review; em-email-change and ad-translation-status remain briefed and undrawn. Existing freezes remain in force until an approved controlled correction is imported."
+  },
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
   "entries": [
     {
@@ -3329,13 +3516,13 @@
       "batch": "batch-06",
       "brief": "design/briefs/ac-account-details.md",
       "artifacts": ["design/wireframes/s1/batch-06/ac-account-details.en.html", "design/wireframes/s1/batch-06/ac-account-details.ar.html"],
-      "en_ltr": "reviewed",
-      "ar_rtl": "reviewed",
-      "mobile": "reviewed",
-      "desktop": "reviewed",
+      "en_ltr": "drawn",
+      "ar_rtl": "drawn",
+      "mobile": "drawn",
+      "desktop": "drawn",
       "states_covered": ["default", "validation", "saved", "email_change"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ac-password",
@@ -3628,13 +3815,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-navigation-editor.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-navigation-editor.en.html"],
-      "en_ltr": "reviewed",
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "reviewed",
+      "desktop": "drawn",
       "states_covered": ["default", "edit_structure", "nested_levels", "arabic_version"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
+    },
+    {
+      "surface": "ad-translation-status",
+      "batch": "batch-09",
+      "brief": "design/briefs/ad-translation-status.md",
+      "artifacts": [],
+      "en_ltr": "not_started",
+      "ar_rtl": "not_applicable",
+      "mobile": "not_applicable",
+      "desktop": "not_started",
+      "states_covered": [],
+      "interaction_pending": [],
+      "review_status": "briefed"
     },
     {
       "surface": "ad-promo-banner-manager",
@@ -3881,13 +4081,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-shipment-panel.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-shipment-panel.en.html"],
-      "en_ltr": "reviewed",
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "reviewed",
+      "desktop": "drawn",
       "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-carrier-status-mapping",
@@ -3933,13 +4133,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-customer-notes.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-customer-notes.en.html"],
-      "en_ltr": "reviewed",
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "reviewed",
+      "desktop": "drawn",
       "states_covered": ["default", "empty", "list", "added"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-customer-suspend",
@@ -4083,13 +4283,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-seo-fields.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-seo-fields.en.html"],
-      "en_ltr": "reviewed",
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "reviewed",
+      "desktop": "drawn",
       "states_covered": ["default", "defaults", "overridden", "arabic_version"],
       "interaction_pending": [],
-      "review_status": "reviewed"
+      "review_status": "wireframed"
     },
     {
       "surface": "ad-redirect-manager",
@@ -4305,6 +4505,19 @@
       "states_covered": ["default", "link"],
       "interaction_pending": [],
       "review_status": "reviewed"
+    },
+    {
+      "surface": "em-email-change",
+      "batch": "batch-08",
+      "brief": "design/briefs/em-email-change.md",
+      "artifacts": [],
+      "en_ltr": "not_started",
+      "ar_rtl": "not_started",
+      "mobile": "not_started",
+      "desktop": "not_started",
+      "states_covered": [],
+      "interaction_pending": [],
+      "review_status": "briefed"
     },
     {
       "surface": "em-staff-native",

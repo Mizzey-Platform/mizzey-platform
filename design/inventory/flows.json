@@ -635,7 +635,7 @@
         {
           "step": "F14.3",
           "what": "Edits profile details or changes the password",
-          "surfaces": ["ac-account-details", "ac-password"],
+          "surfaces": ["ac-account-details", "ac-password", "em-email-change"],
           "register_ids": ["ACCT-02", "ACCT-03"]
         },
         {
@@ -901,7 +901,7 @@
         {
           "step": "S04.3",
           "what": "Edits the Arabic version",
-          "surfaces": ["ad-section-library"],
+          "surfaces": ["ad-section-library", "ad-translation-status"],
           "register_ids": ["SSC-12"]
         },
         {
