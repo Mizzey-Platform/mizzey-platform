@@ -1,27 +1,6 @@
 /* Mizzey batch-05 wireframes: checkout, payment and order received. Loaded after the batch-02, batch-02-targets and batch-03 stylesheets and the shared component layer (../../_shared/components.css). Prototype only; greys, system type. */
-/* Carried verbatim from s1/batch-04/batch-04.css, which batch-05 does not link: the checkout grid, the sticky-summary annotation, au-checkout-entry (.ce, .ce1, .gg) and au-post-order-account (.poa), drawn here as batch-04 drew them, and the line action that cm-coupon's applied code uses (.ln__a). Same declarations, so nothing drawn in batch-04 changes size. */
-.ct{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:48px;align-items:start}
-.ct--n{grid-template-columns:minmax(0,1fr) 336px;gap:32px}
-.ct__l{display:flex;flex-direction:column;gap:16px;min-inline-size:0}
-.stk-s{position:relative;outline:2px dashed #151515;outline-offset:8px}
-.ln__a{position:relative;display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#3a3a3a;white-space:nowrap}
-.okc--s{inline-size:22px;block-size:22px;font-size:11px}
-.vrt{display:inline-block;margin-inline-start:4px;padding:1px 5px;border:1px dashed #9a9a9a;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c;white-space:nowrap;vertical-align:1px}
-.gg{display:flex;align-items:center;justify-content:center;gap:12px;block-size:48px;padding-inline:16px;border:1.5px solid #6b6b6b;border-radius:10px;background:#fff;font-size:14.5px;font-weight:650;color:#151515}
-.gg__m{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border:1.5px dashed #5c5c5c;border-radius:4px;font:700 9px/1 ui-monospace,Menlo,Consolas,monospace}
-.poa{display:flex;flex-direction:column;gap:16px;padding:22px;border:1.5px solid #151515;border-radius:12px;background:#fff}
-.poa--m{padding:18px 16px}
-.ce{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
-.ce--m{grid-template-columns:minmax(0,1fr);gap:12px}
-.ce__o{display:flex;flex-direction:column;gap:12px;padding:22px;border:1.5px solid #d6d6d6;border-radius:12px;background:#fff}
-.ce--m .ce__o{padding:18px 16px}
-.ce__o--p{border-color:#151515}
-.ce__a{display:flex;flex-wrap:wrap;gap:8px}
-.ce__a .btn{flex:1 1 140px}
-.ce1{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 16px;padding:6px 16px;border-radius:10px;background:#f6f6f6;font-size:13.5px}
-.ce1 .lnk{min-block-size:44px}
+/* The rules batch-05 shares with batch-04 (the checkout grid, the sticky-summary annotation, au-checkout-entry .ce, .ce1, .gg, au-post-order-account .poa, the line action .ln__a, the check mark size .okc--s and the annotation tag .vrt) and the tablet gutter (.gtb) are held once in ../../_shared/carried.css, linked before this sheet. */
 /* Batch-05 only. The page: .gtb tablet gutter; .ckm the main column; .cks a numbered section (.cks__h, .cks__n, .cks__s a sub-heading, .cks__c the contact line, .cks__e a section line); .fst a stack of fields, .fg2 a pair of fields side by side; .ckt the page title. */
-.gtb{padding-inline:24px}
 .ckm{gap:24px;padding-block:20px 40px}
 .ct__l.ckm{padding-block:0}
 .cks{display:flex;flex-direction:column;gap:16px;padding-block-start:24px;border-block-start:1px solid #e3e3e3;min-inline-size:0}

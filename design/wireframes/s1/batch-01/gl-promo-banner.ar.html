@@ -263,6 +263,8 @@ code{font-size:11.5px}
 .pr{position:relative;display:flex;justify-content:center;align-items:center;gap:14px;block-size:40px;padding-inline:40px;background:#ececec;font-size:13px;font-weight:600}
 .pr__t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-inline-size:0}
 .pr__l{text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex:none}
+.pr__l{position:relative;z-index:6}
+.pr__l::after{content:"";position:absolute;inset-block:-14px -18px;inset-inline:-8px}
 .pr--m{block-size:52px;padding-inline:16px;font-size:12.5px;gap:12px;justify-content:space-between}
 .pr--m .pr__t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
 .pg[lang="ar"] .pr--m .pr__t{line-height:1.45}
@@ -286,7 +288,7 @@ code{font-size:11.5px}
 <div class="eb">Mizzey · S1 low fidelity · batch-01, global frame, discovery and home · Direction C with A-inspired restraint · Arabic, right to left</div>
 <h1 class="mt"><code style="font-size:22px">gl-promo-banner</code> Promotional banner</h1>
 <p class="ml">A promotion the client creates, schedules and targets to a page. Drawn as a strip in a placeholder position above the header, and as a card inside a page.</p>
-<dl class="mf"><dt>Rows</dt><dd>SSC-09; shaped by HOME-07. Not drawn: HOME-12, ADM-62</dd><dt>States drawn</dt><dd><code>default</code>, <code>active</code>, <code>scheduled_not_started</code>, <code>ended</code>, <code>disabled</code>, <code>long_content</code></dd><dt>Interaction options</dt><dd><code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>CX-06</code>, <code>OD-01</code>, <code>CR-15</code>; open question S8</dd><dt>Viewports</dt><dd>Mobile, 390 and 360; desktop, 1280</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files.</dd></dl>
+<dl class="mf"><dt>Rows</dt><dd>SSC-09; shaped by HOME-07. Not drawn: HOME-12, ADM-62</dd><dt>States drawn</dt><dd><code>default</code>, <code>active</code>, <code>scheduled_not_started</code>, <code>ended</code>, <code>disabled</code>, <code>long_content</code></dd><dt>Interaction options</dt><dd><code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>CX-06</code>, <code>OD-01</code>, <code>CR-15</code>; open question S8</dd><dt>Viewports</dt><dd>Mobile, 390 and 360; desktop, 1280</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files. Stabilisation round (27 October 2026): “Shop the offer” gets a 44 px hit area, as batch-07 gives it, with no visible change (NFR-11).</dd></dl>
 </div>
 <nav class="mn" aria-label="Batch-01 surfaces">
 <div class="seg"><a href="gl-promo-banner.en.html">English, LTR</a><span class="on">Arabic, RTL</span></div>

@@ -74,7 +74,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-CoreX coming-soon mode (from v0.43.0) and WooCommerce's own coming-soon page.
+WooCommerce Site Visibility (its Coming soon mode and page), which owns Coming Soon under the owner's operating policy of 21 October 2026.
 
 ## Open inputs
 

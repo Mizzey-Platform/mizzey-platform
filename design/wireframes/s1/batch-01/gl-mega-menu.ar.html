@@ -74,6 +74,7 @@ code{font-size:11.5px}
 .btn--b{display:flex;inline-size:100%}
 .btn.busy{background:#5c5c5c;border-color:#5c5c5c}
 .lnk{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.lnk::after{content:"";position:absolute;inset-block:calc(50% - 22px);inset-inline:0}
 .chev{display:inline-block;flex:none;inline-size:7px;block-size:7px;border-block-start:1.6px solid currentColor;border-inline-end:1.6px solid currentColor;transform:rotate(45deg)}
 [dir="rtl"] .chev{transform:rotate(-45deg)}
 .chev--down{border-block-start:0;border-block-end:1.6px solid currentColor;margin-block-start:-4px}
@@ -286,7 +287,7 @@ code{font-size:11.5px}
 <div class="eb">Mizzey · S1 low fidelity · batch-01, global frame, discovery and home · Direction C with A-inspired restraint · Arabic, right to left</div>
 <h1 class="mt"><code style="font-size:22px">gl-mega-menu</code> Mega menu</h1>
 <p class="ml">The desktop category navigation behind “All categories”: a two-pane text panel opened by click or tap, driven by the structure the client manages.</p>
-<dl class="mf"><dt>Rows</dt><dd>NAV-07; shaped by SSC-07, IA-03, IA-04, IA-05</dd><dt>States drawn</dt><dd><code>default</code>, <code>closed</code>, <code>open</code>, <code>keyboard_focus</code>, <code>long_content</code>, <code>empty</code></dd><dt>Interaction options</dt><dd><code>IX-05</code> locked and drawn as selected. <code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>CR-15</code>; open question S4</dd><dt>Viewports</dt><dd>Desktop, 1280. Mobile carries the same structure in gl-mobile-nav.</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files.</dd></dl>
+<dl class="mf"><dt>Rows</dt><dd>NAV-07; shaped by SSC-07, IA-03, IA-04, IA-05</dd><dt>States drawn</dt><dd><code>default</code>, <code>closed</code>, <code>open</code>, <code>keyboard_focus</code>, <code>long_content</code>, <code>empty</code></dd><dt>Interaction options</dt><dd><code>IX-05</code> locked and drawn as selected. <code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>CR-15</code>; open question S4</dd><dt>Viewports</dt><dd>Desktop, 1280. Mobile carries the same structure in gl-mobile-nav.</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files. Stabilisation round (27 October 2026): the “Shop all” links get a 44 px hit area, with no visible change (NFR-11).</dd></dl>
 </div>
 <nav class="mn" aria-label="Batch-01 surfaces">
 <div class="seg"><a href="gl-mega-menu.en.html">English, LTR</a><span class="on">Arabic, RTL</span></div>

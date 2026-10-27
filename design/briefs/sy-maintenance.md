@@ -80,7 +80,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-WordPress maintenance mode and the server's own error page.
+CoreX planned maintenance for a planned window, and the hosting provider's own page for emergency maintenance, under the owner's operating policy of 21 October 2026.
 
 ## Open inputs
 
