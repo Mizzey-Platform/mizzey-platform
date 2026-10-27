@@ -4193,7 +4193,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "wireframed"
     },
     {
       "id": "ad-promo-banner-manager",
@@ -6259,7 +6259,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "wireframed",
       "composes": ["em-shell"],
       "note": "Sent to the new address, in the language the customer used, with a single-use, time-limited link. Email only at launch."
     },

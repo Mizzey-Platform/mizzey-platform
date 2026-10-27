@@ -129,7 +129,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
 | Desktop | `drawn` |
-| States covered | 5 of 6 |
+| States covered | 6 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
