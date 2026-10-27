@@ -146,12 +146,24 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertTrue(all(marked[k] == "none" for k, _, _ in f["staff_only"]))
         self.assertEqual(marked[277], "needs design")
 
-    def test_second_release_surfaces_stay_inventoried_and_out_of_the_first_wireframe_pass(self):
+    def test_second_release_surfaces_stay_inventoried_until_the_second_release_batch_opens(self):
         second = [s for s in self.data["surfaces"] if s["stage"] == "S2"]
         self.assertEqual(len(second), 8)
+        manifest = json.loads((ROOT / "design/wireframes/manifest.json").read_text(encoding="utf-8"))
+        batch = next(b for b in manifest["batches"] if b.get("release") == "S2")
+        entries = {e["surface"]: e for e in manifest["entries"]}
+        opening = batch.get("opening")
+        grouped = [sid for g in opening["groups"] for sid in g["surfaces"]] if opening else []
+        if opening:
+            self.assertEqual(sorted(grouped), sorted(s["id"] for s in second))
         for s in second:
             self.assertIn("DQ-04", s["decisions"], s["id"])
-            self.assertEqual(s["status"], "inventoried", s["id"])
+            self.assertEqual(entries[s["id"]]["batch"], batch["id"], s["id"])
+            if opening:
+                self.assertTrue(s.get("purpose"), s["id"])
+                self.assertNotEqual(s["status"], "inventoried", s["id"])
+            else:
+                self.assertEqual(s["status"], "inventoried", s["id"])
 
     def test_building_a_surface_elsewhere_leaves_its_rows_with_their_accepting_pbi(self):
         own = di.owners(self.data["slices"])

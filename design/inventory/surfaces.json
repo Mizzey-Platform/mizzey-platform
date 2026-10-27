@@ -4272,7 +4272,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed",
+      "note": "Related products: the mechanism is open pending D-19. The frame draws WooCommerce's Upsells field as the recommendation and a separate mizzey-site field as the alternative; neither is decided by the 09-C acceptance."
     },
     {
       "id": "ad-catalogue-terms",
@@ -4354,7 +4355,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-stock",
@@ -4394,7 +4395,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-attention",
@@ -4433,7 +4434,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
     },
     {
@@ -4472,7 +4473,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-customers-conversion",
@@ -4551,7 +4552,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
     },
     {
@@ -4592,7 +4593,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-list-search-additions",
@@ -4671,7 +4672,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-status-history",
@@ -4710,7 +4711,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-list-filters",
@@ -4788,7 +4789,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-invoice",
@@ -4828,7 +4829,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-packing-slip",
@@ -4867,7 +4868,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-shipment-panel",
@@ -4902,13 +4903,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The official Bosta integration for WooCommerce.",
-      "design_freedom": "annotate_only",
+      "native_baseline": "The official Bosta integration for WooCommerce: its own pages, order-list columns and order box. One single-order Send to Bosta entry in WooCommerce's Order actions and a read-only shipment record on the order are additions (owner ruling D1, 26 October 2026); whether the installed integration supports a single-order send is verified in #291.",
+      "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-carrier-status-mapping",
@@ -4947,7 +4948,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-cod-reconciliation",
@@ -4987,7 +4988,7 @@
       "decisions": ["DQ-05"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-refund-record",
@@ -5022,13 +5023,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The standard WooCommerce refund panel.",
-      "design_freedom": "annotate_only",
+      "native_baseline": "The standard WooCommerce refund panel. Capturing the refund's payment reference, where the panel does not provide it, is the addition (owner ruling D2, 26 October 2026): a reference the gateway returns is shown, a manual refund's reference is entered by staff; Paymob's behaviour is verified in #293.",
+      "design_freedom": "constrained",
       "open_items": ["CX-01"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-customer-notes",
@@ -5192,7 +5193,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-launch-rules-settings",
@@ -5233,7 +5234,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-manual-product-order",
@@ -5447,7 +5448,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-permission-denied",
@@ -5526,7 +5527,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-redirect-manager",
@@ -5561,8 +5562,8 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own redirect screens (Tools › Redirection), the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling R1, 21 October 2026, applied at the batch-09 closure on 26 October 2026). The refusal of a loop or a missing internal target is a thin Mizzey adapter on its own validation filter, not proven until tested at build under #287.",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
@@ -5601,13 +5602,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own 404 log, the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling F1, 21 October 2026).",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-seo-site-settings",
@@ -5646,7 +5647,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ad-stock-from-erp",
@@ -5685,7 +5686,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "per PRE-09",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
     },
     {
@@ -5767,7 +5768,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "rp-stock",
@@ -5808,7 +5809,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "em-shell",
