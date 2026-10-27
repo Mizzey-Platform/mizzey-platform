@@ -1,8 +1,6 @@
-/* Mizzey batch-08: transactional emails and customer messages. Prototype only; greys, system type. Loaded after ../../_shared/components.css. The email blocks themselves are cn-email-block in components.css; this sheet holds the review device around them and the rules carried from sheets batch-08 does not link. */
-/* Carried verbatim from s1/batch-07/batch-07.css (first in s1/batch-06/batch-06.css), which batch-08 does not link: the tablet gutter (.gtb), the text for assistive technology only (.vh), the annotation tag (.vrt), the value slot (.ivp), the leaves-the-store mark (.odx__e). Same declarations, so nothing drawn earlier changes size. */
-.gtb{padding-inline:24px}
+/* Mizzey batch-08: transactional emails and customer messages. Prototype only; greys, system type. Loaded after ../../_shared/components.css. The email blocks themselves are cn-email-block in components.css; this sheet holds the review device around them and the rules carried from sheets batch-08 does not link; those shared with batch-04 and batch-05 are in ../../_shared/carried.css. */
+/* Carried verbatim from s1/batch-07/batch-07.css (first in s1/batch-06/batch-06.css), which batch-08 does not link: the text for assistive technology only (.vh), the value slot (.ivp), the leaves-the-store mark (.odx__e). Same declarations, so nothing drawn earlier changes size. The tablet gutter (.gtb) and the annotation tag (.vrt) are held in ../../_shared/carried.css. */
 .vh{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.vrt{display:inline-block;margin-inline-start:4px;padding:1px 5px;border:1px dashed #9a9a9a;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c;white-space:nowrap;vertical-align:1px}
 .ivp{display:inline-block;max-inline-size:100%;overflow-wrap:anywhere;padding:1px 6px;border:1px dashed #9a9a9a;border-radius:4px;font:500 11px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
 .odx__e{flex:none;inline-size:11px;block-size:11px;border:1.5px solid currentColor;border-radius:2px;box-shadow:3px -3px 0 -1px #fff,3px -3px 0 0 currentColor}
 /* The email as it is read in a client. A review device, not part of the message: .xc the labelled client bar (sender, recipient, subject, preview text; .xc__r a row, .xc__k its label, .xc__s the subject, .xc__v the preview); .xp the desktop client pane, .xp__c the area around the 600 px message column. */
@@ -22,11 +20,7 @@
 /* sy-store-notices drawn in place: .np the page column under the storefront header, the notice first in it; .np--d the desktop column. */
 .np{display:flex;flex-direction:column;gap:16px;padding-block:20px 28px;min-inline-size:0}
 .np--d{max-inline-size:760px;padding-block:28px 36px}
-/* Carried verbatim from s1/batch-04/batch-04.css, which batch-08 does not link: the removed-line confirmation of sf-cart:item_removed (.ln--gone, its check mark size .okc--s) and the 44 px line action (.ln__a), for sy-store-notices:with_undo. The check mark .okc itself is batch-03's, linked. Same declarations. */
-.ln__a{position:relative;display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#3a3a3a;white-space:nowrap}
-.ln--gone{display:flex;align-items:center;gap:10px;min-block-size:64px;padding-block:12px;border-block-end:1px solid #e3e3e3;font-size:13.5px}
-.ln--gone:focus,.ln--gone.is-focus{outline-offset:-3px}
-.okc--s{inline-size:22px;block-size:22px;font-size:11px}
+/* The rules carried from s1/batch-04/batch-04.css for sy-store-notices:with_undo (.ln--gone, .okc--s, .ln__a) are held once in ../../_shared/carried.css. The check mark .okc itself is batch-03's, linked. */
 /* The review page around the frames of em-email-change (stabilisation round, 27 October 2026), which carries no inline sheet: the inline review sheet the other batch-08 files carry, verbatim, scoped to body.rpg with :where() so its specificity and its place in the cascade are those of the inline sheet. No other file uses .rpg. */
 body:where(.rpg){padding:32px 40px 120px}
 :where(.rpg) .wf-meta{display:flex;flex-direction:column;gap:14px;max-inline-size:1280px;margin-block-end:48px;padding:22px 26px}
