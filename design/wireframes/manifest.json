@@ -2373,6 +2373,37 @@
               "design/wireframes/s2/batch-10/sf-filter-by-rating.en.html": "3b4400007b821a049df6d827d64abdc9715bff0577e85ef85ea1882780045b9c"
             }
           }
+        },
+        {
+          "group": "10-B",
+          "status": "awaiting_owner_review",
+          "date": "2026-10-27",
+          "source": "Claude Design, returned as Mizzey UX decision synthesis (22).zip (SHA-256 99fd0c597bcc70f9fdc305a9593ab22d587f1edb080194e353fc942e57c9c38f, six files under one top-level folder, against the contract's ZIP root) and normalised outside Claude Design as mizzey-batch-10-b-output-normalized.zip (SHA-256 5e49a42c6ec688d9783d6766a54626ca350be98e25690087255473a6e39ec80c, the same six files byte for byte at the root), from the private package mizzey-batch-10-b-design-package-v1.2.zip (SHA-256 efcc53f6ea6460ebc5630aed9dab2930a111dd4b900a0fb04a34ffbf95e43249, built from 754ad2f). Handoff batch-10-b-handoff.md, SHA-256 d291b8fb252f53844566da288ddc58d166b00dbc28b5b073f18a39064a8bab08, and decision sheet batch-10-b-decision-sheet.md, SHA-256 7631db38e8a2e1c30cc794045e524d3fd511fa8f10b419580696fe20b4771533, not committed.",
+          "record": "Four files imported byte for byte in 4f490a9, every hash equal to the handoff: the three 10-B surfaces in English and batch-10-b.css (15,497 bytes, every selector scoped by an adm-s2- class, no collision with wireframe.css or batch-09.css, no adm-b- to adm-e- class). 10 states, each in one 1280 px desktop frame, exactly the inventory's. Links wireframe.css, batch-09.css and batch-10-b.css only. Every addition marked ADDED with its own row (ADM-05, ADM-07, ADM-101, ADM-105, NOTF-14). A review-only import: the three entries are exploration with drawn cells, and their inventory status stays briefed. Nothing is reviewed, accepted or frozen, and no batch-09 or 10-A file and no shared stylesheet changes.",
+          "delivered": {
+            "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html": "021bafe5a58408d0375b0af365431fa355a9dfab18b7b6cd405ac8cf97613f65",
+            "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html": "020886e7dd131bc620bb4fadfdebd3701f1c7bf5e018c8dbf1ad73fbb6fa4bd2",
+            "design/wireframes/s2/batch-10/ad-email-template-editor.en.html": "b21c11754856b21a524baa5fc0093a237359be9d2b28d6d799dabcc0efefa555",
+            "design/wireframes/s2/batch-10/batch-10-b.css": "6434e08a7f1fbffdde9d4e280ffd3ca7eb08e3905cbd637946ebfc20a55d99c8"
+          },
+          "measurements": "Independent, by Claude Code on 27 October 2026: Chromium through Playwright over file addresses, every frame at 1024 and 1280 px, with and without the WCAG 1.4.12 text-spacing override. No element escapes a frame, nothing is clipped, no scroll container, no overlap. Targets per ADMIN-BASELINE section 4: every link in an addition at least 24 px, every button, field and select in an addition at least 40 px; native context drawn at native size. The inline ADDED tags stay on one line inside their cells (adm-s2-tagnw); no code, date or amount splits; no table or cell overflows. The keyboard reaches every focusable element of the three files in document order with a visible focus. checks/text-check.js: nothing found in each file. tools/design_wireframes.py reports 0 problems with the import registered.",
+          "exceptions": [
+            "The native Customers report (ad-customer-metrics-export:default and empty) is drawn with eight native columns hidden through the table's own column menu (Email, Username, Last active, Date registered, Country / Region, City, Region, Postal code), so the two added columns fit at 1024 px with text spacing. The facility is native in WooCommerce 11.1: the report table's menu \"Choose which values to display\" lists every column except the required Name as a checkbox, and the choice is stored per user (customers_report_columns). It is not the native default: Name, Last active, Date registered, Email, Orders, Total spend, AOV and Country / Region show by default (Username, City, Region and Postal code are hidden by default), and the native table scrolls sideways (overflow-x) when its columns do not fit. Raised for the owner as B9; not settled by this import.",
+            "Wireframe conventions, as in batch-09: native context controls at their native size and labelled native; illustrative names, figures and dates, Western digits (DQ-01)."
+          ],
+          "open_decisions": "B1 to B8 of the decision sheet are unruled, and B9, raised by Claude Code at import (the Customers report's column set), is open. OP-13, CR-15, CR-05 and OD-01 stay open.",
+          "new_questions": [
+            "B9 (Claude Code, at import): whether the Customers report is drawn in a per-user column choice (eight native columns, Email included, hidden through the native column menu) or in the native default column set, with the two added columns joining it and the native table scrolling sideways at 1024 px where they do not fit. The first is a reachable native state but not what staff see by default; the second is the platform as it is and needs the owner to accept a native scroll container as an exception to the 10-B check."
+          ],
+          "follow_up": [
+            "B7, for the build (E-NOTF-1b): WooCommerce's email placeholders offer no first name, while its own templates greet by the billing first name (\"Hi %s,\") and the reviewed batch-08 wording does the same (\"Thanks, Nour.\"). The editable body must keep that greeting or the owner must rule that it changes.",
+            "B6, with #285: which native customer emails are enabled at launch (Order on-hold, Customer note and Order details were not drawn in batch-08) decides which emails NOTF-14's editing must cover.",
+            "design/wireframes/s2/README.md says 10-B is not drawn yet; it is corrected when 10-B is accepted, not in this review import."
+          ],
+          "review": {
+            "status": "open",
+            "record": "Imported for the owner's single review sitting of 10-B, as a draft pull request into documentation/open-batch-10. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+          }
         }
       ]
     }
@@ -3657,14 +3688,20 @@
       "surface": "ad-dashboard-customers-conversion",
       "batch": "batch-10",
       "brief": "design/briefs/ad-dashboard-customers-conversion.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": [
+        "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html"
+      ],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": [
+        "default",
+        "empty_range",
+        "date_range"
+      ],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "ad-product-edit-additions",
@@ -3865,14 +3902,20 @@
       "surface": "ad-customer-metrics-export",
       "batch": "batch-10",
       "brief": "design/briefs/ad-customer-metrics-export.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": [
+        "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html"
+      ],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": [
+        "default",
+        "empty",
+        "export_ready"
+      ],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "ad-promotion-editor",
@@ -4048,14 +4091,21 @@
       "surface": "ad-email-template-editor",
       "batch": "batch-10",
       "brief": "design/briefs/ad-email-template-editor.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": [
+        "design/wireframes/s2/batch-10/ad-email-template-editor.en.html"
+      ],
+      "en_ltr": "drawn",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "drawn",
+      "states_covered": [
+        "default",
+        "edit",
+        "arabic_version",
+        "preview"
+      ],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "exploration"
     },
     {
       "surface": "rp-sales",
