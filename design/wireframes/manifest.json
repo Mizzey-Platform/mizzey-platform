@@ -2303,7 +2303,7 @@
             "status": "closed",
             "date": "2026-10-27",
             "decided_by": "Mustafa, owner",
-            "record": "The owner reviewed the five 10-A surfaces, imported for his review in PR #406 from one delivery and one controlled correction round, and on 27 October 2026 ruled A12 (left as drawn) and accepted Batch 10-A on the validated correction round 1 at a39b7b0. Merging PR #406 waits for his separate approval. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). All five surfaces stay stage S2 and are built in the second release by their own slices.",
+            "record": "The owner reviewed the five 10-A surfaces, imported for his review in PR #406 from one delivery and one controlled correction round, and on 27 October 2026 ruled A12 (left as drawn) and accepted Batch 10-A on the validated correction round 1 at a39b7b0. He approved merging PR #406 on 27 October 2026, and the freeze is in force. This is the owner's structural acceptance of low-fidelity wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). All five surfaces stay stage S2 and are built in the second release by their own slices.",
             "accepted": [
               "The structural wireframes of the five 10-A surfaces as imported in PR #406: 15 states in English and 15 in Arabic, 43 frames per language, each state in at least one 360 px and one 1280 px frame.",
               "The 10-A group-only classes in batch-10-a.css as delivered (11,636 bytes, every selector scoped by s2-).",
@@ -2356,9 +2356,9 @@
             ]
           },
           "freeze": {
-            "status": "proposed",
+            "status": "in_force",
             "date": "2026-10-27",
-            "record": "Proposed with the owner's acceptance of 10-A on 27 October 2026, at the hashes of the eleven 10-A files as accepted: the eight returned in correction round 1 and, as first delivered, the two sf-brand-landing files and batch-10-a.css. None changed at acceptance. It comes into force when the owner approves merging PR #406: the status then moves to in_force in this pull request before the merge. Until then nothing is frozen by this record. 10-B changes none of these files; a later change comes only through a controlled correction the owner approves, such as the shared header correction (#253), which touches no 10-A file. The repository checks do not read freeze records, so this proposed state passes them without any check being bypassed.",
+            "record": "Frozen by the owner's acceptance of 10-A on 27 October 2026, in force on his approval of the same day to merge PR #406 into documentation/open-batch-10. Proposed in the acceptance commit (e97b9be) at these hashes, unchanged: the eight files returned in correction round 1 and, as first delivered, the two sf-brand-landing files and batch-10-a.css. 10-B changes none of these files; a group output that differs from a hash here is rejected. A later change comes only through a controlled correction the owner approves, such as the shared header correction (#253), which touches no 10-A file.",
             "files": {
               "design/wireframes/s2/batch-10/ac-account-deletion.ar.html": "f725d18376147892802a72aca376ada0a755448d103a3dd52babe5d1be00b30a",
               "design/wireframes/s2/batch-10/ac-account-deletion.en.html": "a4692e9f839b8663534dd332a8a058d70ded2adfdf001ea7453f003ae4b9aab6",
