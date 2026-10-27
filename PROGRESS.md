@@ -371,8 +371,8 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    review in its own pull request (PR #406); he ruled A1 to A12 on 27 October 2026 and, after one correction
    round, accepted 10-A the same day: its five surfaces are reviewed and its eleven files frozen (in force on his
    merge approval). Claude Design drew 10-B, imported for his review in its own draft pull request (PR #407);
-   he ruled B1 to B9 on 27 October 2026, and Claude Design corrects two of its surfaces before he decides on
-   acceptance.
+   he ruled B1 to B9 on 27 October 2026, and Claude Design returned correction round 1 the same day, imported
+   to that pull request. B10, B11 and his acceptance decision are open.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
