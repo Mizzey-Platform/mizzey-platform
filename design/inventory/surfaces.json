@@ -4187,7 +4187,7 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WPML 4.9.7 Translation Management's Translation Dashboard (pages, products and navigation menus, filtered by Not translated or needs updating) and WPML String Translation 3.5.4 (interface text, filtered by Translation needed). A link removed only from an independently edited Arabic menu is not detected natively: open with #311.",
+      "native_baseline": "WPML 4.9.7 Translation Dashboard for translatable pages, products and navigation records (wp_navigation), filtered by Not completed (untranslated, needing an update, needing review or in progress), with Needs updating also available on its own; WPML String Translation 3.5.4's Translation needed filter for interface text. A link removed only from an independently edited Arabic menu is not detected natively: open with #311.",
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
@@ -5117,7 +5117,8 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "wireframed"
+      "status": "wireframed",
+      "note": "Show the customer's marketing email consent as a read-only line on the staff customer record (US-12-07). NOTF-11 stays accepted by #285; no consent-editing control is added."
     },
     {
       "id": "ad-customer-suspend",

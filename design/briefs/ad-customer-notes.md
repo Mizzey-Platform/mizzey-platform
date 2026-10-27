@@ -117,3 +117,7 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 | Calibration frames | None |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.
+
+## Note
+
+Show the customer's marketing email consent as a read-only line on the staff customer record (US-12-07). NOTF-11 stays accepted by #285; no consent-editing control is added.

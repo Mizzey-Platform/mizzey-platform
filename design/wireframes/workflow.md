@@ -171,7 +171,10 @@ baseline drawn in a wireframe is still provisional.
 
 ## 5. After calibration
 
-Steps 1 to 5 and 7 are done: batches 01 to 09 are reviewed and closed and batch-10 is drawn, recorded in `manifest.json` and `../inventory/interaction-options.json`. Steps 6 and 8 are under way in `manifest.json`, `stabilisation`. Steps 9 onward have not started.
+Steps 1 and 2 are recorded. The original first-release batches 01 to 09 were reviewed and closed; closure
+preparation has reopened five surfaces and added two briefed, undrawn surfaces, so steps 3 to 5 have supplementary
+work pending. Step 7 is drawn: 10-A is reviewed and frozen, and 10-B awaits acceptance. Steps 6 and 8 are under way
+in `manifest.json`, `stabilisation`. Steps 9 onward have not started.
 
 1. Lock the selected structural direction.
 2. Resolve the interaction options that review decided.

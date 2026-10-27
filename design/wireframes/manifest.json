@@ -1412,6 +1412,7 @@
           }
         },
         "treatment_note": "A production classification for drawing effort, derived from each surface's native_baseline and design_freedom. It changes neither, and it adds no capability.",
+        "amendment_note": "On 27 October 2026, ad-translation-status was added to group 09-B's current assignment and the annotate_only treatment for closure preparation. It was not part of the original seven-surface, 36-state 09-B acceptance. The group surface lists show current assignments; state_count keeps the original opening snapshot.",
         "limited_rows": "Twenty-two of the rows these surfaces are drawn for are P1-L, and ten more of their context rows. Register section 1.2 sets out the launch reduction for some (ADM-132 among the drawn rows; SRCH-06, ADM-59 and ADM-60 among the context rows); the rest are drawn to their own row wording through the standard mechanism, and no reduction or extension is inferred. Where a reduction matters to a drawing and is not written, it is raised at review, not resolved in the drawing.",
         "erp": {
           "surfaces": ["ad-product-storefront-controls", "ad-price-stock-history", "ad-stock-from-erp", "ad-order-cancel", "ad-dashboard-stock", "rp-stock"],
@@ -2470,11 +2471,11 @@
     "authority": "The owner's instruction of 27 October 2026 to close the wireframe phase (workflow section 5, steps 6 to 8), worked between Claude Code and Codex as an independent reviewer, each checking the other; the owner carries packages to Claude Design and pastes its prompt. This record is no owner acceptance, approves no implementation (D-14), changes no signed scope and is not PRE-03b.",
     "reviews": [
       "Codex (gpt-6.1-sol), 27 October 2026, read-only at 4612968: the 10-B review (acceptable with notes: four native-fidelity findings in ad-customer-metrics-export), the coverage audit (595 delivery rows each accounted for once; acceptance outcomes the inventory never listed), the plan review (sound with changes), and the complete-UX preflight over the 22 flows (ready after listed fixes). Every finding adopted here was checked by Claude Code against the specification, the files and the installed WordPress, WooCommerce and WPML sources.",
-      "Claude Code, the same day: all 655 inventory states drawn in every required language; a targeted Chromium measurement of every storefront file at its frames' widths, with and without the WCAG 1.4.12 override."
+      "Claude Code, 27 October 2026, at 4612968: all 655 states then assigned to wireframe batches were drawn in every required language; targeted Chromium measurements covered every storefront frame, with and without the WCAG 1.4.12 override. Closure preparation adds eight required states that remain undrawn (663 required in batches; 679 inventory states in all)."
     ],
     "reopened": {
       "ac-account-details": "US-10-05: the outcome of verifying a new email address is not drawn (states email_change_confirmed and email_change_link_invalid added).",
-      "ad-customer-notes": "US-12-07: the customer's marketing email consent is not visible on the staff customer record (one read-only line added to the existing frames; NOTF-11 stays with #285).",
+      "ad-customer-notes": "US-12-07: the customer's marketing email consent is not visible on the staff customer record (one read-only line is to be added to the existing frames; NOTF-11 stays with #285).",
       "ad-shipment-panel": "US-18-04: correcting a shipment whose carrier returned a wrong code is not drawn (state tracking_corrected added).",
       "ad-seo-fields": "US-16-06: the redirect offered when a slug changes is not drawn (state slug_changed added).",
       "ad-navigation-editor": "Flow S04.5 edits the footer, and no frame shows where (state footer added)."
@@ -2494,7 +2495,7 @@
     "record_only": [
       "K4 (batch-09 closure): D-19 settles related products as the staff's assignment in the Upsells field, which ad-product-storefront-controls draws; K4 closes with no drawing when D-19 is merged. D-19 item 8 keeps the superseded notes of closed-batch files and lists them; they are not redrawn.",
       "ac-reorder (10-A, frozen, accepted): the available and item_no_longer_available frames show abridged cart lines (quantity and Remove). The canonical cart is sf-cart, which keeps Move to wishlist (CART-04); nothing in reorder changes it.",
-      "09-B Q1 to Q13 (review of 21 October 2026), dispositions: Q1 interface design (mandatory section fields); Q2 resolved by ad-translation-status; Q3, Q4, Q11 and Q12 client, Stage 1; Q5 client, OD-01; Q6 (collection search fields and image, US-03-09), Q7 (category banner source, SSC-04) and Q10 (synonym entries editable) drawn as working defaults, the owner's confirmation open; Q8 build, a WPML setting; Q9 staging, #282; Q13 staging check of WPML in the site editor."
+      "09-B Q1 to Q13 (review of 21 October 2026), dispositions: Q1 interface design (mandatory section fields); Q2's inventory gap is addressed by the briefed ad-translation-status surface (its annotation, review and #311's missing-link reporting gap remain open); Q3, Q4, Q11 and Q12 client, Stage 1; Q5 client, OD-01; Q6 (collection search fields and image, US-03-09), Q7 (category banner source, SSC-04) and Q10 (synonym entries editable) drawn as working defaults, the owner's confirmation open; Q8 build, a WPML setting; Q9 staging, #282; Q13 staging check of WPML in the site editor."
     ],
     "residual": [
       {
@@ -2616,8 +2617,39 @@
         "item": "Batch-09 group decisions left to their PBIs (09-C to 09-E open lists)",
         "class": "build",
         "note": "As each group's review.open records; unchanged."
+      },
+      {
+        "item": "C2: the ad-redirect-manager validation brief still says 'Loop or duplicate'",
+        "class": "build",
+        "refs": [
+          "#287"
+        ],
+        "note": "Aligned only after #287 confirms the adapter's refusal scope; duplicate-source refusal is not inferred from the brief."
+      },
+      {
+        "item": "09-B D3: the drawn keyboard Move up and Move down on the native category order",
+        "class": "separately gated safeguard",
+        "refs": [
+          "09-B D3"
+        ],
+        "note": "Not an approved build; it creates no implementation authority."
+      },
+      {
+        "item": "Earlier-batch review.deferred items",
+        "class": "carried residuals",
+        "refs": [
+          "#303",
+          "#304",
+          "#305",
+          "#307",
+          "#308",
+          "#309",
+          "#310"
+        ],
+        "note": "Unresolved batch-01 to batch-08 deferred items stay carried unless explicitly superseded: the #308 email-verification and address-book mechanisms, #307 wishlist behaviour, #309 review settings, #310 contact form and campaign handling, and the search, authentication and integration decisions."
       }
-    ]
+    ],
+    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. They do not accept the additions requested on 27 October 2026. ac-account-details, ad-customer-notes, ad-shipment-panel, ad-seo-fields and ad-navigation-editor need supplementary review; em-email-change and ad-translation-status remain briefed and undrawn. Existing freezes remain in force until an approved controlled correction is imported."
   },
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
   "entries": [

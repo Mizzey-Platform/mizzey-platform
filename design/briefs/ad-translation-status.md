@@ -84,7 +84,7 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-WPML 4.9.7 Translation Management's Translation Dashboard (pages, products and navigation menus, filtered by Not translated or needs updating) and WPML String Translation 3.5.4 (interface text, filtered by Translation needed). A link removed only from an independently edited Arabic menu is not detected natively: open with #311.
+WPML 4.9.7 Translation Dashboard for translatable pages, products and navigation records (wp_navigation), filtered by Not completed (untranslated, needing an update, needing review or in progress), with Needs updating also available on its own; WPML String Translation 3.5.4's Translation needed filter for interface text. A link removed only from an independently edited Arabic menu is not detected natively: open with #311.
 
 ## Open inputs
 
