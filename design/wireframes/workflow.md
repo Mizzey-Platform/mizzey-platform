@@ -171,10 +171,9 @@ baseline drawn in a wireframe is still provisional.
 
 ## 5. After calibration
 
-Steps 1 and 2 are recorded. The original first-release batches 01 to 09 were reviewed and closed; closure
-preparation has reopened five surfaces and added two briefed, undrawn surfaces, so steps 3 to 5 have supplementary
-work pending. Step 7 is drawn: 10-A is reviewed and frozen, and 10-B awaits acceptance. Steps 6 and 8 are under way
-in `manifest.json`, `stabilisation`. Steps 9 onward have not started.
+Steps 1 to 8 are done: the low-fidelity wireframe phase closed on 28 October 2026 (`manifest.json`,
+`stabilisation.phase_closure`), with what remains in `stabilisation.residual`. Steps 9 onward have not started;
+step 9 waits on the client (OD-01).
 
 1. Lock the selected structural direction.
 2. Resolve the interaction options that review decided.

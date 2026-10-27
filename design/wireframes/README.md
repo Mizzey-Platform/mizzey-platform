@@ -88,8 +88,9 @@ inline validation, the notices, the coupon entry and the order summary with its 
 the condensed checkout header, the text area and the address card, and, from batch-06, the order status label and
 timeline, and, from batch-07, the star rating input and the review item, and, from batch-08, the email block. Each block is
 headed with its id from `design/inventory/components.json`. The owner set it up at the batch-04 review (D6, 20
-October 2026). Batch-04 links it, batch-05 onward link it and add shared components to it, and batch-01 to
-batch-03 move onto it at stabilisation. Like `wireframe.css`, it is greys only, with no brand token and no final
+October 2026). Batch-04 links it, batch-05 onward link it and add shared components to it, and the planned
+batch-01 to batch-03 migration remains deferred in `stabilisation.residual`. Stabilisation added
+`_shared/carried.css` for the unchanged rules shared by batches 04, 05 and 08. Like `wireframe.css`, it is greys only, with no brand token and no final
 value, and it is not the design system.
 
 ## What every wireframe file declares
