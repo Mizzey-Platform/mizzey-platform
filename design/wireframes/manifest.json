@@ -2460,14 +2460,39 @@
               "B10",
               "B11"
             ]
+          },
+          "correction_round_3": {
+            "status": "returned",
+            "date": "2026-10-27",
+            "scope": "Stabilisation part A: the four native-fidelity findings of the Codex 10-B review, in ad-customer-metrics-export only. No state, frame, control, note or class added; batch-10-b.css and the other two 10-B files unchanged.",
+            "returned": "2026-10-28",
+            "source": "Claude Design, part A of mizzey-wireframe-stabilisation-output.zip (SHA-256 30894784651e6c36863209c5962590b7c81bf99896a4e8bfc8d55db675e05300, 120 files: parts A to D at the ZIP root with the handoff, ruling H alone under h-only/, part E under part-e/), from the private package mizzey-wireframe-stabilisation-package-v1.zip (SHA-256 a418c1fd5ea734e1bae70cd0f2bac7dbd5d50b94be363aa1e803d490f397ca63, 312 entries, built from 8419786). Handoff wireframe-stabilisation-handoff.md, SHA-256 839bedc6cb3e096c78df8e686128dbe8079476e9691010a3536dc83b75092788, not committed.",
+            "files": {
+              "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html": "a7bd2afda224486e711bed5a35d13a28f2777b8d161112e463ec656ec27d0778"
+            },
+            "record": "Imported byte for byte in ce311a0, the hash equal to the handoff. Four lines change against 4612968: the header's Status sentence and the three state sections. export_ready shows WordPress 7.1.3's native row actions for a Confirmed request (Download personal data, Complete request) and the Next steps button 'Send export link'; the cleanup wording, in the request line, the profile's Export file row, pin 4 and the O-6 note, says the file becomes eligible for WordPress's hourly cleanup after the retention deadline, the lifetime the site's setting and three days by default, so that no line implies access stops at the minute shown; 'expiry' reads 'retention deadline' where it named that time. empty has no Download button: WooCommerce 11.1 renders it only when the report has results. The same 10 states.",
+            "measurements": "Independent, by Claude Code on 28 October 2026: checks/text-check.js finds nothing at 1280 and 1024 px, with and without the WCAG 1.4.12 override; the native table wrapper stays the only scroll container. Codex (gpt-6.1-sol, read-only) checked the wording against the installed WordPress 7.1.3 and WooCommerce sources: Download personal data and Complete request on a Confirmed request, Send export link, Remove request only under Next steps once Completed, hourly cleanup with a filterable three-day default, and the report's Download conditional on results.",
+            "new_questions": [],
+            "closes": [
+              "the four native-fidelity findings of the Codex 10-B review of 27 October 2026"
+            ]
           }
         }
       ]
     }
   ],
   "stabilisation": {
-    "status": "requested",
+    "status": "returned",
     "date": "2026-10-27",
+    "return": {
+      "date": "2026-10-28",
+      "source": "Claude Design, mizzey-wireframe-stabilisation-output.zip (SHA-256 30894784651e6c36863209c5962590b7c81bf99896a4e8bfc8d55db675e05300, 120 files: parts A to D at the ZIP root with the handoff, ruling H alone under h-only/, part E under part-e/), from mizzey-wireframe-stabilisation-package-v1.zip (SHA-256 a418c1fd5ea734e1bae70cd0f2bac7dbd5d50b94be363aa1e803d490f397ca63, 312 entries, built from 8419786). Handoff wireframe-stabilisation-handoff.md, SHA-256 839bedc6cb3e096c78df8e686128dbe8079476e9691010a3536dc83b75092788, not committed. Archived privately; nothing from it is committed beyond the files each import names.",
+      "validation": "By Claude Code on 28 October 2026: every hash and size in the handoff matches; the root holds exactly the expected A to D files plus s1/batch-08/batch-08.css (the new email page's review sheet, moved from an inline style element and scoped by :where(.rpg), a class only the two em-email-change files carry); the frozen files changed are exactly the seven named batch-09 files; h-only/ differs from the baseline by ruling H only; every part-e/ HTML file differs from its A to D base by one stylesheet link. Chromium measurements against the baseline, every storefront file with and without the WCAG 1.4.12 override: signup fields under 44 px in 160 file passes before and none after; batch-01 and batch-02 text links under 44 px in 109 and 112 passes before, 3 and 6 after, every remaining one identical to the baseline and outside the package (a link under an open overlay, sf-pdp-simple 'See all reviews', sf-free-shipping-progress 'Continue shopping'); the Arabic mobile header wider than its box in 32 files before and none after. checks/text-check.js finds nothing in the nine administration files. Part E: every element box and computed style of its 77 files, both passes, identical before and after.",
+      "review": "Codex (gpt-6.1-sol), 28 October 2026, read-only: import with records notes; nothing blocking, and no contracted surface or state needs another Claude Design round.",
+      "imports": [
+        "A: ce311a0 on #407 (10-B correction_round_3)."
+      ]
+    },
     "authority": "The owner's instruction of 27 October 2026 to close the wireframe phase (workflow section 5, steps 6 to 8), worked between Claude Code and Codex as an independent reviewer, each checking the other; the owner carries packages to Claude Design and pastes its prompt. This record is no owner acceptance, approves no implementation (D-14), changes no signed scope and is not PRE-03b.",
     "reviews": [
       "Codex (gpt-6.1-sol), 27 October 2026, read-only at 4612968: the 10-B review (acceptable with notes: four native-fidelity findings in ad-customer-metrics-export), the coverage audit (595 delivery rows each accounted for once; acceptance outcomes the inventory never listed), the plan review (sound with changes), and the complete-UX preflight over the 22 flows (ready after listed fixes). Every finding adopted here was checked by Claude Code against the specification, the files and the installed WordPress, WooCommerce and WPML sources.",
