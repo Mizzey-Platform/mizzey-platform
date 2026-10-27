@@ -74,13 +74,13 @@ Arabic right to left does not apply. The administration is English only (ADM-159
 
 ## Design freedom
 
-`constrained`: A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary.
+`annotate_only`: The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned.
 
 It governs how the contracted capability is expressed, never what functionality exists.
 
 ## Native baseline
 
-None.
+Redirection's own redirect screens (Tools › Redirection), the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling R1, 21 October 2026, applied at the batch-09 closure on 26 October 2026). The refusal of a loop or a missing internal target is a thin Mizzey adapter on its own validation filter, not proven until tested at build under #287.
 
 ## Open inputs
 

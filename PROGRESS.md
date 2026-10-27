@@ -98,8 +98,7 @@ Live status. First action each session: read this, then continue from **Next**.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
-  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-08 are drawn, each reviewed and closed, and in batch-09 the
-  09-A and 09-B groups are reviewed, their files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-09 are drawn, each reviewed and closed, batch-09's 46 files frozen**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -350,7 +349,23 @@ imported one review group at a time on his instruction, and CoreX is not upgrade
    with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
    page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
    09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
-   it on 22 October 2026 (PR #397) and its eight files are frozen. 09-C to 09-E follow on his separate instruction.
+   it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
+   with one controlled correction round on his review of 22 October 2026; he accepted it on 23 October 2026 (PR #399),
+   with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
+   open pending D-19. Claude Design drew 09-D from the frozen baseline (version 2 package, 25 October 2026), and it
+   is imported for his review. On 26 October 2026 he ruled D1 and D2 (the shipment and refund surfaces become
+   constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redrew the two
+   surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
+   The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
+   and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
+   lines are not marked as additions); Claude Design corrected that one file, and he accepted 09-E on 26 October
+   2026 (PR #402), E1 to E4 as working structural decisions: its ten files are frozen. All five batch-09 groups
+   are accepted. For the batch-09 closure he chose, on 26 October 2026, a pattern catalogue only (no CSS
+   consolidation) and one Claude Design correction round (ad-redirect-manager redrawn annotate-only on
+   Redirection, the unrelated sample rows replaced, WooCommerce's Apply button added in eight 09-D files), with
+   related products open pending D-19. Claude Design returned the round, and he accepted the closure on 26 October
+   2026 (PR #403), adopting recommendations C1 to C5 and re-freezing the ten corrected files: batch-09 is closed.
+   Batch-10 waits for his instruction.
 3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
    surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
    approved (`design/wireframes/workflow.md`).
