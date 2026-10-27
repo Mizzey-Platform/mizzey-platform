@@ -2391,7 +2391,7 @@
             "The native Customers report (ad-customer-metrics-export:default and empty) is drawn with eight native columns hidden through the table's own column menu (Email, Username, Last active, Date registered, Country / Region, City, Region, Postal code), so the two added columns fit at 1024 px with text spacing. The facility is native in WooCommerce 11.1: the report table's menu \"Choose which values to display\" lists every column except the required Name as a checkbox, and the choice is stored per user (customers_report_columns). It is not the native default: Name, Last active, Date registered, Email, Orders, Total spend, AOV and Country / Region show by default (Username, City, Region and Postal code are hidden by default), and the native table scrolls sideways (overflow-x) when its columns do not fit. Ruled by the owner as B9 on 27 October 2026: the native default columns are drawn, with the native table's own sideways scroll at 1024 px; corrected in correction round 1.",
             "Wireframe conventions, as in batch-09: native context controls at their native size and labelled native; illustrative names, figures and dates, Western digits (DQ-01)."
           ],
-          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings). Open: acceptance of 10-B after correction round 2. OP-13, CR-15, CR-05 and OD-01 stay open.",
+          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings); correction rounds 1 and 2 returned and imported, B10 and B11 closed. Open: acceptance of 10-B. OP-13, CR-15, CR-05 and OD-01 stay open.",
           "new_questions": [
             "B9 (Claude Code, at import): whether the Customers report is drawn in a per-user column choice (eight native columns, Email included, hidden through the native column menu) or in the native default column set, with the two added columns joining it and the native table scrolling sideways at 1024 px where they do not fit. The first is a reachable native state but not what staff see by default; the second is the platform as it is and needs the owner to accept a native scroll container as an exception to the 10-B check. Ruled on 27 October 2026 (B9, owner_rulings)."
           ],
@@ -2405,7 +2405,7 @@
           ],
           "review": {
             "status": "open",
-            "record": "Imported for the owner's single review sitting of 10-B, as a draft pull request into documentation/open-batch-10. He ruled B1 to B9 on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (8491ee4) and validated by Claude Code. He ruled B10 and B11 the same day; correction round 2 (B10, B11) is requested. Open: his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+            "record": "Imported for the owner's single review sitting of 10-B, as a draft pull request into documentation/open-batch-10. He ruled B1 to B9 on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (8491ee4) and validated by Claude Code. He ruled B10 and B11 the same day; Claude Design returned correction round 2, imported here (18b87ac) and validated by Claude Code, closing both. Open: his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
           },
           "owner_rulings": [
             "B1 (27 October 2026): approved. New and returning customers in their own added block under the native Performance tiles, with the two routes to Analytics Orders filtered by customer type; the native tiles unchanged.",
@@ -2438,14 +2438,27 @@
               "The static wireframe's scroll wrapper is always focusable (tabindex 0) and its caption always ends '(scroll to see more)', including empty at 1280 px where the table fits. WooCommerce 11.1 sets both only while the table scrolls. A static file without script cannot switch them, and the pin annotates the native behaviour. Where scroll-driven animation is not supported, the end fade stays drawn."
             ],
             "new_questions": [
-              "B10 (the handoff): in edit and arabic_version, the small preview beside the fields still opens 'We've received order ...' while the Body text now opens with the greeting. Recommended by Claude Design: let it open 'Thanks, Nour.' / the Arabic greeting, as preview does. Alternative: leave it, read as a preview before the edit is saved. Owner to rule. Ruled on 27 October 2026: corrected (B10, owner_rulings).",
-              "B11 (the handoff): the Patterns line of the ad-customer-metrics-export header does not name the new adm-s2-tscroll (native-table-scroll). Recommended by Claude Design: add it on import. Alternative: record the pattern in the manifest only. Owner to rule; Claude Code does not edit Claude Design's file. Ruled on 27 October 2026: Claude Design adds it (B11, owner_rulings)."
+              "B10 (the handoff): in edit and arabic_version, the small preview beside the fields still opens 'We've received order ...' while the Body text now opens with the greeting. Recommended by Claude Design: let it open 'Thanks, Nour.' / the Arabic greeting, as preview does. Alternative: leave it, read as a preview before the edit is saved. Owner to rule. Ruled on 27 October 2026: corrected (B10, owner_rulings). Closed by correction round 2, imported in 18b87ac.",
+              "B11 (the handoff): the Patterns line of the ad-customer-metrics-export header does not name the new adm-s2-tscroll (native-table-scroll). Recommended by Claude Design: add it on import. Alternative: record the pattern in the manifest only. Owner to rule; Claude Code does not edit Claude Design's file. Ruled on 27 October 2026: Claude Design adds it (B11, owner_rulings). Closed by correction round 2, imported in 18b87ac."
             ]
           },
           "correction_round_2": {
-            "status": "requested",
+            "status": "returned",
             "date": "2026-10-27",
-            "scope": "B10 and B11 only, presentation and annotation: in ad-email-template-editor, the small email preview of edit and arabic_version opens with the greeting; in ad-customer-metrics-export, the header's Patterns line names adm-s2-tscroll (native-table-scroll). No state, frame, control, note or stylesheet change beyond that and each file's status line. ad-dashboard-customers-conversion, batch-10-b.css and every frozen file unchanged. Issued to Claude Design by the owner from a private package built by Claude Code."
+            "scope": "B10 and B11 only, presentation and annotation: in ad-email-template-editor, the small email preview of edit and arabic_version opens with the greeting; in ad-customer-metrics-export, the header's Patterns line names adm-s2-tscroll (native-table-scroll). No state, frame, control, note or stylesheet change beyond that and each file's status line. ad-dashboard-customers-conversion, batch-10-b.css and every frozen file unchanged. Issued to Claude Design by the owner from a private package built by Claude Code.",
+            "returned": "2026-10-27",
+            "source": "Claude Design, returned as mizzey-batch-10-b-correction-round-2-output.zip (SHA-256 8813bbe472bc1ef6a6574c30c91fe785aab557f6e66c016d5db2363ce0f82e37, three files at the ZIP root: the two HTML files and the handoff), from the private package mizzey-batch-10-b-correction-round-2-package-v1.zip (SHA-256 c106b05cf66bfa49ebeb9f9f800bdbf4b0d0fff56f68b48ef48418bd1a8df6be, 17 entries, built from 37b4fec). Handoff batch-10-b-correction-round-2-handoff.md, SHA-256 6dbfc306aaeefb7401766608344ae3818ff15bbc0f30518dd468cfe955996f8d, not committed.",
+            "files": {
+              "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html": "3053e6ca72df437878b7c16a664339e16a66fa69653a89d62a033ac69556dc7b",
+              "design/wireframes/s2/batch-10/ad-email-template-editor.en.html": "b3d9406c1f97c1599d9fc2f279d5cd52c2d9caaf508b8061fdf0955207be705b"
+            },
+            "record": "Two files imported byte for byte in 18b87ac, both hashes equal to the handoff. Compared with 37b4fec, only three insertions: ad-email-template-editor, 'Thanks, Nour. ' at the start of the small preview's body in edit and its batch-08 Arabic greeting in arabic_version, as plain text the way preview draws it, the order number still isolated left to right (B10); ad-customer-metrics-export, 'adm-s2-tscroll (native-table-scroll), ' after adm-s2-tagnw in the header's Patterns line (B11); and each file's status line adds the round 2 sentence. Same line counts, no element, class, control, note or state added or removed. batch-10-b.css, ad-dashboard-customers-conversion and every frozen file unchanged. The same 10 states.",
+            "measurements": "Independent, by Claude Code on 27 October 2026, with the return in place: Chromium through Playwright over file addresses, every frame of the three files at 1024 and 1280 px, with and without the WCAG 1.4.12 override. Every frame and page measurement equals the 37b4fec base: no escape, clipping or overlap, no page or frame scrolling sideways, the native table wrapper the only scroll container, behaving as in round 1 (role group, caption, tabindex 0, visible focus, arrow keys scroll it, the fades follow the scroll position). Admin targets per ADMIN-BASELINE section 4 and the inline ADDED tags fit inside their header cells, as at the base. The keyboard reaches every focusable element (33, 11, 11) in document order with a visible focus, including the email editor's language switch (English, Arabic) and its Insert variable buttons; Send a test email is native context, drawn without a control. checks/text-check.js: nothing found on any file. tools/design_wireframes.py: 0 problems.",
+            "new_questions": [],
+            "closes": [
+              "B10",
+              "B11"
+            ]
           }
         }
       ]
