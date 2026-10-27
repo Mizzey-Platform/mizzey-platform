@@ -1,0 +1,127 @@
+/* Mizzey batch-10, group 10-A: the customer-facing second-release surfaces (S2, DQ-04). Linked last, after the reviewed stylesheets each file names. Every class here starts with s2-; no reviewed class is redefined. Greys only, the system typeface, no url(), no brand. Prototype only. */
+/* The review sheet: the page around the frames (body, file header, sets, figures, notes), carried from the inline sheet of batches 02 to 08 under s2- names, because batch-10 files carry no style element or attribute. */
+.s2-body{padding:32px 40px 120px}
+.s2-meta{display:flex;flex-direction:column;gap:12px;max-inline-size:1280px;margin-block-end:48px;padding:22px 26px}
+.s2-meta__eb{font:600 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.s2-meta__h{font-size:26px;font-weight:650;line-height:1.25}
+.s2-meta__h code{font:600 22px/1.25 ui-monospace,Menlo,Consolas,monospace}
+.s2-meta__p{font-size:13.5px;color:#3a3a3a;max-inline-size:880px;text-wrap:pretty}
+.s2-meta__dl{display:grid;grid-template-columns:170px minmax(0,1fr);gap:5px 16px;font-size:12.5px}
+.s2-meta__dl dt{color:#5c5c5c}
+.s2-meta__dl code,.s2-set__h code{font:11.5px ui-monospace,Menlo,Consolas,monospace}
+.s2-nav{display:flex;flex-wrap:wrap;gap:4px;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+.s2-nav a,.s2-nav__cur{display:inline-flex;align-items:center;min-block-size:32px;padding-inline:9px;border:1px solid #bdbdbd;background:#fff;color:#1f1f1f;font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;text-decoration:none;white-space:nowrap}
+.s2-nav__cur{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+.s2-sheet{display:flex;flex-direction:column;gap:80px}
+.s2-set__h{font-size:19px;font-weight:650;line-height:1.3}
+.s2-set__p{font-size:13px;color:#4a4a4a;max-inline-size:920px;margin-block:6px 22px;text-wrap:pretty}
+.s2-row{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.s2-fig{display:flex;flex-direction:column;flex:none}
+.s2-fig--s{inline-size:360px}
+.s2-fig--d{inline-size:1280px}
+.s2-fig .wf-frame{inline-size:100%;max-inline-size:none;position:relative}
+.s2-fig .wf-frame__label{font:11px/1.5 ui-monospace,Menlo,Consolas,monospace}
+.s2-notes{display:grid;gap:10px;margin-block-start:12px;align-items:start}
+.s2-fig--d .s2-notes{grid-template-columns:repeat(3,minmax(0,1fr))}
+.s2-notes .wf-note{margin:0;font-size:12px;line-height:1.5;text-wrap:pretty}
+.s2-notes .wf-note b{font-weight:650}
+.s2-ax::before{content:"Accessibility"}
+.s2-rt::before{content:"Right to left"}
+.s2-qr::before{content:"Question raised, see the decision sheet"}
+.s2-pf::before{content:"The platform today, PLATFORM-FACTS"}
+.s2-s2::before{content:"Second release, as contracted"}
+.s2-tb::before{content:"Tablet"}
+/* Annotation pieces inside a frame, plainly not interface: the cut strip for a part drawn elsewhere (canonical .cut of the inline sheets), the section tag, the dashed marker where something is deliberately not shown, and the fixed-height window for a drawer or a dialog. */
+.s2-cut{display:flex;align-items:center;min-block-size:48px;padding:10px 40px;font:500 10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c;background:#f7f7f7;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.03) 0 1px,transparent 1px 11px)}
+.s2-cut--m{padding-inline:16px}
+.s2-tag{display:inline-block;align-self:flex-start;padding:2px 6px;border:1px dashed #8a8a8a;background:#fff;font:600 10px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a;max-inline-size:100%;overflow-wrap:anywhere}
+.s2-gap{display:flex;align-items:center;min-block-size:52px;margin-block:6px;padding:8px 10px;border:1.5px dashed #8a8a8a;border-radius:8px;font:500 10.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a;background:#fafafa}
+.s2-win{position:relative;block-size:780px;overflow:hidden}
+.s2-win--s{block-size:700px}
+/* Spacing that the reviewed files set in style attributes, as classes (same values). */
+.s2-pt4{padding-block-start:4px}
+.s2-pt12{padding-block-start:12px}
+.s2-pt32{padding-block-start:32px}
+.s2-pt48{padding-block-start:48px}
+.s2-sp40{block-size:40px}
+.s2-sp64{block-size:64px}
+.s2-tbwm{gap:10px;padding-block-end:20px}
+.s2-nu{text-decoration:none}
+.s2-ftp{font-size:13.5px;margin-block-start:4px}
+.s2-ftm{display:flex;flex-direction:column;gap:14px;padding-block:28px;border-block-end:1px solid #e3e3e3}
+.s2-col{flex-direction:column}
+.s2-ftbm{flex-direction:column;align-items:flex-start}
+.s2-h44{min-block-size:44px}
+.s2-r8{border-radius:8px}
+.s2-rel{position:relative}
+.s2-g20{gap:20px}
+.s2-g24{gap:24px}
+.s2-as{align-self:flex-start}
+.s2-vh{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.s2-fcw{flex:0 0 auto}
+/* sf-filter-by-rating: the Rating group of the batch-02 listing filters. Each level is a .op row (44 px) holding a radio mark (.s2-rb, filled ring when chosen, .on) where the other groups hold a checkbox, the decorative stars of the batch-02 rating and the level in words (.s2-ol); the count stays the batch-02 .op__n. .s2-rgo is the radiogroup. */
+.s2-rgo{display:flex;flex-direction:column}
+.s2-op .op__l{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
+.s2-op .stars{font-size:13px}
+.s2-ol{font-size:14px}
+.s2-rb{flex:none;inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:50%;background:#fff}
+.s2-rb.on{border:7px solid #151515}
+/* sf-brand-landing: the sf-brand head laid out as batch-02 draws it (logo box beside the name and description: .s2-band, .s2-band__t, the values of its style attributes), long names wrapping (.s2-ow), and the sizes the ct-campaign-page sections set inline (the 480 px hero .s2-hero, the 320 px banner image .s2-ph320, the 16 px hero line .s2-f16). .s2-sa holds the mobile Shop all under the rail; .s2-acw the accordion at the reading measure; .s2-route the closing route to the brand archive (sf-brand). */
+.s2-band{flex-direction:row;gap:28px;align-items:center}
+.s2-band__t{display:flex;flex-direction:column;gap:10px;align-items:flex-start;min-inline-size:0}
+.s2-ow{overflow-wrap:break-word;max-inline-size:100%}
+.s2-hero{block-size:480px}
+.s2-ph320{min-block-size:320px}
+.s2-f16{font-size:16px}
+.s2-mb12{margin-block-end:12px}
+.s2-sa{padding-block-start:16px}
+.s2-acw{max-inline-size:760px}
+.s2-route{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:28px 24px;border:1.5px solid #d6d6d6;border-radius:12px}
+.s2-route>.btn--b{align-self:stretch}
+/* ac-reorder: Order again under a delivered order's status (.s2-oa); the summary block's rule on mobile (.s2-sep20, the value ac-order-detail sets inline). The cart after a reorder, drawn only as far as needed: the page column (.s2-cw), title and count (.s2-cth), the lines (.s2-lns, .s2-ln) re-created from sf-cart's .ln at its sizes, because batch-04.css is not linked: image, name link (a 44 px hit area past its text, as batch-02-targets.css does), variation and unit price, line total, the quantity stepper (.s2-qs, 44 px steps) and Remove (44 px). .s2-from is the line that says which order an added item came from. .s2-nal lists, inside fb-notice, each item that could not be added, with its reason (.s2-nal__r). */
+.s2-oa{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-block-start:8px}
+.s2-oa>.btn--b{align-self:stretch}
+.s2-sep20{padding-block-start:20px;border-block-start:1px solid #e3e3e3}
+.s2-cw{display:flex;flex-direction:column;gap:20px;padding-block:20px 48px;min-inline-size:0}
+.s2-cw--d{gap:24px;padding-block:28px 64px}
+.s2-cth{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.s2-lns{display:flex;flex-direction:column;border-block-start:1px solid #e3e3e3}
+.s2-ln{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:6px 14px;align-items:start;padding-block:16px;border-block-end:1px solid #e3e3e3;font-size:14px}
+.s2-ln__i{grid-row:span 2;border-radius:6px}
+.s2-ln__n{display:flex;flex-direction:column;gap:2px;min-inline-size:0;overflow-wrap:anywhere}
+.s2-ln__t{position:relative;font-weight:650;text-decoration:none}
+.s2-ln__t::after{content:"";position:absolute;inset:-12px 0}
+.s2-ln__v{font-size:12.5px;color:#5c5c5c}
+.s2-ln__p{font-weight:700;white-space:nowrap;text-align:end}
+.s2-ln__c{grid-column:2/-1;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.s2-qs{display:inline-flex;align-items:center;border:1.5px solid #bdbdbd;border-radius:10px}
+.s2-qs>span{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;font-size:18px}
+.s2-qs>.dis{color:#bdbdbd}
+.s2-qs>b{min-inline-size:28px;text-align:center}
+.s2-ln__a{display:inline-flex;align-items:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13.5px;font-weight:600;text-underline-offset:3px}
+.s2-from{align-self:flex-start;margin-block-start:4px;padding:1px 8px;border:1px solid #9a9a9a;border-radius:999px;font-size:11.5px;font-weight:650;color:#3a3a3a}
+.s2-nal{display:flex;flex-direction:column;gap:8px;margin-block:8px 2px;padding:0;list-style:none}
+.s2-nal>li{display:flex;flex-direction:column;gap:1px;padding-inline-start:12px;border-inline-start:2px solid #9a9a9a;overflow-wrap:anywhere}
+.s2-nal>li>span{font-size:12.5px;color:#5c5c5c}
+.s2-nal .s2-nal__r{font-size:13px;font-weight:650;color:#151515}
+/* ac-notification-preferences: the page column (.s2-npw) and its sections (.s2-np); ctl-toggle, re-created from gl-cookie-consent's .tg and .tgl (batch-01, not linked): the whole row is the switch (.s2-tgr, 44 px at least), its label and hint (.s2-tgr__t), the track (.s2-tg, 46 x 28, filled when .on) and the state in words (.s2-tgl). .s2-acr5 lets the desktop hub tiles hold a fifth route. */
+.s2-npw{display:flex;flex-direction:column;gap:28px;max-inline-size:640px;min-inline-size:0}
+.s2-np{display:flex;flex-direction:column;gap:12px;padding-block-start:20px;border-block-start:1px solid #e3e3e3;min-inline-size:0}
+.s2-npw>.s2-np:first-child{padding-block-start:0;border-block-start:0}
+.s2-tgr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-block-size:44px;padding:14px 16px;border:1.5px solid #d6d6d6;border-radius:12px;background:#fff}
+.s2-tgr__t{display:flex;flex-direction:column;gap:4px;min-inline-size:0}
+.s2-tgr__t>b{font-size:15px;font-weight:650}
+.s2-tgr__s{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none}
+.s2-tg{position:relative;inline-size:46px;block-size:28px;border-radius:14px;background:#cfcfcf}
+.s2-tg::after{content:"";position:absolute;inset-block-start:3px;inset-inline-start:3px;inline-size:22px;block-size:22px;border-radius:50%;background:#fff}
+.s2-tg.on{background:#151515}
+.s2-tg.on::after{inset-inline-start:21px}
+.s2-tgl{font-size:12px;font-weight:650;color:#3a3a3a;white-space:nowrap}
+.acr--t.s2-acr5{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+/* ac-account-deletion: the quiet section at the end of ac-account-details (.s2-del), the explanation opened in place (.s2-dlb, its points .s2-dll), its actions (.s2-dla) and the later-visit line (.s2-dlr). The confirmation is batch-06's dialog (.adl), unchanged. */
+.s2-del{display:flex;flex-direction:column;gap:12px;margin-block-start:16px;padding-block-start:24px;border-block-start:1px solid #e3e3e3;min-inline-size:0}
+.s2-dlb{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:12px;background:#f6f6f6;font-size:14px}
+.s2-dll{display:flex;flex-direction:column;gap:6px;padding-inline-start:20px;list-style:disc;line-height:1.5}
+.s2-dla{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.s2-dla>.btn--b{flex:1 1 100%}
+.s2-dlr{font-size:14.5px}
