@@ -109,6 +109,12 @@ WooCommerce shows a sale badge only.
 |---|---|---|---|---|
 | `OD-01` Brand name, logo and visual identity | client_decision | The brand name, the logo, the colours, the typefaces and the rules for using them. | Neutral tokens only: greys, one system typeface per script, a labelled box where the logo goes, the working name in plain text. | No logo, no client colour, no final typeface, no imagery style, no tone of voice. Nothing that could be read as a visual proposal. |
 
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-08` Merchandising badges | New, Trending, Limited and Best Seller are assigned per product by the staff. None is calculated from dates, sales or stock, and none expires by itself. At most one merchandising badge shows on a card, by the fixed precedence Limited, then New, then Best Seller, then Trending (batch-02 review, 19 October 2026). | No automatic, scheduled or date-limited badge, and no badge derived from sales or stock figures, without Change Control. |
+
 ## Interaction options
 
 ### DQ-01: Numerals in Arabic

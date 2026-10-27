@@ -593,7 +593,7 @@
       "brand": "neutral",
       "rtl": "The rail starts at the inline-start edge and scrolls toward the inline-end edge.",
       "section_library": {
-        "allowed_variants": ["manual pick", "by collection", "by category"],
+        "allowed_variants": ["manual pick", "by collection", "by category", "newest", "by badge"],
         "variants_status": "Proposed. The register fixes no variant before the interface design is approved.",
         "editable": ["heading", "source", "item count within a fixed range"],
         "locked": ["card layout", "columns per viewport"]
