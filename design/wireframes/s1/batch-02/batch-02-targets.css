@@ -4,3 +4,5 @@
 .logo--s::after{inset:-8.5px 0}
 .ft li:has(>a){padding-block:0}
 .ft li>a{display:inline-flex;align-items:center;min-block-size:44px;min-inline-size:44px}
+/* Stabilisation round, ruling H (27 October 2026): the mobile header's spacer may close, so the Arabic 360 px row fits inside its gutters with text spacing. */
+.mh__sp{min-inline-size:0}
