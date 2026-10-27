@@ -14,9 +14,9 @@ that work is prepared, and it changes no contract term.
 |---|---|
 | 1. Signed scope and PBIs | Done. Register MS-ANX-2026-006 version 1.5, and `docs/scope/` |
 | 2. Complete inventory of surfaces, flows and states | **This folder.** Reported in `coverage.md` |
-| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Original batches 01 to 09 reviewed and closed; closure preparation has reopened five surfaces and added two briefed, undrawn surfaces, and their corrections and supplementary review are pending (`wireframes/manifest.json`, `stabilisation`) |
-| 4. Structural component and interaction system, established and stable | Under way: `wireframes/manifest.json`, `stabilisation` |
-| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Batch-10: 10-A reviewed and frozen, 10-B imported for review |
+| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Done. Batches 01 to 09 reviewed and closed; the five reopened and two added surfaces reviewed in the stabilisation round (`wireframes/manifest.json`, `stabilisation`) |
+| 4. Structural component and interaction system, established and stable | Done in the stabilisation round, 28 October 2026; the deferred part of D6 is in `stabilisation.residual` |
+| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Done. Batch-10: 10-A and 10-B reviewed and frozen, batch closed |
 | 6. Brand identity received and applied | Waiting on the client (OD-01) |
 | 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
 | 8. The contracted working HTML and CSS design | Not started |

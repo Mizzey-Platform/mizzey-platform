@@ -4,5 +4,7 @@
 .logo--s::after{inset:-8.5px 0}
 .ft li:has(>a){padding-block:0}
 .ft li>a{display:inline-flex;align-items:center;min-block-size:44px;min-inline-size:44px}
-/* Stabilisation round, ruling H (27 October 2026): the mobile header's spacer may close, so the Arabic 360 px row fits inside its gutters with text spacing. */
+/* Stabilisation round (27 October 2026): the signup field keeps 48 px in the column layout; "Read more" and "Read less" get a 44 px hit area; ruling H: the mobile header's spacer may close, so the Arabic 360 px row fits with text spacing. */
+.suf .inp{min-block-size:48px}
+.desc+.lnk::after{content:"";position:absolute;inset-block:calc(50% - 22px);inset-inline:0}
 .mh__sp{min-inline-size:0}

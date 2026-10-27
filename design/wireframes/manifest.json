@@ -1473,15 +1473,24 @@
             "status": "in_force",
             "date": "2026-10-21",
             "record": "Frozen by the owner's acceptance of 09-A on 21 October 2026. 09-B to 09-E are drawn from these ten files and change none of them; a group output that differs from a hash here is rejected. Proposed in the first review commit with batch-09.css at 855536ae; that file's hash changed only by the two comment corrections above.",
+            "corrected_in_stabilisation": {
+              "date": "2026-10-28",
+              "record": "Controlled correction in the wireframe stabilisation round (manifest stabilisation, package parts C and D, imported in aa71bbf): 3 file(s) named by the package changed and now carry the hashes in files; their previous approved hashes are kept here. The freeze stays in force; no other file of this group changed.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "ed9008d027e6d932584e944d0f5f09074621a55f6ac28d97c21a1fd10782016e",
+                "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "06ab0aa67cb88dde39746610a87a69f0c68ee62245e2d25f74edb68dc252315d",
+                "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "2441cb9f4c617ee667b1352c8f6af83661fe1426a651ebd00d2fc15dc5f99323"
+              }
+            },
             "files": {
-              "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "06ab0aa67cb88dde39746610a87a69f0c68ee62245e2d25f74edb68dc252315d",
+              "design/wireframes/s1/batch-09/ad-permission-denied.en.html": "df9b4bbf91a0cf2335851dd253ba001292bf0f8a19625cec46ebd1ab54d81da0",
               "design/wireframes/s1/batch-09/sy-staging-marker.en.html": "907456bfb9287e7a10c18a572c8fd7860332554a7c65293de55501a82ff024b0",
               "design/wireframes/s1/batch-09/sy-staging-marker.ar.html": "61d46bc05320d4c872fdedebacac6f0fd68ef7b1d105af75cbb3d76231a3ac5b",
               "design/wireframes/s1/batch-09/ad-staff-log.en.html": "398a53d74c794e4d676b0a1a88a396840590e7a3855dc93b13960bc64a230928",
               "design/wireframes/s1/batch-09/ad-redirect-manager.en.html": "30e6e2a7ef3b356603f7b428b41f213a65316aeb98b1d4d574b9df92687ae452",
               "design/wireframes/s1/batch-09/ad-order-list-filters.en.html": "f5579309b4c79bead58c2c80ce6e772ceafaee0395bdadca794cfff46b0da2d7",
-              "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "2441cb9f4c617ee667b1352c8f6af83661fe1426a651ebd00d2fc15dc5f99323",
-              "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "ed9008d027e6d932584e944d0f5f09074621a55f6ac28d97c21a1fd10782016e",
+              "design/wireframes/s1/batch-09/ad-list-search-additions.en.html": "4863c8f25ffeabb5dd97fc0d9301740a3c2fa4ab3db5eb695881ef7d54cc5829",
+              "design/wireframes/s1/batch-09/ad-customer-notes.en.html": "99a8b2fa34ee847b83c1657a0eb4923e5d47cb1d9cafb972297b02d073bf8eac",
               "design/wireframes/s1/batch-09/ad-customer-suspend.en.html": "c2cbd6fe9c62648f7ecc7b5a122453eda6bf9f4f13151793ecbbb7441c9c9835",
               "design/wireframes/s1/batch-09/batch-09.css": "1e28e7d47525fe93e4dad04223001298b8e7267cee37f7b6becdafc3c277ab3d"
             },
@@ -1584,15 +1593,24 @@
             "status": "in_force",
             "date": "2026-10-22",
             "record": "Frozen by the owner's acceptance of 09-B on 22 October 2026, at the hashes of the files as returned in correction round 3 (none changed at acceptance). 09-C to 09-E change none of these eight files or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure (D7, D8) or a controlled correction the owner approves.",
+            "corrected_in_stabilisation": {
+              "date": "2026-10-28",
+              "record": "Controlled correction in the wireframe stabilisation round (manifest stabilisation, package parts C and D, imported in aa71bbf): 2 file(s) named by the package changed and now carry the hashes in files; their previous approved hashes are kept here. The freeze stays in force; no other file of this group changed.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-navigation-editor.en.html": "a49767bac9a2535e0a808f5773353cfe58473c16ad839764d9fde9c7d5d5ca6b",
+                "design/wireframes/s1/batch-09/ad-section-library.en.html": "4ce19d8d5482d955a6638ec91b0543f4bde489e00f04612a5a1a87e7bd56e1f8"
+              }
+            },
             "files": {
-              "design/wireframes/s1/batch-09/ad-section-library.en.html": "4ce19d8d5482d955a6638ec91b0543f4bde489e00f04612a5a1a87e7bd56e1f8",
-              "design/wireframes/s1/batch-09/ad-navigation-editor.en.html": "a49767bac9a2535e0a808f5773353cfe58473c16ad839764d9fde9c7d5d5ca6b",
+              "design/wireframes/s1/batch-09/ad-section-library.en.html": "d1140a69c567f01d37e251ee5dc0ee21ae9352a7d5ad8f8ea441931a1f6597e7",
+              "design/wireframes/s1/batch-09/ad-navigation-editor.en.html": "0cc42a69454aed152863b6b8a70dd6b59662f93884a04247ae103f9d3b4bfffb",
               "design/wireframes/s1/batch-09/ad-promo-banner-manager.en.html": "6219fd848d50b862b21414f7e221bbdc9e4dac2f859600aa3d07d64d46b26249",
               "design/wireframes/s1/batch-09/ad-global-brand-controls.en.html": "0b85d1846fc2247735d49e31e2db36e7c08dab116067891b53a16c05968bba54",
               "design/wireframes/s1/batch-09/ad-catalogue-terms.en.html": "770a1585f1de264cb632e349cb5242132ce0e03860405978a3b94490a6ead414",
               "design/wireframes/s1/batch-09/ad-manual-product-order.en.html": "19f98f6219becfc03c249e7e304e9e702967b8bc2a4edf6e65d528998a3586bb",
               "design/wireframes/s1/batch-09/ad-search-synonyms.en.html": "b4c2bf086df1f60df1497e14087be00db3c2769bf5ea1cb801a1a4a9f1da61cf",
-              "design/wireframes/s1/batch-09/batch-09-b.css": "92bd47520b8178e4175d4d17f646c7c4ed3484af61b23e5a232ac6861dec8115"
+              "design/wireframes/s1/batch-09/batch-09-b.css": "92bd47520b8178e4175d4d17f646c7c4ed3484af61b23e5a232ac6861dec8115",
+              "design/wireframes/s1/batch-09/ad-translation-status.en.html": "469f5665be2b246eceb29117eb0b0bfccc6f2d9f483e31ff64b1046e1859de43"
             }
           },
           "review": {
@@ -1671,12 +1689,19 @@
             "status": "in_force",
             "date": "2026-10-23",
             "record": "Frozen by the owner's acceptance of 09-C on 23 October 2026, at the hashes of the files as returned in correction round 1, three of them after the text-only corrections recorded in corrected_note. 09-D and 09-E change none of these eight files, the eight 09-B files or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
+            "corrected_in_stabilisation": {
+              "date": "2026-10-28",
+              "record": "Controlled correction in the wireframe stabilisation round (manifest stabilisation, package parts C and D, imported in aa71bbf): 1 file(s) named by the package changed and now carry the hashes in files; their previous approved hashes are kept here. The freeze stays in force; no other file of this group changed.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-seo-fields.en.html": "1eeee2abbb8d8a3459377b80732afd5d468ee4b3ffdd0e7924ac03c2bd35f741"
+              }
+            },
             "files": {
               "design/wireframes/s1/batch-09/ad-product-storefront-controls.en.html": "678e5d2b4bbb1c5676a6e895b855ea53a95f24f00d3e4615af2d0cb183e70caf",
               "design/wireframes/s1/batch-09/ad-product-edit-additions.en.html": "c897ba612679d80ba8a280f90ae1b9ab81109159b638e6f41689e4e7f7c78f74",
               "design/wireframes/s1/batch-09/ad-price-stock-history.en.html": "5b1ee6a1989396f76fc0772c0e9a3614b57d27f497632bc9b0ea524d48f746c4",
               "design/wireframes/s1/batch-09/ad-stock-from-erp.en.html": "a12d9452798b9045505d1068b85a31ad8d9a28b9167084bab3894e4a0508a5e3",
-              "design/wireframes/s1/batch-09/ad-seo-fields.en.html": "1eeee2abbb8d8a3459377b80732afd5d468ee4b3ffdd0e7924ac03c2bd35f741",
+              "design/wireframes/s1/batch-09/ad-seo-fields.en.html": "295e699572a0c6063ec84b751bd0fa0c1fd9458ddf397858c21aea113ce5d719",
               "design/wireframes/s1/batch-09/ad-missing-page-log.en.html": "7faac17cab8903701586f47ae5ec54b1fe7c99e8b811fec2a6276fd51cdbecf4",
               "design/wireframes/s1/batch-09/ad-seo-site-settings.en.html": "a193b5c6513af9f1dc4653c90e797d723568860a545e6b551f8a5811391540c6",
               "design/wireframes/s1/batch-09/batch-09-c.css": "ee056a593132395a5973d4e6f92129bef338f857aca1d088d8b6c895e35474ae"
@@ -1748,13 +1773,20 @@
             "status": "in_force",
             "date": "2026-10-26",
             "record": "Frozen by the owner's acceptance of 09-D on 26 October 2026, at the hashes of the files as delivered, with ad-shipment-panel and ad-refund-record as returned in correction round 1. 09-E changes none of these ten files, the eight 09-C, the eight 09-B or the ten 09-A files; a group output that differs from a hash here is rejected. Changes come only through the batch-09 closure or a controlled correction the owner approves.",
+            "corrected_in_stabilisation": {
+              "date": "2026-10-28",
+              "record": "Controlled correction in the wireframe stabilisation round (manifest stabilisation, package parts C and D, imported in aa71bbf): 1 file(s) named by the package changed and now carry the hashes in files; their previous approved hashes are kept here. The freeze stays in force; no other file of this group changed.",
+              "previous": {
+                "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "69fefa25d081f3dda66e90dcc97e39a12ccd968f37e041da7685cafd2e93c516"
+              }
+            },
             "files": {
               "design/wireframes/s1/batch-09/ad-order-status-control.en.html": "93dfe847ef1f70459bc0f4042928020a5cd3eb16205aafd981202f358819950e",
               "design/wireframes/s1/batch-09/ad-order-status-history.en.html": "233c363deebaccbbe3c9663bf5ab35cd42542062abc201350d72bfdc3bcadbcd",
               "design/wireframes/s1/batch-09/ad-order-cancel.en.html": "2bd9830a50dae80cf5d30ddfb3591923d810d1f12a307339287fcb0a9dc0fd4c",
               "design/wireframes/s1/batch-09/ad-invoice.en.html": "20bef3ab463226dac5a999e1b39974dadfc678f1b02b0937cafcc74bf0bd76e4",
               "design/wireframes/s1/batch-09/ad-packing-slip.en.html": "af2440d57641d8d9d328df2810cf5076f5817357c51f7b4473fd90a98b3e8217",
-              "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "69fefa25d081f3dda66e90dcc97e39a12ccd968f37e041da7685cafd2e93c516",
+              "design/wireframes/s1/batch-09/ad-shipment-panel.en.html": "cac88741288ccac28e3537dd1020819fe839462b9c54790dc275841ef6ebe86d",
               "design/wireframes/s1/batch-09/ad-carrier-status-mapping.en.html": "eafe627b34d6e0c7705124e39d1fb00f099226c4b28ff3ae838337c750594246",
               "design/wireframes/s1/batch-09/ad-cod-reconciliation.en.html": "d6023346dfd149d268b2562bced3188c274982ffa10eed757434c38dda2027ca",
               "design/wireframes/s1/batch-09/ad-refund-record.en.html": "2dc6795f771a10b83483cfc50cd88aa33bf0ab61ca3f0fff881adef826f3b3a8",
@@ -2131,10 +2163,10 @@
           "C5 (recommended): the frozen ad-missing-page-log still carries a question that ad-redirect-manager shows a custom screen to be corrected at the closure. It is resolved by K1 and recorded here; the frozen file stays unchanged."
         ],
         "open": [
-          "K4: the related-products mechanism in ad-product-storefront-controls, pending D-19.",
           "K6: the native baselines of sy-coming-soon and sy-maintenance (batch-01), outside batch-09.",
           "K5 stands: design freedom and treatment are distinct fields; no value changed.",
-          "C1 fixture-neutral SKU codes and C2 the brief's validation note, later text-only follow-ups; C4 at staging under #287."
+          "C2: the brief's validation note remains open pending #287's scope verification; C4: Redirection wording and behaviour remain for staging verification under #287.",
+          "C1 was completed by the fixture-neutral SKU substitutions in aa71bbf (PR #411). The dated closure recommendations and deferred lists remain historical."
         ],
         "review": {
           "status": "closed",
@@ -2377,7 +2409,7 @@
         },
         {
           "group": "10-B",
-          "status": "awaiting_owner_review",
+          "status": "accepted",
           "date": "2026-10-27",
           "source": "Claude Design, returned as Mizzey UX decision synthesis (22).zip (SHA-256 99fd0c597bcc70f9fdc305a9593ab22d587f1edb080194e353fc942e57c9c38f, six files under one top-level folder, against the contract's ZIP root) and normalised outside Claude Design as mizzey-batch-10-b-output-normalized.zip (SHA-256 5e49a42c6ec688d9783d6766a54626ca350be98e25690087255473a6e39ec80c, the same six files byte for byte at the root), from the private package mizzey-batch-10-b-design-package-v1.2.zip (SHA-256 efcc53f6ea6460ebc5630aed9dab2930a111dd4b900a0fb04a34ffbf95e43249, built from 754ad2f). Handoff batch-10-b-handoff.md, SHA-256 d291b8fb252f53844566da288ddc58d166b00dbc28b5b073f18a39064a8bab08, and decision sheet batch-10-b-decision-sheet.md, SHA-256 7631db38e8a2e1c30cc794045e524d3fd511fa8f10b419580696fe20b4771533, not committed.",
           "record": "Four files imported byte for byte in 4f490a9, every hash equal to the handoff: the three 10-B surfaces in English and batch-10-b.css (15,497 bytes, every selector scoped by an adm-s2- class, no collision with wireframe.css or batch-09.css, no adm-b- to adm-e- class). 10 states, each in one 1280 px desktop frame, exactly the inventory's. Links wireframe.css, batch-09.css and batch-10-b.css only. Every addition marked ADDED with its own row (ADM-05, ADM-07, ADM-101, ADM-105, NOTF-14). A review-only import: the three entries are exploration with drawn cells, and their inventory status stays briefed. Nothing is reviewed, accepted or frozen, and no batch-09 or 10-A file and no shared stylesheet changes.",
@@ -2392,7 +2424,7 @@
             "The native Customers report (ad-customer-metrics-export:default and empty) is drawn with eight native columns hidden through the table's own column menu (Email, Username, Last active, Date registered, Country / Region, City, Region, Postal code), so the two added columns fit at 1024 px with text spacing. The facility is native in WooCommerce 11.1: the report table's menu \"Choose which values to display\" lists every column except the required Name as a checkbox, and the choice is stored per user (customers_report_columns). It is not the native default: Name, Last active, Date registered, Email, Orders, Total spend, AOV and Country / Region show by default (Username, City, Region and Postal code are hidden by default), and the native table scrolls sideways (overflow-x) when its columns do not fit. Ruled by the owner as B9 on 27 October 2026: the native default columns are drawn, with the native table's own sideways scroll at 1024 px; corrected in correction round 1.",
             "Wireframe conventions, as in batch-09: native context controls at their native size and labelled native; illustrative names, figures and dates, Western digits (DQ-01)."
           ],
-          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings); correction rounds 1 and 2 returned and imported, B10 and B11 closed. Open: acceptance of 10-B. OP-13, CR-15, CR-05 and OD-01 stay open.",
+          "open_decisions": "B1 to B11 ruled on 27 October 2026 (owner_rulings); correction rounds 1 to 3 returned and imported, B10 and B11 closed; 10-B accepted on 28 October 2026 (review). OP-13, CR-15, CR-05 and OD-01 stay open.",
           "new_questions": [
             "B9 (Claude Code, at import): whether the Customers report is drawn in a per-user column choice (eight native columns, Email included, hidden through the native column menu) or in the native default column set, with the two added columns joining it and the native table scrolling sideways at 1024 px where they do not fit. The first is a reachable native state but not what staff see by default; the second is the platform as it is and needs the owner to accept a native scroll container as an exception to the 10-B check. Ruled on 27 October 2026 (B9, owner_rulings)."
           ],
@@ -2402,11 +2434,31 @@
             "B3, for the build (E-ADM-6b): Returns counts distinct orders with a recorded full or partial refund, a working reporting interpretation (ruled B3); the column label stays the signed term and no returns-management capability follows.",
             "B8, for the build (E-ADM-6b): the Customers report CSV carries Returns and Coupon usage (ruled B8).",
             "B9, for the build (E-ADM-6b): the report keeps WooCommerce's own scroll wrapper, which takes focus and adds '(scroll to see more)' to its caption only while the table scrolls, and shows its fades by scroll position; the static wireframe's always-on focus and its fallback fade are drawing approximations, not requirements.",
-            "design/wireframes/s2/README.md says 10-B is not drawn yet; it is corrected when 10-B is accepted, not in this review import."
+            "Closed on 28 October 2026: design/wireframes/s2/README.md now records 10-B acceptance and batch-10 closure."
           ],
           "review": {
-            "status": "open",
-            "record": "Imported for the owner's single review sitting of 10-B, as a draft pull request into documentation/open-batch-10. He ruled B1 to B9 on 27 October 2026; Claude Design returned correction round 1 the same day, imported here (8491ee4) and validated by Claude Code. He ruled B10 and B11 the same day; Claude Design returned correction round 2, imported here (18b87ac) and validated by Claude Code, closing both. Open: his acceptance decision. Not reviewed, accepted or frozen; no implementation starts (D-14)."
+            "status": "closed",
+            "date": "2026-10-28",
+            "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+            "record": "10-B was imported in PR #407 from one delivery and three controlled correction rounds: round 1 on the owner's rulings B1 to B9, round 2 on B10 and B11, round 3 the four native-fidelity findings of the Codex review (stabilisation part A). Claude Code validated the returns; Codex reviewed the corrected 10-B result. With every owner ruling applied and no blocking wireframe finding remaining, 10-B is accepted and frozen. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). All three surfaces stay stage S2 and are built in the second release by their own slices.",
+            "accepted": [
+              "The structural wireframes of the three 10-B surfaces as imported in PR #407: 10 states, each in one 1280 px desktop frame, English only (ADM-159).",
+              "The 10-B group-only classes in batch-10-b.css as delivered (every selector scoped by adm-s2-).",
+              "Rulings B1 to B11 as applied, and correction rounds 1 to 3.",
+              "The exceptions as recorded, the native table's own sideways scroll at 1024 px (B9) included."
+            ],
+            "not_accepted": "Nothing here adopts a ruling the owner did not make. The follow-ups for the build stay open (B3, B6, B7, B8, B9), with OP-13, CR-15, CR-05 and OD-01."
+          },
+          "freeze": {
+            "status": "in_force",
+            "date": "2026-10-28",
+            "record": "Frozen on the acceptance of 10-B on 28 October 2026 at these hashes: ad-dashboard-customers-conversion as first delivered, ad-email-template-editor after correction round 2, ad-customer-metrics-export after correction round 3, and batch-10-b.css after correction round 1. A later change comes only through a controlled correction.",
+            "files": {
+              "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html": "021bafe5a58408d0375b0af365431fa355a9dfab18b7b6cd405ac8cf97613f65",
+              "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html": "a7bd2afda224486e711bed5a35d13a28f2777b8d161112e463ec656ec27d0778",
+              "design/wireframes/s2/batch-10/ad-email-template-editor.en.html": "b3d9406c1f97c1599d9fc2f279d5cd52c2d9caaf508b8061fdf0955207be705b",
+              "design/wireframes/s2/batch-10/batch-10-b.css": "0bd68d6f184131b4cfc183ae4357fb1169af0453753b864a19a87fe3e60686cb"
+            }
           },
           "owner_rulings": [
             "B1 (27 October 2026): approved. New and returning customers in their own added block under the native Performance tiles, with the two routes to Analytics Orders filtered by customer type; the native tiles unchanged.",
@@ -2478,20 +2530,39 @@
             ]
           }
         }
-      ]
+      ],
+      "closure": {
+        "status": "accepted",
+        "date": "2026-10-28",
+        "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+        "record": "Both groups are accepted and frozen: 10-A by the owner on 27 October 2026 (PR #406), 10-B on 28 October 2026 (PR #407). All eight contracted second-release surfaces are reviewed: 25 states, 10-A in English and Arabic, 10-B in English. The shared header correction H (#253) reached the 10-A files through batch-02-targets.css (PR #410) and changed none of them. Workflow step 7 is complete. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14)."
+      }
     }
   ],
   "stabilisation": {
-    "status": "returned",
+    "status": "closed",
+    "supplementary_review": {
+      "date": "2026-10-28",
+      "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+      "record": "The seven surfaces the closure preparation reopened or added were reviewed on their imported files (PR #411): em-email-change, ad-translation-status, ac-account-details, ad-customer-notes, ad-shipment-panel, ad-seo-fields and ad-navigation-editor, every inventory state covered in every required language and viewport. They are reviewed. ad-translation-status joins the 09-B freeze; the seven batch-09 files corrected in this round carry their new hashes in their groups' freezes (corrected_in_stabilisation). The two design recommendations are recorded as Claude Design's, not as owner rulings: the tracking correction typed by staff from the Shipment record, and the redirect offered after a slug change. The dated batch reviews stay the historical acceptance of their original artefacts. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14)."
+    },
+    "phase_closure": {
+      "date": "2026-10-28",
+      "decided_by": "Claude Code and Codex (gpt-6.1-sol), each checking the other, under the owner's instruction of 27 October 2026 to close the wireframe phase between them; not the owner's own review",
+      "record": "The low-fidelity wireframe phase is closed: workflow section 5, steps 3 to 8. Every contracted surface the inventory assigns to a wireframe batch is reviewed in batches 01 to 10, every state in every required language and viewport (tools/design_wireframes.py holds the manifest to the inventory and the files). Step 6, the structural component and interaction system, was stabilised in this round: the shared corrections of part B, the completeness additions of part C, the text corrections of part D and the partial shared-layer consolidation of part E, with the rest of D6 deferred in the residual register. Step 7 closed with batch-10. Step 8, the review of the complete structural UX, rests on the coverage audit of 27 October 2026 (595 delivery rows each accounted for once; the gaps it found were added and are now drawn and reviewed), the targeted Chromium measurements of every storefront frame and the checks of this round. What remains is in residual: build items, fidelity-round items, client and content inputs, and owner input. This is the internal review of low-fidelity structural wireframes only. It is not client approval or contractual acceptance, not approval of the brand identity or the high-fidelity design, not PRE-03b, and it starts no functional implementation (D-14). The next step is 9, the brand identity, which waits on the client (OD-01).",
+      "next": "Workflow section 5, step 9: receive and apply the brand identity (OD-01, client). Steps 10 to 13 follow; storefront implementation stays frozen until PRE-03b (D-14)."
+    },
     "date": "2026-10-27",
     "return": {
       "date": "2026-10-28",
       "source": "Claude Design, mizzey-wireframe-stabilisation-output.zip (SHA-256 30894784651e6c36863209c5962590b7c81bf99896a4e8bfc8d55db675e05300, 120 files: parts A to D at the ZIP root with the handoff, ruling H alone under h-only/, part E under part-e/), from mizzey-wireframe-stabilisation-package-v1.zip (SHA-256 a418c1fd5ea734e1bae70cd0f2bac7dbd5d50b94be363aa1e803d490f397ca63, 312 entries, built from 8419786). Handoff wireframe-stabilisation-handoff.md, SHA-256 839bedc6cb3e096c78df8e686128dbe8079476e9691010a3536dc83b75092788, not committed. Archived privately; nothing from it is committed beyond the files each import names.",
-      "validation": "By Claude Code on 28 October 2026: every hash and size in the handoff matches; the root holds exactly the expected A to D files plus s1/batch-08/batch-08.css (the new email page's review sheet, moved from an inline style element and scoped by :where(.rpg), a class only the two em-email-change files carry); the frozen files changed are exactly the seven named batch-09 files; h-only/ differs from the baseline by ruling H only; every part-e/ HTML file differs from its A to D base by one stylesheet link. Chromium measurements against the baseline, every storefront file with and without the WCAG 1.4.12 override: signup fields under 44 px in 160 file passes before and none after; batch-01 and batch-02 text links under 44 px in 109 and 112 passes before, 3 and 6 after, every remaining one identical to the baseline and outside the package (a link under an open overlay, sf-pdp-simple 'See all reviews', sf-free-shipping-progress 'Continue shopping'); the Arabic mobile header wider than its box in 32 files before and none after. checks/text-check.js finds nothing in the nine administration files. Part E: every element box and computed style of its 77 files, both passes, identical before and after.",
+      "validation": "By Claude Code on 28 October 2026: every hash and size in the handoff matches; the root holds exactly the expected A to D files plus s1/batch-08/batch-08.css (the new email page's review sheet, moved from an inline style element and scoped by :where(.rpg), a class only the two em-email-change files carry); the frozen files changed are exactly the seven named batch-09 files; h-only/ differs from the baseline by ruling H only; every part-e/ HTML file differs from its A to D base by one stylesheet link. Chromium measurements against the baseline, every storefront file with and without the WCAG 1.4.12 override: signup fields under 44 px in 160 file passes before and none after; a.lnk target instances under 44 px: without text spacing, 109 before and 3 after; with text spacing, 112 before and 6 after, every remaining one identical to the baseline and outside the package (a link under an open overlay, sf-pdp-simple 'See all reviews', sf-free-shipping-progress 'Continue shopping'); the Arabic mobile header wider than its box in 32 files before and none after. checks/text-check.js finds nothing in the nine administration files. Part E: every element box and the sampled computed colour, background, font size and weight, border, display and visibility of its 77 files, both passes, identical before and after.",
       "review": "Codex (gpt-6.1-sol), 28 October 2026, read-only: import with records notes; nothing blocking, and no contracted surface or state needs another Claude Design round.",
       "imports": [
         "A: ce311a0 on #407 (10-B correction_round_3).",
-        "H: 926f5a7 on documentation/stabilisation-h (#253): from h-only/, s1/batch-02/batch-02-targets.css and s1/batch-01/gl-header-mobile.ar.html, the mobile header's spacer may close (.mh__sp min-inline-size 0). Measured by Claude Code: the Arabic mobile header no longer exceeds its box at 360 px with the WCAG 1.4.12 override in any of the 33 files (32 linking the sheet, and gl-header-mobile.ar), every item still 44 px, nothing moves without the override. This closes the defect the 10-A acceptance left open ('not_accepted'); that text stays as history. The eleven frozen 10-A HTML files are unchanged; they receive the correction through the stylesheet, which no freeze lists."
+        "H: 926f5a7 on documentation/stabilisation-h (#253): from h-only/, s1/batch-02/batch-02-targets.css and s1/batch-01/gl-header-mobile.ar.html, the mobile header's spacer may close (.mh__sp min-inline-size 0). Measured by Claude Code: the Arabic mobile header no longer exceeds its box at 360 px with the WCAG 1.4.12 override in any of the 33 files (32 linking the sheet, and gl-header-mobile.ar), every item still 44 px, nothing moves without the override. This closes the defect the 10-A acceptance left open ('not_accepted'); that text stays as history. The eleven frozen 10-A HTML files are unchanged; they receive the correction through the stylesheet, which no freeze lists.",
+        "B, C and D: aa71bbf on documentation/stabilisation-import, 31 changed and 3 new files from the ZIP root. Beyond the file lists, accepted on review: s1/batch-08/batch-08.css carries em-email-change's review sheet, moved from an inline style element and scoped by :where(.rpg), a class only the two em-email-change files carry; the same signup-field rule corrects the home page's own field in sf-home and gl-cookie-consent; gl-footer and sy-404 keep OD-18 whole in a no-wrap span. The seven frozen batch-09 files changed are exactly those the package names; their freeze records keep the previous hashes under corrected_in_stabilisation. Records notes from the Codex review: em-email-change and the two account states satisfy ACCT-02, US-10-05 and batch-06 correction C, the current address stays the account email until confirmation, no AUTH-12 lifetime is invented, the mechanism and replay handling stay #308's; a reused link leaves the account's actual current address unchanged and never restores an illustrated old address; the consent line (Given, Not given, Withdrawn) is marketing consent only, read-only, NOTF-11 stays #285's, unsubscribe links at launch remain, and 'in the account' is a second-release example (ac-notification-preferences, S2), not an S1 page; the tracking correction is an added staff action with a native private order note, not Bosta's interface, storage and synchronisation unverified under #291; the slug-change offer is Claude Design's recommendation, not an owner ruling, keeps R1's single Redirection mechanism and the adapter's refusals, and #287 must keep Redirection's automatic permalink monitoring from bypassing it; the footer state covers SSC-08 and S04.5 in the native template-part editor; ad-translation-status draws WPML's own reports, and the independently edited Arabic menu or footer gap stays open under #311, so US-22-06 is not verified. Handoff corrections: part E's stylesheet sizes are 6,531, 4,275 and 7,918 bytes, and sf-home.en is 149,892 bytes with sf-home.ar 159,687, both under the 256 KB cap. S6 (the frozen sf-brand-landing links batch-07.css) is confirmed and explains part E's batch-07 deferral; S1 to S5 and S7 are in the residual register. No further Claude Design round.",
+        "E: 1f8dda0 on documentation/stabilisation-shared-layer, from part-e/: D6 partially delivered. Done: commitment 3, the batch-04 rules copied into later batches, consolidated where the constraints allow: the 23 rules two or more of batch-04.css, batch-05.css and batch-08.css held verbatim now live once in the new s1 shared sheet design/wireframes/_shared/carried.css (3,028 bytes), removed from batch-04.css (22 rules, 6,531 bytes), batch-05.css (21, 4,275) and batch-08.css (6, 7,918, its part C block kept), and linked after components.css by the 77 HTML files of those batches, which is their only change. Exactly those 77 files link the three sheets; no frozen file links any of them. Measured independently by Claude Code: every element box and the computed colour, background, font size and weight, border, display and visibility of every element, in all 77 files with and without the WCAG 1.4.12 override, identical before and after. Deferred, because the stylesheets involved are linked by frozen files and must stay byte-identical: moving batch-01 to 03 onto components.css, removing .sm__itd, promoting the dialog to fb-modal in components.css, and the 30 rules carried into batch-07.css (linked by the frozen 10-A sf-brand-landing). The deferral rests on those constraints; it is not a finding that no partial batch-01 migration is possible. Carried in the residual register."
       ]
     },
     "authority": "The owner's instruction of 27 October 2026 to close the wireframe phase (workflow section 5, steps 6 to 8), worked between Claude Code and Codex as an independent reviewer, each checking the other; the owner carries packages to Claude Design and pastes its prompt. This record is no owner acceptance, approves no implementation (D-14), changes no signed scope and is not PRE-03b.",
@@ -2519,7 +2590,7 @@
     },
     "import_boundaries": "One package, one return: parts A to D at the ZIP root, ruling H alone under h-only/, part E under part-e/, each file whole. Imported byte for byte in separate pull requests: A on #407; H alone (#253, from h-only/); the other B items with C and D as the stabilisation import; E alone (from part-e/). Every frozen batch-09 file a part changes is named in the package, and its freeze record keeps its history and gains the new hash.",
     "record_only": [
-      "K4 (batch-09 closure): D-19 settles related products as the staff's assignment in the Upsells field, which ad-product-storefront-controls draws; K4 closes with no drawing when D-19 is merged. D-19 item 8 keeps the superseded notes of closed-batch files and lists them; they are not redrawn.",
+      "K4 (batch-09 closure): D-19 settles related products as the staff's assignment in the Upsells field, which ad-product-storefront-controls draws; K4 is closed without another drawing: D-19 merged on main as 2b4aa90 (PR #409) and confirms the drawn Upsells assignment. D-19 item 8 keeps the superseded notes of closed-batch files and lists them; they are not redrawn.",
       "ac-reorder (10-A, frozen, accepted): the available and item_no_longer_available frames show abridged cart lines (quantity and Remove). The canonical cart is sf-cart, which keeps Move to wishlist (CART-04); nothing in reorder changes it.",
       "09-B Q1 to Q13 (review of 21 October 2026), dispositions: Q1 interface design (mandatory section fields); Q2's inventory gap is addressed by the briefed ad-translation-status surface (its annotation, review and #311's missing-link reporting gap remain open); Q3, Q4, Q11 and Q12 client, Stage 1; Q5 client, OD-01; Q6 (collection search fields and image, US-03-09), Q7 (category banner source, SSC-04) and Q10 (synonym entries editable) drawn as working defaults, the owner's confirmation open; Q8 build, a WPML setting; Q9 staging, #282; Q13 staging check of WPML in the site editor."
     ],
@@ -2673,9 +2744,94 @@
           "#310"
         ],
         "note": "Unresolved batch-01 to batch-08 deferred items stay carried unless explicitly superseded: the #308 email-verification and address-book mechanisms, #307 wishlist behaviour, #309 review settings, #310 contact form and campaign handling, and the search, authentication and integration decisions."
+      },
+      {
+        "item": "S1: the batch-01 wishlist heart on product cards (.card__w) is 36 x 36 px with no hit area",
+        "class": "build",
+        "refs": [
+          "NFR-11"
+        ],
+        "note": "Stabilisation return. Reach the 44 px target in build without changing the pattern; batch-02 onward already give it a 4 px ::after."
+      },
+      {
+        "item": "S2: OD-18 breaks at its hyphen in the footer's legal value slot at 360 px with text spacing, from batch-02 on",
+        "class": "fidelity round",
+        "refs": [
+          "OD-18"
+        ],
+        "note": "Fixed in gl-footer and sy-404 by a no-wrap span; the other footers need an HTML change, frozen files included, when those artefacts are next editable. No frozen-file exception is inferred."
+      },
+      {
+        "item": "S3: batch-06's back link (.abk, My account) is overlapped by the heading, its hit 35 to 38 px",
+        "class": "fidelity round",
+        "refs": [
+          "NFR-11"
+        ],
+        "note": "Batch-06, the 10-A account pages and the two new ac-account-details states; correct in the fidelity round, then verify in build."
+      },
+      {
+        "item": "S4: gl-cookie-consent's inline Privacy policy link is 19 px tall",
+        "class": "owner input",
+        "refs": [
+          "NFR-11"
+        ],
+        "note": "WCAG 2.5.8 exempts a link in a sentence; the stabilisation package's storefront target baseline asks 44 px. The discrepancy is kept for the owner; WCAG's exception does not itself waive the owner's baseline."
+      },
+      {
+        "item": "S5: the 09-B site-editor frames (frozen batch-09-b.css) do not hold at 200 % text, the new ad-navigation-editor footer state included",
+        "class": "fidelity round",
+        "refs": [
+          "SSC-08",
+          "ADMIN-BASELINE 4"
+        ],
+        "note": "Do not certify these frames as passing 200 % text."
+      },
+      {
+        "item": "S7: ad-seo-fields slug_changed draws the redirect offer on a product only",
+        "class": "build",
+        "refs": [
+          "#276",
+          "#287",
+          "MKT-13"
+        ],
+        "note": "One drawing with its reuse annotation covers category and page slugs; verify their placement and behaviour under #276 and #287."
+      },
+      {
+        "item": "Native labels drawn as annotations, not exact reproductions",
+        "class": "build",
+        "refs": [
+          "#311",
+          "#287"
+        ],
+        "note": "Codex, 28 October 2026: WPML's active dashboard renders needs update and not translated as status icons with tooltips, the drawn chips are an annotation; String Translation's filter is Translation needed but its row status reads Not translated; Redirection is not installed, so its list columns and add form are unverified. Align during native-fidelity verification."
+      },
+      {
+        "item": "D6, the parts of the shared-layer consolidation not delivered: batch-01 to 03 onto components.css, removing .sm__itd, the dialog as fb-modal, the rules carried into batch-07.css",
+        "class": "fidelity round",
+        "refs": [
+          "D6"
+        ],
+        "note": "Deferred in the stabilisation round because each needs a stylesheet that frozen files link (components.css, batch-02.css, batch-02-targets.css, batch-03.css, batch-06.css, batch-07.css). Taken up when those sheets are next editable; part E delivered the batch-04, 05 and 08 consolidation."
+      },
+      {
+        "item": "Inherited privacy-request table overflow at 200 % text",
+        "class": "fidelity round",
+        "refs": [
+          "ADM-105",
+          "ADMIN-BASELINE 4"
+        ],
+        "note": "ad-customer-metrics-export:export_ready's native request table overflows its frame at 200 % text at 1280 px, as the stabilisation handoff reports and as at the baseline. Verify during native-fidelity work; B9's report-table scrolling ruling does not establish acceptance of this separate condition."
+      },
+      {
+        "item": "Remaining target findings from the stabilisation measurements",
+        "class": "fidelity round",
+        "refs": [
+          "NFR-11"
+        ],
+        "note": "Carry the sf-pdp-simple 'See all reviews' target (hit 30 to 38 px where uncovered) and batch-07 ct-campaign-page's 'Shop the offer' (43 to 43.5 px), then verify in build. Links measured at 0 px are covered by an open overlay in that frame (for example sf-free-shipping-progress 'Continue shopping' behind its drawer and the promo strip behind the cookie notice): background links, not actionable undersized targets."
       }
     ],
-    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. They do not accept the additions requested on 27 October 2026. ac-account-details, ad-customer-notes, ad-shipment-panel, ad-seo-fields and ad-navigation-editor need supplementary review; em-email-change and ad-translation-status remain briefed and undrawn. Existing freezes remain in force until an approved controlled correction is imported."
+    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. The additions requested on 27 October 2026 were reviewed separately on 28 October 2026, as stabilisation.supplementary_review records. Controlled corrections preserve the previous approved hashes; current in-force hashes are in each group's freeze."
   },
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
   "entries": [
@@ -3542,13 +3698,13 @@
       "batch": "batch-06",
       "brief": "design/briefs/ac-account-details.md",
       "artifacts": ["design/wireframes/s1/batch-06/ac-account-details.en.html", "design/wireframes/s1/batch-06/ac-account-details.ar.html"],
-      "en_ltr": "drawn",
-      "ar_rtl": "drawn",
-      "mobile": "drawn",
-      "desktop": "drawn",
-      "states_covered": ["default", "validation", "saved", "email_change"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default", "validation", "saved", "email_change", "email_change_confirmed", "email_change_link_invalid"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ac-password",
@@ -3841,26 +3997,26 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-navigation-editor.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-navigation-editor.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": ["default", "edit_structure", "nested_levels", "arabic_version"],
+      "desktop": "reviewed",
+      "states_covered": ["default", "edit_structure", "nested_levels", "arabic_version", "footer"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-translation-status",
       "batch": "batch-09",
       "brief": "design/briefs/ad-translation-status.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
+      "artifacts": ["design/wireframes/s1/batch-09/ad-translation-status.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "not_started",
-      "states_covered": [],
+      "desktop": "reviewed",
+      "states_covered": ["default", "missing"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-promo-banner-manager",
@@ -3970,20 +4126,14 @@
       "surface": "ad-dashboard-customers-conversion",
       "batch": "batch-10",
       "brief": "design/briefs/ad-dashboard-customers-conversion.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-dashboard-customers-conversion.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "empty_range",
-        "date_range"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty_range", "date_range"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-product-edit-additions",
@@ -4107,13 +4257,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-shipment-panel.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-shipment-panel.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error"],
+      "desktop": "reviewed",
+      "states_covered": ["default", "not_sent", "sent_with_tracking", "pickup_requested", "carrier_error", "tracking_corrected"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-carrier-status-mapping",
@@ -4159,13 +4309,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-customer-notes.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-customer-notes.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
+      "desktop": "reviewed",
       "states_covered": ["default", "empty", "list", "added"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-customer-suspend",
@@ -4184,20 +4334,14 @@
       "surface": "ad-customer-metrics-export",
       "batch": "batch-10",
       "brief": "design/briefs/ad-customer-metrics-export.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-customer-metrics-export.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "empty",
-        "export_ready"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "empty", "export_ready"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-promotion-editor",
@@ -4309,13 +4453,13 @@
       "batch": "batch-09",
       "brief": "design/briefs/ad-seo-fields.md",
       "artifacts": ["design/wireframes/s1/batch-09/ad-seo-fields.en.html"],
-      "en_ltr": "drawn",
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": ["default", "defaults", "overridden", "arabic_version"],
+      "desktop": "reviewed",
+      "states_covered": ["default", "defaults", "overridden", "arabic_version", "slug_changed"],
       "interaction_pending": [],
-      "review_status": "wireframed"
+      "review_status": "reviewed"
     },
     {
       "surface": "ad-redirect-manager",
@@ -4373,21 +4517,14 @@
       "surface": "ad-email-template-editor",
       "batch": "batch-10",
       "brief": "design/briefs/ad-email-template-editor.md",
-      "artifacts": [
-        "design/wireframes/s2/batch-10/ad-email-template-editor.en.html"
-      ],
-      "en_ltr": "drawn",
+      "artifacts": ["design/wireframes/s2/batch-10/ad-email-template-editor.en.html"],
+      "en_ltr": "reviewed",
       "ar_rtl": "not_applicable",
       "mobile": "not_applicable",
-      "desktop": "drawn",
-      "states_covered": [
-        "default",
-        "edit",
-        "arabic_version",
-        "preview"
-      ],
+      "desktop": "reviewed",
+      "states_covered": ["default", "edit", "arabic_version", "preview"],
       "interaction_pending": [],
-      "review_status": "exploration"
+      "review_status": "reviewed"
     },
     {
       "surface": "rp-sales",
@@ -4536,14 +4673,14 @@
       "surface": "em-email-change",
       "batch": "batch-08",
       "brief": "design/briefs/em-email-change.md",
-      "artifacts": [],
-      "en_ltr": "not_started",
-      "ar_rtl": "not_started",
-      "mobile": "not_started",
-      "desktop": "not_started",
-      "states_covered": [],
+      "artifacts": ["design/wireframes/s1/batch-08/em-email-change.en.html", "design/wireframes/s1/batch-08/em-email-change.ar.html"],
+      "en_ltr": "reviewed",
+      "ar_rtl": "reviewed",
+      "mobile": "reviewed",
+      "desktop": "reviewed",
+      "states_covered": ["default"],
       "interaction_pending": [],
-      "review_status": "briefed"
+      "review_status": "reviewed"
     },
     {
       "surface": "em-staff-native",
