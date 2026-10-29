@@ -257,9 +257,10 @@ Live status. First action each session: read this, then continue from **Next**.
   not accepted.** The pilot and audit work on product cost ends here; the next work is #249.
 - **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
   companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
-  accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08 reads "approval pending / sent
-  date not evidenced"**, and the deemed-approval rule is not applied.
-- **The ERP pack is ready to send and not sent**: `docs/erp-pack/`. The SKU is the contracted matching baseline
+  accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08: the Stage 1 set was submitted by dated email on 21 October
+  2026**; its review period ends on 4 November 2026, and Stage 1 closes on the signed Approval Record.
+- **The ERP requirements were sent on 21 October 2026** (MS-ERP-2026-040 v1.0, in place of `docs/erp-pack/`) and
+  forwarded to the ERP team on 22 October; the joint meeting is not yet set. The SKU is the contracted matching baseline
   (CR-18, ADM-34); the pack confirms how the SKU behaves and no longer asks what the key should be.
 - **The Accountant clarification MS-CLR-2026-037 is at version 1.1**: "P1-L, S1" is the proposed classification
   of ROLE-06, effective only on signature. Not sent, not acknowledged; the signed register is untouched.
@@ -396,7 +397,7 @@ staging: `docs/2026-10-05-staging-regression-after-repairs.md`. No known enginee
 | Status | State |
 |---|---|
 | **Engineering pre-development readiness** | **Complete.** Normal Stage 1 development can proceed continuously; remaining external items are isolated to explicit acceptance, integration or launch gates |
-| **Contractual pre-development acceptance** | **Pending.** PRE-07 is not held, PRE-03b is not approved, PRE-08 reads "approval pending / sent date not evidenced", PRE-09 is not written, and the Accountant clarification is not acknowledged |
+| **Contractual pre-development acceptance** | **Pending.** PRE-07 is not held, PRE-03b is not approved, PRE-08 was submitted on 21 October 2026 and awaits approval, PRE-09 is not written, and the Accountant clarification is not acknowledged |
 
 1. **Mustafa's review of the repair report**, still owed from D-13. `DECISIONS.md` D-13,
    `docs/2026-10-05-staging-regression-after-repairs.md`, `docs/2026-10-05-storefront-placeholder-guard.md`, and
@@ -444,7 +445,7 @@ outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09
 | Blocks final acceptance | OD-12 product cost basis, who enters it, zero versus missing (AC-7 of #252) | Client |
 | Blocks final acceptance | The Accountant Scope Clarification MS-CLR-2026-037, prepared and **not acknowledged**, for the ROLE-06 criteria | Client |
 | Blocks final acceptance | CX-02 to CX-06, resolved by the owner (D-12) and **not client-confirmed**: dependent criteria are `provisional` or `pending CX-nn` | Client confirmation of each reading |
-| Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**, prepared with a runbook, and not held until the fixed staging address exists; PRE-08 approval of the Functional Specification, **approval pending / sent date not evidenced** | Client, with Mustafa |
+| Blocks final acceptance | PRE-07 the store operations walkthrough, **overdue and not held**, prepared with a runbook, and not held until the fixed staging address exists; PRE-08 approval of the Functional Specification, **submitted 21 October 2026, approval pending** | Client, with Mustafa |
 | Blocks production or launch only | OD-27 written instruction on hosting outside Egypt, **not client-approved**; OD-14 operating budget | Client |
 | Blocks production or launch only | OD-18 domain and legal entity details; CR-04 policy text; CR-05 photographs; CR-09 the full catalogue export | Client |
 | Content or client input | D-242-1 to D-242-4, the page copy for IA-24 to IA-32, the final Arabic endpoint slug wording | Client |

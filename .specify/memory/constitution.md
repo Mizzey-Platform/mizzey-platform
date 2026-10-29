@@ -1,6 +1,6 @@
 # Mizzey Launch Platform Constitution
 
-**Version**: 1.2.0 | **Ratified**: pending (governance PR #235) | **Last Amended**: 2026-10-05
+**Version**: 1.2.0 | **Ratified**: 2026-09-22 (governance PR #235, merged as `7986d85`) | **Last Amended**: 2026-10-05
 
 This constitution governs every specification, plan, task and pull request in this repository. Spec Kit reads it
 through `/speckit-plan` (Constitution Check) and `/speckit-analyze`.
