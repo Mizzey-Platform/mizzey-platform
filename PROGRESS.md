@@ -257,8 +257,10 @@ Live status. First action each session: read this, then continue from **Next**.
   not accepted.** The pilot and audit work on product cost ends here; the next work is #249.
 - **The pre-development documents are technically complete (#266, `Verified`)**: `docs/pre-development/`. Two
   companions were written, a sitemap with the principal user flows (PRE-03a) and an inventory of integrations,
-  accounts and inputs (PRE-05). Neither is delivered to the client yet. **PRE-08: the Stage 1 set was submitted by dated email on 21 October
-  2026**; its review period ends on 4 November 2026, and Stage 1 closes on the signed Approval Record.
+  accounts and inputs (PRE-05). The sitemap companion was included in the Stage 1 submission on 21 October 2026; delivery of the PRE-05 companion
+  is not established here. **PRE-08: the Stage 1 set was submitted by dated email on 21 October
+  2026**; its review period ends on 4 November 2026. Formal Stage 1 closure still requires the signed Approval Record and
+  the staging and repository demonstration.
 - **The ERP requirements were sent on 21 October 2026** (MS-ERP-2026-040 v1.0, in place of `docs/erp-pack/`) and
   forwarded to the ERP team on 22 October; the joint meeting is not yet set. The SKU is the contracted matching baseline
   (CR-18, ADM-34); the pack confirms how the SKU behaves and no longer asks what the key should be.
@@ -453,7 +455,7 @@ outside Stage 1, #318 and #319, hold rows the register itself stages "Per PRE-09
 | Vendor or account input | The Paymob merchant account and wallet approval; the carrier account, API key and rate card | Client and provider |
 | Vendor or account input | Bosta status code legend (SHIP-14, ADR-0002); COD remittance cycle OD-20 (SHIP-16) | Client or Bosta |
 | Vendor or account input | The Google, Meta and TikTok accounts | Client |
-| ERP input | PRE-09 ERP Integration Specification (the 19 P1-E rows, MIG-14 among them) and AC-246-11. The question pack is ready to send | Mustafa sends the pack; then the joint meeting with the ERP team, targeted week 4 |
+| ERP input | PRE-09 ERP Integration Specification (the 19 P1-E rows, MIG-14 among them) and AC-246-11. The ERP requirements were sent on 21 October 2026 and forwarded on 22 October; PRE-09 is not yet written | Joint meeting and ERP responses; then preparation and client approval of PRE-09 |
 | Configurable working default | OD-03, OD-04, OD-05, OD-15, OD-19, OD-21: owner decisions, **not client-confirmed** | Client confirmation, at any time |
 | Repository visibility | The end of the external review period | Mustafa, explicitly |
 

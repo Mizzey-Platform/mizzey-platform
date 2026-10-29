@@ -1810,8 +1810,7 @@ the owner's to decide, before the work it blocks.
 
 ## 2026-10-23 - D-19: badges and curated rails stay manual, related products are the staff's assignment, and only the ERP moves stock
 
-**Status: applied on `main`, 27 October 2026 (PR #409, merged as `2b4aa90`); recorded as applied by D-20.** D-18 is proposed
-separately in PR #396 and is not on `main`; this entry follows it in number only.
+**Status: applied on `main`, 27 October 2026 (PR #409, merged as `2b4aa90`); recorded as applied by D-20.** D-18 is also on `main`, through PRs #395 and #396.
 
 Owner decisions of Mustafa, 23 October 2026, given on the read-only merchandising and ERP stock audit of 22 and 23
 October. **None is a client confirmation, none adds or removes scope, and the Feature Register reads exactly as
@@ -1985,22 +1984,36 @@ CoreX; anything commerce-related stays with WooCommerce; native WordPress and Wo
 | D2 | Build Stage 3 before Stage 2 while the brand identity is awaited? | No. The stage order stays; the interval is used for decisions, the CoreX upgrade and staging |
 | D3 | Show the client a structure preview before the brand identity? | Yes: one clean walkthrough on a private link, marked structure only, outside the contractual review clock |
 | D4 | End the public-repository review period (D-08) and prepare the clean client copy? | Yes, when the review is finished; the client copy goes to their GitHub organisation once it exists |
-| D5 | The owner actions for the Stage 1 demonstration and the client emails? | The owner sends the prepared emails himself, holds the demonstration and records the dates |
+| D5 | The owner actions for the Stage 1 demonstration and the client emails? | The owner keeps the weekly written progress update, sends the prepared emails himself, holds the demonstration and records the dates |
 | D6 | Rewrite repository history? | No |
 | D7 | Separate the WordPress compatibility pin from the exact tested patch in `stack.lock.json`? | Yes, a small checker correction |
 | D8 | **When may the non-storefront work resume (D-14)?** | Approval authorises the agreed non-storefront PBI queue after the CoreX v0.47.0 upgrade passes. Fixtures, mocks and contracts stand in while external inputs are pending; PRE-07 and PRE-09 conditions stay for dependent work. Storefront implementation stays frozen until PRE-03b |
 | D9 | Reconcile the specification with the locked decisions and contracted scope? | Yes, through the document route, only where the current v1.4 still needs correction: preserve IX-02/IX-10, remove superseded promises of deferred returns, saved views or self-service import, and repair the identified traces and deliverable wording. Client scope clarifications stay separate |
 
-**2. What D-20 settles in earlier records.** D-18 sections 6 to 9 are approved (A1, A2; PR #396 merged). The items D-18
-sections 5 and 9 left open are settled by rows A4 to A15, and the redirect mechanism by ruling R1 of 21 October 2026
-(Redirection, the single mechanism). The Paymob demonstration site on the production domain keeps CoreX Coming soon as
+**2. What D-20 settles in earlier records.** D-18 sections 6 to 9 are approved (A1, A2; PR #396 merged). Rows A1 to
+A15 record the owner directions for the items D-18 sections 5 and 9 left open; ruling R1 of 21 October 2026 selects
+Redirection as the single redirect mechanism. These approvals do not complete the concrete release allowlist,
+activation and role assignments, implementation settings, visibility-baseline design follow-up or runtime
+verification. Client inputs remain open as recorded below. The Paymob demonstration site on the production domain keeps CoreX Coming soon as
 a temporary exception to D-18 section 2 until the delivered store replaces it (A1). D-19 is applied (PR #409); K4 is
 closed. DQ-06's current guidance is D-17. CoreX's issue 201 is fixed upstream in v0.42.1; the workaround stays on the
 v0.42.0 pin until the v0.47.0 upgrade passes.
 
-**3. What stays open.** 72 items need the client, Paymob, Bosta, Google or the ERP team, and are asked at the stage they
-block; 26 are proven only in the build and are carried as acceptance evidence. The specification and Technical Design
-corrections (D1, D9) go through the document route with the Stage 1 response; the stale ownership note in the
-specification of feature 002 (PRE-03a, PRE-03b) is corrected by the requirement pull request that next touches it.
-**Restart (D8):** the agreed non-storefront work resumes only after the CoreX v0.47.0 upgrade passes; storefront
-implementation stays frozen until PRE-03b (D-14).
+**3. What stays open.** The inventory's 72 external-input families and 26 verification families remain subject to
+their recorded gates. Owner approval is not client confirmation or technical verification.
+
+D1's repository governance alignment goes through a separate governance PR. Its Technical Design correction and D9's
+specification corrections go through the external document route with the Stage 1 response. The stale PRE-03a and
+PRE-03b ownership note in feature 002 waits for the requirement PR that next touches it.
+
+Dated audits and closed-batch records are preserved as history: R1 governs Redirection; the stabilisation record
+establishes the reviewed email-change surfaces; D-16 governs server staging; later locks and closure rulings supersede
+earlier batch open lists; and D-19 item 8 governs the superseded frozen merchandising annotations. Retaining those
+historical records does not reopen their decisions.
+
+Current operational records affected by D-20, including DQ-01's interaction lock, ADR statuses and current guidance,
+still need synchronisation through the appropriate governance or documentation follow-up before dependent work. This
+PR does not claim that reconciliation is complete.
+
+**Restart (D8):** the agreed non-storefront queue resumes only after the CoreX v0.47.0 upgrade passes, retaining PRE-07
+and PRE-09 conditions for dependent work. Storefront implementation stays frozen until PRE-03b.
