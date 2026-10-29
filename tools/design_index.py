@@ -1,6 +1,6 @@
 """Generate the navigation page of the wireframes, `design/wireframes/index.html`.
 
-One page from which every wireframe can be reached: by journey (the customer flows and the staff flows, step by
+One page from which every batch wireframe can be reached: by journey (the customer flows and the staff flows, step by
 step, each step linking to the screens it uses), by review batch (every surface with its states, languages, viewports
 and review status), and by shared component. It is **generated, never written**: every line comes from
 `design/wireframes/manifest.json` and `design/inventory/` (surfaces, flows, components), so it cannot drift from them.
@@ -119,11 +119,16 @@ def build(data: dict) -> str:
     w(f'<p class="muted">{status}{len(drawn)} drawn surfaces in {files} files, {reviewed} reviewed, in '
       f"{len(batches)} review batches. Generated from the manifest and the inventory by tools/design_index.py; "
       "do not edit this page by hand.</p>")
+    cal = sum(len(f.get("status", {})) * len(f.get("languages", [])) for f in manifest["calibration"]["frames"])
+    w(f'<p class="muted">This index covers the batch wireframes. The {cal} historical calibration files are separate '
+      "explorations and are not indexed here.</p>")
     w('<div class="legend">'
       "<div><b>Structure only.</b> Greys, a system typeface and labelled boxes: not the brand, not the "
       "interface design, not PRE-03b.</div>"
       "<div><b>Languages.</b> English is left to right, Arabic right to left; the notes are in English in both.</div>"
-      "<div><b>States.</b> Each file draws every state listed for its surface, at mobile 360 and desktop widths.</div>"
+      "<div><b>States and viewports.</b> Files show the applicable states and viewports recorded for their surface. "
+      "Some surfaces are desktop-only, and some states apply to English only. Reviewed means internal low-fidelity "
+      "review, not client acceptance or permission to implement.</div>"
       "<div><b>Administration.</b> English only, desktop, drawn on the standard WordPress and WooCommerce "
       "screens.</div></div>")
     w('<nav class="toc" aria-label="Sections">'
