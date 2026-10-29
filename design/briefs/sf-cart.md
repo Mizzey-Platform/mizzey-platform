@@ -99,7 +99,7 @@ Flows it serves: Cart (`F07`); Registration and sign in (`F08`); Reorder, second
 | Notice (`fb-notice`) | feedback | success, error, info, warning |  |
 | Product rail (`cn-product-rail`) | content |  | The rail starts at the inline-start edge and scrolls toward the inline-end edge. |
 
-**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category. Proposed. The register fixes no variant before the interface design is approved.
+**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category, newest, by badge. Proposed. The register fixes no variant before the interface design is approved.
 
 ## States
 
@@ -155,6 +155,12 @@ WooCommerce Cart block.
 |---|---|---|---|---|
 | `OD-04` Free shipping: what two items means | working_default | Two units or two distinct products, and any exclusions. | The prompt reads from the rule. Owner default: two or more units, any mix, no exclusions. | Do not hard-code 'two'. Do not draw exclusions. |
 | `PRE-09` ERP Integration Specification | erp | When and how the store reads stock, what the customer sees when stock cannot be validated, how reservation works, and how stock appears in the admin. | Structural stock states: in stock, out of stock, unknown or cannot validate, and a changed cart line. Neutral placeholder wording. | No timing, no mechanism, no 'only N left', no reservation timer, no stock quantity shown to customers, no admin stock editing behaviour. No P1-E surface beyond a placeholder. |
+
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-10` Related products and cart suggestions | Related products are the products the staff assign, stored in WooCommerce's Upsells field and shown through it on the product page. WooCommerce's automatic Related Products rail is not shown, and no rail shows when nothing is assigned. Cart suggestions read the same assignment from the products in the cart; the Cross-sells field is not used at launch. | No automatic category or tag fallback without a client clarification or Change Control, and no second list for staff to keep in the Cross-sells field. |
 
 ## Interaction options
 

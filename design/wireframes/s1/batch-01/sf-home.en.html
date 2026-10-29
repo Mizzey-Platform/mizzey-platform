@@ -74,6 +74,7 @@ code{font-size:11.5px}
 .btn--b{display:flex;inline-size:100%}
 .btn.busy{background:#5c5c5c;border-color:#5c5c5c}
 .lnk{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.lnk::after{content:"";position:absolute;inset-block:calc(50% - 22px);inset-inline:0}
 .chev{display:inline-block;flex:none;inline-size:7px;block-size:7px;border-block-start:1.6px solid currentColor;border-inline-end:1.6px solid currentColor;transform:rotate(45deg)}
 [dir="rtl"] .chev{transform:rotate(-45deg)}
 .chev--down{border-block-start:0;border-block-end:1.6px solid currentColor;margin-block-start:-4px}
@@ -217,6 +218,7 @@ code{font-size:11.5px}
 .suf__r{display:flex;gap:8px}
 .lbl{display:block;font-size:12.5px;font-weight:650;margin-block-end:6px}
 .inp{display:flex;align-items:center;flex:1;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:14px;color:#8a8a8a;min-inline-size:0}
+.suf .inp{min-block-size:48px}
 .inp.v{color:#151515}
 .fld--e .inp{border:2.5px solid #151515}
 .fld--e .err{margin-block-start:8px}
@@ -264,6 +266,8 @@ code{font-size:11.5px}
 .pr{position:relative;display:flex;justify-content:center;align-items:center;gap:14px;block-size:40px;padding-inline:40px;background:#ececec;font-size:13px;font-weight:600}
 .pr__t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-inline-size:0}
 .pr__l{text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex:none}
+.pr__l{position:relative;z-index:6}
+.pr__l::after{content:"";position:absolute;inset-block:-14px -18px;inset-inline:-8px}
 .pr--m{block-size:52px;padding-inline:16px;font-size:12.5px;gap:12px;justify-content:space-between}
 .pr--m .pr__t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
 .pg[lang="ar"] .pr--m .pr__t{line-height:1.45}
@@ -287,7 +291,7 @@ code{font-size:11.5px}
 <div class="eb">Mizzey · S1 low fidelity · batch-01, global frame, discovery and home · Direction C with A-inspired restraint · English, left to right</div>
 <h1 class="mt"><code style="font-size:22px">sf-home</code> Home page</h1>
 <p class="ml">The home page as nine separate, coherent sections from the curated library: one hero, trust signals, category shortcuts, two independent product rails, featured collections, an offer card, brand highlights and a signup prompt. Each can be edited, hidden and reordered on its own.</p>
-<dl class="mf"><dt>Rows</dt><dd>HOME-01 to HOME-11; shaped by IA-01, JRN-01, SSC-02, SSC-03, ADM-59 to ADM-61, MER-02, MER-04. Not drawn: HOME-12, HOME-13</dd><dt>States drawn</dt><dd><code>default</code>, <code>section_hidden</code>, <code>empty_rail</code>, <code>loading</code>, <code>signup_validation</code>, <code>signup_success</code>, <code>long_content</code></dd><dt>Interaction options</dt><dd><code>IX-09</code> locked, single hero. <code>IX-02</code> locked, quick add on the rails. <code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>OD-01</code>, <code>CR-05</code>, <code>CR-15</code>, <code>OP-12</code></dd><dt>Viewports</dt><dd>Mobile, 390 and 360; desktop, 1280</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files.</dd></dl>
+<dl class="mf"><dt>Rows</dt><dd>HOME-01 to HOME-11; shaped by IA-01, JRN-01, SSC-02, SSC-03, ADM-59 to ADM-61, MER-02, MER-04. Not drawn: HOME-12, HOME-13</dd><dt>States drawn</dt><dd><code>default</code>, <code>section_hidden</code>, <code>empty_rail</code>, <code>loading</code>, <code>signup_validation</code>, <code>signup_success</code>, <code>long_content</code></dd><dt>Interaction options</dt><dd><code>IX-09</code> locked, single hero. <code>IX-02</code> locked, quick add on the rails. <code>DQ-01</code> provisional.</dd><dt>Open inputs</dt><dd><code>OD-01</code>, <code>CR-05</code>, <code>CR-15</code>, <code>OP-12</code></dd><dt>Viewports</dt><dd>Mobile, 390 and 360; desktop, 1280</dd><dt>Direction</dt><dd>C structural baseline with premium A-inspired restraint, as selected and reconfirmed by the owner on 18 October 2026.</dd><dt>Status</dt><dd>Drawn for the owner's batch-01 review. Structural and neutral: greys, a system typeface, a labelled box for the logo, no imagery. Not brand, interface or PRE-03b approval. Annotations are in English in both language files. Stabilisation round (27 October 2026): the signup fields keep their 48 px height in the mobile column, and “View all”, “All brands” and “Shop the offer” get a 44 px hit area, with no visible change (NFR-11).</dd></dl>
 </div>
 <nav class="mn" aria-label="Batch-01 surfaces">
 <div class="seg"><span class="on">English, LTR</span><a href="sf-home.ar.html">Arabic, RTL</a></div>

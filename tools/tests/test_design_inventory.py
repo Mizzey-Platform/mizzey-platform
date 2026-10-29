@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -51,8 +52,14 @@ class TheCommittedInventory(unittest.TestCase):
             if p.suffix in (".html", ".css"):
                 self.assertIn(wireframes, p.parents, f"{p.name}: HTML and CSS belong under design/wireframes/ only")
 
-    def test_four_design_questions_are_locked_owner_decisions(self):
-        self.assertEqual([d["id"] for d in self.data["decisions"]], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])
+    def test_design_questions_are_locked_owner_decisions(self):
+        """D-14 locked four (DQ-04 to DQ-07). A later owner decision follows them, under its own DECISIONS entry."""
+        ids = [d["id"] for d in self.data["decisions"]]
+        self.assertEqual(ids[:4], ["DQ-04", "DQ-05", "DQ-06", "DQ-07"])
+        self.assertTrue(all(re.fullmatch(r"DQ-\d{2}", i) for i in ids), ids)
+        self.assertEqual(ids, sorted(set(ids)), "decision ids are unique and in order")
+        for d in self.data["decisions"]:
+            self.assertRegex(d["record"], r"^DECISIONS\.md D-\d{2}$", d["id"])
         self.assertFalse([p["id"] for p in self.data["placeholders"] if p["id"].startswith("DQ-")])
         self.assertFalse([s["id"] for s in self.data["surfaces"] if any(i.startswith("DQ-") for i in s["open_items"])])
         for d in self.data["decisions"]:
@@ -139,12 +146,24 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertTrue(all(marked[k] == "none" for k, _, _ in f["staff_only"]))
         self.assertEqual(marked[277], "needs design")
 
-    def test_second_release_surfaces_stay_inventoried_and_out_of_the_first_wireframe_pass(self):
+    def test_second_release_surfaces_stay_inventoried_until_the_second_release_batch_opens(self):
         second = [s for s in self.data["surfaces"] if s["stage"] == "S2"]
         self.assertEqual(len(second), 8)
+        manifest = json.loads((ROOT / "design/wireframes/manifest.json").read_text(encoding="utf-8"))
+        batch = next(b for b in manifest["batches"] if b.get("release") == "S2")
+        entries = {e["surface"]: e for e in manifest["entries"]}
+        opening = batch.get("opening")
+        grouped = [sid for g in opening["groups"] for sid in g["surfaces"]] if opening else []
+        if opening:
+            self.assertEqual(sorted(grouped), sorted(s["id"] for s in second))
         for s in second:
             self.assertIn("DQ-04", s["decisions"], s["id"])
-            self.assertEqual(s["status"], "inventoried", s["id"])
+            self.assertEqual(entries[s["id"]]["batch"], batch["id"], s["id"])
+            if opening:
+                self.assertTrue(s.get("purpose"), s["id"])
+                self.assertNotEqual(s["status"], "inventoried", s["id"])
+            else:
+                self.assertEqual(s["status"], "inventoried", s["id"])
 
     def test_building_a_surface_elsewhere_leaves_its_rows_with_their_accepting_pbi(self):
         own = di.owners(self.data["slices"])

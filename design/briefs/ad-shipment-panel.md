@@ -79,6 +79,7 @@ Every state below is drawn. A state that is not drawn is a state the build would
 | `sent_with_tracking` | Success |  |  |
 | `pickup_requested` | Other |  |  |
 | `carrier_error` | Error |  |  |
+| `tracking_corrected` | Other |  | US-18-04: staff correct a wrong tracking code; how Bosta returns and stores it is #291's |
 
 ## Responsive
 
@@ -94,13 +95,13 @@ Arabic right to left does not apply. The administration is English only (ADM-159
 
 ## Design freedom
 
-`annotate_only`: The interface belongs mainly to a provider or to the standard administration. The handoff, the state or the extension is documented. The external or native product is not redesigned.
+`constrained`: A platform, a native block, an integration or a contractual condition limits the solution. Design decisions still exist within that boundary.
 
 It governs how the contracted capability is expressed, never what functionality exists.
 
 ## Native baseline
 
-The official Bosta integration for WooCommerce.
+The official Bosta integration for WooCommerce: its own pages, order-list columns and order box. One single-order Send to Bosta entry in WooCommerce's Order actions and a read-only shipment record on the order are additions (owner ruling D1, 26 October 2026); whether the installed integration supports a single-order send is verified in #291.
 
 ## Open inputs
 
@@ -122,13 +123,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Additions to the standard administration, and reports (`batch-09`) |
-| English, left to right | `not_started` |
+| English, left to right | `reviewed` |
 | Arabic, right to left | `not_applicable` |
 | Mobile | `not_applicable` |
-| Desktop | `not_started` |
-| States covered | 0 of 5 |
+| Desktop | `reviewed` |
+| States covered | 6 of 6 |
 | Interaction decisions pending | None |
 | Calibration frames | None |
 
