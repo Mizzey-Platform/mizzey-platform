@@ -58,7 +58,7 @@ behaviour. The full rules are in the [constitution](.specify/memory/constitution
 |---|---|---|
 | CMS | WordPress | 7.1 |
 | Commerce | WooCommerce | 11.1.0 |
-| Framework | [CoreX](https://github.com/MustafaShaaban/corex), pinned in `corex.lock` | v0.46.1 |
+| Framework | [CoreX](https://github.com/MustafaShaaban/corex), pinned in `corex.lock` | v0.47.0 |
 | Translation | WPML with WooCommerce Multilingual (client-held licence) | 4.9.7 / WCML 5.5.7 |
 | Shipping | Bosta (register §2.2, recommended) | 4.5.7 |
 | Payments | Paymob (register §2.1, recommended). Not yet installed | not selected |
