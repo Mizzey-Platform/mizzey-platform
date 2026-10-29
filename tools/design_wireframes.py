@@ -43,6 +43,12 @@ import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
+try:
+    from tools import design_index
+except ImportError:  # run as a script: tools/ itself is the import root
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import design_index
+
 ROOT = Path(__file__).resolve().parent.parent
 WIREFRAMES = "design/wireframes"
 
@@ -270,7 +276,7 @@ def check_manifest(data: dict, root: Path) -> list[str]:
         errs.append("manifest: a direction is selected, and the record does not say by whom and where")
 
     # No file the manifest does not know
-    listed = {p for e in entries for p in e.get("artifacts", [])} | set(expected)
+    listed = {p for e in entries for p in e.get("artifacts", [])} | set(expected) | {design_index.INDEX}
     folder = root / WIREFRAMES
     if folder.is_dir():
         for path in sorted(folder.rglob("*.html")):
@@ -444,6 +450,8 @@ def check_artefacts(root: Path, surfaces: set[str]) -> list[str]:
         if not path.is_file():
             continue
         rel = path.relative_to(root).as_posix()
+        if rel == design_index.INDEX:
+            continue  # generated navigation page, held to its generator in validate()
         if path.suffix == ".html":
             errs += check_html(rel, path.read_text(encoding="utf-8"), surfaces, root)
         elif path.suffix == ".css":
@@ -455,7 +463,8 @@ def check_artefacts(root: Path, surfaces: set[str]) -> list[str]:
 
 def validate(root: Path = ROOT) -> list[str]:
     data = load(root)
-    return check_manifest(data, root) + check_artefacts(root, {s["id"] for s in data["surfaces"]})
+    return (check_manifest(data, root) + check_artefacts(root, {s["id"] for s in data["surfaces"]})
+            + design_index.check(root))
 
 
 def main() -> int:
