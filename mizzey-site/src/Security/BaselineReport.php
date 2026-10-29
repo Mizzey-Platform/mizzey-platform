@@ -35,7 +35,17 @@ final class BaselineReport
         'sign_in_message',
         'recovery_limit',
         'comment_surface',
+        'two_factor_active',
+        'two_factor_roles',
+        'two_factor_bypass',
+        'two_factor_key',
     ];
+
+    /** The WP 2FA release this integration was built and tested against (stack.lock.json). */
+    public const TWO_FACTOR_VERSION = '4.2.1';
+
+    /** The baseline roles of D-21. */
+    public const TWO_FACTOR_ROLES = ['administrator', 'shop_manager'];
 
     /**
      * @return list<array{key:string,status:string,detail:string}>
@@ -54,7 +64,79 @@ final class BaselineReport
             self::fact('file_editor_disabled', defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT, 'DISALLOW_FILE_EDIT'),
             self::fact('debug_display_off', ! (defined('WP_DEBUG') && WP_DEBUG) || (defined('WP_DEBUG_DISPLAY') && ! WP_DEBUG_DISPLAY), __('Errors are not shown to visitors', 'mizzey-site')),
             self::fact('corex_login_protection', self::corexLoginProtectionOn(), 'CoreX login lockout (AUTH-15, #305)'),
+            self::row('two_factor_active', self::twoFactorActive(), sprintf(
+                /* translators: %s: the WP 2FA version. */
+                __('WP 2FA %s active, its sign-in challenge and the enrolment guard hooked', 'mizzey-site'),
+                self::TWO_FACTOR_VERSION,
+            )),
+            self::row('two_factor_roles', self::twoFactorPolicyEnforced(), __('Two-factor required for administrators and shop managers, authenticator app and backup codes, no grace period, no exclusions', 'mizzey-site')),
+            self::row('two_factor_bypass', ! (defined('DISABLE_2FA_LOGIN') && DISABLE_2FA_LOGIN), __('No emergency bypass (DISABLE_2FA_LOGIN)', 'mizzey-site')),
+            self::row('two_factor_key', self::twoFactorKeyInConfiguration(), __('Encryption key provided by configuration; no copy in the database', 'mizzey-site')),
+            self::pendingStaff(),
         ];
+    }
+
+    private static function twoFactorActive(): bool
+    {
+        return defined('WP_2FA_VERSION') && WP_2FA_VERSION === self::TWO_FACTOR_VERSION
+            && has_action('wp_login', ['WP2FA\Authenticator\Login', 'wp_login']) !== false
+            && has_filter('rest_authentication_errors', [TwoFactor::class, 'guardRest']) === 110
+            && has_action('admin_init', [TwoFactor::class, 'guardAdministration']) === 0;
+    }
+
+    /**
+     * The stored policy enforces the D-21 baseline: both roles, no exclusions, an authenticator app and backup codes,
+     * no grace period. Read from WP 2FA's own getter.
+     */
+    private static function twoFactorPolicyEnforced(): bool
+    {
+        if (! class_exists('\WP2FA\WP2FA')) {
+            return false;
+        }
+        $policy = \WP2FA\WP2FA::get_policy_settings();
+        if (! is_array($policy)) {
+            return false;
+        }
+        $roles = array_values((array) ($policy['enforced_roles'] ?? []));
+
+        return in_array($policy['enforcement-policy'] ?? '', ['certain-roles-only', 'all-users'], true)
+            && ($policy['enforcement-policy'] === 'all-users' || array_diff(self::TWO_FACTOR_ROLES, $roles) === [])
+            && (array) ($policy['excluded_roles'] ?? []) === []
+            && (array) ($policy['excluded_users'] ?? []) === []
+            && ($policy['enable_totp'] ?? '') === 'enable_totp'
+            && ($policy['backup_codes_enabled'] ?? '') === 'yes'
+            && ($policy['grace-policy'] ?? '') === 'no-grace-period';
+    }
+
+    /**
+     * The key is configuration's, and nothing of it is in the database: WP 2FA defines the constant itself when it falls
+     * back to a stored key, so the constant alone proves nothing. Existence only; the value is never read.
+     */
+    private static function twoFactorKeyInConfiguration(): bool
+    {
+        global $wpdb;
+        $stored = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", 'wp_2fa_secret_key')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+        return defined('WP2FA_ENCRYPT_KEY') && is_string(WP2FA_ENCRYPT_KEY) && WP2FA_ENCRYPT_KEY !== ''
+            && ! defined('WP2FA_SECRET_IS_IN_DB')
+            && $stored === 0;
+    }
+
+    /**
+     * @return array{key:string,status:string,detail:string}
+     */
+    private static function pendingStaff(): array
+    {
+        $pending = array_filter(
+            get_users(['role__in' => self::TWO_FACTOR_ROLES, 'number' => 500]),
+            static fn (\WP_User $user): bool => TwoFactor::active() && TwoFactor::pending($user),
+        );
+
+        return ['key' => 'two_factor_pending_staff', 'status' => (string) count($pending), 'detail' => sprintf(
+            /* translators: %s: the logins of the staff still to enrol, or none. */
+            __('Staff still to set up two-factor sign-in: %s (reported, not judged here)', 'mizzey-site'),
+            $pending === [] ? __('none', 'mizzey-site') : implode(', ', array_map(static fn (\WP_User $u): string => $u->user_login, $pending)),
+        )];
     }
 
     /**

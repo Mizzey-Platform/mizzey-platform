@@ -4,8 +4,8 @@
  *
  * AC-7: comments and pings are closed on posts and pages, while a product keeps its reviews open (REV-01 to REV-05).
  * AC-8: `wp mizzey security check` lists every control of the baseline, passes on it, reports "review" for a control
- * switched off by a filter. The command exits 0 when every control of this feature passes and 1 when one does not,
- * each run in its own process.
+ * switched off by a filter. The command exits 1 when a control does not pass; on this runtime the two-factor baseline is
+ * deliberately off (t43 covers it), so it names only two_factor_roles. Each run is in its own process.
  *
  * The command is run for real, in its own WP-CLI process, because its exit code is part of the claim. The
  * switched-off case is in process: the report is computed from the live hooks, so removing one hook is the honest way
@@ -80,10 +80,17 @@ run(
 		$code = 0;
 		exec( $cmd, $out, $code );
 		$text = implode( "\n", $out );
-		$check( 0 === $code, "AC-8: the command exits 0 on the baseline (exit {$code})" );
 		foreach ( $expected as $key ) {
-			$check( false !== strpos( $text, $key ), "AC-8: the command output names {$key}" );
+			$check( 1 === preg_match( '/^' . preg_quote( $key, '/' ) . '\tpass/m', $text ), "AC-8: the command reports {$key} as pass" );
 		}
+		// The disposable runtime runs without the two-factor baseline on purpose (specs/008-admin-two-factor): the
+		// two-factor scenarios apply it and restore it. So the check rightly names two_factor_roles and exits 1 here;
+		// t43 proves it exits 0 when the whole baseline, two-factor included, is in force.
+		$check( 1 === preg_match( '/^two_factor_roles\treview/m', $text ), 'the unenforced runtime reports two_factor_roles as review' );
+		foreach ( array( 'two_factor_active', 'two_factor_bypass', 'two_factor_key' ) as $key ) {
+			$check( 1 === preg_match( '/^' . preg_quote( $key, '/' ) . '\tpass/m', $text ), "and {$key} as pass" );
+		}
+		$check( 1 === $code && false !== strpos( $text, 'two_factor_roles' ), "so the command exits 1 naming two_factor_roles, and nothing else of this feature (exit {$code})" );
 
 		// The failure path, in its own process: a control switched off there, then the command run in that process.
 		// Single quotes inside: on Windows, escapeshellarg() turns double quotes into spaces.

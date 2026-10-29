@@ -27,6 +27,10 @@ define( 'LOGGED_IN_SALT', '{{SALT_7}}' );
 define( 'NONCE_SALT', '{{SALT_8}}' );
 define( 'WP_CACHE_KEY_SALT', '{{SALT_9}}' );
 
+// WP 2FA's encryption key (ADM-131): the same for this installation every time, kept in the tool's owner-only state
+// and backed up with this configuration. Set before WordPress loads, so the plugin never stores a key in the database.
+define( 'WP2FA_ENCRYPT_KEY', '{{TWO_FACTOR_KEY}}' );
+
 $table_prefix = '{{TABLE_PREFIX}}';
 
 define( 'WP_ENVIRONMENT_TYPE', 'staging' );

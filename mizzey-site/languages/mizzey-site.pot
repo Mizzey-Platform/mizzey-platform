@@ -400,42 +400,70 @@ msgstr ""
 msgid "Resolve the store record of the parent before the load."
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:46
+#: mizzey-site/src/Security/BaselineReport.php:56
 msgid "No WordPress, WooCommerce, CoreX or WPML generator mark"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:47
+#: mizzey-site/src/Security/BaselineReport.php:57
 msgid "XML-RPC refused before dispatch; no method registered"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:48
+#: mizzey-site/src/Security/BaselineReport.php:58
 msgid "Visitors cannot list users or resolve ?author= numbers; no users sitemap"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:49
+#: mizzey-site/src/Security/BaselineReport.php:59
 msgid "Application passwords for administrators only"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:50
+#: mizzey-site/src/Security/BaselineReport.php:60
 msgid "One sign-in failure message"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:52
+#: mizzey-site/src/Security/BaselineReport.php:62
 msgid "Comments only on products; pings closed"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:55
+#: mizzey-site/src/Security/BaselineReport.php:65
 msgid "Errors are not shown to visitors"
 msgstr ""
 
-#. translators: %s: the configuration fact, such as a constant's name.
+#. translators: %s: the WP 2FA version.
+#: mizzey-site/src/Security/BaselineReport.php:69
+#, php-format
+msgid "WP 2FA %s active, its sign-in challenge and the enrolment guard hooked"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:72
+msgid "Two-factor required for administrators and shop managers, authenticator app and backup codes, no grace period, no exclusions"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:73
+msgid "No emergency bypass (DISABLE_2FA_LOGIN)"
+msgstr ""
+
 #: mizzey-site/src/Security/BaselineReport.php:74
+msgid "Encryption key provided by configuration; no copy in the database"
+msgstr ""
+
+#. translators: %s: the logins of the staff still to enrol, or none.
+#: mizzey-site/src/Security/BaselineReport.php:137
+#, php-format
+msgid "Staff still to set up two-factor sign-in: %s (reported, not judged here)"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:138
+msgid "none"
+msgstr ""
+
+#. translators: %s: the configuration fact, such as a constant's name.
+#: mizzey-site/src/Security/BaselineReport.php:156
 #, php-format
 msgid "%s (reported, not judged here)"
 msgstr ""
 
 #. translators: 1: requests per account, 2: requests per client address, 3: the window in minutes.
-#: mizzey-site/src/Security/BaselineReport.php:145
+#: mizzey-site/src/Security/BaselineReport.php:227
 #, php-format
 msgid "Recovery limited to %1$d per account and %2$d per address in %3$d minutes"
 msgstr ""
@@ -450,8 +478,28 @@ msgstr ""
 msgid "Every baseline check passes. Request behaviour is verified by the integration scenarios."
 msgstr ""
 
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:77
+msgid "WP 2FA is not active."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:84
+msgid "The stored WP 2FA policy is not readable; it was not changed."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:93
+msgid "The two-factor baseline did not persist."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:95
+msgid "Two-factor sign-in is now required for administrators and shop managers. Staff enrol at their next sign-in."
+msgstr ""
+
 #: mizzey-site/src/Security/RecoveryLimiter.php:89
 msgid "Too many password reset requests. Please wait a few minutes and try again."
+msgstr ""
+
+#: mizzey-site/src/Security/TwoFactor.php:136
+msgid "Set up two-factor sign-in before using this."
 msgstr ""
 
 #: mizzey-site/src/Security/XmlRpc.php:40
