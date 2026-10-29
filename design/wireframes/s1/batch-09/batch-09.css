@@ -1,0 +1,254 @@
+/*
+ * Mizzey batch-09, the shared administration pattern set (09-A). Low-fidelity structure for additions to the
+ * standard WordPress 7.1 and WooCommerce 11.1 administration: not theme code, not the brand, not a restyle.
+ * Greys only, no url(), no @import. Every class starts with adm-. Linked after _shared/wireframe.css, never with
+ * _shared/components.css. 09-B to 09-E reuse it unchanged; group-only rules go in adm-b- to adm-e- files.
+ * Accepted by the owner's 09-A review (21 Oct 2026, structural only, not client approval): frozen for 09-B to 09-E.
+ */
+
+/* adm-frame: the admin frame around every admin state. Markup: div.adm-frame > div.adm-bar (toolbar:
+   span.adm-bar__i items, span.adm-bar__stg the STAGING item, span.adm-bar__end pushes the rest to the inline end),
+   div.adm-menu (span.adm-menu__i top items, span.adm-menu__i--cur the current one, div.adm-menu__sub with
+   span.adm-menu__s and span.adm-menu__s--cur), div.adm-main (title, notices, content). div.adm-cols holds a main column and a sidebar of panels (div.adm-col each). States: with the STAGING
+   item (every staging frame), without it (production, sy-staging-marker:default). The menu is drawn, not operable:
+   it is native context, and the menu path is also written in the frame label. */
+.adm-frame { display: grid; grid-template-columns: 10rem minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); font-size: 0.8125rem; line-height: 1.5; color: #1f1f1f; background: #f0f0f0; }
+.adm-bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.125rem 0.25rem; min-block-size: 2rem; padding-inline: 0.5rem; color: #fff; background: #3a3a3a; }
+.adm-bar__i { padding: 0.25rem 0.5rem; }
+.adm-bar__logo { display: inline-flex; align-items: center; justify-content: center; inline-size: 1.25rem; block-size: 1.25rem; font-size: 0.625rem; font-weight: 700; border: 1px solid #fff; border-radius: 50%; }
+.adm-bar__stg { padding: 0.125rem 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1f1f1f; background: #fff; border: 2px solid #fff; outline: 1px solid #fff; outline-offset: 1px; }
+.adm-bar__end { margin-inline-start: auto; }
+.adm-menu { display: flex; flex-direction: column; padding-block: 0.5rem 1rem; color: #3a3a3a; background: #e4e4e4; border-inline-end: 1px solid #cfcfcf; }
+.adm-menu__i { display: block; padding: 0.3125rem 0.75rem; }
+.adm-menu__i--cur { font-weight: 700; color: #1f1f1f; background: #fff; border-inline-start: 4px solid #1f1f1f; padding-inline-start: calc(0.75rem - 4px); }
+.adm-menu__sub { display: flex; flex-direction: column; padding-block: 0.25rem 0.375rem; background: #f6f6f6; border-inline-start: 4px solid #1f1f1f; }
+.adm-menu__s { display: block; padding: 0.1875rem 0.75rem 0.1875rem 1rem; }
+.adm-menu__s--cur { font-weight: 700; color: #1f1f1f; text-decoration: underline; text-underline-offset: 0.2em; }
+.adm-main { display: flex; flex-direction: column; gap: 0.75rem; min-inline-size: 0; padding: 0.875rem 1.25rem 2rem; }
+.adm-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(14rem, 17.5rem); gap: 1.25rem; align-items: start; }
+.adm-cols > * { min-inline-size: 0; }
+.adm-col { display: flex; flex-direction: column; gap: 0.75rem; min-inline-size: 0; }
+
+/* adm-title: the screen title with at most one title action. Markup: div.adm-title > h1.adm-title__h,
+   optional span.adm-title__act (native, muted) or a.adm-title__act inside an addition, optional
+   span.adm-title__sub ("Search results for: ..."). States: plain, with action, with search subtitle. */
+.adm-title { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem 0.75rem; }
+.adm-title__h { font-size: 1.4375rem; font-weight: 400; line-height: 1.3; }
+.adm-title__act { white-space: nowrap; display: inline-flex; align-items: center; min-block-size: 2rem; padding: 0.125rem 0.625rem; color: #3a3a3a; background: #f6f6f6; border: 1px solid #8a8a8a; border-radius: 3px; }
+.adm-title__sub { color: #3a3a3a; }
+
+/* adm-native: the standard screen, drawn as context: muted, simplified, never operable, not part of the design.
+   Markup: .adm-native on any region; inside it span.adm-native__btn (a native button at its native size,
+   --sm for the compact 32 px one), span.adm-native__fld (a native field or select, --sm compact),
+   div.adm-native__box (a native box or section), h2.adm-native__h (a native section heading),
+   span.adm-native__ln (a line of native content not written out, --s short, --m mid). States: none. */
+.adm-native { color: #5c5c5c; }
+.adm-native__box { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.625rem 0.75rem; background: #fff; border: 1px solid #d6d6d6; }
+.adm-native__h { font-size: 0.875rem; font-weight: 600; color: #5c5c5c; }
+.adm-native__btn,
+.adm-native__fld { white-space: nowrap; }
+.adm-native__btn,
+.adm-native__fld { display: inline-flex; align-items: center; gap: 0.375rem; min-block-size: 2.5rem; padding: 0.25rem 0.75rem; color: #5c5c5c; background: #f6f6f6; border: 1px solid #a8a8a8; border-radius: 3px; }
+.adm-native__fld { min-inline-size: 9rem; background: #fff; }
+.adm-native__btn--sm,
+.adm-native__fld--sm { white-space: nowrap; min-block-size: 2rem; padding-block: 0.125rem; }
+.adm-native__ln { display: block; block-size: 0.5rem; inline-size: 100%; background: #e4e4e4; }
+.adm-native__ln--s { inline-size: 35%; }
+.adm-native__ln--m { inline-size: 65%; }
+.adm-native__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+/* adm-add: the one marker around an addition. Recommended: a 2 px solid black outline with a black "ADDED" tag
+   at its top inline-start corner, naming the row in data-add. Markup: div.adm-add[data-add="ADM-103"] around a
+   block addition; span.adm-add.adm-add--inline around an addition inside a native row (a menu item, a filter);
+   the tag sits inside the outline, so it never covers the addition or its focus ring. States: none; explained
+   once in every frame label. Alternative named for review: a change bar (4 px rule in the inline-start margin,
+   no outline, no tag). */
+.adm-add { position: relative; display: flex; flex-direction: column; gap: 0.75rem; padding: 1.625rem 0.75rem 0.75rem; color: #1f1f1f; background: #fff; border: 2px solid #1f1f1f; }
+.adm-add::before { position: absolute; inset-block-start: 0; inset-inline-start: 0; padding: 0.125rem 0.375rem; font: 700 0.6875rem/1.3 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.04em; color: #fff; background: #1f1f1f; content: "ADDED"; }
+.adm-add[data-add]::before { content: "ADDED \00B7  " attr(data-add); }
+.adm-add--inline { display: inline-flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.375rem; padding: 0.25rem 0.375rem 0.25rem 0; }
+.adm-add--inline::before { position: static; align-self: stretch; display: inline-flex; align-items: center; }
+
+/* adm-notice: an admin notice under the title. Markup: div.adm-notice.adm-notice--ok|--i|--w|--e >
+   div.adm-notice__b (p.adm-notice__t lead line, optional ul.adm-notice__list of links to fields), optional
+   button.adm-notice__x (the dismiss button, 40 px). Role and announcement: --ok success, role="status";
+   --e error, role="alert", focus moved to it after a refused submission; --w warning, role="status";
+   --i information, no live role. Each variant has its own shape (filled circle, filled square, outlined square,
+   outlined circle) and its own edge, so the kind is never told by colour alone. States: each variant, dismissible. */
+.adm-notice { display: flex; align-items: flex-start; gap: 0.625rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem; background: #fff; border: 1px solid #cfcfcf; border-inline-start: 4px solid #1f1f1f; }
+.adm-notice::before { flex: none; display: inline-flex; align-items: center; justify-content: center; inline-size: 1.25rem; block-size: 1.25rem; margin-block-start: 0.125rem; font-size: 0.75rem; font-weight: 700; line-height: 1; }
+.adm-notice--ok::before { content: "\2713"; color: #fff; background: #1f1f1f; border-radius: 50%; }
+.adm-notice--e { border-inline-start-width: 6px; border-inline-start-style: double; }
+.adm-notice--e::before { content: "\2715"; color: #fff; background: #1f1f1f; }
+.adm-notice--w { border-inline-start-style: dashed; }
+.adm-notice--w::before { content: "!"; border: 2px solid #1f1f1f; }
+.adm-notice--i { border-inline-start-style: dotted; }
+.adm-notice--i::before { content: "i"; border: 2px solid #1f1f1f; border-radius: 50%; }
+.adm-notice__b { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.25rem; min-inline-size: 0; padding-block: 0.125rem; }
+.adm-notice__t { font-weight: 600; }
+.adm-notice__list { display: flex; flex-direction: column; gap: 0.125rem; }
+.adm-notice__list a { display: inline-block; padding-block: 0.1875rem; text-underline-offset: 0.2em; }
+.adm-notice__x { flex: none; inline-size: 2.5rem; block-size: 2.5rem; padding: 0; font-size: 1rem; line-height: 1; background: transparent; border: 1px solid transparent; cursor: pointer; }
+.adm-notice__x:hover { border-color: #8a8a8a; }
+
+/* adm-table: the WordPress list table. Markup: div.adm-table > ul.adm-table__views (status views with counts,
+   li.adm-table__view--cur), div.adm-table__nav (the tablenav: filters at the start, div.adm-table__search,
+   span.adm-table__count, span.adm-table__pages with span.adm-table__pg page boxes, compact 32 px),
+   table.adm-table__t (thead th[scope=col]; tbody; td.adm-table__primary holding div.adm-table__acts row actions,
+   shown on hover and on focus, drawn shown where a frame needs them; tr.adm-table__empty with the native
+   "No items found." wording; tr.adm-table__new for a row just added). States: empty, results, no results,
+   filtered, searched (with adm-title__sub). */
+.adm-table { display: flex; flex-direction: column; gap: 0.5rem; min-inline-size: 0; }
+.adm-table__views li { white-space: nowrap; }
+.adm-table__views { display: flex; flex-wrap: wrap; gap: 0.125rem 0.375rem; color: #3a3a3a; }
+.adm-table__views li + li::before { content: "|"; margin-inline-end: 0.375rem; color: #8a8a8a; }
+.adm-table__view--cur { font-weight: 700; color: #1f1f1f; }
+.adm-table__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.adm-table__search { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; margin-inline-start: auto; }
+.adm-table__search .adm-form__ctl { inline-size: 15rem; max-inline-size: 100%; }
+.adm-table__count { margin-inline-start: auto; color: #3a3a3a; }
+.adm-table__pages { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; }
+.adm-table__pg { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 2rem; min-block-size: 2rem; padding-inline: 0.25rem; color: #5c5c5c; background: #f6f6f6; border: 1px solid #a8a8a8; border-radius: 3px; }
+.adm-table__t { inline-size: 100%; border-collapse: collapse; background: #fff; border: 1px solid #cfcfcf; }
+.adm-table__t th,
+.adm-table__t td { padding: 0.5rem 0.625rem; text-align: start; vertical-align: top; overflow-wrap: anywhere; border-block-end: 1px solid #e4e4e4; }
+.adm-table__t thead th { font-weight: 600; border-block-end-color: #cfcfcf; }
+.adm-table__t tbody tr:nth-child(even) { background: #f9f9f9; }
+.adm-table__sort::after { content: " \2195"; color: #5c5c5c; }
+.adm-table__primary { font-weight: 600; }
+.adm-table__acts { display: flex; flex-wrap: wrap; gap: 0 0.5rem; margin-block-start: 0.125rem; font-weight: 400; color: #5c5c5c; }
+.adm-table__acts a,
+.adm-table__acts span { display: inline-block; padding-block: 0.1875rem; }
+.adm-table__empty td { padding: 0.875rem 0.625rem; color: #3a3a3a; }
+.adm-table__new { box-shadow: inset 4px 0 0 #1f1f1f; }
+.adm-table__new td:first-child { padding-inline-start: 0.875rem; }
+.adm-table__muted td,
+.adm-table__muted th { color: #5c5c5c; }
+.adm-table__muted thead th { color: #3a3a3a; }
+
+/* adm-panel: a panel added to a standard edit screen. Markup: section.adm-panel > h2.adm-panel__h (title bar),
+   div.adm-panel__b (body): ul.adm-panel__list of li.adm-panel__item (p text, p.adm-panel__meta author and time),
+   p.adm-panel__empty, an adm-form inside. Used inside adm-add. States: empty, list, list with a new item
+   (li.adm-panel__item--new), with an add form. */
+.adm-panel { display: flex; flex-direction: column; background: #fff; border: 1px solid #cfcfcf; min-inline-size: 0; }
+.adm-panel__h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 0.75rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 600; border-block-end: 1px solid #cfcfcf; }
+.adm-panel__b { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; }
+.adm-panel__lead { color: #3a3a3a; }
+.adm-panel__list { display: flex; flex-direction: column; }
+.adm-panel__item { display: flex; flex-direction: column; gap: 0.125rem; padding-block: 0.5rem; border-block-start: 1px solid #e4e4e4; }
+.adm-panel__item:first-child { border-block-start: 0; padding-block-start: 0; }
+.adm-panel__item--new { padding-inline-start: 0.625rem; border-inline-start: 4px solid #1f1f1f; }
+.adm-panel__meta { font-size: 0.75rem; color: #5c5c5c; }
+.adm-panel__empty { padding: 0.5rem 0; color: #3a3a3a; }
+
+/* adm-form: the form table and its fields, by the native WordPress convention. Markup: div.adm-form >
+   p.adm-form__conv (the convention, when stated once), div.adm-form__row (--stack in a narrow panel, --err with
+   an error) > label.adm-form__label (the text, then span.adm-form__req "(required)" inside the label; the field
+   carries aria-required="true"), div.adm-form__field > input|select|textarea.adm-form__ctl (40 px; --sm 32 px
+   only in a compact native row), p.adm-form__desc (description, tied by aria-describedby), p.adm-form__err (the
+   message, tied by aria-describedby, the field aria-invalid="true"), span.adm-form__val (a fixed value);
+   div.adm-form__actions > button.adm-form__btn (--primary, --sm). States: empty, filled, error, saved.
+   Never colour or an asterisk alone. */
+.adm-form { display: flex; flex-direction: column; gap: 0.25rem; min-inline-size: 0; }
+.adm-form__h { font-size: 1rem; font-weight: 600; }
+.adm-form__conv { color: #3a3a3a; }
+.adm-form__row { display: grid; grid-template-columns: minmax(7rem, 12.5rem) minmax(0, 1fr); gap: 0.375rem 1.25rem; align-items: start; padding-block: 0.5rem; }
+.adm-form__row--stack { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
+.adm-form__row--err { padding-inline-start: 0.625rem; border-inline-start: 4px solid #1f1f1f; }
+.adm-form__label { font-weight: 600; padding-block-start: 0.5rem; }
+.adm-form__row--stack .adm-form__label { padding-block-start: 0; }
+.adm-form__req { font-weight: 400; color: #3a3a3a; }
+.adm-form__field { display: flex; flex-direction: column; gap: 0.25rem; min-inline-size: 0; }
+.adm-form__ctl { inline-size: 100%; max-inline-size: 26rem; min-block-size: 2.5rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; color: #1f1f1f; background: #fff; border: 1px solid #8a8a8a; border-radius: 4px; }
+textarea.adm-form__ctl { max-inline-size: 100%; min-block-size: 5rem; resize: vertical; }
+select.adm-form__ctl { inline-size: auto; min-inline-size: 10rem; }
+.adm-form__ctl--sm { min-block-size: 2rem; padding-block: 0.125rem; font-size: 0.8125rem; }
+.adm-form__row--err .adm-form__ctl { border: 2px solid #1f1f1f; }
+.adm-form__desc { color: #5c5c5c; }
+.adm-form__err { position: relative; padding-inline-start: 1.375rem; font-weight: 600; }
+.adm-form__err::before { position: absolute; inset-inline-start: 0; inset-block-start: 0.125rem; display: inline-flex; align-items: center; justify-content: center; inline-size: 1rem; block-size: 1rem; font-size: 0.625rem; color: #fff; background: #1f1f1f; content: "\2715"; }
+.adm-form__val { padding-block-start: 0.5rem; }
+.adm-form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding-block-start: 0.5rem; }
+.adm-form__btn { flex: none; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; min-block-size: 2.5rem; padding: 0.25rem 1rem; font-size: 0.8125rem; font-weight: 600; color: #1f1f1f; background: #fff; border: 1px solid #1f1f1f; border-radius: 3px; cursor: pointer; }
+.adm-form__btn--primary { color: #fff; background: #1f1f1f; }
+.adm-form__btn--sm { min-block-size: 2rem; padding-inline: 0.625rem; }
+.adm-link { display: inline-block; padding-block: 0.1875rem; text-underline-offset: 0.2em; }
+
+/* adm-reason: an action that does not complete without a reason. Recommended: the reason field and the action sit
+   together, always visible, in the panel or box that holds the action; the action submits only that field; an
+   empty reason refuses the action with the adm-form error (top notice plus the message under the field) and
+   nothing changes. Markup: div.adm-reason > p.adm-reason__what (what the action does, before it is taken),
+   an adm-form__row--stack with the reason textarea "(required)", div.adm-form__actions with the action button;
+   when done, dl.adm-reason__rec (the result, the reason, who, when). States: reason empty, reason given, refused,
+   done. Reused unchanged by ad-order-cancel (09-D). Alternative named for review: a confirmation dialog that
+   opens on the action and asks for the reason there. */
+.adm-reason { display: flex; flex-direction: column; gap: 0.5rem; }
+.adm-reason__what { color: #3a3a3a; }
+.adm-reason__rec { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.375rem 0.875rem; align-items: baseline; }
+.adm-reason__rec dt { font-weight: 600; }
+.adm-reason__rec dd { margin: 0; min-inline-size: 0; overflow-wrap: anywhere; }
+
+/* adm-status: a status label. Text plus a shape, greys only, never colour alone. Markup:
+   span.adm-status.adm-status--on|--off|--plain, its text the status itself. --on: filled circle, outlined pill
+   (for example Active); --off: hollow square, filled pill (for example Suspended); --plain: a native status shown
+   as text in a box, no shape of ours (the standard order status). States: each variant. */
+.adm-status { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.0625rem 0.5rem; font-weight: 600; white-space: nowrap; color: #1f1f1f; background: #fff; border: 1px solid #1f1f1f; border-radius: 999px; }
+.adm-status::before { flex: none; inline-size: 0.625rem; block-size: 0.625rem; content: ""; }
+.adm-status--on::before { background: #1f1f1f; border-radius: 50%; }
+.adm-status--off { color: #fff; background: #1f1f1f; }
+.adm-status--off::before { border: 2px solid #fff; }
+.adm-status--plain { font-weight: 400; color: #3a3a3a; background: #f0f0f0; border-color: #a8a8a8; border-radius: 3px; }
+.adm-status--plain::before { display: none; }
+
+/* adm-refusal: the capability refusal. Markup: div.adm-refusal (a full-page refusal: CoreX's standalone page, drawn
+   as context: p.adm-refusal__msg its explanation, p.adm-refusal__code notes and the HTTP status);
+   span.adm-refusal__absent where a control is not rendered for the role (an annotation of absence, plainly not
+   interface: dashed, hatched, monospaced, no control inside). States: refused screen, absent control. */
+.adm-refusal { display: flex; flex-direction: column; gap: 0.5rem; inline-size: 100%; max-inline-size: 44rem; margin: 1.5rem auto; padding: 1.5rem 1.75rem; background: #fff; border: 1px solid #cfcfcf; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.13); }
+.adm-refusal__msg { font-size: 0.875rem; }
+.adm-refusal__code { font: 0.75rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: #5c5c5c; }
+.adm-refusal__absent { display: block; max-inline-size: 100%; padding: 0.375rem 0.625rem; font: 0.6875rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: #3a3a3a; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 8px); border: 1px dashed #5c5c5c; }
+.adm-refusal__absent::before { margin-inline-end: 0.5rem; font-weight: 700; content: "ABSENT"; }
+
+/* adm-staging: the staging marker as built (#244). Markup: div.adm-staging[role=note][dir=ltr][lang=en], the
+   sticky strip at the top of a storefront or sign-in page, its wording English and isolated on any page;
+   div.adm-staging__page (a storefront page as context: span.adm-staging__ph labelled placeholders);
+   div.adm-staging__login (the sign-in page as context). The admin toolbar item is adm-bar__stg. Drawn in grey:
+   as built, the marker has a colour of its own. States: production (absent), staging (shown). */
+.adm-staging { position: sticky; inset-block-start: 0; z-index: 1; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; text-align: center; direction: ltr; unicode-bidi: isolate; color: #fff; background: #1f1f1f; }
+.adm-staging__page { display: flex; flex-direction: column; background: #fff; color: #5c5c5c; }
+.adm-staging__ph { display: flex; align-items: center; justify-content: center; min-block-size: 3rem; padding: 0.5rem; font-size: 0.75rem; text-align: center; background: #e4e4e4; border-block-end: 1px solid #fff; }
+.adm-staging__ph--tall { min-block-size: 12rem; }
+.adm-staging__login { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 2rem 1rem 2.5rem; background: #f0f0f0; color: #5c5c5c; }
+.adm-staging__login .adm-native__box { inline-size: 100%; max-inline-size: 20rem; }
+
+/* adm-review: the review page around the frames. Not interface. Markup: main.adm-sheet > section.adm-set
+   (h2.adm-set__h, p.adm-set__p, figure.adm-fig > div.wf-frame + div.adm-notes of wf-note asides);
+   nav.adm-nav in the wf-meta header; note kinds adm-note-ax (accessibility), adm-note-q (question raised),
+   adm-note-x (not drawn here), adm-note-open (open input), adm-note-p (pattern); div.adm-stack with div.adm-stack__cap, several screens in one frame. */
+.adm-meta { display: flex; flex-direction: column; gap: 0.75rem; max-inline-size: 1280px; }
+.adm-meta__eb { font: 600 0.6875rem/1.3 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.05em; text-transform: uppercase; color: #5c5c5c; }
+.adm-meta__h { font-size: 1.5rem; font-weight: 650; line-height: 1.25; }
+.adm-meta__p { max-inline-size: 56rem; color: #3a3a3a; text-wrap: pretty; }
+.adm-meta__dl { display: grid; grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr); gap: 0.25rem 1rem; font-size: 0.8125rem; }
+.adm-meta__dl dt { color: #5c5c5c; }
+.adm-nav { display: flex; flex-wrap: wrap; gap: 0.375rem; padding-block-start: 0.75rem; border-block-start: 1px dashed #cfcfcf; }
+.adm-nav a,
+.adm-nav span { flex: none; white-space: nowrap; display: inline-flex; align-items: center; min-block-size: 1.75rem; padding: 0.25rem 0.5rem; font: 600 0.6875rem/1.2 ui-monospace, Menlo, Consolas, monospace; text-decoration: none; background: #fff; border: 1px solid #bdbdbd; }
+.adm-nav .adm-nav__cur { color: #fff; background: #1f1f1f; border-color: #1f1f1f; }
+.adm-set { min-inline-size: 0; }
+.adm-sheet { display: flex; flex-direction: column; gap: 4rem; max-inline-size: 1280px; }
+.adm-set__h { font-size: 1.1875rem; font-weight: 650; line-height: 1.3; }
+.adm-set__p { max-inline-size: 58rem; margin-block: 0.375rem 1.25rem; font-size: 0.8125rem; color: #3a3a3a; text-wrap: pretty; }
+.adm-fig { display: flex; flex-direction: column; gap: 0.75rem; inline-size: 100%; max-inline-size: 1280px; }
+.adm-fig > .wf-frame { position: relative; }
+.adm-fig .wf-frame__label { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.6875rem; }
+.adm-notes { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 0.625rem; align-items: start; }
+.adm-notes .wf-note { margin: 0; font-size: 0.75rem; line-height: 1.5; text-wrap: pretty; }
+.adm-note-ax::before { content: "Accessibility"; }
+.adm-note-q::before { content: "Question raised"; }
+.adm-note-x::before { content: "Not drawn here"; }
+.adm-note-open::before { content: "Open input"; }
+.adm-note-p::before { content: "Pattern"; }
+.adm-stack { display: flex; flex-direction: column; gap: 1px; background: #9a9a9a; }
+.adm-stack__cap { padding: 0.25rem 0.75rem; font: 600 0.6875rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: #1f1f1f; background: #f6f6f6; }

@@ -118,14 +118,14 @@ Core navigation block. The structure is admin-managed (NAV-07, SSC-07).
 
 ### IX-05: How the category navigation opens on desktop
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** Customers reach categories through an admin-managed mega menu or category navigation (NAV-07). No row says how it opens.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Opens on click or tap |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -190,14 +190,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 6 |
-| Interaction decisions pending | IX-05 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `not_applicable` |
+| Desktop | `reviewed` |
+| States covered | 6 of 6 |
+| Interaction decisions pending | None |
 | Calibration frames | Global desktop frame: header, navigation, search and footer (`cal-01`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

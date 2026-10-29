@@ -1,0 +1,197 @@
+/* Mizzey shared component layer (D6, batch-04 review round). Loaded after ../batch-03/batch-03.css and before each batch stylesheet. Shared components only; each block is headed with its canonical id from design/inventory/components.json. Frame, header, footer and review-sheet rules stay where they are. Prototype only; greys, system type. */
+/* ctl-input: text field. A visible label above every field, 48 px field, hint under it. Only an optional field is marked (.fd__o "Optional"); a form with more than one field opens with one line, .frq, "All fields are required unless marked optional." Phone treatment: .fd--tel with .ip.tel and its value in a .ltr span, isolated left to right in both languages (DQ-01 provisional; AUTH-02 optional). States: default, focus (.is-focus), filled, read-only (.ip--ro), error (fb-inline-validation). */
+.frq{font-size:12.5px;line-height:1.45;color:#5c5c5c;margin-block-end:-6px}
+.fd{display:flex;flex-direction:column;gap:6px;min-inline-size:0}
+.fd__l{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;font-weight:650}
+.fd__o{font-size:12.5px;font-weight:400;color:#5c5c5c;white-space:nowrap}
+.fd__h{font-size:12.5px;color:#5c5c5c}
+.ip{display:flex;align-items:center;gap:8px;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;color:#151515;min-inline-size:0}
+.ip>span:first-child{flex:1;min-inline-size:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ip__d{letter-spacing:2px}
+.pg[lang="ar"] .ip>.ltr{text-align:right}
+.ip--ro{background:#f3f3f3;border-color:#d6d6d6}
+.shw{display:inline-flex;align-items:center;justify-content:center;min-inline-size:44px;block-size:44px;margin-inline-end:-11px;padding-inline:10px;font-size:13px;font-weight:650;text-decoration:underline;text-underline-offset:3px;flex:none}
+.tel>.ltr{font-variant-numeric:tabular-nums}
+/* ctl-select: defined for batch-05, not drawn in batch-04. Markup: .fd > label.fd__l + .cs > span (the value, or a prompt with .cs--ph). States: default, focus (.is-focus), disabled (.is-disabled), error (.fd--e). Dependent select (CHK-01: governorate, then city, then district): waiting, .cs--wait, looks disabled until the select before it is answered and says what to choose first in .fd__h; ready is the default state, with its prompt. */
+.cs{display:flex;align-items:center;gap:10px;block-size:48px;padding-inline:14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;color:#151515;min-inline-size:0}
+.cs>span:first-child{flex:1;min-inline-size:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs::after{content:"";flex:none;inline-size:8px;block-size:8px;margin-block-start:-4px;border-right:1.5px solid #3a3a3a;border-bottom:1.5px solid #3a3a3a;transform:rotate(45deg)}
+.cs--ph>span:first-child{color:#6b6b6b}
+.cs.is-disabled,.cs--wait{background:#f3f3f3;border-color:#d6d6d6;color:#6b6b6b}
+.cs.is-disabled::after,.cs--wait::after{border-color:#bdbdbd}
+.cs.is-focus{outline-offset:2px}
+/* ctl-checkbox: a 22 px box inside a 44 px row, the label beside it; links on their own line (.cxl), outside the label. States: default, checked (.cx__b.on), error (fb-inline-validation). */
+.cx{display:flex;gap:12px;align-items:flex-start;min-block-size:44px;padding-block:11px;font-size:13.5px;line-height:1.5}
+.cx__b{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:5px;background:#fff;font-size:12px}
+.cx__b.on{background:#151515;border-color:#151515;color:#fff}
+.cxg{display:flex;flex-direction:column}
+.cxl{display:flex;flex-wrap:wrap;gap:0 18px;padding-inline-start:34px}
+.cxl a{display:inline-flex;align-items:center;min-block-size:44px;font-size:13px;font-weight:600;text-underline-offset:3px}
+/* ctl-radio: radio card, defined for batch-05 (shipping and payment methods), not drawn in batch-04. .rcg (radiogroup) > .rcd (radio, aria-checked): .rcd__b mark, .rcd__t title, optional .rcd__d detail line, optional .rcd__p price at the inline end. States: unselected, selected (.rcd.on), focus (.is-focus), disabled (.is-disabled). */
+.rcg{display:flex;flex-direction:column;gap:8px}
+.rcd{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:2px 12px;align-items:start;min-block-size:56px;padding:15px 16px;border:1.5px solid #bdbdbd;border-radius:10px;background:#fff;font-size:14.5px}
+.rcd__b{grid-row:span 2;inline-size:22px;block-size:22px;border:1.5px solid #6b6b6b;border-radius:50%;background:#fff}
+.rcd__t{font-weight:650;min-inline-size:0}
+.rcd__d{grid-column:2;font-size:13px;color:#5c5c5c}
+.rcd__p{grid-column:3;grid-row:1;font-weight:700;white-space:nowrap;text-align:end}
+.rcd.on{border:2.5px solid #151515;padding:14px 15px}
+.rcd.on .rcd__b{border:7px solid #151515}
+.rcd.is-disabled{opacity:.5}
+/* fb-inline-validation: the field error (.fd--e with aria-invalid on the field and the batch-02 .err message under it, tied by aria-describedby) and the error summary shown on submit (.esum, role alert, one link per error to its field). */
+.fd--e .ip{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+.cx--e .cx__b{border:2.5px solid #151515}
+.cxg .err{margin-block:-4px 6px;padding-inline-start:34px}
+.esum{display:flex;flex-direction:column;gap:0;padding:14px 16px 6px;border:2.5px solid #151515;border-radius:10px;background:#fff}
+.esum b{font-size:14px}
+.esum a{display:flex;align-items:center;min-block-size:44px;font-size:13.5px;font-weight:600;text-underline-offset:3px}
+.fd--e .cs{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+/* fb-notice: one notice block for every page and form notice. Variants: success .nt--ok (check mark), information .nt--i, warning .nt--w (square mark), error .nt--e (heavier border, role alert). Body .nt__b, actions .nt__a. Not used for the in-place add confirmations governed by IX-02 and IX-10. */
+.nt{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1.5px solid #151515;border-radius:10px;background:#fff;font-size:13.5px;line-height:1.5}
+.nt__i{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border-radius:50%;background:#151515;color:#fff;font-size:11px;font-weight:700;margin-block-start:1px}
+.nt__b{display:flex;flex-direction:column;gap:2px;min-inline-size:0;flex:1}
+.nt__a{display:flex;flex-wrap:wrap;gap:0 18px;margin-block-end:-8px}
+.nt__a a{display:inline-flex;align-items:center;gap:6px;min-block-size:44px;font-weight:650;text-underline-offset:3px}
+.nt--ok{border-color:#151515}
+.nt--i{border-color:#bdbdbd;background:#f6f6f6}
+.nt--i .nt__i{background:#fff;color:#151515;border:1.5px solid #5c5c5c}
+.nt--w{border-color:#5c5c5c;background:#f6f6f6}
+.nt--w .nt__i{border-radius:4px;background:#fff;color:#151515;border:2px solid #151515}
+.nt--e{border-width:2.5px;padding:11px 13px}
+/* cm-coupon: the coupon entry. A disclosure (.cpd, aria-expanded; open .cpd--o), the field and Apply (.cpf, .cpf__r), and the applied code (.cpc). States: default, applied, invalid. A single field: no required line. */
+.cpd{display:flex;align-items:center;justify-content:space-between;gap:8px;min-block-size:44px;font-size:14px;font-weight:650;border-block-start:1px solid #e0e0e0;padding-block-start:4px}
+.cpd .chev--down{margin-inline-end:8px}
+.cpd--o .chev--down{transform:rotate(225deg);margin-block-start:6px}
+[dir="rtl"] .cpd--o .chev--down{transform:rotate(135deg)}
+.cpf{display:flex;flex-direction:column;gap:8px}
+.cpf__r{display:flex;gap:8px}
+.cpf__r .ip{flex:1}
+.cpf__r .btn{block-size:48px;padding-inline:16px}
+.cpc{display:flex;align-items:center;gap:10px;min-block-size:48px;padding-inline:12px 4px;border:1.5px solid #151515;border-radius:10px;background:#fff;font-size:13.5px}
+.cpc__c{font-weight:700;letter-spacing:.04em}
+.cpc .ln__a{margin-inline-start:auto}
+/* cm-order-summary: one summary, five variants, one row order: heading; items (checkout, review, as charged); the context blocks (cart: free-shipping slot first, then cm-coupon; checkout: cm-coupon); review: address, shipping method, payment method, each with Change; the breakdown rows in .sm__rs (Subtotal; Discount per code; Shipping; a further charge only where a configured charge applies) and the Total (.sm__t); as charged: payment method, refunds, net paid; the note (.sm__x); the actions. Layout: .sm--m mobile, .sm--t tablet two columns. */
+.sm{display:flex;flex-direction:column;gap:18px;padding:24px;border-radius:12px;background:#f6f6f6;min-inline-size:0}
+.sm--m{padding:20px 16px}
+.sm--t{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 32px}
+.sm--t .sm__h{grid-column:1/-1}
+.sm__h{font-size:17px;font-weight:700}
+.sm__a,.sm__z{display:flex;flex-direction:column;gap:14px;min-inline-size:0}
+.sm__rs{display:flex;flex-direction:column;gap:10px}
+.sm__r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px}
+.sm__r>span:last-child{white-space:nowrap;text-align:end}
+.sm__t{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-block-start:14px;border-block-start:1px solid #d6d6d6;font-size:17px;font-weight:700}
+.sm__x{font-size:12.5px;color:#5c5c5c}
+.sm--cart .sm__z .btn{block-size:52px}
+.sm .lnk{align-self:center;min-block-size:44px}
+.sm .err{font-weight:600}
+/* cm-order-summary, cart variant (.sm--cart): editable context, Shipping "Calculated at checkout", Checkout and Continue shopping. Drawn in sf-cart, sf-cart-revalidation, sf-free-shipping-progress, au-sign-in, au-google-entry. */
+/* cm-order-summary, mini-cart foot variant (.sm--mini, on the drawer foot): Subtotal, one note, View cart and Checkout. */
+.sm--mini{gap:0;padding:0;border-radius:0}
+.sm--mini>.sm__r{padding:14px 20px 0;font-size:15px;font-weight:700}
+.sm--mini>.sm__x{padding:2px 20px 0}
+/* cm-order-summary, checkout variant (.sm--co): collapsible items (.sm__it), cm-coupon, the full breakdown; sticky at the inline end on desktop; on mobile the collapsed total bar (.sm--bar), total always visible (DQ-03). */
+.sm__it{display:flex;flex-direction:column;gap:12px}
+.sm__itd{border-block-start:0;padding-block-start:0}
+.sm__ls{display:flex;flex-direction:column;gap:14px}
+.sm__l{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:start;font-size:13.5px}
+.sm__l .ph{border-radius:6px}
+.sm__n{display:flex;flex-direction:column;gap:2px;min-inline-size:0;overflow-wrap:anywhere}
+.sm__n>b{font-weight:650}
+.sm__n>span{font-size:12.5px;color:#5c5c5c}
+.sm__lp{font-weight:700;white-space:nowrap;text-align:end}
+.sm--bar{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:6px 16px;border-radius:0;border-block-end:1px solid #d6d6d6}
+.sm__bt{display:inline-flex;align-items:center;gap:10px;min-block-size:44px;font-size:14px;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.sm__bp{font-size:16px;white-space:nowrap}
+/* cm-order-summary, review variant (.sm--rv), first drawn in batch-05 (ck-review-place-order): items, then .sm__sec for the delivery address, the shipping method and the payment method, each with its Change (.sm__chg) at the inline end, then the full breakdown. Terms and Place order follow on the page. */
+.sm__sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding-block-start:14px;border-block-start:1px solid #e0e0e0;font-size:13.5px}
+.sm__sec>b{font-size:14px}
+.sm__sec>span:not(.sm__chg){grid-column:1;color:#3a3a3a;overflow-wrap:anywhere}
+.sm__chg{grid-column:2;grid-row:1/span 2;display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;margin-block:-10px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+/* cm-order-summary, as-charged variant (.sm--paid), first drawn in batch-05 (ck-order-received) and batch-06 (ac-order-detail, ac-invoice): read-only items at the prices charged, the breakdown as charged, then the payment method (.sm__pm), one row per refund where one applies (.sm__rf), and the net paid (.sm__t--net). No Change, no actions inside. */
+.sm--paid{background:#fff;border:1.5px solid #d6d6d6}
+.sm__pm{padding-block-start:12px;border-block-start:1px solid #e0e0e0}
+.sm__rf>span:first-child{color:#3a3a3a}
+.sm__t--net{border-block-start-style:dashed}
+/* nv-header (condensed checkout variant), added in batch-05: the reviewed batch-01 header bar with the same controls and the same 44 px targets (logo, search, language switcher, account, wishlist, cart with its live count; NAV-01 to NAV-06), without the All categories control, the category row (.hd2) and the promotional banner (selection adaptation A6; D5). Desktop .hd.hd--co; mobile and tablet .mhw.mhw--co, without the menu button. Used by every checkout, payment and order-received surface. */
+.hd--co .sf{flex:0 1 560px;margin-inline:auto}
+.mhw--co .mh{padding-inline:8px 4px}
+/* ctl-textarea: a multi-line text field, first drawn in batch-05 (the order note, CHK-06); also for ct-contact and rv-form. Markup as ctl-input: .fd > label.fd__l + .ta, hint .fd__h under it; Optional marked only where a form needs it (D1). At least 112 px tall, growing with its text. States: default, focus (.is-focus), filled, error (.fd--e .ta). */
+.ta{display:block;min-block-size:112px;padding:12px 14px;border:1.5px solid #9a9a9a;border-radius:10px;background:#fff;font-size:15px;line-height:1.5;color:#151515;overflow-wrap:anywhere}
+.fd--e .ta{border-color:#151515;box-shadow:inset 0 0 0 1.5px #151515}
+/* cm-address-card: a saved address (CHK-02, ACCT-04), first drawn in batch-05 (ck-address); also for ac-addresses and ac-order-detail. At checkout it is a ctl-radio card, .rcd.adc, in a radiogroup: the name as .rcd__t, the address lines, landmark and phone in .rcd__d, and the default address tagged with .adc__tag at the inline end. States: default, selected (.rcd.on), default_address (.adc__tag). */
+.adc__tag{grid-column:3;grid-row:1;justify-self:end;display:inline-flex;align-items:center;block-size:22px;padding-inline:8px;border:1px solid #6b6b6b;border-radius:999px;background:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.adc .rcd__d{line-height:1.55}
+/* cm-status-label: an order's status as the customer sees it, first drawn in batch-06 (ord-status-labels); used in ac-orders, ac-order-detail and ac-tracking, and for batch-07 and batch-08. One pill, .osl: a shape mark .osl__m (aria-hidden) and the status name as text. The name carries the meaning and the shape repeats it, never colour alone (greys only). Groups: .osl--pend pending payment (dashed, dashed ring); .osl--fail payment failed (heavy border, filled square); .osl--prog confirmed, preparing, shipped, out for delivery (half-filled ring); .osl--done delivered (filled pill, filled dot); .osl--end cancelled (grey, hollow square); .osl--rto returned to origin (grey, heavy border, filled diamond: never the delivered shape, ORD-13); .osl--ref refunded, fully or partly (double ring). COD collected, awaiting remittance is never a customer label: the customer sees Delivered (DQ-05). */
+.osl{display:inline-flex;align-self:flex-start;align-items:center;gap:7px;min-block-size:26px;padding:3px 10px;border:1.5px solid #151515;border-radius:999px;background:#fff;color:#151515;font-size:12.5px;font-weight:700;line-height:1.3;max-inline-size:100%}
+.osl__m{flex:none;inline-size:10px;block-size:10px;border:1.5px solid currentColor;border-radius:50%}
+.osl--pend{border-style:dashed;border-color:#5c5c5c}
+.osl--pend .osl__m{border-style:dashed}
+.osl--fail,.osl--rto{border-width:2.5px;padding:2px 9px}
+.osl--fail .osl__m{border-radius:2px;background:currentColor}
+.osl--prog .osl__m{background:linear-gradient(to top,currentColor 50%,transparent 50%)}
+.osl--done{background:#151515;color:#fff}
+.osl--done .osl__m{background:currentColor}
+.osl--end,.osl--rto{background:#ececec;color:#1f1f1f}
+.osl--end{border-color:#6b6b6b}
+.osl--end .osl__m{border-radius:1px}
+.osl--rto .osl__m{border-radius:1px;background:currentColor;transform:rotate(45deg) scale(.82)}
+.osl--ref .osl__m{border:3px double currentColor}
+/* cm-status-timeline: how far an order has gone (ORD-03 to ORD-07), as the customer sees it, first drawn in batch-06 (ord-status-timeline); used in ac-order-detail and ac-tracking, and for batch-07 and batch-08. An ordered list, ol.otl > li.otl__s: the mark .otl__d (aria-hidden), the step name .otl__t and an optional line .otl__x. Vertical by default, the line running from the inline start in both directions; .otl--h runs the same steps along the inline axis where there is room. Steps: reached (.otl__s--done, filled mark), current (.otl__s--cur, heavy ring, aria-current="step"), to come (no modifier, hollow grey mark, muted name), and the step that ends an interrupted line (.otl__s--end: cancelled or returned to origin, a square mark; no step is drawn after it). .otb is the compact form for the order card: five segments, the reached ones filled, with the status label beside it. Only statuses recorded on the order are drawn as reached; no carrier status that the mapping has not fixed (VENDOR-BOSTA). */
+.otl{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;min-inline-size:0}
+.otl__s{position:relative;display:flex;flex-direction:column;gap:2px;min-block-size:44px;padding-inline-start:34px;padding-block-end:12px;font-size:14px;color:#6b6b6b;overflow-wrap:anywhere}
+.otl__s::before{content:"";position:absolute;inset-inline-start:10px;inset-block:21px -1px;inline-size:2px;background:#d6d6d6}
+.otl__s:last-child{min-block-size:22px;padding-block-end:0}
+.otl__s:last-child::before{content:none}
+.otl__d{position:absolute;inset-inline-start:3px;inset-block-start:2px;inline-size:16px;block-size:16px;border:2px solid #9a9a9a;border-radius:50%;background:#fff}
+.otl__t{font-weight:600;line-height:1.45}
+.otl__x{font-size:12.5px;color:#5c5c5c}
+.otl__s--done,.otl__s--cur,.otl__s--end{color:#151515}
+.otl__s--done::before{background:#151515}
+.otl__s--done .otl__d{border-color:#151515;background:#151515}
+.otl__s--cur .otl__d{border:5px solid #151515}
+.otl__s--cur .otl__t,.otl__s--end .otl__t{font-weight:750}
+.otl__s--end .otl__d{border:3px solid #151515;border-radius:3px}
+.otl--h{flex-direction:row}
+.otl--h .otl__s{flex:0 0 20%;min-block-size:0;padding:28px 8px 0 0;padding-inline:0 8px;font-size:13.5px}
+.otl--h .otl__s::before{inset-block:11px auto;inset-inline:18px 0;inline-size:auto;block-size:2px}
+.otl--h .otl__d{inset-inline-start:0;inset-block-start:2px}
+.otb{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;min-inline-size:0}
+.otb>span{block-size:6px;border-radius:3px;background:#e0e0e0}
+.otb>.on{background:#151515}
+/* cm-address-card, address-book variant (.adc--bk), first drawn in batch-06 (ac-addresses, and read-only in ac-order-detail): the batch-05 card without the radio mark, so not a radio (no role, no aria-checked). The name .rcd__t, the lines, landmark and phone in .rcd__d, the default tag .adc__tag at the inline end, and the card's own actions in .adc__a under the lines (Edit, Delete; 44 px each). */
+.rcd.adc--bk{grid-template-columns:minmax(0,1fr) auto}
+.adc--bk .rcd__d,.adc__a{grid-column:1/-1}
+.adc--bk .adc__tag{grid-column:2}
+.adc__a{display:flex;flex-wrap:wrap;gap:0 8px;margin-block:4px -10px;margin-inline-start:-6px}
+.adc__a>a{display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;min-inline-size:44px;padding-inline:6px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:#151515}
+/* ctl-rating-input: the star rating input (REV-01, REV-02), first drawn in batch-07 (rv-form). A radio group of five options under a visible label (.fd__l, as ctl-input): .rti > .fd__l + .rti__g (role radiogroup, aria-required) > .rti__o (role radio, aria-checked, named "1 star" to "5 stars"), 44 x 44 px each, one tab stop (roving tabindex), the arrow keys move and select, in the reading direction. The options fill from the inline start up to the one chosen (.on); the glyph is decorative, the name carries the meaning. .rti__v repeats the choice in words. States: default, hover (.is-hover, the fill previews up to it), focus (.is-focus), selected (.on, aria-checked on one option), error (.rti--e, with the batch-02 .err message tied by aria-describedby). */
+.rti{display:flex;flex-direction:column;gap:6px;min-inline-size:0}
+.rti__g{display:flex;flex-wrap:wrap;gap:4px;align-self:flex-start;border-radius:10px}
+.rti__o{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:8px;font-size:26px;line-height:1;color:#8a8a8a}
+.rti__o.on{color:#151515}
+.rti__o.is-hover{background:#efefef}
+.rti__v{font-size:12.5px;color:#5c5c5c}
+.rti--e .rti__g{box-shadow:0 0 0 1.5px #151515;padding-inline:2px}
+/* cm-review-item: one review (REV-01, PDP-17), first drawn in batch-07 (rv-list, rv-pending). A list item, li.rvi: the head .rvi__h with the author's display name .rvi__n (R1), the batch-02 stars (aria-hidden) with "Rated N out of 5" for assistive technology, and the date .rvi__d; then the text .rvi__t in the language it was written in (lang, dir="auto"), shown in full. No reply, photo, badge or vote (R2 to R4). The author's own review awaiting approval, shown to the author only: .rvi--p with its line .rvi__p. */
+.rvi{display:flex;flex-direction:column;gap:6px;padding-block:18px;border-block-end:1px solid #e3e3e3;min-inline-size:0}
+.rvi__h{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px}
+.rvi__n{font-size:14px;font-weight:650;overflow-wrap:anywhere}
+.rvi__d{font-size:12.5px;color:#5c5c5c}
+.rvi__t{display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:#262626;overflow-wrap:anywhere;text-wrap:pretty}
+.rvi--p{padding:14px 16px;border:1.5px dashed #6b6b6b;border-radius:10px;background:#f6f6f6}
+.rvi__p{font-size:12.5px;font-weight:700}
+/* cn-email-block: the blocks every customer email shares, first drawn in batch-08 (em-shell and the eight customer emails). A structural drawing of the table-based build: .xm the message, one column, 600 px at most; .xm__hd the header with the logo box (OD-01); .xm__bd the body; .xm__h the heading; .xm__p text; .xm__s the small print; .xm__b the button, a link 48 px tall at least (.xm__b--2 secondary), scoped under .xm so that wireframe.css's .pg a, which makes links inherit their colour, does not turn its label the colour of its fill; .xm__l a text link, 44 px; .xm__k a labelled value (order number, tracking number); .xm__o a block that can be left out, outlined dashed; .xm__ft the footer: sender details as value slots (OD-18) and why it was sent (.xm__why). The order table is cm-order-summary as charged (.sm--paid). */
+.xm{display:flex;flex-direction:column;inline-size:100%;max-inline-size:600px;margin-inline:auto;background:#fff;color:#151515;font-size:15px;overflow-wrap:anywhere}
+.xm__hd{display:flex;align-items:center;justify-content:center;gap:6px;padding:18px 16px;border-block-end:1px solid #e0e0e0}
+.xm__bd{display:flex;flex-direction:column;gap:16px;padding:28px 20px 32px}
+.xm__h{font-size:22px;line-height:1.3;font-weight:700}
+.xm__p{text-wrap:pretty}
+.xm__s{font-size:13px;line-height:1.5;color:#5c5c5c}
+.xm .xm__b{display:flex;align-items:center;justify-content:center;gap:8px;align-self:flex-start;min-inline-size:min(100%,240px);min-block-size:48px;padding:12px 22px;border:1.5px solid #151515;border-radius:10px;background:#151515;color:#fff;font-weight:650;text-align:center;text-decoration:none}
+.xm .xm__b--2{background:#fff;color:#151515}
+.xm__l{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-block-size:44px;font-weight:650;text-underline-offset:3px}
+.xm__k{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:2px 12px;min-block-size:44px;padding-block:8px;border-block-end:1px solid #e0e0e0;font-size:14px}
+.xm__k>span:first-child{color:#5c5c5c}
+.xm__o{display:flex;flex-direction:column;gap:12px;padding:18px 16px;border:1.5px dashed #6b6b6b;border-radius:10px}
+.xm__ft{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:24px 20px;background:#f3f3f3;font-size:12.5px;color:#3a3a3a}
+.xm__why{align-self:stretch;padding-block-start:10px;border-block-start:1px solid #d6d6d6}

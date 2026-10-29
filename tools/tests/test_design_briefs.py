@@ -59,7 +59,8 @@ class TheCommittedBriefs(unittest.TestCase):
         text = db.brief("sf-pdp-simple", self.data)
         self.assertIn("### IX-08:", text)
         self.assertIn("Fixed by the contract. Not a design alternative", text)
-        self.assertIn("Status `open`", text)
+        ix08 = next(o for o in self.data["options"] if o["id"] == "IX-08")
+        self.assertIn(f"Status `{ix08['status']}`", text)
 
     def test_a_provisional_baseline_is_shown_as_provisional_with_its_alternatives(self):
         text = db.brief("sf-pagination", self.data)

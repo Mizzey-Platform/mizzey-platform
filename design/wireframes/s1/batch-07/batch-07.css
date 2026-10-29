@@ -1,0 +1,97 @@
+/* Mizzey batch-07 wireframes: wishlist, reviews, content and trust pages. Loaded after the batch-02, batch-02-targets and batch-03 stylesheets and the shared component layer (../../_shared/components.css), which holds the form, notice, rating input and review item. Prototype only; greys, system type. */
+/* Carried verbatim from s1/batch-06/batch-06.css, which batch-07 does not link: the tablet gutter (.gtb), the text for assistive technology only (.vh), the annotation tag (.vrt), the value slot (.ivp), the leaves-the-store mark (.odx__e). Carried verbatim from the inline sheet of s1/batch-01/sf-home and gl-promo-banner, which no later batch links: the library sections a campaign page is built from, the hero (.hero__p, .herom__t, .split), the promotional banner card (.pc, .pc__t, .pcm) and strip (.pr, .pr__t, .pr__l, .pr--m), the section rhythm (.hs, .sec, .secm, .sect, .sec0), the section head (.sh, .sh__a), the four-card rail (.rail4), the image ratios (.r43, .r169) and the image label (.ph__l). Same declarations, so nothing drawn earlier changes size. */
+.gtb{padding-inline:24px}
+.vh{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.vrt{display:inline-block;margin-inline-start:4px;padding:1px 5px;border:1px dashed #9a9a9a;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c;white-space:nowrap;vertical-align:1px}
+.ivp{display:inline-block;max-inline-size:100%;overflow-wrap:anywhere;padding:1px 6px;border:1px dashed #9a9a9a;border-radius:4px;font:500 11px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+.odx__e{flex:none;inline-size:11px;block-size:11px;border:1.5px solid currentColor;border-radius:2px;box-shadow:3px -3px 0 -1px #fff,3px -3px 0 0 currentColor}
+.ph__l{margin:8px;padding:2px 6px;background:rgba(255,255,255,.9);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace}
+.r43{aspect-ratio:4/3}
+.r169{aspect-ratio:16/9}
+.hs{position:relative}
+.sec{padding-block-start:64px}
+.sec0{padding-block-start:0}
+.sect{padding-block-start:24px}
+.sh{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-block-end:20px}
+.sh__a{display:flex;align-items:center;gap:8px}
+.sh__a .lnk{margin-inline-end:10px}
+.rail4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.hero__p{position:absolute;z-index:2;inset-inline-start:40px;inset-block-end:40px;max-inline-size:540px;background:#fff;padding:32px 36px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;border-radius:4px}
+.herom__t{padding:20px 16px 0;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.split{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center}
+.pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#f3f3f3;border-radius:8px;overflow:hidden}
+.pc__t{padding:40px 48px;display:flex;flex-direction:column;gap:18px;justify-content:center;align-items:flex-start}
+.pcm .pc__t{padding:20px}
+.pr{position:relative;display:flex;justify-content:center;align-items:center;gap:14px;block-size:40px;padding-inline:40px;background:#ececec;font-size:13px;font-weight:600}
+.pr__t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-inline-size:0}
+.pr__l{text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex:none}
+.pr--m{block-size:52px;padding-inline:16px;font-size:12.5px;gap:12px;justify-content:space-between}
+.pr--m .pr__t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+.pg[lang="ar"] .pr--m .pr__t{line-height:1.45}
+.pcm{background:#f3f3f3;border-radius:8px;overflow:hidden}
+.secm{padding-block-start:40px}
+/* Added in batch-07, not carried: a 44 px hit area for the promotional strip's link (.pr__l), which batch-01 drew at the strip's 40 px height. The strip keeps its size; only the link's pressable area grows, past its text. */
+.pr__l{position:relative}
+.pr__l::after{content:"";position:absolute;inset-block:-14px;inset-inline:-8px}
+/* The page column (.pw, desktop .pw--d) and its head (.sp__h: breadcrumbs, title, optional intro .sp__i). */
+.pw{display:flex;flex-direction:column;gap:20px;padding-block:8px 48px;min-inline-size:0}
+.pw--d{gap:24px;padding-block:8px 72px}
+.sp__h{display:flex;flex-direction:column;gap:8px;max-inline-size:760px;min-inline-size:0}
+.sp__h>h1{overflow-wrap:anywhere}
+.sp__i{font-size:16.5px;line-height:1.6;color:#3a3a3a;text-wrap:pretty}
+.sp__c{font-size:14px;color:#3a3a3a}
+/* sf-wishlist: the batch-02 product card in the batch-02 grid, with the wishlist's two actions under the price (.wla): Move to cart (a .btn--b, 46 px) and Remove (.wla__r, 44 px); the reason Move to cart is unavailable (.wla__x). .wlm is the confirmation left in place of a moved item (IX-02), a status, with View cart. */
+.wla{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin-block-start:auto;padding-block-start:4px}
+.wla__r{display:inline-flex;align-items:center;justify-content:center;align-self:center;min-block-size:44px;min-inline-size:44px;padding-inline:8px;font-size:13.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.wla__x{font-size:12.5px;line-height:1.4;color:#3a3a3a;padding-block-start:4px}
+.wlm{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px 14px;border:1.5px dashed #8a8a8a;border-radius:10px;font-size:13.5px;line-height:1.45;min-inline-size:0;overflow-wrap:anywhere}
+.wlm .nt__i{margin:0}
+.wlm .lnk{min-block-size:44px}
+/* The reviews section on the product page (rv-list, rv-form, rv-pending), on the batch-03 summary (.rv, .rvs, .rvp): the list ul.rvl of cm-review-item, the list head .rvh (the count and the page), the form block .rvf, the line that says whose name a review is published under (.rvf__w). */
+.rvl{display:flex;flex-direction:column;border-block-start:1px solid #e3e3e3;min-inline-size:0}
+.rvh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;font-size:13.5px;color:#3a3a3a}
+.rvf{display:flex;flex-direction:column;gap:16px;padding:20px 18px;border:1.5px solid #d6d6d6;border-radius:12px;min-inline-size:0}
+.rvf__w{font-size:13px;color:#3a3a3a;line-height:1.5}
+.rvf__a{display:flex;flex-wrap:wrap;gap:8px}
+.rvf__a .btn{flex:1 1 160px}
+.rvp>.lnk{align-self:flex-start;min-block-size:44px}
+/* cn-rich-text on ct-static-page: .rtx, headings at two levels (h2, h3 under the page's h1), paragraphs, lists, standalone links (.rtx__a, 44 px). .toc: the contents list drawn from the h2s on a long page, above the text on mobile, a sticky column at the inline start on desktop (.toc--d, in the grid .spg). .lbs marks a library section the client edits without a developer. */
+.rtx{display:flex;flex-direction:column;gap:14px;max-inline-size:720px;font-size:15px;line-height:1.7;color:#262626;min-inline-size:0;overflow-wrap:anywhere}
+.pg[lang="ar"] .rtx{line-height:1.85}
+.rtx h2{font-size:21px;line-height:1.3;font-weight:700;margin-block-start:18px;color:#151515}
+.rtx h3{font-size:16.5px;line-height:1.35;font-weight:650;margin-block-start:4px;color:#151515}
+.rtx ul,.rtx ol{display:flex;flex-direction:column;gap:6px;padding-inline-start:22px;list-style:disc}
+.rtx .rtx__o{list-style:decimal}
+.rtx__a{display:inline-flex;align-items:center;gap:8px;min-block-size:44px;font-weight:650;text-underline-offset:3px;color:#151515}
+.rtx--2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 48px;max-inline-size:none}
+.spg{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px 64px;align-items:start}
+.toc{display:flex;flex-direction:column;padding:14px 16px 6px;border:1.5px solid #d6d6d6;border-radius:12px;min-inline-size:0}
+.toc b{font-size:13px;margin-block-end:2px}
+.toc a{display:flex;align-items:center;min-block-size:44px;padding-block:4px;font-size:14px;font-weight:600;line-height:1.35;text-underline-offset:3px}
+.toc--d{position:sticky;inset-block-start:16px;padding:0 0 0 0;padding-inline-start:16px;border:0;border-inline-start:2px solid #e3e3e3;border-radius:0}
+.lbs{display:flex;flex-direction:column;gap:10px;min-inline-size:0}
+/* cn-image-text: the image and its text side by side (.cit), the image at the inline start, or at the inline end (.cit--e); stacked (.cit--s), and always stacked on mobile. */
+.cit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;min-inline-size:0}
+.cit--e>.ph{order:2}
+.cit--s{grid-template-columns:minmax(0,1fr);gap:16px}
+.cit__t{display:flex;flex-direction:column;gap:12px;align-items:flex-start;min-inline-size:0;overflow-wrap:anywhere}
+.cit__t p{color:#3a3a3a;line-height:1.6;text-wrap:pretty}
+/* ct-help: topics (.fqt) of batch-03 accordions; the topic jump links reuse the batch-02 chips (.lnks); .acc__b p the answer text. */
+.fqt{display:flex;flex-direction:column;gap:8px;max-inline-size:760px;min-inline-size:0}
+.fqt+.fqt{margin-block-start:24px}
+.acc__b p{line-height:1.6;text-wrap:pretty}
+/* ct-contact: the form (.cfo, at a 560 px measure) beside the other routes (.cfa: WhatsApp click-to-chat and the support details, .cfk a labelled value); on mobile one column, the routes after the form (.ctf, .ctf--m). */
+.ctf{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:start}
+.ctf--m{grid-template-columns:minmax(0,1fr);gap:28px}
+.cfo{display:flex;flex-direction:column;gap:16px;max-inline-size:560px;min-inline-size:0}
+.cfo>.btn{align-self:flex-start}
+.ctf--m .cfo>.btn{align-self:stretch}
+.cfa{display:flex;flex-direction:column;gap:14px;padding:20px;border:1.5px solid #d6d6d6;border-radius:12px;min-inline-size:0}
+.cfk{display:flex;flex-direction:column;gap:2px;font-size:13.5px;overflow-wrap:anywhere}
+.cfk>span:first-child{color:#5c5c5c}
+.cfp{font-size:12.5px;color:#3a3a3a;line-height:1.5}
+.cfp a{display:inline-flex;align-items:center;min-block-size:44px;font-weight:650;text-underline-offset:3px}
+/* ct-campaign-page: the template's stack of library sections, each tagged (.lbt) with its section id. */
+.lbt{display:inline-block;align-self:flex-start;margin-block-end:8px;padding:2px 6px;border:1px dashed #8a8a8a;background:#fff;font:600 10px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a;max-inline-size:100%;overflow-wrap:anywhere}
+.cmp{display:flex;flex-direction:column;gap:56px;padding-block:0 72px}
+.cmp--m{gap:40px;padding-block-end:48px}

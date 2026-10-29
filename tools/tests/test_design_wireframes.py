@@ -90,7 +90,9 @@ class TheCommittedState(unittest.TestCase):
         self.assertLessEqual(used, known)
         self.assertEqual({f["viewport"] for f in frames}, {"mobile", "desktop"})
         briefed = {e["surface"] for e in data["manifest"]["entries"] if e["brief"]}
-        self.assertEqual(used, briefed, "the briefed surfaces are exactly those of the calibration set")
+        self.assertLessEqual(used, briefed, "every surface of the calibration set is briefed")
+        batches = {e["surface"]: e["batch"] for e in data["manifest"]["entries"]}
+        self.assertFalse([s for s in briefed if batches[s] is None], "a brief belongs to a surface in a review batch")
 
     def test_every_designable_surface_is_in_one_batch_and_the_rest_say_why(self):
         data = dw.load(ROOT)
@@ -235,22 +237,32 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("sf-basket is not a surface of the inventory")
 
     def test_pending_interaction_choices_are_derived_not_typed(self):
-        self.entries["sf-pagination"]["interaction_pending"] = []
+        entry = self.entries["sf-pagination"]
+        entry["interaction_pending"] = [] if entry["interaction_pending"] else ["DQ-02"]
         self.assertRefused("manifest sf-pagination: interaction_pending differs from the inventory")
 
     def test_a_locked_choice_is_no_longer_pending(self):
+        """Holds whether DQ-02 is still provisional or already locked: the fixture sets the state it starts from."""
         option = next(o for o in self.data["options"] if o["id"] == "DQ-02")
+        option["status"] = "provisional"
+        self.entries["sf-pagination"]["interaction_pending"] = ["DQ-02"]
+        text = "manifest sf-pagination: interaction_pending differs from the inventory"
+        self.assertFalse(any(text in e for e in self.errors()))
         option["status"] = "locked"
-        self.assertRefused("manifest sf-pagination: interaction_pending differs from the inventory")
+        self.assertRefused(text)
 
     def test_a_briefed_surface_needs_its_brief_and_a_purpose(self):
+        """Holds before and after sf-wishlist is briefed: the fixture removes the brief and the purpose itself."""
         self.entries["sf-wishlist"]["review_status"] = "briefed"
+        self.entries["sf-wishlist"]["brief"] = None
         self.surfaces["sf-wishlist"]["status"] = "briefed"
+        self.surfaces["sf-wishlist"].pop("purpose", None)
         self.assertRefused("manifest sf-wishlist: briefed, and has no brief")
         self.assertRefused("manifest sf-wishlist: briefed, and the inventory gives the surface no purpose")
 
     def test_the_manifest_and_the_inventory_status_cannot_disagree(self):
         self.entries["sf-cart"]["review_status"] = "reviewed"
+        self.surfaces["sf-cart"]["status"] = "briefed"
         self.assertRefused("review status reviewed and the inventory status briefed disagree")
 
     def test_a_surface_is_not_reviewed_while_a_required_state_is_uncovered(self):
@@ -264,16 +276,22 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertRefused("covers state gift_wrapped, which the surface does not list")
 
     def test_a_listed_artefact_that_does_not_exist(self):
-        self.entries["sf-cart"]["artifacts"] = ["design/wireframes/s1/batch-04/sf-cart.en.html"]
-        self.assertRefused("artefact design/wireframes/s1/batch-04/sf-cart.en.html does not exist")
+        """Holds before and after sf-wishlist is drawn: checked against an empty folder, where no artefact exists."""
+        self.entries["sf-wishlist"]["artifacts"] = ["design/wireframes/s1/batch-07/sf-wishlist.en.html"]
+        with tempfile.TemporaryDirectory() as tmp:
+            errs = dw.check_manifest(self.data, Path(tmp))
+        text = "artefact design/wireframes/s1/batch-07/sf-wishlist.en.html does not exist"
+        self.assertTrue(any(text in e for e in errs), f"expected {text!r} in {errs[:6]}")
 
     def test_an_artefact_filed_under_the_wrong_release_or_name(self):
         self.entries["sf-cart"]["artifacts"] = ["design/wireframes/s2/batch-10/sf-cart.en.html"]
         self.assertRefused("is not design/wireframes/s1/<batch>/sf-cart.en.html or .ar.html")
 
     def test_marked_drawn_with_nothing_to_show(self):
-        self.entries["sf-cart"]["en_ltr"] = "drawn"
-        self.assertRefused("manifest sf-cart: en_ltr marked drawn, and no artefact is listed")
+        """Holds before and after sf-wishlist is drawn: the fixture sets its artefacts and cells itself."""
+        self.entries["sf-wishlist"].update(artifacts=[], en_ltr="drawn", ar_rtl="not_started", mobile="not_started",
+                                           desktop="not_started")
+        self.assertRefused("manifest sf-wishlist: en_ltr marked drawn, and no artefact is listed")
 
     def test_the_administration_is_not_drawn_in_arabic(self):
         self.entries["ad-staff-log"]["ar_rtl"] = "not_started"
@@ -329,6 +347,8 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
 
     def test_a_declared_calibration_file_may_exist_before_its_review_is_recorded(self):
         """The designer creates the files and leaves the manifest alone: the status follows the review."""
+        for frame in self.data["manifest"]["calibration"]["frames"]:
+            frame["status"] = {d: "not_started" for d in dw.DIRECTIONS}
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             path = root / "design/wireframes/s1/calibration/a/cal-01.en.html"
@@ -341,6 +361,7 @@ class TheManifestHoldsToTheInventory(unittest.TestCase):
         self.assertTrue(any("cal-99.en.html: a wireframe the manifest does not list" in e for e in errs))
 
     def test_no_direction_is_selected_before_the_calibration_is_reviewed(self):
+        self.data["manifest"]["calibration"]["frames"][0]["status"]["a"] = "drawn"
         self.data["manifest"]["selection"]["selected_direction"] = "b"
         self.data["manifest"]["selection"]["decision_source"] = "Owner"
         self.assertRefused("a direction is selected before every calibration frame has been reviewed")

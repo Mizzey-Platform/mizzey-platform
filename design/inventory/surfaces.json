@@ -52,7 +52,7 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-05", "IX-07"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["gl-language-switcher", "gl-mega-menu", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
@@ -102,7 +102,7 @@
       "decisions": [],
       "interaction_options": ["IX-02", "IX-07"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["gl-mobile-nav", "sf-search-suggestions", "sf-mini-cart"]
     },
     {
@@ -151,7 +151,7 @@
       "decisions": [],
       "interaction_options": ["IX-06"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "gl-mega-menu",
@@ -201,7 +201,7 @@
       "decisions": [],
       "interaction_options": ["IX-05"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "gl-language-switcher",
@@ -247,7 +247,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "gl-footer",
@@ -289,7 +289,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "The footer's only delivery row is the editing row SSC-08, owned by #311, while the frame is built in #253.",
       "build_note": "SSC-08, the footer's editing row, is accepted by #311. The footer itself is part of the frame, built by #253."
     },
@@ -334,11 +334,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "gl-cookie-consent",
       "name": "Consent and cookie banner",
+      "purpose": "Asks a visitor which tracking they accept, records the choice, and keeps tracking to it.",
       "kind": "overlay",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -378,7 +379,7 @@
       "decisions": ["DQ-07"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Accept, Decline and Preferences. The layout stays within what the tool selected in #288 can produce (DQ-07)."
     },
     {
@@ -425,7 +426,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-home",
@@ -435,7 +436,7 @@
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
       "register_ids": ["HOME-01", "HOME-02", "HOME-03", "HOME-04", "HOME-05", "HOME-06", "HOME-07", "HOME-08", "HOME-09", "HOME-10", "HOME-11"],
-      "context_ids": ["IA-01", "JRN-01", "SSC-02", "SSC-03", "ADM-59", "ADM-60", "ADM-61", "MER-02", "MER-04"],
+      "context_ids": ["IA-01", "JRN-01", "SSC-02", "SSC-03", "ADM-59", "ADM-60", "ADM-61", "MER-01", "MER-02", "MER-04"],
       "excluded_ids": ["HOME-12", "HOME-13"],
       "owner_pbi": 302,
       "build_pbi": 302,
@@ -469,16 +470,17 @@
       "native_baseline": "A static front page built from the curated section library in the block editor.",
       "design_freedom": "free",
       "open_items": ["OD-01", "CR-05", "CR-15", "OP-12"],
-      "decisions": [],
+      "decisions": ["DQ-09"],
       "interaction_options": ["IX-09"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["gl-header", "gl-header-mobile", "gl-footer", "gl-promo-banner", "sf-product-card"],
       "note": "Section order is changeable (HOME-11), so no section may depend on its neighbour."
     },
     {
       "id": "sf-shop",
       "name": "Products listing",
+      "purpose": "Shows the whole range in one listing, with the result count, so a visitor can browse, filter, sort and continue through it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -518,7 +520,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
@@ -564,12 +566,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
       "id": "sf-collection",
       "name": "Collection page",
+      "purpose": "Shows the products of one curated collection, in the order the store sets, so a visitor can browse, narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -608,12 +611,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"]
     },
     {
       "id": "sf-brand",
       "name": "Brand page",
+      "purpose": "Shows the products of one brand, with its name and its logo where one exists, so a visitor can browse, narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -652,7 +656,7 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["gl-breadcrumbs", "sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-listing-empty"],
       "note": "#303 builds the customer-facing brand page. IA-05 (#242) names the page, and ADM-56 (#277) and SSC-05 (#311) own the admin and editing rows that shape its header: they are context here and stay with their owners."
     },
@@ -705,9 +709,10 @@
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-01", "CR-05"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
-      "status": "briefed"
+      "status": "reviewed",
+      "composes": ["sf-product-badges"]
     },
     {
       "id": "sf-listing-filters",
@@ -752,7 +757,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "Filter by rating is second release (sf-filter-by-rating)."
     },
     {
@@ -803,7 +808,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-listing-toolbar",
@@ -848,7 +853,7 @@
       "decisions": [],
       "interaction_options": ["IX-01"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-pagination",
@@ -876,8 +881,8 @@
         {"state": "middle_page"},
         {"state": "last_page"},
         {"state": "single_page", "note": "Nothing more to show"},
-        {"state": "loading_more", "note": "Only if a loading pattern is selected (DQ-02)"},
-        {"state": "end_of_list", "note": "Only if a loading pattern is selected (DQ-02)"}
+        {"state": "loading_more", "note": "As it applies to numbered pages: the next page loading into reserved space (DQ-02)"},
+        {"state": "end_of_list", "note": "As it applies to numbered pages: the end of the last page (DQ-02)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -896,12 +901,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "briefed",
-      "note": "Working baseline: numbered pagination. Provisional, not a decision. Load More and controlled continuous loading are candidates (DQ-02)."
+      "status": "reviewed",
+      "note": "Numbered pagination, locked by the owner at the batch-02 review on 19 October 2026 (DQ-02). Load More and continuous loading are not launch functionality."
     },
     {
       "id": "sf-listing-empty",
       "name": "Listing with no products",
+      "purpose": "Tells a visitor that a listing has no products, or none that match the chosen filters, and offers a way on.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -939,11 +945,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "sf-filter-by-rating",
       "name": "Filter by rating",
+      "purpose": "Lets a shopper filter a product listing by rating, so that only products at or above the selected rating are shown.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -981,12 +988,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "sf-brand-landing",
       "name": "Brand landing page",
+      "purpose": "Gives a brand a landing page of its own, listed with the campaign and search engine pages of the information architecture.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1023,7 +1031,7 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release. What the first release provides in its place is not stated (OP-13). Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
@@ -1071,11 +1079,12 @@
       "decisions": [],
       "interaction_options": ["IX-07"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-search-results",
       "name": "Search results",
+      "purpose": "Shows the products that match a search, in English or Arabic, with the result count and the full filter set, so a visitor can narrow and choose.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1117,12 +1126,13 @@
       "decisions": [],
       "interaction_options": ["DQ-02"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["sf-listing-toolbar", "sf-listing-filters", "sf-filter-drawer", "sf-product-card", "sf-pagination", "sf-search-no-results"]
     },
     {
       "id": "sf-search-no-results",
       "name": "Search with no results",
+      "purpose": "Tells a visitor that a search found nothing, and offers alternative suggestions so the search does not end there.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1159,11 +1169,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-search-synonyms",
       "name": "Synonym and correction list",
+      "purpose": "Lets staff manage the synonym and correction list that the store search uses, from the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -1199,7 +1210,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "sf-pdp-simple",
@@ -1226,7 +1237,7 @@
         {"state": "on_sale", "requires": "PDP-04", "note": "Price, sale price and saving"},
         {"state": "out_of_stock", "requires": "PDP-22", "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."},
         {"state": "adding", "requires": "PDP-08"},
-        {"state": "added", "requires": "PDP-08", "note": "Mini-cart shown"},
+        {"state": "added", "requires": "PDP-08", "note": "Confirmed in place in the buy area, with View cart and Checkout; the header count steps up and the mini-cart does not open. On the mobile buy bar a compact confirmation stays until it is dismissed or the next purchase action (IX-10)"},
         {"state": "in_wishlist", "requires": "PDP-10"},
         {"state": "no_delivery_estimate", "requires": "PDP-14", "note": "Shown where available"},
         {"state": "no_specifications"},
@@ -1249,9 +1260,9 @@
       "design_freedom": "free",
       "open_items": ["PRE-09", "OD-08", "OD-13", "OD-01", "CR-05", "CR-15"],
       "decisions": [],
-      "interaction_options": ["IX-03", "IX-08"],
+      "interaction_options": ["IX-03", "IX-08", "IX-10"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": [
         "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related", "sf-pdp-recently-viewed",
         "sf-product-badges"
@@ -1301,9 +1312,9 @@
       "design_freedom": "free",
       "open_items": ["PRE-09"],
       "decisions": [],
-      "interaction_options": ["IX-03"],
+      "interaction_options": ["IX-03", "IX-10"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": [
         "sf-pdp-simple", "gl-breadcrumbs", "sf-pdp-gallery", "sf-pdp-stock-state", "sf-pdp-reviews", "rv-list", "rv-form", "sf-pdp-related",
         "sf-pdp-recently-viewed", "sf-product-badges"
@@ -1355,7 +1366,7 @@
       "decisions": [],
       "interaction_options": ["IX-04"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-pdp-stock-state",
@@ -1400,7 +1411,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "note": "No delivery row requires a low-stock or 'only N left' state on the storefront. None is drawn."
     },
     {
@@ -1439,18 +1450,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce related products block.",
+      "native_baseline": "WooCommerce's Upsells field on the product's Linked products tab, shown through WooCommerce's upsells product source. WooCommerce's automatic Related Products block is a different mechanism and is not used (DQ-10).",
       "design_freedom": "free",
       "open_items": ["OP-12"],
-      "decisions": [],
+      "decisions": ["DQ-10"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["sf-product-card"]
     },
     {
       "id": "sf-pdp-recently-viewed",
       "name": "Recently viewed, on the product page",
+      "purpose": "Shows a visitor the products they viewed recently, on the product page, so they can get back to one without searching for it again.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1489,7 +1501,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["sf-product-card"]
     },
     {
@@ -1530,10 +1542,11 @@
       "native_baseline": "WooCommerce product reviews block.",
       "design_freedom": "free",
       "open_items": [],
-      "decisions": [],
+      "decisions": ["DQ-06"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed",
+      "note": "The entry to the review form (Write a review, Write the first review) is offered only to a customer who is eligible under DQ-06 as revised by D-17; signed out, Sign in to write a review stays. An ineligible or already-reviewed customer reaches the rv-form not_eligible or already_reviewed state. The batch-03 frames' DQ-06 notes (a signed-in customer may submit) are corrected by the 21 October 2026 correction (batches[batch-03].corrections); no state is added here, and the rv-form states it points to are reviewed."
     },
     {
       "id": "sf-cart",
@@ -1581,15 +1594,16 @@
       "native_baseline": "WooCommerce Cart block.",
       "design_freedom": "constrained",
       "open_items": ["OD-04", "PRE-09"],
-      "decisions": [],
-      "interaction_options": [],
+      "decisions": ["DQ-10"],
+      "interaction_options": ["IX-02"],
       "erp_dependency": "partial",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": ["sf-free-shipping-progress", "sf-cart-revalidation", "sf-cart-empty", "sf-product-card"]
     },
     {
       "id": "sf-cart-empty",
       "name": "Empty cart",
+      "purpose": "Tells a visitor that the cart is empty, and offers suggestions so the visit does not end there.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1626,7 +1640,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Staging finding: the empty cart page is 8 pixels too wide. Attached to #306 by D-13, not corrected."
     },
     {
@@ -1673,7 +1687,7 @@
       "decisions": [],
       "interaction_options": ["IX-02"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-free-shipping-progress",
@@ -1718,11 +1732,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "sf-cart-revalidation",
       "name": "Cart line changed on re-validation",
+      "purpose": "Tells a visitor, when the cart is viewed, which line changed after stock was re-validated and how it changed.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1761,12 +1776,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
       "id": "sf-wishlist",
       "name": "Wishlist",
+      "purpose": "Lets a shopper add products to a wishlist and remove them, keeps the list for a signed-in customer and temporarily for a guest, and moves an item from the wishlist to the cart.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1808,12 +1824,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
+      "note": "One list per visitor, with save, view, remove and move to cart only. No sharing (WISH-05), price-drop alerts (WISH-06), product comparison (WISH-08) or multiple lists, which the register's reduced boundary also excludes. The transfer of a guest list on sign-in is CART-17.",
       "composes": ["sf-product-card"]
     },
     {
       "id": "sf-recently-viewed",
       "name": "Recently viewed products",
+      "purpose": "Shows a visitor the products they viewed recently.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1852,12 +1870,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["sf-product-card"]
     },
     {
       "id": "au-sign-in",
       "name": "Sign in",
+      "purpose": "Lets a returning customer sign in to their account, with login attempts rate limited.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1898,13 +1917,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["au-google-entry", "au-passwordless"],
       "note": "Sign in and register share one address (OP-17)."
     },
     {
       "id": "au-register",
       "name": "Registration",
+      "purpose": "Lets a visitor create an account with no more than email, password and consent, with marketing consent asked for separately.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1945,13 +1965,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["au-google-entry"],
       "note": "No more than email, password and consent are mandatory (AUTH-14)."
     },
     {
       "id": "au-lost-password",
       "name": "Lost password",
+      "purpose": "Lets a customer who has forgotten their password ask for a link to reset it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -1989,11 +2010,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "au-reset-password",
       "name": "Set a new password",
+      "purpose": "Lets a customer set a new password from a reset link that works once and only for a limited time.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2035,11 +2057,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "au-passwordless",
       "name": "Passwordless sign-in link",
+      "purpose": "Lets a customer sign in through a link sent by email, instead of remembering a password.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2080,11 +2103,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "au-google-entry",
       "name": "Google sign-in entry",
+      "purpose": "Lets a visitor sign in or register with a Google account, and keeps one account when the same email is already registered.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2125,11 +2149,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "au-email-verification",
       "name": "Email verification states",
+      "purpose": "Tells a new customer whether their email address is verified, and how to complete the verification or ask for it again.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2169,11 +2194,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "au-checkout-entry",
       "name": "Guest, sign-in or register choice before checkout",
+      "purpose": "Lets a visitor choose, before checkout, to continue as a guest or to sign in or register, without being forced to register.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2211,12 +2237,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Guest checkout is never forced into registration. It is encouraged (FIX-09)."
     },
     {
       "id": "au-post-order-account",
       "name": "Create an account from the order confirmation",
+      "purpose": "Lets a guest who has just ordered become a registered customer by setting a password only.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2257,7 +2284,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "A password only. No re-entry of name, email, phone or address."
     },
     {
@@ -2304,7 +2331,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed",
+      "status": "reviewed",
       "composes": [
         "ck-address", "ck-shipping-method", "ck-payment-method", "ck-coupon-notes", "ck-review-place-order", "ck-validation", "ck-stock-failure",
         "ck-erp-unavailable", "au-checkout-entry"
@@ -2356,7 +2383,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-shipping-method",
@@ -2402,7 +2429,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-payment-method",
@@ -2447,7 +2474,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-coupon-notes",
@@ -2492,7 +2519,7 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-review-place-order",
@@ -2536,11 +2563,12 @@
       "decisions": [],
       "interaction_options": ["DQ-03"],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed"
     },
     {
       "id": "ck-validation",
       "name": "Checkout validation messages",
+      "purpose": "Tells the customer, in both languages, what is wrong in the checkout and how to correct it.",
       "kind": "message",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2579,12 +2607,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Clear in both languages (CHK-11)."
     },
     {
       "id": "ck-stock-failure",
       "name": "Stock no longer available when the order is placed",
+      "purpose": "Tells the customer which line could not be confirmed when stock was re-validated at the point of placing the order.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2622,12 +2651,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Stock wording, timing and mechanism are per PRE-09. Draw the structural state only."
     },
     {
       "id": "ck-erp-unavailable",
       "name": "Stock cannot be validated when the order is placed",
+      "purpose": "Tells the customer that the order was not placed because the stock could not be validated as available, including when the stock system cannot be reached.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2664,12 +2694,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "The sale is not confirmed: that is contracted. What the customer sees is set in PRE-09. Placeholder message only."
     },
     {
       "id": "ck-payment-handoff",
       "name": "Handing off to the payment provider and returning",
+      "purpose": "Takes the customer through the secure hosted payment, by card with 3-D Secure or by a mobile wallet where one is enabled, and back to the store.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2709,12 +2740,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Our side of the handoff only. The hosted card, 3-D Secure and wallet steps are the provider's."
     },
     {
       "id": "ck-payment-failed",
       "name": "Payment failed or cancelled, with a way to retry",
+      "purpose": "Tells the customer that a payment in the secure hosted payment flow did not complete.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2753,11 +2785,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ck-order-received",
       "name": "Order confirmation",
+      "purpose": "Confirms to the customer that the order was placed.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2799,13 +2832,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["au-post-order-account", "ord-status-labels"],
       "build_note": "IA-10, the page row, is accepted by #242 as the route, and JRN-08 by #322 as the journey record. The visible checkout completion screen is built with the checkout, #255."
     },
     {
       "id": "ac-navigation",
       "name": "Account navigation",
+      "purpose": "Takes a signed-in customer to the parts of their account, the saved wishlist among them.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2837,18 +2871,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce My Account navigation.",
-      "design_freedom": "constrained",
+      "native_baseline": "The My Account endpoints (orders, view-order, edit-address, edit-account, customer-logout), listed by the replaceable templates/myaccount/navigation.php inside my-account.php. The endpoints, their addresses and the sign-in requirement are fixed; the sidebar list is only the template's default, and the account's structure is IX-11.",
+      "design_freedom": "free",
       "open_items": ["OP-05"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "No returns entry: the returns area is deferred (ACCT-10)."
     },
     {
       "id": "ac-dashboard",
       "name": "Account dashboard",
+      "purpose": "Gives a signed-in customer an overview of their account.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2881,18 +2916,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce My Account dashboard.",
-      "design_freedom": "constrained",
+      "native_baseline": "The replaceable templates/myaccount/dashboard.php inside my-account.php, a paragraph of links by default. The signed-in requirement is fixed; what leads and how the areas are reached is IX-11.",
+      "design_freedom": "free",
       "open_items": ["OP-05"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ac-navigation"]
     },
     {
       "id": "ac-orders",
       "name": "Order history",
+      "purpose": "Lists the customer's past orders.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2930,18 +2966,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce orders endpoint.",
-      "design_freedom": "constrained",
+      "native_baseline": "The orders endpoint and its paging, shown by the replaceable templates/myaccount/orders.php as a table by default. The endpoint, its paging and the customer's own orders are fixed; the presentation is not.",
+      "design_freedom": "free",
       "open_items": [],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ord-status-labels"]
     },
     {
       "id": "ac-order-detail",
       "name": "Order detail, with tracking and invoice",
+      "purpose": "Shows one order with its full breakdown, lets the customer track it, and offers its invoice to download.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -2981,18 +3018,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce view-order endpoint.",
-      "design_freedom": "constrained",
+      "native_baseline": "The view-order endpoint, shown by the replaceable templates/myaccount/view-order.php. Fixed: an order shows only to an account allowed to view it (current_user_can view_order), and its data as charged. Not native: the status timeline (ord-status-timeline), the carrier tracking display (the Bosta plugin stores bosta_tracking_number in order meta and shows it in the admin only) and the invoice download (ACCT-12, no customer invoice document in WooCommerce).",
+      "design_freedom": "free",
       "open_items": ["OD-09", "OP-20"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ord-status-timeline", "ord-status-labels"]
     },
     {
       "id": "ac-addresses",
       "name": "Address book",
+      "purpose": "Lets the customer keep a book of addresses: add, edit and delete them, and set the default.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3029,18 +3067,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce edit-address endpoint. Add, edit, delete and set default (ACCT-04) go beyond its two fixed addresses.",
+      "native_baseline": "The edit-address endpoint (templates/myaccount/my-address.php and form-edit-address.php) holds one billing and one shipping address. ACCT-04's book of several addresses, with add, edit, delete and a default, is an addition, and checkout's saved-address selection (CHK-02) depends on it. The storage mechanism is decided at implementation.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ac-navigation"]
     },
     {
       "id": "ac-account-details",
       "name": "Profile details",
+      "purpose": "Lets the customer edit their profile details.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3062,7 +3101,9 @@
         {"state": "default"},
         {"state": "validation"},
         {"state": "saved"},
-        {"state": "email_change", "note": "May need verification"}
+        {"state": "email_change", "note": "Verification of the new address is required (US-10-05); the current address stays in use until the new one is confirmed"},
+        {"state": "email_change_confirmed", "note": "The customer followed the link in em-email-change: the new address is now the account email"},
+        {"state": "email_change_link_invalid", "note": "The link has expired or was already used: nothing changes, and the customer can ask again"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -3074,18 +3115,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce edit-account endpoint.",
+      "native_baseline": "The edit-account endpoint (templates/myaccount/form-edit-account.php), saved by WC_Form_Handler::save_account_details: first name, last name, display name and email are required by default (filterable), the password change sits in the same form, and an email change is saved at once with no verification step (OP-19).",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
       "decisions": [],
-      "interaction_options": [],
+      "interaction_options": ["IX-11"],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ac-navigation", "ac-password"]
     },
     {
       "id": "ac-password",
       "name": "Change password",
+      "purpose": "Lets the customer change their password.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3118,17 +3160,18 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce edit-account endpoint, password fields.",
+      "native_baseline": "The password fields of the edit-account form (current, new, confirm), validated by WC_Form_Handler::save_account_details.",
       "design_freedom": "constrained",
       "open_items": ["OP-19"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ac-tracking",
       "name": "Track an order without signing in",
+      "purpose": "Lets a customer track an order without signing in.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3162,18 +3205,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WooCommerce order tracking form: lookup by order number and email.",
+      "native_baseline": "The order tracking form (the woocommerce_order_tracking shortcode, templates/order/form-tracking.php): lookup by order number and billing email, then the native order details. No status timeline and no carrier tracking are native.",
       "design_freedom": "constrained",
       "open_items": ["OP-20", "VENDOR-BOSTA"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ord-status-timeline", "ord-status-labels"]
     },
     {
       "id": "ac-invoice",
       "name": "Customer invoice document",
+      "purpose": "The invoice a customer downloads for an order.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3207,18 +3251,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "An invoice mechanism is selected in #280 and #308.",
+      "native_baseline": "No customer invoice document in WooCommerce: the customer invoice email is an order-details email. The invoice mechanism is selected in #280 and #308, and its output limits the layout.",
       "design_freedom": "constrained",
       "open_items": ["OD-09", "OD-18"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "A printable document. Legal content waits for the client's invoicing inputs."
     },
     {
       "id": "ord-status-timeline",
       "name": "Order status timeline, as the customer sees it",
+      "purpose": "Shows the customer how far an order has gone: confirmed, preparing, shipped, out for delivery and delivered.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -3261,12 +3306,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "build_note": "The statuses ORD-03 to ORD-07 are accepted by #248, the status model. The timeline the customer sees is built on the order and tracking screens of #308."
     },
     {
       "id": "ord-status-labels",
       "name": "Order status labels",
+      "purpose": "Names an order's status wherever the customer sees it, including pending payment, payment failed, cancelled, refunded and returned to origin.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["customer", "staff"],
@@ -3309,12 +3355,13 @@
       "decisions": ["DQ-05"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Customer-facing labels are bilingual. The same states in the administration are English only. Cash collected and remitted is never shown to the customer (DQ-05)."
     },
     {
       "id": "ac-reorder",
       "name": "Reorder from order history",
+      "purpose": "Lets a returning customer repeat a previous order from their order history in one action: a cart is built from its items at current availability and current prices, and items no longer available are reported rather than silently left out.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3346,18 +3393,19 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "None.",
+      "native_baseline": "WooCommerce's \"Order again\" button on the order detail, for completed orders only. It empties the cart first, adds items at current prices, and reports the items it cannot add only as a count.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-notification-preferences",
       "name": "Notification preferences",
+      "purpose": "Gives a signed-in customer a page in their account where they manage their notification preferences.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3396,12 +3444,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "The first release provides unsubscribe links in emails. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "ac-account-deletion",
       "name": "Account deletion request",
+      "purpose": "Lets a signed-in customer ask, from their account page, for their account to be deleted. The request is recorded with a timestamp and is visible to the team, and its handling respects the order records the client must keep.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3434,23 +3483,24 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "None.",
+      "native_baseline": "No customer-facing request form. WordPress records erasure requests created in the administration (Tools > Erase Personal Data), and WooCommerce's erasers anonymise an order's personal data while keeping the order.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "The first release handles this manually on request. Second release: not in the initial S1 wireframe pass. Where it attaches is kept free during S1. It gets its own low-fidelity pass before PRE-03b is approved and is in the final interface-design package. Built in the second release (DQ-04)."
     },
     {
       "id": "rv-list",
       "name": "Review list and average rating",
+      "purpose": "Shows a product's average rating, with the reviews it comes from.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
-      "register_ids": ["REV-01", "REV-04"],
-      "context_ids": ["PDP-17"],
+      "register_ids": ["REV-04"],
+      "context_ids": ["REV-01", "PDP-17"],
       "excluded_ids": ["REV-06", "REV-07", "REV-08", "REV-09"],
       "owner_pbi": 309,
       "build_pbi": 309,
@@ -3486,15 +3536,17 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed",
+      "note": "Each review shows the author's display name (owner decision at the batch-06 review, ACCT-02: kept, required, shown with reviews), its star rating, its date and its text, in the language it was written in. Store-owner replies to reviews are not shown at launch, with comment threading off (owner decision of 20 October 2026, recorded for batch-07; no register row covers them). No photo or video reviews, verified-purchase badge, helpfulness voting or customer questions and answers (REV-06 to REV-09, P2; DQ-06)."
     },
     {
       "id": "rv-form",
       "name": "Write a review",
+      "purpose": "Lets a customer submit a star rating and a written review of a product.",
       "kind": "component",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
-      "register_ids": ["REV-02"],
+      "register_ids": ["REV-01", "REV-02"],
       "context_ids": [],
       "excluded_ids": ["REV-06"],
       "owner_pbi": 309,
@@ -3512,7 +3564,9 @@
         {"state": "signed_out", "note": "Asked to sign in"},
         {"state": "form"},
         {"state": "validation"},
-        {"state": "submitted"}
+        {"state": "submitted"},
+        {"state": "not_eligible", "note": "Signed in, without a delivered purchase of this product: a short explanation in place of the form (DQ-06)"},
+        {"state": "already_reviewed", "note": "Signed in, with a pending or approved review of this product in either language: no form, and the customer is told they have reviewed it (DQ-06)"}
       ],
       "responsive": {"mobile": "Designed first (NFR-01). One column, touch targets.", "tablet": "Two columns where the content allows.", "desktop": "Full layout."},
       "rtl": {
@@ -3530,12 +3584,13 @@
       "decisions": ["DQ-06"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
-      "note": "Star rating and text only. No photo or video (REV-06 is P2). A signed-in customer may submit a review: no verified purchase is required and no verified-purchase badge is shown (DQ-06)."
+      "status": "reviewed",
+      "note": "Star rating and text only. No photo or video (REV-06 is P2). Only a signed-in customer with a delivered purchase of the product may submit, one active review per product across variations and languages, checked on the server; no verified-purchase badge is shown (DQ-06 as revised by D-17, REV-07 is P2). The review is published under the customer's display name, so the form asks for no name or email (owner decision at the batch-06 review, ACCT-02). Reviewed, all seven states: five drawn and reviewed in batch-07, whose closure stands; not_eligible and already_reviewed, added by D-17, drawn by the 21 October 2026 correction (batches[batch-07].corrections) and reviewed by the owner the same day. The batch-07 frames' DQ-06 notes (any signed-in customer, no purchase check) are corrected by the same correction."
     },
     {
       "id": "rv-pending",
       "name": "Review held for moderation",
+      "purpose": "Tells a customer that their review is moderated before it is published.",
       "kind": "message",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3572,11 +3627,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ct-static-page",
       "name": "Static and policy page layout",
+      "purpose": "The layout the trust and policy pages share, each of them editable without a developer.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3613,12 +3669,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "The shared layout the eight trust and support pages use. Each stays editable without a developer (CMS-09)."
     },
     {
       "id": "ct-about",
       "name": "About",
+      "purpose": "Tells visitors about the store.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3655,12 +3712,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-authenticity",
       "name": "Authenticity guarantee",
+      "purpose": "States the store's authenticity guarantee.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3697,12 +3755,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-shipping-policy",
       "name": "Shipping policy",
+      "purpose": "Sets out the store's shipping policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3739,12 +3798,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-help",
       "name": "Help and FAQ",
+      "purpose": "Answers customers' common questions, as an FAQ and help centre.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3784,12 +3844,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-privacy",
       "name": "Privacy policy",
+      "purpose": "Sets out the store's privacy policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3826,12 +3887,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-returns-policy",
       "name": "Return and refund policy",
+      "purpose": "Sets out the store's return and refund policy.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3868,13 +3930,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"],
       "note": "No return request form and no returns area: returns go through the support channels (AC-14)."
     },
     {
       "id": "ct-terms",
       "name": "Terms and conditions",
+      "purpose": "Sets out the store's terms and conditions.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3911,12 +3974,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"]
     },
     {
       "id": "ct-contact",
       "name": "Contact us",
+      "purpose": "Lets a visitor contact the store through a form, or start a WhatsApp chat with it.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -3957,13 +4021,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["ct-static-page"],
       "note": "The WhatsApp link is click-to-chat only (CMS-10). Automated WhatsApp messages are not contracted."
     },
     {
       "id": "ct-campaign-page",
       "name": "Offer and campaign page",
+      "purpose": "A campaign or offer landing page, built without a developer from the approved templates and the delivered section library.",
       "kind": "page",
       "scope_type": "contracted",
       "audience": ["visitor", "customer"],
@@ -4001,13 +4066,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["gl-promo-banner", "sf-product-card"],
       "note": "A template, not a one-off design: staff assemble it from library sections."
     },
     {
       "id": "ad-section-library",
       "name": "Curated section library in the block editor",
+      "purpose": "Lets staff edit the home page sections and the static and policy pages, including the FAQ: their content, images, calls to action and order, and whether each section is shown, in English and Arabic independently, with a preview before a change goes live and a revert to the previous version.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4041,23 +4107,24 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned.",
+      "native_baseline": "The WordPress block editor: patterns, preview and revisions. The editor itself is not redesigned. A section is hidden with WordPress's native block Hide (since 6.9; owner ruling D1): the Hide block dialog with Omit from published content, the block then absent from the canvas and marked hidden in List View; per-viewport hiding stays native and is not a Mizzey control (owner ruling, 22 Oct 2026).",
       "design_freedom": "constrained",
       "open_items": ["OD-01", "CX-06"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "What is designed is the section set, its editable fields and its locked rules. No free canvas, no new section types."
     },
     {
       "id": "ad-navigation-editor",
       "name": "Header navigation and mega menu structure",
+      "purpose": "Lets staff edit the structure of the header navigation and the mega menu.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["SSC-07"],
-      "context_ids": ["NAV-07"],
+      "context_ids": ["NAV-07", "SSC-08"],
       "excluded_ids": [],
       "owner_pbi": 311,
       "build_pbi": 311,
@@ -4073,7 +4140,8 @@
         {"state": "default"},
         {"state": "edit_structure"},
         {"state": "nested_levels"},
-        {"state": "arabic_version"}
+        {"state": "arabic_version"},
+        {"state": "footer", "note": "Flow S04.5: where staff edit the footer's content, links and columns in both languages, on the native site editor"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -4087,11 +4155,50 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
+    },
+    {
+      "id": "ad-translation-status",
+      "name": "Missing translations report",
+      "purpose": "Shows staff which content, menus and interface text are missing in one language, before launch and after.",
+      "kind": "admin_extension",
+      "scope_type": "contracted",
+      "audience": ["staff"],
+      "register_ids": ["SSC-12"],
+      "context_ids": ["SSC-01", "SSC-07"],
+      "excluded_ids": [],
+      "owner_pbi": 311,
+      "build_pbi": 311,
+      "stage": "S1",
+      "route": null,
+      "flow_steps": ["S04.3"],
+      "acceptance": {
+        "stories": ["US-01-03", "US-22-06", "US-22-09"],
+        "scenarios": [],
+        "operations_checks": []
+      },
+      "states": [
+        {"state": "default", "note": "Everything is translated"},
+        {"state": "missing", "note": "A page, a navigation menu, a product and interface text listed as missing in Arabic"}
+      ],
+      "responsive": {
+        "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
+        "tablet": "As the standard administration.",
+        "desktop": "Primary."
+      },
+      "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
+      "native_baseline": "WPML 4.9.7 Translation Dashboard for translatable pages, products and navigation records (wp_navigation), filtered by Not completed (untranslated, needing an update, needing review or in progress), with Needs updating also available on its own; WPML String Translation 3.5.4's Translation needed filter for interface text. A link removed only from an independently edited Arabic menu is not detected natively: open with #311.",
+      "design_freedom": "annotate_only",
+      "open_items": [],
+      "decisions": [],
+      "interaction_options": [],
+      "erp_dependency": "none",
+      "status": "reviewed"
     },
     {
       "id": "ad-promo-banner-manager",
       "name": "Promotional banner: create, schedule, target, remove",
+      "purpose": "Lets staff create a promotional banner, schedule it, target it to a page, and remove it.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4129,11 +4236,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-global-brand-controls",
       "name": "Global brand controls: logo and approved colour tokens",
+      "purpose": "Lets staff change the storefront's logo and its approved colour tokens from the administration, so that nothing a customer reads is locked in code.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4167,12 +4275,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Register section G11 describes these controls in prose and gives them no row of their own. SSC-01 is the nearest row. The exact controls are documented during the interface design."
     },
     {
       "id": "ad-product-storefront-controls",
       "name": "Per-product storefront controls",
+      "purpose": "Adds to the standard product screen the storefront controls it lacks: badges, the featured flag, collection placement and position, related products, visibility (published, hidden or scheduled), the search engine override, and the shipping and tax treatment. The stock field follows the ERP integration specification (PRE-09).",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4206,14 +4315,16 @@
       "native_baseline": "The standard WooCommerce product screen. Only what it lacks is added.",
       "design_freedom": "constrained",
       "open_items": ["PRE-09"],
-      "decisions": [],
+      "decisions": ["DQ-08", "DQ-10"],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed",
+      "note": "Related products: D-19 (DQ-10) settles the mechanism, effective when D-19 is merged: WooCommerce's Upsells field, which the frame draws as the recommendation. The separate mizzey-site field drawn as the alternative is superseded and is not built; the Cross-sells field is not used at launch."
     },
     {
       "id": "ad-catalogue-terms",
       "name": "Category, brand and collection management",
+      "purpose": "Lets staff manage categories and subcategories with their ordering, images and search engine fields, brand pages with their logo, description and search engine fields, and manually curated collections.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4249,11 +4360,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed",
+      "note": "The native category order can be changed only by dragging (WCAG 2.2: 2.1.1, 2.5.7), a platform limitation recorded by the owner (D3). The Move up and Move down drawn on the ordered state are a separately gated accessibility safeguard, not an approved build or implementation requirement: no PBI, ticket or build follows from the drawing."
     },
     {
       "id": "ad-dashboard-sales",
       "name": "Dashboard: sales figures, charts, top products",
+      "purpose": "Shows staff revenue, orders, units sold and average order value, with charts by day, week, month or a custom range, and the top products.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4288,11 +4401,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-stock",
       "name": "Dashboard: low and out-of-stock counts",
+      "purpose": "Shows staff on the dashboard the counts of products low in stock and out of stock, as reported by the ERP.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4327,11 +4441,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-attention",
       "name": "Dashboard: orders needing action, pending refunds",
+      "purpose": "Shows staff on the dashboard the counts of orders requiring action and of pending returns and refunds, each linking to the standard filtered order list.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4365,12 +4480,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Counts and links only (CX-05, owner reading). No custom queue."
     },
     {
       "id": "ad-dashboard-quick-actions",
       "name": "Dashboard: quick actions",
+      "purpose": "Gives staff quick actions from the dashboard: add a product, create a coupon, and view pending orders.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4403,11 +4519,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-dashboard-customers-conversion",
       "name": "Dashboard, second release: customers and conversion rate",
+      "purpose": "Adds to the dashboard the number of new and returning customers, and the conversion rate through Google Analytics 4.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4441,12 +4558,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "ad-product-edit-additions",
       "name": "Product screen: fields the standard screen may lack",
+      "purpose": "Adds to the standard product screen the fields it may lack: images and video, a compare-at price, a barcode per variant, the search engine slug, title, description, canonical and robots override, badges and collection assignment.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4481,12 +4599,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Candidates only. #276's Native coverage table decides which of these the standard screen already provides."
     },
     {
       "id": "ad-price-stock-history",
       "name": "Price and stock change history",
+      "purpose": "Shows staff the history of a product's price and stock changes, with the user and the time of each. The stock part follows the ERP integration specification (PRE-09).",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4521,11 +4640,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-list-search-additions",
       "name": "Product and order list: search by barcode and by phone",
+      "purpose": "Lets staff find any product by SKU, title or barcode, and find an order by the customer's phone number, from the standard lists.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4559,12 +4679,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Staging found a phone-format gap on ADM-157. It stays with #278."
     },
     {
       "id": "ad-order-status-control",
       "name": "Order status change with validation",
+      "purpose": "Lets staff change an order's status, with the change validated.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4598,11 +4719,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-status-history",
       "name": "Order timeline and status history",
+      "purpose": "Adds to the standard order detail the order's timeline: a history of its status changes.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4636,11 +4758,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-list-filters",
       "name": "Order list search and filters",
+      "purpose": "Lets staff search and filter the order list by order number, customer, phone, email, status, payment, date and carrier.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4674,11 +4797,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-order-cancel",
       "name": "Cancel an order with a recorded reason",
+      "purpose": "Lets staff cancel an order, with the reason recorded.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4712,11 +4836,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-invoice",
       "name": "Invoice, printed or downloaded by staff",
+      "purpose": "Lets staff print or download an order's invoice.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4751,11 +4876,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-packing-slip",
       "name": "Packing slip",
+      "purpose": "Lets staff print or download an order's packing slip, one order at a time.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4789,11 +4915,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-shipment-panel",
       "name": "Shipment, tracking and pickup on the order",
+      "purpose": "Shows staff, on the order, the shipment created through the carrier integration: the tracking code returned automatically, the pickup request, and the carrier status reflected on the order.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4815,7 +4942,8 @@
         {"state": "not_sent"},
         {"state": "sent_with_tracking"},
         {"state": "pickup_requested"},
-        {"state": "carrier_error"}
+        {"state": "carrier_error"},
+        {"state": "tracking_corrected", "note": "US-18-04: staff correct a wrong tracking code; how Bosta returns and stores it is #291's"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -4823,17 +4951,18 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The official Bosta integration for WooCommerce.",
-      "design_freedom": "annotate_only",
+      "native_baseline": "The official Bosta integration for WooCommerce: its own pages, order-list columns and order box. One single-order Send to Bosta entry in WooCommerce's Order actions and a read-only shipment record on the order are additions (owner ruling D1, 26 October 2026); whether the installed integration supports a single-order send is verified in #291.",
+      "design_freedom": "constrained",
       "open_items": ["VENDOR-BOSTA"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-carrier-status-mapping",
       "name": "Carrier status to order status mapping, visible in admin",
+      "purpose": "Shows staff the explicit mapping from each carrier status to an order status, documented and visible in the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4867,11 +4996,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-cod-reconciliation",
       "name": "Cash on delivery: collected and remitted, per order",
+      "purpose": "Records, per order, the cash on delivery collected and the cash remitted.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4906,11 +5036,12 @@
       "decisions": ["DQ-05"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-refund-record",
       "name": "Record a refund with its payment reference",
+      "purpose": "Lets staff record a full or partial refund, with its payment reference, from the standard order screen.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -4940,22 +5071,23 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "The standard WooCommerce refund panel.",
-      "design_freedom": "annotate_only",
+      "native_baseline": "The standard WooCommerce refund panel. Capturing the refund's payment reference, where the panel does not provide it, is the addition (owner ruling D2, 26 October 2026): a reference the gateway returns is shown, a manual refund's reference is entered by staff; Paymob's behaviour is verified in #293.",
+      "design_freedom": "constrained",
       "open_items": ["CX-01"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-customer-notes",
       "name": "Internal notes on a customer",
+      "purpose": "Lets staff keep internal notes on a customer that the customer never sees.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["ADM-103"],
-      "context_ids": ["ADM-100"],
+      "context_ids": ["ADM-100", "NOTF-11"],
       "excluded_ids": [],
       "owner_pbi": 279,
       "build_pbi": 279,
@@ -4963,7 +5095,7 @@
       "route": null,
       "flow_steps": ["S06.3"],
       "acceptance": {
-        "stories": ["US-19-02"],
+        "stories": ["US-19-02", "US-12-07"],
         "scenarios": [],
         "operations_checks": []
       },
@@ -4985,11 +5117,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed",
+      "note": "Show the customer's marketing email consent as a read-only line on the staff customer record (US-12-07). NOTF-11 stays accepted by #285; no consent-editing control is added."
     },
     {
       "id": "ad-customer-suspend",
       "name": "Suspend an account with a reason",
+      "purpose": "Lets staff disable or suspend a customer account, with the reason recorded.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5024,11 +5158,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-customer-metrics-export",
       "name": "Customers, second release: lifetime metrics and data export",
+      "purpose": "Shows staff each customer's total spend, average order value, returns and coupon usage, and lets staff export a customer's data under privacy controls.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5056,18 +5191,19 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WooCommerce Analytics customers report.",
+      "native_baseline": "WooCommerce Analytics customers report: total spend and AOV per customer, with no returns or coupon usage per customer. WordPress personal data export (Tools > Export Personal Data): one person's data, on a confirmed request, as a download that expires.",
       "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "ad-promotion-editor",
       "name": "Promotions and coupons",
+      "purpose": "Lets staff create automatic promotions or coupon codes with their conditions, rewards, limits and exclusions and the combination setting, schedule their start and end, and pause or deactivate one without deleting its usage history.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5107,11 +5243,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-launch-rules-settings",
       "name": "Launch rule settings: welcome discount, free shipping, combining",
+      "purpose": "Lets staff set the launch rules: the welcome discount's value, cap, expiry and eligibility, the free-shipping condition for two or more items, and whether the welcome discount, a coupon and free shipping can combine.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5147,11 +5284,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-manual-product-order",
       "name": "Manual product ordering in categories and collections",
+      "purpose": "Lets staff order products manually within a category or a collection.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5179,13 +5317,13 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WooCommerce product sorting.",
+      "native_baseline": "WooCommerce product sorting. Its menu_order is one number per product, so it orders products inside a category only; the per-collection position is an addition (owner ruling D2, #282), one stored value with ad-product-storefront-controls:collection_position_set.",
       "design_freedom": "constrained",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "sf-product-badges",
@@ -5229,10 +5367,11 @@
       "native_baseline": "WooCommerce shows a sale badge only.",
       "design_freedom": "free",
       "open_items": ["OD-01"],
-      "decisions": [],
+      "decisions": ["DQ-08"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "briefed"
+      "status": "reviewed",
+      "note": "Owner decision at the batch-02 review, 19 October 2026: at most one merchandising badge per card, by a fixed precedence: Limited, then New, then Best Seller, then Trending. The sale saving is a price mark, shown separately where it applies. No new field, capability or urgency claim."
     },
     {
       "id": "fd-visual-treatment",
@@ -5280,6 +5419,7 @@
     {
       "id": "ad-staff-log",
       "name": "Staff activity log",
+      "purpose": "Shows staff a searchable log of admin activity, sign-ins and significant security events, which ordinary users cannot delete from the interface.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5316,12 +5456,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
-      "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes."
+      "status": "reviewed",
+      "note": "Logins, security events and order notes, searchable. Not a custom audit trail of refunds, price, stock and permission changes. The one business-facing staff log: CoreX's own framework logs (login protection, access audit, activity) stay framework diagnostics under COREX FRAMEWORK and are not redrawn. Cross-reference: MKT-25 (third-party administrative actions recorded in the audit log) is met by entries in this log; MKT-25 keeps its accepting PBI, #298, and its no_surface behaviour classification."
     },
     {
       "id": "ad-two-factor",
       "name": "Two-factor sign-in for admin accounts",
+      "purpose": "Protects admin accounts with two-factor authentication at sign-in.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5357,11 +5498,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-permission-denied",
       "name": "Action not permitted for this staff account",
+      "purpose": "Tells a staff member that an action is not permitted for their account, under role-based access in which no staff account receives owner-level access by default.",
       "kind": "system_state",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5389,22 +5531,23 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "WordPress capability checks.",
+      "native_baseline": "WordPress capability checks. A full-page refusal in wp-admin is rendered by CoreX's standalone error page (corex-core AdminDieHandler, pinned v0.42.0), without the admin toolbar or menu.",
       "design_freedom": "annotate_only",
       "open_items": ["CX-01", "CX-02"],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-seo-fields",
       "name": "Title, description and canonical on products, categories and pages",
+      "purpose": "Lets staff edit the search engine title, description and canonical tag of every product, category and page.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
       "register_ids": ["MKT-12"],
-      "context_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27"],
+      "context_ids": ["ADM-38", "ADM-39", "ADM-40", "ADM-41", "SSC-27", "MKT-13"],
       "excluded_ids": [],
       "owner_pbi": 287,
       "build_pbi": 287,
@@ -5420,7 +5563,8 @@
         {"state": "default"},
         {"state": "defaults"},
         {"state": "overridden"},
-        {"state": "arabic_version"}
+        {"state": "arabic_version"},
+        {"state": "slug_changed", "note": "US-16-06: changing a slug offers a redirect from the old address, through Redirection (R1); its behaviour is unverified until it is installed (#287)"}
       ],
       "responsive": {
         "mobile": "Not designed for mobile. ADM-160 asks only for order status checks and stock updates on a phone, on the standard screens.",
@@ -5434,11 +5578,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-redirect-manager",
       "name": "Redirect manager",
+      "purpose": "Lets staff create permanent redirects from the administration without a developer.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5468,17 +5613,18 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own redirect screens (Tools › Redirection), the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling R1, 21 October 2026, applied at the batch-09 closure on 26 October 2026). The refusal of a loop or a missing internal target is a thin Mizzey adapter on its own validation filter, not proven until tested at build under #287.",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-missing-page-log",
       "name": "Missing-page log",
+      "purpose": "Shows staff a log of missing-page errors in the administration.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5507,17 +5653,18 @@
         "desktop": "Primary."
       },
       "rtl": {"applies": false, "reason": "The administration is English only (ADM-159). An Arabic administration is ADM-159a, P2."},
-      "native_baseline": "None.",
-      "design_freedom": "constrained",
+      "native_baseline": "Redirection's own 404 log, the free component the Technical Design names for MKT-13 and MKT-14, annotated only (owner ruling F1, 21 October 2026).",
+      "design_freedom": "annotate_only",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-seo-site-settings",
       "name": "Sitemap, robots and search console verification",
+      "purpose": "Lets staff control the XML sitemap and the robots file, and verify the site with Google Search Console and Bing Webmaster.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5551,11 +5698,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "ad-stock-from-erp",
       "name": "Stock on hand and available, from the ERP",
+      "purpose": "Shows staff a product's stock on hand and stock available, as supplied by the ERP. How stock appears in the administration is set by the ERP integration specification (PRE-09); until then it is a placeholder.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5589,12 +5737,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "per PRE-09",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "P1-E. How stock appears in, and is changed through, the admin is set in PRE-09. Placeholder only."
     },
     {
       "id": "ad-email-template-editor",
       "name": "Notifications, second release: admin-editable templates",
+      "purpose": "Lets staff change the wording of the notification email templates themselves, in English and Arabic, without an edit being able to break the variables an email depends on.",
       "kind": "admin_extension",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5629,12 +5778,13 @@
       "decisions": ["DQ-04"],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Second release: not in the initial S1 pass. An addition to the standard administration, annotated in the second-release pass and not part of the storefront interface design. Built in the second release (DQ-04)."
     },
     {
       "id": "rp-sales",
       "name": "Sales report",
+      "purpose": "Gives staff the sales report: revenue, net sales, orders, units, average order value, discounts and shipping.",
       "kind": "report",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5670,11 +5820,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "rp-stock",
       "name": "Inventory report: low and out of stock",
+      "purpose": "Gives staff the standard low-stock and out-of-stock report, on the figures the ERP supplies.",
       "kind": "report",
       "scope_type": "contracted",
       "audience": ["staff"],
@@ -5710,11 +5861,12 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "partial",
-      "status": "inventoried"
+      "status": "reviewed"
     },
     {
       "id": "em-shell",
       "name": "Email layout: header, footer, consent and sender details",
+      "purpose": "The layout every customer email shares, sent under the transactional and marketing consent rules and within the email provider's policies.",
       "kind": "shell",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5752,12 +5904,13 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-welcome",
       "name": "Account created: welcome, verification, discount details",
+      "purpose": "Welcomes a new customer, asks them to verify their email address, and gives the details of their welcome discount.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5795,13 +5948,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-order-confirmed",
       "name": "Order confirmed",
+      "purpose": "Confirms an order to the customer with its order number and a summary.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5841,13 +5995,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-payment-failed",
       "name": "Payment failed, with a retry prompt",
+      "purpose": "Tells the customer that their payment failed, and prompts them to retry.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5884,13 +6039,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-shipped",
       "name": "Shipped: carrier and tracking number",
+      "purpose": "Tells the customer that their order has shipped, with the carrier and the tracking number.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5927,13 +6083,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-delivered",
       "name": "Delivered, with a review invitation",
+      "purpose": "Confirms to the customer that their order was delivered, and invites a review.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -5970,13 +6127,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-refund",
       "name": "Refund completed",
+      "purpose": "Tells the customer that their refund is complete, using the standard refunded-order email.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6014,13 +6172,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-password-reset",
       "name": "Password reset link",
+      "purpose": "Sends a customer who has forgotten their password a link to reset it.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6057,13 +6216,57 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
+      "id": "em-email-change",
+      "name": "New email address verification",
+      "purpose": "Asks a customer who changed their account email to confirm the new address before it replaces the old one.",
+      "kind": "email",
+      "scope_type": "contracted",
+      "audience": ["customer"],
+      "register_ids": ["ACCT-02"],
+      "context_ids": [],
+      "excluded_ids": [],
+      "owner_pbi": 308,
+      "build_pbi": 308,
+      "stage": "S1",
+      "route": null,
+      "flow_steps": ["F14.3"],
+      "acceptance": {
+        "stories": ["US-10-05"],
+        "scenarios": [],
+        "operations_checks": []
+      },
+      "states": [
+        {"state": "default"}
+      ],
+      "responsive": {"mobile": "Single column, readable without zooming.", "tablet": "As mobile.", "desktop": "Single fixed-width column."},
+      "rtl": {
+        "applies": true,
+        "mirrors": ["layout and reading order", "alignment and inline spacing", "icons that imply direction (arrows, chevrons, back)", "carousel and step order"],
+        "does_not_mirror": [
+          "numerals and prices (digit order)", "product imagery and video", "logos and brand marks", "icons that do not imply direction",
+          "media playback controls"
+        ],
+        "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
+      },
+      "native_baseline": "None for customers: WooCommerce's account details save a new email at once, and WordPress core verifies a changed address only from the administration profile (send_confirmation_on_profile_email). The mechanism is #308's and is unverified.",
+      "design_freedom": "constrained",
+      "open_items": [],
+      "decisions": [],
+      "interaction_options": [],
+      "erp_dependency": "none",
+      "status": "reviewed",
+      "composes": ["em-shell"],
+      "note": "Sent to the new address, in the language the customer used, with a single-use, time-limited link. Email only at launch."
+    },
+    {
       "id": "em-passwordless",
       "name": "Passwordless sign-in link",
+      "purpose": "Sends a customer a link that signs them in without a password.",
       "kind": "email",
       "scope_type": "contracted",
       "audience": ["customer"],
@@ -6100,13 +6303,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "composes": ["em-shell"],
       "note": "Sent in the language the customer used. Email only at launch."
     },
     {
       "id": "em-staff-native",
       "name": "WooCommerce's own emails to staff",
+      "purpose": "The platform's own emails to the store's staff, left as the platform sends them inside the shared email layout.",
       "kind": "email",
       "scope_type": "native_required",
       "audience": ["staff"],
@@ -6141,13 +6345,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "WooCommerce sends these to the store's address by default. No register row asks for them. They are left as the platform sends them, inside the shared email layout, and are not a designed deliverable.",
       "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-404",
       "name": "Page not found",
+      "purpose": "Tells a visitor that an address leads nowhere, and gives them search and a way back into the store.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6185,13 +6390,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "Every site answers an unknown address. No register row contracts a designed 404: MKT-14 contracts only the admin log of missing-page errors. It is drawn so that it does not fall back to the platform default, and it is not presented as contracted scope.",
       "implementation_origin": "wordpress"
     },
     {
       "id": "sy-maintenance",
       "name": "Maintenance or site unavailable",
+      "purpose": "Tells a visitor, in both languages, that the store is briefly unavailable.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6223,19 +6429,20 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "WordPress maintenance mode and the server's own error page.",
+      "native_baseline": "CoreX planned maintenance for a planned window, and the hosting provider's own page for emergency maintenance, under the owner's operating policy of 21 October 2026.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "WordPress shows a maintenance message during updates. No register row names it. One neutral bilingual message, not a designed deliverable.",
       "implementation_origin": "wordpress"
     },
     {
       "id": "sy-store-notices",
       "name": "Store notices: added, removed, undo, session expired",
+      "purpose": "The platform's own store notices, styled once so that no flow shows an unstyled platform message.",
       "kind": "message",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6275,13 +6482,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "WooCommerce raises these on its own across the cart, checkout and account. No single row names them. They are styled once so that no flow shows an unstyled platform message.",
       "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-sign-in-required",
       "name": "Sign-in required, or not your order",
+      "purpose": "Tells a visitor that the page needs them to sign in, or that the order they opened is not theirs.",
       "kind": "system_state",
       "scope_type": "native_required",
       "audience": ["visitor", "customer"],
@@ -6319,13 +6527,14 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "An account address opened while signed out, or an order that belongs to someone else. The platform answers both. No register row names the screen.",
       "implementation_origin": "woocommerce"
     },
     {
       "id": "sy-coming-soon",
       "name": "Coming soon",
+      "purpose": "Tells a visitor, before launch, that the store is not open yet.",
       "kind": "page",
       "scope_type": "internal_operational",
       "audience": ["visitor", "customer"],
@@ -6357,13 +6566,13 @@
         ],
         "numerals": "Working baseline: Western digits 0 to 9 in both languages. Provisional (DQ-01)."
       },
-      "native_baseline": "CoreX coming-soon mode (from v0.43.0) and WooCommerce's own coming-soon page.",
+      "native_baseline": "WooCommerce Site Visibility (its Coming soon mode and page), which owns Coming Soon under the owner's operating policy of 21 October 2026.",
       "design_freedom": "free",
       "open_items": [],
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "A launch-support screen for the period before the store opens. It is not a contracted client deliverable and no register row covers it. Decided by the owner on 6 October 2026 (D-14).",
       "implementation_origin": "unknown",
       "note": "Origin unknown until the CoreX v0.43.0 upgrade is evaluated: CoreX's coming-soon mode or WooCommerce's own page. The two were not tested together."
@@ -6371,6 +6580,7 @@
     {
       "id": "sy-staging-marker",
       "name": "Staging marker on every screen",
+      "purpose": "Marks the staging and demonstration copy on every screen so that it is never mistaken for the live store. Already built with the staging environment (#244).",
       "kind": "component",
       "scope_type": "internal_operational",
       "audience": ["staff", "developer"],
@@ -6407,7 +6617,7 @@
       "decisions": [],
       "interaction_options": [],
       "erp_dependency": "none",
-      "status": "inventoried",
+      "status": "reviewed",
       "scope_note": "Marks the staging and demonstration copy so it is never mistaken for the live store. Engineering infrastructure, already built, not a deliverable.",
       "build_note": "No row and no accepting PBI. Already built with the staging environment, #244."
     },

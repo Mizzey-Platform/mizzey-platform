@@ -56,8 +56,12 @@ built in the second release.
 - This changes delivery order only. The register, PRE-03b, the scope and every acceptance obligation are
   unchanged, and a wireframe is not a client deliverable.
 - **CoreX stays a separate, pinned, disposable checkout** (`corex.lock`, `tools/corex-sync.mjs`). Mizzey is not
-  moved into CoreX's merged `sites/` layout. CoreX v0.43.0 is the next upgrade, evaluated and made in its own
-  infrastructure PR before implementation resumes.
+  moved into CoreX's merged `sites/` layout. The pin stays at v0.42.0. CoreX v0.47.0, the last release of the
+  current CoreX generation, is the proposed upgrade target (D-18, ADR-0003), evaluated and made in its own
+  infrastructure PR before implementation resumes. A future CoreX revamp has no released version or API yet.
+- **One authority per setting or business concept** (ADR-0003). Reuse CoreX or native capability before adding a
+  Mizzey one; never hide a duplicate without disabling its writers. The ownership matrix is
+  `docs/2026-10-21-corex-mizzey-ownership-audit.md`.
 
 ## Before any work: classify it
 

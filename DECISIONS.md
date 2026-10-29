@@ -1659,3 +1659,246 @@ publishes.
 **Owner actions this needs, none of which the agent performs without instruction:** placing the translation
 plugin family in the server's folder; the Cloudflare Access policy and the tunnel route for the host name; and
 the commands on the server.
+
+## 2026-10-20 - D-17: a review needs a delivered purchase, and DQ-06 is revised
+
+**Status: applied on `main`, 20 October 2026, as an owner working decision; client acceptance pending.** PR #385 was
+approved by the owner and squash-merged as `67fd6b8` (`67fd6b88a23289265f6f93eb32ed2c3b77dbb153`), and
+PR #386 (`6a1abf5`) records DQ-06 in `docs/scope/open-items.json` as decided by the owner, not client-confirmed,
+and blocking acceptance. Final acceptance of the US-11-01 and US-11-03 eligibility criteria waits for the client's
+signed Stage 1 Approval Record.
+
+Owner decision of Mustafa, 20 October 2026. **Not a client confirmation, adds no scope, and not contractual
+acceptance.** It is presented to the client as a clarification of REV-01 and REV-02 in the Functional
+Specification MS-SPC-2026-032 version 1.4 change note, and is acknowledged only when the client signs the Stage 1
+Approval Record. Until then the Feature Register reads exactly as signed.
+
+**1. What changes.** DQ-06, locked on 6 October 2026 under D-14, said that a signed-in customer may submit a review
+and that no purchase is required. It is revised: a review can be submitted only by a signed-in customer whose
+account holds an order for the product, for any of its variations or for its version in the other language,
+whose delivery has been confirmed. D-14's table is not edited; it is the record of what was decided then. The
+inventory keeps the earlier text in DQ-06's `history`.
+
+**2. Why it is a clarification and not a change.** The register contracts review submission (REV-01, REV-02) and
+says nothing about who may submit. Its reduced boundary excludes only the verified-purchase *badge* (REV-07, P2),
+and the client's SRS section 6.11 ties "verified" to delivered orders. No row is added or moved, and the fee and
+timeline do not change (Change Control MS-CHG-2026-028 section 2.1). **REV-07 is not added: no badge is shown.**
+
+**3. The policy, as the owner approved it.**
+
+- An authenticated account and a qualifying purchase of the specific product.
+- Delivery confirmed. ORD-14 (cash collected, awaiting remittance) qualifies only where delivery is already
+  established. Processing, Shipped, Out for Delivery, Cancelled, Returned to Origin and fully refunded order lines
+  do not qualify.
+- A guest order qualifies only once it is linked to the account after the account's email address is verified. A
+  matching billing email alone does not.
+- One active review per customer and product, across variations and both languages. Pending and approved reviews
+  block a second; a rejected one stays with the moderator, who may remove it to allow a new submission.
+- An ineligible customer sees a short explanation instead of the form; a customer who has reviewed sees that.
+- Enforced on the server on every submission route: the classic form post, the REST comments endpoint, XML-RPC,
+  and WooCommerce's beta review request, which stays off. Administrative moderation is unaffected.
+- Moderation, the required rating and text, and the display name are unchanged.
+- A delivered-order invitation may reach a guest purchaser; it does not make anyone eligible.
+
+**4. What it does to the design record.** `rv-form` gains two states, `not_eligible` and `already_reviewed`, and is
+`wireframed` until they are drawn and reviewed: it is not described as reviewed before then. Batch-07's closure
+record and the original Claude Design archive are not changed. The DQ-06 notes drawn in the batch-07 `rv-form`
+and batch-03 `sf-pdp-reviews` frames are superseded and are corrected by a follow-up drawing after batch-08.
+
+**5. What stays open, recorded as dependencies of #309 rather than decided here.** Which WooCommerce statuses carry
+Delivered and ORD-14 (#248, ADR-0002, the Bosta code legend); whether the email verification that links guest
+orders is active at launch (the AUTH rows); the order of the purchase check after WooCommerce Multilingual's own
+filter; and whether XML-RPC is disabled outright.
+
+## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, how the site is opened and closed, and the CoreX v0.47.0 legacy target
+
+**Status: sections 1 to 5 approved by the owner on 21 October 2026, carried by PR #395 (merged as `b106d33`);
+sections 6 to 9 approved by the owner on 29 October 2026 (decision sheet rows A1 and A2, recorded in D-20),
+carried by PR #396.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the
+read-only CoreX architecture audit. **An internal architecture decision: not a client confirmation, adds no scope,
+changes no signed document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade
+is made only in its own infrastructure PR under its own security and regression review (section 6). PRs #350 and
+#351 are not changed.
+
+**1. Ownership.** Verified against the pinned CoreX v0.42.0 (`corex.lock`), WordPress 7.1 and WooCommerce 11.1.0.
+
+| Component | Owns | Does not own |
+|---|---|---|
+| CoreX | The framework, shared services, the security foundation, technical operations (planned maintenance) and framework administration under COREX FRAMEWORK | Commerce, the storefront, Mizzey business controls |
+| WooCommerce | The commerce engine: products, variations, orders, checkout, commerce records, the native commerce administration, the customer account and the transactional customer emails | A bespoke replacement administration |
+| mizzey-site | Mizzey's contracted business rules, integrations and administration extensions | Framework services |
+| mizzey-theme | The standalone storefront presentation | Anything in wp-admin |
+| corex-kit-woo | Nothing: disabled and excluded from the intended launch package unless a demonstrated requirement changes this | |
+
+There is one commerce engine. No second engine or application framework is introduced.
+
+**2. Environments and operating modes are separate.** The environment (development, staging, production) is fixed per
+server in its configuration. The operating mode is chosen at runtime:
+
+| Mode | Owner | Who gets through |
+|---|---|---|
+| Live | WooCommerce Site Visibility set to live, CoreX mode production | everyone |
+| Coming Soon | **WooCommerce Site Visibility**, with search engines discouraged at the same time | `manage_woocommerce`, the share link |
+| Planned maintenance | **CoreX** maintenance mode (503) | `manage_options` |
+| Emergency maintenance | **Hosting**: a 503 before WordPress loads | nobody |
+| Staging access | **Hosting**: the server login on local staging, Cloudflare Access on server staging (D-16), and a no-index header | testers |
+
+Rules: CoreX's own Coming Soon mode (from v0.43.0) is not used while WooCommerce owns Coming Soon. No mechanism is
+switched on automatically because another is off. Hosting's controls fail closed; CoreX maintenance fails open if
+corex-config is unavailable; neither CoreX nor WooCommerce closes the WooCommerce Store API, `wc-ajax` or `wc-api`.
+
+**3. Add-ons.** Required: corex-core, corex-config. Conditional, kept only on a demonstrated requirement or
+dependency: corex-forms, corex-email, corex-blocks, corex-media, corex-captcha. Not enabled because they exist:
+corex-guides, corex-ui, corex-newsletter, corex-profile, corex-kit-woo and the unrelated kits. Before any deployment,
+the release is packaged from an explicit allowlist with its dependencies checked and a rollback, instead of every
+CoreX plugin the builder copies. Nothing is activated, deactivated or removed by this decision.
+
+**4. The administration boundary.** CoreX framework screens stay under COREX FRAMEWORK and administrator-only
+framework capabilities stay restricted. Mizzey business controls sit in the standard WordPress and WooCommerce menus,
+which stay recognisable. Mizzey administration styles are scoped to Mizzey's own screens; mizzey-theme never restyles
+wp-admin. CoreX's admin footer and sign-in branding are reviewed for a Mizzey or neutral presentation through
+supported configuration or hooks, never by hiding them with CSS or editing the framework. The batch-09 design record
+already follows this (09-A, PR #394, merged as `2618d88`).
+
+**5. Open, and not decided here.**
+
+Implementation decisions (owner, before the work they block):
+
+- **Transaction control during maintenance, before production readiness:** how order creation and checkout are
+  stopped when required, without blocking payment callbacks or integrations.
+- The explicit release allowlist and the production activation list, with dependency checks and rollback.
+- Whether the contact page (CMS-04) uses corex-forms, and with it corex-email and corex-captcha; until then its public
+  submission endpoint stays as the framework ships it.
+- Whether corex-media's WebP copies are served (NFR-02), or the feature is turned off.
+- **HOME-09:** the signup prompt stays contracted; the minimal storage and consent behaviour is decided at
+  implementation, not with corex-newsletter and without campaign automation (INT-06 is P2).
+- The CoreX footer and sign-in branding settings.
+- A read-only check that flags conflicting visibility settings, and the hosting-level emergency maintenance page.
+- Aligning the `sy-coming-soon` and `sy-maintenance` design baselines with section 2 (batch-01 is closed; a separate
+  design follow-up).
+
+Client decisions, not presented as approved: the consent wording for HOME-09 signups, and production hosting
+(OD-27, hosting outside Egypt, which blocks launch).
+
+**6. The CoreX target.** CoreX v0.47.0 (commit `3a5476593b5fdab3975ecf47d327b3cacb43b71d`, published on 21 October
+2026, https://github.com/MustafaShaaban/corex/releases/tag/v0.47.0) is the proposed final release of the current
+CoreX generation and the version Mizzey's next upgrade moves to. It replaces the v0.43.0 target named in D-14 item
+4; the rest of D-14 item 4 stands, and D-14 itself is not edited. The pin stays at v0.42.0, and `corex.lock` and
+`stack.lock.json` are unchanged, until a separate upgrade PR is approved and made under D-14 and
+`docs/stack-and-upgrades.md`. A future CoreX revamp has no released version or API, and nothing is built against it.
+
+**7. The architecture rule.** ADR-0003: framework fixes and capabilities belong to CoreX, contracted behaviour and
+thin adapters to `mizzey-site/`, presentation to `mizzey-theme/`, native WordPress and WooCommerce first; no patch
+to the CoreX checkout; one authority per setting or business concept, with derived assets rather than duplicate
+uploads; a hidden control is not a disabled capability; `corex-kit-woo` stays inactive (section 1); contracted
+operational conditions use CoreX's existing inbox and no second notification system; no new paid dependency without
+written approval; a feature flag is never a version switch.
+
+**8. The evidence.** `docs/2026-10-21-corex-mizzey-ownership-audit.md` and
+`docs/2026-10-21-corex-v0.47.0-migration-readiness.md`, both static source reviews. The Bosta plugin writes stock
+through a webhook route and a manual sync, against the ERP invariant; that needs the PBIs that own it (#291, #317)
+and is not resolved here. The second coming-soon mechanism CoreX adds from v0.43.0 is settled by section 2:
+WooCommerce owns Coming Soon and CoreX's stays off.
+
+**9. Also open, from the ownership audit (section 5 of the audit).** The roles that see the CoreX inbox; the
+generator tag; the staff log's storage (#275); how two-factor sign-in is provided (ADM-131: the Technical Design
+names WP 2FA, free tier, which is evaluated before any paid component is raised); and the redirect and missing-page
+log mechanism (MKT-13, MKT-14: the Technical Design names Redirection, a free component, and the frozen 09-A design
+draws a custom screen). Whether PR #351 (v0.42.0 to v0.46.1) is retargeted to v0.47.0 or closed, and PR #350 with
+it. The sign-in identity is the branding item in section 5. Whether corex-ui is active follows section 3. Each is
+the owner's to decide, before the work it blocks.
+
+## 2026-10-23 - D-19: badges and curated rails stay manual, related products are the staff's assignment, and only the ERP moves stock
+
+**Status: proposed in this pull request, for the owner's review. Not applied until it is merged.** D-18 is proposed
+separately in PR #396 and is not on `main`; this entry follows it in number only.
+
+Owner decisions of Mustafa, 23 October 2026, given on the read-only merchandising and ERP stock audit of 22 and 23
+October. **None is a client confirmation, none adds or removes scope, and the Feature Register reads exactly as
+signed.** Each one applies a signed row or story as written, or chooses between readings it leaves open. The three
+design decisions are recorded as DQ-08, DQ-09 and DQ-10 in `design/inventory/placeholders.json`.
+
+**1. Badges are assigned by hand (DQ-08).** New, Trending, Limited and Best Seller are set per product by the staff
+(MER-01, SSC-22, ADM-42, US-14-09). No badge is calculated from dates, sales or stock, and no badge expires by
+itself. The batch-02 precedence ruling of 19 October is confirmed here: at most one merchandising badge per card,
+Limited, then New, then Best Seller, then Trending. Any automatic badge would be new behaviour, and reaches the
+store only through Change Control.
+
+**2. The two home product rails (DQ-09).** HOME-03 New arrivals shows the newest products first, by publish date,
+using WooCommerce's native ordering. The staff select that source in the section's settings; it is not fixed in
+code, which is what US-02-01 asks ("the rule or curation set in admin, not from code"). HOME-02 Trending is
+curated: it shows the products that carry the Trending badge, which is the reading US-02-01's own example gives
+("no products currently flagged trending"). No trending algorithm is built, and all-time best sellers are not
+presented as trending.
+
+**3. Related products and cart suggestions (DQ-10).** WooCommerce has three separate mechanisms, and they are not
+interchangeable: *Related Products* is automatic (products sharing a category or tag, chosen at random, upsells
+excluded); *Upsells* are chosen by staff and shown on the product page; *Cross-sells* are chosen by staff and shown
+in the cart.
+
+- Related products (PDP-18, MER-05, SSC-25, ADM-45, US-04-08) are the products the staff assign. They are stored
+  in WooCommerce's Upsells field on the product's Linked products tab and shown through that field.
+- WooCommerce's automatic Related Products rail is not shown on the product page.
+- There is no automatic fallback at launch. A product with nothing assigned shows no rail (`sf-pdp-related`, state
+  `empty`). An automatic fallback would change what US-04-08 says customers see, so it would need a client
+  clarification or Change Control first.
+- Cart suggestions (CART-08) read the same assignment, from the products in the cart, as US-05-05 already says
+  ("shown from the related product assignment"). The Cross-sells field is not used at launch, so staff keep one
+  list, not two. Reading the Upsells field in the cart is a small build item for #306; WooCommerce's own cart
+  cross-sells read the other field.
+
+**4. Manual merchandising and automatic ordering stay apart.** Badges and curated rails are always set by people.
+Sections and listings may be ordered automatically (newest first; best selling for PLP-14), but nothing automatic
+assigns a badge. A product may therefore sit in the New arrivals rail without the New badge, and a manual Best
+Seller badge may differ from the best-selling sort. Both are accepted.
+
+**5. Stock authority.** The owner's invariant, in his words: **"Only the ERP is authoritative for stock. No
+independent local stock writer may alter the effective available stock. Any permitted ERP-derived projection write
+must be controlled through the designated adapter."** It restates ERP-01 and the D-10 invariants and makes one
+consequence explicit: every local path that can write stock is refused on the server, not hidden. The audit found
+these paths in WooCommerce 11.1.0 and WooCommerce Multilingual 5.5.7, and none is guarded today: the product and
+variation editors, variation bulk actions, quick edit and bulk edit, the CSV importer, the REST API and WP-CLI,
+checkout holds, order stock reduction and restoration, refund restocking, order line edits, the Bosta stock webhook,
+and direct database writes. Hiding a field is not enforcement.
+
+**Which WooCommerce stock configuration carries the ERP figure is not decided.** Two candidates are on record:
+WooCommerce's own stock fields as a protected projection, or WooCommerce stock management switched off with a
+separate availability projection. The choice waits for the ERP team's answers and the ERP Integration
+Specification (PRE-09), under the constitution's rule that no ERP mechanism is chosen before it.
+
+**6. The Bosta stock route, and a gate until it is closed.** Bosta 4.5.7 registers `bosta/v1/webhook/stock-sync`
+on every request, guarded by one shared secret, and its handler changes WooCommerce stock directly: a second stock
+authority. D-18 (PR #396) proposes removing it; this decision adopts that as required before Bosta is connected
+anywhere. **Until the route is neutralised and a test shows it absent, no Bosta API key is entered, no Bosta webhook
+is registered and no server deployment runs with Bosta configured, in any environment.** On 23 October the route
+answered on the developer's loopback only: no tunnel was running and no environment held real stock. Building the
+neutralisation is functional work and waits for the D-14 release or an owner exception.
+
+**7. Best-seller counts across languages are measured before they are accepted.** WooCommerce Multilingual 5.5.7
+copies each recorded sale to the product's other language, but always as an increase, including when WooCommerce
+records a cancellation as a decrease. This is read from the code and not yet measured. Before PLP-14 (#303) and
+ADM-09 (#294) are accepted, one measurement checks the count in both languages across a sale and a cancellation. A
+wrong count there is a defect in contracted rows, not a change.
+
+**8. What it does to the design record.** `placeholders.json` gains DQ-08, DQ-09 and DQ-10, and the surfaces they
+govern cite them. `sf-pdp-related`'s native baseline no longer names WooCommerce's automatic Related Products block.
+The product rail's proposed sources add "newest" and "by badge". OP-12's placeholder no longer calls every rail
+hand-picked. The files of closed batches are not edited; their superseded notes are listed here instead:
+`batch-01/sf-home` traces HOME-02 to MER-02 and lists only manual, collection and category sources (DQ-09 governs);
+`batch-02/sf-product-badges` gives "Expires by itself" as the reason New ranks second (DQ-08: no badge expires).
+`batch-03/sf-pdp-related` (its empty state) and `batch-04/sf-cart` (the suggestions rail) already agree. Group 09-C
+was accepted and frozen on 23 October 2026 with the related-products mechanism left open; this decision settles it.
+`ad-product-storefront-controls` draws the Upsells field as the recommendation, which is the mechanism chosen here;
+the separate site field it draws as the alternative is superseded and is not built, and the Cross-sells field is not
+used at launch. `ad-stock-from-erp` displays figures and enforces nothing. The frozen 09-C files are not redrawn for
+this; batch-09's K4 closes on this record when it is merged.
+
+**9. What stays open, and where.** #282: how badges are stored, the label staff see on the Upsells field, where a
+product lands when it joins a collection, and how the featured flag affects prominence. #302: the order of products
+inside the Trending rail. #254: taking the automatic rail out of the product template. #306: the cart's read of the
+assignment. #303 and #294: the measurement in item 7. #245, #316 and #317: the stock configuration, after PRE-09.
+Outside this repository, and needing the owner's separate approval: the Technical Design v1.3 classes ADM-42 to
+ADM-45 as standard platform capability, which is not true of badges or per-collection position; it is corrected in
+its next version with the Stage 1 response. `AGENTS.md` carries the D-10 form of the stock invariant ("the store
+holds no independent authoritative stock") and is not changed here: aligning it with item 5 is a governance-control
+change, for a separate pull request if the owner wants it.

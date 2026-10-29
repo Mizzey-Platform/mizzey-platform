@@ -42,7 +42,7 @@
       "requirement_outcome": "A customer can continue through a product list beyond the first set of products and sees how many results there are (PLP-16, PLP-17). PLP-16 names pagination or infinite scroll and fixes neither.",
       "candidate_patterns": ["Numbered pagination", "Load More", "Controlled continuous or infinite loading"],
       "working_baseline": "Numbered pagination",
-      "status": "provisional",
+      "status": "locked",
       "constrained_by": ["platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -57,8 +57,8 @@
         "usability", "mobile behaviour", "accessibility", "SEO", "performance", "catalogue size", "native platform behaviour", "technical cost",
         "whether the footer stays reachable"
       ],
-      "selected_pattern": null,
-      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision."
+      "selected_pattern": "Numbered pagination",
+      "decision_source": "Owner decision by Mustafa, 19 October 2026, at the batch-02 low-fidelity review (manifest.json, batches, batch-02 review), on Claude Design's batch-02 recommendation and Claude Code's validation (PR #362, f8ddd44). Numbered pagination for first-release product listings and search results: addressable pages, keyboard and screen-reader use, page order following the reading direction in Arabic with digits not mirrored, and a predictable return to the same place in the list. Load More and continuous or infinite loading are not added as launch functionality. Not a client confirmation and not approval of the interface design (PRE-03b). The baseline set in D-14 on 6 October 2026, now selected."
     },
     {
       "id": "DQ-03",
@@ -70,7 +70,7 @@
         "Stepped checkout, only if it stays compatible with the contracted behaviour and the chosen commerce implementation"
       ],
       "working_baseline": "One page with clear sections",
-      "status": "provisional",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -79,6 +79,7 @@
           "type": "contract_pattern",
           "text": "A review of the order comes before it is confirmed (CHK-05). The review cannot be dropped or moved after Place Order."
         },
+        {"type": "contract_condition", "text": "The review restates the items, the delivery address, the shipping method, the payment method and the full total breakdown before Place Order (CHK-05, US-07-04)."},
         {"type": "contract_condition", "text": "Guest checkout is never forced into registration (AUTH-07)."},
         {"type": "contract_condition", "text": "Place Order creates exactly one order (PAY-05)."},
         {"type": "platform", "text": "The WooCommerce Checkout block is the native baseline, and native comes first (constitution M-4)."}
@@ -87,8 +88,8 @@
         "completion on mobile", "clarity of the total at every point", "error recovery", "what the native checkout supports without custom code",
         "accessibility", "technical cost"
       ],
-      "selected_pattern": null,
-      "decision_source": "Owner working baseline, D-14, 6 October 2026. A starting point for the first wireframes, not a final decision."
+      "selected_pattern": "One page with clear sections",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The baseline set in D-14 on 6 October 2026, now selected. Presented as Direction C's checkout cards, with the total visible at every point."
     },
     {
       "id": "IX-01",
@@ -97,7 +98,7 @@
       "requirement_outcome": "A customer narrows a list by category, brand, price, attribute and availability, and sees and removes each active filter (PLP-06 to PLP-10, PLP-18). No row says where the filters sit on desktop or tablet.",
       "candidate_patterns": ["Sidebar beside the grid", "Horizontal filter bar above the grid", "Drawer on every viewport"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -106,36 +107,40 @@
         {"type": "platform", "text": "The WooCommerce product filter blocks are the native baseline."}
       ],
       "selection_criteria": ["how many filters and options a category really has", "room left for product imagery", "discoverability", "tablet behaviour", "accessibility"],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Sidebar beside the grid",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The drawer on tablet and mobile. Whether the drawer holds one panel or two is decided in batch-02, on Arabic evidence at 360 px. Decided at the batch-02 review by the owner, 19 October 2026: one panel with collapsible groups, chosen on the Arabic layout at 360 px."
     },
     {
       "id": "IX-02",
       "name": "Mini-cart presentation",
-      "affected_surfaces": ["sf-mini-cart", "gl-header", "gl-header-mobile"],
-      "requirement_outcome": "The header shows the cart with a live item count and a mini-cart, and the customer sees that an item was added (NAV-06, CART-12, PDP-08). No row says how the mini-cart opens.",
-      "candidate_patterns": ["Dropdown panel under the header", "Side drawer", "Drawer that opens after an add, with the count alone at other times"],
+      "affected_surfaces": ["sf-mini-cart", "gl-header", "gl-header-mobile", "sf-product-card", "sf-cart"],
+      "requirement_outcome": "The header shows the cart with a live item count and a mini-cart (NAV-06, CART-12), and a customer who adds from a listing or a product rail (PLP-04) or from the cart's suggestions (CART-08) sees that the item was added. No row says how the mini-cart opens or how those adds are confirmed. The product page's Add to Cart (PDP-08) is IX-10.",
+      "candidate_patterns": [
+        "Dropdown panel under the header", "Side drawer", "Drawer that opens after an add, with the count alone at other times",
+        "The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer"
+      ],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
         {"type": "contract_pattern", "text": "A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page."},
         {"type": "contract_condition", "text": "The cart page remains (IA-08)."},
+        {"type": "contract_condition", "text": "Every confirmation, error and drawer is operable by keyboard and perceivable by screen-reader users, and its motion respects a reduced-motion preference (NFR-11)."},
         {"type": "platform", "text": "The WooCommerce mini-cart block is the native baseline."}
       ],
       "selection_criteria": ["mobile behaviour", "room for the free-shipping prompt (CART-07)", "how much an add interrupts browsing", "focus management", "performance"],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). First recorded in #353 as \"Drawer that opens after an add, with the count alone at other times\", and refined at the owner's deliberate reconfirmation of the same date (manifest.json, selection, reconfirmation), as the selected pattern states. Interaction presentation and accessibility only: no capability is added. The confirmation after Add to Cart on the product page is not part of this lock: it is IX-10, open for the batch-03 review. The cart page remains (IA-08). Whether the drawer is a side drawer or a bottom sheet on mobile is settled at high fidelity."
     },
     {
       "id": "IX-03",
       "name": "Keeping the buy actions in reach on the product page",
       "affected_surfaces": ["sf-pdp-simple", "sf-pdp-variable"],
       "requirement_outcome": "Add to Cart and Buy Now are available on the product page (PDP-08, PDP-09). No row says whether they stay in view while the page scrolls.",
-      "candidate_patterns": ["Buy area in the page flow only", "Sticky buy bar on mobile once the buy area has scrolled away", "Sticky buy area beside the gallery on desktop"],
+      "candidate_patterns": ["Buy area in the page flow only", "Sticky buy bar on mobile once the buy area has scrolled away", "Sticky buy area beside the gallery on desktop", "Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -147,8 +152,8 @@
         "length of the product page", "mobile reach", "accessibility", "performance", "whether it distracts from the product",
         "nothing it covers: content, the consent banner, the keyboard"
       ],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Sticky buy area beside the gallery on desktop, and a sticky buy bar on mobile once the buy area has scrolled away",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). C's sticky buy card on desktop and B's conditional bar on mobile. With no variant chosen, the bar's action asks for the choice and moves focus to the selector (PDP-05)."
     },
     {
       "id": "IX-04",
@@ -157,7 +162,7 @@
       "requirement_outcome": "A customer browses a product's images and video and can zoom (PDP-01, PDP-02). No row says how the gallery is navigated or how zoom works.",
       "candidate_patterns": ["Thumbnail strip with a main image", "Swipe with a position indicator", "Image grid on desktop, swipe on mobile"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -172,8 +177,8 @@
         "number of images a product really has", "touch behaviour", "performance of large images (NFR-02)", "accessibility",
         "reading direction: order and swipe mirror, the image never does"
       ],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Thumbnail strip with a main image",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). C's main image with a position counter and a horizontal thumbnail rail on desktop; swipe with the counter on mobile; video in the same sequence. No hover magnifier. The zoom mechanism detail is settled at high fidelity."
     },
     {
       "id": "IX-05",
@@ -182,7 +187,7 @@
       "requirement_outcome": "Customers reach categories through an admin-managed mega menu or category navigation (NAV-07). No row says how it opens.",
       "candidate_patterns": ["Opens on hover and on keyboard focus", "Opens on click or tap"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -191,8 +196,8 @@
         {"type": "platform", "text": "The core navigation block is the native baseline."}
       ],
       "selection_criteria": ["size of the category tree", "accidental opening", "touch laptops and tablets", "accessibility"],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Opens on click or tap",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The quick row of top-level categories is plain links. The panel falls back to a text list where no category image is managed."
     },
     {
       "id": "IX-06",
@@ -201,7 +206,7 @@
       "requirement_outcome": "On mobile the navigation carries the same category structure as on desktop (NAV-07, NAV-10). No row says how its levels are shown.",
       "candidate_patterns": ["Drill-down: one level per panel, with a way back", "Accordion: levels expand in place"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -212,17 +217,17 @@
         "depth of the category tree", "orientation: knowing where you are", "one-handed use", "accessibility",
         "where the language switcher and the account and wishlist entry points sit"
       ],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Drill-down: one level per panel, with a way back",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). Direction A's drill-down."
     },
     {
       "id": "IX-07",
       "name": "Search interaction",
       "affected_surfaces": ["sf-search-suggestions", "gl-header", "gl-header-mobile"],
       "requirement_outcome": "A customer searches from the header and gets suggestions while typing (NAV-03, NAV-09, SRCH-03). No row says how the field and its suggestions behave.",
-      "candidate_patterns": ["Inline field with a suggestions panel", "Full-screen search overlay on mobile", "Field that expands in the header"],
+      "candidate_patterns": ["Inline field with a suggestions panel", "Full-screen search overlay on mobile", "Field that expands in the header", "Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -232,8 +237,8 @@
         {"type": "platform", "text": "No external search provider (SRCH-09 and INT-15 are P2). What a suggestion can contain follows what #304 selects."}
       ],
       "selection_criteria": ["speed to first result", "mobile keyboard behaviour", "what the suggestions can really contain", "accessibility", "performance"],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Inline field with a suggestions panel on desktop, and a full-screen search overlay on mobile",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). On mobile, a persistent field on the discovery pages and an icon elsewhere, both opening the overlay. What a suggestion contains stays with #304: completions are the baseline, and product previews or a suggestion count are not assumed."
     },
     {
       "id": "IX-08",
@@ -246,7 +251,7 @@
         "A full-description tab and a specifications tab, with delivery, returns and authenticity presented outside the tab group"
       ],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": ["contract", "platform"],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -264,8 +269,8 @@
         "how the tab navigation itself responds on a small screen: horizontal scrolling or another accessible treatment, with the description still a tab",
         "whether content is hidden from the customer or from search engines", "accessibility"
       ],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "The full description stays a tab on every viewport, with other information groups such as delivery, returns or authenticity in accordions or stacked blocks around it",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The specifications as a second tab, the key features as their own block, and delivery, returns and authenticity as accordions beside the buy actions, closed by default."
     },
     {
       "id": "IX-09",
@@ -274,7 +279,7 @@
       "requirement_outcome": "An admin-managed hero at the top of the home page (HOME-01). HOME-01 names a banner or a slider and fixes neither.",
       "candidate_patterns": ["Single hero banner", "Slider of several banners"],
       "working_baseline": null,
-      "status": "open",
+      "status": "locked",
       "constrained_by": [],
       "decision_stage": "low_fidelity_review",
       "constraints": [
@@ -282,8 +287,66 @@
         {"type": "contract_condition", "text": "A slider is operable by keyboard and does not move against a reduced-motion preference (NFR-11)."}
       ],
       "selection_criteria": ["how many campaigns run at once", "performance of the largest image", "accessibility", "editing effort for the client"],
-      "selected_pattern": null,
-      "decision_source": null
+      "selected_pattern": "Single hero banner",
+      "decision_source": "Owner selection by Mustafa, 18 October 2026, at the low-fidelity review of the calibration set, on Claude Design's UX decision report and Claude Code's validation of the same date (manifest.json, selection). Not a client confirmation and not approval of the interface design (PRE-03b). The featured collections stay their own home section (HOME-04)."
+    },
+    {
+      "id": "IX-10",
+      "name": "Confirmation after Add to Cart on the product page",
+      "affected_surfaces": ["sf-pdp-simple", "sf-pdp-variable"],
+      "requirement_outcome": "The customer sees that an item was added from the product page, and the header count follows (PDP-08, CART-12, NAV-06). No row says whether the mini-cart opens to confirm it.",
+      "candidate_patterns": [
+        "The mini-cart drawer opens as a focused confirmation",
+        "The add is confirmed in place on the product page and the count updates, without opening the drawer",
+        "The add is confirmed in place in the product purchase area, and the mini-cart drawer opens only when the customer deliberately activates the header cart control. A success updates the header count, is announced accessibly and offers View cart and Checkout; keyboard focus stays where it was. A failure is shown in place, with no change to the count. On the mobile sticky buy bar the confirmation is compact and persistent: it stays until it is dismissed or the next purchase action, is never removed because time passes or the customer scrolls, keeps its actions keyboard and screen-reader accessible, and the sticky area does not obscure content"
+      ],
+      "working_baseline": null,
+      "status": "locked",
+      "constrained_by": [],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {"type": "contract_condition", "text": "A variable product needs a choice before it can be added (PDP-05)."},
+        {"type": "contract_condition", "text": "The confirmation is perceivable by keyboard and screen-reader users, and its motion respects a reduced-motion preference (NFR-11)."}
+      ],
+      "selection_criteria": [
+        "whether the customer continues shopping or goes to checkout next", "how much the confirmation interrupts the page",
+        "focus management", "consistency with the quick add and the sticky buy bar (IX-03)", "mobile behaviour", "performance"
+      ],
+      "selected_pattern": "The add is confirmed in place in the product purchase area, and the mini-cart drawer opens only when the customer deliberately activates the header cart control. A success updates the header count, is announced accessibly and offers View cart and Checkout; keyboard focus stays where it was. A failure is shown in place, with no change to the count. On the mobile sticky buy bar the confirmation is compact and persistent: it stays until it is dismissed or the next purchase action, is never removed because time passes or the customer scrolls, keeps its actions keyboard and screen-reader accessible, and the sticky area does not obscure content",
+      "decision_source": "Owner decision by Mustafa, 19 October 2026, at the batch-03 low-fidelity review (manifest.json, batches, batch-03 review), on Claude Design's batch-03 recommendation and Claude Code's validation (PR #368, 8b96f03), with the persistent mobile buy-bar confirmation he directed (PR #369, 91f54be). First recorded open at the owner's reconfirmation of 18 October 2026, with the drawer allowed and not chosen. Interaction presentation and accessibility only: no capability is added. IX-02, IX-03, IX-04 and IX-08 are unchanged, and Buy Now keeps its checkout behaviour (US-04-04). Not a client confirmation and not approval of the interface design (PRE-03b)."
+    },
+    {
+      "id": "IX-11",
+      "name": "The account structure",
+      "affected_surfaces": ["ac-navigation", "ac-dashboard", "ac-orders", "ac-order-detail", "ac-addresses", "ac-account-details"],
+      "requirement_outcome": "A signed-in customer reaches the account overview, order history and detail with tracking and invoice, the address book, profile and password, and the saved wishlist (ACCT-01 to ACCT-08, ACCT-12). No row says how the account is structured or what its overview leads with.",
+      "candidate_patterns": ["A permanent navigation list beside every account page, the WooCommerce My Account default", "A hub-led account: the account home leads with the customer's recent orders, their status and tracking, with clear routes to the other contracted account areas, and each area is a focused inner page, consistent across mobile, tablet and desktop"],
+      "working_baseline": null,
+      "status": "locked",
+      "constrained_by": ["platform"],
+      "decision_stage": "low_fidelity_review",
+      "constraints": [
+        {
+          "type": "contract_condition",
+          "text": "No returns entry in the account: customer returns are deferred to the Operations Platform (ACCT-10, OP-05)."
+        },
+        {
+          "type": "contract_condition",
+          "text": "Reorder, notification preferences and account deletion are second-release surfaces (ACCT-09, ACCT-11, ACCT-13; DQ-04) and are not drawn in the first-release pass."
+        },
+        {
+          "type": "platform",
+          "text": "The account endpoints, their addresses, the sign-in requirement and the order view permission are fixed; their presentation is not (templates/myaccount/my-account.php and navigation.php are replaceable)."
+        },
+        {
+          "type": "contract_condition",
+          "text": "Order tracking stays both on the order and as the lookup without signing in (OP-20)."
+        }
+      ],
+      "selection_criteria": ["what a returning customer comes to the account for", "reaching every contracted account area in one step from the account home", "mobile behaviour at 360 to 390 px", "consistency with the storefront's components", "accessibility and focus order"],
+      "selected_pattern": "A hub-led account: the account home leads with the customer's recent orders, their status and tracking, with clear routes to the other contracted account areas, and each area is a focused inner page, consistent across mobile, tablet and desktop",
+      "decision_source": "Owner decision by Mustafa, 20 October 2026, approving batch-06's direction on the independent quality-gate review's recommendation (B1 to B3) and Claude Code's verification. The standard WooCommerce My Account sidebar and dashboard template is not reproduced with different styling. All contracted functionality, accessibility and the existing authentication behaviour are kept, and no deferred account capability is added. Recorded with his authorisation to correct the account inventory on platform evidence and to keep the ACCT-04 address book (add, edit, delete, default) consistent with checkout's saved-address selection, with no storage mechanism decided in the wireframes. Not a client confirmation and not approval of the interface design (PRE-03b).",
+      "applies_to": "All first-release account surfaces"
     }
   ]
 }

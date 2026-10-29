@@ -4,7 +4,7 @@ This folder is the single place the design of the Mizzey Launch Platform is work
 decision D-14 on 6 October 2026.
 
 **Nothing here is approved UI or UX, and nothing here is a client deliverable.** It is an inventory: what needs
-design, in what states, on which signed rows. No screen has been drawn. The contracted interface design is
+design, in what states, on which signed rows, and the low-fidelity wireframes drawn from it. The contracted interface design is
 PRE-03b, owned by #250, delivered as working HTML and CSS after the brand identity is approved. This folder is how
 that work is prepared, and it changes no contract term.
 
@@ -14,9 +14,9 @@ that work is prepared, and it changes no contract term.
 |---|---|
 | 1. Signed scope and PBIs | Done. Register MS-ANX-2026-006 version 1.5, and `docs/scope/` |
 | 2. Complete inventory of surfaces, flows and states | **This folder.** Reported in `coverage.md` |
-| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Not started. The first is drawn only when the owner approves the start of the wireframe pass |
-| 4. Structural component and interaction system, established and stable | Not started |
-| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Not started |
+| 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Done. Batches 01 to 09 reviewed and closed; the five reopened and two added surfaces reviewed in the stabilisation round (`wireframes/manifest.json`, `stabilisation`) |
+| 4. Structural component and interaction system, established and stable | Done in the stabilisation round, 28 October 2026; the deferred part of D6 is in `stabilisation.residual` |
+| 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Done. Batch-10: 10-A and 10-B reviewed and frozen, batch closed |
 | 6. Brand identity received and applied | Waiting on the client (OD-01) |
 | 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
 | 8. The contracted working HTML and CSS design | Not started |
@@ -73,7 +73,7 @@ folder.**
 | `inventory/interaction-options.json` | UX choices with more than one legitimate pattern: open, provisional or locked |
 | `coverage.md` | Generated. How the inventory accounts for the signed scope |
 | `briefs/` | One generated brief per surface, for the surfaces a review batch has opened. Never edited by hand |
-| `wireframes/` | The wireframe format, the production workflow and the manifest. **No wireframe exists yet** |
+| `wireframes/` | The wireframe format, the production workflow, the manifest, the reviewed calibration set and the batch-01 wireframes, reviewed by the owner and closed, and the batch-02 to batch-08 wireframes, each reviewed and closed |
 | `tokens/` | Empty. Neutral tokens first, brand values after OD-01 |
 
 ## Five kinds of statement, kept apart
@@ -214,14 +214,16 @@ not a list of every component.
 | `provisional` | A working baseline for the first wireframes. **Not a requirement and not an owner-confirmed final product decision.** It may change in review with no scope change |
 | `locked` | A pattern was selected at its decision stage. `selected_pattern` and `decision_source` say which, and by whom |
 
-Three are provisional today, and none is locked:
+Fourteen are recorded. **Thirteen are locked**: DQ-03 and IX-01 to IX-09, selected by the owner at the low-fidelity
+review of the calibration set on 18 October 2026 and reconfirmed the same day (`wireframes/manifest.json`,
+`selection`); DQ-02, numbered pagination, selected at the batch-02 review on 19 October 2026; and IX-10, the add
+confirmed in place on the product page, selected at the batch-03 review on 19 October 2026; and IX-11, the hub-led
+account, selected when batch-06 opened on 20 October 2026. Each lock's
+`selected_pattern` and `decision_source` are in the file, and `coverage.md` lists them. One is not locked:
 
-| Id | Choice | Working baseline | Also candidates |
-|---|---|---|---|
-| DQ-01 | Numerals in Arabic | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
-| DQ-02 | Product-list continuation | Numbered pagination | Load More, or controlled continuous loading |
-| DQ-03 | Checkout structure | One page with clear sections, review before Place Order | Progressive or accordion sections, or a stepped checkout if it stays compatible with the contracted behaviour and the commerce implementation |
-
+| Id | Choice | Status | Working baseline | Also candidates |
+|---|---|---|---|---|
+| DQ-01 | Numerals in Arabic | `provisional` | Western digits 0 to 9 | Arabic-Indic digits, or a mixed treatment, if justified in the design and localisation review |
 Each entry carries its `selection_criteria`, which are what the review weighs, and its `constraints`, which are
 real limits. An option never adds a capability: it is about how a contracted one is presented.
 
@@ -237,8 +239,8 @@ An option with no `contract_pattern` and no `platform` constraint is genuinely o
 layout (IX-08) shows the difference. PDP-12 words the full description as a tab, so the tab is a
 `contract_pattern`: the description stays a tab on every viewport. The designer explores how the other
 information sits around that tab, and how the tab navigation responds on a small screen, and does not propose a
-layout in which the description is no longer a tab. The home hero (IX-09) is genuinely open, because
-HOME-01 names a banner or a slider and fixes neither. **A contractual constraint is never an invitation to
+layout in which the description is no longer a tab. The home hero (IX-09) was genuinely open, because
+HOME-01 names a banner or a slider and fixes neither, and the owner chose a single banner in review. **A contractual constraint is never an invitation to
 redesign the requirement.**
 
 ## The designer proposes

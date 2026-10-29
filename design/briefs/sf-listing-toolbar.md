@@ -111,14 +111,14 @@ None.
 
 ### IX-01: Filter placement on desktop and tablet
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer narrows a list by category, brand, price, attribute and availability, and sees and removes each active filter (PLP-06 to PLP-10, PLP-18). No row says where the filters sit on desktop or tablet.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Sidebar beside the grid |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -184,14 +184,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 5 |
-| Interaction decisions pending | IX-01 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 5 of 5 |
+| Interaction decisions pending | None |
 | Calibration frames | Category listing (`cal-04`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

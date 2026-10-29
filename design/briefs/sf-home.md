@@ -54,6 +54,7 @@ Flows it serves: Arrival and discovery (`F01`).
 | `ADM-59` | P1-L | S1 | #277 |
 | `ADM-60` | P1-L | S1 | #277 |
 | `ADM-61` | P1 | S1 | #277 |
+| `MER-01` | P1 | S1 | #282 |
 | `MER-02` | P1 | S1 | #282 |
 | `MER-04` | P1 | S1 | #282 |
 
@@ -116,7 +117,7 @@ Flows it serves: Arrival and discovery (`F01`).
 
 **Promotional banner is a section of the curated library.** Editable: text, link, image, start, optional end, page placement, enabled. Locked: position rules, size. Variants: strip, card. Proposed. The register fixes no variant before the interface design is approved.
 
-**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category. Proposed. The register fixes no variant before the interface design is approved.
+**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category, newest, by badge. Proposed. The register fixes no variant before the interface design is approved.
 
 **Category tiles is a section of the curated library.** Editable: category, image, label. Locked: grid, aspect ratio. Variants: four tiles, six tiles. Proposed. The register fixes no variant before the interface design is approved.
 
@@ -179,20 +180,26 @@ A static front page built from the curated section library in the block editor.
 | `OD-01` Brand name, logo and visual identity | client_decision | The brand name, the logo, the colours, the typefaces and the rules for using them. | Neutral tokens only: greys, one system typeface per script, a labelled box where the logo goes, the working name in plain text. | No logo, no client colour, no final typeface, no imagery style, no tone of voice. Nothing that could be read as a visual proposal. |
 | `CR-05` Product and brand photography | client_input | The real images. | Neutral image boxes at the intended aspect ratios, and the invented products of the staging seed. | No stock photography that suggests a visual direction. |
 | `CR-15` Storefront content in both languages | client_input | Category names, collection names, the brand list, page copy, and the final Arabic wording of the account addresses. | Invented content from the staging seed, in both languages, including long strings. | No real category tree, brand list or campaign. |
-| `OP-12` Recommendations in the find journey | open_point | JRN-02 names recommendations and cites no row for them. | Curated, hand-picked rails only: trending, new arrivals, collections, related products. | No personalised recommendation (JRN-12 and HOME-13 are P3). |
+| `OP-12` Recommendations in the find journey | open_point | JRN-02 names recommendations and cites no row for them. | Non-personalised rails only, each curated or drawn from a source the staff select: trending (the Trending badge, DQ-09), new arrivals (newest first, DQ-09), collections, related products (the staff's assignment, DQ-10). | No personalised recommendation (JRN-12 and HOME-13 are P3). |
+
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-09` Home product rail sources | New arrivals (HOME-03) shows the newest products first, by publish date, as a source the staff select in the section's settings. Trending (HOME-02) shows the products the staff have given the Trending badge. Both are non-personalised. | No trending algorithm, no all-time best sellers presented as trending, and no rail source fixed in code (US-02-01). |
 
 ## Interaction options
 
 ### IX-09: Home hero: one banner or a slider
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** An admin-managed hero at the top of the home page (HOME-01). HOME-01 names a banner or a slider and fixes neither.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Single hero banner |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -256,14 +263,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Global frame, discovery and home (`batch-01`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 7 |
-| Interaction decisions pending | IX-09 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 7 of 7 |
+| Interaction decisions pending | None |
 | Calibration frames | Home page (`cal-03`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

@@ -1,0 +1,75 @@
+/* Mizzey batch-08: transactional emails and customer messages. Prototype only; greys, system type. Loaded after ../../_shared/components.css. The email blocks themselves are cn-email-block in components.css; this sheet holds the review device around them and the rules carried from sheets batch-08 does not link; those shared with batch-04 and batch-05 are in ../../_shared/carried.css. */
+/* Carried verbatim from s1/batch-07/batch-07.css (first in s1/batch-06/batch-06.css), which batch-08 does not link: the text for assistive technology only (.vh), the value slot (.ivp), the leaves-the-store mark (.odx__e). Same declarations, so nothing drawn earlier changes size. The tablet gutter (.gtb) and the annotation tag (.vrt) are held in ../../_shared/carried.css. */
+.vh{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.ivp{display:inline-block;max-inline-size:100%;overflow-wrap:anywhere;padding:1px 6px;border:1px dashed #9a9a9a;border-radius:4px;font:500 11px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+.odx__e{flex:none;inline-size:11px;block-size:11px;border:1.5px solid currentColor;border-radius:2px;box-shadow:3px -3px 0 -1px #fff,3px -3px 0 0 currentColor}
+/* The email as it is read in a client. A review device, not part of the message: .xc the labelled client bar (sender, recipient, subject, preview text; .xc__r a row, .xc__k its label, .xc__s the subject, .xc__v the preview); .xp the desktop client pane, .xp__c the area around the 600 px message column. */
+.xc{display:flex;flex-direction:column;gap:2px;padding:12px 16px;background:#f3f3f3;border-block-end:1px solid #cfcfcf;font-size:13px;line-height:1.45;min-inline-size:0}
+.xc__r{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:baseline;min-inline-size:0;overflow-wrap:anywhere}
+.xc__k{font:600 10px/1.4 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em;text-transform:uppercase;color:#5c5c5c}
+.xc__s{font-size:14px;font-weight:700}
+.xc__v{color:#4a4a4a}
+.xp{display:flex;flex-direction:column;background:#e4e4e4}
+.xp__c{padding:32px 24px 40px}
+/* Inside em-delivered's review invitation (.xm__o): one row per delivered product (.xr), its image box, its name (.xr__n) and its link to the review form. */
+.xr{display:grid;grid-template-columns:56px minmax(0,1fr);gap:0 12px;align-items:center;padding-block-start:10px;border-block-start:1px solid #e0e0e0}
+.xr>.ph{grid-row:span 2;border-radius:6px}
+.xr__n{font-size:14px;font-weight:650}
+/* em-staff-native, annotate only: the platform's own body drawn as labelled outlines (.xn__b), never designed. */
+.xn__b{display:flex;align-items:center;justify-content:center;min-block-size:56px;padding:10px 14px;border:1px dashed #9a9a9a;background:#f6f6f6;font:500 11px/1.45 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;text-align:center}
+/* sy-store-notices drawn in place: .np the page column under the storefront header, the notice first in it; .np--d the desktop column. */
+.np{display:flex;flex-direction:column;gap:16px;padding-block:20px 28px;min-inline-size:0}
+.np--d{max-inline-size:760px;padding-block:28px 36px}
+/* The rules carried from s1/batch-04/batch-04.css for sy-store-notices:with_undo (.ln--gone, .okc--s, .ln__a) are held once in ../../_shared/carried.css. The check mark .okc itself is batch-03's, linked. */
+/* The review page around the frames of em-email-change (stabilisation round, 27 October 2026), which carries no inline sheet: the inline review sheet the other batch-08 files carry, verbatim, scoped to body.rpg with :where() so its specificity and its place in the cascade are those of the inline sheet. No other file uses .rpg. */
+body:where(.rpg){padding:32px 40px 120px}
+:where(.rpg) .wf-meta{display:flex;flex-direction:column;gap:14px;max-inline-size:1280px;margin-block-end:48px;padding:22px 26px}
+:where(.rpg) .eb{font:600 11px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+:where(.rpg) .mt{font-size:26px;font-weight:650;line-height:1.25;margin-block:6px}
+:where(.rpg) .ml{font-size:13.5px;color:#3a3a3a;max-inline-size:880px;text-wrap:pretty}
+:where(.rpg) .mf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:5px 16px;margin-block-start:14px;font-size:12.5px}
+:where(.rpg) .mf dt{color:#5c5c5c}
+:where(.rpg) .mf dd{margin:0}
+:where(.rpg) code,:where(.rpg) .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+:where(.rpg) code{font-size:11.5px}
+:where(.rpg) .mn{display:flex;flex-direction:column;gap:6px;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+:where(.rpg) .seg{display:flex;gap:4px;flex-wrap:wrap}
+:where(.rpg) .seg a,:where(.rpg) .seg span{white-space:nowrap;font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 9px;border:1px solid #bdbdbd;text-decoration:none;color:#1f1f1f;background:#fff}
+:where(.rpg) .seg .on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+:where(.rpg) .sheet{display:flex;flex-direction:column;gap:80px}
+:where(.rpg) .set__h{font-size:19px;font-weight:650;line-height:1.3}
+:where(.rpg) .set__p{font-size:13px;color:#4a4a4a;max-inline-size:920px;margin-block:6px 22px;text-wrap:pretty}
+:where(.rpg) .row{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+:where(.rpg) .fig{display:flex;flex-direction:column}
+:where(.rpg) .fig--m{inline-size:390px}
+:where(.rpg) .fig--s{inline-size:360px}
+:where(.rpg) .fig--d{inline-size:1280px}
+:where(.rpg) .fig--t{inline-size:1024px}
+:where(.rpg) .fig .wf-frame{inline-size:100%;max-inline-size:none;position:relative}
+:where(.rpg) .wf-frame__label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+:where(.rpg) .notes{display:grid;gap:10px;margin-block-start:12px;align-items:start}
+:where(.rpg) .fig--d .notes,:where(.rpg) .fig--t .notes{grid-template-columns:repeat(3,minmax(0,1fr))}
+:where(.rpg) .notes .wf-note{margin:0}
+:where(.rpg) .wf-note{font-size:12px;line-height:1.5;text-wrap:pretty}
+:where(.rpg) .wf-note b{font-weight:650}
+:where(.rpg) .ax::before{content:"Accessibility"}
+:where(.rpg) .pf::before{content:"Performance"}
+:where(.rpg) .tbl{border-collapse:collapse;inline-size:100%;max-inline-size:1280px;font-size:12.5px;background:#fff;border:1px solid #cfcfcf}
+:where(.rpg) .tbl th,:where(.rpg) .tbl td{text-align:start;vertical-align:top;padding:9px 12px;border-block-end:1px solid #e3e3e3;font-weight:400}
+:where(.rpg) .tbl thead th{font-weight:650;background:#f6f6f6}
+:where(.rpg) .tbl tbody th{font-weight:650}
+:where(.rpg) .ph__l{margin:8px;padding:2px 6px;background:rgba(255,255,255,.9);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace}
+:where(.rpg) .cut{display:flex;align-items:flex-start;padding:10px 40px;font:500 10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#6b6b6b;background:#f7f7f7;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.03) 0 1px,transparent 1px 11px)}
+:where(.rpg) .fig--tb{inline-size:768px}
+:where(.rpg) .fig--d .notes,:where(.rpg) .fig--t .notes,:where(.rpg) .fig--tb .notes{grid-template-columns:repeat(3,minmax(0,1fr))}
+:where(.rpg) .fig--tb .notes{grid-template-columns:repeat(2,minmax(0,1fr))}
+:where(.rpg) .an::before{content:"Analytics, a note only"}
+:where(.rpg) .ax::before{content:"Accessibility"}
+:where(.rpg) .rt::before{content:"Right to left"}
+:where(.rpg) .qr::before{content:"Question raised"}
+:where(.rpg) .cap{font:600 10px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a;padding:3px 6px;border:1px dashed #8a8a8a;background:#fff;align-self:flex-start;white-space:nowrap;max-inline-size:100%;overflow:hidden;text-overflow:ellipsis}
+:where(.rpg) .slot__l{font:500 10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+:where(.rpg) .mtbl td,:where(.rpg) .mtbl th{font-size:12px}
+:where(.rpg) .ed::before{content:"Editor"}
+:where(.rpg) .rc::before{content:"Recommendation"}
+:where(.rpg) .ds::before{content:"Link destinations"}

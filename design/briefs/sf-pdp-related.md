@@ -75,7 +75,7 @@ Flows it serves: Product evaluation (`F04`).
 | Product card (`cm-product-card`) | commerce |  |  |
 | Product rail (`cn-product-rail`) | content |  | The rail starts at the inline-start edge and scrolls toward the inline-end edge. |
 
-**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category. Proposed. The register fixes no variant before the interface design is approved.
+**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category, newest, by badge. Proposed. The register fixes no variant before the interface design is approved.
 
 ## States
 
@@ -114,13 +114,19 @@ It governs how the contracted capability is expressed, never what functionality 
 
 ## Native baseline
 
-WooCommerce related products block.
+WooCommerce's Upsells field on the product's Linked products tab, shown through WooCommerce's upsells product source. WooCommerce's automatic Related Products block is a different mechanism and is not used (DQ-10).
 
 ## Open inputs
 
 | Input | Kind | What is unknown | Placeholder allowed now | Must not be assumed |
 |---|---|---|---|---|
-| `OP-12` Recommendations in the find journey | open_point | JRN-02 names recommendations and cites no row for them. | Curated, hand-picked rails only: trending, new arrivals, collections, related products. | No personalised recommendation (JRN-12 and HOME-13 are P3). |
+| `OP-12` Recommendations in the find journey | open_point | JRN-02 names recommendations and cites no row for them. | Non-personalised rails only, each curated or drawn from a source the staff select: trending (the Trending badge, DQ-09), new arrivals (newest first, DQ-09), collections, related products (the staff's assignment, DQ-10). | No personalised recommendation (JRN-12 and HOME-13 are P3). |
+
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-10` Related products and cart suggestions | Related products are the products the staff assign, stored in WooCommerce's Upsells field and shown through it on the product page. WooCommerce's automatic Related Products rail is not shown, and no rail shows when nothing is assigned. Cart suggestions read the same assignment from the products in the cart; the Cross-sells field is not used at launch. | No automatic category or tag fallback without a client clarification or Change Control, and no second list for staff to keep in the Cross-sells field. |
 
 ## Interaction options
 
@@ -173,13 +179,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 4 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 4 of 4 |
 | Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`) |
 

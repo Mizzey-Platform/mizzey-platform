@@ -127,14 +127,14 @@ WooCommerce product category archive.
 
 ### DQ-02: Product-list continuation
 
-Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer can continue through a product list beyond the first set of products and sees how many results there are (PLP-16, PLP-17). PLP-16 names pagination or infinite scroll and fixes neither.
 
 |  |  |
 |---|---|
 | Working baseline | Numbered pagination |
-| Selected pattern | None |
+| Selected pattern | Numbered pagination |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -200,14 +200,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 5 |
-| Interaction decisions pending | DQ-02 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 5 of 5 |
+| Interaction decisions pending | None |
 | Calibration frames | Category listing (`cal-04`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

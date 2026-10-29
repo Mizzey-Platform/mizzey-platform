@@ -70,6 +70,8 @@ Flows it serves: Arrival and discovery (`F01`); Navigation and browsing (`F02`);
 | `F06.5` | Or adds from a listing | PLP-04, PLP-05 |
 | `F07.4` | Adds one more item from a suggestion | CART-08 |
 
+**Contains:** Product badges (`sf-product-badges`).
+
 **Appears inside:** Home page (`sf-home`), Products listing (`sf-shop`), Category page (`sf-category`), Collection page (`sf-collection`), Brand page (`sf-brand`), Search results (`sf-search-results`), Related products (`sf-pdp-related`), Recently viewed, on the product page (`sf-pdp-recently-viewed`), Cart (`sf-cart`), Wishlist (`sf-wishlist`), Recently viewed products (`sf-recently-viewed`), Offer and campaign page (`ct-campaign-page`).
 
 **Components.** Structure and states only: no brand value.
@@ -144,6 +146,34 @@ WooCommerce product collection block card.
 
 ## Interaction options
 
+### IX-02: Mini-cart presentation
+
+Status `locked`. Selected. Draw the selected pattern.
+
+**Outcome required.** The header shows the cart with a live item count and a mini-cart (NAV-06, CART-12), and a customer who adds from a listing or a product rail (PLP-04) or from the cart's suggestions (CART-08) sees that the item was added. No row says how the mini-cart opens or how those adds are confirmed. The product page's Add to Cart (PDP-08) is IX-10.
+
+|  |  |
+|---|---|
+| Working baseline | None |
+| Selected pattern | The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer |
+| Decided at | the owner's review of the low-fidelity wireframes |
+
+Candidate patterns:
+
+- Dropdown panel under the header
+- Side drawer
+- Drawer that opens after an add, with the count alone at other times
+- The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer
+
+| Constraint | What it is |
+|---|---|
+| A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page. | Fixed by the contract. Not a design alternative |
+| The cart page remains (IA-08). | Contracted condition every pattern must meet |
+| Every confirmation, error and drawer is operable by keyboard and perceivable by screen-reader users, and its motion respects a reduced-motion preference (NFR-11). | Contracted condition every pattern must meet |
+| The WooCommerce mini-cart block is the native baseline. | Platform limit |
+
+Weighed in the review: mobile behaviour; room for the free-shipping prompt (CART-07); how much an add interrupts browsing; focus management; performance.
+
 ### DQ-01: Numerals in Arabic
 
 Status `provisional`. A working baseline, not a requirement and not a final owner decision. Start from it, and say if another candidate is better.
@@ -193,13 +223,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Listing, filters and search (`batch-02`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 13 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 13 of 13 |
 | Interaction decisions pending | None |
 | Calibration frames | Home page (`cal-03`), Category listing (`cal-04`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |
 
