@@ -39,6 +39,19 @@ require_once __DIR__ . '/src/Security/CommentSurface.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';
+require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
+require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
+require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
+require_once __DIR__ . '/src/Catalogue/Import/LoadRules.php';
+require_once __DIR__ . '/src/Catalogue/Import/Mapping.php';
+require_once __DIR__ . '/src/Catalogue/Import/HeaderCheck.php';
+require_once __DIR__ . '/src/Catalogue/Import/RowInterpreter.php';
+require_once __DIR__ . '/src/Catalogue/Import/SkuIndex.php';
+require_once __DIR__ . '/src/Catalogue/Import/ValidationPass.php';
+require_once __DIR__ . '/src/Catalogue/Import/ReportWriter.php';
+require_once __DIR__ . '/src/Catalogue/Import/ImportRunRecorder.php';
+require_once __DIR__ . '/src/Catalogue/Import/FileImportRunRecorder.php';
+require_once __DIR__ . '/src/Catalogue/Import/Cli/CatalogueCommand.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -70,3 +83,16 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+
+// The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
+// MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
+if (defined('WP_CLI') && WP_CLI) {
+    WP_CLI::add_command('mizzey catalogue', MizzeySite\Catalogue\Import\Cli\CatalogueCommand::class);
+    // A preview or a validation run writes nothing to the catalogue, the load of WordPress included: the guard is
+    // installed here, as this plugin loads, so WooCommerce's work on `init` is covered too.
+    $mizzey_cli_arguments = WP_CLI::get_runner()->arguments;
+    if (array_slice($mizzey_cli_arguments, 0, 2) === ['mizzey', 'catalogue'] && in_array($mizzey_cli_arguments[2] ?? '', ['preview', 'validate'], true)) {
+        MizzeySite\Catalogue\Import\CatalogueWriteGuard::installForBootstrap();
+    }
+    unset($mizzey_cli_arguments);
+}
