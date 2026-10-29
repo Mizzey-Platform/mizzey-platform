@@ -147,30 +147,69 @@ PATTERN;
     }
 
     /**
-     * Whether a statement changes data: its first keyword outside parentheses is a mutation, or a read that wraps one
-     * (a common table expression such as `WITH ... DELETE`).
+     * Whether a statement changes data: the operation keyword, read after any common table expressions, is a mutation.
+     * A CTE's name is an identifier, never the operation (`WITH checksum AS (...) UPDATE ...` is an update). A `WITH`
+     * clause that cannot be read is treated as a mutation: the guard fails closed.
      *
      * @param list<string> $tokens
      */
     private static function mutates(array $tokens): bool
     {
+        $position = 0;
+        if (strtoupper($tokens[$position] ?? '') === 'WITH') {
+            ++$position;
+            if (strtoupper($tokens[$position] ?? '') === 'RECURSIVE') {
+                ++$position;
+            }
+            while (true) {
+                if (! isset($tokens[$position])) {
+                    return true;
+                }
+                ++$position;
+                if (($tokens[$position] ?? '') === '(' && ! self::skipGroup($tokens, $position)) {
+                    return true;
+                }
+                if (strtoupper($tokens[$position] ?? '') !== 'AS') {
+                    return true;
+                }
+                ++$position;
+                if (! self::skipGroup($tokens, $position)) {
+                    return true;
+                }
+                if (($tokens[$position] ?? '') !== ',') {
+                    break;
+                }
+                ++$position;
+            }
+        }
+        $keyword = strtoupper($tokens[$position] ?? '');
+        if (in_array($keyword, self::READS, true)) {
+            return false;
+        }
+
+        return in_array($keyword, self::MUTATIONS, true);
+    }
+
+    /**
+     * Moves past one parenthesised group starting at `$position`.
+     *
+     * @param list<string> $tokens
+     */
+    private static function skipGroup(array $tokens, int &$position): bool
+    {
+        if (($tokens[$position] ?? '') !== '(') {
+            return false;
+        }
         $depth = 0;
-        foreach ($tokens as $token) {
+        do {
+            $token = $tokens[$position++];
             if ($token === '(') {
                 ++$depth;
             } elseif ($token === ')') {
                 --$depth;
-            } elseif ($depth === 0 && $token[0] !== '`') {
-                $keyword = strtoupper($token);
-                if (in_array($keyword, self::MUTATIONS, true)) {
-                    return true;
-                }
-                if (in_array($keyword, self::READS, true)) {
-                    return false;
-                }
             }
-        }
+        } while ($depth > 0 && isset($tokens[$position]));
 
-        return false;
+        return $depth === 0;
     }
 }

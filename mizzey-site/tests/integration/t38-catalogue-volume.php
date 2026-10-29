@@ -41,7 +41,11 @@ run(
 		$s->note( 'fact: counts ' . wp_json_encode( $counts ) );
 		$s->note( sprintf( 'fact: elapsed %.1f s for the whole command, peak memory %s', $elapsed, $memory[1] ?? 'not reported' ) );
 
-		$accounted = count( $rows ) === ( $counts['rows'] ?? -1 ) && count( $rows ) === ( $counts['create'] ?? 0 ) + ( $counts['update'] ?? 0 ) + ( $counts['reject'] ?? 0 );
+		$accounted = 0 === $run['code']
+			&& 'completed' === ( $record['outcome'] ?? '' )
+			&& count( $rows ) === ( $counts['rows'] ?? -1 )
+			&& count( $rows ) === count( catalogue_csv( $out . '/validation-report.csv' ) )
+			&& count( $rows ) === ( $counts['create'] ?? 0 ) + ( $counts['update'] ?? 0 ) + ( $counts['reject'] ?? 0 );
 		if ( ! $accounted ) {
 			$s->note( 'FAIL  every row must be accounted for' );
 			return false;

@@ -92,6 +92,12 @@ run(
 		$check( 'U1' === $line( 'MZ-R-STRAßE' )['rule'] && (string) $strasse === $line( 'MZ-R-STRAßE' )['resolved_id'] && in_array( 'W1', explode( ' ', $line( 'MZ-R-STRAßE' )['issues'] ), true ), 'AC-6 a SKU equal under the column collation (STRAßE and STRASSE) matches, with W1 (' . $say( 'MZ-R-STRAßE' ) . ')' );
 		$check( 'C1' === $line( 'MZ-R-STRASE' )['rule'], 'AC-6 a SKU that differs under the collation (STRASE) does not match (' . $say( 'MZ-R-STRASE' ) . ')' );
 		$check( 'U1' === $line( ' MZ-R-LEAD' )['rule'] && (string) $lead === $line( ' MZ-R-LEAD' )['resolved_id'] && in_array( 'W1', explode( ' ', $line( ' MZ-R-LEAD' )['issues'] ), true ), 'AC-6 a leading space is trimmed, as the loader trims it, and reported with W1 (' . $say( ' MZ-R-LEAD' ) . ')' );
+		// A trailing non-breaking space weighs as a space, so the PAD SPACE collation compares it as padding.
+		$padded_sku = "MZ-R-STRASSE\u{00A0}";
+		$pad_index  = \MizzeySite\Catalogue\Import\SkuIndex::build( array( $padded_sku ) );
+		$padded     = $pad_index->resolve( $padded_sku );
+		$check( 'original' === ( $padded['status'] ?? '' ) && $strasse === ( $padded['id'] ?? 0 ), 'AC-6 a trailing non-breaking space resolves as the collation compares it' );
+		$check( $pad_index->key( 'MZ-R-STRASSE' ) === $pad_index->key( $padded_sku ), 'and the repeated-SKU rule uses the same equality' );
 		unset( $vp );
 
 		return $ok;

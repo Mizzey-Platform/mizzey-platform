@@ -74,6 +74,7 @@ run(
 				'an executable comment'    => "/*!40000 UPDATE {$p} SET post_title = post_title WHERE ID = 0 */",
 				'a quoted identifier'      => "UPDATE `{$p}` SET post_title = post_title WHERE ID = 0",
 				'a common table expression' => "WITH x AS (SELECT 0 AS id) DELETE FROM {$m} WHERE meta_id IN (SELECT id FROM x)",
+				'a CTE named like a read'   => "WITH checksum AS (SELECT 0 AS id) UPDATE {$p} SET post_title = post_title WHERE ID IN (SELECT id FROM checksum)",
 			);
 			$shape_results = array();
 			foreach ( $shapes as $label => $sql ) {

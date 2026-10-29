@@ -58,9 +58,9 @@ final class ReportWriter
             ));
         }
         try {
-            $complete = fwrite($handle, "\xEF\xBB\xBF") === 3 && fputcsv($handle, $columns, ',', '"', '') !== false;
+            $complete = fwrite($handle, "\xEF\xBB\xBF") === 3 && self::writeRow($handle, $columns);
             foreach ($rows as $row) {
-                $complete = $complete && fputcsv($handle, array_map(static fn (string $column): string => $row[$column] ?? '', $columns), ',', '"', '') !== false;
+                $complete = $complete && self::writeRow($handle, array_map(static fn (string $column): string => $row[$column] ?? '', $columns));
             }
             if (! $complete || ! fflush($handle)) {
                 throw new RuntimeException(sprintf(
@@ -74,5 +74,31 @@ final class ReportWriter
         }
 
         return $path;
+    }
+
+    /**
+     * Encodes one row in memory, then writes it and checks every byte arrived: `fputcsv()` on the file itself would
+     * report a short write as success.
+     *
+     * @param resource     $handle
+     * @param list<string> $values
+     */
+    private static function writeRow($handle, array $values): bool
+    {
+        $buffer = fopen('php://memory', 'w+b');
+        if ($buffer === false) {
+            return false;
+        }
+        try {
+            $length = fputcsv($buffer, $values, ',', '"', '');
+            if ($length === false || ! rewind($buffer)) {
+                return false;
+            }
+            $csv = stream_get_contents($buffer);
+
+            return is_string($csv) && strlen($csv) === $length && fwrite($handle, $csv) === $length;
+        } finally {
+            fclose($buffer);
+        }
     }
 }

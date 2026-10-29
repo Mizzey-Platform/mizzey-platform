@@ -346,11 +346,11 @@ msgstr ""
 msgid "The catalogue SKU index could not be read."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/SkuIndex.php:180
+#: mizzey-site/src/Catalogue/Import/SkuIndex.php:184
 msgid "The SKU comparison keys could not be read."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/SkuIndex.php:201
+#: mizzey-site/src/Catalogue/Import/SkuIndex.php:211
 msgid "The collation of the SKU lookup column could not be read."
 msgstr ""
 

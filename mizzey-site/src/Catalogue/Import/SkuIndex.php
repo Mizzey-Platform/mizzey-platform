@@ -175,12 +175,22 @@ final class SkuIndex
         // query names, and a derived table is not one it can describe, so it would refuse the query.
         foreach (array_chunk($unknown, self::BATCH) as $batch) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-            $weights = $wpdb->get_row($wpdb->prepare('SELECT ' . implode(', ', array_fill(0, count($batch), "HEX(WEIGHT_STRING(CONVERT(%s USING utf8mb4) COLLATE {$this->collation}))")), $batch), ARRAY_N);
-            if (! is_array($weights) || count($weights) !== count($batch) || $wpdb->last_error !== '') {
+            // The first two columns say how the collation pads: the weight of a space, and whether "a" equals "a ". A
+            // PAD SPACE collation compares trailing space-weighted characters (a non-breaking space among them) as
+            // padding, so they are taken off the key, as the database's own comparison ignores them.
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+            $weights = $wpdb->get_row($wpdb->prepare("SELECT HEX(WEIGHT_STRING(CONVERT(' ' USING utf8mb4) COLLATE {$this->collation})), (CONVERT('a' USING utf8mb4) COLLATE {$this->collation} = CONVERT('a ' USING utf8mb4) COLLATE {$this->collation}), " . implode(', ', array_fill(0, count($batch), "HEX(WEIGHT_STRING(CONVERT(%s USING utf8mb4) COLLATE {$this->collation}))")), $batch), ARRAY_N);
+            if (! is_array($weights) || count($weights) !== count($batch) + 2 || in_array(null, $weights, true) || $wpdb->last_error !== '') {
                 throw new RuntimeException(__('The SKU comparison keys could not be read.', 'mizzey-site'));
             }
+            $space     = (string) array_shift($weights);
+            $padsSpace = (int) array_shift($weights) === 1;
             foreach ($batch as $position => $value) {
-                $this->keys[$value] = 'sku_' . $weights[$position];
+                $weight = (string) $weights[$position];
+                while ($padsSpace && $space !== '' && str_ends_with($weight, $space)) {
+                    $weight = substr($weight, 0, -strlen($space));
+                }
+                $this->keys[$value] = 'sku_' . $weight;
             }
         }
     }
