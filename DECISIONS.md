@@ -1810,8 +1810,7 @@ the owner's to decide, before the work it blocks.
 
 ## 2026-10-23 - D-19: badges and curated rails stay manual, related products are the staff's assignment, and only the ERP moves stock
 
-**Status: proposed in this pull request, for the owner's review. Not applied until it is merged.** D-18 is proposed
-separately in PR #396 and is not on `main`; this entry follows it in number only.
+**Status: applied on `main`, 27 October 2026 (PR #409, merged as `2b4aa90`); recorded as applied by D-20.** D-18 is also on `main`, through PRs #395 and #396.
 
 Owner decisions of Mustafa, 23 October 2026, given on the read-only merchandising and ERP stock audit of 22 and 23
 October. **None is a client confirmation, none adds or removes scope, and the Feature Register reads exactly as
@@ -1902,3 +1901,119 @@ ADM-45 as standard platform capability, which is not true of badges or per-colle
 its next version with the Stage 1 response. `AGENTS.md` carries the D-10 form of the stock invariant ("the store
 holds no independent authoritative stock") and is not changed here: aligning it with item 5 is a governance-control
 change, for a separate pull request if the owner wants it.
+
+## 2026-10-29 - D-20: the decisions closed while the brand identity is awaited
+
+**Status: approved by the owner on 29 October 2026 ("approve all decisions as recommended"); applied by this pull
+request.** Owner decisions of Mustafa, from a decision sheet Claude Code prepared on an independent inventory of every
+open item by Codex (gpt-6.1-sol, read-only), cross-checked by both. **Internal decisions: not client confirmations, add
+no scope, change no signed document.** Approving a row decides the direction; it does not mean the work is built or
+verified, and every row stays subject to the build checks its pull request carries.
+
+**The rule they follow.** The owner's rule of 29 October 2026: a framework capability that exists in CoreX is used from
+CoreX; anything commerce-related stays with WooCommerce; native WordPress and WooCommerce come first (D-18, ADR-0003).
+
+**1. The approved directions** (56 inventory items in 55 rows; C9 covers ADR-0001 and ADR-0002).
+
+**Architecture, CoreX and operations.**
+
+| Id | Question | Approved direction |
+|---|---|---|
+| A1 | Adopt D-18 (who owns what, operating modes)? | Yes. Merge PR #395 then #396. Add one line: the Paymob demo on mizzey.com keeps CoreX Coming soon as a temporary exception until it is replaced by the real store |
+| A2 | CoreX target: v0.46.1 (PR #351) or v0.47.0 (D-18 section 6)? | v0.47.0. Retarget #351 to it, keep its tooling work, rerun every gate on v0.47.0. One upgrade, not two |
+| A3 | PR #350 (the tested-version record may change with the CoreX pin)? | Merge it. Needed whichever version wins |
+| A4 | Which CoreX add-ons ship? | Core and config required; other add-ons only for a demonstrated requirement or dependency, from a dependency-checked allowlist with rollback. Kits, guides, ui, newsletter and profile stay disabled unless separately justified |
+| A5 | Build CoreX's admin screen assets during release preparation? | Yes, when CoreX administration ships |
+| A6 | Allow installing packages from CoreX's Releases screen? | No. Disable it: releases arrive only as CI-built tags (D-16) |
+| A7 | How are orders stopped during maintenance without breaking payment callbacks? | Through supported WooCommerce paths, callbacks kept open, hosting's emergency 503 kept, plus a check that flags conflicting visibility settings |
+| A8 | Contact form (CMS-04): CoreX forms? | Yes, CoreX forms with its email and bot protection, a thin Mizzey adapter only for a proven gap |
+| A9 | CoreX WebP copies (NFR-02)? | Serve them through supported integration; switch generation off if serving cannot be shown |
+| A10 | Signup prompt storage (HOME-09)? | One small signup and consent record as the working baseline; no implicit customer account and no campaign engine. Whether HOME-09 means marketing signup or account signup, and its wording, still needs client confirmation |
+| A11 | CoreX branding on the login screen and admin footer? | Mizzey or neutral through supported settings or hooks; reuse the authoritative site-logo asset where supported, without assuming automatic login-logo synchronisation. Never hide branding with CSS or edit CoreX |
+| A12 | Who sees and resolves the CoreX notifications inbox? | Only staff responsible for operational incidents; not the restricted Marketing access |
+| A13 | CoreX generator meta tag? | Remove it through its filter |
+| A14 | Staff log (#275): CoreX Activity or a second log? | CoreX Activity behind a thin adapter; a CoreX task for any framework gap |
+| A15 | Two-factor sign-in for staff (ADM-131)? | WP 2FA free tier, tested first; no paid component without your written approval |
+
+**Storefront and product rules.**
+
+| Id | Question | Approved direction |
+|---|---|---|
+| B1 | Review invitations and consent (REV-05, NOTF-06)? | Invitations follow recorded marketing consent and stay separate from delivery notices |
+| B2 | Digits on Arabic pages, emails and invoices (DQ-01)? | Lock Western digits 0 to 9 everywhere, with locale formatting. It is the baseline already drawn |
+| B3 | The 19 px "Privacy policy" link inside the cookie notice's sentence (S4)? | Record an exception for links inside a sentence; 44 px stays the rule for every standalone control |
+| B4 | Mobile mini-cart: full-height drawer or bottom sheet? | Keep the reviewed full-height drawer |
+| B5 | Remember the visitor's language (OP-14)? | The address decides the language. A remembered choice applies only to an explicitly defined unqualified entry, never overriding an English or Arabic route. Absence of an /en/ prefix does not make an English address unqualified; #253 defines how the preference is applied |
+| B6 | What survives a language switch mid-task (OP-15)? | The search query and the cart carry over; a warning before unsaved checkout fields are lost; order pages keep their access rules |
+| B7 | Separate addresses for sign-in and register, collections and curated collections (OP-17)? | No. One native account address, one collection route |
+| B8 | Index pages for all categories, collections or brands (OP-18)? | No. Reached from navigation and the home page; none is contracted |
+| B9 | Where profile and password editing live (OP-19)? | WooCommerce's account-details page, with its password section |
+| B10 | Public tracking page and tracking in the account (OP-20)? | Keep both; the public one shows only approved tracking details |
+| B11 | Home page: static page or posts (D-242-1)? | A static page built from the section library |
+| B12 | Author archives in the sitemap (OP-22)? | Excluded |
+| B13 | Search (#304): component and defaults? | Mizzey's own search and synonym list; an exact SKU opens the result page; text suggestions; staff order then newest as fallback; non-personal empty-state suggestions |
+| B14 | Link earlier guest orders to an account (D-17)? | Yes, only after the account's email is verified; a matching billing email alone is not enough |
+| B15 | XML-RPC (a route around review eligibility)? | Switch it off unless a demonstrated dependency needs it; if retained, enforce the same review eligibility on XML-RPC submissions |
+| B16 | Sign-in policies (link lifetime, sessions, throttling)? | Configurable, single-use, time-limited sign-in links, with no mandatory same-browser restriction; native reset, session and password policies; shared account and IP protection and non-disclosing public responses. Record the numeric limits in #305 before implementation |
+| B17 | Wishlist (#307)? | One minimal implementation keyed to the canonical WooCommerce product or variation across languages, with a defined guest lifetime and an idempotent transfer or merge on registration or sign-in. Save, view, remove and move to cart; no other wishlist capability |
+| B18 | An ended campaign page (#310)? | Unpublished by staff; a redirect only when staff choose a successor page. No automatic campaign lifecycle |
+| B19 | Collection image and search fields (09-B Q6)? | Yes, the image and content US-03-09 needs, feeding the one SEO mechanism |
+| B20 | Category banner: a second image or the category image (09-B Q7)? | Reuse one authoritative category image with derived crops unless the supplied imagery shows a separate image is needed |
+| B21 | Edit synonym entries, not only add and delete (09-B Q10)? | Yes, as drawn |
+| B22 | Keyboard ordering of categories (09-B D3)? | Approve it explicitly as a separately recorded accessibility safeguard attached to the proper accepting work; it creates no additional contracted scope |
+
+**Merchandising, orders and reports.**
+
+| Id | Question | Approved direction |
+|---|---|---|
+| C1 | Where a product joins a collection (D-19)? | At the end, until staff reorder it |
+| C2 | Where manual badges are stored (D-19)? | Four flags on the WooCommerce product, edited in one place; no expiry, no calculation |
+| C3 | What staff see for the related-products field? | WooCommerce's Upsells field, labelled "Related products"; no second field |
+| C4 | What the Featured flag changes? | Only placements that explicitly choose featured products; no ranking algorithm |
+| C5 | Order of the Trending rail? | Staff-controlled order with a stable tie-break |
+| C6 | Compare-at price check (#276)? | Use WooCommerce's native validation where it prevents an invalid effective sale price; add only the gap #276 proves |
+| C7 | Coupon combination and welcome discount defaults? | Ship the recorded example as configurable, keep native individual-use rules and the free-shipping override (BR-009). The client's real values follow |
+| C8 | Which staff see each report? | Least privilege per report; financial access separate from refunds and system settings (CX-01) |
+| C9 | ADR-0001 (native WooCommerce cost of goods) and ADR-0002 (minimum shipment record)? | Accept ADR-0001. Accept ADR-0002's minimum model subject to the carrier facts; mapping, collection-event source and lifecycle rules stay conditional. Proposed default: decline its optional dispatched and returned timestamps and the raw-code order-note safeguard unless separately approved. Do not build the rejected measurement-grade event log |
+
+**Process, records and the next phase.**
+
+| Id | Question | Approved direction |
+|---|---|---|
+| D1 | Correct the Technical Design's stock classification and governance wording after D-19? | Yes: align the repository governance wording in a separate governance PR, and correct the Technical Design's capability classification through the external document route in the Stage 1 response |
+| D2 | Build Stage 3 before Stage 2 while the brand identity is awaited? | No. The stage order stays; the interval is used for decisions, the CoreX upgrade and staging |
+| D3 | Show the client a structure preview before the brand identity? | Yes: one clean walkthrough on a private link, marked structure only, outside the contractual review clock |
+| D4 | End the public-repository review period (D-08) and prepare the clean client copy? | Yes, when the review is finished; the client copy goes to their GitHub organisation once it exists |
+| D5 | The owner actions for the Stage 1 demonstration and the client emails? | The owner keeps the weekly written progress update, sends the prepared emails himself, holds the demonstration and records the dates |
+| D6 | Rewrite repository history? | No |
+| D7 | Separate the WordPress compatibility pin from the exact tested patch in `stack.lock.json`? | Yes, a small checker correction |
+| D8 | **When may the non-storefront work resume (D-14)?** | Approval authorises the agreed non-storefront PBI queue after the CoreX v0.47.0 upgrade passes. Fixtures, mocks and contracts stand in while external inputs are pending; PRE-07 and PRE-09 conditions stay for dependent work. Storefront implementation stays frozen until PRE-03b |
+| D9 | Reconcile the specification with the locked decisions and contracted scope? | Yes, through the document route, only where the current v1.4 still needs correction: preserve IX-02/IX-10, remove superseded promises of deferred returns, saved views or self-service import, and repair the identified traces and deliverable wording. Client scope clarifications stay separate |
+
+**2. What D-20 settles in earlier records.** D-18 sections 6 to 9 are approved (A1, A2; PR #396 merged). Rows A1 to
+A15 record the owner directions for the items D-18 sections 5 and 9 left open; ruling R1 of 21 October 2026 selects
+Redirection as the single redirect mechanism. These approvals do not complete the concrete release allowlist,
+activation and role assignments, implementation settings, visibility-baseline design follow-up or runtime
+verification. Client inputs remain open as recorded below. The Paymob demonstration site on the production domain keeps CoreX Coming soon as
+a temporary exception to D-18 section 2 until the delivered store replaces it (A1). D-19 is applied (PR #409); K4 is
+closed. DQ-06's current guidance is D-17. CoreX's issue 201 is fixed upstream in v0.42.1; the workaround stays on the
+v0.42.0 pin until the v0.47.0 upgrade passes.
+
+**3. What stays open.** The inventory's 72 external-input families and 26 verification families remain subject to
+their recorded gates. Owner approval is not client confirmation or technical verification.
+
+D1's repository governance alignment goes through a separate governance PR. Its Technical Design correction and D9's
+specification corrections go through the external document route with the Stage 1 response. The stale PRE-03a and
+PRE-03b ownership note in feature 002 waits for the requirement PR that next touches it.
+
+Dated audits and closed-batch records are preserved as history: R1 governs Redirection; the stabilisation record
+establishes the reviewed email-change surfaces; D-16 governs server staging; later locks and closure rulings supersede
+earlier batch open lists; and D-19 item 8 governs the superseded frozen merchandising annotations. Retaining those
+historical records does not reopen their decisions.
+
+Current operational records affected by D-20, including DQ-01's interaction lock, ADR statuses and current guidance,
+still need synchronisation through the appropriate governance or documentation follow-up before dependent work. This
+PR does not claim that reconciliation is complete.
+
+**Restart (D8):** the agreed non-storefront queue resumes only after the CoreX v0.47.0 upgrade passes, retaining PRE-07
+and PRE-09 conditions for dependent work. Storefront implementation stays frozen until PRE-03b.
