@@ -87,12 +87,12 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
 
 - [x] T025 Write `t38-catalogue-volume.php`: a generated 5,000-product file, rows accounted for, elapsed time and peak
       memory recorded as facts (FR-012, OD-15 provisional). Test: itself.
-- [ ] T026 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
+- [x] T026 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
       Record the named FR-003 single-mapping and no-profile review and the FR-011 CLI-only registration and no-screen
       review, with source references. Verification: the guard results and both boundary reviews in `analysis.md`.
-- [ ] T027 Reset the runtime to the clean baseline and run the whole suite serially; commit `evidence/clean-baseline.txt`,
+- [x] T027 Reset the runtime to the clean baseline and run the whole suite serially; commit `evidence/clean-baseline.txt`,
       `evidence/final-suite.txt` and `evidence/final-suite.json`. Test: the suite, t02 to t29 verdicts unchanged.
-- [ ] T028 Write `verification.md`, reporting technical verification, staging and client acceptance separately.
+- [x] T028 Write `verification.md`, reporting technical verification, staging and client acceptance separately.
       Test: `test_spec_consistency.py` and the scope trace.
 
 ## Not done until outside inputs arrive
