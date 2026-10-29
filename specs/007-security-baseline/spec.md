@@ -46,7 +46,7 @@ None. Nothing here waits for a client, vendor or ERP input.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | No page, feed or response header discloses the WordPress, WooCommerce or CoreX product or version through a generator mark (admin protection) | NFR-05 | final |
+| AC-1 | No page, feed or response header discloses the WordPress, WooCommerce, WPML or CoreX product or version through a generator mark (admin protection) | NFR-05 | final |
 | AC-2 | Every XML-RPC request, `?rsd` included, is refused before dispatch; pingbacks and trackbacks are off; no page advertises an XML-RPC or pingback address (admin protection) | NFR-05 | final |
 | AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint, not through a numeric author query, not through the users sitemap (admin protection) | NFR-05 | final |
 | AC-4 | Application-password availability and authentication are restricted to users with `manage_options`; upstream restrictions stay effective (admin protection) | NFR-05 | final |
@@ -128,7 +128,8 @@ recovery request for one account within the window is refused.
 
 ### Functional Requirements
 
-- **FR-001**: The site MUST print no generator mark for WordPress, WooCommerce or CoreX in pages, feeds or the head.
+- **FR-001**: The site MUST print no generator mark for WordPress, WooCommerce, WPML or CoreX in pages, feeds or the
+  head.
 - **FR-002**: Every request entering through `xmlrpc.php`, `?rsd` included, MUST be refused with 403 before XML-RPC
   dispatch; the `X-Pingback` header, the RSD link and pingbacks MUST be off.
 - **FR-003**: For a visitor not signed in, the users REST collection and single-user routes MUST refuse; a numeric
