@@ -1712,9 +1712,9 @@ filter; and whether XML-RPC is disabled outright.
 
 ## 2026-10-21 - D-18: who owns what between CoreX, WooCommerce and Mizzey, how the site is opened and closed, and the CoreX v0.47.0 legacy target
 
-**Status: approved by the owner on 21 October 2026. Sections 1 to 5 are carried by PR #395; sections 6 to 9 are
-proposed in PR #396, which is stacked on #395. Each part is in force on `main` only when the pull request that
-carries it is merged.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the
+**Status: sections 1 to 5 approved by the owner on 21 October 2026, carried by PR #395 (merged as `b106d33`);
+sections 6 to 9 approved by the owner on 29 October 2026 (decision sheet rows A1 and A2, recorded in D-20),
+carried by PR #396.** Owner decision of Mustafa, recorded from his instructions of 21 October 2026 after the
 read-only CoreX architecture audit. **An internal architecture decision: not a client confirmation, adds no scope,
 changes no signed document.** It changes no code, plugin activation, release package or CoreX pin; the CoreX upgrade
 is made only in its own infrastructure PR under its own security and regression review (section 6). PRs #350 and
@@ -1807,3 +1807,98 @@ log mechanism (MKT-13, MKT-14: the Technical Design names Redirection, a free co
 draws a custom screen). Whether PR #351 (v0.42.0 to v0.46.1) is retargeted to v0.47.0 or closed, and PR #350 with
 it. The sign-in identity is the branding item in section 5. Whether corex-ui is active follows section 3. Each is
 the owner's to decide, before the work it blocks.
+
+## 2026-10-23 - D-19: badges and curated rails stay manual, related products are the staff's assignment, and only the ERP moves stock
+
+**Status: proposed in this pull request, for the owner's review. Not applied until it is merged.** D-18 is proposed
+separately in PR #396 and is not on `main`; this entry follows it in number only.
+
+Owner decisions of Mustafa, 23 October 2026, given on the read-only merchandising and ERP stock audit of 22 and 23
+October. **None is a client confirmation, none adds or removes scope, and the Feature Register reads exactly as
+signed.** Each one applies a signed row or story as written, or chooses between readings it leaves open. The three
+design decisions are recorded as DQ-08, DQ-09 and DQ-10 in `design/inventory/placeholders.json`.
+
+**1. Badges are assigned by hand (DQ-08).** New, Trending, Limited and Best Seller are set per product by the staff
+(MER-01, SSC-22, ADM-42, US-14-09). No badge is calculated from dates, sales or stock, and no badge expires by
+itself. The batch-02 precedence ruling of 19 October is confirmed here: at most one merchandising badge per card,
+Limited, then New, then Best Seller, then Trending. Any automatic badge would be new behaviour, and reaches the
+store only through Change Control.
+
+**2. The two home product rails (DQ-09).** HOME-03 New arrivals shows the newest products first, by publish date,
+using WooCommerce's native ordering. The staff select that source in the section's settings; it is not fixed in
+code, which is what US-02-01 asks ("the rule or curation set in admin, not from code"). HOME-02 Trending is
+curated: it shows the products that carry the Trending badge, which is the reading US-02-01's own example gives
+("no products currently flagged trending"). No trending algorithm is built, and all-time best sellers are not
+presented as trending.
+
+**3. Related products and cart suggestions (DQ-10).** WooCommerce has three separate mechanisms, and they are not
+interchangeable: *Related Products* is automatic (products sharing a category or tag, chosen at random, upsells
+excluded); *Upsells* are chosen by staff and shown on the product page; *Cross-sells* are chosen by staff and shown
+in the cart.
+
+- Related products (PDP-18, MER-05, SSC-25, ADM-45, US-04-08) are the products the staff assign. They are stored
+  in WooCommerce's Upsells field on the product's Linked products tab and shown through that field.
+- WooCommerce's automatic Related Products rail is not shown on the product page.
+- There is no automatic fallback at launch. A product with nothing assigned shows no rail (`sf-pdp-related`, state
+  `empty`). An automatic fallback would change what US-04-08 says customers see, so it would need a client
+  clarification or Change Control first.
+- Cart suggestions (CART-08) read the same assignment, from the products in the cart, as US-05-05 already says
+  ("shown from the related product assignment"). The Cross-sells field is not used at launch, so staff keep one
+  list, not two. Reading the Upsells field in the cart is a small build item for #306; WooCommerce's own cart
+  cross-sells read the other field.
+
+**4. Manual merchandising and automatic ordering stay apart.** Badges and curated rails are always set by people.
+Sections and listings may be ordered automatically (newest first; best selling for PLP-14), but nothing automatic
+assigns a badge. A product may therefore sit in the New arrivals rail without the New badge, and a manual Best
+Seller badge may differ from the best-selling sort. Both are accepted.
+
+**5. Stock authority.** The owner's invariant, in his words: **"Only the ERP is authoritative for stock. No
+independent local stock writer may alter the effective available stock. Any permitted ERP-derived projection write
+must be controlled through the designated adapter."** It restates ERP-01 and the D-10 invariants and makes one
+consequence explicit: every local path that can write stock is refused on the server, not hidden. The audit found
+these paths in WooCommerce 11.1.0 and WooCommerce Multilingual 5.5.7, and none is guarded today: the product and
+variation editors, variation bulk actions, quick edit and bulk edit, the CSV importer, the REST API and WP-CLI,
+checkout holds, order stock reduction and restoration, refund restocking, order line edits, the Bosta stock webhook,
+and direct database writes. Hiding a field is not enforcement.
+
+**Which WooCommerce stock configuration carries the ERP figure is not decided.** Two candidates are on record:
+WooCommerce's own stock fields as a protected projection, or WooCommerce stock management switched off with a
+separate availability projection. The choice waits for the ERP team's answers and the ERP Integration
+Specification (PRE-09), under the constitution's rule that no ERP mechanism is chosen before it.
+
+**6. The Bosta stock route, and a gate until it is closed.** Bosta 4.5.7 registers `bosta/v1/webhook/stock-sync`
+on every request, guarded by one shared secret, and its handler changes WooCommerce stock directly: a second stock
+authority. D-18 (PR #396) proposes removing it; this decision adopts that as required before Bosta is connected
+anywhere. **Until the route is neutralised and a test shows it absent, no Bosta API key is entered, no Bosta webhook
+is registered and no server deployment runs with Bosta configured, in any environment.** On 23 October the route
+answered on the developer's loopback only: no tunnel was running and no environment held real stock. Building the
+neutralisation is functional work and waits for the D-14 release or an owner exception.
+
+**7. Best-seller counts across languages are measured before they are accepted.** WooCommerce Multilingual 5.5.7
+copies each recorded sale to the product's other language, but always as an increase, including when WooCommerce
+records a cancellation as a decrease. This is read from the code and not yet measured. Before PLP-14 (#303) and
+ADM-09 (#294) are accepted, one measurement checks the count in both languages across a sale and a cancellation. A
+wrong count there is a defect in contracted rows, not a change.
+
+**8. What it does to the design record.** `placeholders.json` gains DQ-08, DQ-09 and DQ-10, and the surfaces they
+govern cite them. `sf-pdp-related`'s native baseline no longer names WooCommerce's automatic Related Products block.
+The product rail's proposed sources add "newest" and "by badge". OP-12's placeholder no longer calls every rail
+hand-picked. The files of closed batches are not edited; their superseded notes are listed here instead:
+`batch-01/sf-home` traces HOME-02 to MER-02 and lists only manual, collection and category sources (DQ-09 governs);
+`batch-02/sf-product-badges` gives "Expires by itself" as the reason New ranks second (DQ-08: no badge expires).
+`batch-03/sf-pdp-related` (its empty state) and `batch-04/sf-cart` (the suggestions rail) already agree. Group 09-C
+was accepted and frozen on 23 October 2026 with the related-products mechanism left open; this decision settles it.
+`ad-product-storefront-controls` draws the Upsells field as the recommendation, which is the mechanism chosen here;
+the separate site field it draws as the alternative is superseded and is not built, and the Cross-sells field is not
+used at launch. `ad-stock-from-erp` displays figures and enforces nothing. The frozen 09-C files are not redrawn for
+this; batch-09's K4 closes on this record when it is merged.
+
+**9. What stays open, and where.** #282: how badges are stored, the label staff see on the Upsells field, where a
+product lands when it joins a collection, and how the featured flag affects prominence. #302: the order of products
+inside the Trending rail. #254: taking the automatic rail out of the product template. #306: the cart's read of the
+assignment. #303 and #294: the measurement in item 7. #245, #316 and #317: the stock configuration, after PRE-09.
+Outside this repository, and needing the owner's separate approval: the Technical Design v1.3 classes ADM-42 to
+ADM-45 as standard platform capability, which is not true of badges or per-collection position; it is corrected in
+its next version with the Stage 1 response. `AGENTS.md` carries the D-10 form of the stock invariant ("the store
+holds no independent authoritative stock") and is not changed here: aligning it with item 5 is a governance-control
+change, for a separate pull request if the owner wants it.

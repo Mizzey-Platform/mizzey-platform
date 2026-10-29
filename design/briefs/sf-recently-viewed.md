@@ -58,7 +58,7 @@ No flow step passes through this surface.
 |---|---|---|---|
 | Product rail (`cn-product-rail`) | content |  | The rail starts at the inline-start edge and scrolls toward the inline-end edge. |
 
-**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category. Proposed. The register fixes no variant before the interface design is approved.
+**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category, newest, by badge. Proposed. The register fixes no variant before the interface design is approved.
 
 ## States
 

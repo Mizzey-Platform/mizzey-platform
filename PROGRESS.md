@@ -98,8 +98,7 @@ Live status. First action each session: read this, then continue from **Next**.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
-  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists, and only
-  batch-01 to batch-08 are drawn, each reviewed and closed**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-10 are drawn, each reviewed and closed, 62 files frozen, and the low-fidelity wireframe phase closed on 28 October 2026**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
@@ -303,8 +302,8 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In order:
+**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. Batches 01 to 10 and
+the supplementary stabilisation review are closed under the recorded review authority, and CoreX is not upgraded until he says so either.** In order:
 
 1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
    the owner's reconfirmation of 18 October 2026 (PR #358).
@@ -351,12 +350,40 @@ drawn beyond batch-08 and CoreX is not upgraded until he says so either.** In or
    administration patterns and is drawn and reviewed first; 09-B to 09-E are drawn from it only after he accepts it,
    and their outputs come in one pull request at a time. Claude Design drew 09-A, and it is imported for his review
    with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
-   page for a full-page refusal); its baseline is frozen only when he accepts it.
-3. **Then the remaining first-release surfaces in review batches**, each reviewed and closed, and the second-release
-   surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
-   approved (`design/wireframes/workflow.md`).
-4. **The CoreX upgrade to v0.47.0** (D-18, proposed), made in its own infrastructure PR on the owner's approval,
-   before application and storefront implementation resumes. Its gates are in
+   page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
+   09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
+   it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
+   with one controlled correction round on his review of 22 October 2026; he accepted it on 23 October 2026 (PR #399),
+   with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
+   open pending D-19. Claude Design drew 09-D from the frozen baseline (version 2 package, 25 October 2026), and it
+   is imported for his review. On 26 October 2026 he ruled D1 and D2 (the shipment and refund surfaces become
+   constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redrew the two
+   surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
+   The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
+   and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
+   lines are not marked as additions); Claude Design corrected that one file, and he accepted 09-E on 26 October
+   2026 (PR #402), E1 to E4 as working structural decisions: its ten files are frozen. All five batch-09 groups
+   are accepted. For the batch-09 closure he chose, on 26 October 2026, a pattern catalogue only (no CSS
+   consolidation) and one Claude Design correction round (ad-redirect-manager redrawn annotate-only on
+   Redirection, the unrelated sample rows replaced, WooCommerce's Apply button added in eight 09-D files), with
+   related products open pending D-19. Claude Design returned the round, and he accepted the closure on 26 October
+   2026 (PR #403), adopting recommendations C1 to C5 and re-freezing the ten corrected files: batch-09 is closed.
+   Batch-10 (the eight contracted second-release surfaces) opens on his instruction of 26 October 2026 in two
+   review groups, 10-A customer-facing (English and Arabic, mobile first) and 10-B administration (English): its
+   eight surfaces and 25 states are briefed and stay stage S2 (DQ-04). Claude Design drew 10-A, imported for his
+   review in its own pull request (PR #406); he ruled A1 to A12 on 27 October 2026 and, after one correction
+   round, accepted 10-A the same day: its five surfaces are reviewed and its eleven files frozen (in force on his
+   merge approval). Claude Design drew 10-B, imported for his review in its own draft pull request (PR #407);
+   he ruled B1 to B9 on 27 October 2026, and Claude Design returned correction round 1 the same day, imported
+   to that pull request. He ruled B10 and B11 the same day, and Claude Design returned the second, minimal round,
+   imported there. Correction round 3 followed in ce311a0. On 28 October 2026, Claude Code and Codex accepted
+   and froze the corrected 10-B result under the owner's delegated review instruction; this was not the owner's
+   own review.
+3. **The low-fidelity wireframe phase is closed under delegated review**, as `stabilisation.phase_closure`
+   records. Next: receive and apply the brand identity, pending OD-01; then high-fidelity design, motion, working
+   HTML and CSS and PRE-03b. Residuals remain carried. No functional implementation is authorised.
+4. **The CoreX upgrade to v0.47.0** (D-18 section 6, approved by the owner on 29 October 2026), made in its own
+   infrastructure PR before the non-storefront work resumes. Its gates are in
    `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`.
 5. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
    Mustafa's decision. The queue is kept as the order they would follow.
