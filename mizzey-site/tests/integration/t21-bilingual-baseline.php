@@ -342,8 +342,8 @@ run(
 		// hooked and that a string bound to the domain resolves.
 		$hooked = has_action( 'init', array( 'MizzeySite\\I18n\\Localisation', 'loadPluginTextdomain' ) );
 		$s->note( 'plugin text domain loader hooked on init: ' . ( false !== $hooked ? 'yes' : 'no' ) );
-		$s->note( 'fact: the storefront ships no .mo of its own yet, because it has no strings of its own. The '
-			. 'mechanism is asserted below through a temporary catalogue.' );
+		$s->note( 'fact: the mechanism is asserted below through the shipped Arabic catalogue, or a temporary one '
+			. 'when none ships.' );
 		$s->note( 'theme languages directory: ' . ( is_dir( $theme . '/languages' ) ? 'present' : 'missing' ) );
 		$s->note( 'translation template: ' . ( file_exists( WP_PLUGIN_DIR . '/mizzey-site/languages/mizzey-site.pot' ) ? 'present' : 'missing' ) );
 		if ( false === $hooked ) {
@@ -361,11 +361,25 @@ run(
 		// Arabic. That tested WordPress, not this feature: it would have passed with Localisation.php deleted.
 		// So a real .mo is written, the production method loads it, and the file is removed afterwards. Nothing
 		// test-shaped is shipped, and the assertion fails if the loader is removed or misconfigured.
-		$probe     = 'Mizzey t21 translation probe';
-		$arabic_mo = WP_PLUGIN_DIR . '/mizzey-site/languages/mizzey-site-ar.mo';
-		$pre_existing = file_exists( $arabic_mo );
+		//
+		// Since specs/007-security-baseline the plugin ships a real Arabic catalogue, `mizzey-site-ar.l10n.php`,
+		// which WordPress prefers to a .mo beside it. When it exists, the probe is its first string: a shipped
+		// translation read through the production loader is the stronger evidence, and a temporary .mo would
+		// never be read. Without it, the temporary .mo below stands in, as before.
+		$probe         = 'Mizzey t21 translation probe';
+		$probe_arabic  = 'مزي t21';
+		$arabic_mo     = WP_PLUGIN_DIR . '/mizzey-site/languages/mizzey-site-ar.mo';
+		$shipped       = WP_PLUGIN_DIR . '/mizzey-site/languages/mizzey-site-ar.l10n.php';
+		$catalogue     = is_readable( $shipped ) ? include $shipped : array();
+		$messages      = is_array( $catalogue ) && ! empty( $catalogue['messages'] ) ? $catalogue['messages'] : array();
+		if ( array() !== $messages ) {
+			$probe        = (string) array_key_first( $messages );
+			$probe_arabic = (string) $messages[ $probe ];
+			$s->note( 'probe: the first string of the shipped Arabic catalogue' );
+		}
+		$pre_existing = array() !== $messages || file_exists( $arabic_mo );
 		if ( ! $pre_existing ) {
-			file_put_contents( $arabic_mo, t21_mo( array( $probe => 'مزي t21' ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			file_put_contents( $arabic_mo, t21_mo( array( $probe => $probe_arabic ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 			$s->on_finish(
 				static function () use ( $arabic_mo ) {
 					if ( file_exists( $arabic_mo ) ) {
@@ -402,7 +416,7 @@ run(
 		$s->note( "probe in English: {$english}" );
 		$s->note( 'fact: WordPress 7.1 loads translations lazily, so is_textdomain_loaded() reads false until a '
 			. 'string is requested even though the loader returned true' );
-		if ( 'مزي t21' !== $arabic ) {
+		if ( $probe_arabic !== $arabic ) {
 			$s->note( 'FAIL AC-8: a string bound to the site text domain did not resolve in Arabic.' );
 			$ok = false;
 		}

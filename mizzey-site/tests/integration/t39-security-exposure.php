@@ -146,7 +146,7 @@ run(
 		$check( 200 === $index['status'] && false === strpos( $index['body'], 'wp-sitemap-users' ), 'AC-3: the sitemap index lists no users sitemap' );
 		$check( false !== strpos( $index['body'], 'wp-sitemap-posts-product' ), 'AC-3: the product sitemap is still listed' );
 		$users_map = t39_get( home_url( '/wp-sitemap-users-1.xml' ) );
-		$check( 200 !== $users_map['status'] || false === strpos( $users_map['body'], $author_slug ), "AC-3: the users sitemap does not exist (status {$users_map['status']})" );
+		$check( 404 === $users_map['status'], "AC-3: the users sitemap does not exist (status {$users_map['status']})" );
 
 		return $ok;
 	}

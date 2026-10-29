@@ -116,7 +116,7 @@ run(
 		$check( $admin_used instanceof \WP_User, 'AC-4: an administrator still can' );
 		remove_filter( 'application_password_is_api_request', '__return_true' );
 		foreach ( array( 'customer' => array( $customer, $customer_secret, false ), 'administrator' => array( $admin, $admin_secret, true ) ) as $who => list( $u, $secret, $allowed ) ) {
-			$r      = wp_remote_get( rest_url( 'wp/v2/users/me' ), array( 'timeout' => 30, 'headers' => array( 'Authorization' => 'Basic ' . base64_encode( $u->user_login . ':' . $secret ) ) ) );
+			$r      = wp_remote_get( rest_url( 'wp/v2/users/me' ), array( 'timeout' => 30, 'headers' => array( 'Authorization' => 'Basic ' . base64_encode( $u->user_login . ':' . $secret ) ) ) ); // storefront-guard: exempt, a JSON endpoint and not a page.
 			$status = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
 			$check( $allowed ? 200 === $status : in_array( $status, array( 401, 403 ), true ), "AC-4 [HTTP] a stored application password for the {$who} " . ( $allowed ? 'authenticates' : 'is refused' ) . " (status {$status})" );
 		}
@@ -144,7 +144,7 @@ run(
 		$login_url = site_url( 'wp-login.php', 'login_post' );
 		$a = t40_error_text( t40_post( $login_url, array( 'log' => $customer->user_login, 'pwd' => 'not-the-password', 'testcookie' => 1 ), array( new \WP_Http_Cookie( array( 'name' => 'wordpress_test_cookie', 'value' => 'WP Cookie check' ) ) ) ) );
 		$b = t40_error_text( t40_post( $login_url, array( 'log' => 't40_nobody_' . wp_rand(), 'pwd' => 'not-the-password', 'testcookie' => 1 ), array( new \WP_Http_Cookie( array( 'name' => 'wordpress_test_cookie', 'value' => 'WP Cookie check' ) ) ) ) );
-		$check( '' !== $a && $a === $b, "AC-5 [wp-login] the same message for a real and an unknown account ('{$a}' / '{$b}')" );
+		$check( false !== strpos( $a, 'Invalid username, email address or incorrect password' ) && $a === $b, "AC-5 [wp-login] the generic message for a real and an unknown account ('{$a}' / '{$b}')" );
 		foreach ( array( 'en', 'ar' ) as $lang ) {
 			$account = t40_in_language( $lang, fn () => wc_get_page_permalink( 'myaccount' ) );
 			$texts   = array();
@@ -152,7 +152,8 @@ run(
 				$form    = t40_form( $account, 'woocommerce-login-nonce' );
 				$texts[] = t40_error_text( t40_post( $account, array( 'username' => $who, 'password' => 'not-the-password', 'woocommerce-login-nonce' => $form['field'], '_wp_http_referer' => wp_parse_url( $account, PHP_URL_PATH ), 'login' => 'Log in' ), $form['cookies'] ) );
 			}
-			$check( '' !== $texts[0] && $texts[0] === $texts[1], "AC-5 [account, $lang] the same message for a real and an unknown account ('{$texts[0]}' / '{$texts[1]}')" );
+			$generic = 'ar' === $lang ? 'كلمة المرور غير صحيحة' : 'Invalid username, email address or incorrect password';
+			$check( false !== strpos( $texts[0], $generic ) && $texts[0] === $texts[1], "AC-5 [account, $lang] the generic message for a real and an unknown account ('{$texts[0]}' / '{$texts[1]}')" );
 		}
 
 		// ---- AC-6: recovery limits, in process -----------------------------------------------------------------
@@ -212,7 +213,7 @@ run(
 		add_filter( 'mizzey_recovery_limits', $broken );
 		$safe = RecoveryLimiter::limits();
 		remove_filter( 'mizzey_recovery_limits', $broken );
-		$check( array( 'account' => 1, 'address' => 10, 'window' => 1 ) === $safe, 'AC-6: invalid settings fall back safely (' . wp_json_encode( $safe ) . ')' );
+		$check( array( 'account' => 3, 'address' => 10, 'window' => 900 ) === $safe, 'AC-6: invalid settings fall back safely (' . wp_json_encode( $safe ) . ')' );
 
 		foreach ( array( '198.51.100.40', '198.51.100.41', '198.51.100.42', '198.51.100.43' ) as $address ) {
 			foreach ( array( $wp_user, $woo_user, $limited_user, $alias_user ) as $u ) {

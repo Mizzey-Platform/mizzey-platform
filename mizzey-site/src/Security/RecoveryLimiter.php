@@ -24,8 +24,8 @@ use WP_User;
  * sent and abort on an error added there, so one hook covers both pages in every language.
  *
  * The client address comes from CoreX's `ClientAddress` service, the one its login lockout uses, so a visitor behind
- * the proxy is identified the same way by both. An unknown login counts against the address only, so the limit
- * cannot be used to tell whether an account exists. Each counter is a fixed window from its first request; a refused
+ * the proxy is identified the same way by both. An unknown login counts against the address only. Reaching the
+ * account limit can reveal that an account exists. Each counter is a fixed window from its first request; a refused
  * request does not count and does not extend the window.
  *
  * Register id: NFR-05 (rate limiting). See specs/007-security-baseline, FR-006.
@@ -43,7 +43,8 @@ final class RecoveryLimiter
     }
 
     /**
-     * The documented settings, filterable through `mizzey_recovery_limits`. Each value is at least 1.
+     * The documented settings, filterable through `mizzey_recovery_limits`. A value that is not a positive whole
+     * number falls back to its default.
      *
      * @return array{account:int,address:int,window:int}
      */
@@ -52,8 +53,13 @@ final class RecoveryLimiter
         $filtered = apply_filters('mizzey_recovery_limits', self::DEFAULTS);
         $limits   = self::DEFAULTS;
         foreach (array_keys(self::DEFAULTS) as $key) {
-            if (is_array($filtered) && isset($filtered[$key]) && is_numeric($filtered[$key])) {
-                $limits[$key] = max(1, (int) $filtered[$key]);
+            $value = is_array($filtered) ? ($filtered[$key] ?? null) : null;
+            if (! is_int($value) && ! is_string($value)) {
+                continue;
+            }
+            $value = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($value !== false) {
+                $limits[$key] = $value;
             }
         }
 

@@ -31,9 +31,9 @@ run(
 
 		// ---- AC-7: comment surface -----------------------------------------------------------------------------
 		$post_id = wp_insert_post( array( 'post_title' => 't41 post', 'post_status' => 'publish', 'comment_status' => 'open', 'ping_status' => 'open' ) );
-		$s->track_post( $post_id );
+		$s->on_finish( static fn () => wp_delete_post( $post_id, true ) );
 		$page_id = wp_insert_post( array( 'post_title' => 't41 page', 'post_type' => 'page', 'post_status' => 'publish', 'comment_status' => 'open', 'ping_status' => 'open' ) );
-		$s->track_post( $page_id );
+		$s->on_finish( static fn () => wp_delete_post( $page_id, true ) );
 		$product = $s->simple_product( 't41 product', '100', null );
 		$product->set_reviews_allowed( true );
 		$product->save();
@@ -53,7 +53,8 @@ run(
 		$on_post = $comment( $post_id, 't41 comment on a post' );
 		$check( 403 === $on_post && 0 === (int) get_comments( array( 'post_id' => $post_id, 'count' => true, 'status' => 'all' ) ), "AC-7 [HTTP] a comment on a post is refused (status {$on_post})" );
 		$review = $comment( $product->get_id(), 't41 review of a product' );
-		$check( 302 === $review && 1 === (int) get_comments( array( 'post_id' => $product->get_id(), 'count' => true, 'status' => 'all' ) ), "AC-7 [HTTP] a review of a product is still accepted for moderation (status {$review})" );
+		$reviews = get_comments( array( 'post_id' => $product->get_id(), 'type' => 'review', 'status' => 'all' ) );
+		$check( 302 === $review && 1 === count( $reviews ) && 5 === (int) get_comment_meta( $reviews[0]->comment_ID, 'rating', true ), "AC-7 [HTTP] a product review is stored with rating 5 (status {$review})" );
 		$tb = wp_remote_post( add_query_arg( 'p', $post_id, site_url( '/wp-trackback.php' ) ), array( 'timeout' => 30, 'body' => array( 'url' => 'https://example.invalid/', 'title' => 't41', 'blog_name' => 't41' ) ) );
 		$tb_body = is_wp_error( $tb ) ? '' : (string) wp_remote_retrieve_body( $tb );
 		$check( false !== strpos( $tb_body, '<error>1</error>' ), 'AC-7 [HTTP] a trackback is refused' );

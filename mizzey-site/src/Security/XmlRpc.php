@@ -37,8 +37,7 @@ final class XmlRpc
             return;
         }
         status_header(403);
-        header('Content-Type: text/plain; charset=utf-8');
-        echo 'XML-RPC is not available on this site.';
+        echo esc_html__('XML-RPC is not available on this site.', 'mizzey-site');
         exit;
     }
 

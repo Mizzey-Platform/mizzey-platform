@@ -27,13 +27,13 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
 
 ## Phase 3: Verification and records
 
-- [ ] T013 Write `docs/security-baseline.md`: each control, its hook, its setting and its test, for the handover
+- [x] T013 Write `docs/security-baseline.md`: each control, its hook, its setting and its test, for the handover
       (US-27-03). Test: docs-guard.
-- [ ] T014 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
+- [x] T014 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
       Test: `analysis.md`.
-- [ ] T015 Reset the runtime to the clean baseline and run the whole suite serially; commit `evidence/final-suite.txt`.
+- [x] T015 Reset the runtime to the clean baseline and run the whole suite serially; commit `evidence/final-suite.txt`.
       Test: the suite, t02 to t29 verdicts unchanged.
-- [ ] T016 Write `verification.md`, keeping technical verification, staging and client acceptance apart. Test: the
+- [x] T016 Write `verification.md`, keeping technical verification, staging and client acceptance apart. Test: the
       scope trace.
 
 ## Not done until later

@@ -12,6 +12,10 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
 "X-Domain: mizzey-site\n"
 
-#: mizzey-site/src/Security/RecoveryLimiter.php:83
+#: mizzey-site/src/Security/RecoveryLimiter.php:89
 msgid "Too many password reset requests. Please wait a few minutes and try again."
 msgstr "طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى."
+
+#: mizzey-site/src/Security/XmlRpc.php:40
+msgid "XML-RPC is not available on this site."
+msgstr "خدمة XML-RPC غير متاحة على هذا الموقع."

@@ -42,8 +42,13 @@ final class SecurityCommand
             static fn (array $row): bool => in_array($row['key'], BaselineReport::CONTROLS, true) && $row['status'] !== 'pass',
         );
         if ($failing !== []) {
-            WP_CLI::error(count($failing) . ' control(s) need review: ' . implode(', ', array_column($failing, 'key')));
+            WP_CLI::error(sprintf(
+                /* translators: 1: how many controls fail, 2: their keys. */
+                __('%1$d control(s) need review: %2$s', 'mizzey-site'),
+                count($failing),
+                implode(', ', array_column($failing, 'key')),
+            ));
         }
-        WP_CLI::success('Every control of the security baseline passes.');
+        WP_CLI::success(__('Every baseline check passes. Request behaviour is verified by the integration scenarios.', 'mizzey-site'));
     }
 }
