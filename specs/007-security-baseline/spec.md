@@ -44,16 +44,16 @@ None. Nothing here waits for a client, vendor or ERP input.
 
 ## Contractual acceptance criteria [checked]
 
-| AC | Criterion | Rows | Status |
+| # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | No page, feed or response header discloses the WordPress, WooCommerce or CoreX product or version through a generator mark | NFR-05 (admin protection) | final |
-| AC-2 | Every XML-RPC request, `?rsd` included, is refused before dispatch; pingbacks and trackbacks are off; no page advertises an XML-RPC or pingback address | NFR-05 (admin protection) | final |
-| AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint, not through a numeric author query, not through the users sitemap | NFR-05 (admin protection) | final |
-| AC-4 | Application-password availability and authentication are restricted to users with `manage_options`; upstream restrictions stay effective | NFR-05 (admin protection) | final |
-| AC-5 | A failed sign-in, on the WordPress sign-in page and on the account page, gives one message whether the account exists or not, and the failure still reaches CoreX's lockout | NFR-05 (admin protection) | final |
-| AC-6 | Password-recovery requests are rate limited per account and per client address, on the WordPress page and on the account page, in both languages, and the limits are documented settings | NFR-05 (rate limiting) | final |
-| AC-7 | Non-product comments are closed; product-review availability is unchanged; incoming pings are closed on every content type | NFR-05 (input validation) | final |
-| AC-8 | One command reports the state of every control in this baseline, and the controls are listed for the handover | NFR-05, US-27-03 | final |
+| AC-1 | No page, feed or response header discloses the WordPress, WooCommerce or CoreX product or version through a generator mark (admin protection) | NFR-05 | final |
+| AC-2 | Every XML-RPC request, `?rsd` included, is refused before dispatch; pingbacks and trackbacks are off; no page advertises an XML-RPC or pingback address (admin protection) | NFR-05 | final |
+| AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint, not through a numeric author query, not through the users sitemap (admin protection) | NFR-05 | final |
+| AC-4 | Application-password availability and authentication are restricted to users with `manage_options`; upstream restrictions stay effective (admin protection) | NFR-05 | final |
+| AC-5 | A failed sign-in, on the WordPress sign-in page and on the account page, gives one message whether the account exists or not, and the failure still reaches CoreX's lockout (admin protection) | NFR-05 | final |
+| AC-6 | Password-recovery requests are rate limited per account and per client address, on the WordPress page and on the account page, in both languages, and the limits are documented settings (rate limiting) | NFR-05 | final |
+| AC-7 | Non-product comments are closed; product-review availability is unchanged; incoming pings are closed on every content type (input validation) | NFR-05 | final |
+| AC-8 | One command reports the state of every control in this baseline, and the controls are listed for the handover (US-27-03) | NFR-05 | final |
 
 ## User Scenarios & Testing *(mandatory)*
 
