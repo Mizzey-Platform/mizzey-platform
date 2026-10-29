@@ -40,7 +40,7 @@ Mizzey writes only the contracted behaviour, thin adapters and the storefront pr
 | Promotional banner | A section of the library, placed globally | mizzey-site (`Mizzey\Storefront`) |
 | Consent banner | Decision pending (Technical Design, row 22; #288) | open |
 | Breadcrumbs | WooCommerce and core breadcrumbs | WooCommerce, WordPress |
-| Transactional emails | WooCommerce email templates and settings; sent through the CoreX mail queue (`Mizzey\Notify`) | WooCommerce for content, CoreX for transport |
+| Transactional emails | WooCommerce email templates and settings. The Technical Design names the CoreX mail queue (`Mizzey\Notify`) for sending, but the ownership audit (PR #396) finds WooCommerce mail separate and no SMTP service in CoreX: the sending path, one send per message and one sender authority are proven in the build | WooCommerce for content; the transport is verified, not assumed |
 
 ## 3. Pages, parts and sections
 
@@ -176,6 +176,8 @@ interface design uses them.
 
 - D-18 sections 1 to 5 and 6 to 9 are approved but not on `main` until PR #395 and PR #396 merge.
 - Consent banner mechanism (Technical Design, row 22; #288).
+- The email sending path (`Mizzey\Notify` in the Technical Design against the ownership audit): verified in the build,
+  with the mail service account the client approves (INT-05).
 - Which CoreX add-ons are allowed (D-18 section 3): corex-blocks for the section library, corex-forms and corex-email
   for the contact page (CMS-04), corex-media for WebP (NFR-02).
 - The CoreX target: PR #351 (v0.46.1) against D-18 section 6 (v0.47.0).
