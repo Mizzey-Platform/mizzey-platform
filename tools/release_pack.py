@@ -60,6 +60,7 @@ LOCALES = ("ar",)
 BUNDLED = {
     "woocommerce": ("woocommerce", "woocommerce.php"),
     "bosta": ("bosta-woocommerce", "bosta-woocommerce.php"),
+    "wp-2fa": ("wp-2fa", "wp-2fa.php"),
 }
 # Paid, so never in the archive while the repository is public. Listed in the manifest for the server to check.
 SERVER_SUPPLIED = {

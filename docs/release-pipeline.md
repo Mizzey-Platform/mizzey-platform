@@ -28,7 +28,7 @@ A release is never replaced. If a build is wrong, fix `main` and tag the next nu
 | Downloads WordPress core at the version `stack.lock.json` records as tested, and checks it against the checksum wordpress.org publishes | `python tools/release_pack.py fetch-core` |
 | Checks out CoreX at the commit `corex.lock` pins and installs its dependencies | `node tools/corex-sync.mjs` |
 | Builds the flat WordPress tree | `node tools/build-dist.mjs` |
-| Adds WooCommerce and the carrier plugin from wordpress.org at the versions `stack.lock.json` records, the Arabic language packs, and the manifest, and writes the archive and its checksum | `python tools/release_pack.py pack --tag <tag>` |
+| Adds WooCommerce, the carrier plugin and WP 2FA from wordpress.org at the versions `stack.lock.json` records, the Arabic language packs, and the manifest, and writes the archive and its checksum | `python tools/release_pack.py pack --tag <tag>` |
 | Checks the checksum, and that the archive holds no paid plugin and no file the server owns | `sha256sum -c`, and the archive's own list of names |
 | Publishes the two files as a release of this repository | `gh release create`, with the workflow's own token |
 
@@ -49,7 +49,7 @@ Under `wp-content/`:
 |---|---|
 | `plugins/corex-*` | CoreX at the pinned commit, every plugin and add-on its builder packages |
 | `plugins/mizzey-site`, `themes/mizzey-theme`, `themes/corex` | This repository at the tag, without `tests/`, and the CoreX parent theme |
-| `plugins/woocommerce`, `plugins/bosta-woocommerce` | wordpress.org |
+| `plugins/woocommerce`, `plugins/bosta-woocommerce`, `plugins/wp-2fa` | wordpress.org |
 | `languages/`, `languages/plugins/` | The Arabic language packs of WordPress and of WooCommerce, from wordpress.org |
 
 **Not in the archive, because the server owns it:**
