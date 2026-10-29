@@ -36,6 +36,7 @@ require_once __DIR__ . '/src/Security/ApplicationPasswords.php';
 require_once __DIR__ . '/src/Security/SignInMessages.php';
 require_once __DIR__ . '/src/Security/RecoveryLimiter.php';
 require_once __DIR__ . '/src/Security/CommentSurface.php';
+require_once __DIR__ . '/src/Security/TwoFactor.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';

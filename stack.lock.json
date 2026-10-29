@@ -14,6 +14,7 @@
   "wpml-cms-nav": {"plugin": "wpml-cms-nav", "version": "1.5.8", "status": "installed-untested", "source": "plugin header"},
   "wcml": {"plugin": "woocommerce-multilingual", "version": "5.5.7", "status": "tested", "source": "plugin header; probes P-006, P-019, P-020"},
   "bosta": {"plugin": "bosta-woocommerce", "version": "4.5.7", "status": "tested", "source": "plugin header; probe P-012", "notes": "Status mapping dormant in this version (P-012). Carrier status legend not yet obtained"},
+  "wp-2fa": {"plugin": "wp-2fa", "version": "4.2.1", "status": "tested", "source": "wordpress.org wp-2fa.4.2.1.zip, sha256 43b38e97f43f418ec0acf3434587a39c20975844640a66a474825709c205c548; scenarios t42 to t45 (specs/008-admin-two-factor)", "notes": "ADM-131, free tier (Technical Design row 20). Declares Tested up to 7.1; verified on WordPress 7.1.4 by t42 to t45. Key from WP2FA_ENCRYPT_KEY in configuration. The release packer bundles it in its own tooling pull request"},
   "paymob": {"plugin": null, "version": null, "status": "not-selected", "source": "No payment plugin installed. Selected and tested under PAY-* work"}
  }
 }

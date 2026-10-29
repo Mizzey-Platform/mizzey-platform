@@ -39,9 +39,14 @@ esac
 $WP db reset --yes
 $WP core install --url=http://mizzey.local --title=Mizzey --admin_user=pilot_admin \
   --admin_email=pilot-admin@example.invalid --admin_password="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')" --skip-email
+# WP 2FA's encryption key comes from configuration, before the plugin first loads, so the plugin never writes a
+# fallback key into the database (specs/008-admin-two-factor, FR-004). It is kept across resets: a disposable key, but
+# the same one, so a scenario's enrolment is never undecryptable halfway through a run.
+$WP config get WP2FA_ENCRYPT_KEY --type=constant >/dev/null 2>&1 || \
+  $WP config set WP2FA_ENCRYPT_KEY "$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')" --type=constant >/dev/null
 for p in woocommerce sitepress-multilingual-cms wpml-string-translation woocommerce-multilingual \
          corex-core corex-config corex-blocks corex-forms corex-guides corex-email corex-media corex-ui \
-         bosta-woocommerce mizzey-site; do
+         bosta-woocommerce wp-2fa mizzey-site; do
   $WP plugin activate "$p" >/dev/null
 done
 $WP theme activate mizzey-theme >/dev/null

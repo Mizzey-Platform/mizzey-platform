@@ -38,6 +38,7 @@ container's own environment, and a generated password reaches PHP through the en
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import gzip
 import hashlib
@@ -295,11 +296,38 @@ def cmd_build(a) -> None:
         raise SystemExit("the deployed release is not ready for staging:\n  " + "\n  ".join(problems))
 
 
+TWO_FACTOR_KEY_FILE = "two-factor.key"
+
+
+def two_factor_key() -> str:
+    """WP 2FA's encryption key for this installation: made once, then the same key every time.
+
+    Every two-factor enrolment is encrypted with it, so a new key would make every enrolment unreadable. It is kept
+    in the tool's own owner-only state, outside the repository and outside anything PHP can serve, and back it up
+    with the server configuration (docs/two-factor-recovery.md). A file that is not a 32-byte base64 key is refused
+    rather than replaced, because replacing it would lock every enrolled staff member out. specs/008-admin-two-factor,
+    FR-004.
+    """
+    path = state(TWO_FACTOR_KEY_FILE)
+    if path.exists():
+        key = path.read_text(encoding="ascii").strip()
+        try:
+            if len(base64.b64decode(key, validate=True)) != 32:
+                raise ValueError
+        except ValueError:
+            raise SystemExit(f"{path} does not hold a 32-byte base64 key; it was not replaced. Restore it from backup.")
+        return key
+    key = base64.b64encode(secrets.token_bytes(32)).decode("ascii")
+    path.write_text(key + "\n", encoding="ascii")
+    os.chmod(path, 0o600)
+    return key
+
+
 def cmd_server_config(a) -> None:
     salts = {f"SALT_{i}": secrets.token_urlsafe(48) for i in range(1, 10)}
     sys.stdout.write(local.render("wp-config-server.php.tmpl", {
         "TABLE_PREFIX": TABLE_PREFIX, "PUBLIC_HOST": PUBLIC_HOST, "LOCAL_HOST": LOCAL_HOST, "IN_SHARED": IN_SHARED,
-        "IN_MU_PLUGINS": in_layer("staging", "mu-plugins"), **salts}))
+        "IN_MU_PLUGINS": in_layer("staging", "mu-plugins"), "TWO_FACTOR_KEY": two_factor_key(), **salts}))
 
 
 # ---- database -----------------------------------------------------------------------------------------------

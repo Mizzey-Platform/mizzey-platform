@@ -1,0 +1,49 @@
+PASS  t42-two-factor-sign-in       ADM-131: with two-factor in force, a password alone gives no session
+      PASS  AC-1 [wp-login] the right password alone brings the two-factor challenge
+      PASS  AC-1 [wp-login] and no session: the cookies it leaves do not open the administration
+      PASS  AC-1 [wp-login] a wrong code is refused, and the challenge is shown again
+      PASS  AC-1 [wp-login] the right code completes sign-in (status 302)
+      PASS  AC-1 [REST] a wrong code is refused (status 200)
+      PASS  AC-1 [REST] and a replacement transaction is issued for the retry
+      PASS  AC-1 [REST] the right code with that transaction completes sign-in (status 200)
+      PASS  AC-1 [account, en] the right password alone brings the challenge and no session
+      PASS  AC-1 [account, en] the right code completes sign-in
+      PASS  AC-1 [account, ar] the right password alone brings the challenge and no session
+      PASS  AC-1 [account, ar] the right code completes sign-in
+      PASS  AC-2 an enrolled shop manager is challenged too
+      PASS  AC-2 an unenrolled customer-only account signs in with no challenge (status 302)
+      PASS  FR-007 [home (visitor)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [product (visitor)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [home (customer)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [account (customer)] loads no WP 2FA asset (status 200)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+PASS  t44-two-factor-enrolment-guard ADM-131: a staff member who must enrol can do nothing privileged first
+      PASS  before the baseline, the shop manager signs in normally
+      PASS  AC-3 [pre-existing session] an administration page sends to set-up (status 302)
+      PASS  AC-3 [pre-existing session] the orders screen sends to set-up (status 302)
+      PASS  AC-3 [pre-existing session] the set-up exception cannot dispatch page=wc-settings (status 403)
+      PASS  AC-3 [pre-existing session] the set-up exception cannot dispatch import=wordpress (status 302)
+      PASS  AC-3 [pre-existing session] the set-up screen opens (status 200)
+      PASS  AC-3 [pre-existing session] an administration action is refused (status 302, location 'http://mizzey.local/wp-admin/profile.php?show=wp-2fa-setup')
+      PASS  AC-3 [pre-existing session] a privileged REST call with a valid nonce is refused (status 403)
+      PASS  AC-3 [pre-existing session] WP 2FA's sign-in route passes the guard and rejects the forged transaction (status 403)
+      PASS  AC-3 [pre-existing session] an unlisted background action is refused
+      PASS  AC-3 [pre-existing session] reset and unlock actions are refused while pending
+      PASS  AC-3 [new session] an administration page sends to set-up (status 302)
+      PASS  AC-3 [new session] the orders screen sends to set-up (status 302)
+      PASS  AC-3 [new session] the set-up exception cannot dispatch page=wc-settings (status 403)
+      PASS  AC-3 [new session] the set-up exception cannot dispatch import=wordpress (status 302)
+      PASS  AC-3 [new session] the set-up screen opens (status 200)
+      PASS  AC-3 [new session] an administration action is refused (status 302, location 'http://mizzey.local/wp-admin/profile.php?show=wp-2fa-setup')
+      PASS  AC-3 [new session] a privileged REST call with a valid nonce is refused (status 403)
+      PASS  AC-3 [new session] WP 2FA's sign-in route passes the guard and rejects the forged transaction (status 403)
+      PASS  AC-3 [new session] an unlisted background action is refused
+      PASS  AC-3 [new session] reset and unlock actions are refused while pending
+      PASS  AC-3 the allowed enrolment action completes enrolment (status 200)
+      PASS  AC-3 once enrolled, the administration opens (status 200)
+      PASS  AC-3 once enrolled, the same REST call works (status 200)
+      PASS  AC-3 a customer who is also a shop manager is pending as staff
+      PASS  AC-3 a pending administrator's application password is refused (status 403)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed

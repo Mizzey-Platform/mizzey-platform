@@ -10,11 +10,13 @@ test and `staging.py check` on the server itself, on MariaDB 11.4, and it is rec
 
 from __future__ import annotations
 
+import base64
 import http.server
 import importlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tarfile
@@ -304,6 +306,24 @@ class TheStagingLayer(OnTheServer):
         config = printed.getvalue()
         self.assertIn(f"define( 'WPMU_PLUGIN_DIR', '{srv.in_layer('staging', 'mu-plugins')}' );", config)
         self.assertTrue((srv.LAYER / "staging" / "mu-plugins" / "mizzey-staging.php").is_file())
+
+    def test_the_two_factor_key_is_made_once_and_kept(self):
+        printed = []
+        for _ in range(2):
+            with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+                srv.cmd_server_config(None)
+            printed.append(out.getvalue())
+        keys = [re.search(r"define\( 'WP2FA_ENCRYPT_KEY', '([A-Za-z0-9+/=]+)' \);", text) for text in printed]
+        self.assertTrue(all(keys), "the configuration defines WP2FA_ENCRYPT_KEY")
+        self.assertEqual(keys[0].group(1), keys[1].group(1), "a second server-config keeps the same key")
+        self.assertEqual(32, len(base64.b64decode(keys[0].group(1))))
+        self.assertNotEqual(printed[0], printed[1], "the salts are still new each time")
+
+    def test_a_damaged_two_factor_key_is_refused_not_replaced(self):
+        srv.state(srv.TWO_FACTOR_KEY_FILE).write_text("not a key\n", encoding="ascii")
+        with self.assertRaises(SystemExit):
+            srv.two_factor_key()
+        self.assertEqual("not a key\n", srv.state(srv.TWO_FACTOR_KEY_FILE).read_text(encoding="ascii"))
 
     def test_the_configuration_it_prints_is_the_one_its_guard_accepts(self):
         with mock.patch("sys.stdout", new_callable=io.StringIO) as printed:

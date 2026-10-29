@@ -1,0 +1,24 @@
+t42 to t45 run against the site code on origin/main: the WP 2FA plugin active, the Mizzey two-factor code absent.
+Recorded after the code was written (T007 was not captured beforehand); the files were restored afterwards.
+
+===== t42 (exit 1)
+FAIL  t42-two-factor-sign-in       ADM-131: with two-factor in force, a password alone gives no session
+      Error: The two-factor baseline command failed: Error: 'two-factor-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _two_factor.php:31
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+===== t43 (exit 1)
+FAIL  t43-two-factor-policy        ADM-131: the baseline command, the owner's setting, and the protection check
+      Error: The two-factor baseline command failed: Error: 'two-factor-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _two_factor.php:31
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+===== t44 (exit 1)
+FAIL  t44-two-factor-enrolment-guard ADM-131: a staff member who must enrol can do nothing privileged first
+      PASS  before the baseline, the shop manager signs in normally
+      Error: The two-factor baseline command failed: Error: 'two-factor-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _two_factor.php:31
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+===== t45 (exit 1)
+FAIL  t45-two-factor-recovery      ADM-131: backup codes work once; a reset follows the written runbook
+      Error: The two-factor baseline command failed: Error: 'two-factor-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _two_factor.php:31
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

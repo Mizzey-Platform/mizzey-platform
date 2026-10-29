@@ -1,0 +1,4 @@
+mutation: REST guard never refuses -> FAIL  t44-two-factor-enrolment-guard ADM-1
+mutation: set-up exception lets import= through -> FAIL  t44-two-factor-enrolment-guard ADM-1
+mutation: policy row ignores email codes -> FAIL  t43-two-factor-policy        ADM-131
+mutation: baseline leaves exclusions in place -> FAIL  t43-two-factor-policy        ADM-131
