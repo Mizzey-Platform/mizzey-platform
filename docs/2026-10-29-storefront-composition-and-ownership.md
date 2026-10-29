@@ -2,8 +2,9 @@
 
 **Status: working draft, 29 October 2026, for the high-fidelity design and the build.** Derived from the closed
 low-fidelity wireframes (`design/wireframes/manifest.json`, `stabilisation.phase_closure`), the design inventory
-(`design/inventory/`), the signed Technical Design (MS-TDD-2026-033 v1.3, sections 2 to 4) and D-18 (approved by the
-owner on 21 October 2026, carried by PR #395 and PR #396). It changes no scope, no signed document and no code.
+(`design/inventory/`), the issued Technical Design (MS-TDD-2026-033 v1.3, sections 2 to 4, awaiting Stage 1 approval),
+and D-18: owner-approved sections 1 to 5 in PR #395, with sections 6 to 9 proposed in PR #396. Neither PR is merged.
+This working draft changes no scope, signed document or code.
 
 **What it is not.** The Technical Design, section 4.1, says that no number of sections, blocks or variants is fixed
 before the interface design is approved. The section list, variants and editable fields below are the proposals the
@@ -18,11 +19,11 @@ Mizzey writes only the contracted behaviour, thin adapters and the storefront pr
 
 | Capability | Owner | Mechanism |
 |---|---|---|
-| Container, configuration, routing, service providers, the mail queue, forms, blocks API, media, security foundation, planned maintenance, framework administration | **CoreX** | The pinned CoreX framework; each Mizzey module is a CoreX service provider (Technical Design, section 4). Only the add-ons D-18 section 3 allows |
+| Container, configuration, routing, service providers, the mail queue, forms, blocks API, media, security foundation, planned maintenance, framework administration | **CoreX** | The pinned CoreX framework. The Technical Design proposes CoreX service providers for site modules; their layout and registration are settled in the relevant specs. Add-ons remain subject to D-18 section 3 |
 | Products, variations, prices, stock records, cart, checkout, orders and statuses, coupons, refunds, shipping zones, the customer account, transactional customer emails, Coming Soon | **WooCommerce** | Native blocks, templates, endpoints and settings, extended through supported hooks |
 | Content, pages, menus (`wp_navigation`), templates and template parts, users, roles, media, the XML sitemap | **WordPress** | The block editor and Full Site Editing |
 | English and Arabic content, strings, translated menus | **WPML** (licensed) | WPML, WooCommerce Multilingual, String Translation |
-| Contracted rules and integrations: cart merge, free shipping rule, welcome discount, Egyptian address, idempotency, Paymob and Bosta adapters, COD reconciliation, search, SEO fields, review eligibility, wishlist, the ERP stock adapter, the section library's blocks | **mizzey-site** | The 13 modules of the Technical Design, section 4 (`Mizzey\Storefront` to `Mizzey\Notify`) |
+| Contracted rules and integrations: cart merge, free shipping rule, welcome discount, Egyptian address, idempotency, Paymob and Bosta adapters, COD reconciliation, search, SEO fields, review eligibility, wishlist, the ERP stock adapter, the section library's blocks | **mizzey-site** | The Technical Design's 13 proposed module responsibilities. Its `Mizzey\...` labels, used in this map too, are design references; implementation uses the repository's `MizzeySite\` namespace |
 | The storefront presentation: block theme, `theme.json` tokens, templates, template parts, styles of the native blocks | **mizzey-theme** | Never wp-admin (D-18 section 4) |
 | Redirects and the missing-page log | **Redirection** (free) | Owner ruling R1, 21 October 2026; the adapter refuses loops and a target equal to its source |
 
@@ -44,9 +45,11 @@ Mizzey writes only the contracted behaviour, thin adapters and the storefront pr
 
 ## 3. Pages, parts and sections
 
-Generated from `design/inventory/surfaces.json` and `components.json`. "Native starting point" is the inventory's
-native baseline; "sections and components" are the structural components each surface uses (foundations and controls
-omitted, since every surface uses them).
+These tables select primary storefront surfaces from `design/inventory/surfaces.json` and `components.json`. They show
+the inventory's native baselines and direct component references (foundations and controls omitted); composed child
+surfaces are not expanded. They are not a complete S1 and S2 composition handoff: the customer invoice and the reviewed
+S2 brand landing, rating filter, reorder, notification preferences and deletion request stay in the canonical inventory
+and manifest, with their existing stages and open mechanisms.
 
 ### Global parts
 
@@ -157,7 +160,7 @@ omitted, since every surface uses them).
 | `cm-cart-line`, `cm-order-summary`, `cm-coupon` | WooCommerce Cart and Checkout blocks | Cart merge notice (`Mizzey\Cart`) |
 | `cm-free-shipping-progress` | None | `Mizzey\Cart`, from the configured free shipping rule (BR-002) |
 | `cm-address-card` | WooCommerce addresses | Egyptian address structure (`Mizzey\Checkout`) |
-| `cm-status-timeline`, `cm-status-label` | WooCommerce order statuses | The two added statuses; the carrier status map (`Mizzey\Shipping`) |
+| `cm-status-timeline`, `cm-status-label` | WooCommerce order statuses | The contracted status labels and timeline, plus the carrier mapping (`Mizzey\Shipping`). The WooCommerce status representation, the Delivered and ORD-14 status set and the transitions are settled and verified under #248; this map fixes no count of new status objects |
 | `cm-rating`, `cm-review-item` | WooCommerce reviews | Review eligibility (D-17, `Mizzey\Catalogue`) |
 | `cm-product-badge` | None | Manual badges (D-19), `Mizzey\Catalogue` |
 | `cm-payment-method`, `cm-shipping-method` | WooCommerce payment and shipping methods | Paymob and Bosta adapters |
@@ -165,16 +168,19 @@ omitted, since every surface uses them).
 
 ## 5. Data a section stores
 
-Each library section is one block with a fixed structure (Technical Design, section 4.1). Its stored data is the
-"client edits" column of the section library table, saved as block attributes in the page content, per language
-through WPML. Product data is never copied into a block: a rail or tile stores a source (a manual pick, a collection
-or a category) and the products are read from WooCommerce at render time. Curated rails stay manual (D-19); the
-"newest" and "by badge" rail sources in the inventory's proposal need the owner's confirmation against D-19 before the
-interface design uses them.
+Each library section uses a self-contained block or a locked block pattern, as the approved design and technical
+specification determine (Technical Design, section 4.1 permits both). The proposed editable fields above do not
+prescribe their final serialization. Content is maintained per language through WPML. Product selections reference
+WooCommerce data rather than duplicate product records; the specification defines the native references, block
+attributes or child-block content appropriate to the chosen mechanism. D-19 (DQ-09) already decides HOME-03 as newest
+first by WooCommerce publish date and HOME-02 as products manually flagged Trending, with the source selected in
+section settings. Badges stay manual. The wider section variant list and editable controls stay subject to the
+approved interface design.
 
 ## 6. Open points this map depends on
 
-- D-18 sections 1 to 5 and 6 to 9 are approved but not on `main` until PR #395 and PR #396 merge.
+- D-18 sections 1 to 5 are owner-approved in unmerged PR #395; sections 6 to 9 stay proposed in PR #396. The
+  29 October ownership rule does not itself approve the proposed upgrade target.
 - Consent banner mechanism (Technical Design, row 22; #288).
 - The email sending path (`Mizzey\Notify` in the Technical Design against the ownership audit): verified in the build,
   with the mail service account the client approves (INT-05).
