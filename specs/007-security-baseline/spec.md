@@ -8,9 +8,13 @@
 
 **Work type**: requirement
 
-**Input**: User description: "Start the site hardening PR" (the owner, 29 October 2026), under the quality standard D-21
-section 3. The site plugin closes the exposures a WordPress store carries by default that CoreX and WooCommerce leave
-open, uses CoreX wherever CoreX already provides the control, and reports the baseline's state in one check.
+**Input**: User description: "Start the site hardening PR" (the owner, 29 October 2026). A site-level implementation
+slice of NFR-05 under #269. Its specific policies (comments only on products, the users sitemap removed, application
+passwords for administrators only) are engineering choices approved by the owner in the quality standard D-21
+(PR #421), not additional register obligations. Completing it does not establish NFR-05 acceptance: #269 must also
+hold evidence for HTTPS, password storage, RBAC, input validation, secret management and dependency updates. Login
+protection and form challenges stay with #305, two-factor sign-in with #275. CoreX is used wherever it provides the
+control.
 
 ## Register trace [checked]
 
@@ -43,12 +47,12 @@ None. Nothing here waits for a client, vendor or ERP input.
 | AC | Criterion | Rows | Status |
 |---|---|---|---|
 | AC-1 | No page, feed or response header discloses the WordPress, WooCommerce or CoreX product or version through a generator mark | NFR-05 (admin protection) | final |
-| AC-2 | XML-RPC answers no method, pingbacks and trackbacks are off, and no page advertises an XML-RPC or pingback address | NFR-05 (admin protection) | final |
+| AC-2 | Every XML-RPC request, `?rsd` included, is refused before dispatch; pingbacks and trackbacks are off; no page advertises an XML-RPC or pingback address | NFR-05 (admin protection) | final |
 | AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint, not through a numeric author query, not through the users sitemap | NFR-05 (admin protection) | final |
-| AC-4 | Application passwords can be created and used only by administrators; customers and other staff cannot | NFR-05 (admin protection) | final |
+| AC-4 | Application-password availability and authentication are restricted to users with `manage_options`; upstream restrictions stay effective | NFR-05 (admin protection) | final |
 | AC-5 | A failed sign-in, on the WordPress sign-in page and on the account page, gives one message whether the account exists or not, and the failure still reaches CoreX's lockout | NFR-05 (admin protection) | final |
 | AC-6 | Password-recovery requests are rate limited per account and per client address, on the WordPress page and on the account page, in both languages, and the limits are documented settings | NFR-05 (rate limiting) | final |
-| AC-7 | Comments and pings are closed on every content type except products, whose reviews are unchanged | NFR-05 (input validation) | final |
+| AC-7 | Non-product comments are closed; product-review availability is unchanged; incoming pings are closed on every content type | NFR-05 (input validation) | final |
 | AC-8 | One command reports the state of every control in this baseline, and the controls are listed for the handover | NFR-05, US-27-03 | final |
 
 ## User Scenarios & Testing *(mandatory)*
@@ -104,16 +108,17 @@ recovery request for one account within the window is refused.
 - Behind the proxy, the client address comes from CoreX's `ClientAddress` service, the same one its lockout uses.
 - Registration necessarily reveals that an email is already registered, and WooCommerce's recovery says an unknown
   account is unknown. Hiding that needs a different account flow; the mitigation here is the recovery limit (AC-6), and
-  automated registration is #305's (AUTH-15).
+  automated registration is #305's (AUTH-15). The recovery limit does not conceal account existence either: reaching
+  the account limit is observable.
 
 ## Native coverage
 
 | Need | Native or CoreX | Decision |
 |---|---|---|
 | Generator marks | WordPress `wp_generator`, WooCommerce `wc_generator_tag`, CoreX `GeneratorTag` (filter `corex_generator_tag`) | Switch each off through its own hook |
-| XML-RPC | `xmlrpc_enabled` turns off authenticated methods only; pingbacks still answer | Empty `xmlrpc_methods`, remove the pingback header and discovery links |
+| XML-RPC | `xmlrpc_enabled` leaves unauthenticated methods on; an empty `xmlrpc_methods` still leaves the server's `system.*` methods and `?rsd` | Refuse `XMLRPC_REQUEST` at `init` before dispatch; keep both native switches; remove the pingback header and discovery links |
 | User discovery | REST users controller, `?author=` canonical redirect, users sitemap provider | Restrict for visitors through the native filters |
-| Application passwords | `wp_is_application_passwords_available_for_user` | Administrators only |
+| Application passwords | `wp_is_application_passwords_available_for_user`, judged on the target user | Administrators only |
 | Sign-in failure message | Distinct WordPress errors; WooCommerce applies `login_errors` | Replace the two account-revealing codes in `authenticate`, after CoreX |
 | Recovery rate limit | None in WordPress, WooCommerce or CoreX (CoreX's limiter wraps its own controllers only) | Mizzey limiter on `lostpassword_post`, which both pages fire |
 | Comment surface | Per-post `comments_open`, `pings_open` | Closed except products |
@@ -124,18 +129,21 @@ recovery request for one account within the window is refused.
 ### Functional Requirements
 
 - **FR-001**: The site MUST print no generator mark for WordPress, WooCommerce or CoreX in pages, feeds or the head.
-- **FR-002**: XML-RPC MUST answer no method; the `X-Pingback` header, the RSD link and pingbacks MUST be off.
+- **FR-002**: Every request entering through `xmlrpc.php`, `?rsd` included, MUST be refused with 403 before XML-RPC
+  dispatch; the `X-Pingback` header, the RSD link and pingbacks MUST be off.
 - **FR-003**: For a visitor not signed in, the users REST collection and single-user routes MUST refuse; a numeric
   `author` query MUST not redirect to or reveal an author slug; the users sitemap MUST not exist. Signed-in users with
   `list_users` or `edit_posts` keep the users endpoint.
-- **FR-004**: Application passwords MUST be available only to users with `manage_options`.
+- **FR-004**: Application-password availability, and so authentication with one, MUST be restricted to target users
+  with `manage_options`, preserving any upstream refusal.
 - **FR-005**: The unknown-username, unknown-email and wrong-password failures MUST return one generic message on both
   sign-in pages; every other error, CoreX's lockout included, MUST pass unchanged, and the failure MUST still fire
   `wp_login_failed`.
 - **FR-006**: Password-recovery requests MUST be limited per target account and per client address over a window;
   the limits and window MUST be filterable settings with documented defaults (3 per account and 10 per address per 15
   minutes). A refused request MUST send no email and MUST show a plain message in the visitor's language.
-- **FR-007**: Comments and pings MUST be closed for every post type except `product`.
+- **FR-007**: Comments MUST be closed for every post type except `product`; for products the incoming `comments_open`
+  result MUST be returned unchanged. Incoming pingbacks and trackbacks MUST be closed for every post type.
 - **FR-008**: `wp mizzey security check` MUST report each control of FR-001 to FR-007, plus the configuration facts the
   site depends on (file changes disabled, debug display off, CoreX's hardening facts, whether CoreX login protection
   is on, reported for #305 and not judged here), and exit non-zero when a control of this feature fails.
@@ -163,7 +171,8 @@ None. The recovery limiter keeps short-lived counters in transients; nothing is 
 - **SC-001**: Every fetch in the independent tests of stories 1 and 2 returns the expected result in both languages.
 - **SC-002**: The security check reports pass for every control on the development runtime and, once deployed, on
   staging.
-- **SC-003**: Products keep their reviews: the review scenarios already in the suite keep their verdicts.
+- **SC-003**: Products keep native review availability and submission, shown by the AC-7 HTTP cases; t02 to t29 keep
+  their verdicts.
 
 ## Delivery stage
 

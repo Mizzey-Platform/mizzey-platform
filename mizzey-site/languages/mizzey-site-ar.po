@@ -1,0 +1,17 @@
+# Arabic translations for the Mizzey storefront, domain mizzey-site (NFR-04a). The PHP file beside it is generated
+# from this file with: wp i18n make-php mizzey-site/languages/mizzey-site-ar.po
+msgid ""
+msgstr ""
+"Project-Id-Version: Mizzey Site 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/Mizzey-Platform/mizzey-platform/issues\n"
+"Language-Team: Mizzey\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+"X-Domain: mizzey-site\n"
+
+#: mizzey-site/src/Security/RecoveryLimiter.php:83
+msgid "Too many password reset requests. Please wait a few minutes and try again."
+msgstr "طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى."

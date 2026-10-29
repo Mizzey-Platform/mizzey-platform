@@ -33,3 +33,7 @@ msgstr ""
 #: mizzey-site/src/Catalogue/Collections.php:59
 msgid "Collection"
 msgstr ""
+
+#: mizzey-site/src/Security/RecoveryLimiter.php:83
+msgid "Too many password reset requests. Please wait a few minutes and try again."
+msgstr ""
