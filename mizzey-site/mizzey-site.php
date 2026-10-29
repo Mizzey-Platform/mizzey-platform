@@ -88,4 +88,11 @@ MizzeySite\Security\Security::register();
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
 if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('mizzey catalogue', MizzeySite\Catalogue\Import\Cli\CatalogueCommand::class);
+    // A preview or a validation run writes nothing to the catalogue, the load of WordPress included: the guard is
+    // installed here, as this plugin loads, so WooCommerce's work on `init` is covered too.
+    $mizzey_cli_arguments = WP_CLI::get_runner()->arguments;
+    if (array_slice($mizzey_cli_arguments, 0, 2) === ['mizzey', 'catalogue'] && in_array($mizzey_cli_arguments[2] ?? '', ['preview', 'validate'], true)) {
+        MizzeySite\Catalogue\Import\CatalogueWriteGuard::installForBootstrap();
+    }
+    unset($mizzey_cli_arguments);
 }

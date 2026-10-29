@@ -60,6 +60,11 @@ LOGGING = re.compile(
     r"|(?:->\s*(?:log|debug|info|notice|warning|error|critical)\s*\()"
 )
 
+# A query passed to $wpdb. A literal written inside one of these calls is SQL sent to the database, never shown to a
+# visitor. Exempted by the call it sits in, not by its first word, so "UPDATE your address." in an echo still fails.
+# Found by the catalogue import (#249); narrow on purpose: SQL assembled outside the call is still judged.
+SQL_CALL = re.compile(r"\$wpdb\s*->\s*(?:prepare|query|get_results|get_row|get_col|get_var)\s*\(")
+
 # A single- or double-quoted PHP string literal, with escapes.
 LITERAL = re.compile(r"""(?P<q>['"])(?P<body>(?:\\.|(?!\1)[^\\])*)(?P=q)""")
 
@@ -77,7 +82,6 @@ IGNORE_PATTERNS = (
     re.compile(r"^[^A-Za-z]*$"),                         # no letters at all
     re.compile(r"^%[sd]"),                               # bare format specifiers
     re.compile(r"^[A-Za-z0-9_-]+$"),                     # any single identifier-shaped token
-    re.compile(r"^(?:SELECT|INSERT|UPDATE|DELETE|JOIN|LEFT JOIN|WHERE|FROM|AND|ORDER BY|GROUP BY)\b"),  # SQL for $wpdb: a query, never output
 )
 
 
@@ -138,8 +142,8 @@ def _call_spans(line: str, pattern: re.Pattern[str]) -> list[tuple[int, int]]:
 
 
 def exempt_spans(line: str) -> list[tuple[int, int]]:
-    """Ranges where a literal is not storefront interface text: translated, or written to a log."""
-    return _call_spans(line, CALL) + _call_spans(line, LOGGING)
+    """Ranges where a literal is not storefront interface text: translated, written to a log, or a query."""
+    return _call_spans(line, CALL) + _call_spans(line, LOGGING) + _call_spans(line, SQL_CALL)
 
 
 def findings(root: Path = ROOT) -> list[str]:
@@ -275,19 +279,25 @@ class StorefrontStrings(unittest.TestCase):
             with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
                 self.assertEqual(self._scan_snippet(snippet), [])
 
-    def test_sql_for_wpdb_is_not_interface_text(self):
-        """Found by the catalogue import (#249): a query for $wpdb is never shown to anyone."""
+    def test_sql_inside_a_wpdb_call_is_not_interface_text(self):
+        """Found by the catalogue import (#249): a query passed to $wpdb is never shown to anyone."""
         for snippet in (
-            "<?php\n$sql = 'SELECT l.product_id AS id FROM lookup l ';\n",
-            "<?php\n$sql .= 'JOIN posts p ON p.ID = l.product_id ';\n",
-            "<?php\n$sql .= \"WHERE p.post_status <> 'trash'\";\n",
+            "<?php\n$rows = $wpdb->get_results($wpdb->prepare(\"SELECT id FROM {$t} WHERE sku IN ({$p})\", $batch));\n",
+            "<?php\n$row = $wpdb->get_row(\"SHOW FULL COLUMNS FROM {$t} WHERE Field = 'sku'\", ARRAY_A);\n",
+            "<?php\n$found = $wpdb->get_col(\n    $wpdb->prepare(\"SELECT HEX(v) FROM ({$s}) t\", $batch)\n);\n",
         ):
             with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
                 self.assertEqual(self._scan_snippet(snippet), [])
 
-    def test_a_sentence_that_starts_like_sql_still_counts(self):
-        """The SQL exemption is upper-case keywords only: an interface sentence starting with "Select" still fails."""
-        found = self._scan_snippet("<?php\necho 'Select a size first.';\n")
+    def test_interface_sentences_that_start_like_sql_still_count(self):
+        """The SQL exemption is the call, not the first word: these reach a visitor and still fail."""
+        for text in ("Select a size first.", "SELECT a size first.", "UPDATE your address.", "DELETE this item.", "WHERE is my order?"):
+            with self.subTest(text=text):
+                found = self._scan_snippet(f"<?php\necho '{text}';\n")
+                self.assertEqual(len(found), 1, f"expected one finding, got {found}")
+
+    def test_sql_assembled_outside_a_wpdb_call_is_still_judged(self):
+        found = self._scan_snippet("<?php\n$sql = 'SELECT id FROM posts WHERE x = 1';\n")
         self.assertEqual(len(found), 1, f"expected one finding, got {found}")
 
     def test_a_sentence_inside_markup_still_counts(self):

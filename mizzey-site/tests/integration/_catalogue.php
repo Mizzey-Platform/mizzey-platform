@@ -219,7 +219,12 @@ function catalogue_snapshot(): array {
 	global $wpdb;
 	$tables = \MizzeySite\Catalogue\Import\CatalogueWriteGuard::tables();
 	$sums   = array();
-	foreach ( $wpdb->get_results( 'CHECKSUM TABLE ' . implode( ', ', array_map( fn ( $t ) => '`' . $t . '`', $tables ) ), ARRAY_A ) as $row ) { // phpcs:ignore
+	$rows   = $wpdb->get_results( 'CHECKSUM TABLE ' . implode( ', ', array_map( fn ( $t ) => '`' . $t . '`', $tables ) ), ARRAY_A ); // phpcs:ignore
+	// Fail closed: an empty or partial snapshot would make "unchanged" true by default.
+	if ( ! is_array( $rows ) || count( $rows ) !== count( $tables ) || array() !== array_filter( $rows, fn ( $r ) => ! isset( $r['Checksum'] ) ) ) {
+		throw new \RuntimeException( 'A complete catalogue checksum snapshot could not be read.' );
+	}
+	foreach ( $rows as $row ) {
 		$sums[ (string) $row['Table'] ] = (string) $row['Checksum'];
 	}
 	return $sums;

@@ -1,3 +1,4 @@
 mutation: guard never installed -> FAIL  t34-catalogue-no-write       MIG-0
 mutation: first repeated row wins -> FAIL  t33-catalogue-outcomes       MIG-0
-mutation: byte-exact SKU key -> FAIL  t35-catalogue-sku-resolution MIG-0
+mutation: SKU key ignores the collation -> FAIL  t35-catalogue-sku-resolution MIG-0
+mutation: rejected parent's owner forced to client -> FAIL  t36-catalogue-issue-list     MIG-1

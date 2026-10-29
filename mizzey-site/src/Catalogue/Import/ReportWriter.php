@@ -58,10 +58,16 @@ final class ReportWriter
             ));
         }
         try {
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, $columns, ',', '"', '');
+            $complete = fwrite($handle, "\xEF\xBB\xBF") === 3 && fputcsv($handle, $columns, ',', '"', '') !== false;
             foreach ($rows as $row) {
-                fputcsv($handle, array_map(static fn (string $column): string => $row[$column] ?? '', $columns), ',', '"', '');
+                $complete = $complete && fputcsv($handle, array_map(static fn (string $column): string => $row[$column] ?? '', $columns), ',', '"', '') !== false;
+            }
+            if (! $complete || ! fflush($handle)) {
+                throw new RuntimeException(sprintf(
+                    /* translators: %s: a file path. */
+                    __('The report was not written completely: %s', 'mizzey-site'),
+                    $path,
+                ));
             }
         } finally {
             fclose($handle);

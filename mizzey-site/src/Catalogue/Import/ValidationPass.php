@@ -29,11 +29,9 @@ final class ValidationPass
      */
     public static function run(Mapping $mapping, array $read): array
     {
-        $rows = array_map(static fn (array $raw): array => RowInterpreter::interpret($raw, $read['header'], $mapping), $read['rows']);
-        $rows = self::markRepeatedSkus($rows, $mapping);
-
-        $skus  = array_merge(array_column($rows, 'sku'), array_column($rows, 'parent_sku'));
-        $index = SkuIndex::build($skus);
+        $rows  = array_map(static fn (array $raw): array => RowInterpreter::interpret($raw, $read['header'], $mapping), $read['rows']);
+        $index = SkuIndex::build(array_merge(array_column($rows, 'sku_source'), array_column($rows, 'parent_sku_source')));
+        $rows  = self::markRepeatedSkus($rows, $mapping, $index);
 
         $decided = [];
         foreach ($rows as $position => $row) {
@@ -41,7 +39,7 @@ final class ValidationPass
                 $decided[$position] = self::decide($row, $index, null, $mapping);
             }
         }
-        $fileParents = self::fileParents($rows, $decided);
+        $fileParents = self::fileParents($rows, $decided, $index);
         foreach ($rows as $position => $row) {
             if ($row['type'] === 'variation') {
                 $decided[$position] = self::decide($row, $index, self::parent($row, $fileParents, $index), $mapping);
@@ -95,12 +93,12 @@ final class ValidationPass
      *
      * @return list<array<string, mixed>>
      */
-    private static function markRepeatedSkus(array $rows, Mapping $mapping): array
+    private static function markRepeatedSkus(array $rows, Mapping $mapping, SkuIndex $index): array
     {
         $byKey = [];
         foreach ($rows as $position => $row) {
             if ($row['sku'] !== '') {
-                $byKey[SkuIndex::key($row['sku'])][] = $position;
+                $byKey[$index->key($row['sku_source'])][] = $position;
             }
         }
         foreach ($byKey as $positions) {
@@ -126,9 +124,9 @@ final class ValidationPass
      * @param list<array<string, mixed>>        $rows
      * @param array<int, array<string, mixed>> $decided
      *
-     * @return array<string, list<array{row:int,usable:bool}>>
+     * @return array<string, list<array{row:int,usable:bool,type:string,owner:string}>>
      */
-    private static function fileParents(array $rows, array $decided): array
+    private static function fileParents(array $rows, array $decided, SkuIndex $index): array
     {
         $parents = [];
         foreach ($decided as $position => $decision) {
@@ -136,10 +134,12 @@ final class ValidationPass
             if ($row['sku'] === '') {
                 continue;
             }
-            $parents[SkuIndex::key($row['sku'])][] = [
+            $parents[$index->key($row['sku_source'])][] = [
                 'row'    => $row['row'],
                 'usable' => $row['type'] === 'variable' && $decision['outcome'] !== 'reject',
                 'type'   => (string) $row['type'],
+                // A parent rejected for a store-identity defect leaves the Developer, not the Client, to correct it.
+                'owner'  => in_array('developer', array_column(array_filter($decision['issues'], static fn (array $i): bool => str_starts_with($i['code'], 'R')), 'owner'), true) ? 'developer' : 'client',
             ];
         }
 
@@ -148,7 +148,7 @@ final class ValidationPass
 
     /**
      * @param array<string, mixed>                                   $row
-     * @param array<string, list<array{row:int,usable:bool,type:string}>> $fileParents
+     * @param array<string, list<array{row:int,usable:bool,type:string,owner:string}>> $fileParents
      *
      * @return array{usable:bool,reason:string,correction:string,owner:string}
      */
@@ -158,7 +158,7 @@ final class ValidationPass
         if ($row['parent_sku'] === '') {
             return $usable;
         }
-        $inFile = $fileParents[SkuIndex::key($row['parent_sku'])] ?? [];
+        $inFile = $fileParents[$index->key($row['parent_sku_source'])] ?? [];
         if ($inFile !== []) {
             if (count($inFile) === 1 && $inFile[0]['usable']) {
                 return $usable;
@@ -178,7 +178,9 @@ final class ValidationPass
                         $inFile[0]['row'],
                     ));
 
-            return ['usable' => false, 'reason' => $reason, 'correction' => __('Correct the parent row first.', 'mizzey-site'), 'owner' => 'client'];
+            $owner = count($inFile) === 1 && $inFile[0]['type'] === 'variable' ? $inFile[0]['owner'] : 'client';
+
+            return ['usable' => false, 'reason' => $reason, 'correction' => __('Resolve the issues of the parent row first.', 'mizzey-site'), 'owner' => $owner];
         }
 
         $store = $index->resolve($row['parent_sku_source']);

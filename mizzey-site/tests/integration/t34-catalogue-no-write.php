@@ -33,45 +33,65 @@ run(
 		catalogue_seed_export_store( $s );
 		wp_cache_flush();
 		$before = catalogue_snapshot();
-		$out    = catalogue_out_dir( $s, 'nowrite' );
 		$runs   = array(
-			'preview'                => 'preview ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ),
-			'validate'               => 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) . ' --out=' . escapeshellarg( $out ),
-			'validate, file failure' => 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/header-mismatch.tsv' ) . ' --out=' . escapeshellarg( $out ),
+			'preview'                => array( 0, 'preview ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) ),
+			'validate'               => array( 0, 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) . ' --out=' . escapeshellarg( catalogue_out_dir( $s, 'nowrite' ) ) ),
+			'validate, file failure' => array( 1, 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/header-mismatch.tsv' ) . ' --out=' . escapeshellarg( catalogue_out_dir( $s, 'nowrite-failure' ) ) ),
 		);
-		foreach ( $runs as $label => $args ) {
+		foreach ( $runs as $label => list( $expected, $args ) ) {
 			$result = catalogue_command( $args );
-			$after  = catalogue_snapshot();
-			$moved  = array_keys( array_diff_assoc( $after, $before ) );
-			$check( array() === $moved, "AC-5 [{$label}, exit {$result['code']}] every protected table is unchanged" . ( $moved ? ' (changed: ' . implode( ', ', $moved ) . ')' : '' ) );
+			$check( $expected === $result['code'], "[{$label}] the command did its work: exit {$result['code']}, expected {$expected}" );
+			$moved = array_keys( array_diff_assoc( catalogue_snapshot(), $before ) );
+			$check( array() === $moved, "AC-5 [{$label}] every protected table is unchanged" . ( $moved ? ' (changed: ' . implode( ', ', $moved ) . ')' : '' ) );
 		}
 
-		// The guard, in process.
+		// The guard, in process, always removed again.
+		$probe_title = 't34 guard probe ' . wp_generate_uuid4();
+		$refused     = function ( callable $write ): bool {
+			try {
+				$write();
+			} catch ( CatalogueWriteRefused $e ) {
+				return true;
+			}
+			return false;
+		};
 		CatalogueWriteGuard::install();
-		$api_refused = false;
 		try {
-			wp_insert_post( array( 'post_title' => 't34 guard probe', 'post_type' => 'product', 'post_status' => 'draft' ) );
-		} catch ( CatalogueWriteRefused $e ) {
-			$api_refused = true;
-		}
-		$sql_refused = false;
-		try {
-			$wpdb->query( "UPDATE {$wpdb->postmeta} SET meta_value = meta_value WHERE meta_id = 0" ); // phpcs:ignore
-		} catch ( CatalogueWriteRefused $e ) {
-			$sql_refused = true;
-		}
-		$option_ok = false;
-		try {
-			$option_ok = update_option( 'mizzey_t34_probe', 'x', false );
+			$api = $refused(
+				function () use ( $probe_title, $s ) {
+					$id = wp_insert_post( array( 'post_title' => $probe_title, 'post_type' => 'product', 'post_status' => 'draft' ) );
+					if ( is_int( $id ) && $id > 0 ) {
+						$s->track_post( $id );
+					}
+				}
+			);
+			$p     = $wpdb->posts;
+			$m     = $wpdb->postmeta;
+			$shapes = array(
+				'direct SQL'               => "UPDATE {$m} SET meta_value = meta_value WHERE meta_id = 0",
+				'a leading line comment'   => "-- note\nUPDATE {$p} SET post_title = post_title WHERE ID = 0",
+				'repeated block comments'  => "/* a */ /* b */ DELETE FROM {$m} WHERE meta_id = 0",
+				'an executable comment'    => "/*!40000 UPDATE {$p} SET post_title = post_title WHERE ID = 0 */",
+				'a quoted identifier'      => "UPDATE `{$p}` SET post_title = post_title WHERE ID = 0",
+				'a common table expression' => "WITH x AS (SELECT 0 AS id) DELETE FROM {$m} WHERE meta_id IN (SELECT id FROM x)",
+			);
+			$shape_results = array();
+			foreach ( $shapes as $label => $sql ) {
+				$shape_results[ $label ] = $refused( fn () => $wpdb->query( $sql ) ); // phpcs:ignore
+			}
+			$option_ok = ! $refused( fn () => update_option( 'mizzey_t34_probe', "a value that mentions FROM {$p} WHERE", false ) );
 			delete_option( 'mizzey_t34_probe' );
-		} catch ( CatalogueWriteRefused $e ) {
-			$option_ok = false;
+			$read_ok = ! $refused( fn () => $wpdb->get_var( "SELECT COUNT(*) FROM {$p} WHERE ID = 0" ) ); // phpcs:ignore
+		} finally {
+			CatalogueWriteGuard::remove();
 		}
-		CatalogueWriteGuard::remove();
-		$probe = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_title = %s", 't34 guard probe' ) ); // phpcs:ignore
-		$check( $api_refused && 0 === $probe, 'AC-5: a WordPress API write to the catalogue is refused before it runs' );
-		$check( $sql_refused, 'AC-5: a direct SQL write to a catalogue table is refused before it runs' );
-		$check( $option_ok, 'an option write, which read-side housekeeping needs, is allowed' );
+		$probe = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_title = %s", $probe_title ) ); // phpcs:ignore
+		$check( $api && 0 === $probe, 'AC-5: a WordPress API write to the catalogue is refused before it runs' );
+		foreach ( $shape_results as $label => $was_refused ) {
+			$check( $was_refused, "AC-5: a catalogue write written as {$label} is refused before it runs" );
+		}
+		$check( $option_ok, 'an option write whose value mentions a catalogue table is allowed: values are not statements' );
+		$check( $read_ok, 'a read of a catalogue table is allowed' );
 
 		// A write attempted by another plugin during a real run stops it with exit 3.
 		$dir     = catalogue_out_dir( $s, 'intruder' );
@@ -83,6 +103,17 @@ run(
 		$record = json_decode( (string) @file_get_contents( $out2 . '/run.json' ), true ); // phpcs:ignore
 		$check( 3 === $guard['code'], "AC-5: a write attempted during a run stops it with exit 3 (exit {$guard['code']})" );
 		$check( 'guard-refused' === ( $record['outcome'] ?? '' ), "the run record says guard-refused, not completed ('" . ( $record['outcome'] ?? 'none' ) . "')" );
+		$check( array() === array_diff_assoc( catalogue_snapshot(), $before ), 'and the catalogue is unchanged' );
+
+		// A write attempted while WordPress loads, before the command starts (as an install routine on `init` would),
+		// is refused too: the plugin installs the guard as it loads when a catalogue command is the one being run.
+		$early = $dir . '/early.php';
+		file_put_contents( $early, "<?php\nWP_CLI::add_wp_hook( 'init', function () {\n\tglobal \$wpdb;\n\t\$wpdb->query( \"UPDATE {\$wpdb->posts} SET post_title = post_title WHERE ID = 0\" );\n}, 1 );\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$out3   = catalogue_out_dir( $s, 'early' );
+		$before = catalogue_snapshot();
+		$boot   = catalogue_command( '--require=' . escapeshellarg( $early ) . ' validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) . ' --out=' . escapeshellarg( $out3 ) );
+		$check( 3 === $boot['code'] && false !== strpos( $boot['out'], 'catalogue write was attempted' ), "AC-5: a write during the load of WordPress is refused with exit 3 and its reason, and the run does not start (exit {$boot['code']})" );
+		$check( ! file_exists( $out3 . '/run.json' ) && ! file_exists( $out3 . '/validation-report.csv' ), 'and no run is recorded, completed or otherwise' );
 		$check( array() === array_diff_assoc( catalogue_snapshot(), $before ), 'and the catalogue is unchanged' );
 
 		return $ok;

@@ -61,6 +61,7 @@ final class CatalogueCommand
     {
         $mapping = $this->mapping($assoc);
         $file    = $this->file($args);
+        $exit    = 0;
         CatalogueWriteGuard::install();
         try {
             $read   = ExportReader::read($file, $mapping->source(), max(1, (int) ($assoc['rows'] ?? 10)));
@@ -75,7 +76,8 @@ final class CatalogueCommand
             ));
             $this->printHeader($header);
             if ($header['failures'] !== []) {
-                WP_CLI::halt(self::EXIT_FILE_FAILURE);
+                $exit         = self::EXIT_FILE_FAILURE;
+                $read['rows'] = [];
             }
             foreach ($read['rows'] as $raw) {
                 $row = RowInterpreter::interpret($raw, $read['header'], $mapping);
@@ -100,12 +102,15 @@ final class CatalogueCommand
             }
         } catch (CatalogueWriteRefused $refused) {
             WP_CLI::warning($refused->getMessage());
-            WP_CLI::halt(self::EXIT_GUARD);
+            $exit = self::EXIT_GUARD;
         } catch (RuntimeException $failure) {
             WP_CLI::warning($failure->getMessage());
-            WP_CLI::halt(self::EXIT_USAGE);
+            $exit = self::EXIT_USAGE;
         } finally {
             CatalogueWriteGuard::remove();
+        }
+        if ($exit !== 0) {
+            WP_CLI::halt($exit);
         }
     }
 
@@ -135,6 +140,12 @@ final class CatalogueCommand
             WP_CLI::warning(__('--out must name a directory that can be written.', 'mizzey-site'));
             WP_CLI::halt(self::EXIT_USAGE);
         }
+        foreach ([ReportWriter::REPORT, ReportWriter::ISSUES, FileImportRunRecorder::FILE] as $name) {
+            if (file_exists($out . '/' . $name)) {
+                WP_CLI::warning(__('Use an output directory with no earlier report or run record in it.', 'mizzey-site'));
+                WP_CLI::halt(self::EXIT_USAGE);
+            }
+        }
 
         $recorder = new FileImportRunRecorder($out);
         $payload  = [
@@ -144,6 +155,8 @@ final class CatalogueCommand
             'rules_version'   => $mapping->rulesVersion(),
             'actor'           => $this->actor(),
             'started_at'      => gmdate('c'),
+            'counts'          => null,
+            'reports'         => [],
         ];
         $exit = 0;
         CatalogueWriteGuard::install();
@@ -153,22 +166,23 @@ final class CatalogueCommand
             $payload['header'] = $header;
             $this->printHeader($header);
             if ($header['failures'] !== []) {
-                $payload += ['outcome' => 'file-level-failure', 'reason' => implode(' ', array_column($header['failures'], 'detail')), 'counts' => null, 'reports' => []];
+                $payload = array_replace($payload, ['outcome' => 'file-level-failure', 'reason' => implode(' ', array_column($header['failures'], 'detail'))]);
                 $exit = self::EXIT_FILE_FAILURE;
             } else {
-                $result  = ValidationPass::run($mapping, $read);
-                $reports = ReportWriter::write($out, $result['lines'], $result['client_issues']);
-                $payload += ['outcome' => 'completed', 'reason' => null, 'counts' => $result['counts'], 'reports' => $reports];
+                $result            = ValidationPass::run($mapping, $read);
+                $payload['counts'] = $result['counts'];
+                $reports           = ReportWriter::write($out, $result['lines'], $result['client_issues']);
+                $payload           = array_replace($payload, ['outcome' => 'completed', 'reason' => null, 'reports' => $reports]);
                 foreach ($result['counts'] as $name => $count) {
                     WP_CLI::log(sprintf('%-18s %d', $name, $count));
                 }
                 WP_CLI::log(sprintf('%-18s %s', __('peak memory', 'mizzey-site'), size_format(memory_get_peak_usage(true), 1)));
             }
         } catch (CatalogueWriteRefused $refused) {
-            $payload += ['outcome' => 'guard-refused', 'reason' => $refused->getMessage(), 'counts' => null, 'reports' => []];
+            $payload = array_replace($payload, ['outcome' => 'guard-refused', 'reason' => $refused->getMessage(), 'reports' => []]);
             $exit = self::EXIT_GUARD;
         } catch (RuntimeException $failure) {
-            $payload += ['outcome' => 'output-failure', 'reason' => $failure->getMessage(), 'counts' => null, 'reports' => []];
+            $payload = array_replace($payload, ['outcome' => 'output-failure', 'reason' => $failure->getMessage(), 'reports' => []]);
             $exit = self::EXIT_USAGE;
         } finally {
             CatalogueWriteGuard::remove();
@@ -183,8 +197,8 @@ final class CatalogueCommand
                 $recorder->record($payload),
             ));
         } catch (RuntimeException $failure) {
-            WP_CLI::warning($failure->getMessage());
-            $exit = $exit === 0 ? self::EXIT_USAGE : $exit;
+            $payload = array_replace($payload, ['outcome' => 'output-failure', 'reason' => $failure->getMessage(), 'error_reference' => 'output-failure']);
+            $exit    = $exit === 0 ? self::EXIT_USAGE : $exit;
         }
         if ($exit !== 0) {
             WP_CLI::warning((string) $payload['reason']);

@@ -46,6 +46,25 @@ run(
 
 		$developer = array_filter( $issues, fn ( $i ) => in_array( $i['issue_code'], array( 'R3', 'R4', 'R9', 'W1', 'W4' ), true ) || ( 'MZ-WRONG-1' === $i['sku'] ) );
 		$check( array() === $developer, 'AC-7: no issue the Developer resolves is on the Client list (store identity, near matches, a store parent of the wrong type)' );
+		// A variation whose parent row is rejected for a store-identity defect (R4, the Developer's) inherits the
+		// Developer as owner: the Client is not asked to correct what only the Developer can.
+		$amb_a = catalogue_simple( $s, 'MZ-PAR-A' );
+		$amb_b = catalogue_simple( $s, 'MZ-PAR-B' );
+		catalogue_force_sku( $amb_a, 'MZ-PAR-AMB' );
+		catalogue_force_sku( $amb_b, 'MZ-PAR-AMB' );
+		$path = catalogue_temp_export(
+			$s,
+			array(
+				array( 'seller-sku' => 'MZ-PAR-AMB', 'item-name' => 'Parent', 'item-name-ar' => 'منتج', 'parent-child' => 'parent' ),
+				array( 'seller-sku' => 'MZ-PAR-AMB-1', 'item-name' => 'Child', 'item-name-ar' => 'منتج', 'price' => '100.00', 'parent-child' => 'child', 'parent-sku' => 'MZ-PAR-AMB', 'size-name' => '30 ml' ),
+			)
+		);
+		$out2 = catalogue_out_dir( $s, 'inherited' );
+		catalogue_command( 'validate ' . escapeshellarg( $path ) . ' --out=' . escapeshellarg( $out2 ) );
+		$child = catalogue_by_sku( catalogue_csv( $out2 . '/validation-report.csv' ) )['MZ-PAR-AMB-1'] ?? array();
+		$listed = array_filter( catalogue_csv( $out2 . '/client-issues.csv' ), fn ( $i ) => in_array( $i['sku'], array( 'MZ-PAR-AMB', 'MZ-PAR-AMB-1' ), true ) && in_array( $i['issue_code'], array( 'R4', 'R5' ), true ) );
+		$check( 'R5' === ( $child['rule'] ?? '' ) && array() === $listed, 'AC-7: a variation of a parent rejected for a store-identity defect is rejected, and neither is on the Client list' );
+
 		$s->note( 'fact: the Developer reviews this list before it is sent (quickstart step 6); the scenario proves the list, not the review' );
 
 		return $ok;

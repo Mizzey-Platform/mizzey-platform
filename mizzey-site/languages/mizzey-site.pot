@@ -35,65 +35,79 @@ msgid "Collection"
 msgstr ""
 
 #. translators: 1: a table, 2: the start of the statement.
-#: mizzey-site/src/Catalogue/Import/CatalogueWriteGuard.php:56
+#: mizzey-site/src/Catalogue/Import/CatalogueWriteGuard.php:91
 #, php-format
 msgid "A catalogue write was attempted during a read-only run and refused (table %1$s): %2$s"
 msgstr ""
 
 #. translators: 1: mapping version, 2: rules version, 3: format, 4: encoding.
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:70
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:71
 #, php-format
 msgid "Mapping %1$s (initial-load rules %2$d), format %3$s, encoding %4$s"
 msgstr ""
 
 #. translators: 1: row number, 2: row type.
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:85
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:87
 #, php-format
 msgid "Row %1$d (%2$s)"
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:135
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:140
 msgid "--out must name a directory that can be written."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:165
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:145
+msgid "Use an output directory with no earlier report or run record in it."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:179
 msgid "peak memory"
 msgstr ""
 
 #. translators: %s: a file path.
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:182
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:196
 #, php-format
 msgid "Run recorded: %s"
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:193
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:207
 msgid "Validation completed. Review client-issues.csv before it is sent (MIG-19)."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:205
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:219
 msgid "The mapping cannot be used:"
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:217
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:231
 msgid "Give the path of a readable export file."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:233
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:247
 msgid "Header: every column is mapped or recorded as not imported."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:234
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:248
 msgid "Header: the mapping is not complete for this file."
 msgstr ""
 
 #. translators: %s: the file path.
-#: mizzey-site/src/Catalogue/Import/ExportReader.php:43
+#: mizzey-site/src/Catalogue/Import/ExportReader.php:89
 #, php-format
 msgid "The file cannot be read: %s"
 msgstr ""
 
+#. translators: %s: the declared encoding.
+#: mizzey-site/src/Catalogue/Import/ExportReader.php:104
+#, php-format
+msgid "The file cannot be decoded from the declared encoding %s."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ExportReader.php:110
+msgid "The decoded file cannot be buffered."
+msgstr ""
+
 #. translators: %s: a file path.
-#: mizzey-site/src/Catalogue/Import/FileImportRunRecorder.php:36
+#: mizzey-site/src/Catalogue/Import/FileImportRunRecorder.php:37
 #, php-format
 msgid "The run record cannot be written: %s"
 msgstr ""
@@ -282,6 +296,12 @@ msgstr ""
 msgid "The report cannot be written: %s"
 msgstr ""
 
+#. translators: %s: a file path.
+#: mizzey-site/src/Catalogue/Import/ReportWriter.php:68
+#, php-format
+msgid "The report was not written completely: %s"
+msgstr ""
+
 #. translators: 1: cells in the row, 2: columns in the header.
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:39
 #, php-format
@@ -293,40 +313,54 @@ msgid "Re-export the row so every column has one cell."
 msgstr ""
 
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:56
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:66
 msgid "The text is not valid in the declared encoding."
 msgstr ""
 
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:56
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:66
 msgid "Re-export the file in the encoding the mapping declares."
 msgstr ""
 
 #. translators: %s: the value found.
-#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:75
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:80
 #, php-format
 msgid "The row type \"%s\" is not one the mapping knows."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:77
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:82
 msgid "Use one of the row-type values the mapping lists."
 msgstr ""
 
 #. translators: %s: the value found.
-#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:84
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:89
 #, php-format
 msgid "The price \"%s\" is not a number."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:86
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:91
 msgid "Write the price as digits with a dot for decimals, for example 249.50, with no currency or thousands separator."
 msgstr ""
 
+#: mizzey-site/src/Catalogue/Import/SkuIndex.php:70
+msgid "The catalogue SKU index could not be read."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/SkuIndex.php:180
+msgid "The SKU comparison keys could not be read."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/SkuIndex.php:201
+msgid "The collation of the SKU lookup column could not be read."
+msgstr ""
+
 #. translators: %s: row numbers.
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:114
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:112
 #, php-format
 msgid "The SKU is repeated on rows %s, so which row is the product cannot be decided."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:116
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:114
 msgid "Give each product its own SKU, or remove the repeated rows."
 msgstr ""
 
@@ -346,23 +380,23 @@ msgstr ""
 msgid "The parent on row %d is rejected, so it cannot hold variations."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:181
-msgid "Correct the parent row first."
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:183
+msgid "Resolve the issues of the parent row first."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:189
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:191
 msgid "The parent SKU is neither in the file nor in the store."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:189
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:191
 msgid "Add the parent product row, or correct the parent SKU."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:192
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:194
 msgid "The parent SKU belongs to a store record that cannot hold variations (not a variable product, or its identity is unresolved)."
 msgstr ""
 
-#: mizzey-site/src/Catalogue/Import/ValidationPass.php:192
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:194
 msgid "Resolve the store record of the parent before the load."
 msgstr ""
 

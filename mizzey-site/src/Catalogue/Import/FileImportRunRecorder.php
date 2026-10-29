@@ -30,7 +30,8 @@ final class FileImportRunRecorder implements ImportRunRecorder
         $path    = $this->directory . '/' . self::FILE;
         $payload = $payload + ['recorder' => 'fixture-adapter', 'persisted' => false];
         $json    = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if ($json === false || file_put_contents($path, $json . "\n") === false) {
+        $bytes   = $json === false ? false : file_put_contents($path, $json . "\n");
+        if ($json === false || $bytes !== strlen($json . "\n")) {
             throw new RuntimeException(sprintf(
                 /* translators: %s: a file path. */
                 __('The run record cannot be written: %s', 'mizzey-site'),

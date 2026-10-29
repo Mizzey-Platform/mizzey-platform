@@ -50,6 +50,10 @@ run(
 		$check( 1 === $failure['code'] && 'file-level-failure' === ( $failed['outcome'] ?? '' ) && false !== strpos( (string) ( $failed['reason'] ?? '' ), 'price' ), "a file-level failure is recorded with its reason (exit {$failure['code']})" );
 		$check( is_array( $failed ) && array_key_exists( 'counts', $failed ) && null === $failed['counts'] && ! file_exists( $out2 . '/validation-report.csv' ), 'and with no invented row outcomes' );
 
+		$again = catalogue_command( 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) . ' --out=' . escapeshellarg( $out ) );
+		$kept  = json_decode( (string) file_get_contents( $out . '/run.json' ), true ); // phpcs:ignore
+		$check( 2 === $again['code'] && ( $kept['started_at'] ?? '' ) === ( $record['started_at'] ?? 'x' ), "an output directory holding an earlier run is refused and the earlier record is kept (exit {$again['code']})" );
+
 		$blocked = catalogue_out_dir( $s, 'blocked' ) . '/not-a-directory';
 		file_put_contents( $blocked, 'x' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		$unwritable = catalogue_command( 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/export.tsv' ) . ' --out=' . escapeshellarg( $blocked ) );

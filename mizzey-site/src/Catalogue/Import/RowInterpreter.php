@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
 /**
  * Applies the mapping to one raw row, without coercing anything silently.
  *
- * The source SKU and parent SKU are kept exactly as written; their matching keys are separate (`SkuIndex::key()`).
+ * The source SKU and parent SKU are kept exactly as written; their matching keys come from the store collation (`SkuIndex::key()`).
  * Every other field is trimmed. A price must read as a plain decimal with a dot and at most two places; anything else
  * is an issue, never a guess. An unknown row type, a row wider or narrower than the header, and text that is not
  * valid in the declared encoding are issues too. Whether an issue rejects the row is the rules' decision, not this
@@ -61,7 +61,12 @@ final class RowInterpreter
 
         $attributes = [];
         foreach ($mapping->attributeColumns() as $slug => $name) {
-            $value = trim($byHeader[$name] ?? '');
+            $value = $byHeader[$name] ?? '';
+            if (! mb_check_encoding($value, 'UTF-8')) {
+                $issues[] = LoadRules::issue('R6', $name, __('The text is not valid in the declared encoding.', 'mizzey-site'), __('Re-export the file in the encoding the mapping declares.', 'mizzey-site'));
+                $value = '';
+            }
+            $value = trim($value);
             if ($value !== '') {
                 $attributes[$slug] = $value;
             }

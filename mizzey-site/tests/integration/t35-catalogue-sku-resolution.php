@@ -57,12 +57,16 @@ run(
 
 		$case = catalogue_simple( $s, 'MZ-R-CASE' );
 
+		// Collation, not a PHP approximation: under the column's collation the German sharp s equals "ss".
+		$strasse = catalogue_simple( $s, 'MZ-R-STRASSE' );
+		$lead    = catalogue_simple( $s, 'MZ-R-LEAD' );
+
 		$vp        = catalogue_variable( $s, 'MZ-R-VP', array( 'MZ-R-VAR-1' ) );
 		$variation = (int) wc_get_product_id_by_sku( 'MZ-R-VAR-1' );
 		wp_cache_flush();
 
 		$rows = array();
-		foreach ( array( 'MZ-R-DUP', 'MZ-R-SEP', 'MZ-R-NONE', 'MZ-R-AMB', 'MZ-R-BARE', 'MZ-R-ORPH', 'MZ-R-W4', 'MZ-R-TRASH', 'mz-r-case ' ) as $sku ) {
+		foreach ( array( 'MZ-R-DUP', 'MZ-R-SEP', 'MZ-R-NONE', 'MZ-R-AMB', 'MZ-R-BARE', 'MZ-R-ORPH', 'MZ-R-W4', 'MZ-R-TRASH', 'mz-r-case ', 'MZ-R-STRAßE', 'MZ-R-STRASE', ' MZ-R-LEAD' ) as $sku ) {
 			$rows[] = array( 'seller-sku' => $sku, 'item-name' => 'Resolution ' . $sku, 'item-name-ar' => 'منتج', 'price' => '100.00' );
 		}
 		$rows[] = array( 'seller-sku' => 'MZ-R-VAR-1', 'item-name' => 'Variation', 'item-name-ar' => 'منتج', 'price' => '100.00', 'parent-child' => 'child', 'parent-sku' => 'MZ-R-VP', 'size-name' => 'Small' );
@@ -70,7 +74,7 @@ run(
 		$out  = catalogue_out_dir( $s, 'resolution' );
 		$run  = catalogue_command( 'validate ' . escapeshellarg( $path ) . ' --out=' . escapeshellarg( $out ) );
 		$by   = catalogue_by_sku( catalogue_csv( $out . '/validation-report.csv' ) );
-		$check( 0 === $run['code'] && 10 === count( $by ), "the validation completes with a line per row (exit {$run['code']}, " . count( $by ) . ' lines)' );
+		$check( 0 === $run['code'] && 13 === count( $by ), "the validation completes with a line per row (exit {$run['code']}, " . count( $by ) . ' lines)' );
 
 		$line = fn ( string $sku ): array => $by[ $sku ] ?? array( 'rule' => 'none', 'resolved_id' => '', 'language_role' => '', 'translations' => '', 'issues' => '', 'near_matches' => '', 'reason' => '' );
 		$say  = fn ( string $sku ): string => $line( $sku )['rule'] . ' ' . $line( $sku )['resolved_id'] . ' ' . $line( $sku )['language_role'] . ' [' . $line( $sku )['translations'] . '] ' . $line( $sku )['issues'];
@@ -85,6 +89,9 @@ run(
 		$check( 'C1' === $line( 'MZ-R-TRASH' )['rule'], 'AC-6 a trashed record is not a match (' . $say( 'MZ-R-TRASH' ) . ')' );
 		$check( 'U1' === $line( 'mz-r-case ' )['rule'] && (string) $case === $line( 'mz-r-case ' )['resolved_id'] && false !== strpos( $line( 'mz-r-case ' )['near_matches'], $case . '=MZ-R-CASE (collation)' ), 'AC-6 a case and whitespace variant matches as the store would, with its evidence (' . $line( 'mz-r-case ' )['near_matches'] . ')' );
 		$check( 'U1' === $line( 'MZ-R-VAR-1' )['rule'] && (string) $variation === $line( 'MZ-R-VAR-1' )['resolved_id'], 'AC-6 a variation resolves to the store variation (' . $say( 'MZ-R-VAR-1' ) . ')' );
+		$check( 'U1' === $line( 'MZ-R-STRAßE' )['rule'] && (string) $strasse === $line( 'MZ-R-STRAßE' )['resolved_id'] && in_array( 'W1', explode( ' ', $line( 'MZ-R-STRAßE' )['issues'] ), true ), 'AC-6 a SKU equal under the column collation (STRAßE and STRASSE) matches, with W1 (' . $say( 'MZ-R-STRAßE' ) . ')' );
+		$check( 'C1' === $line( 'MZ-R-STRASE' )['rule'], 'AC-6 a SKU that differs under the collation (STRASE) does not match (' . $say( 'MZ-R-STRASE' ) . ')' );
+		$check( 'U1' === $line( ' MZ-R-LEAD' )['rule'] && (string) $lead === $line( ' MZ-R-LEAD' )['resolved_id'] && in_array( 'W1', explode( ' ', $line( ' MZ-R-LEAD' )['issues'] ), true ), 'AC-6 a leading space is trimmed, as the loader trims it, and reported with W1 (' . $say( ' MZ-R-LEAD' ) . ')' );
 		unset( $vp );
 
 		return $ok;
