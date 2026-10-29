@@ -8,20 +8,16 @@
  * Mizzey path is ever written into the CoreX repository.
  *
  * Usage:
- *   node tools/build-dist.mjs               build and verify, dev vendor as-is
- *   node tools/build-dist.mjs --production  swap to a --no-dev vendor first, then restore
+ *   node tools/build-dist.mjs               build and verify
  *   node tools/build-dist.mjs --dry-run     plan only, write nothing
  *
  * Output lands in <pinned CoreX>/dist, which is git-ignored there and is the only thing a deploy
  * receives. It contains no .git, node_modules, tests, .env or wp-config.php.
  *
- * On --production, and why it is not the default. The builder copies CoreX's `vendor/` verbatim.
- * Our vendor carries dev dependencies, because corex#201 means a --no-dev install silently loses
- * `wp corex migrate`, `doctor`, `reset` and four more. So the default build ships Pest, PHPUnit,
- * Mockery and PHPStan into the artifact, which is wrong for production but keeps the CLI whole.
- * --production trades the other way: a lean artifact whose CoreX CLI is missing those commands.
- * Neither is right. Both are honest. The choice disappears when corex#201 is fixed.
- * See COREX-WORKAROUNDS.md.
+ * The builder installs the artifact's own production packages into `wp-content/vendor/` with
+ * Composer, and never reads or changes the checkout's `vendor/`, so the local runtime keeps its dev
+ * tree and the artifact never carries one. It needs `composer` on the PATH, and the network the first
+ * time.
  */
 
 import { existsSync } from 'node:fs';
@@ -34,7 +30,6 @@ const COREX = resolve(REPO, '..', 'app', 'corex');
 const CLIENT = 'mizzey';
 
 const DRY_RUN = process.argv.includes('--dry-run');
-const PRODUCTION = process.argv.includes('--production');
 
 function run(script, args) {
 	execFileSync('node', [join(COREX, 'scripts', script), ...args], { cwd: COREX, stdio: 'inherit' });
@@ -54,41 +49,9 @@ if (!existsSync(join(COREX, 'sites', CLIENT))) {
 	process.exit(1);
 }
 
-function composer(args) {
-	execFileSync('composer', [...args, '--no-interaction'], { cwd: COREX, stdio: 'inherit', shell: true });
-}
-
-if (PRODUCTION && !DRY_RUN) {
-	console.log('\nSwapping to a production vendor tree (no dev dependencies).');
-	composer(['install', '--no-dev']);
-}
-
-try {
-	run('build-shared-host-dist.mjs', [`--client=${CLIENT}`, ...(DRY_RUN ? ['--dry-run'] : [])]);
-
-	if (!DRY_RUN) {
-		run('verify-shared-host-dist.mjs', []);
-	}
-} finally {
-	// Restore unconditionally. A failed build must not leave the local runtime with a crippled CLI.
-	if (PRODUCTION && !DRY_RUN) {
-		console.log('\nRestoring the development vendor tree.');
-		composer(['install']);
-	}
-}
+run('build-shared-host-dist.mjs', [`--client=${CLIENT}`, ...(DRY_RUN ? ['--dry-run'] : [])]);
 
 if (!DRY_RUN) {
+	run('verify-shared-host-dist.mjs', []);
 	console.log(`\nArtifact: ${join(COREX, 'dist')}`);
-	if (PRODUCTION) {
-		console.log(
-			'Built --production: lean vendor, but wp corex migrate / doctor / reset / readiness /\n' +
-				'version / security reset-login / docs:generate are absent in this artifact until\n' +
-				'corex#201 is fixed. Run migrations from a dev-vendor checkout, not from the deploy.',
-		);
-	} else {
-		console.log(
-			'Built with dev dependencies present, so the artifact carries the test toolchain.\n' +
-				'Use --production for a deployable artifact, and read the caveat it prints.',
-		);
-	}
 }

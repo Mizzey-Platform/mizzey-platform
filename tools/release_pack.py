@@ -4,7 +4,7 @@
     python tools/release_pack.py pack --tag vX.Y.Z [--dist ../app/corex/dist] [--out ../app/release]
 
 `tools/build-dist.mjs` builds the flat tree: WordPress core, CoreX at the commit `corex.lock` pins, and this
-repository's plugin and theme. The CoreX v0.42.0 builder packages nothing else, so `pack` adds what a running
+repository's plugin and theme. The CoreX builder packages nothing else, so `pack` adds what a running
 store also needs, at the versions `stack.lock.json` records, and writes two files:
 
     mizzey-<tag>.zip           the WordPress root is the archive root, with no folder around it
@@ -53,6 +53,7 @@ APP = ROOT.parent / "app"
 
 TAG_RE = re.compile(r"^v\d+\.\d+\.\d+$")
 MANIFEST = "mizzey-release.json"
+VENDOR = PurePosixPath("wp-content/vendor")
 LOCALES = ("ar",)
 
 # stack.lock.json component -> the plugin's folder and the file that carries its header.
@@ -191,8 +192,10 @@ def check_tree(dist: Path, wordpress: str) -> dict:
     Returns what it was built with: its plugins, its themes, and which CoreX vendor tree it carries.
     """
     release = dist / "corex-release.json"
+    # Since CoreX v0.43.4 the builder installs the package's own vendor tree at wp-content/vendor/. A tree with
+    # vendor/ at its root was built by an older builder and does not load CoreX on a host.
     for needed in (release, dist / "wp-includes" / "version.php", dist / "wp-content" / "plugins" / "mizzey-site",
-                   dist / "wp-content" / "themes" / "mizzey-theme", dist / "vendor" / "autoload.php"):
+                   dist / "wp-content" / "themes" / "mizzey-theme", dist / VENDOR / "autoload.php"):
         if not needed.exists():
             raise Refused(f"{dist} is not a built tree: {needed.relative_to(dist).as_posix()} is missing. "
                           "Run node tools/build-dist.mjs first")
@@ -200,9 +203,9 @@ def check_tree(dist: Path, wordpress: str) -> dict:
     if found != wordpress:
         raise Refused(f"the built tree holds WordPress {found}, stack.lock.json records {wordpress} as tested")
     built = json.loads(release.read_text(encoding="utf-8"))
-    # The builder copies CoreX's vendor tree as it finds it: with the test toolchain, or without it and without
-    # seven CLI commands (corex#201, COREX-WORKAROUNDS.md).
-    vendor = "dev" if (dist / "vendor" / "pestphp").exists() else "production"
+    # The builder installs production packages only. Recorded rather than assumed, so a tree that carries the test
+    # toolchain says so in the manifest.
+    vendor = "dev" if (dist / VENDOR / "pestphp").exists() else "production"
     return {"plugins": sorted(built.get("plugins", [])), "themes": sorted(built.get("themes", [])), "vendor": vendor}
 
 

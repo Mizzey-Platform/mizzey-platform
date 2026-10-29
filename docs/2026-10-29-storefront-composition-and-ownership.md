@@ -186,5 +186,5 @@ approved interface design.
   with the mail service account the client approves (INT-05).
 - Which CoreX add-ons are allowed (D-18 section 3): corex-blocks for the section library, corex-forms and corex-email
   for the contact page (CMS-04), corex-media for WebP (NFR-02).
-- The CoreX target: PR #351 (v0.46.1) against D-18 section 6 (v0.47.0).
+- The CoreX target is settled: v0.47.0 (D-18 section 6, D-20 row A2), pinned by PR #351.
 - The section list, variants and editable fields: confirmed by the approved interface design.

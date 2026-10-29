@@ -58,7 +58,7 @@ behaviour. The full rules are in the [constitution](.specify/memory/constitution
 |---|---|---|
 | CMS | WordPress | 7.1 |
 | Commerce | WooCommerce | 11.1.0 |
-| Framework | [CoreX](https://github.com/MustafaShaaban/corex), pinned in `corex.lock` | v0.42.0 |
+| Framework | [CoreX](https://github.com/MustafaShaaban/corex), pinned in `corex.lock` | v0.47.0 |
 | Translation | WPML with WooCommerce Multilingual (client-held licence) | 4.9.7 / WCML 5.5.7 |
 | Shipping | Bosta (register §2.2, recommended) | 4.5.7 |
 | Payments | Paymob (register §2.1, recommended). Not yet installed | not selected |
@@ -101,13 +101,12 @@ by a real directory, which is the one mistake that silently shadows the framewor
 ### Building the deployable artifact
 
 ```bash
-node tools/build-dist.mjs --production
+node tools/build-dist.mjs
 ```
 
 This drives the stock CoreX shared-host builder. The artifact carries no `.git`, `node_modules`, tests, `.env`,
-`wp-config.php` or any document from `docs/`. Until [corex#201](https://github.com/MustafaShaaban/corex/issues/201)
-is fixed, a lean artifact and a complete CoreX CLI are mutually exclusive. See
-[COREX-WORKAROUNDS.md](COREX-WORKAROUNDS.md).
+`wp-config.php` or any document from `docs/`. Its vendor tree is CoreX's production packages, installed by the
+builder into `wp-content/vendor/`, and the CoreX CLI in it is whole.
 
 ### Upgrading CoreX or any other component
 

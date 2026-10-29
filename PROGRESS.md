@@ -118,11 +118,10 @@ Live status. First action each session: read this, then continue from **Next**.
   Mustafa's approval, and nothing else on the board changed. The board snapshot in
   `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
   them.
-- **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
-  v0.47.0, published on 21 October 2026 as the last release of the current CoreX generation, is the proposed
-  upgrade target, in its own infrastructure PR before implementation resumes (D-18, proposed and pending merge;
-  ADR-0003). The readiness assessment is `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`; nothing is
-  upgraded.
+- **CoreX stays a separate, pinned, disposable checkout.** The merged `sites/` layout is not adopted. The upgrade
+  to v0.47.0 (D-18 section 6, approved by the owner on 29 October 2026, D-20 row A2) is made in its own
+  infrastructure PR (#351); the pin moves from v0.42.0 when that PR merges. The readiness assessment is
+  `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`.
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
   templates under `discovery/tasks/` are marked as not to be used for design.
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
