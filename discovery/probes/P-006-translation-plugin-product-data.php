@@ -11,6 +11,15 @@
  *
  * Method note: the seeded row said playwright. The question is about the data layer, not the screen, so
  * it is answered directly. A browser test would only observe the same rows through a template.
+ *
+ * Read-back note (29 October 2026): the Arabic product is read after WooCommerce's product cache for it is
+ * invalidated, so the verdict reflects what the duplication stored, which is what the next request sees. While
+ * WPML inserts the duplicate, before WooCommerce Multilingual gives it its product type, WPML's automatic media
+ * handling reads the new post's meta, WooCommerce Multilingual's rating filter loads it as a product, and
+ * WooCommerce caches its type as simple for the rest of the process. WPML switches that media handling on for a
+ * new install on its first admin request, which the integration baseline makes (admin-visit.php). The process-local
+ * read is still recorded, because code that creates a translation and then loads and saves it in the same process
+ * would write that stale type back.
  */
 
 $notes   = array();
@@ -93,6 +102,14 @@ try {
 	}
 	$made[] = $ar_id;
 
+	// The same-process view, before the cache is invalidated. See the read-back note in the header.
+	$stale      = wc_get_product( $ar_id );
+	$stale_view = $stale ? $stale->get_type() . ' with ' . count( $stale->get_children() ) . ' variations' : 'none';
+
+	WC_Cache_Helper::invalidate_cache_group( 'product_' . $ar_id );
+	wc_delete_product_transients( $ar_id );
+	clean_post_cache( $ar_id );
+
 	$ar_product = wc_get_product( $ar_id );
 	$ar_kids    = $ar_product ? $ar_product->get_children() : array();
 	foreach ( $ar_kids as $kid ) {
@@ -111,6 +128,12 @@ try {
 		count( $ar_kids ),
 		var_export( $trid, true ),
 		implode( ', ', array_keys( (array) $linked ) )
+	);
+	$notes[] = sprintf(
+		'Read back after invalidating WooCommerce\'s product cache. Inside the process that made it, before that, '
+			. 'the Arabic product read as %s (WPML media handling automatic: %s).',
+		$stale_view,
+		class_exists( '\WPML\Media\Option' ) && \WPML\Media\Option::shouldHandleMediaAuto() ? 'yes' : 'no'
 	);
 
 	// Attributes: are the taxonomy terms themselves translatable, which is what filtering depends on?
