@@ -2017,3 +2017,74 @@ PR does not claim that reconciliation is complete.
 
 **Restart (D8):** the agreed non-storefront queue resumes only after the CoreX v0.47.0 upgrade passes, retaining PRE-07
 and PRE-09 conditions for dependent work. Storefront implementation stays frozen until PRE-03b.
+
+## 2026-10-29 - D-21: the quality standard for performance, accessibility and security
+
+**Status: approved by the owner on 29 October 2026 ("record the quality standard as D-21"); recorded by this pull
+request.** An owner decision of Mustafa. **Internal: not a client confirmation, adds no scope, changes no signed
+document.** It sets how well the contracted non-functional rows are met and how that is proved. Each check below is
+built in its own correctly classified pull request; recording the standard does not mean any check exists yet.
+
+**Why.** The register names the non-functional areas (NFR-02, NFR-03, NFR-05, NFR-08, NFR-10, NFR-11, NFR-12, NFR-14)
+but not a level or a test. The owner wants a level he can stand behind publicly: fast, accessible to a screen-reader
+user through a whole purchase, and hardened against the usual WordPress weaknesses. Without a written level, each pull
+request would choose its own.
+
+**1. Performance (serves NFR-02).**
+
+| Measure | Level |
+|---|---|
+| Lighthouse, mobile profile, pinned Lighthouse version, median of three runs per page | Performance, Accessibility, Best Practices and SEO each 98 or more. On staging, the deliberate `noindex` is excluded from the SEO score |
+| Laboratory budgets on the same runs | Largest Contentful Paint 2.0 s or less, Cumulative Layout Shift 0.05 or less, Total Blocking Time 150 ms or less |
+| Field Core Web Vitals after launch, 75th percentile | LCP 2.5 s or less, INP 200 ms or less, CLS 0.1 or less |
+| Byte budgets for scripts, styles and images per template | Set from the approved design in the first storefront pull request, then enforced |
+
+Pages: home, a category, a simple and a variable product, search results, cart, checkout and the account, in English
+and in Arabic. Means already decided elsewhere stay: images converted on upload (A9), lazy loading, skeleton states with
+fixed dimensions, each block loading only its own assets, a page cache for anonymous visitors that skips cart, checkout,
+account and cart sessions, and the CDN. Staging is not the production host (OD-27), so staging results are indicative;
+the launch measurement is taken on the production host.
+
+**2. Accessibility (serves NFR-11, and NFR-14 for the browsers).**
+
+- **Target:** WCAG 2.2 level AA.
+- **Automated:** axe-core reports no serious or critical violation on the pages above, including their open states
+  (menus, dialogs, filters, form errors).
+- **Manual, per release candidate before client UAT:** a complete purchase by screen reader and by keyboard alone, from
+  the home page through search or a category, a product and its variation, the cart, checkout and the confirmation, to
+  the account, in English and in Arabic. NVDA with Firefox on Windows and VoiceOver with Safari on iOS.
+
+**3. Security baseline (serves NFR-05, with NFR-08, NFR-10 and NFR-12 where named).** CoreX is used wherever it provides
+the control (D-18, ADR-0003); Mizzey adds code only for a real gap.
+
+| Area | Level |
+|---|---|
+| Sign-in | Failed attempts throttled and locked out on every sign-in surface, WordPress and WooCommerce, by the real client address behind the proxy; lost-password requests throttled; messages that do not reveal whether an account exists |
+| Staff accounts | Two-factor sign-in for administrators and shop managers; no account named `admin` |
+| Public forms | Spam protection on every public form (contact, newsletter, registration, reviews), with a honeypot always and a challenge service whose keys sit in the client's own account |
+| Disclosure | No version disclosed: no generator tags, no readme or licence files, no `Server` or `X-Powered-By` detail |
+| Exposed interfaces | XML-RPC refused; user enumeration closed for guests (the users endpoint, numeric author queries, the users sitemap); application passwords for administrators only; comments only where the store takes them (product reviews), pingbacks and trackbacks off; every endpoint that is not public requires authentication; what the open Store API exposes is a deliberate, documented decision |
+| Production configuration | File editing and file changes off; debug output hidden; unique salts; a revision limit |
+| Uploads | An allow-list of file types, size and count limits, PHP never executed from uploads, images converted for performance |
+| Server and edge | HTTPS only with HSTS; the security headers, with a Content Security Policy in report-only mode first and then enforced; sensitive and archive files refused; the edge proxy in front, with rate limits on sign-in and the APIs |
+| Dependencies and secrets | Every version pinned; an automated check of the pinned versions against a public vulnerability feed; fixes through `internal:security-maintenance` pull requests; the WPML licence active in the client's account; no secret in the repository |
+| Backups (NFR-08) | An offsite copy, a retention period, a documented restore procedure, and one restore rehearsal before launch |
+| Monitoring (NFR-10) | Lockouts and failed scheduled actions alerted |
+| Consent (NFR-12) | No third-party cookie or request before consent or after it is refused |
+
+**4. Search and agent readiness (serves NFR-03).** Organization data, `noindex` on utility pages, one main heading and
+a unique description per template, a crawl of staging with no broken image or link. An `llms.txt` file and an
+agent-readable product feed are part of this standard.
+
+**5. Against the contract.** Where this standard asks more than a row's wording (the score thresholds, WCAG 2.2 AA as the
+measure, the screen-reader purchase, agent readiness), it is the developer's own engineering standard: not a client
+obligation, not an acceptance criterion, not a Change Request and not billed. A shortfall is a defect against this
+standard, not a breach of the Agreement. Whether any part is offered to the client in writing, which would make it a
+commitment, is the owner's choice; the recommendation is to offer only what has been measured.
+
+**6. When it applies.** The security baseline applies now, to every pull request. The performance and accessibility
+levels apply from the first storefront pull request; storefront implementation stays frozen until PRE-03b (D-14), and
+the checks are built ahead of it against staging. A server or edge change still needs the owner's approval each time.
+
+**7. Not decided here.** The challenge service for forms (the owner asked for reCAPTCHA; Cloudflare Turnstile sets no
+Google cookies) is the owner's choice. The byte budgets wait for the approved design.
