@@ -57,8 +57,8 @@ run(
 		$api_wrong = two_factor_http( 'POST', $validate, $fields + array( 'token' => '000000' === two_factor_code( $api_admin ) ? '111111' : '000000' ), $api_step['cookies'] );
 		$wrong_body = json_decode( $api_wrong['body'], true );
 		$retry_nonce = (string) ( $wrong_body['data']['login_nonce'] ?? $wrong_body['login_nonce'] ?? '' );
-		// WP 2FA answers a wrong code with a failure in the body, whatever the status; the claim is no success and no session.
-		$check( true !== ( $wrong_body['success'] ?? false ) && ! two_factor_signed_in( $api_wrong['cookies'] ), "AC-1 [REST] a wrong code is refused (status {$api_wrong['status']})" );
+		// WP 2FA answers a wrong code with HTTP 200 and status false (class-api-login.php).
+		$check( 200 === $api_wrong['status'] && false === ( $wrong_body['status'] ?? null ) && ! two_factor_signed_in( $api_wrong['cookies'] ), "AC-1 [REST] a wrong code is refused (status {$api_wrong['status']})" );
 		$check( '' !== $retry_nonce, 'AC-1 [REST] and a replacement transaction is issued for the retry' );
 		$api_right = two_factor_http( 'POST', $validate, array( 'login_nonce' => $retry_nonce, 'token' => two_factor_code( $api_admin ) ) + $fields, $api_step['cookies'] );
 		$check( 200 === $api_right['status'] && two_factor_signed_in( $api_right['cookies'] ), "AC-1 [REST] the right code with that transaction completes sign-in (status {$api_right['status']})" );

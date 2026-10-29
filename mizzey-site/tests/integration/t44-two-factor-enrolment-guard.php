@@ -65,7 +65,7 @@ run(
 			// The one REST exception reaches WP 2FA, whose own transaction check still refuses a forged request.
 			$validation = two_factor_http( 'POST', rest_url( 'wp-2fa-methods/v1/login/validate' ), array( 'user_id' => $user->ID, 'provider' => 'totp', 'token' => '000000', 'login_nonce' => 'not-an-issued-login-transaction' ), $cookies, array( 'X-WP-Nonce' => $rest_nonce ) );
 			$validation_body = json_decode( $validation['body'], true );
-			$check( false === strpos( $validation['body'], 'mizzey_two_factor_enrol_first' ) && in_array( $validation['status'], array( 400, 401, 403 ), true ) && '' !== (string) ( $validation_body['code'] ?? '' ), "AC-3 [{$label}] WP 2FA's sign-in route passes the guard and keeps its own check (status {$validation['status']}, " . ( $validation_body['code'] ?? '' ) . ')' );
+			$check( 403 === $validation['status'] && 'invalid_request' === ( $validation_body['code'] ?? '' ), "AC-3 [{$label}] WP 2FA's sign-in route passes the guard and rejects the forged transaction (status {$validation['status']})" );
 			$check( t44_ajax_refused( $cookies, 'heartbeat' ), "AC-3 [{$label}] an unlisted background action is refused" );
 			$check( t44_ajax_refused( $cookies, 'remove_user_2fa' ) && t44_ajax_refused( $cookies, 'unlock_account' ), "AC-3 [{$label}] reset and unlock actions are refused while pending" );
 		}
