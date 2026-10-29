@@ -34,7 +34,8 @@ Security change: <what the change does, and for whom>
 Add when the PR touches governance-sensitive paths (checkers, CI, hooks, constitution, docs/scope, stack.lock.json,
 AGENTS, CLAUDE, CONTRIBUTING, .gitignore) or build, deployment or version-lock paths:
 Sensitive changes: <each sensitive file, and why>
-Add when the PR touches tools/build-dist.mjs, tools/corex-sync.mjs, corex.lock, composer.* or package*.json:
+Add when the PR touches tools/build-dist.mjs, tools/corex-sync.mjs, corex.lock, stack.lock.json, composer.* or
+package*.json:
 Delivery impact: <what changes in the deployed artifact, or why nothing does>
 -->
 

@@ -68,7 +68,10 @@ PATH_POLICY: tuple[tuple[str, str], ...] = (
     ("tools/run_trusted.py", "governance-control"),
     (".specify/memory/constitution.md", "governance-control"),
     ("docs/scope/*", "governance-control"),
-    ("stack.lock.json", "governance-control"),
+    # The tested-versions record. Its CoreX and WordPress entries must equal corex.lock (tools/repo_checks.py), so
+    # the categories that may move corex.lock must be able to record it in the same PR. The release build also
+    # reads WordPress's tested version from it (tools/release_pack.py fetch-core).
+    ("stack.lock.json", "stack-record"),
     ("AGENTS.md", "governance-control"),
     ("CLAUDE.md", "governance-control"),
     ("CONTRIBUTING.md", "governance-control"),
@@ -100,17 +103,17 @@ PATH_POLICY: tuple[tuple[str, str], ...] = (
 
 ALLOWED: dict[str, set[str]] = {
     "requirement": {"feature-spec", "site-code", "site-tests", "test-infra", "docs", "delivery-tooling", "version-lock",
-                    "design"},
-    "governance": {"governance-control", "workflow-config", "test-infra", "tooling", "docs", "design"},
-    "ci": {"governance-control", "workflow-config", "test-infra", "docs"},
+                    "stack-record", "design"},
+    "governance": {"governance-control", "stack-record", "workflow-config", "test-infra", "tooling", "docs", "design"},
+    "ci": {"governance-control", "stack-record", "workflow-config", "test-infra", "docs"},
     "test-infrastructure": {"test-infra", "site-tests", "docs"},
     "tooling": {"tooling", "test-infra", "delivery-tooling", "docs"},
     "documentation": {"docs", "design"},
     "security-maintenance": {"site-code", "site-tests", "test-infra", "tooling", "delivery-tooling", "version-lock",
-                             "docs"},
+                             "stack-record", "docs"},
 }
-SENSITIVE = {"governance-control", "delivery-tooling", "version-lock"}
-DELIVERY = {"delivery-tooling", "version-lock"}
+SENSITIVE = {"governance-control", "delivery-tooling", "version-lock", "stack-record"}
+DELIVERY = {"delivery-tooling", "version-lock", "stack-record"}
 TEST_CLASSES = {"site-tests", "test-infra"}
 
 STATUS_FIXED = {"final", "provisional"}
