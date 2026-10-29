@@ -1,0 +1,128 @@
+PASS  t21-bilingual-baseline       AC-1 to AC-8
+      permalink_structure: /%postname%/
+      htaccess present: yes
+      enabled languages: ar, en
+      default language: en
+      [clean session] GET / -> 200 <html lang="en-US">
+      [clean session] cookies set by / : none
+      [clean session] GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [clean session] GET /ar/shop/ -> 200 <html dir="rtl" lang="ar">
+      [clean session] /ar/shop/ shows the shop page: yes
+      [one session] 1. GET / -> 200 <html lang="en-US">
+      [one session] 1. set-cookie: none
+      [one session] 2. GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [one session] 2. set-cookie: none
+      [one session] cookies carried into request 3: none
+      [one session] 3. GET / -> 200 <html lang="en-US">
+      shop: en=5 ar=19
+      cart: en=6 ar=20
+      myaccount: en=8 ar=22
+      translation group: ar, en
+      resolved Arabic counterpart: 10745, source language: en
+      theme templates: 2, Arabic-specific: 0
+      plugin text domain loader hooked on init: yes
+      fact: the mechanism is asserted below through the shipped Arabic catalogue, or a temporary one when none ships.
+      theme languages directory: present
+      translation template: present
+      probe: the first string of the shipped Arabic catalogue
+      probe in Arabic: طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.
+      probe in English: Too many password reset requests. Please wait a few minutes and try again.
+      fact: WordPress 7.1 loads translations lazily, so is_textdomain_loaded() reads false until a string is requested even though the loader returned true
+      admin locale (WPLANG): en_US
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+PASS  t39-security-exposure        NFR-05: no generator mark, no XML-RPC, no account discovery for visitors
+      PASS  [home (en)] http://mizzey.local/ answers 200 (got 200)
+      PASS  [home (en)] AC-1: no generator meta tag
+      PASS  [home (en)] AC-2: no X-Pingback header
+      PASS  [home (en)] AC-2: no RSD, pingback or manifest link
+      PASS  [home (ar)] http://mizzey.local/ar/ answers 200 (got 200)
+      PASS  [home (ar)] AC-1: no generator meta tag
+      PASS  [home (ar)] AC-2: no X-Pingback header
+      PASS  [home (ar)] AC-2: no RSD, pingback or manifest link
+      PASS  [post] http://mizzey.local/t39-post/ answers 200 (got 200)
+      PASS  [post] AC-1: no generator meta tag
+      PASS  [post] AC-2: no X-Pingback header
+      PASS  [post] AC-2: no RSD, pingback or manifest link
+      PASS  [product] http://mizzey.local/product/t39-product/ answers 200 (got 200)
+      PASS  [product] AC-1: no generator meta tag
+      PASS  [product] AC-2: no X-Pingback header
+      PASS  [product] AC-2: no RSD, pingback or manifest link
+      PASS  [shop (ar)] http://mizzey.local/ar/shop/ answers 200 (got 200)
+      PASS  [shop (ar)] AC-1: no generator meta tag
+      PASS  [shop (ar)] AC-2: no X-Pingback header
+      PASS  [shop (ar)] AC-2: no RSD, pingback or manifest link
+      PASS  [feed] http://mizzey.local/feed/ answers 200 (got 200)
+      PASS  [feed] AC-1: no generator element or attribute
+      PASS  [comments feed] http://mizzey.local/comments/feed/ answers 200 (got 200)
+      PASS  [comments feed] AC-1: no generator element or attribute
+      PASS  AC-2: system.listMethods is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: system.getCapabilities is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: system.multicall is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: pingback.ping is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: xmlrpc.php?rsd is refused (status 403)
+      PASS  AC-2: pings are closed on a post
+      PASS  AC-3: a visitor is refused the users collection (status 401)
+      PASS  AC-3: a visitor is refused the users single user (status 401)
+      PASS  AC-3: a visitor is refused the users collection, query (status 401)
+      PASS  AC-3: a visitor is refused the users single user, query (status 401)
+      PASS  AC-3: an editor keeps the users collection the block editor reads (status 200)
+      PASS  AC-3: the native refusal of the edit context to an editor still holds (status 403)
+      PASS  AC-3 [en] ?author= for a existing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [en] ?author= for a missing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [ar] ?author= for a existing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [ar] ?author= for a missing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3: the sitemap index lists no users sitemap
+      PASS  AC-3: the product sitemap is still listed
+      PASS  AC-3: the users sitemap does not exist (status 404)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+PASS  t40-security-accounts        NFR-05: application passwords, sign-in messages and recovery limits
+      PASS  AC-4: not available to a customer
+      PASS  AC-4: not available to a shop manager
+      PASS  AC-4: available to an administrator
+      PASS  AC-4: a customer cannot authenticate with an application password stored for them (application_passwords_disabled_for_user)
+      PASS  AC-4: an administrator still can
+      PASS  AC-4 [HTTP] a stored application password for the customer is refused (status 401)
+      PASS  AC-4 [HTTP] a stored application password for the administrator authenticates (status 200)
+      PASS  AC-5: wrong password, unknown username and unknown email give one answer (authentication_failed: <strong>Error:</strong> Invalid username, email address or incorrect password.)
+      PASS  AC-5: each failure still fires wp_login_failed, which CoreX counts
+      PASS  AC-5: CoreX's lockout error passes unchanged
+      PASS  AC-5: the right password still signs in
+      PASS  AC-5: empty credentials keep their own answer (empty_username)
+      PASS  AC-5 [wp-login] the generic message for a real and an unknown account ('Error: Invalid username, email address or incorrect password.' / 'Error: Invalid username, email address or incorrect password.')
+      PASS  AC-5 [account, en] the generic message for a real and an unknown account ('Error: Invalid username, email address or incorrect password.' / 'Error: Invalid username, email address or incorrect password.')
+      PASS  AC-5 [account, ar] the generic message for a real and an unknown account ('خطأ: اسم المستخدم أو عنوان البريد الإلكتروني غير صالح أو كلمة المرور غير صحيحة.' / 'خطأ: اسم المستخدم أو عنوان البريد الإلكتروني غير صالح أو كلمة المرور غير صحيحة.')
+      PASS  AC-6 [WordPress] three requests for one account pass, the fourth is refused with no email (sent+mail, sent+mail, sent+mail, mizzey_recovery_limited)
+      PASS  AC-6 [WooCommerce] three requests for one account pass, the fourth is refused with the message and no email (sent+mail, sent+mail, sent+mail, refused:Too many password reset requests. Please wait a few minutes and try again.)
+      PASS  AC-6: the eleventh request from one address is refused, whatever the accounts (invalidcombo, mizzey_recovery_limited)
+      PASS  AC-6: the limits are a setting: a filtered limit of one refuses the second request
+      PASS  AC-6: the username and the email of one account share one allowance (sent, sent, sent, mizzey_recovery_limited)
+      PASS  AC-6: invalid settings fall back safely ({"account":3,"address":10,"window":900})
+      PASS  AC-6 [account, en] the fourth request reads the refusal in the visitor's language ('Too many password reset requests. Please wait a few minutes and try again.')
+      PASS  AC-6 [account, ar] the fourth request reads the refusal in the visitor's language ('طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.')
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+PASS  t41-security-check           NFR-05: comments closed outside products; the security check reports the baseline
+      PASS  AC-7: a post stored as open has comments and pings closed
+      PASS  AC-7: a page stored as open has comments and pings closed
+      PASS  AC-7: a product with reviews allowed keeps them open
+      PASS  AC-7: a product with reviews off stays closed
+      PASS  AC-7 [HTTP] a comment on a post is refused (status 403)
+      PASS  AC-7 [HTTP] a product review is stored with rating 5 (status 302)
+      PASS  AC-7 [HTTP] a trackback is refused
+      PASS  AC-8: the report lists every control of this feature (generator, xmlrpc, account_discovery, application_passwords, sign_in_message, recovery_limit, comment_surface, file_changes_disabled, file_editor_disabled, debug_display_off, corex_login_protection)
+      PASS  AC-8: every control passes on the baseline
+      fact: configuration rows reported, not judged by this feature: file_changes_disabled=off, file_editor_disabled=on, debug_display_off=on, corex_login_protection=off
+      PASS  AC-8: with the XML-RPC control switched off, the report says review
+      PASS  AC-8: the command exits 0 on the baseline (exit 0)
+      PASS  AC-8: the command output names generator
+      PASS  AC-8: the command output names xmlrpc
+      PASS  AC-8: the command output names account_discovery
+      PASS  AC-8: the command output names application_passwords
+      PASS  AC-8: the command output names sign_in_message
+      PASS  AC-8: the command output names recovery_limit
+      PASS  AC-8: the command output names comment_surface
+      PASS  AC-8: with a control switched off, the command names it and exits 1 (exit 1)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
