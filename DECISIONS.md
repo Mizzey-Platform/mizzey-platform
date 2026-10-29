@@ -2063,7 +2063,7 @@ the control (D-18, ADR-0003); Mizzey adds code only for a real gap.
 | Staff accounts | Two-factor sign-in for administrators and shop managers; no account named `admin` |
 | Public forms | Spam protection on every public form (contact, newsletter, registration, reviews), with a honeypot always and a challenge service whose keys sit in the client's own account |
 | Disclosure | No version disclosed: no generator tags, no readme or licence files, no `Server` or `X-Powered-By` detail |
-| Exposed interfaces | XML-RPC off; user enumeration closed (the users endpoint and author archives for guests); every endpoint that is not public requires authentication; what the open Store API exposes is a deliberate, documented decision |
+| Exposed interfaces | XML-RPC refused; user enumeration closed for guests (the users endpoint, numeric author queries, the users sitemap); application passwords for administrators only; comments only where the store takes them (product reviews), pingbacks and trackbacks off; every endpoint that is not public requires authentication; what the open Store API exposes is a deliberate, documented decision |
 | Production configuration | File editing and file changes off; debug output hidden; unique salts; a revision limit |
 | Uploads | An allow-list of file types, size and count limits, PHP never executed from uploads, images converted for performance |
 | Server and edge | HTTPS only with HSTS; the security headers, with a Content Security Policy in report-only mode first and then enforced; sensitive and archive files refused; the edge proxy in front, with rate limits on sign-in and the APIs |
