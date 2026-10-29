@@ -62,12 +62,15 @@ plugin is selected.
 
 | | Version | Where it is recorded |
 |---|---|---|
-| Current pin | v0.42.0 | `corex.lock`, `stack.lock.json` |
-| Proposed frozen legacy target | v0.47.0 (`3a54765`) | D-18, ADR-0003, `docs/2026-10-21-corex-v0.47.0-migration-readiness.md` |
+| Current pin | v0.47.0 (`3a54765`), from v0.42.0 | `corex.lock`, `stack.lock.json` (PR #351) |
+| Frozen legacy target | v0.47.0, approved by the owner on 29 October 2026 (D-18 section 6, D-20 row A2) | D-18, D-20, ADR-0003, `docs/2026-10-21-corex-v0.47.0-migration-readiness.md` |
 | Future CoreX revamp | Not released | Nothing is built against it until it publishes a version and an API |
 
-The target is not tested for Mizzey. It becomes the pin only through the upgrade PR, by the path below, and that PR
-is the only change that edits either lock file.
+v0.47.0 is verified on the disposable development runtime (PR #351 lists the evidence of 29 October 2026). Still to
+verify on server staging, on MariaDB 11.4: the tagged release's deployment and migration with a backup taken before
+the first request (a WP-CLI load applies the schema change too), the restore, earlier CoreX access grants, the
+generator tag behind any cache and CoreX patterns in the inserter. The CoreX admin asset build (D-20 row A5) and the
+add-on allowlist (row A4) are their own pull requests.
 
 ## Regression path for any upgrade
 
