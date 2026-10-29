@@ -119,7 +119,10 @@ Live status. First action each session: read this, then continue from **Next**.
   `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
   them.
 - **CoreX stays a separate, pinned, disposable checkout** at v0.42.0. The merged `sites/` layout is not adopted.
-  v0.43.0 is the next upgrade, in its own infrastructure PR before implementation resumes (D-14).
+  v0.47.0, published on 21 October 2026 as the last release of the current CoreX generation, is the proposed
+  upgrade target, in its own infrastructure PR before implementation resumes (D-18, proposed and pending merge;
+  ADR-0003). The readiness assessment is `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`; nothing is
+  upgraded.
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
   templates under `discovery/tasks/` are marked as not to be used for design.
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
@@ -379,8 +382,9 @@ the supplementary stabilisation review are closed under the recorded review auth
 3. **The low-fidelity wireframe phase is closed under delegated review**, as `stabilisation.phase_closure`
    records. Next: receive and apply the brand identity, pending OD-01; then high-fidelity design, motion, working
    HTML and CSS and PRE-03b. Residuals remain carried. No functional implementation is authorised.
-4. **The CoreX v0.43.0 upgrade**, evaluated and made in its own infrastructure PR, before application and
-   storefront implementation resumes.
+4. **The CoreX upgrade to v0.47.0** (D-18 section 6, approved by the owner on 29 October 2026), made in its own
+   infrastructure PR before the non-storefront work resumes. Its gates are in
+   `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`.
 5. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
    Mustafa's decision. The queue is kept as the order they would follow.
 
