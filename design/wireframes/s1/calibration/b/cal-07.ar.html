@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="wf-surfaces" content="ck-checkout ck-address ck-shipping-method ck-payment-method ck-coupon-notes ck-review-place-order">
+<meta name="wf-viewport" content="desktop">
+<meta name="wf-direction" content="b">
+<title>cal-07 Checkout · Direction B · Arabic RTL</title>
+<link rel="stylesheet" href="../../../_shared/wireframe.css">
+<style>
+body{padding:32px 40px 96px}
+.wf-meta{display:flex;flex-direction:column;gap:16px;max-inline-size:1660px;margin-block-end:40px;padding:20px 24px}
+.meta__eyebrow{font:600 11px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#5c5c5c}
+.meta__title{font-size:24px;font-weight:650;line-height:1.25;margin-block:6px 6px}
+.meta__lede{font-size:13.5px;color:#3a3a3a;max-inline-size:780px;text-wrap:pretty}
+.meta__facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 16px;margin-block-start:14px;font-size:12.5px}
+.meta__facts dt{color:#5c5c5c}.meta__facts dd{margin:0}
+.meta__facts code,.wf-note code,.attach code{font:11.5px ui-monospace,Menlo,Consolas,monospace}
+.meta__nav{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding-block-start:14px;border-block-start:1px dashed #cfcfcf}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg a,.seg span{font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 9px;border:1px solid #bdbdbd;text-decoration:none;color:#1f1f1f;background:#fff}
+.seg .on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+.seg .off{color:#8a8a8a;border-style:dashed}
+.sheet{display:flex;flex-direction:column;gap:64px}
+.board{display:flex;gap:28px;align-items:flex-start}
+.board__notes{flex:none;inline-size:340px;position:sticky;inset-block-start:16px}
+.board__notes>.wf-note:first-child,.mnotes>.wf-note{margin-block-start:0}
+.mboard{display:flex;flex-direction:column;gap:20px}
+.mrow{display:flex;gap:28px;align-items:flex-start}
+.mnotes{display:grid;grid-template-columns:repeat(4,390px);gap:12px 28px;align-items:start}
+.wf-frame{position:relative}
+.wf-frame--desktop{inline-size:1280px;max-inline-size:none}
+.wf-frame--mobile{inline-size:390px;max-inline-size:none}
+.wf-frame__label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+.wf-note{font-size:12px;line-height:1.5}
+.wf-note b{font-weight:650}
+.dsq::before{content:"Design source question"}
+.rtl-note::before{content:"Right to left, decided"}
+.pin{display:inline-flex;align-items:center;justify-content:center;inline-size:20px;block-size:20px;border-radius:50%;background:#1f1f1f;color:#fff;font:700 10.5px/1 ui-monospace,Menlo,Consolas,monospace;flex:none;vertical-align:middle;margin-inline-end:6px}
+.pinat{position:absolute;z-index:6}
+.ph{position:relative;display:flex;align-items:flex-end;justify-content:flex-start;background:#e4e4e4;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.045) 0 1px,transparent 1px 11px);overflow:hidden;min-block-size:24px}
+.ph__l{position:relative;z-index:1;margin:8px;padding:2px 6px;background:rgba(255,255,255,.88);color:#4a4a4a;font:500 10px/1.35 ui-monospace,Menlo,Consolas,monospace;max-inline-size:calc(100% - 16px)}
+.ph--dark{background:#bdbdbd;background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.06) 0 1px,transparent 1px 11px)}
+.r11{aspect-ratio:1/1}.r45{aspect-ratio:4/5}.r34{aspect-ratio:3/4}.r23{aspect-ratio:2/3}.r169{aspect-ratio:16/9}.r21{aspect-ratio:2/1}.r31{aspect-ratio:3/1}.r41{aspect-ratio:4/1}.r43{aspect-ratio:4/3}.r32{aspect-ratio:3/2}.r54{aspect-ratio:5/4}
+.lns{display:flex;flex-direction:column;gap:8px}
+.ln{display:block;block-size:8px;background:#e2e2e2;border-radius:2px}
+.logo{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #8a8a8a;font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#4a4a4a;letter-spacing:.06em;block-size:34px;padding-inline:14px;white-space:nowrap;flex:none}
+.attach{border:1px dashed #9a9a9a;padding:14px 16px;font-size:12px;color:#5c5c5c;background:#fafafa}
+.stars{letter-spacing:1px;font-size:12px;color:#1f1f1f}
+.money{white-space:nowrap}
+.chev{display:inline-block;font-weight:400}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.muted{color:#6b6b6b}.faint{color:#8a8a8a}
+.strike{text-decoration:line-through;color:#8a8a8a}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:2}
+.rel{position:relative}
+.ltr-field{direction:ltr;text-align:start}
+html[lang="ar"] .ltr-field{text-align:end}
+html[lang="ar"] .wf-frame{line-height:1.7}
+html[lang="ar"] .eyebrow{letter-spacing:0;text-transform:none}
+html[lang="ar"] .disp,html[lang="ar"] .h1,html[lang="ar"] .h2{letter-spacing:0}
+html[lang="ar"] .wf-note,html[lang="ar"] .wf-meta,html[lang="ar"] .wf-frame__label{line-height:1.5}
+
+.fB{background:#fff;color:#111;font-size:14px}
+.g{padding-inline:48px}
+.eyebrow{font:600 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#4a4a4a}
+.disp{font-size:96px;line-height:.92;font-weight:750;letter-spacing:-.04em}
+.h1{font-size:60px;line-height:.98;font-weight:750;letter-spacing:-.03em}
+.h2{font-size:34px;line-height:1.05;font-weight:750;letter-spacing:-.02em}
+.h3{font-size:18px;line-height:1.25;font-weight:700}
+html[lang="ar"] .disp{font-size:80px;line-height:1.15}
+html[lang="ar"] .h1{font-size:52px;line-height:1.2}
+html[lang="ar"] .h2{line-height:1.3}
+.rule{border-block-start:2px solid #111}
+.hair{border-block-start:1px solid #dcdcdc}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;block-size:52px;padding-inline:30px;background:#111;color:#fff;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1.5px solid #111;white-space:nowrap}
+html[lang="ar"] .btn{letter-spacing:0;text-transform:none;font-size:14px}
+.btn--2{background:#fff;color:#111}
+.btn--block{display:flex;inline-size:100%}
+.btn--sm{block-size:38px;padding-inline:18px;font-size:11px}
+.btn.dis{background:#ebebeb;color:#8a8a8a;border-color:#ebebeb}
+.lnk{text-decoration:underline;text-underline-offset:4px;font-weight:600;font-size:13px}
+.hdB{background:#fff;position:relative;z-index:5}
+.hb0{display:flex;justify-content:flex-end;gap:24px;align-items:center;block-size:34px;padding-inline:48px;font-size:12px;border-block-end:1px solid #e3e3e3}
+.hb1{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;block-size:96px;padding-inline:48px}
+.hb1 .logo{block-size:52px;padding-inline:44px;font-size:12px}
+.ufield{display:flex;align-items:center;gap:10px;inline-size:300px;block-size:40px;border-block-end:1.5px solid #111;font-size:14px;color:#6b6b6b}
+.ufield.on{color:#111}
+.sicon{inline-size:14px;block-size:14px;border:1.6px solid currentColor;border-radius:50%;flex:none}
+.caret{inline-size:1.5px;block-size:22px;background:#111}
+.cart{justify-self:end;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+html[lang="ar"] .cart{letter-spacing:0}
+.hb2{display:flex;justify-content:center;gap:40px;block-size:50px;align-items:stretch;border-block:2px solid #111;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+html[lang="ar"] .hb2{letter-spacing:0;font-size:14px}
+.hb2 a{display:flex;align-items:center;text-decoration:none;position:relative}
+.hb2 a.on::after{content:"";position:absolute;inset-inline:0;inset-block-end:-2px;border-block-end:4px solid #111}
+.megaB{position:absolute;inset-inline:0;inset-block-start:0;z-index:4;background:#fff;border-block-end:2px solid #111;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.3fr) minmax(0,.9fr) 380px;gap:48px;padding:44px 48px}
+.megaB li{font-size:19px;font-weight:600;padding-block:6px;letter-spacing:-.01em}
+.megaB .sm li{font-size:14px;font-weight:400;padding-block:5px}
+.slayer{position:absolute;inset-inline:0;inset-block-start:0;z-index:4;background:#fff;border-block-end:2px solid #111;padding:36px 48px 44px}
+.bigq{display:flex;align-items:center;gap:18px;font-size:44px;font-weight:750;letter-spacing:-.03em;border-block-end:2px solid #111;padding-block-end:16px}
+.card{display:flex;flex-direction:column;gap:10px}
+.card__img{position:relative}
+.card__tag{font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
+html[lang="ar"] .card__tag{letter-spacing:0;font-family:inherit;font-size:12px}
+.card__name{font-size:15px;line-height:1.35;font-weight:600}
+.card__price{display:flex;gap:10px;font-size:14px;flex-wrap:wrap}
+.card__save{position:absolute;inset-block-start:12px;inset-inline-end:12px;z-index:2;font-size:12px;font-weight:600;background:#fff;padding:4px 8px}
+.card__oos{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;font:700 12px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.55)}
+.secH{display:grid;grid-template-columns:120px minmax(0,1fr) auto;align-items:end;gap:24px;padding-block:20px 32px}
+.secN{font:600 13px/1 ui-monospace,Menlo,Consolas,monospace}
+.chip{display:inline-flex;align-items:center;gap:8px;block-size:34px;padding-inline:14px;border:1.5px solid #111;font-size:12.5px;font-weight:600;background:#fff;white-space:nowrap}
+.chip--on{background:#111;color:#fff}
+.chip--soft{border-color:#cfcfcf;font-weight:500}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-inline-size:18px;block-size:18px;padding-inline:4px;background:#111;color:#fff;font-size:10.5px;font-weight:700}
+.chip--on .cnt{background:#fff;color:#111}
+.inp{display:flex;align-items:center;block-size:50px;padding-inline:14px;border:1.5px solid #bdbdbd;font-size:14px;background:#fff}
+.inp.pt{color:#8a8a8a}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld>label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+html[lang="ar"] .fld>label{letter-spacing:0;font-size:13px}
+.fld--err .inp{border:2.5px solid #111}
+.err{font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.err::before{content:"!";display:inline-flex;inline-size:16px;block-size:16px;background:#111;color:#fff;font-size:10px;align-items:center;justify-content:center;flex:none}
+.opt{display:inline-flex;align-items:center;justify-content:center;min-inline-size:56px;block-size:46px;padding-inline:14px;border:1.5px solid #cfcfcf;font-size:13px;font-weight:600}
+.opt--on{border-color:#111;background:#111;color:#fff}
+.opt--na{color:#a6a6a6;border-style:dashed;text-decoration:line-through}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #111;block-size:52px}
+.qty span{inline-size:44px;text-align:center;font-weight:600}
+.qty--sm{block-size:38px}.qty--sm span{inline-size:34px}
+.bar{block-size:6px;background:#e3e3e3}
+.bar>i{display:block;block-size:100%;background:#111}
+.tabs{display:flex;gap:0;border-block-end:2px solid #111}
+.tab{padding:18px 26px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b}
+html[lang="ar"] .tab{letter-spacing:0;font-size:15px}
+.tab--on{background:#111;color:#fff}
+.tbl{inline-size:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{text-align:start;padding:14px 0;border-block-end:1px solid #dcdcdc;font-weight:400}
+.tbl th{inline-size:40%;font-weight:700}
+.rc{display:flex;align-items:center;gap:14px;padding:18px;border:1.5px solid #cfcfcf;font-size:14px}
+.rc--on{border-color:#111}
+.dot{inline-size:18px;block-size:18px;border-radius:50%;border:1.5px solid #8a8a8a;flex:none}
+.rc--on .dot{border:5.5px solid #111}
+.cb{inline-size:20px;block-size:20px;border:1.5px solid #111;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.cb--on{background:#111;color:#fff}
+.crumbs{display:flex;gap:8px;font:500 11.5px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em;color:#4a4a4a;padding-block:18px}
+html[lang="ar"] .crumbs{font-family:inherit;font-size:13px;letter-spacing:0}
+.drop{position:absolute;z-index:6;background:#fff;border:2px solid #111;box-shadow:0 24px 48px rgba(0,0,0,.14)}
+.mhd{display:flex;align-items:center;gap:4px;block-size:60px;padding-inline:16px;border-block-end:2px solid #111;background:#fff}
+.mhd .logo{block-size:30px;font-size:9.5px;margin-inline-end:auto}
+.ib{display:inline-flex;align-items:center;justify-content:center;min-inline-size:44px;block-size:44px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+html[lang="ar"] .ib{letter-spacing:0}
+.burger{inline-size:22px;block-size:12px;border-block:2px solid #111;position:relative}
+.burger::after{content:"";position:absolute;inset-inline:0;inset-block-start:3px;border-block-start:2px solid #111}
+.acc li{display:flex;justify-content:space-between;align-items:center;min-block-size:60px;border-block-end:1px solid #dcdcdc;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.acc .kids li{font-size:16px;font-weight:500;min-block-size:48px;letter-spacing:0;padding-inline-start:16px;border-block-end-color:#ececec}
+.drawer{position:absolute;inset-block:0;z-index:5;background:#fff;display:flex;flex-direction:column}
+.drawer--end{inset-inline-end:0;border-inline-start:2px solid #111}
+.dr__h{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-block-end:2px solid #111}
+.dr__f{padding:16px 24px;border-block-start:2px solid #111;display:flex;flex-direction:column;gap:10px}
+.x{display:inline-flex;align-items:center;justify-content:center;inline-size:36px;block-size:36px;font-size:18px}
+</style>
+</head>
+<body>
+<header class="wf-meta" lang="en" dir="ltr">
+<div>
+<div class="meta__eyebrow">Mizzey · S1 low-fidelity calibration · Direction B, Editorial Modern Retail · Arabic, right to left</div>
+<h1 class="meta__title">cal-07: Checkout</h1>
+<p class="meta__lede">Composed like a publication. A centred masthead between heavy rules, display type, numbered sections, a mix of feature and standard product sizes, full-bleed imagery and a typographic category index. It shows the less native, more expressive candidates.</p>
+<dl class="meta__facts">
+<dt>Surfaces</dt><dd><code>ck-checkout</code>, <code>ck-address</code>, <code>ck-shipping-method</code>, <code>ck-payment-method</code>, <code>ck-coupon-notes</code>, <code>ck-review-place-order</code></dd>
+<dt>States drawn</dt><dd><code>ck-checkout:guest</code>, <code>ck-address:validation</code>, <code>ck-payment-method:card_and_wallet</code>, <code>ck-review-place-order:ready</code></dd>
+<dt>Interaction options</dt><dd><code>DQ-03</code> One page with progressive accordion sections; completed sections collapse to a summary with Edit.</dd>
+<dt>Viewport</dt><dd>Desktop, 1280 frame</dd>
+<dt>Status</dt><dd>Exploration. Locks no pattern and is not owner approval. Neutral: greys, system typeface, no logo, no imagery.</dd>
+</dl>
+</div>
+<nav class="meta__nav" aria-label="Calibration set">
+<div class="seg"><a href="../a/cal-07.ar.html">A · Clean Premium Commerce</a><span class="on">B · Editorial Modern Retail</span><a href="../c/cal-07.ar.html">C · Dynamic Contemporary Ecommerce</a></div>
+<div class="seg"><a href="cal-07.en.html">English, LTR</a><span class="on">Arabic, RTL</span></div>
+<div class="seg"><a href="cal-01.ar.html">cal-01 Header, search, footer</a><a href="cal-02.ar.html">cal-02 Mobile header</a><a href="cal-03.en.html">cal-03 Home</a><a href="cal-04.en.html">cal-04 Category</a><a href="cal-05.ar.html">cal-05 Product</a><a href="cal-06.en.html">cal-06 Mini-cart, cart</a><span class="on">cal-07 Checkout</span><a href="cal-08.ar.html">cal-08 Mobile shopping</a></div>
+</nav>
+</header>
+<main class="sheet">
+<section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">ck-checkout: guest · ck-address: validation · step 1 open, later steps waiting</div><div class="fB"><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;block-size:88px;padding-inline:48px;border-block-end:2px solid #111"><span class="lnk" style="font-size:12px"><span class="chev">‹</span> العودة إلى السلة</span><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span style="justify-self:end;font-size:13px"><a href="#"><span lang="en" dir="ltr">English</span></a></span></div><div class="g" style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:64px;padding-block:32px 72px;align-items:start;max-inline-size:1200px;margin-inline:auto"><div><h1 class="h1" style="margin-block-end:24px">إتمام الشراء</h1><section style="border-block-start:2px solid #111"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">01</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">بيانات التواصل وعنوان التوصيل</span></div></div><div style="padding:0 0 32px 72px"><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px"><div class="fld " style=""><label>البريد الإلكتروني</label><div class="inp " dir="ltr" style="justify-content:flex-end">name@example.com</div></div><div class="fld fld--err" style=""><label>رقم الجوال</label><div class="inp " dir="ltr" style="justify-content:flex-end">010 1234</div><span class="err">أدخل رقم جوال مصري كاملاً.</span></div><div class="fld " style="grid-column:1/-1"><label>الاسم بالكامل</label><div class="inp "  style="">نور حسن</div></div><div class="fld " style=""><label>المحافظة</label><div class="inp "  style="">الجيزة<span style="margin-inline-start:auto">▾</span></div></div><div class="fld " style=""><label>المدينة</label><div class="inp "  style="">السادس من أكتوبر<span style="margin-inline-start:auto">▾</span></div></div><div class="fld fld--err" style=""><label>الحي</label><div class="inp pt"  style="">اختر الحي<span style="margin-inline-start:auto">▾</span></div><span class="err">اختر الحي للمتابعة.</span></div><div class="fld " style=""><label>الشارع والمبنى</label><div class="inp "  style="">اسم الشارع، مبنى 12</div></div><div class="fld " style="grid-column:1/-1"><label>علامة مميزة · اختياري</label><div class="inp pt"  style="">بالقرب من …</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-block-start:24px"><span style="font-size:13px">أنت تتابع كضيف. <u>تسجيل الدخول</u></span><span class="btn">المتابعة إلى الشحن</span></div></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;color:#a0a0a0"><span class="h2 wf-num">02</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الشحن</span></div></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;color:#a0a0a0"><span class="h2 wf-num">03</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الدفع</span></div></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;color:#a0a0a0"><span class="h2 wf-num">04</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">المراجعة والتأكيد</span></div></div></section><div style="border-block-start:1px solid #dcdcdc"></div></div><aside style="background:#ededed;padding:28px;display:flex;flex-direction:column;gap:16px;position:sticky;inset-block-start:24px"><div class="eyebrow">طلبك · <span class="wf-num">3</span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">قميص كتان مغسول بقصة خارجية</span><span style="font-size:13px"><span class="money"><span class="wf-num">1,850</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">حقيبة كروس من الجلد</span><span style="font-size:13px"><span class="money"><span class="wf-num">3,650</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">طقم أكواب من الفخار الحجري</span><span style="font-size:13px"><span class="money"><span class="wf-num">780</span> ج.م</span></span></div><div class="rule"></div><div class="lns mono" style="gap:10px;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>المجموع الفرعي</span><span class="money"><span class="wf-num">6,280</span> ج.م</span></div><div style="display:flex;justify-content:space-between"><span>WELCOME10</span><span>− <span class="money"><span class="wf-num">628</span> ج.م</span></span></div><div style="display:flex;justify-content:space-between"><span>الشحن</span><span class="money"><span class="wf-num">60</span> ج.م</span></div></div><div class="rule"></div><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:750"><span>الإجمالي</span><span class="money"><span class="wf-num">5,712</span> ج.م</span></div></aside></div></div></div><div class="board__notes"><aside class="wf-note wf-option" lang="en" dir="ltr"><b>DQ-03 · Checkout structure</b><br>Shows: One page with progressive accordion sections: one section open at a time; completed ones collapse to a one-line summary with Edit; the order is fixed (JRN-07).<br>Not the working baseline (one page with clear sections, A). Native support for collapsing needs checking against the Checkout block (platform).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>ck-checkout:guest</b> — Guest by default; Sign in offered under the form (AUTH-07).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>ck-address:validation</b> — Two errors shown under their fields; Continue stays available and moves focus to the first error.</aside><aside class="wf-note wf-motion" lang="en" dir="ltr" data-trigger="Continue is pressed and the section is valid" data-effect="Section collapses to its summary and the next one opens below; the page keeps the new section in view" data-role="essential" data-reduced-motion="Sections change in place without collapsing motion">Accordion progression.</aside><aside class="wf-note dsq" lang="en" dir="ltr"><b>cal-07 · <code>ck-address</code> · CHK-01, CHK-11</b><br>Missing: required fields and the phone rule.</aside><aside class="wf-note rtl-note" lang="en" dir="ltr">Section numbers sit at the right with headings beside them; Edit at the left. Inputs align right; email and phone are typed left to right and shown aligned to the field’s left edge. The summary column is on the left; amounts sit at the inline-end edge in mono with digit order kept.</aside></div></section><section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">ck-shipping-method: methods_listed (completed) · ck-payment-method: card_and_wallet (open)</div><div class="fB"><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;block-size:88px;padding-inline:48px;border-block-end:2px solid #111"><span class="lnk" style="font-size:12px"><span class="chev">‹</span> العودة إلى السلة</span><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span style="justify-self:end;font-size:13px"><a href="#"><span lang="en" dir="ltr">English</span></a></span></div><div class="g" style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:64px;padding-block:32px 72px;align-items:start;max-inline-size:1200px;margin-inline:auto"><div><h1 class="h1" style="margin-block-end:24px">إتمام الشراء</h1><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">01</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">بيانات التواصل وعنوان التوصيل</span><span style="font-size:13.5px;color:#4a4a4a">نور حسن · الجيزة، السادس من أكتوبر</span></div><u style="font-size:13px;font-weight:600">تعديل</u></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">02</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الشحن</span><span style="font-size:13.5px;color:#4a4a4a">التوصيل العادي · 60 ج.م</span></div><u style="font-size:13px;font-weight:600">تعديل</u></div></section><section style="border-block-start:2px solid #111"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">03</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الدفع</span></div></div><div style="padding:0 0 32px 72px"><div class="lns" style="gap:10px"><div class="rc rc--on"><span class="dot"></span><span style="flex:1;font-weight:700">بطاقة</span><span class="mono faint" style="font-size:11px">شعارات البطاقات</span></div><div class="rc"><span class="dot"></span><span style="flex:1;font-weight:700">محفظة الهاتف</span></div><p style="font-size:13px;margin-block:8px 16px">تُكمل الدفع لدى مزوّد الدفع بعد تأكيد الطلب.</p><span class="btn" style="align-self:flex-end">المتابعة إلى المراجعة</span></div></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;color:#a0a0a0"><span class="h2 wf-num">04</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">المراجعة والتأكيد</span></div></div></section><div style="border-block-start:1px solid #dcdcdc"></div></div><aside style="background:#ededed;padding:28px;display:flex;flex-direction:column;gap:16px;position:sticky;inset-block-start:24px"><div class="eyebrow">طلبك · <span class="wf-num">3</span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">قميص كتان مغسول بقصة خارجية</span><span style="font-size:13px"><span class="money"><span class="wf-num">1,850</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">حقيبة كروس من الجلد</span><span style="font-size:13px"><span class="money"><span class="wf-num">3,650</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">طقم أكواب من الفخار الحجري</span><span style="font-size:13px"><span class="money"><span class="wf-num">780</span> ج.م</span></span></div><div class="rule"></div><div class="lns mono" style="gap:10px;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>المجموع الفرعي</span><span class="money"><span class="wf-num">6,280</span> ج.م</span></div><div style="display:flex;justify-content:space-between"><span>WELCOME10</span><span>− <span class="money"><span class="wf-num">628</span> ج.م</span></span></div><div style="display:flex;justify-content:space-between"><span>الشحن</span><span class="money"><span class="wf-num">60</span> ج.م</span></div></div><div class="rule"></div><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:750"><span>الإجمالي</span><span class="money"><span class="wf-num">5,712</span> ج.م</span></div></aside></div></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>ck-payment-method:card_and_wallet</b> — Two methods as large options. The provider’s own step is not drawn (VENDOR-PAYMOB).</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>OD-05 · OD-19</b> — Cash on delivery would be a third option; instalments, kiosk and Instapay are not drawn.</aside><aside class="wf-note wf-placeholder" lang="en" dir="ltr"><b>CR-03</b> — Rates invented.</aside></div></section><section class="board"><div class="wf-frame wf-frame--desktop"><div class="wf-frame__label" lang="en" dir="ltr">ck-review-place-order: ready · ck-coupon-notes: collapsed</div><div class="fB"><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;block-size:88px;padding-inline:48px;border-block-end:2px solid #111"><span class="lnk" style="font-size:12px"><span class="chev">‹</span> العودة إلى السلة</span><span class="logo " lang="en" dir="ltr">LOGO · OD-01</span><span style="justify-self:end;font-size:13px"><a href="#"><span lang="en" dir="ltr">English</span></a></span></div><div class="g" style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:64px;padding-block:32px 72px;align-items:start;max-inline-size:1200px;margin-inline:auto"><div><h1 class="h1" style="margin-block-end:24px">إتمام الشراء</h1><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">01</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">بيانات التواصل وعنوان التوصيل</span><span style="font-size:13.5px;color:#4a4a4a">نور حسن · الجيزة، السادس من أكتوبر</span></div><u style="font-size:13px;font-weight:600">تعديل</u></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">02</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الشحن</span><span style="font-size:13.5px;color:#4a4a4a">التوصيل العادي · 60 ج.م</span></div><u style="font-size:13px;font-weight:600">تعديل</u></div></section><section style="border-block-start:1px solid #dcdcdc"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">03</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">الدفع</span><span style="font-size:13.5px;color:#4a4a4a">بطاقة</span></div><u style="font-size:13px;font-weight:600">تعديل</u></div></section><section style="border-block-start:2px solid #111"><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:16px;align-items:baseline;padding-block:24px;"><span class="h2 wf-num">04</span><div class="lns" style="gap:4px"><span class="h3" style="font-size:22px">المراجعة والتأكيد</span></div></div><div style="padding:0 0 32px 72px"><div class="lns" style="gap:18px"><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;font-size:13px"><div class="lns" style="gap:4px"><span class="eyebrow">التوصيل إلى</span><span>نور حسن، الجيزة، السادس من أكتوبر، الحي 3</span></div><div class="lns" style="gap:4px"><span class="eyebrow">الشحن</span><span>عادي · من 2 إلى 4 أيام عمل</span></div><div class="lns" style="gap:4px"><span class="eyebrow">الدفع</span><span>بطاقة، لدى المزوّد</span></div></div><div class="hair"></div><div style="display:flex;gap:28px;font-size:13px"><u>+ إضافة قسيمة</u><u>+ إضافة ملاحظة على الطلب</u></div><div style="display:flex;gap:12px;font-size:14px"><span class="cb cb--on">✓</span><span>قرأت ووافقت على <u>الشروط والأحكام</u>.</span></div><span class="btn btn--block" style="block-size:60px;font-size:13px">تأكيد الطلب · <span class="money"><span class="wf-num">5,712</span> ج.م</span></span></div></div></section><div style="border-block-start:1px solid #dcdcdc"></div></div><aside style="background:#ededed;padding:28px;display:flex;flex-direction:column;gap:16px;position:sticky;inset-block-start:24px"><div class="eyebrow">طلبك · <span class="wf-num">3</span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">قميص كتان مغسول بقصة خارجية</span><span style="font-size:13px"><span class="money"><span class="wf-num">1,850</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">حقيبة كروس من الجلد</span><span style="font-size:13px"><span class="money"><span class="wf-num">3,650</span> ج.م</span></span></div><div style="display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px"><div class="ph r34"><span class="ph__l" lang="en" dir="ltr"></span></div><span style="font-size:13px;font-weight:600">طقم أكواب من الفخار الحجري</span><span style="font-size:13px"><span class="money"><span class="wf-num">780</span> ج.م</span></span></div><div class="rule"></div><div class="lns mono" style="gap:10px;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>المجموع الفرعي</span><span class="money"><span class="wf-num">6,280</span> ج.م</span></div><div style="display:flex;justify-content:space-between"><span>WELCOME10</span><span>− <span class="money"><span class="wf-num">628</span> ج.م</span></span></div><div style="display:flex;justify-content:space-between"><span>الشحن</span><span class="money"><span class="wf-num">60</span> ج.م</span></div></div><div class="rule"></div><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:750"><span>الإجمالي</span><span class="money"><span class="wf-num">5,712</span> ج.م</span></div></aside></div></div></div><div class="board__notes"><aside class="wf-note wf-state" lang="en" dir="ltr"><b>ck-review-place-order:ready</b> — Review restates address, shipping and payment before Place order (CHK-05). Terms ticked; one press places one order (PAY-05).</aside><aside class="wf-note wf-state" lang="en" dir="ltr"><b>ck-coupon-notes:collapsed</b> — Coupon and note as two links; each opens its field in place.</aside><aside class="wf-note wf-note" lang="en" dir="ltr">Header reduced to back to cart, the mark and the language switcher (OP-15). See the DSQ in A about the full header.</aside><aside class="wf-note wf-recommend" lang="en" dir="ltr">The accordion shortens the page on mobile and makes progress visible, at the cost of hiding earlier answers behind Edit and of custom work on the native block.</aside></div></section>
+</main>
+</body>
+</html>

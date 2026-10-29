@@ -1,8 +1,9 @@
 # Wireframe production workflow
 
 How the low-fidelity wireframes are produced, reviewed and tracked. The artefact format is in
-[README.md](README.md). Nothing in this document has started: **no wireframe exists**, and the calibration set
-begins only on the owner's instruction.
+[README.md](README.md). The calibration set is drawn and reviewed, and the owner's selection is recorded in
+`manifest.json` under `selection`. **Batch-01 is reviewed and closed**; each later batch begins on the
+owner's instruction. A batch's owner review is recorded in `manifest.json`, under its entry in `batches`.
 
 ## 1. What Claude Design receives and reads
 
@@ -170,7 +171,9 @@ baseline drawn in a wireframe is still provisional.
 
 ## 5. After calibration
 
-Planned, not started.
+Steps 1 to 8 are done: the low-fidelity wireframe phase closed on 28 October 2026 (`manifest.json`,
+`stabilisation.phase_closure`), with what remains in `stabilisation.residual`. Steps 9 onward have not started;
+step 9 waits on the client (OD-01).
 
 1. Lock the selected structural direction.
 2. Resolve the interaction options that review decided.
@@ -201,8 +204,8 @@ together. Every surface stays traceable by its canonical id, and `manifest.json`
 | `batch-05` | Checkout, payment and order received: the checkout and its sections, validation, the stock and ERP failure states, the payment handoff and failure, and the order confirmation | 12 |
 | `batch-06` | Account, orders and tracking: the account screens, order history and detail, tracking, the invoice, and the status timeline and labels | 11 |
 | `batch-07` | Wishlist, reviews, content and trust: the wishlist, recently viewed, the review list and form, and the content, policy, contact and campaign pages | 15 |
-| `batch-08` | Transactional emails and customer messages: the email layout, the eight customer emails, the platform's staff emails, and the store notices | 11 |
-| `batch-09` | Additions to the standard administration, and reports: annotated, not redesigned | 40 |
+| `batch-08` | Transactional emails and customer messages: the email layout, the eight customer emails, the new-address verification, the platform's staff emails, and the store notices | 12 |
+| `batch-09` | Additions to the standard administration, and reports: annotated, not redesigned | 41 |
 | `batch-10` | Contracted second-release surfaces, in their own pass after the first-release system is stable (DQ-04) | 8 |
 
 Eight surfaces are in no batch: the seven provider-hosted interfaces, which are not ours to draw, and the premium

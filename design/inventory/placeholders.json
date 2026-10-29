@@ -302,7 +302,7 @@
       "title": "Recommendations in the find journey",
       "affected_surfaces": ["sf-home", "sf-pdp-related"],
       "unknown": "JRN-02 names recommendations and cites no row for them.",
-      "placeholder_allowed": "Curated, hand-picked rails only: trending, new arrivals, collections, related products.",
+      "placeholder_allowed": "Non-personalised rails only, each curated or drawn from a source the staff select: trending (the Trending badge, DQ-09), new arrivals (newest first, DQ-09), collections, related products (the staff's assignment, DQ-10).",
       "must_not_assume": "No personalised recommendation (JRN-12 and HOME-13 are P3).",
       "replaced_by": "The Stage 1 review.",
       "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
@@ -396,7 +396,7 @@
       "source": "docs/pre-development/PRE-03a-sitemap-and-user-flows.md, section 7"
     }
   ],
-  "owner_design_decisions_about": "Boundaries the owner decided on 6 October 2026 (DECISIONS.md D-14) for questions no source answered. Owner design decisions: not client confirmations, and not scope additions. They are locked, and no surface waits on one. A UX pattern with more than one legitimate answer is not here: it is in interaction-options.json, as open or provisional.",
+  "owner_design_decisions_about": "Boundaries the owner decided for questions no source answered (DECISIONS.md D-14, D-17 and D-19; each decision names its own record). Owner design decisions: not client confirmations, and not scope additions. They are locked, and no surface waits on one. A UX pattern with more than one legitimate answer is not here: it is in interaction-options.json, as open or provisional.",
   "owner_design_decisions": [
     {
       "id": "DQ-04",
@@ -435,14 +435,23 @@
       "title": "Review eligibility",
       "status": "locked",
       "question": "No row says whether a review needs an account or a purchase.",
-      "decision": "The Stage 1 design assumes a signed-in customer may submit a review.",
-      "must_not": "No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2).",
+      "decision": "A review can be submitted only by a signed-in customer whose account holds an order for the product, any of its variations or its version in the other language, with delivery confirmed (ORD-07; ORD-14 only once delivery is established). Processing, shipped, out-for-delivery, cancelled, returned-to-origin orders and fully refunded lines do not qualify. A guest order qualifies once linked to the account after its email is verified. One active review per customer and product across variations and languages. An ineligible customer sees a short explanation instead of the form (not_eligible); a customer who has reviewed sees already_reviewed. Enforced on the server on every submission route.",
+      "must_not": "No verified-purchase badge or label anywhere (REV-07 is P2). No guest review by order key, and no review form shown to a customer who is not eligible. An invitation never makes a customer eligible.",
       "decided_by": "owner",
-      "date": "2026-10-06",
-      "record": "DECISIONS.md D-14",
+      "date": "2026-10-20",
+      "record": "DECISIONS.md D-17",
       "client_confirmed": false,
       "adds_scope": false,
-      "affected_surfaces": ["rv-form"]
+      "affected_surfaces": ["sf-pdp-reviews", "rv-form"],
+      "history": [
+        {
+          "date": "2026-10-06",
+          "record": "DECISIONS.md D-14",
+          "decision": "The Stage 1 design assumes a signed-in customer may submit a review.",
+          "must_not": "No verified-purchase requirement and no verified-purchase badge: neither is contracted (REV-07 is P2).",
+          "superseded_by": "DECISIONS.md D-17, 2026-10-20"
+        }
+      ]
     },
     {
       "id": "DQ-07",
@@ -457,6 +466,48 @@
       "client_confirmed": false,
       "adds_scope": false,
       "affected_surfaces": ["gl-cookie-consent"]
+    },
+    {
+      "id": "DQ-08",
+      "title": "Merchandising badges",
+      "status": "locked",
+      "question": "MER-01 and SSC-22 name four badges assigned per product. No source says whether a badge can be calculated or has dates.",
+      "decision": "New, Trending, Limited and Best Seller are assigned per product by the staff. None is calculated from dates, sales or stock, and none expires by itself. At most one merchandising badge shows on a card, by the fixed precedence Limited, then New, then Best Seller, then Trending (batch-02 review, 19 October 2026).",
+      "must_not": "No automatic, scheduled or date-limited badge, and no badge derived from sales or stock figures, without Change Control.",
+      "decided_by": "owner",
+      "date": "2026-10-23",
+      "record": "DECISIONS.md D-19",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["ad-product-storefront-controls", "sf-product-badges"]
+    },
+    {
+      "id": "DQ-09",
+      "title": "Home product rail sources",
+      "status": "locked",
+      "question": "HOME-02 and HOME-03 name a trending section and a new-arrivals section. No source fixes where their products come from.",
+      "decision": "New arrivals (HOME-03) shows the newest products first, by publish date, as a source the staff select in the section's settings. Trending (HOME-02) shows the products the staff have given the Trending badge. Both are non-personalised.",
+      "must_not": "No trending algorithm, no all-time best sellers presented as trending, and no rail source fixed in code (US-02-01).",
+      "decided_by": "owner",
+      "date": "2026-10-23",
+      "record": "DECISIONS.md D-19",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["sf-home"]
+    },
+    {
+      "id": "DQ-10",
+      "title": "Related products and cart suggestions",
+      "status": "locked",
+      "question": "PDP-18, MER-05 and SSC-25 contract related products assigned per product, and US-05-05 draws cart suggestions from that assignment. WooCommerce has three separate mechanisms: automatic Related Products, Upsells and Cross-sells.",
+      "decision": "Related products are the products the staff assign, stored in WooCommerce's Upsells field and shown through it on the product page. WooCommerce's automatic Related Products rail is not shown, and no rail shows when nothing is assigned. Cart suggestions read the same assignment from the products in the cart; the Cross-sells field is not used at launch.",
+      "must_not": "No automatic category or tag fallback without a client clarification or Change Control, and no second list for staff to keep in the Cross-sells field.",
+      "decided_by": "owner",
+      "date": "2026-10-23",
+      "record": "DECISIONS.md D-19",
+      "client_confirmed": false,
+      "adds_scope": false,
+      "affected_surfaces": ["sf-pdp-related", "sf-cart", "ad-product-storefront-controls"]
     }
   ]
 }

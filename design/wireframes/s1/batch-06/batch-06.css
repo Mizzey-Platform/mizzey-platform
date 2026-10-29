@@ -1,0 +1,117 @@
+/* Mizzey batch-06 wireframes: account, orders and tracking. Loaded after the batch-02, batch-02-targets and batch-03 stylesheets and the shared component layer (../../_shared/components.css), which holds the form, notice, address-card, order-summary, status-label and status-timeline components. Prototype only; greys, system type. */
+/* Carried verbatim from s1/batch-04/batch-04.css and s1/batch-05/batch-05.css, which batch-06 does not link: the sign-in page as batch-04 drew it (.aum, .au1, .au1--t, .aut, .au__c, .atab, .gg, .gg__m, .lk2), shown for the signed-out account and the not-permitted page; the summary grid (.ct, .ct--n, .ct__l); the tablet gutter, field stack and field pair (.gtb, .fst, .fg2); the annotation tag (.vrt) and the review-sheet slot (.vsl). Same declarations, so nothing drawn in batch-04 or batch-05 changes size. */
+.ct{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:48px;align-items:start}
+.ct--n{grid-template-columns:minmax(0,1fr) 336px;gap:32px}
+.ct__l{display:flex;flex-direction:column;gap:16px;min-inline-size:0}
+.vrt{display:inline-block;margin-inline-start:4px;padding:1px 5px;border:1px dashed #9a9a9a;font:600 9.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c;white-space:nowrap;vertical-align:1px}
+.au__c{display:flex;flex-direction:column;gap:18px;padding-inline:56px;min-inline-size:0}
+.au1{display:flex;flex-direction:column;gap:18px;max-inline-size:440px;margin-inline:auto;padding-block:56px 80px}
+.aum{display:flex;flex-direction:column;gap:18px;padding:24px 16px 40px}
+.aut{max-inline-size:440px;margin-inline:auto;padding-inline:0}
+.au1--t{padding-block:48px 80px}
+.au1--t>h1{text-align:center}
+.au1--t>.aut{inline-size:100%}
+.atab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;padding:4px;border-radius:12px;background:#f0f0f0}
+.atab>span{display:flex;align-items:center;justify-content:center;min-block-size:44px;padding-inline:6px;border-radius:9px;font-size:14px;font-weight:650;color:#3a3a3a;text-align:center}
+.atab>.on{background:#fff;color:#151515;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.gg{display:flex;align-items:center;justify-content:center;gap:12px;block-size:48px;padding-inline:16px;border:1.5px solid #6b6b6b;border-radius:10px;background:#fff;font-size:14.5px;font-weight:650;color:#151515}
+.gg__m{flex:none;display:inline-flex;align-items:center;justify-content:center;inline-size:22px;block-size:22px;border:1.5px dashed #5c5c5c;border-radius:4px;font:700 9px/1 ui-monospace,Menlo,Consolas,monospace}
+.lk2{display:inline-flex;align-items:center;align-self:flex-start;gap:7px;min-block-size:44px;font-size:13.5px;font-weight:600;text-underline-offset:3px}
+.gtb{padding-inline:24px}
+.fst{display:flex;flex-direction:column;gap:16px}
+.fg2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.vsl{display:flex;align-items:center;min-block-size:48px;padding:8px 12px;border:1.5px dashed #9a9a9a;border-radius:10px;font:500 10.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+/* nv-account-menu: the account under IX-11, with no permanent menu. The page column .acw (desktop .acw--d). The hub: .ach the greeting and one status line; .acs a hub section with its head .acs__h; the routes to the account areas, .acr full-width rows on mobile and tablet, .acr--t tiles on desktop; Sign out .aso, last. Inner pages: on mobile a back link to the account (.abk) and the title; on tablet and desktop the storefront breadcrumbs (gl-breadcrumbs), the title and one row of section links (.asl), the current one marked with aria-current, Sign out at its inline end (.asl__o). .vh: text read by assistive technology only. */
+.acw{display:flex;flex-direction:column;gap:24px;padding-block:16px 48px;min-inline-size:0}
+.acw--d{gap:28px;padding-block:8px 64px}
+.ach{display:flex;flex-direction:column;gap:6px}
+.ach__l{font-size:14.5px;color:#3a3a3a}
+.acs{display:flex;flex-direction:column;gap:12px;min-inline-size:0}
+.acs__h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 16px}
+.acs__h .lnk{min-block-size:44px}
+.acr{display:flex;flex-direction:column;border-block-start:1px solid #e3e3e3}
+.acr>a{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 12px;min-block-size:64px;padding-block:12px;border-block-end:1px solid #e3e3e3;color:#151515;text-decoration:none}
+.acr b{font-size:15px;font-weight:650;overflow-wrap:anywhere}
+.acr small{grid-column:1;font-size:13px;color:#5c5c5c;overflow-wrap:anywhere}
+.acr .chev{grid-column:2;grid-row:1/span 2;margin-inline-end:6px}
+.acr--t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;border-block-start:0}
+.acr--t>a{align-content:start;min-block-size:104px;padding:18px;border:1.5px solid #d6d6d6;border-radius:12px}
+.aso{display:inline-flex;align-items:center;align-self:flex-start;min-block-size:44px;font-size:14px;font-weight:650;text-underline-offset:3px}
+.abk{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;min-block-size:44px;margin-block-end:-8px;font-size:14px;font-weight:600;text-underline-offset:3px}
+.aph{display:flex;flex-direction:column;gap:2px;min-inline-size:0}
+.asl{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-block-start:14px;padding-block-end:12px;border-block-end:1px solid #e3e3e3}
+.asl>a{display:inline-flex;align-items:center;min-block-size:44px;padding-inline:14px;border-radius:999px;font-size:14px;font-weight:600;color:#3a3a3a;text-decoration:none}
+.asl>a[aria-current]{background:#151515;color:#fff}
+.asl>.asl__o{margin-inline-start:auto;text-decoration:underline;text-underline-offset:3px}
+.vh{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* The order card (.ocd): one order. The number and date (.ocd__hd), the status label (cm-status-label) at the inline end, up to three thumbnails (.ocd__th, then +N), the total as charged (.ocd__t). In the order history the whole card is one link. .ocd--lead is the hub's latest order: the compact timeline (.otb) or, on desktop, the timeline itself, and its actions (.ocd__a) outside any link; .ocd--c a compact card without thumbnails. .ocg the list: one column, .ocg--2 two from 768. .odx: the link out to the carrier's page, with the mark .odx__e that says it leaves the store. */
+.ocg{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.ocg--2{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ocd{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:12px;padding:16px;border:1.5px solid #d6d6d6;border-radius:12px;background:#fff;color:#151515;text-decoration:none;min-inline-size:0}
+.ocd__hd{display:flex;flex-direction:column;gap:2px;min-inline-size:0}
+.ocd__n{font-size:15px;font-weight:700}
+.ocd__m{font-size:13px;color:#5c5c5c}
+.ocd .osl{justify-self:end}
+.ocd__th,.ocd__t,.ocd__a,.ocd .otb,.ocd .otl{grid-column:1/-1}
+.ocd__th{display:flex;align-items:center;gap:8px}
+.ocd__th>.ph{flex:none;inline-size:48px;border-radius:6px}
+.ocd__mo{display:inline-flex;align-items:center;justify-content:center;inline-size:48px;block-size:60px;border-radius:6px;background:#ececec;font-size:12.5px;font-weight:700}
+.ocd__t{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding-block-start:12px;border-block-start:1px solid #ececec;font-size:14px}
+.ocd__t b{font-size:15px}
+.ocd--lead{gap:14px 16px;padding:20px 18px;border-color:#151515}
+.ocd__a{display:flex;flex-wrap:wrap;gap:8px}
+.ocd__a .btn{flex:1 1 150px}
+.ocd--c .ocd__t{border-block-start:0;padding-block-start:0}
+.odx{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-block-size:44px;font-size:14px;font-weight:650;text-underline-offset:3px}
+.odx__e{flex:none;inline-size:11px;block-size:11px;border:1.5px solid currentColor;border-radius:2px;box-shadow:3px -3px 0 -1px #fff,3px -3px 0 0 currentColor}
+/* The order detail: .odh the head (title, date, status label); .ods a block (status and timeline, tracking, delivery address, invoice) with its heading, .ods__l its line, .odk a labelled value such as the tracking number. Desktop: the blocks in the main column, the as-charged summary at the inline end, in the summary grid (.ct). */
+.odh{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.odh__m{font-size:14px;color:#3a3a3a}
+.ods{display:flex;flex-direction:column;gap:12px;padding-block-start:20px;border-block-start:1px solid #e3e3e3;min-inline-size:0}
+.ods__l{font-size:14px;line-height:1.5;color:#3a3a3a}
+.odk{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:14px}
+.odk>span:first-child{color:#5c5c5c}
+.odk b{font-size:15px;letter-spacing:.02em}
+.ods .btn{align-self:flex-start}
+.ct__l>.ods:first-child{padding-block-start:0;border-block-start:0}
+/* The address book: .adg the cards, one column, .adg--2 two on desktop; .adf the add-and-edit form at its measure. .adl a dialog (fb-modal) over a scrim, .adl__b its box, .adl__x the close control at the inline end, .adl__a the actions. */
+.adg{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.adg--2{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.adf{max-inline-size:560px}
+.adl{position:absolute;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45)}
+.adl--c{align-items:center}
+.adl__b{position:relative;display:flex;flex-direction:column;gap:14px;inline-size:100%;max-inline-size:480px;padding:24px 20px 20px;border-radius:16px 16px 0 0;background:#fff;box-shadow:0 0 40px rgba(0,0,0,.25)}
+.adl--c .adl__b{border-radius:16px;padding:28px}
+.adl__x{position:absolute;inset-block-start:8px;inset-inline-end:8px;display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;font-size:20px}
+.adl__b>h2{padding-inline-end:40px}
+.adl__a{display:flex;flex-direction:column;gap:8px}
+.adl--c .adl__a{flex-direction:row-reverse;justify-content:flex-start}
+/* Tracking without signing in: .trw the column at a 560 px measure. */
+.trw{display:flex;flex-direction:column;gap:18px;max-inline-size:560px;min-inline-size:0}
+/* ac-invoice: the printable document. .ivw the plain page around it with its return link; .inv the document (.inv--d at print width); .inv__h its head; .inv__g the labelled regions (.inv__r, label .inv__k); the lines and totals are cm-order-summary as charged, without thumbnails inside the document (.inv .sm__l); .inv__pb a page break; .inv__f the foot. */
+.ivw{display:flex;flex-direction:column;gap:12px;padding:16px 12px 40px;background:#ececec;min-inline-size:0}
+.ivw--d{gap:16px;padding:24px 40px 64px}
+.inv{display:flex;flex-direction:column;gap:20px;padding:20px 16px;border:1px solid #bdbdbd;background:#fff;font-size:13.5px;min-inline-size:0}
+.inv--d{inline-size:794px;max-inline-size:100%;margin-inline:auto;gap:26px;padding:56px 64px}
+.ivw--d>.abk{inline-size:794px;max-inline-size:100%;margin-inline:auto}
+.inv__h{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px 24px}
+.inv__g{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.inv--d .inv__g{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 40px}
+.inv__r{display:flex;flex-direction:column;gap:3px;min-inline-size:0;line-height:1.5;overflow-wrap:anywhere}
+.inv__k{font-size:12px;font-weight:700;color:#5c5c5c}
+.inv__l{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
+.inv__l>span:first-child{color:#5c5c5c}
+.inv .sm__l{grid-template-columns:minmax(0,1fr) auto}
+.inv__pb{display:flex;flex-direction:column;gap:14px;margin-inline:-16px;padding:10px 16px 0;border-block-start:2px dashed #8a8a8a;font:500 10.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+.inv--d .inv__pb{margin-inline:-64px;padding-inline:64px}
+.inv__f{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding-block-start:12px;border-block-start:1px solid #e0e0e0;font-size:12px;color:#5c5c5c}
+.ivp{display:inline-block;max-inline-size:100%;overflow-wrap:anywhere;padding:1px 6px;border:1px dashed #9a9a9a;border-radius:4px;font:500 11px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#5c5c5c}
+/* The status-label key and the staff-to-customer mapping (ord-status-labels): .slk the rows, .slm the annotated mapping. */
+.slk{display:flex;flex-direction:column;border-block-start:1px solid #e3e3e3}
+.slk>div{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);align-items:center;gap:6px 16px;min-block-size:52px;padding-block:10px;border-block-end:1px solid #e3e3e3;font-size:13.5px;color:#3a3a3a}
+.slk--m>div{grid-template-columns:minmax(0,1fr);gap:6px}
+.slk .osl{justify-self:start}
+.slm{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:16px;border:1.5px dashed #8a8a8a;border-radius:12px;background:#f3f3f3;font-size:13px}
+.slm__s{display:flex;flex-direction:column;gap:6px;min-inline-size:0}
+.slm__k{font:600 10.5px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#3a3a3a}
+.slm--m{grid-template-columns:minmax(0,1fr)}

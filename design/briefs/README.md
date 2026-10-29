@@ -11,8 +11,8 @@ python tools/design_briefs.py             # check that the committed briefs are 
 python tools/design_briefs.py --surface sf-cart   # print any surface's brief without committing it
 ```
 
-**Which briefs exist is decided by the manifest.** The 32 here are the surfaces of the calibration set. The rest
-are generated batch by batch, when each review batch opens (`../wireframes/workflow.md`).
+**Which briefs exist is decided by the manifest.** The ones here cover the calibration set and every review batch
+opened so far. The rest are generated batch by batch, when each review batch opens (`../wireframes/workflow.md`).
 
 **A brief carries ids and structure, not the wording of the signed register.** The repository is public, and the
 signed documents stay outside it (`../sources.json`). A designer reads the wording of each row in the signed

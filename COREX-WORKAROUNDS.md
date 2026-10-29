@@ -11,4 +11,4 @@ ships in a tag, bump `corex.lock`, delete the workaround, and delete the row.
 |---|---|---|
 
 None open. [corex#201](https://github.com/MustafaShaaban/corex/issues/201), the CLI that lost seven commands under
-`composer install --no-dev`, was fixed in CoreX v0.42.1 and its workaround was removed with the v0.46.1 upgrade.
+`composer install --no-dev`, was fixed in CoreX v0.42.1 and its workaround was removed with the v0.47.0 upgrade, after the reproduction passed on a `--no-dev` build.

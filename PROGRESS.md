@@ -34,23 +34,79 @@ Live status. First action each session: read this, then continue from **Next**.
   for the workflow, merged as `a059e40`). The low-fidelity wireframe is a standalone static HTML and CSS design
   prototype under `design/wireframes/`, never theme or application code. The format, the workflow, the production
   manifest, the brief generator (`tools/design_briefs.py`) and the check that keeps a wireframe from carrying
-  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 32 generated
-  briefs for the calibration surfaces. The shared neutral stylesheet, `design/wireframes/_shared/wireframe.css`,
-  completes the supporting preparation for execution. **No wireframe exists and the calibration set has not
-  started.**
+  script, outside resources, a library or colour (`tools/design_wireframes.py`) are in place, with 98 generated
+  briefs: the calibration surfaces, the rest of batch-01 (PR #356, `52d8600`), the rest of batch-02, the rest of
+  batch-03, the rest of batch-04, the rest of batch-05, batch-06, batch-07 and batch-08. The shared neutral stylesheet,
+  `design/wireframes/_shared/wireframe.css`, completes the supporting preparation for execution. **The calibration
+  set is drawn and reviewed.** Claude
+  Design's 39 files for directions A, B and C were merged on 18 October 2026 as the review record (PR #343,
+  `e8373e3`). The owner selected Direction C with named elements A1 to A5 and B2, and locked DQ-03 and IX-01 to
+  IX-09; DQ-01 and DQ-02 stay provisional. **Recorded in PR #353, merged on 18 October 2026 as `c139c45`**: the
+  selection in `design/wireframes/manifest.json` and the locks in `design/inventory/interaction-options.json`.
+  **The owner then deliberately reconfirmed the direction on 18 October 2026**: C as the structural baseline with
+  A-inspired restraint across the whole storefront, IX-02 refined so that a quick add confirms in place without
+  opening the drawer, and the product-page confirmation recorded as IX-10, open for batch-03. **Recorded in PR
+  #358**, approved by the owner and squash-merged on 18 October 2026: `selection.reconfirmation` in the manifest,
+  beside the #353 fields, which are kept as first recorded. **Batch-01 is reviewed and closed**: Claude Design's 24
+  files, twelve surfaces in English and Arabic, were imported in PR #359 (`0ee1772`), and the owner reviewed and
+  approved them on 19 October 2026. The record, with the seven deferred questions and their references, is the
+  batch-01 entry under `batches` in the manifest. It is the internal structural wireframe review only: not client
+  acceptance, not brand or high-fidelity approval, and not PRE-03b. **Batch-02 is reviewed and closed**: Claude Design's 30
+  files, fifteen surfaces in English and Arabic, were imported in PR #362 (`f8ddd44`), and the owner reviewed and
+  approved them on 19 October 2026, locking DQ-02 (numbered pagination) and setting the badge precedence. The
+  record is the batch-02 entry under `batches` in the manifest, beside its import record. **Batch-03 is reviewed and
+  closed**: Claude Design's 14 files, seven surfaces in English and Arabic, were imported in PR #368 (`8b96f03`)
+  and corrected on the owner's direction in PR #369 (`91f54be`). He reviewed and approved them on 19 October 2026,
+  locking IX-10: the add is confirmed in place, with a persistent confirmation on the mobile buy bar. The record is
+  the batch-03 entry under `batches` in the manifest, beside its import and correction records. **Batch-04 is
+  reviewed and closed**: Claude Design's 30 files, fifteen surfaces in English and Arabic, were imported in PR #372
+  (`238c4fc`). Before closing, the owner directed two corrections: the free-shipping prompt as a rule-neutral
+  placement in the sample carts (OD-04), and decisions D1 to D6, made on 20 October 2026 after the pre-batch-05
+  quality-gate review. These are one form-and-notice pattern, one order summary with five variants, desktop sign-in
+  in one column, a return line when sign-in starts from a context, the order summary on the checkout entry, and a
+  shared component layer, `design/wireframes/_shared/components.css`, that batch-05 onward link. He approved
+  closure on 20 October 2026. The record is the batch-04 entry under `batches` in the manifest, beside its import
+  and correction records. **Batch-05 is reviewed and closed**: Claude Design's 24 files, twelve surfaces in English
+  and Arabic (checkout, payment and order received), were imported with the owner's corrections in one closure on
+  20 October 2026: phone required at checkout, landmark optional pending confirmation, the handoff notes no longer
+  promising what stays filled in, and one narrowed shared rule. The record is the batch-05 entry under `batches`
+  in the manifest: import, corrections and review, with the platform additions and the open inputs it names.
+  **Batch-06 is reviewed and closed**: Claude Design's 22 files, eleven surfaces in English and Arabic (the hub-led
+  account, orders, tracking, the address book, profile and invoice), were imported with the owner's corrections in
+  one closure on 20 October 2026: the email change confirmed from the new address before it takes effect (US-10-05
+  kept), no silent default when the default address is deleted, and a required display name. US-10-01's returns
+  route is to be corrected in the Functional Specification before the Stage 1 submission (ACCT-10 is DEF). The
+  record is the batch-06 entry under `batches` in the manifest.
+  **Batch-07 is reviewed and closed**: Claude Design's 30 files, fifteen surfaces in English and Arabic (the wishlist,
+  recently viewed, the review list, form and pending message, the trust and policy pages, help, contact and the
+  campaign template), were imported with the owner's corrections in one closure on 20 October 2026: the contact
+  layout class renamed so it no longer inherits the batch-03 confirmation card, one labelled Remove action on the
+  wishlist cards (the heart removed there only), and REV-01 traced to the review form. US-01-07's sender
+  acknowledgement stays open for Stage 1, and the batch-01 promotional link (18 px) is a stabilisation item. The
+  record is the batch-07 entry under `batches` in the manifest. **D-17 (applied 20 October 2026 as an owner working
+  decision; client acceptance pending at Stage 1)** revises DQ-06: a review needs a delivered purchase. `rv-form`
+  gains `not_eligible` and `already_reviewed`, drawn by the D-17
+  correction (PR #390) and reviewed by the owner on 21 October 2026: it is `reviewed`, 7 of 7 states. The batch-07
+  and batch-03 closures are unchanged, and client acceptance of the eligibility criteria waits for Stage 1.
+  **Batch-08 is reviewed and closed**: Claude Design's final corrected files, eleven surfaces (the email layout,
+  the eight customer emails and the store notices in English and Arabic, the platform's staff emails in English),
+  were imported for review in PR #388 with the batch-04 Undo correction, and the owner approved them as
+  low-fidelity structural wireframes on 21 October 2026. The shipped, payment-failed and delivered emails carry
+  his three clarifications. Nine items stay open and undecided, among them the review-invitation consent, the
+  email-change verification (US-10-05) and the native email configuration (#285). The record is the batch-08
+  entry under `batches` in the manifest.
 - **`design/` is the UX source of truth, and it holds an inventory, not a design.** 154 surfaces, 22 flows, 72
   components and 34 open design inputs, each surface on its exact register rows. Of the 595 delivery rows, 409
   are carried by a surface and 186 are marked as having no surface with a reason; none is unaccounted for
-  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No wireframe, brief or token
-  exists**, and nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
+  (`design/coverage.md`, generated and checked by `tools/design_inventory.py`). **No token exists. Batch-01 to batch-10 are drawn, each reviewed and closed, 62 files frozen, and the low-fidelity wireframe phase closed on 28 October 2026**; nothing committed is approved UI or UX. The signed documents stay in `final docs/`:
   `design/sources.json` points at them and copies none.
 - **A surface records two PBIs: the one that accepts its rows, and the one that builds it.** No row changed
   owner. Five surfaces are built by a PBI other than the accepting one, the order confirmation among them
   (accepted by #242, built by #255). Six platform surfaces have no build PBI and none is invented for them.
-- **UX is not locked early (D-14, items 12 and 13).** Twelve interaction choices are recorded in
-  `design/inventory/interaction-options.json`: three provisional baselines for the first wireframes (Western
-  digits, numbered pagination, a one-page checkout) and nine open. None is locked, and a provisional baseline is
-  not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
+- **UX is locked only at its decision stage (D-14, items 12 and 13).** Thirteen interaction choices are recorded
+  in `design/inventory/interaction-options.json`: ten locked at the calibration review (DQ-03 and IX-01 to IX-09),
+  DQ-02 (numbered pagination) locked at the batch-02 review, IX-10 (the product-page add confirmation) locked at
+  the batch-03 review, and one provisional baseline (DQ-01 Western digits). A provisional baseline is not a requirement or a final owner decision. Four boundaries are locked owner decisions: second-release surfaces
   out of the first wireframe pass, the cash-collected state for staff only, reviews from signed-in customers with
   no verified-purchase badge, and the consent banner within what the selected tool supports.
 - **The experience target is `design/direction.md`**, and it is not the brand identity. No implementation library
@@ -63,8 +119,9 @@ Live status. First action each session: read this, then continue from **Next**.
   `docs/2026-10-04-github-project-proposal.md` was regenerated from the live Project on 6 October 2026 and shows
   them.
 - **CoreX stays a separate, pinned, disposable checkout.** The merged `sites/` layout is not adopted. The upgrade
-  D-14 calls for is made to v0.46.1, the latest release, in its own infrastructure PR (#351); the pin moves from
-  v0.42.0 when the owner merges it, after the policy PR it is stacked on.
+  to v0.47.0 (D-18 section 6, approved by the owner on 29 October 2026, D-20 row A2) is made in its own
+  infrastructure PR (#351); the pin moves from v0.42.0 when that PR merges. The readiness assessment is
+  `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`.
 - **Option C material is history and is not moved yet.** `scripts/stories.json` and the two retired task
   templates under `discovery/tasks/` are marked as not to be used for design.
 - **Repository visibility: PUBLIC**, deliberately, for an authorized external review period. Mustafa made it
@@ -244,19 +301,89 @@ Live status. First action each session: read this, then continue from **Next**.
 
 ## Next
 
-**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. No wireframe is
-drawn and CoreX is not upgraded until he says so either.** In order:
+**Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. Batches 01 to 10 and
+the supplementary stabilisation review are closed under the recorded review authority, and CoreX is not upgraded until he says so either.** In order:
 
-1. **The wireframe-production preparation (D-15) is complete** with the shared stylesheet. Nothing further is
-   prepared by Claude Code before the design starts.
-2. **Then, on Mustafa's instruction to Claude Design, the calibration set**: eight frames in three structural
-   directions, from the 32 generated briefs. Claude Design draws it; Claude Code does not (D-15, item 9). He
-   selects a direction, or one with elements of another.
-3. **Then the first-release surfaces in ten review batches**, each reviewed and closed, and the second-release
-   surfaces in their own pass once the structural component and interaction system is stable, before PRE-03b is
-   approved (`design/wireframes/workflow.md`).
-4. **The CoreX upgrade**, to v0.46.1, in its own infrastructure PR (#351), before application and storefront
-   implementation resumes. Its description lists the server-side items the new release layout needs.
+1. **The calibration review is done and recorded**: Direction C with named elements (PR #353, `c139c45`), and
+   the owner's reconfirmation of 18 October 2026 (PR #358).
+2. **Then batch-01**: its twelve briefs are on `main` (PR #356, `52d8600`), two of them regenerated by the
+   reconfirmation (`gl-header`, `gl-header-mobile`). Claude Design drew it on Mustafa's instruction; he reviewed it
+   and closed it on 19 October 2026 (PR #359, with the closure record in the manifest). Batch-02 opens on his instruction
+   of 19 October 2026: its fifteen surfaces are briefed, six of them newly, and Claude Design draws it from a
+   private manual-transfer package built from `main` at `8247de7`. Claude Design drew it; the 30 files were imported
+   (PR #362), and he reviewed and closed it on 19 October 2026. A narrow correction of the 44 px targets carried
+   from batch-01 followed (the `corrections` record on the batch-01 entry in the manifest). Batch-03 opens on his
+   instruction of 19 October 2026: its seven surfaces are briefed, one of them newly (`sf-pdp-recently-viewed`),
+   and Claude Design draws it from a private manual-transfer package built from `main` at `5aefe22`. Claude Design
+   drew it; the 14 files were imported (PR #368, `8b96f03`) and he reviewed them on 19 October 2026, selecting the
+   inline confirmation for IX-10. The focused correction he directed merged in PR #369 (`91f54be`): a mobile
+   buy-bar confirmation without a timeout, and 44 px targets for the reused header, logos and footer. He then
+   closed the batch on 19 October 2026, with IX-10 locked (the closure record in the manifest). DQ-01 stays
+   provisional. Batch-04 (cart and authentication) opens on his instruction of 19 October 2026: its fifteen
+   surfaces are briefed, twelve of them newly, and Claude Design draws it from a private manual-transfer package
+   built from `main` at `fcadab5`. Claude Design drew it; the 30 files were imported (PR #372, `238c4fc`). He
+   directed the free-shipping correction and decisions D1 to D6, which Claude Design carried out in one review
+   round, and closed the batch on 20 October 2026 (the correction and closure records in the manifest). IX-02 and
+   IX-10 stay locked, and DQ-01 stays provisional. Batch-05 (checkout, payment and order received) opens on his
+   instruction of 20 October 2026: its twelve surfaces are briefed, six of them newly, and Claude Design draws it
+   from a private manual-transfer package built from the opening, linking the shared component layer. Claude Design
+   drew it, and he reviewed and closed it on 20 October 2026 with his corrections in one PR (the import, correction
+   and closure records in the manifest). DQ-03 stays locked (one page). Batch-06 (account, orders and tracking)
+   opens on his instruction of 20 October 2026, with three decisions: the hub-led account (IX-11, locked), the
+   account inventory corrected on platform evidence, and the ACCT-04 address book kept consistent with checkout's
+   saved addresses. Its eleven surfaces are briefed, and Claude Design draws it from a private manual-transfer
+   package built from the opening. Claude Design drew it, and he reviewed and closed it on 20 October 2026 with his
+   corrections in one PR (the import, correction and closure records in the manifest). Batch-07 (wishlist, reviews,
+   content and trust pages) opens on his instruction of 20 October 2026: its fifteen surfaces are briefed, with the
+   review and wishlist boundaries he had already decided recorded on them (the author's display name, no store-owner
+   replies at launch, nothing from REV-06 to REV-09, and no wishlist capability beyond the contracted one), and Claude
+   Design draws it from a private manual-transfer package built from the opening. The design sources now name the
+   Functional Specification version 1.3 and the Sitemap version 1.1. Claude Design drew it, and he reviewed and
+   closed it on 20 October 2026 with his corrections in one PR (the import, correction and closure records in the
+   manifest). Batch-08 (transactional emails and customer messages) opened on his instruction of 20 October 2026
+   (PR #383); Claude Design drew it from the private package, the final corrected files were imported for his
+   review in PR #388, and he reviewed and closed it on 21 October 2026, with nine items left open in the
+   manifest. US-01-07's sender acknowledgement stays unresolved, and no email surface is added for it. Batch-09
+   (additions to the standard administration, and reports) opens on his instruction of 21 October 2026 in five
+   review groups: its forty surfaces are briefed, each in one group, in English on desktop (the staging marker also in Arabic). 09-A sets the shared
+   administration patterns and is drawn and reviewed first; 09-B to 09-E are drawn from it only after he accepts it,
+   and their outputs come in one pull request at a time. Claude Design drew 09-A, and it is imported for his review
+   with the corrections he approved on 21 October 2026 (the real CoreX, Bosta and WPML menus by role, and CoreX's own
+   page for a full-page refusal); he accepted it on 21 October 2026 and its ten files are frozen. Claude Design drew
+   09-B from that baseline in three controlled correction rounds on his rulings of 21 and 22 October 2026; he accepted
+   it on 22 October 2026 (PR #397) and its eight files are frozen. Claude Design drew 09-C from the frozen baseline,
+   with one controlled correction round on his review of 22 October 2026; he accepted it on 23 October 2026 (PR #399),
+   with three text-only label corrections, and its eight files are frozen. The related-products mechanism stays
+   open pending D-19. Claude Design drew 09-D from the frozen baseline (version 2 package, 25 October 2026), and it
+   is imported for his review. On 26 October 2026 he ruled D1 and D2 (the shipment and refund surfaces become
+   constrained), D4, D5, D7, the ADDED-marker exception and the ORD-14 boundary; Claude Design redrew the two
+   surfaces in one correction round, and he accepted 09-D on 26 October 2026 (PR #401): its ten files are frozen.
+   The Bosta and Paymob mechanisms stay with #291 and #293. Claude Design drew 09-E from the version 2 package,
+   and it is imported for his review in its own pull request. He ruled E9 on 26 October 2026 (the native stock
+   lines are not marked as additions); Claude Design corrected that one file, and he accepted 09-E on 26 October
+   2026 (PR #402), E1 to E4 as working structural decisions: its ten files are frozen. All five batch-09 groups
+   are accepted. For the batch-09 closure he chose, on 26 October 2026, a pattern catalogue only (no CSS
+   consolidation) and one Claude Design correction round (ad-redirect-manager redrawn annotate-only on
+   Redirection, the unrelated sample rows replaced, WooCommerce's Apply button added in eight 09-D files), with
+   related products open pending D-19. Claude Design returned the round, and he accepted the closure on 26 October
+   2026 (PR #403), adopting recommendations C1 to C5 and re-freezing the ten corrected files: batch-09 is closed.
+   Batch-10 (the eight contracted second-release surfaces) opens on his instruction of 26 October 2026 in two
+   review groups, 10-A customer-facing (English and Arabic, mobile first) and 10-B administration (English): its
+   eight surfaces and 25 states are briefed and stay stage S2 (DQ-04). Claude Design drew 10-A, imported for his
+   review in its own pull request (PR #406); he ruled A1 to A12 on 27 October 2026 and, after one correction
+   round, accepted 10-A the same day: its five surfaces are reviewed and its eleven files frozen (in force on his
+   merge approval). Claude Design drew 10-B, imported for his review in its own draft pull request (PR #407);
+   he ruled B1 to B9 on 27 October 2026, and Claude Design returned correction round 1 the same day, imported
+   to that pull request. He ruled B10 and B11 the same day, and Claude Design returned the second, minimal round,
+   imported there. Correction round 3 followed in ce311a0. On 28 October 2026, Claude Code and Codex accepted
+   and froze the corrected 10-B result under the owner's delegated review instruction; this was not the owner's
+   own review.
+3. **The low-fidelity wireframe phase is closed under delegated review**, as `stabilisation.phase_closure`
+   records. Next: receive and apply the brand identity, pending OD-01; then high-fidelity design, motion, working
+   HTML and CSS and PRE-03b. Residuals remain carried. No functional implementation is authorised.
+4. **The CoreX upgrade to v0.47.0** (D-18 section 6, approved by the owner on 29 October 2026), made in its own
+   infrastructure PR before the non-storefront work resumes. Its gates are in
+   `docs/2026-10-21-corex-v0.47.0-migration-readiness.md`.
 5. **When the PBIs that are not storefront screens resume** (#249, #245, #248 and the rest of the queue below) is
    Mustafa's decision. The queue is kept as the order they would follow.
 

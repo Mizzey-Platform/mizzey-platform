@@ -122,14 +122,14 @@ WooCommerce product image gallery block.
 
 ### IX-04: Gallery navigation and zoom
 
-Status `open`. No pattern is preferred yet: propose, recommend one and show the alternatives.
+Status `locked`. Selected. Draw the selected pattern.
 
 **Outcome required.** A customer browses a product's images and video and can zoom (PDP-01, PDP-02). No row says how the gallery is navigated or how zoom works.
 
 |  |  |
 |---|---|
 | Working baseline | None |
-| Selected pattern | None |
+| Selected pattern | Thumbnail strip with a main image |
 | Decided at | the owner's review of the low-fidelity wireframes |
 
 Candidate patterns:
@@ -195,14 +195,14 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Product page, gallery and purchase actions (`batch-03`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 7 |
-| Interaction decisions pending | IX-04 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 7 of 7 |
+| Interaction decisions pending | None |
 | Calibration frames | Product detail page (`cal-05`), Mobile shopping composition: listing, filters, product and add to cart (`cal-08`) |
 
 Statuses run: `briefed`, `exploration`, `candidate_selected`, `wireframed`, `reviewed`.

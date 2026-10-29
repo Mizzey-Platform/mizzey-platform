@@ -99,7 +99,7 @@ Flows it serves: Cart (`F07`); Registration and sign in (`F08`); Reorder, second
 | Notice (`fb-notice`) | feedback | success, error, info, warning |  |
 | Product rail (`cn-product-rail`) | content |  | The rail starts at the inline-start edge and scrolls toward the inline-end edge. |
 
-**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category. Proposed. The register fixes no variant before the interface design is approved.
+**Product rail is a section of the curated library.** Editable: heading, source, item count within a fixed range. Locked: card layout, columns per viewport. Variants: manual pick, by collection, by category, newest, by badge. Proposed. The register fixes no variant before the interface design is approved.
 
 ## States
 
@@ -156,7 +156,41 @@ WooCommerce Cart block.
 | `OD-04` Free shipping: what two items means | working_default | Two units or two distinct products, and any exclusions. | The prompt reads from the rule. Owner default: two or more units, any mix, no exclusions. | Do not hard-code 'two'. Do not draw exclusions. |
 | `PRE-09` ERP Integration Specification | erp | When and how the store reads stock, what the customer sees when stock cannot be validated, how reservation works, and how stock appears in the admin. | Structural stock states: in stock, out of stock, unknown or cannot validate, and a changed cart line. Neutral placeholder wording. | No timing, no mechanism, no 'only N left', no reservation timer, no stock quantity shown to customers, no admin stock editing behaviour. No P1-E surface beyond a placeholder. |
 
+**Locked owner decisions that govern this surface.** Not client confirmations, not scope additions.
+
+| Decision | What was decided | Not to be done |
+|---|---|---|
+| `DQ-10` Related products and cart suggestions | Related products are the products the staff assign, stored in WooCommerce's Upsells field and shown through it on the product page. WooCommerce's automatic Related Products rail is not shown, and no rail shows when nothing is assigned. Cart suggestions read the same assignment from the products in the cart; the Cross-sells field is not used at launch. | No automatic category or tag fallback without a client clarification or Change Control, and no second list for staff to keep in the Cross-sells field. |
+
 ## Interaction options
+
+### IX-02: Mini-cart presentation
+
+Status `locked`. Selected. Draw the selected pattern.
+
+**Outcome required.** The header shows the cart with a live item count and a mini-cart (NAV-06, CART-12), and a customer who adds from a listing or a product rail (PLP-04) or from the cart's suggestions (CART-08) sees that the item was added. No row says how the mini-cart opens or how those adds are confirmed. The product page's Add to Cart (PDP-08) is IX-10.
+
+|  |  |
+|---|---|
+| Working baseline | None |
+| Selected pattern | The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer |
+| Decided at | the owner's review of the low-fidelity wireframes |
+
+Candidate patterns:
+
+- Dropdown panel under the header
+- Side drawer
+- Drawer that opens after an add, with the count alone at other times
+- The drawer opens on a deliberate click or tap of the cart control, with focus moved into it and returned to the control that opened it on close. A successful quick add from a listing or a product rail is confirmed in place, updates the header count and is announced, without opening the drawer or moving focus away from the quick add. A failed add shows its error, with no success message and no change to the count. An add from the cart's suggestions does not automatically open another drawer
+
+| Constraint | What it is |
+|---|---|
+| A mini-cart in the header is contracted (CART-12). It cannot be reduced to a link to the cart page. | Fixed by the contract. Not a design alternative |
+| The cart page remains (IA-08). | Contracted condition every pattern must meet |
+| Every confirmation, error and drawer is operable by keyboard and perceivable by screen-reader users, and its motion respects a reduced-motion preference (NFR-11). | Contracted condition every pattern must meet |
+| The WooCommerce mini-cart block is the native baseline. | Platform limit |
+
+Weighed in the review: mobile behaviour; room for the free-shipping prompt (CART-07); how much an add interrupts browsing; focus management; performance.
 
 ### DQ-01: Numerals in Arabic
 
@@ -207,13 +241,13 @@ The direction is not the brand identity. Wireframes are neutral: greys, a system
 
 |  |  |
 |---|---|
-| Review status | `briefed` |
+| Review status | `reviewed` |
 | Review batch | Cart and authentication (`batch-04`) |
-| English, left to right | `not_started` |
-| Arabic, right to left | `not_started` |
-| Mobile | `not_started` |
-| Desktop | `not_started` |
-| States covered | 0 of 11 |
+| English, left to right | `reviewed` |
+| Arabic, right to left | `reviewed` |
+| Mobile | `reviewed` |
+| Desktop | `reviewed` |
+| States covered | 11 of 11 |
 | Interaction decisions pending | None |
 | Calibration frames | Mini-cart and cart (`cal-06`) |
 
