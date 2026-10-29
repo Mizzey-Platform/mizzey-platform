@@ -7,82 +7,85 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
 
 ## Phase 1: Fixtures and the import specification as data
 
-- [ ] T001 Write `mizzey-site/tests/integration/fixtures/catalogue/README.md`: the fixture is invented, its headers are
+- [x] T001 Write `mizzey-site/tests/integration/fixtures/catalogue/README.md`: the fixture is invented, its headers are
       illustrative of an Amazon seller listings report, and the real export (CR-06) replaces them. Test: none; a record.
-- [ ] T002 Write `fixtures/catalogue/export.tsv`: simple, variable and variation rows across the four client categories
+- [x] T002 Write `fixtures/catalogue/export.tsv`: simple, variable and variation rows across the four client categories
       (Beauty, Health and household, Sport, Vitamins), Arabic text, and one seeded row per rule code and warning in
       `contracts/initial-load-rules.md`, including a parent that appears after its variations. Test: t30, t33.
-- [ ] T003 Write the file-level fixtures: `header-mismatch.tsv`, `duplicate-headers.tsv`, `ragged-rows.tsv`,
+- [x] T003 Write the file-level fixtures: `header-mismatch.tsv`, `duplicate-headers.tsv`, `ragged-rows.tsv`,
       `empty.tsv`, `header-only.tsv`. Test: t31, t33.
-- [ ] T004 Write `mizzey-site/import/catalogue-mapping.json` for the fixture: `version`, `rules_version`, `source`,
+- [x] T004 Write `mizzey-site/import/catalogue-mapping.json` for the fixture: `version`, `rules_version`, `source`,
       every header mapped or ignored with a reason, `row_type`, `language` (data-model.md). Test: t31.
 
 ## Phase 2: Failing scenarios first
 
-- [ ] T005 [US1] Write `t30-catalogue-read.php`: the agreed format read row for row, identifiers and parsed text
+- [x] T005 [US1] Write `t30-catalogue-read.php`: the agreed format read row for row, identifiers and parsed text
       preserved, a byte-order mark stripped. Test: itself (AC-1).
-- [ ] T006 [US1] Write `t31-catalogue-mapping.php`: every agreed header mapped or ignored with a reason; F1 on a missing
+- [x] T006 [US1] Write `t31-catalogue-mapping.php`: every agreed header mapped or ignored with a reason; F1 on a missing
       mapped column; W2 on an unlisted column and no completeness claim; duplicate headers; inconsistent row widths;
       mapping validation (version, format, delimiter, encoding, unique headers, rules version). Test: itself (AC-2).
-- [ ] T007 [US1] Write `t32-catalogue-preview.php`: the first rows field by field, Arabic intact, the mapping version,
+- [x] T007 [US1] Write `t32-catalogue-preview.php`: the first rows field by field, Arabic intact, the mapping version,
       the declared encoding, the row limit and explicit header differences. Test: itself (AC-3).
-- [ ] T008 [US2] Write `t33-catalogue-outcomes.php`: one deterministic outcome per row with every applicable issue
+- [x] T008 [US2] Write `t33-catalogue-outcomes.php`: one deterministic outcome per row with every applicable issue
       retained; each seeded rule code; partial updates; several issues at once; duplicate-row order independence;
       later, rejected and wrong-type parents; unknown row types; empty and header-only files. Assert the completed
       command's `validation-report.csv` contains the expected row outcomes, reasons and applicable issues. Test: itself
       (AC-4, FR-005).
-- [ ] T009 [US2] Write `t34-catalogue-no-write.php`: both real commands in separate processes; protected records
+- [x] T009 [US2] Write `t34-catalogue-no-write.php`: both real commands in separate processes; protected records
       compared before and after (posts, meta, terms and relationships, term meta, attachment meta, product lookup rows,
       WPML translation relationships); representative API and direct-SQL mutations stopped with exit 3 before they
       happen; cold-cache reads and permitted cache housekeeping succeed; failure paths included. Test: itself (AC-5).
-- [ ] T010 [US2] Write `t35-catalogue-sku-resolution.php`: products and variations; duplicate and separately
+- [x] T010 [US2] Write `t35-catalogue-sku-resolution.php`: products and variations; duplicate and separately
       translated pairs; unmatched SKU; unrelated duplicate identities; missing language details; missing group
       original; an original with a different SKU; trash; case and whitespace candidates. Assert `validation-report.csv`
       contains the expected resolved ids, language roles, translations and near-match candidate ids, stored SKUs and
       comparison rules. Test: itself (AC-6, FR-006).
-- [ ] T011 [US3] Write `t36-catalogue-issue-list.php`: every `client` issue in `client-issues.csv` with row, SKU,
+- [x] T011 [US3] Write `t36-catalogue-issue-list.php`: every `client` issue in `client-issues.csv` with row, SKU,
       field, problem and correction, including one on a non-rejected row; no `developer` issue; UTF-8 with a
       byte-order mark. Test: itself (AC-7).
-- [ ] T012 Write `t37-catalogue-run-record.php`: the complete CX-04 payload, the fixture-adapter marking, and a
+- [x] T012 Write `t37-catalogue-run-record.php`: the complete CX-04 payload, the fixture-adapter marking, and a
       file-level failure recorded without invented row outcomes. Exercise guard and output-write failures and assert
       that neither leaves a run marked completed. Test: itself (FR-010, CX-04).
-- [ ] T013 Run t30 to t37 before any production code and keep the output as `evidence/before.txt`. Each must fail.
+- [x] T013 Run t30 to t37 before any production code and keep the output as `evidence/before.txt`. Each must fail.
+      **Not done as written:** the components were written before the scenarios. In its place, three deliberate
+      defects were each shown to fail the scenario that guards them, and the code was restored
+      (`evidence/mutation.txt`).
 
 ## Phase 3: Reading and mapping
 
-- [ ] T014 [US1] Create `src/Catalogue/Import/ExportReader.php`: the delimited reader, byte-order mark, documented
+- [x] T014 [US1] Create `src/Catalogue/Import/ExportReader.php`: the delimited reader, byte-order mark, documented
       encoding, bounded reading (research R-3). Test: t30.
-- [ ] T015 [US1] Create `Mapping.php`: load and validate the import specification (data-model.md). Test: t31.
-- [ ] T016 [US1] Create `HeaderCheck.php`: F1, W2, duplicate headers, row widths (FR-008). Test: t31.
-- [ ] T017 [US1] Create `RowInterpreter.php`: SKU and parent SKU preserved unchanged; other fields by explicit mapping
+- [x] T015 [US1] Create `Mapping.php`: load and validate the import specification (data-model.md). Test: t31.
+- [x] T016 [US1] Create `HeaderCheck.php`: F1, F2, F3, W2 (FR-008); row widths are judged per row (R8, `RowInterpreter`). Test: t31, t33.
+- [x] T017 [US1] Create `RowInterpreter.php`: SKU and parent SKU preserved unchanged; other fields by explicit mapping
       and loader rules; unknown row types and malformed values get documented outcomes. Test: t32, t33.
 
 ## Phase 4: Resolution, rules and the pass
 
-- [ ] T018 [US2] Create `SkuIndex.php`: batched prepared queries on `wc_product_meta_lookup` joined to posts, trash
+- [x] T018 [US2] Create `SkuIndex.php`: batched prepared queries on `wc_product_meta_lookup` joined to posts, trash
       excluded, no `LIMIT 1`; byte-identical, collation-equivalent and trimming-only candidates kept apart; WPML
       details by element type with full-group resolution (research R-4). Test: t35.
-- [ ] T019 [US2] Create `LoadRules.php`: file-level checks first, rejections before C1 or U1, separate create and update
+- [x] T019 [US2] Create `LoadRules.php`: file-level checks first, rejections before C1 or U1, separate create and update
       requirements, parent resolution irrespective of row order, R2 without first-row-wins (contracts). Test: t33.
-- [ ] T020 [US2] Create `ValidationPass.php`: index the file's parent candidates, then finalise outcomes, totals and
+- [x] T020 [US2] Create `ValidationPass.php`: index the file's parent candidates, then finalise outcomes, totals and
       issues. Test: t33, t35.
-- [ ] T021 [US2] Create `CatalogueWriteGuard.php`: hooks plus the command-local `query` filter over protected storage,
+- [x] T021 [US2] Create `CatalogueWriteGuard.php`: hooks plus the command-local `query` filter over protected storage,
       the permitted housekeeping list, removal in `finally` (plan.md). Test: t34.
 
 ## Phase 5: Reports, record and command
 
-- [ ] T022 [US2] [US3] Create `ReportWriter.php`: `validation-report.csv` with near-match evidence, `client-issues.csv`,
+- [x] T022 [US2] [US3] Create `ReportWriter.php`: `validation-report.csv` with near-match evidence, `client-issues.csv`,
       UTF-8 with a byte-order mark (research R-8). Test: t33, t35, t36.
-- [ ] T023 Create `ImportRunRecorder.php` and `FileImportRunRecorder.php`: the CX-04 payload in `run.json`, a guard or
+- [x] T023 Create `ImportRunRecorder.php` and `FileImportRunRecorder.php`: the CX-04 payload in `run.json`, a guard or
       output failure never marked completed (research R-6). Test: t37.
-- [ ] T024 [US1] [US2] Create `Cli/CatalogueCommand.php` and register it in the service provider only when `WP_CLI` is
+- [x] T024 [US1] [US2] Create `Cli/CatalogueCommand.php` and register it in `mizzey-site.php` only when `WP_CLI` is
       defined (contracts/cli.md, exits 0 to 3). Test: t32, t34, t37; the FR-011 registration and surface review in T026
       verifies CLI-only registration and no administration screen. The unchanged t27 is storefront regression evidence
       only.
 
 ## Phase 6: Scale and verification
 
-- [ ] T025 Write `t38-catalogue-volume.php`: a generated 5,000-product file, rows accounted for, elapsed time and peak
+- [x] T025 Write `t38-catalogue-volume.php`: a generated 5,000-product file, rows accounted for, elapsed time and peak
       memory recorded as facts (FR-012, OD-15 provisional). Test: itself.
 - [ ] T026 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
       Record the named FR-003 single-mapping and no-profile review and the FR-011 CLI-only registration and no-screen

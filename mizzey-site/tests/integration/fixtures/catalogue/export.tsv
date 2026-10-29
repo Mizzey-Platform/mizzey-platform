@@ -1,0 +1,24 @@
+﻿seller-sku	item-name	item-name-ar	item-description	item-description-ar	price	quantity	parent-child	parent-sku	variation-theme	size-name	color-name	flavor-name	asin1	image-url	open-date
+MZ-VIT-C-1000	Vitamin C 1000 mg, 60 capsules	فيتامين سي ١٠٠٠ مجم، ٦٠ كبسولة	Vitamin C 1000 mg, 60 capsules, from the Mizzey range.	فيتامين سي ١٠٠٠ مجم، ٦٠ كبسولة من مجموعة ميزي.	349.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-SER-30	Hydrating Serum 30 ml	سيروم مرطب ٣٠ مل	Hydrating Serum 30 ml, from the Mizzey range.	سيروم مرطب ٣٠ مل من مجموعة ميزي.	450.00	12	child	MZ-SER	Size	30 ml			B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-SER-50	Hydrating Serum 50 ml	سيروم مرطب ٥٠ مل	Hydrating Serum 50 ml, from the Mizzey range.	سيروم مرطب ٥٠ مل من مجموعة ميزي.	690.00	12	child	MZ-SER	Size	50 ml			B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-SER	Hydrating Serum	سيروم مرطب	Hydrating Serum, from the Mizzey range.	سيروم مرطب من مجموعة ميزي.		12	parent		Size				B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-UPD-001	Whey Protein 1 kg, vanilla	بروتين مصل اللبن ١ كجم، فانيليا	Whey Protein 1 kg, vanilla, from the Mizzey range.	بروتين مصل اللبن ١ كجم، فانيليا من مجموعة ميزي.	1199.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-UPD-002						12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-NOPRICE	Yoga Mat 6 mm	سجادة يوجا ٦ مم	Yoga Mat 6 mm, from the Mizzey range.	سجادة يوجا ٦ مم من مجموعة ميزي.		12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-DUP-1	Hand Cream 75 ml	كريم يدين ٧٥ مل	Hand Cream 75 ml, from the Mizzey range.	كريم يدين ٧٥ مل من مجموعة ميزي.	120.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+mz-dup-1	Hand Cream 75 ml (repeat)	كريم يدين ٧٥ مل	Hand Cream 75 ml (repeat), from the Mizzey range.	كريم يدين ٧٥ مل من مجموعة ميزي.	120.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-TRX-001	Omega 3, 90 softgels	أوميجا ٣، ٩٠ كبسولة	Omega 3, 90 softgels, from the Mizzey range.	أوميجا ٣، ٩٠ كبسولة من مجموعة ميزي.	410.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-AMB-001	Resistance Band Set	مجموعة أحزمة مقاومة	Resistance Band Set, from the Mizzey range.	مجموعة أحزمة مقاومة من مجموعة ميزي.	260.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-ORPHAN-1	Lip Oil, rose	زيت شفاه، وردي	Lip Oil, rose, from the Mizzey range.	زيت شفاه، وردي من مجموعة ميزي.	180.00	12	child	MZ-NOPARENT	Color		Rose		B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-BADPRICE	Shampoo 400 ml	شامبو ٤٠٠ مل	Shampoo 400 ml, from the Mizzey range.	شامبو ٤٠٠ مل من مجموعة ميزي.	12,50	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-BUNDLE	Morning Vitamins Bundle	باقة فيتامينات الصباح	Morning Vitamins Bundle, from the Mizzey range.	باقة فيتامينات الصباح من مجموعة ميزي.	599.00	12	bundle						B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+mz-near-001 	Collagen Powder 300 g	مسحوق كولاجين ٣٠٠ جم	Collagen Powder 300 g, from the Mizzey range.	مسحوق كولاجين ٣٠٠ جم من مجموعة ميزي.	899.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-NOAR	Electrolyte Tablets, lemon		Electrolyte Tablets, lemon, from the Mizzey range.		95.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-LIP-01	Lip Tint, coral	صبغة شفاه، مرجاني	Lip Tint, coral, from the Mizzey range.	صبغة شفاه، مرجاني من مجموعة ميزي.	210.00	12	child	MZ-LIP	Color		Coral		B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-LIP		صبغة شفاه		صبغة شفاه من مجموعة ميزي.		12	parent		Color				B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-WRONG-1	Dish Soap 500 ml, lemon	صابون أطباق ٥٠٠ مل، ليمون	Dish Soap 500 ml, lemon, from the Mizzey range.	صابون أطباق ٥٠٠ مل، ليمون من مجموعة ميزي.	45.00	12	child	MZ-SIMPLE-STORE	Flavor			Lemon	B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-WIDE	Laundry Pods 30	كبسولات غسيل ٣٠
+MZ-STOREVAR-1	Pre-workout 100 g	مكمل قبل التمرين ١٠٠ جم	Pre-workout 100 g, from the Mizzey range.	مكمل قبل التمرين ١٠٠ جم من مجموعة ميزي.	150.00	12	child	MZ-VARPARENT-STORE	Size	100 g			B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-KIND-1	Sports Bottle 750 ml	زجاجة رياضية ٧٥٠ مل	Sports Bottle 750 ml, from the Mizzey range.	زجاجة رياضية ٧٥٠ مل من مجموعة ميزي.	130.00	12							B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15
+MZ-MULTI	Face Mask Sheet	قناع وجه	Face Mask Sheet, from the Mizzey range.	قناع وجه من مجموعة ميزي.	x	12	bundle						B0FIXTURE0	https://example.invalid/i.jpg	2026-01-15

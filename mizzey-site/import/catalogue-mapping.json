@@ -1,0 +1,66 @@
+{
+  "version": "0.1.0-fixture",
+  "rules_version": 1,
+  "note": "Fixture mapping for the illustrative export in tests/integration/fixtures/catalogue. The real export (CR-06) replaces the headers; bump the version when it does.",
+  "source": {
+    "format": "tsv",
+    "encoding": "UTF-8"
+  },
+  "columns": {
+    "seller-sku": {
+      "to": "sku"
+    },
+    "item-name": {
+      "to": "name"
+    },
+    "item-name-ar": {
+      "to": "name_ar"
+    },
+    "item-description": {
+      "to": "description"
+    },
+    "item-description-ar": {
+      "to": "description_ar"
+    },
+    "price": {
+      "to": "regular_price"
+    },
+    "parent-child": {
+      "to": "row_type"
+    },
+    "parent-sku": {
+      "to": "parent_sku"
+    },
+    "size-name": {
+      "to": "attribute_size"
+    },
+    "color-name": {
+      "to": "attribute_shade"
+    },
+    "flavor-name": {
+      "to": "attribute_flavour"
+    },
+    "quantity": {
+      "ignore": "Stock comes from the ERP; the stock rows are P1-E and wait for PRE-09"
+    },
+    "variation-theme": {
+      "ignore": "Names the varying attributes only; their values are read from their own columns"
+    },
+    "asin1": {
+      "ignore": "Amazon's own identifier; the store has no field for it"
+    },
+    "image-url": {
+      "ignore": "Images are migrated by #296 (MIG-16), subject to CR-08"
+    },
+    "open-date": {
+      "ignore": "Amazon's listing date; the store has no field for it"
+    }
+  },
+  "row_type": {
+    "values": {
+      "": "simple",
+      "parent": "variable",
+      "child": "variation"
+    }
+  }
+}

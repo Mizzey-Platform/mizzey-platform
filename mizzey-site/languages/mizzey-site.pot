@@ -34,6 +34,338 @@ msgstr ""
 msgid "Collection"
 msgstr ""
 
+#. translators: 1: a table, 2: the start of the statement.
+#: mizzey-site/src/Catalogue/Import/CatalogueWriteGuard.php:56
+#, php-format
+msgid "A catalogue write was attempted during a read-only run and refused (table %1$s): %2$s"
+msgstr ""
+
+#. translators: 1: mapping version, 2: rules version, 3: format, 4: encoding.
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:70
+#, php-format
+msgid "Mapping %1$s (initial-load rules %2$d), format %3$s, encoding %4$s"
+msgstr ""
+
+#. translators: 1: row number, 2: row type.
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:85
+#, php-format
+msgid "Row %1$d (%2$s)"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:135
+msgid "--out must name a directory that can be written."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:165
+msgid "peak memory"
+msgstr ""
+
+#. translators: %s: a file path.
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:182
+#, php-format
+msgid "Run recorded: %s"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:193
+msgid "Validation completed. Review client-issues.csv before it is sent (MIG-19)."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:205
+msgid "The mapping cannot be used:"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:217
+msgid "Give the path of a readable export file."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:233
+msgid "Header: every column is mapped or recorded as not imported."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:234
+msgid "Header: the mapping is not complete for this file."
+msgstr ""
+
+#. translators: %s: the file path.
+#: mizzey-site/src/Catalogue/Import/ExportReader.php:43
+#, php-format
+msgid "The file cannot be read: %s"
+msgstr ""
+
+#. translators: %s: a file path.
+#: mizzey-site/src/Catalogue/Import/FileImportRunRecorder.php:36
+#, php-format
+msgid "The run record cannot be written: %s"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/HeaderCheck.php:36
+msgid "The file has no header row."
+msgstr ""
+
+#. translators: 1: a header, 2: how many times it appears.
+#: mizzey-site/src/Catalogue/Import/HeaderCheck.php:48
+#, php-format
+msgid "The header \"%1$s\" appears %2$d times."
+msgstr ""
+
+#. translators: 1: a header, 2: the store field it fills.
+#: mizzey-site/src/Catalogue/Import/HeaderCheck.php:63
+#, php-format
+msgid "The mapped column \"%1$s\" (fills %2$s) is missing from the file."
+msgstr ""
+
+#. translators: %s: a header.
+#: mizzey-site/src/Catalogue/Import/HeaderCheck.php:76
+#, php-format
+msgid "The column \"%s\" is in the file but not in the mapping: map it or record why it is not imported."
+msgstr ""
+
+#. translators: %s: a store field.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:80
+#, php-format
+msgid "The required value \"%s\" is empty."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:82
+msgid "Fill in the value for this row."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:91
+msgid "The Arabic text is empty."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:91
+msgid "Add the Arabic text, or confirm the product is English only."
+msgstr ""
+
+#. translators: %d: a product or variation id.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:107
+#, php-format
+msgid "The SKU belongs to the source-language original %d."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:112
+msgid "No store record has this SKU."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:125
+msgid "A store record with this SKU has no language details, so its original cannot be identified."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:125
+msgid "Repair the record's translation details before the load."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:128
+msgid "The SKU belongs only to a translation whose source-language original is missing or in the trash."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:128
+msgid "Restore or recreate the original before the load."
+msgstr ""
+
+#. translators: %s: product ids.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:133
+#, php-format
+msgid "The SKU belongs to unrelated store records: %s."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:135
+msgid "Give each store record its own SKU before the load."
+msgstr ""
+
+#. translators: 1: the store record's kind, 2: the row type.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:142
+#, php-format
+msgid "The SKU belongs to a store %1$s, and the row is a %2$s."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:145
+msgid "Correct the row type or the SKU."
+msgstr ""
+
+#. translators: %d: a product id.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:150
+#, php-format
+msgid "The SKU matched a translation; its original %d carries a different SKU."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:152
+msgid "Align the SKUs of the translation group."
+msgstr ""
+
+#. translators: 1: a product id, 2: its stored SKU.
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:160
+#, php-format
+msgid "Matched record %1$d stores the SKU as \"%2$s\"; the match ignores case, accents and surrounding spaces, as the store's own SKU lookup does."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/LoadRules.php:163
+msgid "Check the SKU is meant to be the same product."
+msgstr ""
+
+#. translators: %s: the mapping file path.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:50
+#, php-format
+msgid "The mapping is not readable JSON: %s"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:141
+msgid "version: a non-empty string is required"
+msgstr ""
+
+#. translators: %d: the rules version this code applies.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:146
+#, php-format
+msgid "rules_version: this tool applies initial-load rules version %d"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:152
+msgid "source.format: tsv or csv (another format needs agreement first)"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:156
+msgid "source.encoding: a known encoding name is required"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:161
+msgid "columns: an object of source headers is required"
+msgstr ""
+
+#. translators: %s: a source header.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:172
+#, php-format
+msgid "columns.%s: exactly one of \"to\" or \"ignore\" (with its reason) is required"
+msgstr ""
+
+#. translators: %s: a source header.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:180
+#, php-format
+msgid "columns.%s: \"ignore\" needs the reason the column is not imported"
+msgstr ""
+
+#. translators: 1: a source header, 2: the field it names.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:188
+#, php-format
+msgid "columns.%1$s: \"%2$s\" is not a store field this tool knows"
+msgstr ""
+
+#. translators: %s: a store field.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:195
+#, php-format
+msgid "columns: two columns fill \"%s\""
+msgstr ""
+
+#. translators: %s: a store field.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:206
+#, php-format
+msgid "columns: no column fills \"%s\""
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:214
+msgid "row_type.values: the source values of the row-type column are required"
+msgstr ""
+
+#. translators: 1: a source value, 2: the row type it names.
+#: mizzey-site/src/Catalogue/Import/Mapping.php:220
+#, php-format
+msgid "row_type.values: \"%1$s\" names \"%2$s\", which is not simple, variable or variation"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/Mapping.php:227
+msgid "columns: variation rows need a column that fills \"parent_sku\""
+msgstr ""
+
+#. translators: %s: a file path.
+#: mizzey-site/src/Catalogue/Import/ReportWriter.php:56
+#, php-format
+msgid "The report cannot be written: %s"
+msgstr ""
+
+#. translators: 1: cells in the row, 2: columns in the header.
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:39
+#, php-format
+msgid "The row has %1$d cells and the header has %2$d columns."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:42
+msgid "Re-export the row so every column has one cell."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:56
+msgid "The text is not valid in the declared encoding."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:56
+msgid "Re-export the file in the encoding the mapping declares."
+msgstr ""
+
+#. translators: %s: the value found.
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:75
+#, php-format
+msgid "The row type \"%s\" is not one the mapping knows."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:77
+msgid "Use one of the row-type values the mapping lists."
+msgstr ""
+
+#. translators: %s: the value found.
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:84
+#, php-format
+msgid "The price \"%s\" is not a number."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/RowInterpreter.php:86
+msgid "Write the price as digits with a dot for decimals, for example 249.50, with no currency or thousands separator."
+msgstr ""
+
+#. translators: %s: row numbers.
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:114
+#, php-format
+msgid "The SKU is repeated on rows %s, so which row is the product cannot be decided."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:116
+msgid "Give each product its own SKU, or remove the repeated rows."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:167
+msgid "The parent SKU is on more than one row of the file."
+msgstr ""
+
+#. translators: 1: a row number, 2: its row type.
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:171
+#, php-format
+msgid "The parent SKU is on row %1$d, which is a %2$s product, not a variable one."
+msgstr ""
+
+#. translators: %d: a row number.
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:177
+#, php-format
+msgid "The parent on row %d is rejected, so it cannot hold variations."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:181
+msgid "Correct the parent row first."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:189
+msgid "The parent SKU is neither in the file nor in the store."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:189
+msgid "Add the parent product row, or correct the parent SKU."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:192
+msgid "The parent SKU belongs to a store record that cannot hold variations (not a variable product, or its identity is unresolved)."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/Import/ValidationPass.php:192
+msgid "Resolve the store record of the parent before the load."
+msgstr ""
+
 #: mizzey-site/src/Security/BaselineReport.php:46
 msgid "No WordPress, WooCommerce, CoreX or WPML generator mark"
 msgstr ""

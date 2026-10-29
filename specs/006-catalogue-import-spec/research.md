@@ -50,10 +50,11 @@ product the query reaches first (`class-wc-product-data-store-cpt.php`, line 134
 
 **Decision:** use prepared, batched candidate queries joining WooCommerce's `wc_product_meta_lookup` (its `sku` column
 is indexed, `class-wc-install.php`, line 1985) to posts, retaining every matching product and variation and excluding
-trash. No `LIMIT 1`. SQL equality follows the column collation, so byte-identical values are explicitly distinguished
-from case, whitespace or other collation-equivalent candidates. Trimming-only candidates are retrieved separately and
-reported with their ids, stored SKUs and comparison rule. Outcome matching agrees with the documented loader; a native
-collision is never predicted as an uncomplicated create.
+trash. No `LIMIT 1`. The SKU column's collation is `utf8mb4_unicode_520_ci` (measured on the runtime): case, accents and
+trailing spaces do not count, which is how WooCommerce's own lookup and uniqueness check compare. The source SKU is
+trimmed for the query and kept as written in the report; each candidate is marked `exact` (byte for byte) or
+`collation`, and a `collation` match carries W1 with its id and stored SKU. The outcome follows the match, as the
+loader's would; a native collision is never predicted as an uncomplicated create.
 
 For each candidate, `wpml_element_language_details` is called with its actual element type (`post_product` or
 `post_product_variation`). A valid details object with a language and a translation-group id is required before

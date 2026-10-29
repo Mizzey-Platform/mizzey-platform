@@ -77,6 +77,7 @@ IGNORE_PATTERNS = (
     re.compile(r"^[^A-Za-z]*$"),                         # no letters at all
     re.compile(r"^%[sd]"),                               # bare format specifiers
     re.compile(r"^[A-Za-z0-9_-]+$"),                     # any single identifier-shaped token
+    re.compile(r"^(?:SELECT|INSERT|UPDATE|DELETE|JOIN|LEFT JOIN|WHERE|FROM|AND|ORDER BY|GROUP BY)\b"),  # SQL for $wpdb: a query, never output
 )
 
 
@@ -273,6 +274,21 @@ class StorefrontStrings(unittest.TestCase):
         ):
             with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
                 self.assertEqual(self._scan_snippet(snippet), [])
+
+    def test_sql_for_wpdb_is_not_interface_text(self):
+        """Found by the catalogue import (#249): a query for $wpdb is never shown to anyone."""
+        for snippet in (
+            "<?php\n$sql = 'SELECT l.product_id AS id FROM lookup l ';\n",
+            "<?php\n$sql .= 'JOIN posts p ON p.ID = l.product_id ';\n",
+            "<?php\n$sql .= \"WHERE p.post_status <> 'trash'\";\n",
+        ):
+            with self.subTest(snippet=snippet.splitlines()[1].strip()[:50]):
+                self.assertEqual(self._scan_snippet(snippet), [])
+
+    def test_a_sentence_that_starts_like_sql_still_counts(self):
+        """The SQL exemption is upper-case keywords only: an interface sentence starting with "Select" still fails."""
+        found = self._scan_snippet("<?php\necho 'Select a size first.';\n")
+        self.assertEqual(len(found), 1, f"expected one finding, got {found}")
 
     def test_a_sentence_inside_markup_still_counts(self):
         """The markup exemption must not become a hole: words in a wrapper are still words."""

@@ -1,0 +1,3 @@
+mutation: guard never installed -> FAIL  t34-catalogue-no-write       MIG-0
+mutation: first repeated row wins -> FAIL  t33-catalogue-outcomes       MIG-0
+mutation: byte-exact SKU key -> FAIL  t35-catalogue-sku-resolution MIG-0
