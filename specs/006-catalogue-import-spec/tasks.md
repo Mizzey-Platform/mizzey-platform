@@ -28,19 +28,24 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
       the declared encoding, the row limit and explicit header differences. Test: itself (AC-3).
 - [ ] T008 [US2] Write `t33-catalogue-outcomes.php`: one deterministic outcome per row with every applicable issue
       retained; each seeded rule code; partial updates; several issues at once; duplicate-row order independence;
-      later, rejected and wrong-type parents; unknown row types; empty and header-only files. Test: itself (AC-4).
+      later, rejected and wrong-type parents; unknown row types; empty and header-only files. Assert the completed
+      command's `validation-report.csv` contains the expected row outcomes, reasons and applicable issues. Test: itself
+      (AC-4, FR-005).
 - [ ] T009 [US2] Write `t34-catalogue-no-write.php`: both real commands in separate processes; protected records
       compared before and after (posts, meta, terms and relationships, term meta, attachment meta, product lookup rows,
       WPML translation relationships); representative API and direct-SQL mutations stopped with exit 3 before they
       happen; cold-cache reads and permitted cache housekeeping succeed; failure paths included. Test: itself (AC-5).
 - [ ] T010 [US2] Write `t35-catalogue-sku-resolution.php`: products and variations; duplicate and separately
       translated pairs; unmatched SKU; unrelated duplicate identities; missing language details; missing group
-      original; an original with a different SKU; trash; case and whitespace candidates. Test: itself (AC-6).
+      original; an original with a different SKU; trash; case and whitespace candidates. Assert `validation-report.csv`
+      contains the expected resolved ids, language roles, translations and near-match candidate ids, stored SKUs and
+      comparison rules. Test: itself (AC-6, FR-006).
 - [ ] T011 [US3] Write `t36-catalogue-issue-list.php`: every `client` issue in `client-issues.csv` with row, SKU,
       field, problem and correction, including one on a non-rejected row; no `developer` issue; UTF-8 with a
       byte-order mark. Test: itself (AC-7).
 - [ ] T012 Write `t37-catalogue-run-record.php`: the complete CX-04 payload, the fixture-adapter marking, and a
-      file-level failure recorded without invented row outcomes. Test: itself (FR-010).
+      file-level failure recorded without invented row outcomes. Exercise guard and output-write failures and assert
+      that neither leaves a run marked completed. Test: itself (FR-010, CX-04).
 - [ ] T013 Run t30 to t37 before any production code and keep the output as `evidence/before.txt`. Each must fail.
 
 ## Phase 3: Reading and mapping
@@ -66,19 +71,22 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
 
 ## Phase 5: Reports, record and command
 
-- [ ] T022 [US3] Create `ReportWriter.php`: `validation-report.csv` with near-match evidence, `client-issues.csv`,
-      UTF-8 with a byte-order mark (research R-8). Test: t36.
+- [ ] T022 [US2] [US3] Create `ReportWriter.php`: `validation-report.csv` with near-match evidence, `client-issues.csv`,
+      UTF-8 with a byte-order mark (research R-8). Test: t33, t35, t36.
 - [ ] T023 Create `ImportRunRecorder.php` and `FileImportRunRecorder.php`: the CX-04 payload in `run.json`, a guard or
       output failure never marked completed (research R-6). Test: t37.
 - [ ] T024 [US1] [US2] Create `Cli/CatalogueCommand.php` and register it in the service provider only when `WP_CLI` is
-      defined (contracts/cli.md, exits 0 to 3). Test: t32, t34, t37; no hook on a web request (t27 unchanged).
+      defined (contracts/cli.md, exits 0 to 3). Test: t32, t34, t37; the FR-011 registration and surface review in T026
+      verifies CLI-only registration and no administration screen. The unchanged t27 is storefront regression evidence
+      only.
 
 ## Phase 6: Scale and verification
 
 - [ ] T025 Write `t38-catalogue-volume.php`: a generated 5,000-product file, rows accounted for, elapsed time and peak
       memory recorded as facts (FR-012, OD-15 provisional). Test: itself.
 - [ ] T026 Run the guards on the diff (wp-guard, woo-guard, test-guard, clean-code-guard, docs-guard as relevant).
-      Test: `analysis.md`.
+      Record the named FR-003 single-mapping and no-profile review and the FR-011 CLI-only registration and no-screen
+      review, with source references. Verification: the guard results and both boundary reviews in `analysis.md`.
 - [ ] T027 Reset the runtime to the clean baseline and run the whole suite serially; commit `evidence/clean-baseline.txt`,
       `evidence/final-suite.txt` and `evidence/final-suite.json`. Test: the suite, t02 to t29 verdicts unchanged.
 - [ ] T028 Write `verification.md`, reporting technical verification, staging and client acceptance separately.
@@ -88,9 +96,15 @@ Integration scenarios run on the disposable runtime only, serially, and never wh
 
 - [ ] T029 [US4] AC-8 on the real sample export: preview, finalise the mapping, validate, Developer review, send the
       Client list. **Waits for CR-06 and CR-07.** If the agreed export is a workbook, assess a reader first (research
-      R-3) and add its cases to t30.
-- [ ] T030 Manual testing on staging (DOD-04).
-- [ ] T031 Client approval of the acceptance criteria (DOD-09). AC-3 stays `pending CX-04`.
+      R-3) and add its cases to t30. Test: named manual check `AC-8 real-file validation`, recorded in
+      `verification.md`, referencing the mapping used, the complete row report, the Developer review and the Client
+      issue list.
+- [ ] T030 Manual testing on staging (DOD-04). Test: named manual check `DOD-04 staging verification`, recorded in
+      `verification.md` with the release, environment, operator, checks and results; scripted evidence is labelled
+      separately.
+- [ ] T031 Client approval through MS-UAT-2026-027 (DOD-09). Verification: the referenced client acceptance record
+      in `verification.md`; CX-04 client confirmation is recorded separately, and AC-3 stays `pending CX-04` until that
+      confirmation exists.
 
 ## Not tasks
 
