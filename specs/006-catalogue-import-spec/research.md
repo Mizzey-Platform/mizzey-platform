@@ -21,30 +21,47 @@ and CR-07). The fixture's headers are marked illustrative and are replaced when 
 - `parse_id_field()` saves a placeholder product for an unknown id (lines 289 to 310);
 - `parse_categories_field()` and `parse_tags_field()` insert missing terms (`wp_insert_term`, lines 455, 502, 533).
 
-**Decision:** the native importer is used, if at all, only to read raw rows (`parse => false`), and every interpretation
-in the preview and the pass is Mizzey's own read-only code. A test proves the catalogue unchanged (AC-5). **Rationale:**
+**Decision:** do not invoke the native parsed-data pipeline during preview or validation. With `parse => false`, the
+inspected `read_file()` path reads and maps rows without invoking the placeholder or term-creation callbacks. Its
+constructor still loads WooCommerce services and invokes filters (line 56), so this is not proof that the whole
+WordPress process performs no writes. Mizzey's own reader is chosen for explicit format handling and bounded reading,
+not because native raw reading creates catalogue records. Native file validation accepts CSV and TXT extensions by
+default (`wc-conditional-functions.php`, line 522), so the fixture's `.tsv` extension needs its own handling. Every
+interpretation in the preview and the pass is Mizzey's own read-only code, and a test proves the catalogue unchanged
+(AC-5). **Rationale:**
 this is the gap P-008 recorded ("no dry run"), now located precisely. **Alternative rejected:** running the native
 parse inside a database transaction and rolling it back: WordPress caches, term counts and the CoreX Activity log are not
 transactional, so a rollback is not proof of no write.
 
-## R-3. Reading the three formats
+## R-3. Reading the agreed format
 
-**Decision:** CSV and tab-delimited text are read with PHP's own CSV reader with the mapping's delimiter, a byte-order
-mark stripped, and the documented encoding (UTF-8 unless the mapping says otherwise). An Excel workbook (`.xlsx`) is
-read with the `zip` and `xmlreader` extensions, which every runtime has (checked locally and in the staging PHP image),
-reading the shared strings and the one sheet the mapping names. **Rationale:** no library is added for three small
-readers; `.xlsx` is a zip of XML. **Alternative rejected:** PhpSpreadsheet, a large new dependency for one read path.
-Older `.xls` is not read; the agreed export is confirmed with CR-06, and an `.xls` file is a reason to agree another
-format, not to add a library.
+**Decision:** implement the tab-delimited fixture path now, with PHP's own CSV reader, the mapping's delimiter, a
+byte-order mark stripped and the documented encoding (UTF-8 unless the mapping says otherwise); the same delimited
+reader serves CSV where needed. An Excel (`.xlsx`) reader is deferred until the agreed export requires it; then an
+existing suitable reader is assessed before committing to a handwritten workbook parser, because XML parsing alone does
+not establish correct spreadsheet-cell interpretation. The availability of any PHP extension on each deployment target
+is a prerequisite to verify at that point, not an assumed property of every runtime. Any other source format needs
+agreement (CR-06).
 
 ## R-4. Resolving a SKU to a product and its language role
 
 **Finding (A5, #249):** a WPML duplicate carries its original's SKU, and `wc_get_product_id_by_sku()` returns whichever
-product the query reaches first. **Decision:** one read query collects every product and variation whose `_sku` equals a
-SKU in the file (the file's SKUs batched), and for each id WPML's `wpml_element_language_details` filter gives the
-language code and the source language: an id with no source language is the source-language original. **Rationale:**
-one indexed read per batch, not one per row (the 5,000-product sizing check). The matching rule is exact, byte for
-byte; a match only after trimming or case folding is reported as a near match, never used silently (spec, edge cases).
+product the query reaches first (`class-wc-product-data-store-cpt.php`, line 1341).
+
+**Decision:** use prepared, batched candidate queries joining WooCommerce's `wc_product_meta_lookup` (its `sku` column
+is indexed, `class-wc-install.php`, line 1985) to posts, retaining every matching product and variation and excluding
+trash. No `LIMIT 1`. SQL equality follows the column collation, so byte-identical values are explicitly distinguished
+from case, whitespace or other collation-equivalent candidates. Trimming-only candidates are retrieved separately and
+reported with their ids, stored SKUs and comparison rule. Outcome matching agrees with the documented loader; a native
+collision is never predicted as an uncomplicated create.
+
+For each candidate, `wpml_element_language_details` is called with its actual element type (`post_product` or
+`post_product_variation`). A valid details object with a language and a translation-group id is required before
+`source_language_code === null` is read as "original"; missing details are an identity issue, not an original. The
+complete group is resolved by translation-group id and element type, including members whose SKU differs, so a missing
+original is distinguished from an original that is merely absent from the SKU candidate set. **Rationale:** one indexed
+read per batch, not one per row (the 5,000-product sizing check); near matches are reported, never used silently
+(spec, edge cases).
 
 ## R-5. The initial-load rules
 
@@ -55,12 +72,14 @@ the rules the live load (#247) will apply, so the pass predicts that load rather
 | SKU resolves to | Outcome |
 |---|---|
 | nothing | create, if the row's required fields for its type are present |
-| one source-language original, with or without its translations | update that original; the translations are listed |
-| only a translation, no original | reject: the store's original is missing |
+| one source-language original, with or without its translations | update that original, if the row passes the applicable update checks; the translations are listed |
+| a translation group with no usable original, or unresolvable identity details | reject: the store's original is missing or unresolvable |
 | two or more unrelated originals | reject: ambiguous SKU |
-| the same SKU on an earlier row of the file | reject: repeated source SKU (both rows reported, the first as the kept one) |
+| an unresolved repeated source SKU | reject the affected ambiguous rows; file order does not select a valid identity |
 
-A variation row needs a resolvable parent: a parent row in the file or an existing variable product.
+A variation needs an unambiguous usable variable parent, resolved from the store or a valid file row irrespective of row
+order. Validation indexes the file's parent candidates before finalising dependent outcomes and performs no conversion or
+repair writes.
 
 ## R-6. Recording the run
 

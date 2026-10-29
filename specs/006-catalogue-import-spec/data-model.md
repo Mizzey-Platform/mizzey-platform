@@ -6,9 +6,9 @@ Nothing here is a new database table. The tool reads the catalogue and writes fi
 
 | Field | Meaning |
 |---|---|
-| `version` | The mapping's version; every run reports it |
+| `version` | Required mapping version; every run reports it. Mapping validation checks the supported format, the delimiter and encoding (or workbook-sheet configuration, once a workbook format is agreed), unique source headers, explicit targets or ignore reasons, row-type interpretation and a compatible rules version |
 | `rules_version` | The version of `contracts/initial-load-rules.md` the mapping assumes |
-| `source` | `format` (`csv`, `tsv` or `xlsx`), `delimiter` for text, `sheet` for a workbook, `encoding` (default `UTF-8`) |
+| `source` | `format` (`tsv`, or `csv` where needed; another format only once agreed), `delimiter`, `encoding` (default `UTF-8`) |
 | `columns` | One entry per source header: `to` (a store field key, as the native importer names it) or `ignore` with a `reason` |
 | `row_type` | How the row type is read: the column and its values for simple, variable and variation rows |
 | `language` | Which columns carry Arabic text and the store field each fills in the Arabic translation |
@@ -36,7 +36,7 @@ SKU that matches only after trimming or case folding.
 | `resolved_id` | The product or variation id the SKU resolves to, or empty |
 | `language_role` | `original`, `translation` or empty |
 | `translations` | Ids of the original's translations, when it has any |
-| `issues` | Issue codes on this row, whatever its outcome |
+| `issues` | Issue codes on this row, whatever its outcome; near-match issues include candidate ids, stored SKU values and the comparison rule |
 
 ## Client issue (`client-issues.csv`)
 
@@ -44,6 +44,6 @@ SKU that matches only after trimming or case folding.
 
 ## Run (`run.json`, the CX-04 payload)
 
-`file` (name, size, sha256), `mapping_version`, `rules_version`, `counts` (rows, create, update, reject, client issues,
+`file` (source file reference), `mapping_used` (reference identifying the versioned mapping), `mapping_version`, `rules_version`, `counts` (rows, create, update, reject, client issues,
 developer issues), `outcome` (`completed` or `file-level-failure` with its reason), `actor` (the WordPress user or the
-system user running WP-CLI), `started_at`, `finished_at`, `reports` (the paths), `recorder: fixture-adapter`.
+system user running WP-CLI), `started_at`, `finished_at`, `reports` (the paths) or the error reference, `recorder: fixture-adapter` (a fixture record, not database persistence).
