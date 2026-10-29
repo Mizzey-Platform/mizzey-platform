@@ -5,7 +5,8 @@
  * Over HTTP: a backup code completes sign-in once and is refused when used again, while another unused code works. The
  * runbook's own commands (`docs/two-factor-recovery.md`), run as the Developer would, remove an administrator's second
  * factor and end their sessions; that administrator then signs in with the password and is sent straight to enrol again.
- * A shop manager cannot reset an administrator.
+ * Through WP 2FA's own reset action over HTTP, a shop manager cannot reset an administrator and another administrator
+ * can.
  *
  * @package MizzeySite\Tests\Integration
  */
@@ -51,18 +52,35 @@ run(
 		$check( 302 === $page['status'] && false !== strpos( $page['location'], 'show=wp-2fa-setup' ), 'AC-4 and the administrator is sent to enrol again before anything else' );
 
 		// ---- Who may reset whom --------------------------------------------------------------------------------
-		// Asked as each user signed in, as the reset screen asks: WooCommerce's edit_user rule reads the current user.
-		list( $manager )     = two_factor_user( $s, 'shop_manager' );
-		list( $target )      = two_factor_user( $s, 'administrator' );
-		list( $other_admin ) = two_factor_user( $s, 'administrator' );
-		$previous            = get_current_user_id();
-		wp_set_current_user( $manager->ID );
-		$manager_may = current_user_can( 'edit_user', $target->ID );
-		wp_set_current_user( $other_admin->ID );
-		$admin_may = current_user_can( 'edit_user', $target->ID );
-		wp_set_current_user( $previous );
-		$check( ! $manager_may, 'AC-4 a shop manager cannot reset an administrator (no edit_user on them)' );
-		$check( $admin_may, 'AC-4 another administrator can' );
+		// Through WP 2FA's own reset action, over HTTP, by staff signed in with two factors: a shop manager is refused,
+		// another administrator succeeds.
+		list( $target, $target_password ) = two_factor_user( $s, 'administrator' );
+		two_factor_enrol( $target );
+		foreach ( array( 'shop_manager' => false, 'administrator' => true ) as $role => $allowed ) {
+			list( $actor, $actor_password ) = two_factor_user( $s, $role );
+			two_factor_enrol( $actor );
+			$signed = two_factor_answer( two_factor_password_step( $actor->user_login, $actor_password ), two_factor_code( $actor ) );
+			$check( two_factor_signed_in( $signed['cookies'] ), "the {$role} who attempts the reset is signed in with two factors" );
+			$reset  = two_factor_http(
+				'POST',
+				admin_url( 'admin-ajax.php' ),
+				array(
+					'action'       => 'remove_user_2fa',
+					'user_id'      => $target->ID,
+					'admin_reset'  => 1,
+					'wp_2fa_nonce' => two_factor_nonce( $actor, $signed['cookies'], 'wp-2fa-remove-user-2fa-nonce' ),
+				),
+				$signed['cookies']
+			);
+			$answer = json_decode( $reset['body'], true );
+			$check( $allowed === ( $answer['success'] ?? null ), "AC-4 a {$role} " . ( $allowed ? 'can' : 'cannot' ) . ' reset an administrator\'s second factor' );
+			wp_cache_delete( $target->ID, 'user_meta' );
+			$removed = '' === get_user_meta( $target->ID, \WP2FA\Admin\Helpers\User_Helper::ENABLED_METHODS_META_KEY, true );
+			$check( $allowed === $removed, "AC-4 and the administrator's second factor is " . ( $allowed ? 'removed' : 'kept' ) );
+		}
+		$pending = two_factor_password_step( $target->user_login, $target_password );
+		$page    = two_factor_http( 'GET', admin_url( 'index.php' ), array(), $pending['cookies'] );
+		$check( 302 === $page['status'] && false !== strpos( $page['location'], 'show=wp-2fa-setup' ), 'AC-4 the reset administrator must enrol again' );
 
 		return $ok;
 	}

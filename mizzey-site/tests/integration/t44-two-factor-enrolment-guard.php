@@ -48,6 +48,12 @@ run(
 			$check( 302 === $dashboard['status'] && false !== strpos( $dashboard['location'], 'show=wp-2fa-setup' ), "AC-3 [{$label}] an administration page sends to set-up (status {$dashboard['status']})" );
 			$orders = two_factor_http( 'GET', admin_url( 'edit.php?post_type=shop_order' ), array(), $cookies );
 			$check( 302 === $orders['status'] && false !== strpos( $orders['location'], 'show=wp-2fa-setup' ), "AC-3 [{$label}] the orders screen sends to set-up (status {$orders['status']})" );
+			foreach ( array( 'page=wc-settings', 'import=wordpress' ) as $dispatch ) {
+				$sneak = two_factor_http( 'GET', admin_url( 'profile.php?show=wp-2fa-setup&' . $dispatch ), array(), $cookies );
+				// Sent to set-up, or refused by WordPress's own menu check first: either way the other screen never runs.
+				$not_dispatched = 403 === $sneak['status'] || ( 302 === $sneak['status'] && false !== strpos( $sneak['location'], 'show=wp-2fa-setup' ) );
+				$check( $not_dispatched && false === strpos( $sneak['body'], 'woocommerce-settings' ), "AC-3 [{$label}] the set-up exception cannot dispatch {$dispatch} (status {$sneak['status']})" );
+			}
 			$setup = two_factor_http( 'GET', admin_url( 'profile.php?show=wp-2fa-setup' ), array(), $cookies );
 			$check( 200 === $setup['status'] && false !== strpos( $setup['body'], 'totpKey' ), "AC-3 [{$label}] the set-up screen opens (status {$setup['status']})" );
 			$post = two_factor_http( 'POST', admin_url( 'admin-post.php' ), array( 'action' => 'mizzey_t44_probe' ), $cookies );
@@ -56,6 +62,10 @@ run(
 			$rest_nonce = two_factor_nonce( $user, $cookies, 'wp_rest' );
 			$rest       = two_factor_http( 'GET', rest_url( 'wc/v3/orders' ), array(), $cookies, array( 'X-WP-Nonce' => $rest_nonce ) );
 			$check( 403 === $rest['status'] && false !== strpos( $rest['body'], 'mizzey_two_factor_enrol_first' ), "AC-3 [{$label}] a privileged REST call with a valid nonce is refused (status {$rest['status']})" );
+			// The one REST exception reaches WP 2FA, whose own transaction check still refuses a forged request.
+			$validation = two_factor_http( 'POST', rest_url( 'wp-2fa-methods/v1/login/validate' ), array( 'user_id' => $user->ID, 'provider' => 'totp', 'token' => '000000', 'login_nonce' => 'not-an-issued-login-transaction' ), $cookies, array( 'X-WP-Nonce' => $rest_nonce ) );
+			$validation_body = json_decode( $validation['body'], true );
+			$check( false === strpos( $validation['body'], 'mizzey_two_factor_enrol_first' ) && in_array( $validation['status'], array( 400, 401, 403 ), true ) && '' !== (string) ( $validation_body['code'] ?? '' ), "AC-3 [{$label}] WP 2FA's sign-in route passes the guard and keeps its own check (status {$validation['status']}, " . ( $validation_body['code'] ?? '' ) . ')' );
 			$check( t44_ajax_refused( $cookies, 'heartbeat' ), "AC-3 [{$label}] an unlisted background action is refused" );
 			$check( t44_ajax_refused( $cookies, 'remove_user_2fa' ) && t44_ajax_refused( $cookies, 'unlock_account' ), "AC-3 [{$label}] reset and unlock actions are refused while pending" );
 		}

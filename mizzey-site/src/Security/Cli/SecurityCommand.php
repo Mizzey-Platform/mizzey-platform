@@ -89,7 +89,9 @@ final class SecurityCommand
 
         $saved = \WP2FA\Utils\Settings_Utils::get_option(WP_2FA_POLICY_SETTINGS_NAME, null);
         $held  = is_array($saved) && array_intersect_key($saved, self::baselinePolicy()) == self::baselinePolicy(); // phpcs:ignore Universal.Operators.StrictComparisons -- order-insensitive array equality.
-        if (! $held || ! \WP2FA\Utils\Settings_Utils::get_option(WP_2FA_PREFIX . 'settings_hash')) {
+        // The hash WP 2FA keeps must be the hash of this policy, calculated as WP 2FA calculates it.
+        $expectedHash = \WP2FA\Utils\Settings_Utils::create_settings_hash(\WP2FA\WP2FA::get_policy_settings());
+        if (! $held || \WP2FA\Utils\Settings_Utils::get_option(WP_2FA_PREFIX . 'settings_hash') !== $expectedHash) {
             WP_CLI::error(__('The two-factor baseline did not persist.', 'mizzey-site'));
         }
         WP_CLI::success(__('Two-factor sign-in is now required for administrators and shop managers. Staff enrol at their next sign-in.', 'mizzey-site'));

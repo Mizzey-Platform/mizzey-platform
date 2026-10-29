@@ -48,6 +48,21 @@ run(
 		$right = two_factor_answer( $retry, two_factor_code( $admin ) );
 		$check( 302 === $right['status'] && two_factor_signed_in( $right['cookies'] ), "AC-1 [wp-login] the right code completes sign-in (status {$right['status']})" );
 
+		// ---- AC-1 through WP 2FA's REST challenge -----------------------------------------------------------------
+		list( $api_admin, $api_password ) = two_factor_user( $s, 'administrator' );
+		two_factor_enrol( $api_admin );
+		$api_step  = two_factor_password_step( $api_admin->user_login, $api_password );
+		$validate  = rest_url( 'wp-2fa-methods/v1/login/validate' );
+		$fields    = array( 'user_id' => $api_admin->ID, 'provider' => 'totp', 'login_nonce' => two_factor_field( $api_step['body'], 'wp-auth-nonce' ) );
+		$api_wrong = two_factor_http( 'POST', $validate, $fields + array( 'token' => '000000' === two_factor_code( $api_admin ) ? '111111' : '000000' ), $api_step['cookies'] );
+		$wrong_body = json_decode( $api_wrong['body'], true );
+		$retry_nonce = (string) ( $wrong_body['data']['login_nonce'] ?? $wrong_body['login_nonce'] ?? '' );
+		// WP 2FA answers a wrong code with a failure in the body, whatever the status; the claim is no success and no session.
+		$check( true !== ( $wrong_body['success'] ?? false ) && ! two_factor_signed_in( $api_wrong['cookies'] ), "AC-1 [REST] a wrong code is refused (status {$api_wrong['status']})" );
+		$check( '' !== $retry_nonce, 'AC-1 [REST] and a replacement transaction is issued for the retry' );
+		$api_right = two_factor_http( 'POST', $validate, array( 'login_nonce' => $retry_nonce, 'token' => two_factor_code( $api_admin ) ) + $fields, $api_step['cookies'] );
+		$check( 200 === $api_right['status'] && two_factor_signed_in( $api_right['cookies'] ), "AC-1 [REST] the right code with that transaction completes sign-in (status {$api_right['status']})" );
+
 		// ---- AC-1 on the account page, both languages -------------------------------------------------------------
 		foreach ( array( 'en', 'ar' ) as $lang ) {
 			list( $staff, $staff_password ) = two_factor_user( $s, 'administrator' );

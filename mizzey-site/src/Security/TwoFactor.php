@@ -120,7 +120,10 @@ final class TwoFactor
         $isSetupScreen = $pagenow === self::SETUP_PAGE
             && self::method() === 'GET'
             && ($_GET['show'] ?? '') === self::SETUP_SHOW // phpcs:ignore WordPress.Security.NonceVerification
-            && ! isset($_REQUEST['action']); // phpcs:ignore WordPress.Security.NonceVerification
+            && ! isset($_REQUEST['action']) // phpcs:ignore WordPress.Security.NonceVerification
+            // `page` and `import` make wp-admin/admin.php dispatch another screen from profile.php.
+            && ! isset($_GET['page']) // phpcs:ignore WordPress.Security.NonceVerification
+            && ! isset($_GET['import']); // phpcs:ignore WordPress.Security.NonceVerification
         if ($isSetupScreen) {
             return;
         }

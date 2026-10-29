@@ -45,26 +45,37 @@ run(
 			$ok = $ok && $condition;
 		};
 
-		// An unrelated policy field, set before the baseline, must survive it.
-		$original = \WP2FA\Utils\Settings_Utils::get_option( WP_2FA_POLICY_SETTINGS_NAME, null );
-		$stored   = (array) $original;
-		$stored['enable_destroy_session'] = 'enable_destroy_session';
-		\WP2FA\WP2FA::update_plugin_settings( $stored, false, WP_2FA_POLICY_SETTINGS_NAME );
+		// The restore is registered first, by the baseline helper, so nothing below can outlive the scenario.
 		two_factor_baseline( $s );
-		// Registered after the baseline's own restore, so it runs last and puts the policy back as it was found.
-		$s->on_finish(
-			static function () use ( $original ) {
-				if ( is_array( $original ) ) {
-					\WP2FA\WP2FA::update_plugin_settings( $original, false, WP_2FA_POLICY_SETTINGS_NAME );
-				}
-			}
-		);
+		$stored = (array) \WP2FA\Utils\Settings_Utils::get_option( WP_2FA_POLICY_SETTINGS_NAME, array() );
+		$stored['enable_destroy_session'] = 'enable_destroy_session';
+		// Exclusions that would exempt staff, and a customer named for enforcement: the baseline must clear all three.
+		$stored['excluded_roles'] = array( 'shop_manager' );
+		$stored['excluded_users'] = array( 'pilot_admin' );
+		$stored['enforced_users'] = array( 'a-customer' );
+		\WP2FA\WP2FA::update_plugin_settings( $stored, false, WP_2FA_POLICY_SETTINGS_NAME );
+		$applied = t43_wp( 'mizzey security two-factor-baseline' );
+		$check( 0 === $applied['code'], 'FR-002 the baseline command succeeds with an unrelated field and contrary exclusions present' );
+		two_factor_reload();
 
 		$policy = (array) \WP2FA\Utils\Settings_Utils::get_option( WP_2FA_POLICY_SETTINGS_NAME, array() );
 		$owned  = SecurityCommand::baselinePolicy();
 		$check( array_intersect_key( $policy, $owned ) == $owned, 'FR-002 the baseline command sets every owned field' ); // phpcs:ignore Universal.Operators.StrictComparisons
 		$check( 'enable_destroy_session' === ( $policy['enable_destroy_session'] ?? '' ), 'FR-002 and keeps an unrelated field as it was' );
-		$check( '' !== (string) \WP2FA\Utils\Settings_Utils::get_option( WP_2FA_PREFIX . 'settings_hash' ), 'FR-002 through WP 2FA\'s API: its policy hash is set' );
+		$check( \WP2FA\Utils\Settings_Utils::create_settings_hash( $policy ) === \WP2FA\Utils\Settings_Utils::get_option( WP_2FA_PREFIX . 'settings_hash' ), 'FR-002 through WP 2FA\'s API: the stored policy hash is the hash of this policy' );
+
+		// A policy that drifts from the baseline is review, whichever owned field drifts.
+		$drifts = array(
+			'email codes on'        => array( 'enable_email' => 'enable_email' ),
+			'passkeys on'           => array( 'enable_passkeys' => 'enable_passkeys' ),
+			'expiry action changed' => array( 'grace-policy-after-expire-action' => 'block-user' ),
+		);
+		foreach ( $drifts as $label => $change ) {
+			\WP2FA\WP2FA::update_plugin_settings( array_replace( $policy, $change ), false, WP_2FA_POLICY_SETTINGS_NAME );
+			$drifted = t43_wp( 'mizzey security check' );
+			$check( 'review' === t43_row( $drifted['out'], 'two_factor_roles' ) && 1 === $drifted['code'], "AC-5 with {$label}, the policy row says review" );
+		}
+		\WP2FA\WP2FA::update_plugin_settings( $policy, false, WP_2FA_POLICY_SETTINGS_NAME );
 
 		// AC-2: the owner's setting decides. A fresh request asks WP 2FA whether a shop manager is enforced.
 		list( $manager ) = two_factor_user( $s, 'shop_manager' );
@@ -93,7 +104,10 @@ run(
 		$fallback = t43_wp( '--exec=' . escapeshellarg( "define( 'WP2FA_SECRET_IS_IN_DB', true );" ) . ' mizzey security check' );
 		$check( 'review' === t43_row( $fallback['out'], 'two_factor_key' ) && 1 === $fallback['code'], 'AC-5 with a database fallback key, the key row says review' );
 
-		$wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_2fa_secret_key', 'option_value' => 'not-a-key', 'autoload' => 'no' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// Only a row this scenario created is removed afterwards: a failed insert means one exists, and it is left alone.
+		if ( 1 !== $wpdb->insert( $wpdb->options, array( 'option_name' => 'wp_2fa_secret_key', 'option_value' => 'not-a-key', 'autoload' => 'no' ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			throw new \RuntimeException( 'The database-key probe was not created; existing rows were left unchanged.' );
+		}
 		try {
 			$leftover = t43_wp( 'mizzey security check' );
 		} finally {

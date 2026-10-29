@@ -85,8 +85,9 @@ final class BaselineReport
     }
 
     /**
-     * The stored policy enforces the D-21 baseline: both roles, no exclusions, an authenticator app and backup codes,
-     * no grace period. Read from WP 2FA's own getter.
+     * The stored policy is the D-21 baseline: both roles, no exclusions, an authenticator app and backup codes, no email
+     * codes or passkeys (the enrolment guard allows only the authenticator's set-up), no grace period, set-up at once.
+     * Read from WP 2FA's own getter.
      */
     private static function twoFactorPolicyEnforced(): bool
     {
@@ -104,8 +105,12 @@ final class BaselineReport
             && (array) ($policy['excluded_roles'] ?? []) === []
             && (array) ($policy['excluded_users'] ?? []) === []
             && ($policy['enable_totp'] ?? '') === 'enable_totp'
+            && empty($policy['enable_email'])
+            && empty($policy['enable_passkeys'])
+            && (array) ($policy['enable_passkeys_certain_roles'] ?? []) === []
             && ($policy['backup_codes_enabled'] ?? '') === 'yes'
-            && ($policy['grace-policy'] ?? '') === 'no-grace-period';
+            && ($policy['grace-policy'] ?? '') === 'no-grace-period'
+            && ($policy['grace-policy-after-expire-action'] ?? '') === 'configure-right-away';
     }
 
     /**
