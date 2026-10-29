@@ -1,0 +1,51 @@
+      FAIL  [post] AC-2: no X-Pingback header
+      FAIL  [post] AC-2: no RSD, pingback or manifest link
+      PASS  [product] http://mizzey.local/product/t39-product/ answers 200 (got 200)
+      FAIL  [product] AC-1: no generator meta tag
+      PASS  [product] AC-2: no X-Pingback header
+      FAIL  [product] AC-2: no RSD, pingback or manifest link
+      PASS  [shop (ar)] http://mizzey.local/ar/shop/ answers 200 (got 200)
+      FAIL  [shop (ar)] AC-1: no generator meta tag
+      PASS  [shop (ar)] AC-2: no X-Pingback header
+      FAIL  [shop (ar)] AC-2: no RSD, pingback or manifest link
+      PASS  [feed] http://mizzey.local/feed/ answers 200 (got 200)
+      FAIL  [feed] AC-1: no generator element or attribute
+      PASS  [comments feed] http://mizzey.local/comments/feed/ answers 200 (got 200)
+      FAIL  [comments feed] AC-1: no generator element or attribute
+      FAIL  AC-2: system.listMethods lists no method (<?xml version="1.0" encoding="UTF-8"?> <methodResponse> <params> <param> <value> <array><data> <value><string>system.multicall</string></value> <value><string>s)
+      PASS  AC-2: pingback.ping is refused as an unknown method, not processed
+      FAIL  AC-2: pings are closed on a post
+      FAIL  AC-3: a visitor is refused the users collection (status 200)
+      FAIL  AC-3: a visitor is refused a single user (status 200)
+      PASS  AC-3: an editor keeps the users collection the block editor reads (status 200)
+      FAIL  AC-3: ?author=4 reveals no author slug (status 301, location 'http://mizzey.local/author/t39_author_1831139192/')
+      FAIL  AC-3: the sitemap index lists no users sitemap
+      FAIL  AC-3: the users sitemap does not exist (status 200)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+FAIL  t40-security-accounts        NFR-05: application passwords, sign-in messages and recovery limits
+      FAIL  AC-4: not available to a customer
+      FAIL  AC-4: not available to a shop manager
+      PASS  AC-4: available to an administrator
+      FAIL  AC-4: a customer cannot authenticate with an application password stored for them (authenticated)
+      PASS  AC-4: an administrator still can
+      FAIL  AC-5: wrong password, unknown username and unknown email give one answer (incorrect_password: <strong>Error:</strong> The password you entered for the username <strong>t40_customer_196300290</strong> is incorrect. <a href="http://mizzey.local/my-account/lost-password/">Lost your password?</a> | invalid_username: <strong>Error:</strong> The username <strong>t40_nobody_1872787422</strong> is not registered on this site. If you are unsure of your username, try your email address instead. | invalid_email: Unknown email address. Check again or try your username.)
+      PASS  AC-5: each failure still fires wp_login_failed, which CoreX counts
+      PASS  AC-5: CoreX's lockout error passes unchanged
+      FAIL  AC-5 [wp-login] the same message for a real and an unknown account ('Error: The password you entered for the username t40_customer_196300290 is incorrect. Lost your password?' / 'Error: The username t40_nobody_979019776 is not registered on this site. If you are unsure of your username, try your email address instead.')
+      FAIL  AC-5 [account, en] the same message for a real and an unknown account ('' / '')
+      FAIL  AC-5 [account, ar] the same message for a real and an unknown account ('' / '')
+      FAIL  AC-6 [WordPress] three requests for one account pass, the fourth is refused with no email (sent+mail, sent+mail, sent+mail, sent+mail)
+      FAIL  AC-6 [WooCommerce] three requests for one account pass, the fourth is refused with the message and no email (sent+mail, sent+mail, sent+mail, sent+mail)
+      FAIL  AC-6: the eleventh request from one address is refused, whatever the accounts (invalidcombo)
+      FAIL  AC-6: the limits are a setting: a filtered limit of one refuses the second request
+      Error: Class "MizzeySite\Security\RecoveryLimiter" not found at EvalFile_Command.php(85) : eval()'d code:181
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+FAIL  t41-security-check           NFR-05: comments closed outside products; the security check reports the baseline
+      FAIL  AC-7: a post stored as open has comments and pings closed
+      FAIL  AC-7: a page stored as open has comments and pings closed
+      PASS  AC-7: a product with reviews allowed keeps them open
+      Error: Class "MizzeySite\Security\BaselineReport" not found at EvalFile_Command.php(85) : eval()'d code:44
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

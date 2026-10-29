@@ -1,0 +1,2 @@
+<?php
+return ['domain'=>'mizzey-site','plural-forms'=>'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);','language'=>'ar','project-id-version'=>'Mizzey Site 0.1.0','pot-creation-date'=>'2026-10-29T16:50:31+00:00','po-revision-date'=>'2026-10-29T16:50:31+00:00','messages'=>['Too many password reset requests. Please wait a few minutes and try again.'=>'طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.','XML-RPC is not available on this site.'=>'خدمة XML-RPC غير متاحة على هذا الموقع.']];

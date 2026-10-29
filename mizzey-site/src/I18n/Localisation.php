@@ -51,6 +51,7 @@ final class Localisation
     public static function register(): void
     {
         add_action('init', [self::class, 'loadPluginTextdomain']);
+        add_filter('lang_dir_for_domain', [self::class, 'pluginDirectoryFirst'], 10, 3);
     }
 
     /**
@@ -66,5 +67,29 @@ final class Localisation
     public static function loadPluginTextdomain(): void
     {
         load_plugin_textdomain('mizzey-site', false, 'mizzey-site/languages');
+    }
+
+    /**
+     * The plugin's translation file wins when it has one for the locale; otherwise the theme's directory stands.
+     *
+     * WordPress keeps one custom directory per domain, and the plugin and the theme both register one for
+     * `mizzey-site`. Measured on 29 October 2026 (specs/007-security-baseline): under an Arabic request WPML's
+     * handling leaves the theme's directory registered, which holds no file, so the plugin's Arabic file was never
+     * read. The template in the plugin's `languages/` already covers the strings of both, so its files are the
+     * domain's translations.
+     */
+    public static function pluginDirectoryFirst(mixed $path, string $domain, string $locale): mixed
+    {
+        if ($domain !== 'mizzey-site') {
+            return $path;
+        }
+        $directory = WP_PLUGIN_DIR . '/mizzey-site/languages/';
+        foreach (["mizzey-site-{$locale}.l10n.php", "mizzey-site-{$locale}.mo"] as $file) {
+            if (is_readable($directory . $file)) {
+                return $directory;
+            }
+        }
+
+        return $path;
     }
 }
