@@ -66,14 +66,24 @@ class Fixture(unittest.TestCase):
         (self.root / "stack.lock.json").write_text(json.dumps({"components": STACK}), encoding="utf-8")
         (self.root / "corex.lock").write_text(json.dumps(
             {"version": "v0.42.0", "commit": "c" * 40, "wordpress": "7.1", "php": ">=8.3"}), encoding="utf-8")
+        corex = [*rp.COREX_CARRIED, "corex-bookings"]
+        described = {
+            "plugins": sorted([*corex, "mizzey-site"]), "themes": ["mizzey-theme"],
+            "release_paths": [f"wp-content/plugins/{name}" for name in corex],
+            "contents": {f"wp-content/plugins/{name}": {"files": 1, "bytes": 1, "hash": "0" * 64} for name in corex},
+            "autoload": {"file": "wp-content/vendor/autoload.php",
+                         "psr4": {"Corex\\": "wp-content/plugins/corex-core/src/",
+                                  "Corex\\Bookings\\": "wp-content/plugins/corex-bookings/src/"}},
+        }
         for path, body in {
             "index.php": "<?php // front",
             "wp-includes/version.php": "<?php\n$wp_version = '7.1.2';\n",
             "wp-content/plugins/mizzey-site/mizzey-site.php": "<?php // site",
-            "wp-content/plugins/corex-core/corex-core.php": "<?php // corex",
+            **{f"wp-content/plugins/{name}/{name}.php": "<?php // corex" for name in corex},
+            "wp-content/plugins/corex-bookings/src/Booking.php": "<?php // a booking",
             "wp-content/themes/mizzey-theme/style.css": "/* theme */",
             "wp-content/vendor/autoload.php": "<?php // autoload",
-            "corex-release.json": json.dumps({"plugins": ["mizzey-site", "corex-core"], "themes": ["mizzey-theme"]}),
+            "corex-release.json": json.dumps(described),
         }.items():
             (self.dist / path).parent.mkdir(parents=True, exist_ok=True)
             (self.dist / path).write_text(body, encoding="utf-8")
@@ -202,6 +212,65 @@ class NothingPaid(Fixture):
         stray.parent.mkdir(parents=True)
         stray.write_text("<?php", encoding="utf-8")
         self.refused("paid software")
+
+
+class TheCoreXPluginsTheStoreDoesNotRun(Fixture):
+    """The CoreX builder packages every CoreX plugin. Those the store does not run stay out of the release."""
+
+    def archive(self) -> tuple[set[str], dict]:
+        self.pack()
+        with zipfile.ZipFile(self.out / "mizzey-v0.1.0.zip") as archive:
+            return set(archive.namelist()), json.loads(archive.read("corex-release.json"))
+
+    def test_an_add_on_the_store_does_not_run_is_not_in_the_archive(self):
+        names, _ = self.archive()
+        self.assertFalse([n for n in names if n.startswith("wp-content/plugins/corex-bookings/")])
+
+    def test_the_eight_the_store_runs_are(self):
+        names, _ = self.archive()
+        for name in rp.COREX_CARRIED:
+            self.assertIn(f"wp-content/plugins/{name}/{name}.php", names)
+
+    def test_corex_own_description_matches_the_archive(self):
+        _, described = self.archive()
+        self.assertNotIn("corex-bookings", described["plugins"])
+        self.assertIn("mizzey-site", described["plugins"])
+        self.assertEqual(described["release_paths"], [f"wp-content/plugins/{n}" for n in rp.COREX_CARRIED])
+        self.assertEqual(sorted(described["contents"]), [f"wp-content/plugins/{n}" for n in rp.COREX_CARRIED])
+        self.assertEqual(described["autoload"]["psr4"], {"Corex\\": "wp-content/plugins/corex-core/src/"})
+
+    def test_the_manifest_names_what_was_left_out(self):
+        plugins = self.pack()["manifest"]["plugins"]
+        self.assertEqual(plugins["left_out"], ["corex-bookings"])
+        self.assertNotIn("corex-bookings", plugins["built"])
+
+    def test_the_built_tree_keeps_them(self):
+        self.pack()
+        self.assertTrue((self.dist / "wp-content" / "plugins" / "corex-bookings" / "src" / "Booking.php").exists())
+        self.assertIn("corex-bookings", (self.dist / "corex-release.json").read_text(encoding="utf-8"))
+
+    def test_a_tree_without_one_the_store_runs_is_refused(self):
+        for path in sorted((self.dist / "wp-content" / "plugins" / "corex-ui").iterdir()):
+            path.unlink()
+        (self.dist / "wp-content" / "plugins" / "corex-ui").rmdir()
+        self.refused("lacks the CoreX plugins the store runs: corex-ui")
+
+    def test_a_tree_whose_description_does_not_list_one_the_store_runs_is_refused(self):
+        described = json.loads((self.dist / "corex-release.json").read_text(encoding="utf-8"))
+        described["plugins"].remove("corex-media")
+        (self.dist / "corex-release.json").write_text(json.dumps(described), encoding="utf-8")
+        self.refused("lacks the CoreX plugins the store runs: corex-media")
+
+    def test_the_staging_tools_run_the_same_eight(self):
+        # The staging tool activates these, so a release that left one out would fail on staging, not here.
+        import importlib
+        import sys
+        sys.path.insert(0, str(rp.ROOT / "mizzey-site" / "tests" / "staging"))
+        try:
+            staging = importlib.import_module("staging")
+        finally:
+            sys.path.pop(0)
+        self.assertEqual(sorted(staging.COREX_PLUGINS), list(rp.COREX_CARRIED))
 
 
 class Refusals(Fixture):
