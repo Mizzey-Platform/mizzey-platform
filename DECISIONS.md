@@ -2088,3 +2088,33 @@ the checks are built ahead of it against staging. A server or edge change still 
 
 **7. Not decided here.** The challenge service for forms (the owner asked for reCAPTCHA; Cloudflare Turnstile sets no
 Google cookies) is the owner's choice. The byte budgets wait for the approved design.
+
+## 2026-10-30 - D-22: Stage 3 is built now and delivered in contract order
+
+**Status: the owner's ruling of 30 October 2026 ("build Stage 3 now while the brand identity is pending, deliver in
+contract order"); the function and presentation split in item 2 is proposed with it and is approved when the owner
+approves this pull request.** Internal: not a client confirmation, adds no scope, changes no signed document. The plan
+is `docs/2026-10-30-stage3-build-plan.md`.
+
+**1. What changes in earlier records.** D-20 row D2 ("No. The stage order stays") is replaced: Stage 3 is built now.
+The stage order of delivery, acceptance and invoicing stays: Stage 3 is not demonstrated, offered for acceptance or
+invoiced before Stage 2 is accepted, and no request to reorder the stages is made to the client. D-20 row D8 is
+narrowed for the Stage 3 slices of the plan only, as item 2 sets out.
+
+**2. Function now, presentation after PRE-03b.** For #248, #281, #245, #290, #289, #305, #306, #307, #255, #308,
+#309, #285 and the migration track (#247, #295, #296, #297), the function layer is built now: server-side behaviour,
+data, validation, admin settings, integration seams, email triggers and content, and their tests, with customer
+screens on WooCommerce's native blocks and neutral tokens. The presentation layer (the designed screens, the status
+labels customers see and the shared email layout) is built from the approved design after PRE-03b, as D-14 requires,
+with its own budget: parts of it are block extensions, not styling. For the function layer only, the design system
+(#250), the header and navigation (#253) and the product page (#254) stop being blocking predecessors; they stay
+blocking for the presentation layer, and every other recorded dependency stands. The ADM-92 invoice part of #280 and
+the Stage 3 capabilities of #251 are scheduled with them, because #308 and the admin screens depend on them. The
+Stage 2 storefront slices (#253, #254, #302, #303, #304) stay frozen until PRE-03b.
+
+**Stock.** D-19 item 5 holds: checkout and cart ship with tests proving that every stock question and change goes
+through the adapter and fails closed, and that no WooCommerce path changes stock on its own.
+
+**3. What stays.** Every register row, acceptance criterion and stage boundary. PRE-09 conditions for ERP-dependent
+work (seams and mocks only, M-3). Client inputs stand in as defaults, fixtures or mocks (D-10), each keeping the
+class the backlog records. Each slice is its own requirement pull request with its spec and evidence.
