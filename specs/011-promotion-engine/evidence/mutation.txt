@@ -1,0 +1,6 @@
+Deliberate defects, each run against t52 and then reverted (31 October 2026):
+
+M1  the cap is not applied (each item keeps its full discount)        -> t52 fails (2 checks)
+M2  the smaller automatic discount wins                               -> t52 fails (1 check)
+M3  the first-order condition is never checked                       -> t52 fails (4 checks)
+M4  the start date is never checked                                   -> t52 fails (2 checks)
