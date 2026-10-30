@@ -28,6 +28,7 @@ final class Security
         RecoveryLimiter::register();
         CommentSurface::register();
         TwoFactor::register();
+        SignupRoutes::register();
 
         if (defined('WP_CLI') && WP_CLI) {
             \WP_CLI::add_command('mizzey security', Cli\SecurityCommand::class);

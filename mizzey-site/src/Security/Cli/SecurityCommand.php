@@ -98,6 +98,80 @@ final class SecurityCommand
     }
 
     /**
+     * Turns on CoreX's sign-in limit with the documented settings, once.
+     *
+     * Five failed sign-ins for one identity from one address within five minutes lock that pair for fifteen minutes.
+     * WordPress's default sign-in address stays served, so staff and the two-factor challenge keep working. Only those
+     * five settings change; the rest of CoreX's login protection is kept. Saved through CoreX's own settings store.
+     * Afterwards the setting is the owner's, in CoreX's screen; this command is never run automatically.
+     *
+     * ## EXAMPLES
+     *
+     *     wp mizzey security sign-in-baseline
+     *
+     * @subcommand sign-in-baseline
+     *
+     * @param list<string>          $args
+     * @param array<string, string> $assoc
+     *
+     * Register id: AUTH-15. See specs/009-sign-in-protection, FR-001.
+     */
+    public function signInBaseline(array $args, array $assoc): void
+    {
+        $storeClass = '\Corex\Config\Security\LoginProtection\LoginProtectionSettingsStore';
+        if (! class_exists($storeClass)) {
+            WP_CLI::error(__('CoreX login protection is not available.', 'mizzey-site'));
+        }
+        $store  = new $storeClass();
+        $before = self::signInSettings($store->current());
+        $wanted = array_replace($before, self::signInPolicy());
+        $store->save($wanted);
+
+        $after = self::signInSettings($store->current());
+        if ($after != $wanted) { // phpcs:ignore Universal.Operators.StrictComparisons -- order-insensitive array equality.
+            WP_CLI::error(__('The sign-in baseline did not persist.', 'mizzey-site'));
+        }
+        WP_CLI::success(__('The sign-in limit is on: five failures in five minutes lock that sign-in for fifteen minutes.', 'mizzey-site'));
+    }
+
+    /**
+     * The CoreX settings the sign-in baseline owns (specs/009-sign-in-protection, FR-001), in the store's input keys.
+     *
+     * @return array<string, mixed>
+     */
+    public static function signInPolicy(): array
+    {
+        return [
+            'enabled'                 => true,
+            'threshold'               => 5,
+            'window_seconds'          => 300,
+            'lockout_seconds'         => 900,
+            'block_default_endpoints' => false,
+        ];
+    }
+
+    /**
+     * CoreX's settings object, mapped to the store's snake_case input keys.
+     *
+     * @return array<string, mixed>
+     */
+    private static function signInSettings(object $settings): array
+    {
+        return [
+            'enabled'                  => (bool) $settings->enabled,
+            'custom_slug'              => (string) $settings->customSlug,
+            'block_default_endpoints'  => (bool) $settings->blockDefaultEndpoints,
+            'threshold'                => (int) $settings->threshold,
+            'window_seconds'           => (int) $settings->windowSeconds,
+            'lockout_seconds'          => (int) $settings->lockoutSeconds,
+            'trusted_proxy_mode'       => (bool) $settings->trustedProxyMode,
+            'trusted_proxy_ranges'     => array_values((array) $settings->trustedProxyRanges),
+            'retain_days'              => (int) $settings->retainDays,
+            'successful_login_logging' => (bool) $settings->successfulLoginLogging,
+        ];
+    }
+
+    /**
      * The policy fields the baseline owns (specs/008-admin-two-factor, FR-002).
      *
      * @return array<string, mixed>
