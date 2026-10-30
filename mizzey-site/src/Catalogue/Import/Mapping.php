@@ -24,8 +24,12 @@ use InvalidArgumentException;
  */
 final class Mapping
 {
-    /** Store fields a column can fill. `attribute_<slug>` fills a variation attribute, as WooCommerce names them. */
-    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar'];
+    /**
+     * Store fields a column can fill. `attribute_<slug>` fills a variation attribute, as WooCommerce names them.
+     * `source_asin` keeps Amazon's identifier as a hidden source reference, never shown or searched (owner,
+     * 30 October 2026).
+     */
+    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar', 'source_asin'];
 
     /** Row types the rules know. */
     public const ROW_TYPES = ['simple', 'variable', 'variation'];
