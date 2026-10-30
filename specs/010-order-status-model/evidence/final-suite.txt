@@ -1,0 +1,133 @@
+Full suite on a clean baseline, 30 October 2026, commit 6cd4c35 (branch 010-order-status-model).
+47 scenarios: 41 pass, 6 fact-finding, 0 failed.
+
+PASS  t02-simple-cost
+PASS  t03-variation-cost
+PASS  t04-order-line-snapshot
+PASS  t07-csv-import-cost
+PASS  t08-no-public-exposure
+INFO  t09-staff-visibility
+PASS  t11-cost-sync-matrix
+PASS  t12-cost-sync-identity
+PASS  t13-cost-sync-semantics
+PASS  t14-arabic-content-after-sync
+PASS  t15-cost-sync-entrypoints
+PASS  t16-translation-cost-ownership
+INFO  t17-multilingual-stock
+INFO  t18-synced-fields
+INFO  t19-translation-group-integrity
+INFO  t20-price-integrity
+PASS  t21-bilingual-baseline
+PASS  t22-information-architecture
+PASS  t23-seo-fundamentals
+PASS  t24-stock-report-physical-items
+PASS  t25-stock-report-volume
+PASS  t26-stock-report-real-request
+PASS  t27-storefront-guard
+PASS  t28-archive-language-links
+PASS  t29-cost-before-translation
+PASS  t30-catalogue-read
+PASS  t31-catalogue-mapping
+PASS  t32-catalogue-preview
+PASS  t33-catalogue-outcomes
+PASS  t34-catalogue-no-write
+PASS  t35-catalogue-sku-resolution
+PASS  t36-catalogue-issue-list
+PASS  t37-catalogue-run-record
+INFO  t38-catalogue-volume
+PASS  t39-security-exposure
+PASS  t40-security-accounts
+PASS  t41-security-check
+PASS  t42-two-factor-sign-in
+PASS  t43-two-factor-policy
+PASS  t44-two-factor-enrolment-guard
+PASS  t45-two-factor-recovery
+PASS  t46-sign-in-limit
+PASS  t47-signup-check
+PASS  t48-sessions
+PASS  t49-sign-in-browser
+PASS  t50-two-factor-issuer
+PASS  t51-order-status-model
+
+t51 checks:
+Order storage: HPOS
+PASS  AC-1 pending is named "Pending Payment"
+PASS  AC-1 failed is named "Payment Failed"
+PASS  AC-1 processing is named "Confirmed"
+PASS  AC-1 preparing is named "Preparing"
+PASS  AC-1 shipped is named "Shipped"
+PASS  AC-1 out-for-delivery is named "Out for Delivery"
+PASS  AC-1 cod-collected is named "COD Collected, Awaiting Remittance"
+PASS  AC-1 completed is named "Delivered"
+PASS  AC-1 cancelled is named "Cancelled"
+PASS  AC-1 refunded is named "Refunded"
+PASS  AC-1 delivery-failed is named "Delivery Failed / Returned to Origin"
+PASS  AC-1 the new statuses are registered with WordPress
+PASS  AC-1 the names are translated into Arabic (بانتظار الدفع | فشل الدفع | تم التأكيد | قيد التجهيز | تم التوصيل | تعذّر التوصيل / أُعيد إلى المصدر)
+PASS  AC-5 a customer sees COD Collected as Delivered (Delivered)
+PASS  FR-011 Preparing, Shipped, Out for Delivery and COD Collected are paid; Delivery Failed is not
+PASS  FR-011 the legacy sales reports count them too
+PASS  AC-2 staff move to preparing accepted
+PASS  AC-2 staff move to shipped accepted
+PASS  AC-2 staff move to out-for-delivery accepted
+PASS  AC-2 staff move to completed accepted
+PASS  AC-8 the first entry into each status is recorded at the time of the move
+PASS  FR-010 stock unchanged across the new statuses (stays 9)
+PASS  AC-7 each staff move is in the timeline under the staff member's name (4 notes)
+PASS  AC-8 orders are found by when they were delivered, from order data
+PASS  FR-009 a Delivered order is in the delivered set with its delivery time
+PASS  AC-8 going out for delivery again keeps the first time
+PASS  AC-2 [code] Confirmed to Delivered refused: status and completed date unchanged in storage
+PASS  AC-2 [code] no status-change hook and no transition note followed the refusal
+PASS  AC-2 [code] the refusal is noted on the order and the rest of the save went ahead
+PASS  AC-2 [code] a stale copy cannot move a Delivered order back to Preparing, and no hook fires
+PASS  AC-2 [code] the refused stale copy does not erase the completed date
+PASS  AC-2 [code] a stale copy asking for the status already stored fires no second transition
+PASS  AC-5 a new cash order cannot be created as Delivered
+PASS  AC-2 a new or draft order starts as Pending Payment, Confirmed, On hold, Payment Failed or Cancelled
+PASS  AC-2 [code] a new order saved directly as Shipped is kept as Pending Payment
+PASS  AC-2 the message for a new order lists the starting statuses
+PASS  AC-5 an ordinary cash order is not marked paid when it is confirmed
+PASS  AC-5 a payment completion on a cash order past payment leaves nothing behind that marks it paid later
+PASS  AC-5 an aborted payment completion leaves nothing behind that marks a cash order paid when it is confirmed
+PASS  AC-2 [code] a Confirmed order cannot become a draft, so it cannot skip to Delivered through one
+PASS  AC-2 payment_complete moves Pending Payment to Confirmed
+PASS  AC-7 the payment-driven change is in the timeline
+PASS  AC-5 completing the payment of a cash order confirms it, instead of the WooCommerce jump to Delivered
+PASS  AC-2 [code] a just-created order in memory cannot jump to Delivered
+PASS  AC-2 a failed payment, then on hold, are allowed
+PASS  AC-2 a payment arriving after cancellation revives the order as Confirmed
+PASS  AC-2 [screen] Confirmed to Delivered refused
+PASS  AC-2 [screen] the person is told which moves are allowed
+PASS  AC-3 [screen] a cancellation without a reason is refused
+PASS  AC-2 [screen] Confirmed to Preparing accepted
+PASS  AC-3 [screen] with a reason: cancelled, the reason and the person stored
+PASS  AC-3, AC-7 the reason is in the timeline under the staff member's name
+PASS  AC-6 a paid order that was cancelled can still be refunded in full
+PASS  AC-2 [list button] the check runs before WooCommerce's handler
+PASS  AC-2 [list button] Confirmed to Delivered refused, Confirmed to Preparing allowed
+PASS  AC-2 [bulk] the Confirmed order moves to Preparing, the Delivered one is left out and unchanged
+PASS  AC-3 [bulk] no cancellation in bulk, because no reason can be given
+PASS  AC-2 [bulk] the refused orders are reported
+PASS  AC-2 [REST] Confirmed to Delivered is a 400 and the order is unchanged (status 400)
+PASS  AC-3 [REST] a staff cancellation without a reason is a 400 (status 400)
+PASS  AC-7 [REST] an allowed staff move is attributed to the person (status 200)
+PASS  AC-3 [REST] with a reason the cancellation is stored (status 200)
+PASS  AC-3 [REST] creating an order as Cancelled without a reason is a 400 (status 400)
+PASS  AC-3 [REST] creating an order as Cancelled with a reason stores it (status 201)
+PASS  AC-2 [REST] creating an order directly as Shipped is a 400, not a 201 the guard then undoes (status 400)
+PASS  AC-3 the unpaid-order timeout records its reason
+PASS  AC-3 a customer's own cancellation records its reason
+PASS  AC-2 a Shipped order cannot be cancelled
+PASS  AC-4 Delivery Failed is not delivered and cannot become Delivered
+PASS  AC-4 Delivery Failed cannot be cancelled (stock restoration belongs to the ERP)
+PASS  AC-5 a cash order cannot skip COD Collected on its way to Delivered
+PASS  AC-5 COD Collected is delivered, with the time delivery was established
+PASS  AC-5 the "order complete" email stays for a prepaid order and is not sent when a cash order's remittance is recorded
+PASS  AC-5 COD Collected leads to Delivered, and delivery dates from collection
+PASS  AC-5 COD Collected is refused from Confirmed
+PASS  AC-5 COD Collected is refused for a prepaid order
+PASS  AC-6 a partial refund is recorded and leaves the status
+PASS  AC-6 a full refund sets Refunded, from Shipped too
+PASS  FR-013 (D6) an order placed in Arabic stores its language as order data (ar)
+PASS  FR-012 the order's language stays as stored after a status move

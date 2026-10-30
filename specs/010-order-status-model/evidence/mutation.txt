@@ -1,0 +1,9 @@
+Deliberate defects, each run against t51 and then reverted (30 October 2026):
+
+M1  the pending transition is not cleared on a refused code-path move     -> t51 fails (1 check)
+M2  Confirmed may move straight to Delivered                              -> t51 fails (13 checks)
+M3  no cancellation reason is required                                    -> t51 fails (8 checks)
+M4  the cash payment mark set on every payment completion (leak, before
+    the final design removed the mark)                                    -> t51 fails ("a payment completion on a
+                                                                             cash order past payment leaves nothing
+                                                                             behind that marks it paid later")

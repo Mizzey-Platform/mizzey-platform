@@ -58,6 +58,10 @@ require_once __DIR__ . '/src/Catalogue/Import/ReportWriter.php';
 require_once __DIR__ . '/src/Catalogue/Import/ImportRunRecorder.php';
 require_once __DIR__ . '/src/Catalogue/Import/FileImportRunRecorder.php';
 require_once __DIR__ . '/src/Catalogue/Import/Cli/CatalogueCommand.php';
+require_once __DIR__ . '/src/Orders/StatusModel.php';
+require_once __DIR__ . '/src/Orders/StatusRegistry.php';
+require_once __DIR__ . '/src/Orders/TransitionGuard.php';
+require_once __DIR__ . '/src/Orders/CancellationField.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -89,6 +93,12 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+
+// The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
+// cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
+MizzeySite\Orders\StatusRegistry::register();
+MizzeySite\Orders\TransitionGuard::register();
+MizzeySite\Orders\CancellationField::register();
 
 // The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
