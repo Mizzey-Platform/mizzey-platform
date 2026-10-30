@@ -280,7 +280,7 @@ final class BaselineReport
     private static function accountWriters(): array
     {
         $writers = SignupRoutes::writers();
-        $list    = implode(', ', array_map(static fn (string $name, string $state): string => "{$name} {$state}", array_keys($writers), $writers));
+        $list    = implode(', ', array_map(static fn (string $name, string $state): string => $name . ' ' . $state, array_keys($writers), $writers));
 
         return self::row('account_writers', ! in_array('unchecked', $writers, true), sprintf(
             /* translators: %s: each place accounts can be created, with its state. */

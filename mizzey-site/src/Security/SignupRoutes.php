@@ -253,12 +253,12 @@ final class SignupRoutes
         // resolve to the real target instead of the plugin slug (see Localisation::loadPluginTextdomain()).
         $file = WP_PLUGIN_DIR . '/mizzey-site/assets/signup-check.js';
         wp_enqueue_script(self::SCRIPT, plugins_url('mizzey-site/assets/signup-check.js'), ['wp-data'], is_readable($file) ? (string) filemtime($file) : null, true);
-        wp_add_inline_script(self::SCRIPT, 'window.mizzeySignup = ' . wp_json_encode([
+        wp_localize_script(self::SCRIPT, 'mizzeySignup', [
             'namespace' => self::STORE_NAMESPACE,
             'token'     => $checkout ? SignupCheck::issue('checkout') : '',
             'tokenName' => SignupCheck::FIELD_TOKEN,
             'trapName'  => SignupCheck::FIELD_TRAP,
-        ]) . ';', 'before');
+        ]);
     }
 
     public static function registerCheckoutData(): void
@@ -270,8 +270,8 @@ final class SignupRoutes
             'endpoint'        => \Automattic\WooCommerce\StoreApi\Schemas\V1\CheckoutSchema::IDENTIFIER,
             'namespace'       => self::STORE_NAMESPACE,
             'schema_callback' => static fn (): array => [
-                'token' => ['description' => 'The signup check token.', 'type' => 'string', 'context' => ['view', 'edit'], 'readonly' => false],
-                'trap'  => ['description' => 'The signup check trap, always empty.', 'type' => 'string', 'context' => ['view', 'edit'], 'readonly' => false],
+                'token' => ['type' => 'string', 'context' => ['view', 'edit'], 'readonly' => false],
+                'trap'  => ['type' => 'string', 'context' => ['view', 'edit'], 'readonly' => false],
             ],
             'data_callback'   => static fn (): array => [],
             'schema_type'     => ARRAY_A,
