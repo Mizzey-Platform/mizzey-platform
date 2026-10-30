@@ -2831,7 +2831,37 @@
         "note": "Carry the sf-pdp-simple 'See all reviews' target (hit 30 to 38 px where uncovered) and batch-07 ct-campaign-page's 'Shop the offer' (43 to 43.5 px), then verify in build. Links measured at 0 px are covered by an open overlay in that frame (for example sf-free-shipping-progress 'Continue shopping' behind its drawer and the promo strip behind the cookie notice): background links, not actionable undersized targets."
       }
     ],
-    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. The additions requested on 27 October 2026 were reviewed separately on 28 October 2026, as stabilisation.supplementary_review records. Controlled corrections preserve the previous approved hashes; current in-force hashes are in each group's freeze."
+    "review_boundaries": "The dated batch reviews remain historical acceptance of their original artefacts and state sets. The additions requested on 27 October 2026 were reviewed separately on 28 October 2026, as stabilisation.supplementary_review records. Controlled corrections preserve the previous approved hashes; current in-force hashes are in each group's freeze.",
+    "post_closure_rulings": [
+      {
+        "id": "FE-1",
+        "date": "2026-10-29",
+        "recorded": "2026-10-30",
+        "decided_by": "Mustafa, owner",
+        "kind": "owner ruling after the phase closure, applied at high fidelity; no frozen file changes",
+        "ruling": "Form errors on the storefront appear on the field itself, not as a list at the top of the page. The top of a form is only for errors that belong to no field: payment declined, an item out of stock or a changed price, a coupon that expired after it was applied, a session or connection error, and a failed sign-in.",
+        "supersedes": "The error summary at the top of the main column on submit (the .esum component of ck-validation, batch-05, with role alert, a heading and one link per error) and its summary_error state, wherever the frozen low-fidelity files draw it or refer to it.",
+        "surfaces_drawing_the_summary": [
+          "ac-account-details",
+          "ac-addresses",
+          "ac-password",
+          "ac-tracking",
+          "au-lost-password",
+          "au-passwordless",
+          "au-register",
+          "au-reset-password",
+          "au-sign-in",
+          "ck-validation",
+          "ct-contact",
+          "rv-form"
+        ],
+        "surfaces_referring_to_it": [
+          "ck-address",
+          "ck-review-place-order"
+        ],
+        "record": "The low-fidelity phase is closed and its files stay frozen as reviewed: they are not redrawn, as with the batch-09 closure's catalogue-only stabilisation (Option A). The high-fidelity design (D-15) and the working HTML and CSS (PRE-03b) apply this ruling in place of the summary on every surface listed. The focus rule, the Arabic placement and the sign-in, registration and reset cases are set out in the high-fidelity evidence pack, pattern 13 (form validation), held outside the repository. The registration email_in_use state, which discloses an account, is a separate proposal for #305 and is not ruled here. A design working decision: it approves no implementation, changes no signed scope and is not a client confirmation."
+      }
+    ]
   },
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
   "entries": [
