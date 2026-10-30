@@ -57,7 +57,7 @@ proves them over HTTP and in a browser, in both languages.
 | 3 | E-SF-8 checkout | #255 | Order placement in both languages, BR-005 price snapshot, ENT-08 order snapshot, CHK validation messages in both languages (CHK-11), and the stock safeguard below | Checkout screens | OD-09 VAT: placeholder fields until the client's answer |
 | 3 | E-ADM-5 invoice document, ADM-92 only | #280 | The invoice ACCT-12 downloads, from an approved plugin before custom code (M-4) | Invoice layout | OD-09 and OD-18: placeholder entity details |
 | 3 | E-SF-9 My Account | #308 | Address book, order detail with status history, profile and password on WooCommerce's account details (B9), invoice download after ADM-92 | Account screens | None |
-| 3 | E-SF-11 reviews | #309 | D-17 eligibility on every submission route, moderation, average rating data, the invitation trigger | Review form and display | None |
+| 3 | E-SF-11 reviews | #309 | D-17 eligibility on every submission route, moderation, average rating data, the invitation trigger, and up to 5 images per review, a recorded gift (D-23, not REV-06) | Review form and display | None |
 | 3 | E-NOTF-1 emails, Stage 3 part | #285 | Account and order emails, in the order's language, with triggers and content | Shared email layout and header | OD-01 logo: placeholder; OD-18 sender: staging capture |
 
 **The stock safeguard (D-19 item 5).** Only the ERP is authoritative for stock. Native checkout holds, order stock

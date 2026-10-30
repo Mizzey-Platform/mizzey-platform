@@ -2118,3 +2118,28 @@ through the adapter and fails closed, and that no WooCommerce path changes stock
 **3. What stays.** Every register row, acceptance criterion and stage boundary. PRE-09 conditions for ERP-dependent
 work (seams and mocks only, M-3). Client inputs stand in as defaults, fixtures or mocks (D-10), each keeping the
 class the backlog records. Each slice is its own requirement pull request with its spec and evidence.
+
+## 2026-10-30 - D-23: photos in reviews, a recorded gift
+
+**Status: the owner's decision of 30 October 2026, in his words: "Photos in reviews as a recorded gift: up to 5 images
+per review, no video, moderated with the review. Record it as a gift, not REV-06."** Internal record. It adds no
+register row, changes no fee and is not a Change Request.
+
+**1. What is given.** A customer who may review a product (D-17: a delivered purchase) may attach up to 5 images to
+the review. No video. The images are moderated with the review: nothing is public before the review is approved, and
+a rejected or removed review takes its images out of public view.
+
+**2. Why it is a gift and not REV-06.** REV-06 ("Photo and video reviews") is P2, and the register's launch scope lists
+photo and video reviews as not included. This gift is images only, so it does not deliver REV-06, and REV-06 stays P2.
+It is given on the owner's choice, recorded so it is never read as owed: more images, video, galleries or any other
+P2 row are not owed because this was given. When Stage 3 is presented, the client is told in writing that review
+photos are included at no charge, beyond the contracted scope. Defects in it are fixed like any delivered code;
+extensions to it are not owed.
+
+**3. Engineering limits (D-21 security).** JPEG, PNG and WebP only, checked by the file's content, not its name; a
+per-image size and dimension cap set in the spec; location and camera data removed before storage; stored as images
+only, never executable, under names that cannot be guessed; only the reviewer can attach; the review form's spam
+protection (D-21) applies; each image has alternative text. The values are set in #309's spec.
+
+**4. Where it is built.** Inside #309 (E-SF-11), under D-22: upload, checks, storage and moderation now; the designed
+form and display after PRE-03b.
