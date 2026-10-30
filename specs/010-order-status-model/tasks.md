@@ -17,5 +17,5 @@ Each task names its test. `t51` is `mizzey-site/tests/integration/t51-order-stat
 | T009 | Wire into `mizzey-site.php` | t51 |
 | T010 | Write `t51-order-status-model` | itself |
 | T011 | Full suite on a clean baseline; guards (wp-guard, woo-guard, test-guard, clean-code-guard) | suite |
-| T012 | Staging, on the owner's approval: the order screen in a browser in English, a forbidden move and a cancellation without a reason refused | `verification.md` |
+| T012 | Staging, on the owner's approval: done 31 October 2026 on v0.1.7 (t51 on staging, the Arabic block checkout); the order screen seen in a browser remains, with the owner's staff sign-in | `verification.md`, `evidence/staging-T012.txt` |
 | T013 | Client acceptance through MS-UAT-2026-027 (DOD-09) | `verification.md` |

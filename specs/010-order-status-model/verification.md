@@ -24,10 +24,15 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0 with HPOS order storage, WPML 4.9.7, 
 | AC-8 | Pass. First entry recorded at the time of the move, kept on re-entry, and queryable with `wc_get_orders` |
 | FR-010 to FR-013 | Pass. Stock unchanged across the new statuses; paid and legacy report lists; the order's language captured natively and kept |
 
-## 2. Staging
+## 2. Staging, 31 October 2026, release v0.1.7
 
-Not done. T012 waits for the owner's approval of a release: the order screen in a browser in English, a forbidden move
-and a cancellation without a reason refused, the list buttons, and the block checkout storing the order's language.
+`evidence/staging-T012.txt`. Backup first; deploy, build and the staging check clean; the security check passes. t51
+passes on staging, 80 of 80 checks, on MariaDB with the Redis object cache. A real guest checkout through the block
+checkout's Store API in Arabic stored the order's language as `ar` (D6), confirmed the cash order without a paid date,
+and recorded its first entry; cancelling it by code stored the system reason and WooCommerce restored the unit before
+the test order was deleted.
+
+Still to do: the order screen seen in a browser, which needs a staff sign-in with the owner's authenticator.
 
 ## 3. Client acceptance
 
