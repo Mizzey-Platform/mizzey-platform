@@ -52,7 +52,9 @@ final class StatusModel
         self::COD_COLLECTED     => ['completed', 'refunded'],
         'completed'             => ['refunded'],
         self::DELIVERY_FAILED   => ['refunded'],
-        'cancelled'             => [],
+        // A payment that arrives after cancellation revives the order, as WooCommerce's own payment flow does; a paid
+        // cancelled order can still be refunded in full.
+        'cancelled'             => ['processing', 'refunded'],
         'refunded'              => [],
     ];
 
@@ -80,9 +82,35 @@ final class StatusModel
     public static function renamed(): array
     {
         return [
+            'pending'    => __('Pending Payment', 'mizzey-site'),
+            'failed'     => __('Payment Failed', 'mizzey-site'),
             'processing' => __('Confirmed', 'mizzey-site'),
             'completed'  => __('Delivered', 'mizzey-site'),
         ];
+    }
+
+    /** Whether the order is paid in cash on delivery. */
+    public static function isCash(\WC_Order $order): bool
+    {
+        return $order->get_payment_method() === 'cod';
+    }
+
+    /**
+     * The owner's cash route (30 October 2026): a cash order reaches Delivered only through COD Collected, and COD
+     * Collected is for cash orders only. Null when the move fits the route.
+     */
+    public static function routeProblem(\WC_Order $order, string $from, string $to): ?string
+    {
+        $from = self::bare($from);
+        $to   = self::bare($to);
+        if ($to === 'completed' && self::isCash($order) && $from !== self::COD_COLLECTED && ! in_array($from, self::STARTING, true)) {
+            return __('Order status not changed: a cash on delivery order reaches Delivered through COD Collected, when the remittance is recorded.', 'mizzey-site');
+        }
+        if ($to === self::COD_COLLECTED && ! self::isCash($order)) {
+            return __('Order status not changed: COD Collected is only for cash on delivery orders.', 'mizzey-site');
+        }
+
+        return null;
     }
 
     /** Whether the table allows the move. Into an unknown status: never. From an unknown status: to a known one. */

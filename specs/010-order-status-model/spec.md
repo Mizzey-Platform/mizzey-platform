@@ -56,10 +56,10 @@ timeline records every status change with actor and timestamp"), US-18-03 (Statu
 | # | Criterion | Traces | Status |
 |---|---|---|---|
 | AC-1 | Every contracted state exists as a distinct order status with its register name: Pending Payment, Payment Failed, Confirmed, Preparing, Shipped, Out for Delivery, Delivered, Cancelled, Refunded, Delivery Failed / Returned to Origin, and COD Collected, Awaiting Remittance | ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-12, ORD-13, ORD-14 | final |
-| AC-2 | A status update is validated: a change the allowed-transition table does not permit is refused, the order keeps its status, and the person is told why. The rule applies to the order screen, bulk actions, the REST API and code paths alike | ADM-87 | final |
+| AC-2 | A status update is validated: a change the allowed-transition table does not permit is refused, the order keeps its status, and the person is told why. The rule applies to the order screen, the order list's status buttons, bulk actions, the REST API and code paths alike, and is checked against the status in storage | ADM-87 | final |
 | AC-3 | A cancellation records its reason. Staff cancelling from the order screen, a bulk action or the REST API must give one, or the cancellation is refused; a customer's own cancellation of an unpaid order and a system cancellation record their own reason | ORD-08, ADM-87 | final |
 | AC-4 | Delivery Failed / Returned to Origin is a distinct status. It is never counted as Delivered, and no path moves an order from it to Delivered | ORD-13 | final |
-| AC-5 | COD Collected, Awaiting Remittance is entered only from Out for Delivery or Shipped, which establishes that delivery happened, and it leads to Delivered when the remittance is recorded | ORD-14, ORD-07 | final |
+| AC-5 | COD Collected, Awaiting Remittance is entered only from Out for Delivery or Shipped, which establishes that delivery happened, and only for a cash on delivery order; a cash order reaches Delivered only through it, when the remittance is recorded | ORD-14, ORD-07 | final |
 | AC-6 | Refunds use WooCommerce's standard refund states: a full refund sets Refunded, a partial refund leaves the status and records the refund | ORD-12 | final |
 | AC-7 | The order timeline records every status change with its actor and timestamp | ADM-86, ADM-87 | final |
 | AC-8 | When an order first entered each status is stored as order data and can be queried, not read from note text | ADM-86, ORD-07, ORD-14 | final |
@@ -68,8 +68,8 @@ timeline records every status change with actor and timestamp"), US-18-03 (Statu
 
 | Register state | Status | Source |
 |---|---|---|
-| ORD-01 Pending Payment | `pending` | WooCommerce |
-| ORD-02 Payment Failed | `failed` | WooCommerce |
+| ORD-01 Pending Payment | `pending`, named Pending Payment | WooCommerce |
+| ORD-02 Payment Failed | `failed`, named Payment Failed | WooCommerce |
 | ORD-03 Confirmed | `processing`, named Confirmed | WooCommerce |
 | ORD-04 Preparing | `preparing` | New |
 | ORD-05 Shipped | `shipped` | New |
@@ -104,14 +104,19 @@ prefix.
 | COD Collected | Delivered, Refunded |
 | Delivered | Refunded |
 | Delivery Failed | Refunded |
-| Cancelled | none |
+| Cancelled | Confirmed (a payment that arrives after cancellation), Refunded |
 | Refunded | none |
 
 A new order, or one leaving the block checkout's draft, may take any first status. A full refund moves any paid status
 to Refunded, as WooCommerce does. Cancellation stops at Preparing: once a parcel is with the carrier, its outcome is
 Delivered, COD Collected or Delivery Failed. Delivery Failed ends there, or in Refunded for a paid order; a move to
 Cancelled would trigger WooCommerce's own stock restoration, which belongs to the ERP (D-19 item 5). Pending Payment never
-goes straight to Delivered: the store sells physical goods only.
+goes straight to Delivered: the store sells physical goods only. An order with a real status never goes back to a draft.
+
+**The cash route** (owner, 30 October 2026): a cash on delivery order reaches Delivered only through COD Collected, and
+COD Collected is only for cash on delivery orders. A customer sees COD Collected as Delivered, because the remittance is
+between the courier and the store, and is not sent WooCommerce's "order complete" email when the remittance is recorded
+days later; the delivery email itself is #285's (NOTF-06).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -226,8 +231,9 @@ try forbidden moves, and read the result.
   readers (AC-4, AC-5)
 - **FR-010**: The new statuses MUST NOT add any stock reduction or restoration of their own (D-19 item 5); moves among
   them MUST leave stock unchanged
-- **FR-011**: The new statuses that follow payment (Preparing, Shipped, Out for Delivery, COD Collected) MUST be treated
-  as paid wherever WooCommerce counts paid orders, so sales figures stay complete; Delivery Failed MUST NOT be
+- **FR-011**: The new statuses that follow payment (Preparing, Shipped, Out for Delivery, COD Collected) MUST be in
+  WooCommerce's paid-status list and in its legacy report status list; Delivery Failed MUST NOT be. Which statuses the
+  sales report counts or excludes is #286's (RPT-01)
 - **FR-012**: All of this MUST work with WooCommerce's order storage as configured (HPOS or legacy) and in both
   languages, and status moves MUST NOT change the language an order was placed in
 - **FR-013**: The language an order was placed in MUST be stored as order data (D6, which #248 carries). WooCommerce

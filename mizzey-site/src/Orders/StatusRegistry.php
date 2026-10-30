@@ -23,6 +23,51 @@ final class StatusRegistry
         add_filter('woocommerce_register_shop_order_post_statuses', [self::class, 'postStatuses']);
         add_filter('wc_order_statuses', [self::class, 'labels']);
         add_filter('woocommerce_order_is_paid_statuses', [self::class, 'paid']);
+        add_filter('woocommerce_reports_order_statuses', [self::class, 'reported']);
+        add_filter('woocommerce_email_enabled_customer_completed_order', [self::class, 'completedEmail'], 10, 2);
+    }
+
+    /**
+     * Whether the labels are being drawn for a customer: on the storefront, not in the admin, the REST API, cron or
+     * WP-CLI. Filterable, so a test can draw the customer's view.
+     */
+    public static function customerView(): bool
+    {
+        $view = ! is_admin() && ! (defined('REST_REQUEST') && REST_REQUEST) && ! wp_doing_cron() && ! (defined('WP_CLI') && WP_CLI);
+
+        return (bool) apply_filters('mizzey_order_status_customer_view', $view);
+    }
+
+    /**
+     * The legacy sales reports and the dashboard widget count the statuses after payment too. WooCommerce Analytics
+     * includes registered statuses unless excluded; which statuses the sales report excludes is #286's (RPT-01).
+     *
+     * @param mixed $statuses
+     * @return mixed
+     */
+    public static function reported($statuses)
+    {
+        if (! is_array($statuses) || ! array_intersect(['completed', 'processing'], $statuses)) {
+            return $statuses;
+        }
+
+        return array_values(array_unique([...$statuses, ...StatusModel::PAID]));
+    }
+
+    /**
+     * A cash order already delivered (COD Collected) is not told "your order is complete" when the remittance is
+     * recorded days later. The delivery email itself is #285's (NOTF-06).
+     *
+     * @param mixed $enabled
+     * @param mixed $order
+     */
+    public static function completedEmail($enabled, $order): bool
+    {
+        if ($order instanceof \WC_Order && StatusModel::enteredAt($order, StatusModel::COD_COLLECTED) !== null) {
+            return false;
+        }
+
+        return (bool) $enabled;
     }
 
     /**
@@ -76,6 +121,11 @@ final class StatusRegistry
             $ordered[$key] = $label;
         }
         $ordered['wc-' . StatusModel::DELIVERY_FAILED] = $added[StatusModel::DELIVERY_FAILED];
+        // The remittance is between the courier and the store: a customer whose cash order is COD Collected sees
+        // Delivered.
+        if (self::customerView()) {
+            $ordered['wc-' . StatusModel::COD_COLLECTED] = StatusModel::renamed()['completed'];
+        }
 
         return $ordered;
     }

@@ -8,17 +8,23 @@ declare(strict_types=1);
 
 namespace MizzeySite\Orders;
 
+use Automattic\WooCommerce\Utilities\OrderUtil;
+
 defined('ABSPATH') || exit;
 
 /**
  * Validates every order status change against the model, records when an order first entered each status, and keeps
  * the reason for a cancellation.
  *
- * The order screen, bulk actions and the REST API are checked before WooCommerce sets the status, so a refusal is a
- * plain message and nothing else in the request is lost. The guard before every order save catches any other code
- * path: it puts the stored status and dates back and clears WooCommerce's pending transition, so no status hook, note or
- * email follows a refused move, and the rest of the save goes ahead. WooCommerce 11.1.0 offers no public way to drop a
- * pending transition, so `WC_Order::$status_transition` is cleared by reflection; t51 fails if that stops working.
+ * Every staff entry point is checked before WooCommerce sets the status, so a refusal is a plain message and nothing
+ * else in the request is lost: the order screen, the list's status buttons, bulk actions and the REST API. The guard
+ * before every order save catches any other code path. It validates against the status in storage, not the copy the
+ * object was loaded with, so an out-of-date object cannot overwrite a newer status. A refused move gets its stored
+ * status and dates back and WooCommerce's pending transition is cleared, so no status hook, transition note or email
+ * follows and the rest of the save goes ahead. (`woocommerce_order_edit_status`, which WooCommerce fires inside a
+ * manual `set_status()` before saving, cannot be recalled; the staff entry points are checked first for that reason.)
+ * WooCommerce 11.1.0 offers no public way to drop a pending transition, so `WC_Order::$status_transition` is cleared by
+ * reflection; t51 fails if that stops working.
  *
  * Register ids: ADM-86, ADM-87, ORD-08. See specs/010-order-status-model, FR-002, FR-003, FR-007, FR-008.
  */
@@ -26,12 +32,16 @@ final class TransitionGuard
 {
     private const NOTICES = 'mizzey_order_notices_';
 
-    /** @var array<int,string> Reasons given on the order screen or over REST for the cancellation being saved. */
+    /** @var array<int,string> Reasons given on the order screen or over REST, by order id. */
     private static array $reasons = [];
+
+    /** @var \WeakMap<\WC_Order,string>|null Reasons given for an order REST is creating, which has no id yet. */
+    private static ?\WeakMap $newReasons = null;
 
     public static function register(): void
     {
         add_action('woocommerce_process_shop_order_meta', [self::class, 'screen'], 1, 1);
+        add_action('wp_ajax_woocommerce_mark_order_status', [self::class, 'listButton'], 1);
         add_filter('woocommerce_bulk_action_ids', [self::class, 'bulk'], 10, 3);
         add_filter('woocommerce_rest_pre_insert_shop_order_object', [self::class, 'rest'], 10, 3);
         add_action('woocommerce_before_order_object_save', [self::class, 'beforeSave'], PHP_INT_MAX, 1);
@@ -51,15 +61,15 @@ final class TransitionGuard
         if (! $order instanceof \WC_Order) {
             return;
         }
-        $from   = $order->get_status();
+        $from   = self::storedStatus($order);
         $to     = StatusModel::bare(wc_clean(wp_unslash((string) $_POST['order_status'])));
         $reason = sanitize_textarea_field(wp_unslash((string) ($_POST[CancellationField::FIELD] ?? '')));
         if ($from === $to) {
             return;
         }
-        $problem = self::problem($from, $to, $reason, true);
+        $problem = self::check($order, $from, $to, $reason, true);
         if ($problem !== null) {
-            $_POST['order_status'] = 'wc-' . $from;
+            $_POST['order_status'] = 'wc-' . ($from !== '' ? $from : 'pending');
             self::notice($problem);
 
             return;
@@ -68,6 +78,32 @@ final class TransitionGuard
         if ($to === 'cancelled') {
             self::$reasons[$orderId] = $reason;
         }
+    }
+
+    /**
+     * The status buttons in the order list (`woocommerce_mark_order_status`). Checked before WooCommerce's own handler
+     * runs, with the same nonce and capability; a refused move goes back to the list with the reason.
+     */
+    public static function listButton(): void
+    {
+        if (! current_user_can('edit_shop_orders') || ! isset($_GET['status'], $_GET['order_id'])) {
+            return;
+        }
+        check_admin_referer('woocommerce-mark-order-status');
+        $problem = self::listButtonProblem(absint(wp_unslash($_GET['order_id'])), sanitize_text_field(wp_unslash($_GET['status'])));
+        if ($problem === null) {
+            return;
+        }
+        self::notice($problem);
+        wp_safe_redirect(wp_get_referer() ?: admin_url('admin.php?page=wc-orders'));
+        exit;
+    }
+
+    public static function listButtonProblem(int $orderId, string $status): ?string
+    {
+        $order = wc_get_order($orderId);
+
+        return $order instanceof \WC_Order ? self::check($order, self::storedStatus($order), StatusModel::bare($status), '', true) : null;
     }
 
     /**
@@ -87,7 +123,7 @@ final class TransitionGuard
         $refused = [];
         foreach ($ids as $id) {
             $order = wc_get_order($id);
-            if ($order instanceof \WC_Order && self::problem($order->get_status(), $to, '', true) !== null) {
+            if ($order instanceof \WC_Order && self::check($order, self::storedStatus($order), $to, '', true) !== null) {
                 $refused[] = $id;
                 continue;
             }
@@ -106,25 +142,26 @@ final class TransitionGuard
     }
 
     /**
-     * The REST API. A forbidden move, or a staff cancellation without `cancellation_reason`, is a 400 before anything is
-     * saved. A staff change is marked manual, so the timeline names the person.
+     * The REST API, for updates and for creation. A forbidden move, or a staff cancellation without
+     * `cancellation_reason`, is a 400 before anything is saved. A staff change is marked manual, so the timeline names
+     * the person.
      *
      * @param \WC_Order|\WP_Error $order
      * @return \WC_Order|\WP_Error
      */
     public static function rest($order, \WP_REST_Request $request, bool $creating)
     {
-        if ($creating || ! $order instanceof \WC_Order || empty($request['status'])) {
+        if (! $order instanceof \WC_Order || empty($request['status'])) {
             return $order;
         }
-        $from = $order->get_status();
+        $from = $creating ? '' : self::storedStatus($order);
         $to   = StatusModel::bare((string) $request['status']);
         if ($from === $to) {
             return $order;
         }
         $staff   = current_user_can('edit_shop_orders');
         $reason  = sanitize_textarea_field((string) ($request['cancellation_reason'] ?? ''));
-        $problem = self::problem($from, $to, $reason, $staff);
+        $problem = self::check($order, $from, $to, $reason, $staff);
         if ($problem !== null) {
             return new \WP_Error('mizzey_order_status_refused', $problem, ['status' => 400]);
         }
@@ -132,15 +169,19 @@ final class TransitionGuard
             $request->set_param('manual_update', true);
         }
         if ($to === 'cancelled') {
-            self::$reasons[$order->get_id()] = $reason;
+            if ($creating) {
+                self::newReasons()[$order] = $reason;
+            } else {
+                self::$reasons[$order->get_id()] = $reason;
+            }
         }
 
         return $order;
     }
 
     /**
-     * Before every order save: refuse a forbidden move without side effects, store a cancellation's reason, and record
-     * the first entry into the new status.
+     * Before every order save: refuse a forbidden move without side effects, store a cancellation's reason, complete
+     * the timeline when WooCommerce leaves out the transition note, and record the first entry into the new status.
      */
     public static function beforeSave(\WC_Order $order): void
     {
@@ -151,32 +192,42 @@ final class TransitionGuard
             return;
         }
         $data = $order->get_data();
-        // An order created without an explicit status holds an empty one in memory, while storage has Pending Payment.
-        $from = $isNew ? '' : ((string) $data['status'] !== '' ? (string) $data['status'] : 'pending');
-        if ($from === $to || in_array($to, StatusModel::STARTING, true)) {
+        $from = $isNew ? '' : self::storedStatus($order);
+        if ($from === $to) {
             return;
         }
-        if (! StatusModel::allowed($from, $to)) {
+        $draft = in_array($from, StatusModel::STARTING, true);
+        if (in_array($to, StatusModel::STARTING, true)) {
+            // Only a new order or a draft may be a draft; an order with a real status never goes back to one.
+            if (! $draft) {
+                self::refuse($order, $from, $to, $data);
+            }
+
+            return;
+        }
+        if (! $draft && ! StatusModel::allowed($from, $to)) {
             self::refuse($order, $from, $to, $data);
 
             return;
         }
-        if ($to === 'cancelled' && ! in_array($from, StatusModel::STARTING, true)) {
-            $transition = self::transition($order);
-            $manual     = is_array($transition) && ! empty($transition['manual']);
-            $reason     = self::$reasons[$order->get_id()] ?? '';
-            unset(self::$reasons[$order->get_id()]);
-            if ($reason === '' && $manual) {
-                self::refuse($order, $from, $to, $data, __('Cancellation refused: give the reason for the cancellation.', 'mizzey-site'));
+        $route = StatusModel::routeProblem($order, $from, $to);
+        if ($route !== null) {
+            self::refuse($order, $from, $to, $data, $route);
 
-                return;
-            }
-            if ($reason === '') {
-                $note   = is_array($transition) ? trim(wp_strip_all_tags((string) ($transition['note'] ?? ''))) : '';
-                $reason = $note !== '' ? $note : __('Cancelled by the system.', 'mizzey-site');
-            }
-            $order->update_meta_data(StatusModel::REASON_META, $reason);
-            $order->update_meta_data(StatusModel::CANCELLED_BY_META, (string) ($manual ? get_current_user_id() : 0));
+            return;
+        }
+        $transition = self::transition($order);
+        if ($to === 'cancelled' && ! self::recordCancellation($order, $from, $to, $data, $transition)) {
+            return;
+        }
+        if (! $draft && is_array($transition) && $transition['note'] === false) {
+            // WooCommerce's payment completion passes no transition note; the timeline still records the change.
+            $order->add_order_note(sprintf(
+                /* translators: 1: old status, 2: new status. */
+                __('Order status changed from %1$s to %2$s.', 'mizzey-site'),
+                StatusModel::name($from),
+                StatusModel::name($to)
+            ));
         }
         if ($order->get_meta(StatusModel::metaKey($to), true) === '') {
             $order->update_meta_data(StatusModel::metaKey($to), (string) time());
@@ -199,7 +250,15 @@ final class TransitionGuard
         }
     }
 
-    /** Why the move is refused, or null when it is allowed. */
+    /** Why the move is refused for this order, or null when it is allowed. */
+    public static function check(\WC_Order $order, string $from, string $to, string $reason, bool $staff): ?string
+    {
+        $problem = self::problem($from, $to, $reason, $staff);
+
+        return $problem ?? StatusModel::routeProblem($order, $from, $to);
+    }
+
+    /** Why the move is refused by the table or for a missing reason, or null when it is allowed. */
     public static function problem(string $from, string $to, string $reason, bool $staff): ?string
     {
         if (! StatusModel::allowed($from, $to)) {
@@ -219,13 +278,59 @@ final class TransitionGuard
     }
 
     /**
+     * The status in storage, not the one the object was loaded with. An order created without an explicit status is
+     * stored as Pending Payment.
+     */
+    public static function storedStatus(\WC_Order $order): string
+    {
+        if (! $order->get_id()) {
+            return '';
+        }
+        global $wpdb;
+        $stored = OrderUtil::custom_orders_table_usage_is_enabled()
+            ? $wpdb->get_var($wpdb->prepare("SELECT status FROM {$wpdb->prefix}wc_orders WHERE id = %d", $order->get_id())) // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            : get_post_status($order->get_id());
+        $stored = is_string($stored) && $stored !== '' ? StatusModel::bare($stored) : (string) $order->get_data()['status'];
+
+        return $stored !== '' ? $stored : 'pending';
+    }
+
+    /**
+     * Stores the reason for a cancellation. A manual cancellation without a reason is refused; any other records the
+     * change's own note, or that the system made it.
+     *
+     * @param array<string,mixed>                                $data       The order as loaded.
+     * @param array{from:string,to:string,note:mixed,manual:bool}|false $transition
+     */
+    private static function recordCancellation(\WC_Order $order, string $from, string $to, array $data, $transition): bool
+    {
+        $manual = is_array($transition) && ! empty($transition['manual']);
+        // REST creation saves the new order once, giving it an id, before it sets the status: look in both places.
+        $reason = self::$reasons[$order->get_id()] ?? (self::newReasons()[$order] ?? '');
+        unset(self::$reasons[$order->get_id()], self::newReasons()[$order]);
+        if ($reason === '' && $manual) {
+            self::refuse($order, $from, $to, $data, __('Cancellation refused: give the reason for the cancellation.', 'mizzey-site'));
+
+            return false;
+        }
+        if ($reason === '') {
+            $note   = is_array($transition) && is_string($transition['note'] ?? null) ? trim(wp_strip_all_tags($transition['note'])) : '';
+            $reason = $note !== '' ? $note : __('Cancelled by the system.', 'mizzey-site');
+        }
+        $order->update_meta_data(StatusModel::REASON_META, $reason);
+        $order->update_meta_data(StatusModel::CANCELLED_BY_META, (string) ($manual ? get_current_user_id() : 0));
+
+        return true;
+    }
+
+    /**
      * Messages for the person's next admin page.
      */
     private static function notice(string $message): void
     {
-        $key      = self::NOTICES . get_current_user_id();
-        $messages = get_transient($key);
-        $messages = is_array($messages) ? $messages : [];
+        $key        = self::NOTICES . get_current_user_id();
+        $messages   = get_transient($key);
+        $messages   = is_array($messages) ? $messages : [];
         $messages[] = $message;
         set_transient($key, array_values(array_unique($messages)), 5 * MINUTE_IN_SECONDS);
     }
@@ -234,11 +339,11 @@ final class TransitionGuard
      * Puts back the stored status and the dates WooCommerce sets on a status change, drops the pending transition,
      * and notes the refusal on the order.
      *
-     * @param array<string,mixed> $data The order as stored.
+     * @param array<string,mixed> $data The order as loaded.
      */
     private static function refuse(\WC_Order $order, string $from, string $to, array $data, ?string $why = null): void
     {
-        $order->set_status($from);
+        $order->set_status($from !== '' ? $from : 'pending');
         $order->set_date_paid($data['date_paid'] ?? null);
         $order->set_date_completed($data['date_completed'] ?? null);
         self::clearTransition($order);
@@ -248,8 +353,16 @@ final class TransitionGuard
             StatusModel::name($from),
             StatusModel::name($to)
         );
-        $order->add_order_note($message);
+        if ($order->get_id()) {
+            $order->add_order_note($message);
+        }
         wc_get_logger()->warning($message, ['source' => 'mizzey-order-status', 'order_id' => $order->get_id()]);
+    }
+
+    /** @return \WeakMap<\WC_Order,string> */
+    private static function newReasons(): \WeakMap
+    {
+        return self::$newReasons ??= new \WeakMap();
     }
 
     /** @return array{from:string,to:string,note:mixed,manual:bool}|false */

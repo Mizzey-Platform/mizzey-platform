@@ -59,3 +59,11 @@ msgstr "تم التأكيد"
 #: mizzey-site/src/Orders/StatusModel.php
 msgid "Delivered"
 msgstr "تم التوصيل"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Pending Payment"
+msgstr "بانتظار الدفع"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Payment Failed"
+msgstr "فشل الدفع"
