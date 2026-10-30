@@ -43,6 +43,11 @@ two-factor scenario applies the baseline and restores the earlier policy when it
 - [x] T016 Write `verification.md`, keeping technical verification, staging and client acceptance apart. Test: the
       scope trace.
 
+## Addition (30 October 2026)
+
+- [x] T020 FR-008: `src/Security/TwoFactorIssuer.php` names the authenticator entry after the site's title. Test:
+      t50.
+
 ## Not done until later
 
 - [ ] T017 The release packer bundles `wp-2fa` from wordpress.org: its own `internal:tooling` pull request.

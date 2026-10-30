@@ -145,6 +145,12 @@ code from the authenticator, they do.
   reset helper, session revocation, re-enrolment), and the limits on the emergency bypass.
 - **FR-007**: Ordinary catalogue and customer-account responses MUST load no WP 2FA assets. Staff second-factor
   challenge and enrolment responses are explicit exceptions.
+- **FR-008** (an addition the owner asked for on 30 October 2026, not a register obligation): the entry a staff
+  member's authenticator app shows MUST carry the site's title as stored ("Mizzey" on the live site, "Mizzey
+  (staging)" on staging), not the site's address, with colons removed and unaffected by translation. Only WP 2FA's
+  two name builders are affected; every other `site_url()` result is unchanged. An empty title leaves WP 2FA's own
+  name. The app's logo is outside the site's control: authenticator apps show logos only for brands on their own
+  lists.
 
 ### Key Entities
 
