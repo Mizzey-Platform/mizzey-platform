@@ -33,5 +33,5 @@
 
 - The status model names WooCommerce's status keys because the Mizzey template's Native coverage section requires the
   native mechanism and its evidence; the requirements themselves stay behavioural.
-- Q1 (Delivered is WooCommerce's Completed; a cash order passes through COD Collected) is the recommended default,
-  written into the spec, for the owner to confirm. No [NEEDS CLARIFICATION] marker is left.
+- Q1 (Delivered is WooCommerce's Completed; a cash order passes through COD Collected) was confirmed by the owner on
+  30 October 2026. No [NEEDS CLARIFICATION] marker is left.

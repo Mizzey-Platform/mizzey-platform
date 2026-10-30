@@ -57,7 +57,7 @@ timeline records every status change with actor and timestamp"), US-18-03 (Statu
 |---|---|---|---|
 | AC-1 | Every contracted state exists as a distinct order status with its register name: Pending Payment, Payment Failed, Confirmed, Preparing, Shipped, Out for Delivery, Delivered, Cancelled, Refunded, Delivery Failed / Returned to Origin, and COD Collected, Awaiting Remittance | ORD-01, ORD-02, ORD-03, ORD-04, ORD-05, ORD-06, ORD-07, ORD-08, ORD-12, ORD-13, ORD-14 | final |
 | AC-2 | A status update is validated: a change the allowed-transition table does not permit is refused, the order keeps its status, and the person is told why. The rule applies to the order screen, bulk actions, the REST API and code paths alike | ADM-87 | final |
-| AC-3 | A cancellation records its reason. A cancellation without a reason is refused when a person makes it, and a system cancellation records the system's reason | ORD-08, ADM-87 | final |
+| AC-3 | A cancellation records its reason. Staff cancelling from the order screen, a bulk action or the REST API must give one, or the cancellation is refused; a customer's own cancellation of an unpaid order and a system cancellation record their own reason | ORD-08, ADM-87 | final |
 | AC-4 | Delivery Failed / Returned to Origin is a distinct status. It is never counted as Delivered, and no path moves an order from it to Delivered | ORD-13 | final |
 | AC-5 | COD Collected, Awaiting Remittance is entered only from Out for Delivery or Shipped, which establishes that delivery happened, and it leads to Delivered when the remittance is recorded | ORD-14, ORD-07 | final |
 | AC-6 | Refunds use WooCommerce's standard refund states: a full refund sets Refunded, a partial refund leaves the status and records the refund | ORD-12 | final |
@@ -78,7 +78,7 @@ timeline records every status change with actor and timestamp"), US-18-03 (Statu
 | ORD-07 Delivered | `completed`, named Delivered | WooCommerce |
 | ORD-08 Cancelled | `cancelled` | WooCommerce, plus a recorded reason |
 | ORD-12 Refunded | `refunded`, and partial refunds as WooCommerce records them | WooCommerce |
-| ORD-13 Delivery Failed / Returned to Origin | `returned-to-origin` | New |
+| ORD-13 Delivery Failed / Returned to Origin | `delivery-failed` | New |
 
 WooCommerce's `on-hold` (used by payment methods that wait for confirmation) and `checkout-draft` (an internal state of
 the block checkout) stay as WooCommerce has them. They are not register states and are not renamed or removed.
@@ -86,27 +86,32 @@ the block checkout) stay as WooCommerce has them. They are not register states a
 **Why Delivered is WooCommerce's Completed.** Completed is what WooCommerce's reports, its sales figures, its completed
 date and the verified-purchase check already read as finished. A new Delivered status would need every one of them
 rewired. A cash-on-delivery order passes through COD Collected on delivery and reaches Delivered when its remittance is
-recorded, so a card order and a settled cash order end in the same place. **Owner to confirm (Q1).**
+recorded, so a card order and a settled cash order end in the same place. **Confirmed by the owner on 30 October 2026
+(Q1).** Status names are at most 17 characters, because WordPress stores them in a 20-character field with a `wc-`
+prefix.
 
 **Allowed transitions** (staff, bulk actions, REST and code alike):
 
 | From | To |
 |---|---|
 | Pending Payment | Confirmed, On hold, Payment Failed, Cancelled |
-| Payment Failed | Pending Payment, Confirmed, Cancelled |
-| On hold | Confirmed, Payment Failed, Cancelled |
+| Payment Failed | Pending Payment, Confirmed, On hold, Cancelled |
+| On hold | Confirmed, Payment Failed, Cancelled, Refunded |
 | Confirmed | Preparing, Cancelled, Refunded |
 | Preparing | Shipped, Confirmed, Cancelled, Refunded |
-| Shipped | Out for Delivery, Delivered, COD Collected, Returned to Origin |
-| Out for Delivery | Delivered, COD Collected, Returned to Origin, Shipped |
+| Shipped | Out for Delivery, Delivered, COD Collected, Delivery Failed, Refunded |
+| Out for Delivery | Delivered, COD Collected, Delivery Failed, Shipped, Refunded |
 | COD Collected | Delivered, Refunded |
 | Delivered | Refunded |
-| Returned to Origin | Refunded, Cancelled |
+| Delivery Failed | Refunded |
 | Cancelled | none |
 | Refunded | none |
 
-A full refund moves any paid status to Refunded, as WooCommerce does. Cancellation stops at Preparing: once a parcel is
-with the carrier, its outcome is Delivered or Returned to Origin.
+A new order, or one leaving the block checkout's draft, may take any first status. A full refund moves any paid status
+to Refunded, as WooCommerce does. Cancellation stops at Preparing: once a parcel is with the carrier, its outcome is
+Delivered, COD Collected or Delivery Failed. Delivery Failed ends there, or in Refunded for a paid order; a move to
+Cancelled would trigger WooCommerce's own stock restoration, which belongs to the ERP (D-19 item 5). Pending Payment never
+goes straight to Delivered: the store sells physical goods only.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -139,11 +144,12 @@ try forbidden moves, and read the result.
 
 **Acceptance Scenarios**:
 
-1. **Given** a Preparing order, **When** staff cancel it without a reason, **Then** the cancellation is refused (AC-3)
+1. **Given** a Preparing order, **When** staff cancel it without a reason, from the order screen, in bulk or over REST,
+   **Then** the cancellation is refused (AC-3)
 2. **Given** a Preparing order, **When** staff cancel it with a reason, **Then** it is Cancelled and the reason is
    stored and shown in the timeline (AC-3)
-3. **Given** an unpaid order WooCommerce cancels when its payment window lapses, **When** it is cancelled, **Then** the
-   recorded reason says so (AC-3)
+3. **Given** an unpaid order WooCommerce cancels when its payment window lapses, or a customer cancels their own unpaid
+   order, **When** it is cancelled, **Then** the recorded reason says so (AC-3)
 4. **Given** a Shipped order, **When** staff try to cancel it, **Then** it is refused (AC-2)
 
 ---
@@ -154,8 +160,8 @@ try forbidden moves, and read the result.
 
 **Acceptance Scenarios**:
 
-1. **Given** an Out for Delivery order, **When** it is set to Returned to Origin, **Then** it is not in the delivered
-   set and cannot be set to Delivered (AC-4)
+1. **Given** an Out for Delivery order, **When** it is set to Delivery Failed / Returned to Origin, **Then** it is not
+   in the delivered set and cannot be set to Delivered (AC-4)
 2. **Given** an Out for Delivery cash order, **When** it is set to COD Collected, **Then** it is in the delivered set,
    the time delivery was established is recorded, and it can move to Delivered (AC-5, AC-8)
 3. **Given** a Confirmed order, **When** COD Collected is set, **Then** it is refused (AC-5)
@@ -179,6 +185,8 @@ try forbidden moves, and read the result.
 
 - A payment method moves an order on its own (Pending Payment to Confirmed, On hold or Payment Failed): allowed by the
   table, so payment callbacks are never blocked.
+- WooCommerce's cash-on-delivery gateway asks for Delivered when a payment is marked complete. From Pending Payment that
+  is refused: a cash order reaches Delivered through the shipping states and COD Collected.
 - A move to the status an order already has: no change, no timeline entry, nothing refused.
 - An order created by staff in admin starts as Pending Payment, as WooCommerce does.
 - Orders that exist before this feature: their status stays, and the record of first entry starts from the next change.
@@ -194,7 +202,7 @@ try forbidden moves, and read the result.
 | Timeline of status changes with actor and time | Order notes: WooCommerce adds a note on every status change, attributed to the person for a manual change (P-018 recorded the notes) | PREVIOUSLY TESTED (attribution UNVERIFIED) |
 | Full and partial refunds with their states | WooCommerce refunds; P-014 (the refund API refuses more than the remaining paid amount) | PREVIOUSLY TESTED |
 | Registering extra order statuses, HPOS and legacy storage | WooCommerce's order status filters | UNVERIFIED |
-| The order's language stored at checkout | WooCommerce Multilingual 5.5.7, `inc/class-wcml-orders.php` (`wpml_language` order meta, set before save and on classic checkout) | UNVERIFIED for the block checkout |
+| The order's language stored at checkout (D6) | WooCommerce Multilingual 5.5.7, `inc/class-wcml-orders.php` (`wpml_language` order meta, set before every non-draft save and on classic checkout); t51 | VERIFIED in-process; the block checkout's own request is checked on staging (T012) |
 | Transition validation | None in WooCommerce | GAP |
 | Cancellation reason | None in WooCommerce | GAP |
 
@@ -206,9 +214,9 @@ try forbidden moves, and read the result.
   with their register names as translatable labels in both languages (AC-1)
 - **FR-002**: Every status change MUST be checked against the allowed-transition table, whoever or whatever makes it;
   a forbidden change MUST leave the order unchanged and report why (AC-2)
-- **FR-003**: A cancellation MUST store a reason; a person cancelling MUST give one; a system cancellation MUST record
-  its own (AC-3)
-- **FR-004**: Returned to Origin MUST NOT count as delivered and MUST NOT lead to Delivered (AC-4)
+- **FR-003**: A cancellation MUST store a reason; staff cancelling MUST give one; a customer's own cancellation and a
+  system cancellation MUST record their own (AC-3)
+- **FR-004**: Delivery Failed MUST NOT count as delivered and MUST NOT lead to Delivered (AC-4)
 - **FR-005**: COD Collected MUST be enterable only from Shipped or Out for Delivery and MUST count as delivered (AC-5)
 - **FR-006**: Refunds MUST use WooCommerce's refund states unchanged (AC-6)
 - **FR-007**: Every status change MUST appear in the order timeline with its actor and time (AC-7)
@@ -219,9 +227,11 @@ try forbidden moves, and read the result.
 - **FR-010**: The new statuses MUST NOT add any stock reduction or restoration of their own (D-19 item 5); moves among
   them MUST leave stock unchanged
 - **FR-011**: The new statuses that follow payment (Preparing, Shipped, Out for Delivery, COD Collected) MUST be treated
-  as paid wherever WooCommerce counts paid orders, so sales figures stay complete; Returned to Origin MUST NOT be
+  as paid wherever WooCommerce counts paid orders, so sales figures stay complete; Delivery Failed MUST NOT be
 - **FR-012**: All of this MUST work with WooCommerce's order storage as configured (HPOS or legacy) and in both
-  languages
+  languages, and status moves MUST NOT change the language an order was placed in
+- **FR-013**: The language an order was placed in MUST be stored as order data (D6, which #248 carries). WooCommerce
+  Multilingual stores it natively (`wpml_language`); this feature verifies it and adds nothing
 
 ### Key Entities
 
@@ -249,8 +259,9 @@ try forbidden moves, and read the result.
 - **SC-001**: An order can be taken through every contracted state in both languages, and every forbidden move is
   refused, on staging.
 - **SC-002**: For any order, when it first entered each status is answered from order data alone, and matches its
-  timeline to the second.
-- **SC-003**: No Returned to Origin order is ever counted as delivered, in any query or report this feature defines.
+  timeline within two seconds.
+- **SC-003**: No Delivery Failed order is ever counted as delivered, in any query this feature defines. Which statuses
+  the sales report excludes is #286's (RPT-01).
 - **SC-004**: Stock is unchanged by every move among the new statuses.
 
 ## Delivery stage

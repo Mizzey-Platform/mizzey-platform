@@ -31,3 +31,31 @@ msgstr "تعذر إنشاء حسابك. يرجى إعادة تحميل الصف�
 #: mizzey-site/src/Security/SignupCheck.php
 msgid "Leave this field empty"
 msgstr "اترك هذا الحقل فارغًا"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Preparing"
+msgstr "قيد التجهيز"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Shipped"
+msgstr "تم الشحن"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Out for Delivery"
+msgstr "خرج للتوصيل"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "COD Collected, Awaiting Remittance"
+msgstr "تم تحصيل الدفع عند الاستلام، بانتظار التحويل"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Delivery Failed / Returned to Origin"
+msgstr "تعذّر التوصيل / أُعيد إلى المصدر"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Confirmed"
+msgstr "تم التأكيد"
+
+#: mizzey-site/src/Orders/StatusModel.php
+msgid "Delivered"
+msgstr "تم التوصيل"
