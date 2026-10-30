@@ -226,7 +226,7 @@ class TheCoreXPluginsTheStoreDoesNotRun(Fixture):
         names, _ = self.archive()
         self.assertFalse([n for n in names if n.startswith("wp-content/plugins/corex-bookings/")])
 
-    def test_the_eight_the_store_runs_are(self):
+    def test_the_ones_the_store_uses_are(self):
         names, _ = self.archive()
         for name in rp.COREX_CARRIED:
             self.assertIn(f"wp-content/plugins/{name}/{name}.php", names)
@@ -238,6 +238,11 @@ class TheCoreXPluginsTheStoreDoesNotRun(Fixture):
         self.assertEqual(described["release_paths"], [f"wp-content/plugins/{n}" for n in rp.COREX_CARRIED])
         self.assertEqual(sorted(described["contents"]), [f"wp-content/plugins/{n}" for n in rp.COREX_CARRIED])
         self.assertEqual(described["autoload"]["psr4"], {"Corex\\": "wp-content/plugins/corex-core/src/"})
+
+    def test_the_challenge_service_add_on_d21_requires_is_carried(self):
+        names, described = self.archive()
+        self.assertIn("wp-content/plugins/corex-captcha/corex-captcha.php", names)
+        self.assertIn("corex-captcha", described["plugins"])
 
     def test_the_manifest_names_what_was_left_out(self):
         plugins = self.pack()["manifest"]["plugins"]

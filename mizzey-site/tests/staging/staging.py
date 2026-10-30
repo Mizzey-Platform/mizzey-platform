@@ -79,7 +79,9 @@ THIRD_PARTY_PLUGINS = ("woocommerce", "sitepress-multilingual-cms", "wpml-string
 # Linked to the pinned CoreX checkout, which corex.lock fixes to one commit and which nobody edits.
 COREX_PLUGINS = {"corex-core": "plugins", "corex-config": "plugins", "corex-blocks": "plugins",
                  "corex-forms": "plugins", "corex-guides": "addons", "corex-email": "addons",
-                 "corex-media": "addons", "corex-ui": "addons"}
+                 "corex-media": "addons", "corex-ui": "addons",
+                 # Linked, not activated: the challenge service D-21 requires, switched on once its provider is chosen.
+                 "corex-captcha": "addons"}
 ACTIVE_PLUGINS = ("woocommerce", "sitepress-multilingual-cms", "wpml-string-translation",
                   "woocommerce-multilingual", "corex-core", "corex-config", "corex-blocks", "corex-forms",
                   "corex-guides", "corex-email", "corex-media", "corex-ui", "bosta-woocommerce", "mizzey-site")
