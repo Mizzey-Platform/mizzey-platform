@@ -114,17 +114,22 @@ more", saves it, and it applies by itself on those dates.
   promotions, and removing it brings them back. Whether two codes the customer enters can combine follows each
   promotion's own "Individual use only" setting until #290 adds the combination setting and makes one promotion per
   order the default (BR-004); automatic promotions are made individual-use when they are switched on.
-- A guest whose billing email has already used a promotion up, or is not on its email list, is not given it as an
-  automatic promotion; the next qualifying one applies, so checkout is never blocked by one it would remove.
-- A free-shipping automatic promotion is worth the cheapest paid rate it replaces, and nothing where no free shipping
-  method accepts a coupon; the value is the same whichever promotion is applied, so the choice is stable.
+- A customer or guest who has already used a promotion up, counted over their account, its email and their billing
+  email as the checkout counts it, or whose email is not on its list, is not given it as an automatic promotion; the next
+  qualifying one applies, so checkout is never blocked by one it would remove.
+- An automatic promotion switched off, ended or no longer qualifying is taken off carts that hold it, without the
+  customer rebuilding the cart.
+- A free-shipping automatic promotion is worth the cheapest paid rate of the zone, and nothing where shipping is already
+  free by the order's amount or no free shipping method accepts a coupon; the value is the same whichever promotion is
+  applied and whether paid rates are hidden once shipping is free, so the choice is stable.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept
   until it no longer qualifies, as WooCommerce does.
 - A start date in the future with no end date: the promotion waits; an end date before the start date is refused on
   save.
 - First order only, for a guest: decided by the billing email, against orders that are not cancelled, failed or
   pending.
-- The cap applies to the promotion's total discount, not per item, and is exact to the cent. It is offered for
+- The cap applies to the promotion's total discount, not per item, and is exact to the cent. A promotion that already
+  fits under its cap, for example because an earlier promotion took most of one line, is not lowered. It is offered for
   percentage and fixed cart promotions; a fixed discount per product cannot hold a cap exactly, so the coupon screen
   does not save one.
 - Arabic and English: the refusal messages are translated; promotions themselves are not language-specific.

@@ -27,6 +27,9 @@ final class AutomaticPromotions
 {
     private const CACHE = 'mizzey_automatic_promotions';
 
+    /** The automatic promotions this class applied to the visitor's cart, kept in their session. */
+    private const APPLIED = 'mizzey_automatic_applied';
+
     private static bool $busy = false;
 
     public static function register(): void
@@ -54,7 +57,8 @@ final class AutomaticPromotions
         if (self::$busy || ! $cart instanceof \WC_Cart) {
             return;
         }
-        $automatic = self::codes();
+        // What this class applied stays automatic even after its flag is switched off, so it can be taken away.
+        $automatic = array_values(array_unique([...self::codes(), ...self::appliedHere()]));
         $applied   = array_map('wc_format_coupon_code', $cart->get_applied_coupons());
         $entered   = array_diff($applied, $automatic);
         $winner    = ($entered === [] && ! $cart->is_empty()) ? self::winner($cart, $automatic) : null;
@@ -71,6 +75,8 @@ final class AutomaticPromotions
             if ($add) {
                 $cart->apply_coupon($winner);
             }
+            $now = array_map('wc_format_coupon_code', $cart->get_applied_coupons());
+            self::remember($winner !== null && in_array($winner, $now, true) ? [$winner] : []);
             $cart->calculate_totals();
         } finally {
             self::$busy = false;
@@ -123,51 +129,125 @@ final class AutomaticPromotions
     }
 
     /**
-     * The checks WooCommerce's checkout makes and its cart check does not, for a guest: the email restriction and the
-     * per-customer limit by billing email. Without them an automatic promotion the checkout removes would come back on
-     * the next calculation.
+     * The checks WooCommerce's checkout makes and its cart check does not: the email list against the billing email,
+     * and the per-customer limit counted the way the Store API counts it (`OrderController::validate_coupon_usage_limit()`
+     * in WooCommerce 11.1.0): over the account, its email and the billing email for a customer; for a guest, over the
+     * billing email and any account that email belongs to. Without them an automatic promotion the checkout removes
+     * would come back on the next calculation.
      */
     public static function passesCheckout(\WC_Coupon $coupon): bool
     {
-        if (get_current_user_id() || ! function_exists('WC') || ! WC()->customer) {
+        if (! function_exists('WC') || ! WC()->customer) {
             return true;
         }
-        $email = (string) WC()->customer->get_billing_email();
-        if ($email === '') {
-            return true;
-        }
+        $email        = (string) WC()->customer->get_billing_email();
         $restrictions = $coupon->get_email_restrictions();
-        if ($restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed([$email], $restrictions)) {
+        if ($email !== '' && $restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed([$email], $restrictions)) {
             return false;
         }
         $limit = (int) $coupon->get_usage_limit_per_user();
-        $store = $coupon->get_data_store();
+        if ($limit === 0) {
+            return true;
+        }
+        $userId = get_current_user_id();
+        if ($userId) {
+            $aliases = [$email, (string) $userId, (string) get_userdata($userId)->user_email];
+        } elseif ($email !== '') {
+            $search  = wc_get_container()->get(\Automattic\WooCommerce\Internal\Customers\SearchService::class);
+            $aliases = [$email];
+            foreach ($search->find_user_ids_by_billing_email_for_coupons_usage_lookup([$email]) as $id) {
+                $aliases[] = (string) $id;
+                $aliases[] = (string) get_userdata((int) $id)->user_email;
+            }
+            $user = get_user_by('email', $email);
+            if ($user) {
+                $aliases[] = (string) $user->ID;
+                $aliases[] = (string) $user->user_email;
+                $aliases[] = (string) get_user_meta($user->ID, 'billing_email', true);
+            }
+        } else {
+            return true;
+        }
 
-        // The data store is a proxy that forwards through __call, so method_exists() cannot see its methods.
-        return ! ($limit > 0 && $store && $store->has_callable('get_usage_by_email') && $store->get_usage_by_email($coupon, $email) >= $limit);
+        return self::usage($coupon, $aliases) < $limit;
     }
 
-    /** The cheapest paid rate of each package, summed, in cents; nothing where no free shipping method takes a coupon. */
+    /**
+     * A coupon's uses by any of the aliases, held ones included, as the Store API counts them.
+     *
+     * @param list<string> $aliases
+     */
+    public static function usage(\WC_Coupon $coupon, array $aliases): int
+    {
+        global $wpdb;
+        $aliases = array_values(array_unique(array_filter($aliases)));
+        if ($aliases === []) {
+            return 0;
+        }
+        $placeholders = implode(',', array_fill(0, count($aliases), '%s'));
+        $used         = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_id) FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_used_by' AND meta_value IN ($placeholders)", $coupon->get_id(), ...$aliases)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $store        = $coupon->get_data_store();
+
+        // The data store is a proxy that forwards through __call, so method_exists() cannot see its methods.
+        return $used + ($store && $store->has_callable('get_tentative_usages_for_user') ? (int) $store->get_tentative_usages_for_user($coupon->get_id(), $aliases) : 0);
+    }
+
+    /**
+     * What free shipping saves on this cart, in cents: for each package, the cheapest paid rate of its zone, calculated
+     * by the zone's own methods (so neither the promotion applied nor WooCommerce hiding paid rates when shipping is
+     * free changes it), counted only where a coupon is what makes shipping free, by the free shipping method's own rules.
+     */
     public static function shippingValue(\WC_Cart $cart): int
     {
         $cents = 0;
         foreach (WC()->shipping()->get_packages() as $package) {
-            $zone     = \WC_Shipping_Zones::get_zone_matching_package($package);
-            $unlocks  = false;
-            foreach ($zone->get_shipping_methods(true) as $method) {
-                $requires = $method->id === 'free_shipping' ? (string) $method->get_option('requires') : '';
-                $minimum  = (float) $method->get_option('min_amount');
-                if (in_array($requires, ['coupon', 'either'], true) || ($requires === 'both' && (float) $cart->get_displayed_subtotal() >= $minimum)) {
-                    $unlocks = true;
+            $methods = \WC_Shipping_Zones::get_zone_matching_package($package)->get_shipping_methods(true);
+            $unlocks = false;
+            foreach ($methods as $method) {
+                if ($method->id !== 'free_shipping') {
+                    continue;
+                }
+                $requires = (string) $method->get_option('requires');
+                $met      = self::minimumMet($cart, $method);
+                if ($requires === '' || ($requires === 'min_amount' && $met) || ($requires === 'either' && $met)) {
+                    // Shipping is free here without a coupon: the promotion saves nothing on it.
+                    $unlocks = false;
+                    break;
+                }
+                $unlocks = $unlocks || $requires === 'coupon' || $requires === 'either' || ($requires === 'both' && $met);
+            }
+            if (! $unlocks) {
+                continue;
+            }
+            $costs = [];
+            foreach ($methods as $method) {
+                if ($method->id === 'free_shipping') {
+                    continue;
+                }
+                foreach ((array) $method->get_rates_for_package($package) as $rate) {
+                    $costs[] = (float) $rate->get_cost();
                 }
             }
-            $paid = array_filter((array) ($package['rates'] ?? []), static fn ($rate) => $rate instanceof \WC_Shipping_Rate && $rate->get_method_id() !== 'free_shipping');
-            if ($unlocks && $paid) {
-                $cents += (int) round(wc_add_number_precision(min(array_map(static fn ($rate) => (float) $rate->get_cost(), $paid))));
+            if ($costs !== []) {
+                $cents += (int) round(wc_add_number_precision(min($costs)));
             }
         }
 
         return $cents;
+    }
+
+    /** The free shipping method's own minimum check (`WC_Shipping_Free_Shipping::is_available()`, WooCommerce 11.1.0). */
+    private static function minimumMet(\WC_Cart $cart, \WC_Shipping_Method $method): bool
+    {
+        $total = (float) $cart->get_displayed_subtotal();
+        if ($cart->display_prices_including_tax()) {
+            $total -= (float) $cart->get_discount_tax();
+        }
+        if ($method->get_option('ignore_discounts') !== 'yes') {
+            $total -= (float) $cart->get_discount_total();
+        }
+
+        return round($total, wc_get_price_decimals()) >= (float) $method->get_option('min_amount');
     }
 
     /**
@@ -221,6 +301,22 @@ final class AutomaticPromotions
     public static function forget(): void
     {
         delete_transient(self::CACHE);
+    }
+
+    /** @return list<string> */
+    private static function appliedHere(): array
+    {
+        $codes = function_exists('WC') && WC()->session ? WC()->session->get(self::APPLIED) : [];
+
+        return is_array($codes) ? array_values(array_map('strval', $codes)) : [];
+    }
+
+    /** @param list<string> $codes */
+    private static function remember(array $codes): void
+    {
+        if (function_exists('WC') && WC()->session) {
+            WC()->session->set(self::APPLIED, $codes);
+        }
     }
 
     /** @param mixed $postId */
