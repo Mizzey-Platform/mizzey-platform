@@ -2105,9 +2105,16 @@ narrowed for the Stage 3 slices of the plan only, as item 2 sets out.
 #309, #285 and the migration track (#247, #295, #296, #297), the function layer is built now: server-side behaviour,
 data, validation, admin settings, integration seams, email triggers and content, and their tests, with customer
 screens on WooCommerce's native blocks and neutral tokens. The presentation layer (the designed screens, the status
-labels customers see and the shared email layout) is built from the approved design after PRE-03b, as D-14 requires.
-The Stage 2 storefront slices (#253, #254, #302, #303, #304) stay frozen until PRE-03b.
+labels customers see and the shared email layout) is built from the approved design after PRE-03b, as D-14 requires,
+with its own budget: parts of it are block extensions, not styling. For the function layer only, the design system
+(#250), the header and navigation (#253) and the product page (#254) stop being blocking predecessors; they stay
+blocking for the presentation layer, and every other recorded dependency stands. The ADM-92 invoice part of #280 and
+the Stage 3 capabilities of #251 are scheduled with them, because #308 and the admin screens depend on them. The
+Stage 2 storefront slices (#253, #254, #302, #303, #304) stay frozen until PRE-03b.
+
+**Stock.** D-19 item 5 holds: checkout and cart ship with tests proving that every stock question and change goes
+through the adapter and fails closed, and that no WooCommerce path changes stock on its own.
 
 **3. What stays.** Every register row, acceptance criterion and stage boundary. PRE-09 conditions for ERP-dependent
-work (seams and mocks only, M-3). Client inputs stand in as defaults, fixtures or mocks (D-10) and still block final
-acceptance. Each slice is its own requirement pull request with its spec and evidence.
+work (seams and mocks only, M-3). Client inputs stand in as defaults, fixtures or mocks (D-10), each keeping the
+class the backlog records. Each slice is its own requirement pull request with its spec and evidence.
