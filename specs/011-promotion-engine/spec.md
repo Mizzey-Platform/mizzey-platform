@@ -122,7 +122,10 @@ more", saves it, and it applies by itself on those dates.
 - "The larger discount" (Q1) is what the promotion saves the customer, shipping included: a discount that would take the
   cart below a free shipping minimum counts the shipping the customer would then pay, and free shipping counts the
   cheapest paid rate it replaces. Each is measured on its own against the cart with no automatic promotion, so the
-  choice is stable. A promotion that saves nothing, or makes the customer pay more, is not applied.
+  choice is stable. A promotion that saves nothing, or makes the customer pay more, is not applied. Discounts are
+  measured line by line with each line's own tax. Paid shipping rates are taken as the zone calculates them for the
+  cart: the store's rates are fixed per governorate (the carrier's rate card), so a promotion does not change them. A
+  paid rate that depends on the cart's discounted value is not modelled; the store does not use one.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept
   until it no longer qualifies, as WooCommerce does.
 - A start date in the future with no end date: the promotion waits; an end date before the start date is refused on

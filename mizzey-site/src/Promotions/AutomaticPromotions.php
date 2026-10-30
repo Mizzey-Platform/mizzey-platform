@@ -127,9 +127,32 @@ final class AutomaticPromotions
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->apply_coupon($coupon, false);
-        $cents = (int) round(array_sum($discounts->get_discounts_by_coupon(true)));
+        $cents   = (int) round(array_sum($discounts->get_discounts_by_coupon(true)));
+        $shown   = self::shownDiscount($cart, (array) $discounts->get_discounts_by_item(true));
 
-        return $cents + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $cents, $coupon->get_free_shipping());
+        return $cents + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
+    }
+
+    /**
+     * The discount as the free shipping minimum sees it, in cents: with each line's own tax when prices are shown with
+     * tax and entered without it, or without it in the opposite case, so a cart mixing tax rates is measured exactly.
+     *
+     * @param array<string,float|int> $byItem Cents of discount by cart item key.
+     */
+    public static function shownDiscount(\WC_Cart $cart, array $byItem): int
+    {
+        $entered = wc_prices_include_tax();
+        $shown   = $cart->display_prices_including_tax();
+        $total   = 0.0;
+        foreach ($byItem as $key => $cents) {
+            $line  = $cart->get_cart_item((string) $key);
+            $sub   = (float) ($line['line_subtotal'] ?? 0);
+            $rate  = $sub > 0 ? (float) ($line['line_subtotal_tax'] ?? 0) / $sub : 0.0;
+            $factor = (! $entered && $shown) ? 1 + $rate : (($entered && ! $shown) ? 1 / (1 + $rate) : 1.0);
+            $total += (float) $cents * $factor;
+        }
+
+        return (int) round($total);
     }
 
     /**
@@ -147,7 +170,8 @@ final class AutomaticPromotions
         $email        = (string) WC()->customer->get_billing_email();
         $restrictions = $coupon->get_email_restrictions();
         // WooCommerce accepts a match on the billing email or the account's email.
-        $emails = array_values(array_filter([$email, get_current_user_id() ? (string) get_userdata(get_current_user_id())->user_email : '']));
+        $emails = array_values(array_filter(array_map('wc_strtolower', [$email, get_current_user_id() ? (string) get_userdata(get_current_user_id())->user_email : ''])));
+        $restrictions = array_map('wc_strtolower', $restrictions);
         if ($emails !== [] && $restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed($emails, $restrictions)) {
             return false;
         }
@@ -203,7 +227,9 @@ final class AutomaticPromotions
      * coupon: per package, nothing when a free shipping method of the zone would be available under its own rules
      * (`WC_Shipping_Free_Shipping::is_available()`, WooCommerce 11.1.0), otherwise the cheapest paid rate the zone's
      * methods calculate. Calculated from the zone's methods, so neither the promotion applied now nor WooCommerce hiding
-     * paid rates once shipping is free changes it.
+     * paid rates once shipping is free changes it. Paid rates are taken as the zone calculates them for the cart: the
+     * store's rates are fixed per governorate (the carrier's rate card), so a promotion does not change them. A rate that
+     * depends on the cart's discounted value is not modelled (recorded in the specification).
      */
     public static function shippingCost(\WC_Cart $cart, int $discountCents, bool $freeCoupon): int
     {
@@ -246,11 +272,8 @@ final class AutomaticPromotions
     {
         $total = (float) $cart->get_displayed_subtotal();
         if ($method->get_option('ignore_discounts') !== 'yes') {
-            $discount = wc_remove_number_precision($discountCents);
-            if (! wc_prices_include_tax() && $cart->display_prices_including_tax() && (float) $cart->get_subtotal() > 0) {
-                $discount *= $total / (float) $cart->get_subtotal();
-            }
-            $total -= $discount;
+            // The discount arrives already as shown (shownDiscount()).
+            $total -= wc_remove_number_precision($discountCents);
         }
 
         return round($total, wc_get_price_decimals()) >= (float) $method->get_option('min_amount');

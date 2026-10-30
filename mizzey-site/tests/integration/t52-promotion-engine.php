@@ -294,6 +294,54 @@ run(
 		$zone->delete_shipping_method( $free );
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( ! in_array( wc_format_coupon_code( $ship_auto->get_code() ), t52_applied(), true ), 'AC-3 where no free shipping method takes a coupon, the free-shipping promotion is worth nothing and does not win' );
+		// Fourth review round: a cart mixing tax rates, and emails in mixed case.
+		$tax_options = array( 'woocommerce_calc_taxes', 'woocommerce_prices_include_tax', 'woocommerce_tax_display_cart', 'woocommerce_tax_display_shop' );
+		$tax_before  = array_combine( $tax_options, array_map( 'get_option', $tax_options ) );
+		$s->on_finish( static function () use ( $tax_before ) { foreach ( $tax_before as $name => $value ) { update_option( $name, $value ); } } );
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		update_option( 'woocommerce_tax_display_cart', 'incl' );
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		$rate_id = \WC_Tax::_insert_tax_rate( array( 'tax_rate_country' => '', 'tax_rate' => '20.0000', 'tax_rate_name' => 't52 VAT', 'tax_rate_priority' => 1, 'tax_rate_shipping' => 0, 'tax_rate_class' => '' ) );
+		$s->on_finish( static function () use ( $rate_id ) { \WC_Tax::_delete_tax_rate( $rate_id ); } );
+		$taxed   = t52_product( $s, 't52 taxed', '100' );
+		$untaxed = t52_product( $s, 't52 untaxed', '100' );
+		$untaxed->set_tax_class( 'zero-rate' );
+		$untaxed->save();
+		$free_taxed = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free_taxed}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '197', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$taxed_off = t52_coupon( $s, "{$tag}autotaxed", array( 'discount_type' => 'fixed_product', 'amount' => '20', 'individual_use' => true, 'product_ids' => array( $taxed->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		foreach ( array( $auto_a, $auto_b ) as $other ) {
+			$other->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$other->save();
+		}
+		WC()->customer->set_shipping_country( 'EG' );
+		WC()->customer->set_billing_country( 'EG' );
+		t52_cart( array( $taxed->get_id() => 1, $untaxed->get_id() => 1 ) );
+		$shown_subtotal = (float) WC()->cart->get_displayed_subtotal();
+		$check( 220.0 === $shown_subtotal && ! in_array( wc_format_coupon_code( $taxed_off->get_code() ), t52_applied(), true ), "Q1 with 20 percent tax on one line only (shown 220), 20 off that line counts as 24 shown, takes the cart to 196 under a 197 free shipping minimum, and is not applied ({$shown_subtotal})" );
+		foreach ( $tax_before as $name => $value ) {
+			update_option( $name, $value );
+		}
+		$zone->delete_shipping_method( $free_taxed );
+		foreach ( array( $auto_a, $auto_b ) as $other ) {
+			$other->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+			$other->save();
+		}
+		$taxed_off->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$taxed_off->save();
+		WC()->customer->set_shipping_country( '' );
+		WC()->customer->set_billing_country( '' );
+
+		$cased = t52_coupon( $s, "{$tag}autocase", array( 'discount_type' => 'fixed_cart', 'amount' => '80', 'individual_use' => true, 'email_restrictions' => array( 'Mixed.Case-' . $tag . '@Example.invalid' ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		WC()->customer->set_billing_email( 'mixed.case-' . $tag . '@example.INVALID' );
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$check( in_array( wc_format_coupon_code( $cased->get_code() ), t52_applied(), true ), 'AC-3 an email list matches regardless of letter case, as WooCommerce does' );
+		WC()->customer->set_billing_email( '' );
+		$cased->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$cased->save();
+
 		$ship_auto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$ship_auto->save();
 		WC()->customer->set_shipping_country( '' );
