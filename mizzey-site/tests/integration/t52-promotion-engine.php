@@ -12,7 +12,6 @@
 namespace MizzeySite\Tests\Integration;
 
 use MizzeySite\Promotions\AutomaticPromotions;
-use MizzeySite\Promotions\PromotionRules;
 use MizzeySite\Promotions\PromotionSettings;
 
 require_once __DIR__ . '/_bootstrap.php';
@@ -190,18 +189,17 @@ run(
 		$check( 'This coupon is for a first order only.' === t52_valid( $first, $second ), 'AC-2 an order for a returning customer is refused in order context' );
 
 		// AC-3 and Q1: automatic promotions.
-		$auto_a = t52_coupon( $s, "{$tag}auto10", array( 'discount_type' => 'percent', 'amount' => '10', 'individual_use' => true ), array( PromotionSettings::AUTOMATIC => 'yes', PromotionSettings::MIN_ITEMS => '2' ) );
+		$auto_a = t52_coupon( $s, "{$tag}auto10", array( 'discount_type' => 'percent', 'amount' => '10', 'individual_use' => true, 'date_created' => time() - 3 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes', PromotionSettings::MIN_ITEMS => '2' ) );
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( array( $auto_a->get_code() ) === t52_applied() && 20.0 === (float) WC()->cart->get_discount_total(), 'AC-3 an automatic promotion applies with no code when it qualifies' );
 		WC()->cart->set_quantity( array_key_first( WC()->cart->get_cart() ), 1 );
 		WC()->cart->calculate_totals();
 		$check( array() === t52_applied(), 'AC-3 it leaves when the cart stops qualifying' );
-		$auto_b = t52_coupon( $s, "{$tag}auto25", array( 'discount_type' => 'fixed_cart', 'amount' => '25', 'individual_use' => true ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$auto_b = t52_coupon( $s, "{$tag}auto25", array( 'discount_type' => 'fixed_cart', 'amount' => '25', 'individual_use' => true, 'date_created' => time() - HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( array( $auto_b->get_code() ) === t52_applied(), 'Q1 of two qualifying automatic promotions (20 and 25 off) the larger applies, alone' );
 		$auto_b->set_amount( '20' );
 		$auto_b->save();
-		AutomaticPromotions::forget();
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( array( $auto_a->get_code() ) === t52_applied(), 'Q1 on a tie (20 and 20) the one created first applies' );
 		WC()->cart->apply_coupon( $percent->get_code() );
@@ -210,6 +208,58 @@ run(
 		WC()->cart->remove_coupon( $percent->get_code() );
 		WC()->cart->calculate_totals();
 		$check( array( $auto_a->get_code() ) === t52_applied(), 'AC-3 removing the code brings the automatic promotion back' );
+		$auto_a->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$auto_a->save();
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$check( array( $auto_b->get_code() ) === t52_applied(), 'AC-3 switching a promotion off as automatic (saved through WooCommerce) takes effect at once' );
+		$auto_a->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		$auto_a->save();
+
+		// AC-3: a guest who has used a promotion up by email is not given it again; the next one applies.
+		$auto_b->set_usage_limit_per_user( 1 );
+		$auto_b->set_amount( '30' );
+		$auto_b->save();
+		add_post_meta( $auto_b->get_id(), '_used_by', 'used-' . $tag . '@example.invalid' );
+		WC()->customer = new \WC_Customer( 0, true );
+		WC()->customer->set_billing_email( 'used-' . $tag . '@example.invalid' );
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$check( array( $auto_a->get_code() ) === t52_applied(), 'AC-3, AC-4 a guest whose email has used up a promotion gets the next one instead (' . implode( ',', t52_applied() ) . ')' );
+		WC()->customer->set_billing_email( '' );
+		$auto_b->set_amount( '20' );
+		$auto_b->set_usage_limit_per_user( 0 );
+		$auto_b->save();
+
+		// AC-1, AC-3: an automatic free-shipping promotion, valued at the rate it replaces, and stable.
+		$zone = new \WC_Shipping_Zone();
+		$zone->set_zone_name( 't52 Egypt ' . $tag );
+		$zone->set_zone_order( 0 );
+		$zone->add_location( 'EG', 'country' );
+		$zone->save();
+		$s->on_finish( static function () use ( $zone ) { $zone->delete(); } );
+		$flat = $zone->add_shipping_method( 'flat_rate' );
+		update_option( "woocommerce_flat_rate_{$flat}_settings", array( 'enabled' => 'yes', 'title' => 'Flat', 'cost' => '50', 'tax_status' => 'none' ) );
+		$free = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$ship_auto = t52_coupon( $s, "{$tag}autoship", array( 'discount_type' => 'fixed_cart', 'amount' => '0', 'free_shipping' => true, 'individual_use' => true, 'date_created' => time() - 2 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		WC()->customer->set_shipping_country( 'EG' );
+		WC()->customer->set_billing_country( 'EG' );
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$winners = array();
+		for ( $pass = 0; $pass < 3; $pass++ ) {
+			WC()->cart->calculate_totals();
+			$winners[] = implode( ',', t52_applied() );
+		}
+		$check( array_fill( 0, 3, wc_format_coupon_code( $ship_auto->get_code() ) ) === $winners && 0.0 === (float) WC()->cart->get_shipping_total(), 'AC-1, Q1 free shipping worth 50 beats 20 off, ships free, and stays chosen over repeated calculations (' . implode( ' | ', $winners ) . ')' );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => '' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$zone->delete_shipping_method( $free );
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$check( ! in_array( wc_format_coupon_code( $ship_auto->get_code() ), t52_applied(), true ), 'AC-3 where no free shipping method takes a coupon, the free-shipping promotion is worth nothing and does not win' );
+		$ship_auto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$ship_auto->save();
+		WC()->customer->set_shipping_country( '' );
+		WC()->customer->set_billing_country( '' );
 
 		// AC-3 over HTTP: the block cart's Store API.
 		WC()->cart->empty_cart();
@@ -261,28 +311,68 @@ run(
 		t52_cart( array( $lipstick->get_id() => 1, $cream->get_id() => 1, $tablets->get_id() => 1 ) );
 		$check( 20.0 === t52_discount( $excluding ), 'AC-6 the excluded category and product are not discounted (native)' );
 
-		// AC-7: the cap.
+		// AC-7: the cap, through WooCommerce's own allocation, rounding and leftover cents.
 		$capped = t52_coupon( $s, "{$tag}cap", array( 'discount_type' => 'percent', 'amount' => '10' ), array( PromotionSettings::MAX_DISCOUNT => '150' ) );
 		t52_cart( array( $lipstick->get_id() => 20 ) );
 		$check( 150.0 === t52_discount( $capped ), 'AC-7 10 percent of 2,000 is capped at 150' );
+		$tight = t52_coupon( $s, "{$tag}captight", array( 'discount_type' => 'percent', 'amount' => '50' ), array( PromotionSettings::MAX_DISCOUNT => '33.32' ) );
+		$odd2  = t52_product( $s, 't52 odd two', '33.33' );
+		t52_cart( array( $odd->get_id() => 1, $odd2->get_id() => 1 ) );
+		$check( 33.32 === t52_discount( $tight ), 'AC-7 where WooCommerce would add a leftover cent (50 percent of 66.66, cap 33.32) the cap still holds' );
+		WC()->cart->apply_coupon( $tight->get_code() );
+		WC()->cart->calculate_totals();
+		$check( 33.32 === (float) WC()->cart->get_discount_total(), 'AC-7 the cart total shows the capped discount ( ' . WC()->cart->get_discount_total() . ' )' );
 		$small = t52_coupon( $s, "{$tag}capodd", array( 'discount_type' => 'percent', 'amount' => '50' ), array( PromotionSettings::MAX_DISCOUNT => '5' ) );
 		t52_cart( array( $odd->get_id() => 3, $cream->get_id() => 1, $lipstick->get_id() => 1 ) );
 		$check( 5.0 === t52_discount( $small ), 'AC-7 across several lines and odd prices the cap holds to the cent' );
 		t52_cart( array( $cream->get_id() => 1 ) );
 		$check( 5.0 === t52_discount( $percent ) && 5.0 === t52_discount( $capped ), 'AC-7 below the cap the discount is the full percentage' );
-		$check( true === WC()->cart->apply_coupon( $capped->get_code() ) && 5.0 === (float) WC()->cart->get_discount_total(), 'AC-7 the cart applies a capped promotion with the same discount' );
-		$check( 'A promotion with a maximum discount applies at checkout, not to an existing order.' === t52_valid( $capped, $second ), 'AC-7 a capped promotion is refused on an existing order' );
+		$fixed_capped = t52_coupon( $s, "{$tag}capfix", array( 'discount_type' => 'fixed_cart', 'amount' => '100' ), array( PromotionSettings::MAX_DISCOUNT => '40' ) );
+		t52_cart( array( $tablets->get_id() => 1 ) );
+		$check( 40.0 === t52_discount( $fixed_capped ), 'AC-7 a fixed cart discount of 100 capped at 40 gives 40' );
+		$limited = t52_coupon( $s, "{$tag}caplim", array( 'discount_type' => 'percent', 'amount' => '50', 'limit_usage_to_x_items' => 1 ), array( PromotionSettings::MAX_DISCOUNT => '30' ) );
+		t52_cart( array( $lipstick->get_id() => 3 ) );
+		$check( 30.0 === t52_discount( $limited ), 'AC-7 with the item limit (50 percent of one 100 item), the cap of 30 holds' );
+		$sequential = get_option( 'woocommerce_calc_discounts_sequentially', 'no' );
+		$s->on_finish( static function () use ( $sequential ) { update_option( 'woocommerce_calc_discounts_sequentially', $sequential ); } );
+		update_option( 'woocommerce_calc_discounts_sequentially', 'yes' );
+		$seq_cap = t52_coupon( $s, "{$tag}capseq", array( 'discount_type' => 'percent', 'amount' => '50' ), array( PromotionSettings::MAX_DISCOUNT => '20' ) );
+		t52_cart( array( $lipstick->get_id() => 1, $cream->get_id() => 1 ) );
+		$discounts = new \WC_Discounts( WC()->cart );
+		$discounts->apply_coupon( new \WC_Coupon( $fixed->get_code() ), false );
+		$discounts->apply_coupon( new \WC_Coupon( $seq_cap->get_code() ), false );
+		$by_coupon = $discounts->get_discounts_by_coupon();
+		update_option( 'woocommerce_calc_discounts_sequentially', $sequential );
+		$check( 20.0 === (float) $by_coupon[ wc_format_coupon_code( $seq_cap->get_code() ) ], 'AC-7 with sequential discounts, after a fixed 30, the capped promotion gives its cap of 20' );
+		$order = wc_create_order();
+		$order->add_product( $lipstick, 20 );
+		$order->calculate_totals();
+		$order->save();
+		$s->track_order( $order->get_id() );
+		$order->apply_coupon( $capped->get_code() );
+		$order = wc_get_order( $order->get_id() );
+		$first_total = (float) $order->get_discount_total();
+		$order->recalculate_coupons();
+		$check( 150.0 === $first_total && 150.0 === (float) wc_get_order( $order->get_id() )->get_discount_total(), 'AC-7 on an order, applying and recalculating the coupons keeps the cap (' . $first_total . ')' );
 
-		// AC-8: the coupon screen's save path.
-		$screen = t52_coupon( $s, "{$tag}screen", array( 'discount_type' => 'percent', 'amount' => '10', 'date_expires' => time() + 10 * DAY_IN_SECONDS ) );
-		$_POST  = array( 'mizzey_automatic' => 'yes', 'mizzey_starts' => wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS ), 'mizzey_max_discount' => '75', 'mizzey_min_items' => '4', 'mizzey_first_order' => 'yes' );
-		do_action( 'woocommerce_coupon_options_save', $screen->get_id(), new \WC_Coupon( $screen->get_id() ) );
+		// AC-8: the coupon screen's own save.
+		require_once WC_ABSPATH . 'includes/admin/meta-boxes/class-wc-meta-box-coupon-data.php';
+		$screen = t52_coupon( $s, "{$tag}screen", array( 'discount_type' => 'percent', 'amount' => '10' ) );
+		$form   = static fn ( array $extra ): array => $extra + array(
+			'discount_type' => 'percent', 'coupon_amount' => '10', 'expiry_date' => wp_date( 'Y-m-d', time() + 10 * DAY_IN_SECONDS ),
+			'usage_limit' => '', 'usage_limit_per_user' => '', 'limit_usage_to_x_items' => '', 'minimum_amount' => '', 'maximum_amount' => '', 'customer_email' => '',
+		);
+		$_POST = $form( array( 'mizzey_automatic' => 'yes', 'mizzey_starts' => wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS ), 'mizzey_max_discount' => '75', 'mizzey_min_items' => '4', 'mizzey_first_order' => 'yes' ) );
+		\WC_Meta_Box_Coupon_Data::save( $screen->get_id(), get_post( $screen->get_id() ) );
 		$saved = new \WC_Coupon( $screen->get_id() );
-		$check( PromotionSettings::automatic( $saved ) && null !== PromotionSettings::starts( $saved ) && 75.0 === PromotionSettings::maxDiscount( $saved ) && 4 === PromotionSettings::minItems( $saved ) && PromotionSettings::firstOrder( $saved ) && $saved->get_individual_use(), 'AC-8 every setting saves from the coupon screen, and an automatic promotion becomes individual-use' );
-		$_POST = array( 'mizzey_starts' => wp_date( 'Y-m-d', time() + 30 * DAY_IN_SECONDS ) );
+		$check( PromotionSettings::automatic( $saved ) && null !== PromotionSettings::starts( $saved ) && 75.0 === PromotionSettings::maxDiscount( $saved ) && 4 === PromotionSettings::minItems( $saved ) && PromotionSettings::firstOrder( $saved ) && $saved->get_individual_use(), 'AC-8 every setting saves through the coupon screen, and an automatic promotion becomes individual-use' );
 		$before = PromotionSettings::starts( $saved );
-		do_action( 'woocommerce_coupon_options_save', $screen->get_id(), new \WC_Coupon( $screen->get_id() ) );
+		$_POST  = $form( array( 'mizzey_automatic' => 'yes', 'mizzey_starts' => wp_date( 'Y-m-d', time() + 30 * DAY_IN_SECONDS ), 'mizzey_max_discount' => '75' ) );
+		\WC_Meta_Box_Coupon_Data::save( $screen->get_id(), get_post( $screen->get_id() ) );
 		$check( $before === PromotionSettings::starts( new \WC_Coupon( $screen->get_id() ) ), 'AC-5 a start after the expiry is not saved' );
+		$_POST = $form( array( 'discount_type' => 'fixed_product', 'mizzey_max_discount' => '75' ) );
+		\WC_Meta_Box_Coupon_Data::save( $screen->get_id(), get_post( $screen->get_id() ) );
+		$check( null === PromotionSettings::maxDiscount( new \WC_Coupon( $screen->get_id() ) ), 'AC-7 a cap is not saved on a fixed per-product discount' );
 		$_POST = array();
 
 		return $ok;

@@ -150,7 +150,13 @@ final class PromotionSettings
         } else {
             self::error(__('Promotion start not saved: use the YYYY-MM-DD format.', 'mizzey-site'));
         }
-        $coupon->update_meta_data(self::MAX_DISCOUNT, $maxInput !== '' && (float) $maxInput > 0 ? (string) $maxInput : '');
+        $max = $maxInput !== '' && (float) $maxInput > 0 ? (string) $maxInput : '';
+        if ($max !== '' && $coupon->is_type('fixed_product')) {
+            // Its allocation item by item could not hold a cap exactly; percentage and fixed cart promotions can.
+            self::error(__('Maximum discount not saved: it applies to percentage and fixed cart promotions, not to a fixed discount per product.', 'mizzey-site'));
+            $max = '';
+        }
+        $coupon->update_meta_data(self::MAX_DISCOUNT, $max);
         $coupon->update_meta_data(self::MIN_ITEMS, $minItems > 0 ? (string) $minItems : '');
         $coupon->update_meta_data(self::FIRST_ORDER, $firstOrder);
         $coupon->save();

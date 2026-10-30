@@ -62,7 +62,7 @@ above.
 | AC-4 | A promotion stops applying when its total usage limit or its per-customer limit is reached | PROMO-13, PROMO-14 | final |
 | AC-5 | A promotion applies only between its start and end dates | PROMO-15 | final |
 | AC-6 | Products and categories can be excluded from a promotion | PROMO-18 | final |
-| AC-7 | A promotion's discount never exceeds its maximum cap | PROMO-19 | final |
+| AC-7 | A promotion's discount never exceeds its maximum cap, on the cart and when an order's coupons are recalculated | PROMO-19 | final |
 | AC-8 | Every one of these settings is made from the admin, without a code change | PROMO-23 | final |
 
 ## User Scenarios & Testing *(mandatory)*
@@ -110,16 +110,23 @@ more", saves it, and it applies by itself on those dates.
   separately configured (Part One 1.6). The one that gives the customer the larger discount applies; on a tie, the one
   created first. **Confirmed by the owner on 31 October 2026 (Q1).** The setting that lets promotions combine is
   BR-004, #290's.
-- A customer enters a code while an automatic promotion applies: WooCommerce's own rules decide as configured on each
-  promotion ("individual use only"); automatic promotions are created individual-use. #290 adds the combination
-  setting.
+- A customer enters a code while an automatic promotion applies: the customer's code takes the place of automatic
+  promotions, and removing it brings them back. Whether two codes the customer enters can combine follows each
+  promotion's own "Individual use only" setting until #290 adds the combination setting and makes one promotion per
+  order the default (BR-004); automatic promotions are made individual-use when they are switched on.
+- A guest whose billing email has already used a promotion up, or is not on its email list, is not given it as an
+  automatic promotion; the next qualifying one applies, so checkout is never blocked by one it would remove.
+- A free-shipping automatic promotion is worth the cheapest paid rate it replaces, and nothing where no free shipping
+  method accepts a coupon; the value is the same whichever promotion is applied, so the choice is stable.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept
   until it no longer qualifies, as WooCommerce does.
 - A start date in the future with no end date: the promotion waits; an end date before the start date is refused on
   save.
 - First order only, for a guest: decided by the billing email, against orders that are not cancelled, failed or
   pending.
-- The cap applies to the promotion's total discount on the cart, not per item.
+- The cap applies to the promotion's total discount, not per item, and is exact to the cent. It is offered for
+  percentage and fixed cart promotions; a fixed discount per product cannot hold a cap exactly, so the coupon screen
+  does not save one.
 - Arabic and English: the refusal messages are translated; promotions themselves are not language-specific.
 
 ## Native coverage
@@ -149,8 +156,8 @@ more", saves it, and it applies by itself on those dates.
   block cart and checkout and in the classic cart (AC-3)
 - **FR-005**: A promotion MUST be able to have a start date; before it, and after its end date, it does not apply
   (AC-5)
-- **FR-006**: A promotion MUST be able to have a maximum discount; its total discount on a cart MUST NOT exceed it
-  (AC-7)
+- **FR-006**: A percentage or fixed cart promotion MUST be able to have a maximum discount; its total discount on a
+  cart, and on an order whose coupons are recalculated, MUST NOT exceed it (AC-7)
 - **FR-007**: Each of these settings MUST be a field on the coupon's admin screen, saved with it (AC-8)
 - **FR-008**: A refused code MUST say why, in the customer's language (AC-2, AC-4, AC-5)
 - **FR-009**: The brand condition MUST be verified native and used as it is (AC-2)

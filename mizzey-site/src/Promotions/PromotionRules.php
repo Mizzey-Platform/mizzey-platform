@@ -16,7 +16,7 @@ defined('ABSPATH') || exit;
  * sees the reason in their language. The Store API updates the customer from the checkout request before it validates
  * the cart, so a guest's billing email is known when "first order only" is checked at checkout.
  *
- * Register ids: PROMO-05, PROMO-09, PROMO-15, PROMO-19. See specs/011-promotion-engine, FR-002, FR-003, FR-005, FR-008.
+ * Register ids: PROMO-05, PROMO-09, PROMO-15. See specs/011-promotion-engine, FR-002, FR-003, FR-005, FR-008.
  */
 final class PromotionRules
 {
@@ -46,10 +46,6 @@ final class PromotionRules
             return true;
         }
         $object = $discounts->get_object();
-        if ($object instanceof \WC_Order && PromotionSettings::maxDiscount($coupon) !== null) {
-            // WooCommerce calculates an existing order's discounts without the filter the cap uses.
-            throw new \Exception(esc_html__('A promotion with a maximum discount applies at checkout, not to an existing order.', 'mizzey-site'), 110);
-        }
         $minItems = PromotionSettings::minItems($coupon);
         if ($minItems > 0 && self::units($coupon, $discounts) < $minItems) {
             throw new \Exception(esc_html(sprintf(

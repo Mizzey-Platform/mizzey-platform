@@ -35,6 +35,10 @@ final class AutomaticPromotions
         add_filter('woocommerce_apply_with_individual_use_coupon', [self::class, 'stepAside'], 10, 3);
         add_filter('woocommerce_coupon_message', [self::class, 'quiet'], 10, 3);
         add_action('save_post_shop_coupon', [self::class, 'forget']);
+        add_action('woocommerce_new_coupon', [self::class, 'forget']);
+        add_action('woocommerce_update_coupon', [self::class, 'forget']);
+        add_action('woocommerce_delete_coupon', [self::class, 'forget']);
+        add_action('woocommerce_trash_coupon', [self::class, 'forget']);
         add_action('trashed_post', [self::class, 'forgetPost']);
         add_action('untrashed_post', [self::class, 'forgetPost']);
         add_action('deleted_post', [self::class, 'forgetPost']);
@@ -83,7 +87,8 @@ final class AutomaticPromotions
         $best = null;
         foreach ($codes as $code) {
             $coupon = new \WC_Coupon($code);
-            if (! $coupon->get_id() || (new \WC_Discounts($cart))->is_coupon_valid($coupon) !== true) {
+            if (! $coupon->get_id() || $coupon->get_status() !== 'publish' || ! PromotionSettings::automatic($coupon)
+                || (new \WC_Discounts($cart))->is_coupon_valid($coupon) !== true || ! self::passesCheckout($coupon)) {
                 continue;
             }
             $created   = $coupon->get_date_created();
@@ -101,14 +106,65 @@ final class AutomaticPromotions
         return $best['code'] ?? null;
     }
 
-    /** What the promotion is worth on this cart, in cents. */
+    /**
+     * What the promotion is worth on this cart, in cents. Free shipping is worth the cheapest paid rate it replaces,
+     * measured the same way whichever promotion is applied, and only where a free shipping method accepts a coupon.
+     */
     public static function value(\WC_Cart $cart, \WC_Coupon $coupon): int
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->apply_coupon($coupon, false);
         $cents = (int) round(array_sum($discounts->get_discounts_by_coupon(true)));
         if ($coupon->get_free_shipping()) {
-            $cents += (int) round(wc_add_number_precision((float) $cart->get_shipping_total()));
+            $cents += self::shippingValue($cart);
+        }
+
+        return $cents;
+    }
+
+    /**
+     * The checks WooCommerce's checkout makes and its cart check does not, for a guest: the email restriction and the
+     * per-customer limit by billing email. Without them an automatic promotion the checkout removes would come back on
+     * the next calculation.
+     */
+    public static function passesCheckout(\WC_Coupon $coupon): bool
+    {
+        if (get_current_user_id() || ! function_exists('WC') || ! WC()->customer) {
+            return true;
+        }
+        $email = (string) WC()->customer->get_billing_email();
+        if ($email === '') {
+            return true;
+        }
+        $restrictions = $coupon->get_email_restrictions();
+        if ($restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed([$email], $restrictions)) {
+            return false;
+        }
+        $limit = (int) $coupon->get_usage_limit_per_user();
+        $store = $coupon->get_data_store();
+
+        // The data store is a proxy that forwards through __call, so method_exists() cannot see its methods.
+        return ! ($limit > 0 && $store && $store->has_callable('get_usage_by_email') && $store->get_usage_by_email($coupon, $email) >= $limit);
+    }
+
+    /** The cheapest paid rate of each package, summed, in cents; nothing where no free shipping method takes a coupon. */
+    public static function shippingValue(\WC_Cart $cart): int
+    {
+        $cents = 0;
+        foreach (WC()->shipping()->get_packages() as $package) {
+            $zone     = \WC_Shipping_Zones::get_zone_matching_package($package);
+            $unlocks  = false;
+            foreach ($zone->get_shipping_methods(true) as $method) {
+                $requires = $method->id === 'free_shipping' ? (string) $method->get_option('requires') : '';
+                $minimum  = (float) $method->get_option('min_amount');
+                if (in_array($requires, ['coupon', 'either'], true) || ($requires === 'both' && (float) $cart->get_displayed_subtotal() >= $minimum)) {
+                    $unlocks = true;
+                }
+            }
+            $paid = array_filter((array) ($package['rates'] ?? []), static fn ($rate) => $rate instanceof \WC_Shipping_Rate && $rate->get_method_id() !== 'free_shipping');
+            if ($unlocks && $paid) {
+                $cents += (int) round(wc_add_number_precision(min(array_map(static fn ($rate) => (float) $rate->get_cost(), $paid))));
+            }
         }
 
         return $cents;
