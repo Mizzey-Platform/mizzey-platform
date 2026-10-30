@@ -1,0 +1,26 @@
+FAIL  t43-two-factor-policy        ADM-131: the baseline command, the owner's setting, and the protection check
+      PASS  FR-002 the baseline command succeeds with an unrelated field and contrary exclusions present
+      PASS  FR-002 the baseline command sets every owned field
+      PASS  FR-002 and keeps an unrelated field as it was
+      PASS  FR-002 through WP 2FA's API: the stored policy hash is the hash of this policy
+      PASS  AC-5 with email codes on, the policy row says review
+      PASS  AC-5 with passkeys on, the policy row says review
+      PASS  AC-5 with expiry action changed, the policy row says review
+      PASS  AC-2 with the baseline, a shop manager is required to use two-factor
+      PASS  AC-2 when the owner requires it for administrators only, a shop manager is not
+      FAIL  AC-5 after the policy changes, every staff member still to enrol is reported
+      PASS  AC-5 on the baseline, two_factor_active passes
+      PASS  AC-5 on the baseline, two_factor_roles passes
+      PASS  AC-5 on the baseline, two_factor_bypass passes
+      PASS  AC-5 on the baseline, two_factor_key passes
+      PASS  AC-5 and the check exits 0 (exit 0)
+      PASS  AC-5 the staff still to enrol are reported
+      PASS  AC-5 with the emergency bypass on, the bypass row says review and the check exits 1
+      PASS  AC-5 DISABLE_2FA_LOGIN=false is not a bypass
+      PASS  AC-5 with a database fallback key, the key row says review
+      PASS  AC-5 with a leftover database key row, the key row says review
+      PASS  and the check never prints a key value
+      PASS  AC-5 with WP 2FA deactivated, the active row says review and the check exits 1
+      PASS  and WP 2FA is active again
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

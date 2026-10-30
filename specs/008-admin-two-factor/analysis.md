@@ -58,6 +58,16 @@ Reported and not acted on, with the reason:
 - CoreX's lockout records a first-factor success before the second factor. That is CoreX's record, not a sign-in.
 - Application passwords for administrators stay available (D-21); S-1 would refuse them for enrolled staff.
 
+## Found on staging
+
+When the baseline was applied on staging (30 October 2026), the check listed one of the two staff still to enrol. WP 2FA
+keeps each user's enforcement state and refreshes it, after a policy change, for only the first user it reads in a
+process (`$update_started`, `class-user-helper.php`). A report over several staff therefore read stale states. Sign-in
+and the enrolment guard read one user per request and are not affected. The report now asks WP 2FA's own reporting call
+(`user_must_configure_2fa` without a user object), which reads the live policy and writes nothing. t43 caches a stale
+state for two shop managers, changes the policy, and requires both in the report and an enrolled one absent:
+`evidence/pending-count-before.txt` fails, `pending-count-after.txt` passes.
+
 ## House rules
 
 No em dash, no emoji, no heading below h3 in the changed files. Command and screen text is translatable
