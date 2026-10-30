@@ -188,15 +188,37 @@ run(
 		$check( 0 === $changed && ! preg_grep( '/to Delivered\./', $notes ), 'AC-2 [code] no status-change hook and no transition note followed the refusal' );
 		$check( (bool) preg_grep( '/refused: not an allowed move/', $notes ) && 't51 kept' === $stored->get_customer_note(), 'AC-2 [code] the refusal is noted on the order and the rest of the save went ahead' );
 
-		// AC-2: an out-of-date object cannot overwrite a newer status.
+		// AC-2: an out-of-date copy cannot change the status, fire hooks, or erase a date another change saved.
 		$stale = t51_order( $s, $product, 'processing' );
-		$newer = t51_fresh( $stale->get_id() );
-		$newer->update_status( StatusModel::PREPARING );
-		$newer = t51_fresh( $stale->get_id() );
-		$newer->update_status( StatusModel::SHIPPED );
+		foreach ( array( StatusModel::PREPARING, StatusModel::SHIPPED, 'completed' ) as $to ) {
+			t51_fresh( $stale->get_id() )->update_status( $to );
+		}
+		$completed_at = t51_fresh( $stale->get_id() )->get_date_completed();
+		$changed      = 0;
+		add_action( 'woocommerce_order_status_changed', $count );
 		$stale->set_status( StatusModel::PREPARING );
 		$stale->save();
-		$check( StatusModel::SHIPPED === t51_fresh( $stale->get_id() )->get_status(), 'AC-2 [code] a stale copy cannot move a Shipped order back to Preparing' );
+		remove_action( 'woocommerce_order_status_changed', $count );
+		$after = t51_fresh( $stale->get_id() );
+		$check( 'completed' === $after->get_status() && 0 === $changed, 'AC-2 [code] a stale copy cannot move a Delivered order back to Preparing, and no hook fires' );
+		$check( null !== $completed_at && null !== $after->get_date_completed() && $completed_at->getTimestamp() === $after->get_date_completed()->getTimestamp(), 'AC-2 [code] the refused stale copy does not erase the completed date' );
+		$twin  = t51_order( $s, $product, 'processing' );
+		$other = t51_fresh( $twin->get_id() );
+		$other->update_status( StatusModel::PREPARING );
+		$changed = 0;
+		add_action( 'woocommerce_order_status_changed', $count );
+		$twin->set_status( StatusModel::PREPARING );
+		$twin->save();
+		remove_action( 'woocommerce_order_status_changed', $count );
+		$check( 0 === $changed && StatusModel::PREPARING === t51_fresh( $twin->get_id() )->get_status(), 'AC-2 [code] a stale copy asking for the status already stored fires no second transition' );
+		$new_cash = new \WC_Order();
+		$new_cash->add_product( $product, 1 );
+		$new_cash->set_payment_method( 'cod' );
+		$new_cash->set_status( 'completed' );
+		$new_cash->save();
+		$s->track_order( $new_cash->get_id() );
+		$check( 'completed' !== t51_fresh( $new_cash->get_id() )->get_status(), 'AC-5 a new cash order cannot be created as Delivered' );
+		$check( ! StatusModel::allowed( 'auto-draft', StatusModel::SHIPPED ) && StatusModel::allowed( 'auto-draft', 'processing' ) && StatusModel::allowed( 'checkout-draft', 'pending' ), 'AC-2 a new or draft order starts as Pending Payment, Confirmed, On hold, Payment Failed or Cancelled' );
 
 		// AC-2: an order with a real status never goes back to a draft.
 		$draft = t51_order( $s, $product, 'processing' );
@@ -215,7 +237,8 @@ run(
 		$check( (bool) preg_grep( '/^Order status changed from Pending Payment to Confirmed\.$/', $pay_notes ), 'AC-7 the payment-driven change is in the timeline' );
 		$cod_paid = t51_order( $s, $product, 'pending', 'cod' );
 		$cod_paid->payment_complete( 't51-cod' );
-		$check( 'pending' === t51_fresh( $cod_paid->get_id() )->get_status(), 'AC-2 the WooCommerce cash-on-delivery shortcut from Pending Payment to Delivered is refused' );
+		$cod_paid = t51_fresh( $cod_paid->get_id() );
+		$check( 'processing' === $cod_paid->get_status() && null === $cod_paid->get_date_completed(), 'AC-5 completing the payment of a cash order confirms it, instead of the WooCommerce jump to Delivered' );
 		$unsaved = wc_create_order();
 		$unsaved->add_product( $product, 1 );
 		$unsaved->save();
@@ -292,7 +315,14 @@ run(
 		if ( $new_id ) {
 			$s->track_order( $new_id );
 		}
-		$check( 201 === $created->get_status() && $new_id && 'Duplicate order entered by staff' === t51_fresh( $new_id )->get_meta( StatusModel::REASON_META ), 'AC-3 [REST] creating an order as Cancelled with a reason stores it (status ' . $created->get_status() . ')' );
+		$check( 201 === $created->get_status() && $new_id && 'cancelled' === t51_fresh( $new_id )->get_status() && 'Duplicate order entered by staff' === t51_fresh( $new_id )->get_meta( StatusModel::REASON_META ), 'AC-3 [REST] creating an order as Cancelled with a reason stores it (status ' . $created->get_status() . ')' );
+		$shipped_new = new \WP_REST_Request( 'POST', '/wc/v3/orders' );
+		$shipped_new->set_body_params( array( 'status' => StatusModel::SHIPPED, 'line_items' => array( array( 'product_id' => $product->get_id(), 'quantity' => 1 ) ) ) );
+		$made = rest_do_request( $shipped_new );
+		if ( isset( $made->get_data()['id'] ) ) {
+			$s->track_order( (int) $made->get_data()['id'] );
+		}
+		$check( 400 === $made->get_status(), 'AC-2 [REST] creating an order directly as Shipped is a 400, not a 201 the guard then undoes (status ' . $made->get_status() . ')' );
 
 		// AC-3: system and customer cancellations record their own reason.
 		$unpaid = t51_order( $s, $product, 'pending' );

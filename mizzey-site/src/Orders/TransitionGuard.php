@@ -45,6 +45,7 @@ final class TransitionGuard
         add_filter('woocommerce_bulk_action_ids', [self::class, 'bulk'], 10, 3);
         add_filter('woocommerce_rest_pre_insert_shop_order_object', [self::class, 'rest'], 10, 3);
         add_action('woocommerce_before_order_object_save', [self::class, 'beforeSave'], PHP_INT_MAX, 1);
+        add_filter('woocommerce_payment_complete_order_status', [self::class, 'paymentStatus'], 20, 3);
         add_action('admin_notices', [self::class, 'notices']);
     }
 
@@ -193,6 +194,14 @@ final class TransitionGuard
         }
         $data = $order->get_data();
         $from = $isNew ? '' : self::storedStatus($order);
+        // An out-of-date copy (loaded before another change was saved) may not change the status at all: its pending
+        // transition would describe a move that never happened.
+        $loaded = (string) $data['status'] !== '' ? (string) $data['status'] : 'pending';
+        if (! $isNew && $loaded !== $from) {
+            self::refuse($order, $from, $to, $data, __('Status change refused: the order changed since this copy was loaded. Reload it and try again.', 'mizzey-site'));
+
+            return;
+        }
         if ($from === $to) {
             return;
         }
@@ -343,9 +352,10 @@ final class TransitionGuard
      */
     private static function refuse(\WC_Order $order, string $from, string $to, array $data, ?string $why = null): void
     {
+        $dates = self::storedDates($order, $data);
         $order->set_status($from !== '' ? $from : 'pending');
-        $order->set_date_paid($data['date_paid'] ?? null);
-        $order->set_date_completed($data['date_completed'] ?? null);
+        $order->set_date_paid($dates['date_paid']);
+        $order->set_date_completed($dates['date_completed']);
         self::clearTransition($order);
         $message = $why ?? sprintf(
             /* translators: 1: current status, 2: requested status. */
@@ -357,6 +367,51 @@ final class TransitionGuard
             $order->add_order_note($message);
         }
         wc_get_logger()->warning($message, ['source' => 'mizzey-order-status', 'order_id' => $order->get_id()]);
+    }
+
+    /**
+     * WooCommerce's cash-on-delivery gateway asks for Delivered when a payment is completed. A cash order is
+     * Confirmed at that point; it reaches Delivered through COD Collected.
+     *
+     * @param mixed $status
+     * @param mixed $orderId
+     * @param mixed $order
+     * @return mixed
+     */
+    public static function paymentStatus($status, $orderId = 0, $order = null)
+    {
+        $order = $order instanceof \WC_Order ? $order : wc_get_order((int) $orderId);
+        if ($status === 'completed' && $order instanceof \WC_Order && StatusModel::isCash($order)) {
+            return 'processing';
+        }
+
+        return $status;
+    }
+
+    /**
+     * The paid and completed dates as stored, so a refused move never overwrites a date another change saved.
+     *
+     * @param array<string,mixed> $data The order as loaded, used for a new order.
+     * @return array{date_paid:int|\WC_DateTime|null,date_completed:int|\WC_DateTime|null}
+     */
+    private static function storedDates(\WC_Order $order, array $data): array
+    {
+        if (! $order->get_id()) {
+            return ['date_paid' => $data['date_paid'] ?? null, 'date_completed' => $data['date_completed'] ?? null];
+        }
+        global $wpdb;
+        if (OrderUtil::custom_orders_table_usage_is_enabled()) {
+            $row = $wpdb->get_row($wpdb->prepare("SELECT date_paid_gmt, date_completed_gmt FROM {$wpdb->prefix}wc_order_operational_data WHERE order_id = %d", $order->get_id()), ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $paid      = is_array($row) && ! empty($row['date_paid_gmt']) ? strtotime($row['date_paid_gmt'] . ' UTC') : null;
+            $completed = is_array($row) && ! empty($row['date_completed_gmt']) ? strtotime($row['date_completed_gmt'] . ' UTC') : null;
+        } else {
+            $paid      = get_post_meta($order->get_id(), '_date_paid', true);
+            $completed = get_post_meta($order->get_id(), '_date_completed', true);
+            $paid      = is_numeric($paid) ? (int) $paid : null;
+            $completed = is_numeric($completed) ? (int) $completed : null;
+        }
+
+        return ['date_paid' => $paid ?: null, 'date_completed' => $completed ?: null];
     }
 
     /** @return \WeakMap<\WC_Order,string> */

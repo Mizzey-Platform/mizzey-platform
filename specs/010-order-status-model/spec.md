@@ -107,7 +107,9 @@ prefix.
 | Cancelled | Confirmed (a payment that arrives after cancellation), Refunded |
 | Refunded | none |
 
-A new order, or one leaving the block checkout's draft, may take any first status. A full refund moves any paid status
+A new order, or one leaving a draft (the block checkout's or the admin's), starts as Pending Payment, Confirmed, On
+hold, Payment Failed or Cancelled, because WooCommerce first stores a new order as Pending Payment. An out-of-date copy of
+an order (loaded before another change was saved) may not change its status. A full refund moves any paid status
 to Refunded, as WooCommerce does. Cancellation stops at Preparing: once a parcel is with the carrier, its outcome is
 Delivered, COD Collected or Delivery Failed. Delivery Failed ends there, or in Refunded for a paid order; a move to
 Cancelled would trigger WooCommerce's own stock restoration, which belongs to the ERP (D-19 item 5). Pending Payment never
@@ -190,8 +192,9 @@ try forbidden moves, and read the result.
 
 - A payment method moves an order on its own (Pending Payment to Confirmed, On hold or Payment Failed): allowed by the
   table, so payment callbacks are never blocked.
-- WooCommerce's cash-on-delivery gateway asks for Delivered when a payment is marked complete. From Pending Payment that
-  is refused: a cash order reaches Delivered through the shipping states and COD Collected.
+- WooCommerce's cash-on-delivery gateway asks for Delivered when a payment is marked complete. The store answers
+  Confirmed instead: a cash order reaches Delivered through the shipping states and COD Collected, including one created
+  directly.
 - A move to the status an order already has: no change, no timeline entry, nothing refused.
 - An order created by staff in admin starts as Pending Payment, as WooCommerce does.
 - Orders that exist before this feature: their status stays, and the record of first entry starts from the next change.

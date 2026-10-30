@@ -27,8 +27,11 @@ final class StatusModel
     public const COD_COLLECTED    = 'cod-collected';
     public const DELIVERY_FAILED  = 'delivery-failed';
 
-    /** Statuses a new order or one leaving the checkout draft moves from without a table check. */
+    /** A new order, or a draft (the block checkout's or the admin's), before it has a real status. */
     public const STARTING = ['', 'new', 'auto-draft', 'draft', 'checkout-draft'];
+
+    /** The statuses an order may start with: WooCommerce first stores a new order as Pending Payment. */
+    public const INITIAL = ['pending', 'processing', 'on-hold', 'failed', 'cancelled'];
 
     /** Delivered (ORD-07) and COD Collected (ORD-14, entered only once delivery happened). */
     public const DELIVERED = ['completed', self::COD_COLLECTED];
@@ -103,7 +106,7 @@ final class StatusModel
     {
         $from = self::bare($from);
         $to   = self::bare($to);
-        if ($to === 'completed' && self::isCash($order) && $from !== self::COD_COLLECTED && ! in_array($from, self::STARTING, true)) {
+        if ($to === 'completed' && self::isCash($order) && $from !== self::COD_COLLECTED) {
             return __('Order status not changed: a cash on delivery order reaches Delivered through COD Collected, when the remittance is recorded.', 'mizzey-site');
         }
         if ($to === self::COD_COLLECTED && ! self::isCash($order)) {
@@ -118,8 +121,11 @@ final class StatusModel
     {
         $from = self::bare($from);
         $to   = self::bare($to);
-        if ($from === $to || in_array($from, self::STARTING, true)) {
+        if ($from === $to) {
             return true;
+        }
+        if (in_array($from, self::STARTING, true)) {
+            return in_array($to, self::INITIAL, true) || in_array($to, self::STARTING, true);
         }
         if (! array_key_exists($to, self::TRANSITIONS)) {
             return false;
