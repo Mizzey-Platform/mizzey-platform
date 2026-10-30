@@ -1,0 +1,22 @@
+T012, staging, 31 October 2026 (00:00 to 00:15 Cairo), release v0.1.7 (1ad0313), on the owner's order.
+
+Before: backup set 20261031-000001-manual. Deployed from the verified archive (sha256 f547d8b5...) with bin/deploy --file.
+After deploy: staging.py build, no problems; staging.py check 6/6 PASS; wp mizzey security check, every baseline row
+passes; no PHP errors in the container log. Labels live: processing = "Confirmed", completed = "Delivered", 13 statuses.
+
+1. t51-order-status-model run on staging (WP-CLI eval-file, MariaDB 11.4, Redis object cache, HPOS): pass, 80 of 80
+   checks. Every fixture it made was removed; the copied script was deleted from the container afterwards.
+
+2. The block checkout's own request, in Arabic, over HTTP to the server's web server (Host mizzey-staging.localhost,
+   no Cloudflare): GET /ar/wp-json/wc/store/v1/cart 200, add-item 201 (product 62, the Arabic record of 39), checkout
+   200 with cash on delivery, order 141 created.
+   Stored on order 141: wpml_language = ar (D6, FR-013); status processing (Confirmed); payment method cod;
+   date_paid null (a cash order is not marked paid at confirmation); _mizzey_status_entered_processing set (AC-8).
+
+3. Clean-up through the model: order 141 cancelled by code with the note "T012 staging check cleanup", which the
+   guard stored as the cancellation reason (AC-3, system path); WooCommerce restored the unit (stock 37 to 38); the
+   order was then deleted.
+
+Not done here: looking at the order screen in a browser on staging needs a staff sign-in with the owner's
+authenticator (ADM-131). The screen's save handler, the list buttons, bulk actions and REST were exercised on staging
+in-process by t51 (item 1).
