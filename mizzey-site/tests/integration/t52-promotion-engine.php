@@ -266,6 +266,29 @@ run(
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( ! in_array( wc_format_coupon_code( $ship_auto->get_code() ), t52_applied(), true ), 'AC-3 where the order already ships free by its amount, the free-shipping promotion is worth nothing and does not win' );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '95', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$auto_a->update_meta_data( PromotionSettings::MIN_ITEMS, '1' );
+		$auto_a->save();
+		$auto_b->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$auto_b->save();
+		t52_cart( array( $lipstick->get_id() => 1 ) );
+		$passes = array();
+		for ( $pass = 0; $pass < 3; $pass++ ) {
+			WC()->cart->calculate_totals();
+			$passes[] = implode( ',', t52_applied() );
+		}
+		$free_rate = false;
+		foreach ( WC()->shipping()->get_packages() as $package ) {
+			foreach ( (array) $package['rates'] as $rate ) {
+				$free_rate = $free_rate || 'free_shipping' === $rate->get_method_id();
+			}
+		}
+		$check( 1 === count( array_unique( $passes ) ) && ! in_array( wc_format_coupon_code( $auto_a->get_code() ), t52_applied(), true ) && $free_rate, 'Q1 a 10 off that would push a 100 cart below the 95 free shipping minimum is not applied: free shipping stays available, and the choice is stable (' . implode( ' | ', $passes ) . ')' );
+		$auto_a->update_meta_data( PromotionSettings::MIN_ITEMS, '2' );
+		$auto_a->save();
+		$auto_b->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		$auto_b->save();
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => '' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		$zone->delete_shipping_method( $free );
@@ -325,6 +348,18 @@ run(
 		$excluding = t52_coupon( $s, "{$tag}excl", array( 'discount_type' => 'percent', 'amount' => '20', 'excluded_product_categories' => array( $vitamins['term_id'] ), 'excluded_product_ids' => array( $cream->get_id() ) ) );
 		t52_cart( array( $lipstick->get_id() => 1, $cream->get_id() => 1, $tablets->get_id() => 1 ) );
 		$check( 20.0 === t52_discount( $excluding ), 'AC-6 the excluded category and product are not discounted (native)' );
+
+		// Third review round: an email list matches the account email as well as the billing email.
+		$listed = t52_coupon( $s, "{$tag}autolist", array( 'discount_type' => 'fixed_cart', 'amount' => '70', 'individual_use' => true, 'email_restrictions' => array( $newcomer->user_email ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		wp_set_current_user( $newcomer->ID );
+		WC()->customer = new \WC_Customer( $newcomer->ID, true );
+		WC()->customer->set_billing_email( 'other-' . $tag . '@example.invalid' );
+		t52_cart( array( $lipstick->get_id() => 2 ) );
+		$check( in_array( wc_format_coupon_code( $listed->get_code() ), t52_applied(), true ), 'AC-3 an automatic promotion limited to an account email applies when the billing email differs, as WooCommerce accepts' );
+		wp_set_current_user( 0 );
+		WC()->customer = new \WC_Customer( 0, true );
+		$listed->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$listed->save();
 
 		// Second review round: usage across accounts and emails, provenance, shipping value rules, Arabic, expiry.
 		$reuse = t52_coupon( $s, "{$tag}autoreuse", array( 'discount_type' => 'fixed_cart', 'amount' => '60', 'individual_use' => true, 'usage_limit_per_user' => 1, 'date_created' => time() - 4 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );

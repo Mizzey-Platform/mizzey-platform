@@ -119,9 +119,10 @@ more", saves it, and it applies by itself on those dates.
   qualifying one applies, so checkout is never blocked by one it would remove.
 - An automatic promotion switched off, ended or no longer qualifying is taken off carts that hold it, without the
   customer rebuilding the cart.
-- A free-shipping automatic promotion is worth the cheapest paid rate of the zone, and nothing where shipping is already
-  free by the order's amount or no free shipping method accepts a coupon; the value is the same whichever promotion is
-  applied and whether paid rates are hidden once shipping is free, so the choice is stable.
+- "The larger discount" (Q1) is what the promotion saves the customer, shipping included: a discount that would take the
+  cart below a free shipping minimum counts the shipping the customer would then pay, and free shipping counts the
+  cheapest paid rate it replaces. Each is measured on its own against the cart with no automatic promotion, so the
+  choice is stable. A promotion that saves nothing, or makes the customer pay more, is not applied.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept
   until it no longer qualifies, as WooCommerce does.
 - A start date in the future with no end date: the promotion waits; an end date before the start date is refused on

@@ -104,6 +104,10 @@ final class AutomaticPromotions
                 'created' => $created ? $created->getTimestamp() : PHP_INT_MAX,
                 'id'      => $coupon->get_id(),
             ];
+            // A promotion that saves the customer nothing, or makes them pay more, is not applied.
+            if ($candidate['value'] <= 0) {
+                continue;
+            }
             if ($best === null || self::better($candidate, $best)) {
                 $best = $candidate;
             }
@@ -113,19 +117,19 @@ final class AutomaticPromotions
     }
 
     /**
-     * What the promotion is worth on this cart, in cents. Free shipping is worth the cheapest paid rate it replaces,
-     * measured the same way whichever promotion is applied, and only where a free shipping method accepts a coupon.
+     * What the promotion saves the customer on this cart, in cents: its discount, plus the shipping it saves. Each
+     * candidate is measured on its own, against the cart with no automatic promotion, so the promotion applied at the
+     * moment never changes the comparison: what the customer would pay for shipping without any automatic promotion,
+     * less what they would pay with this one (its discount can move the cart below a free shipping minimum; its free
+     * shipping can make shipping free).
      */
     public static function value(\WC_Cart $cart, \WC_Coupon $coupon): int
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->apply_coupon($coupon, false);
         $cents = (int) round(array_sum($discounts->get_discounts_by_coupon(true)));
-        if ($coupon->get_free_shipping()) {
-            $cents += self::shippingValue($cart);
-        }
 
-        return $cents;
+        return $cents + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $cents, $coupon->get_free_shipping());
     }
 
     /**
@@ -142,7 +146,9 @@ final class AutomaticPromotions
         }
         $email        = (string) WC()->customer->get_billing_email();
         $restrictions = $coupon->get_email_restrictions();
-        if ($email !== '' && $restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed([$email], $restrictions)) {
+        // WooCommerce accepts a match on the billing email or the account's email.
+        $emails = array_values(array_filter([$email, get_current_user_id() ? (string) get_userdata(get_current_user_id())->user_email : '']));
+        if ($emails !== [] && $restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed($emails, $restrictions)) {
             return false;
         }
         $limit = (int) $coupon->get_usage_limit_per_user();
@@ -193,42 +199,37 @@ final class AutomaticPromotions
     }
 
     /**
-     * What free shipping saves on this cart, in cents: for each package, the cheapest paid rate of its zone, calculated
-     * by the zone's own methods (so neither the promotion applied nor WooCommerce hiding paid rates when shipping is
-     * free changes it), counted only where a coupon is what makes shipping free, by the free shipping method's own rules.
+     * What the customer would pay for shipping, in cents, with a given discount and with or without a free shipping
+     * coupon: per package, nothing when a free shipping method of the zone would be available under its own rules
+     * (`WC_Shipping_Free_Shipping::is_available()`, WooCommerce 11.1.0), otherwise the cheapest paid rate the zone's
+     * methods calculate. Calculated from the zone's methods, so neither the promotion applied now nor WooCommerce hiding
+     * paid rates once shipping is free changes it.
      */
-    public static function shippingValue(\WC_Cart $cart): int
+    public static function shippingCost(\WC_Cart $cart, int $discountCents, bool $freeCoupon): int
     {
         $cents = 0;
         foreach (WC()->shipping()->get_packages() as $package) {
             $methods = \WC_Shipping_Zones::get_zone_matching_package($package)->get_shipping_methods(true);
-            $unlocks = false;
-            foreach ($methods as $method) {
-                if ($method->id !== 'free_shipping') {
-                    continue;
-                }
-                $requires = (string) $method->get_option('requires');
-                $met      = self::minimumMet($cart, $method);
-                if ($requires === '' || ($requires === 'min_amount' && $met) || ($requires === 'either' && $met)) {
-                    // Shipping is free here without a coupon: the promotion saves nothing on it.
-                    $unlocks = false;
-                    break;
-                }
-                $unlocks = $unlocks || $requires === 'coupon' || $requires === 'either' || ($requires === 'both' && $met);
-            }
-            if (! $unlocks) {
-                continue;
-            }
-            $costs = [];
+            $free    = false;
+            $costs   = [];
             foreach ($methods as $method) {
                 if ($method->id === 'free_shipping') {
+                    $met      = self::minimumMet($cart, $method, $discountCents);
+                    $requires = (string) $method->get_option('requires');
+                    $free     = $free || match ($requires) {
+                        'coupon'     => $freeCoupon,
+                        'min_amount' => $met,
+                        'either'     => $met || $freeCoupon,
+                        'both'       => $met && $freeCoupon,
+                        default      => true,
+                    };
                     continue;
                 }
                 foreach ((array) $method->get_rates_for_package($package) as $rate) {
                     $costs[] = (float) $rate->get_cost();
                 }
             }
-            if ($costs !== []) {
+            if (! $free && $costs !== []) {
                 $cents += (int) round(wc_add_number_precision(min($costs)));
             }
         }
@@ -236,15 +237,20 @@ final class AutomaticPromotions
         return $cents;
     }
 
-    /** The free shipping method's own minimum check (`WC_Shipping_Free_Shipping::is_available()`, WooCommerce 11.1.0). */
-    private static function minimumMet(\WC_Cart $cart, \WC_Shipping_Method $method): bool
+    /**
+     * The free shipping method's minimum, checked for a given discount rather than the cart's current one. As
+     * WooCommerce does, the discount counts only when the method does not ignore discounts; shown with tax, it counts
+     * with its tax.
+     */
+    private static function minimumMet(\WC_Cart $cart, \WC_Shipping_Method $method, int $discountCents): bool
     {
         $total = (float) $cart->get_displayed_subtotal();
-        if ($cart->display_prices_including_tax()) {
-            $total -= (float) $cart->get_discount_tax();
-        }
         if ($method->get_option('ignore_discounts') !== 'yes') {
-            $total -= (float) $cart->get_discount_total();
+            $discount = wc_remove_number_precision($discountCents);
+            if (! wc_prices_include_tax() && $cart->display_prices_including_tax() && (float) $cart->get_subtotal() > 0) {
+                $discount *= $total / (float) $cart->get_subtotal();
+            }
+            $total -= $discount;
         }
 
         return round($total, wc_get_price_decimals()) >= (float) $method->get_option('min_amount');
