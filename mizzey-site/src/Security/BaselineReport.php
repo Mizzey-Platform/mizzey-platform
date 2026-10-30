@@ -39,6 +39,10 @@ final class BaselineReport
         'two_factor_roles',
         'two_factor_bypass',
         'two_factor_key',
+        'sign_in_limit',
+        'signup_check',
+        'account_writers',
+        'wordpress_registration',
     ];
 
     /** The WP 2FA release this integration was built and tested against (stack.lock.json). */
@@ -63,7 +67,6 @@ final class BaselineReport
             self::fact('file_changes_disabled', defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS, 'DISALLOW_FILE_MODS'),
             self::fact('file_editor_disabled', defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT, 'DISALLOW_FILE_EDIT'),
             self::fact('debug_display_off', ! (defined('WP_DEBUG') && WP_DEBUG) || (defined('WP_DEBUG_DISPLAY') && ! WP_DEBUG_DISPLAY), __('Errors are not shown to visitors', 'mizzey-site')),
-            self::fact('corex_login_protection', self::corexLoginProtectionOn(), 'CoreX login lockout (AUTH-15, #305)'),
             self::row('two_factor_active', self::twoFactorActive(), sprintf(
                 /* translators: %s: the WP 2FA version. */
                 __('WP 2FA %s active, its sign-in challenge and the enrolment guard hooked', 'mizzey-site'),
@@ -73,6 +76,10 @@ final class BaselineReport
             self::row('two_factor_bypass', ! (defined('DISABLE_2FA_LOGIN') && DISABLE_2FA_LOGIN), __('No emergency bypass (DISABLE_2FA_LOGIN)', 'mizzey-site')),
             self::row('two_factor_key', self::twoFactorKeyInConfiguration(), __('Encryption key provided by configuration; no copy in the database', 'mizzey-site')),
             self::pendingStaff(),
+            self::signInLimit(),
+            self::row('signup_check', SignupRoutes::attached() && SignupRoutes::selfTest(), __('Account creation checked on the account page, the checkout, the order-received offer and WordPress registration; the check works', 'mizzey-site')),
+            self::accountWriters(),
+            self::row('wordpress_registration', self::wordpressRegistrationGuarded(), get_option('users_can_register') ? __('WordPress registration is open and checked', 'mizzey-site') : __('WordPress registration is closed', 'mizzey-site')),
         ];
     }
 
@@ -234,11 +241,67 @@ final class BaselineReport
         return ! apply_filters('comments_open', true, 0) && ! apply_filters('pings_open', true, 0);
     }
 
-    private static function corexLoginProtectionOn(): bool
+    /**
+     * CoreX's sign-in limit: on, its enforcer attached, and WordPress's default sign-in address served. The numbers
+     * are reported, not judged: after the one-time baseline they are the owner's (specs/009-sign-in-protection, FR-007).
+     *
+     * @return array{key:string,status:string,detail:string}
+     */
+    private static function signInLimit(): array
     {
-        $settings = get_option('corex_login_protection_settings');
+        $storeClass = '\Corex\Config\Security\LoginProtection\LoginProtectionSettingsStore';
+        if (! class_exists($storeClass)) {
+            return self::row('sign_in_limit', false, __('CoreX login protection is not available', 'mizzey-site'));
+        }
+        try {
+            $settings = (new $storeClass())->current();
+        } catch (\Throwable) {
+            return self::row('sign_in_limit', false, __('CoreX login protection settings are not readable', 'mizzey-site'));
+        }
+        // The lockout check and the failure recorder: without the second, failures never lead to a lockout.
+        $enforced = false;
+        foreach ((array) ($GLOBALS['wp_filter']['authenticate']->callbacks[30] ?? []) as $callback) {
+            $function = $callback['function'] ?? null;
+            if (! is_array($function)
+                || ! ($function[0] ?? null) instanceof \Corex\Config\Security\LoginProtection\LoginProtectionEnforcer
+                || ($function[1] ?? null) !== 'blockLockedOut'
+                || (int) ($callback['accepted_args'] ?? 0) < 3
+            ) {
+                continue;
+            }
+            $enforced = has_action('wp_login_failed', [$function[0], 'recordFailure']) !== false;
+            if ($enforced) {
+                break;
+            }
+        }
 
-        return is_array($settings) && ! empty($settings['enabled']);
+        return self::row('sign_in_limit', $settings->enabled && $enforced && ! $settings->blockDefaultEndpoints, sprintf(
+            /* translators: 1: failures, 2: window in seconds, 3: lockout in seconds. */
+            __('Sign-in limit: %1$d failures in %2$d s lock that identity and address for %3$d s; default sign-in address served', 'mizzey-site'),
+            $settings->threshold,
+            $settings->windowSeconds,
+            $settings->lockoutSeconds,
+        ));
+    }
+
+    /**
+     * @return array{key:string,status:string,detail:string}
+     */
+    private static function accountWriters(): array
+    {
+        $writers = SignupRoutes::writers();
+        $list    = implode(', ', array_map(static fn (string $name, string $state): string => $name . ' ' . $state, array_keys($writers), $writers));
+
+        return self::row('account_writers', ! in_array('unchecked', $writers, true), sprintf(
+            /* translators: %s: each place accounts can be created, with its state. */
+            __('Places accounts can be created: %s', 'mizzey-site'),
+            $list,
+        ));
+    }
+
+    private static function wordpressRegistrationGuarded(): bool
+    {
+        return ! get_option('users_can_register') || has_filter('registration_errors', [SignupRoutes::class, 'wordpress']) !== false;
     }
 
     private static function limitsDetail(): string

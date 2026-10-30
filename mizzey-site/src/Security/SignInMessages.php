@@ -19,14 +19,19 @@ use WP_Error;
  * for the other, which confirms accounts to anyone guessing. WooCommerce's account page shows the same errors. The two
  * revealing codes become WordPress's own generic failure, whose Arabic translation ships with WordPress.
  *
- * It runs at priority 100, after CoreX's lockout check (30). Every other error passes unchanged, CoreX's lockout
- * message included, and `wp_authenticate()` still fires `wp_login_failed` for the failure, which CoreX counts.
+ * It runs at priority 100, after CoreX's lockout check (30). CoreX's lockout keeps its code and gets a message Mizzey
+ * translates, because CoreX ships none in Arabic. Every other error passes unchanged, and `wp_authenticate()` still
+ * fires `wp_login_failed` for the failure, which CoreX counts.
  *
- * Register id: NFR-05 (admin protection). See specs/007-security-baseline, FR-005.
+ * Register ids: NFR-05 (admin protection), AUTH-15 (the lockout message). See specs/007-security-baseline, FR-005, and
+ * specs/009-sign-in-protection.
  */
 final class SignInMessages
 {
     private const REVEALING = ['invalid_username', 'invalid_email', 'incorrect_password'];
+
+    /** CoreX's lockout error (LoginProtectionEnforcer). */
+    public const LOCKED = 'corex_login_locked';
 
     public static function register(): void
     {
@@ -35,7 +40,16 @@ final class SignInMessages
 
     public static function generic(mixed $user): mixed
     {
-        if (! $user instanceof WP_Error || ! in_array($user->get_error_code(), self::REVEALING, true)) {
+        if (! $user instanceof WP_Error) {
+            return $user;
+        }
+        if ($user->get_error_code() === self::LOCKED) {
+            return new WP_Error(
+                self::LOCKED,
+                __('Too many failed sign-in attempts. Please wait a few minutes and try again.', 'mizzey-site'),
+            );
+        }
+        if (! in_array($user->get_error_code(), self::REVEALING, true)) {
             return $user;
         }
 

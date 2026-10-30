@@ -1,0 +1,5 @@
+mutation: an account permit survives the registration handler -> FAIL  t47-signup-check             AUTH-
+mutation: tokens are accepted straight away (no minimum age) -> FAIL  t47-signup-check             AUTH-
+mutation: the checkout script always sends an empty trap -> FAIL  t49-sign-in-browser          AUTH-
+mutation: the sign-in limit row ignores a hidden default address -> FAIL  t46-sign-in-limit            AUTH-
+mutation: the lockout message is left untranslated -> FAIL  t46-sign-in-limit            AUTH-

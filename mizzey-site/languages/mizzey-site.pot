@@ -15,13 +15,12 @@ msgstr ""
 
 #. Theme Name of the theme
 #. Author of the theme
-#: mizzey-theme:2
-#: mizzey-theme:5
+#: mizzey-theme
 msgid "Mizzey"
 msgstr ""
 
 #. Description of the theme
-#: mizzey-theme:3
+#: mizzey-theme
 msgid "The Mizzey site theme, a Corex client skin. Presentation only."
 msgstr ""
 
@@ -36,19 +35,16 @@ msgstr ""
 
 #. translators: 1: a table, 2: the start of the statement.
 #: mizzey-site/src/Catalogue/Import/CatalogueWriteGuard.php:91
-#, php-format
 msgid "A catalogue write was attempted during a read-only run and refused (table %1$s): %2$s"
 msgstr ""
 
 #. translators: 1: mapping version, 2: rules version, 3: format, 4: encoding.
 #: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:71
-#, php-format
 msgid "Mapping %1$s (initial-load rules %2$d), format %3$s, encoding %4$s"
 msgstr ""
 
 #. translators: 1: row number, 2: row type.
 #: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:87
-#, php-format
 msgid "Row %1$d (%2$s)"
 msgstr ""
 
@@ -66,7 +62,6 @@ msgstr ""
 
 #. translators: %s: a file path.
 #: mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php:196
-#, php-format
 msgid "Run recorded: %s"
 msgstr ""
 
@@ -92,13 +87,11 @@ msgstr ""
 
 #. translators: %s: the file path.
 #: mizzey-site/src/Catalogue/Import/ExportReader.php:89
-#, php-format
 msgid "The file cannot be read: %s"
 msgstr ""
 
 #. translators: %s: the declared encoding.
 #: mizzey-site/src/Catalogue/Import/ExportReader.php:104
-#, php-format
 msgid "The file cannot be decoded from the declared encoding %s."
 msgstr ""
 
@@ -108,7 +101,6 @@ msgstr ""
 
 #. translators: %s: a file path.
 #: mizzey-site/src/Catalogue/Import/FileImportRunRecorder.php:37
-#, php-format
 msgid "The run record cannot be written: %s"
 msgstr ""
 
@@ -118,25 +110,21 @@ msgstr ""
 
 #. translators: 1: a header, 2: how many times it appears.
 #: mizzey-site/src/Catalogue/Import/HeaderCheck.php:48
-#, php-format
 msgid "The header \"%1$s\" appears %2$d times."
 msgstr ""
 
 #. translators: 1: a header, 2: the store field it fills.
 #: mizzey-site/src/Catalogue/Import/HeaderCheck.php:63
-#, php-format
 msgid "The mapped column \"%1$s\" (fills %2$s) is missing from the file."
 msgstr ""
 
 #. translators: %s: a header.
 #: mizzey-site/src/Catalogue/Import/HeaderCheck.php:76
-#, php-format
 msgid "The column \"%s\" is in the file but not in the mapping: map it or record why it is not imported."
 msgstr ""
 
 #. translators: %s: a store field.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:80
-#, php-format
 msgid "The required value \"%s\" is empty."
 msgstr ""
 
@@ -154,7 +142,6 @@ msgstr ""
 
 #. translators: %d: a product or variation id.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:107
-#, php-format
 msgid "The SKU belongs to the source-language original %d."
 msgstr ""
 
@@ -180,7 +167,6 @@ msgstr ""
 
 #. translators: %s: product ids.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:133
-#, php-format
 msgid "The SKU belongs to unrelated store records: %s."
 msgstr ""
 
@@ -190,7 +176,6 @@ msgstr ""
 
 #. translators: 1: the store record's kind, 2: the row type.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:142
-#, php-format
 msgid "The SKU belongs to a store %1$s, and the row is a %2$s."
 msgstr ""
 
@@ -200,7 +185,6 @@ msgstr ""
 
 #. translators: %d: a product id.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:150
-#, php-format
 msgid "The SKU matched a translation; its original %d carries a different SKU."
 msgstr ""
 
@@ -210,7 +194,6 @@ msgstr ""
 
 #. translators: 1: a product id, 2: its stored SKU.
 #: mizzey-site/src/Catalogue/Import/LoadRules.php:160
-#, php-format
 msgid "Matched record %1$d stores the SKU as \"%2$s\"; the match ignores case, accents and surrounding spaces, as the store's own SKU lookup does."
 msgstr ""
 
@@ -220,7 +203,6 @@ msgstr ""
 
 #. translators: %s: the mapping file path.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:50
-#, php-format
 msgid "The mapping is not readable JSON: %s"
 msgstr ""
 
@@ -230,7 +212,6 @@ msgstr ""
 
 #. translators: %d: the rules version this code applies.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:146
-#, php-format
 msgid "rules_version: this tool applies initial-load rules version %d"
 msgstr ""
 
@@ -248,31 +229,26 @@ msgstr ""
 
 #. translators: %s: a source header.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:172
-#, php-format
 msgid "columns.%s: exactly one of \"to\" or \"ignore\" (with its reason) is required"
 msgstr ""
 
 #. translators: %s: a source header.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:180
-#, php-format
 msgid "columns.%s: \"ignore\" needs the reason the column is not imported"
 msgstr ""
 
 #. translators: 1: a source header, 2: the field it names.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:188
-#, php-format
 msgid "columns.%1$s: \"%2$s\" is not a store field this tool knows"
 msgstr ""
 
 #. translators: %s: a store field.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:195
-#, php-format
 msgid "columns: two columns fill \"%s\""
 msgstr ""
 
 #. translators: %s: a store field.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:206
-#, php-format
 msgid "columns: no column fills \"%s\""
 msgstr ""
 
@@ -282,7 +258,6 @@ msgstr ""
 
 #. translators: 1: a source value, 2: the row type it names.
 #: mizzey-site/src/Catalogue/Import/Mapping.php:220
-#, php-format
 msgid "row_type.values: \"%1$s\" names \"%2$s\", which is not simple, variable or variation"
 msgstr ""
 
@@ -292,19 +267,16 @@ msgstr ""
 
 #. translators: %s: a file path.
 #: mizzey-site/src/Catalogue/Import/ReportWriter.php:56
-#, php-format
 msgid "The report cannot be written: %s"
 msgstr ""
 
 #. translators: %s: a file path.
 #: mizzey-site/src/Catalogue/Import/ReportWriter.php:68
-#, php-format
 msgid "The report was not written completely: %s"
 msgstr ""
 
 #. translators: 1: cells in the row, 2: columns in the header.
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:39
-#, php-format
 msgid "The row has %1$d cells and the header has %2$d columns."
 msgstr ""
 
@@ -324,7 +296,6 @@ msgstr ""
 
 #. translators: %s: the value found.
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:80
-#, php-format
 msgid "The row type \"%s\" is not one the mapping knows."
 msgstr ""
 
@@ -334,7 +305,6 @@ msgstr ""
 
 #. translators: %s: the value found.
 #: mizzey-site/src/Catalogue/Import/RowInterpreter.php:89
-#, php-format
 msgid "The price \"%s\" is not a number."
 msgstr ""
 
@@ -356,7 +326,6 @@ msgstr ""
 
 #. translators: %s: row numbers.
 #: mizzey-site/src/Catalogue/Import/ValidationPass.php:112
-#, php-format
 msgid "The SKU is repeated on rows %s, so which row is the product cannot be decided."
 msgstr ""
 
@@ -370,13 +339,11 @@ msgstr ""
 
 #. translators: 1: a row number, 2: its row type.
 #: mizzey-site/src/Catalogue/Import/ValidationPass.php:171
-#, php-format
 msgid "The parent SKU is on row %1$d, which is a %2$s product, not a variable one."
 msgstr ""
 
 #. translators: %d: a row number.
 #: mizzey-site/src/Catalogue/Import/ValidationPass.php:177
-#, php-format
 msgid "The parent on row %d is rejected, so it cannot hold variations."
 msgstr ""
 
@@ -400,77 +367,102 @@ msgstr ""
 msgid "Resolve the store record of the parent before the load."
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:56
+#: mizzey-site/src/Security/BaselineReport.php:60
 msgid "No WordPress, WooCommerce, CoreX or WPML generator mark"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:57
+#: mizzey-site/src/Security/BaselineReport.php:61
 msgid "XML-RPC refused before dispatch; no method registered"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:58
+#: mizzey-site/src/Security/BaselineReport.php:62
 msgid "Visitors cannot list users or resolve ?author= numbers; no users sitemap"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:59
+#: mizzey-site/src/Security/BaselineReport.php:63
 msgid "Application passwords for administrators only"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:60
+#: mizzey-site/src/Security/BaselineReport.php:64
 msgid "One sign-in failure message"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:62
+#: mizzey-site/src/Security/BaselineReport.php:66
 msgid "Comments only on products; pings closed"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:65
+#: mizzey-site/src/Security/BaselineReport.php:69
 msgid "Errors are not shown to visitors"
 msgstr ""
 
 #. translators: %s: the WP 2FA version.
-#: mizzey-site/src/Security/BaselineReport.php:69
-#, php-format
+#: mizzey-site/src/Security/BaselineReport.php:72
 msgid "WP 2FA %s active, its sign-in challenge and the enrolment guard hooked"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:72
+#: mizzey-site/src/Security/BaselineReport.php:75
 msgid "Two-factor required for administrators and shop managers, authenticator app and backup codes, no grace period, no exclusions"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:73
+#: mizzey-site/src/Security/BaselineReport.php:76
 msgid "No emergency bypass (DISABLE_2FA_LOGIN)"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:74
+#: mizzey-site/src/Security/BaselineReport.php:77
 msgid "Encryption key provided by configuration; no copy in the database"
 msgstr ""
 
+#: mizzey-site/src/Security/BaselineReport.php:80
+msgid "Account creation checked on the account page, the checkout, the order-received offer and WordPress registration; the check works"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:82
+msgid "WordPress registration is open and checked"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:82
+msgid "WordPress registration is closed"
+msgstr ""
+
 #. translators: %s: the logins of the staff still to enrol, or none.
-#: mizzey-site/src/Security/BaselineReport.php:137
-#, php-format
+#: mizzey-site/src/Security/BaselineReport.php:153
 msgid "Staff still to set up two-factor sign-in: %s (reported, not judged here)"
 msgstr ""
 
-#: mizzey-site/src/Security/BaselineReport.php:138
+#: mizzey-site/src/Security/BaselineReport.php:154
 msgid "none"
 msgstr ""
 
 #. translators: %s: the configuration fact, such as a constant's name.
-#: mizzey-site/src/Security/BaselineReport.php:156
-#, php-format
+#: mizzey-site/src/Security/BaselineReport.php:186
 msgid "%s (reported, not judged here)"
 msgstr ""
 
+#: mizzey-site/src/Security/BaselineReport.php:254
+msgid "CoreX login protection is not available"
+msgstr ""
+
+#: mizzey-site/src/Security/BaselineReport.php:259
+msgid "CoreX login protection settings are not readable"
+msgstr ""
+
+#. translators: 1: failures, 2: window in seconds, 3: lockout in seconds.
+#: mizzey-site/src/Security/BaselineReport.php:270
+msgid "Sign-in limit: %1$d failures in %2$d s lock that identity and address for %3$d s; default sign-in address served"
+msgstr ""
+
+#. translators: %s: each place accounts can be created, with its state.
+#: mizzey-site/src/Security/BaselineReport.php:287
+msgid "Places accounts can be created: %s"
+msgstr ""
+
 #. translators: 1: requests per account, 2: requests per client address, 3: the window in minutes.
-#: mizzey-site/src/Security/BaselineReport.php:227
-#, php-format
+#: mizzey-site/src/Security/BaselineReport.php:303
 msgid "Recovery limited to %1$d per account and %2$d per address in %3$d minutes"
 msgstr ""
 
 #. translators: 1: how many controls fail, 2: their keys.
 #: mizzey-site/src/Security/Cli/SecurityCommand.php:47
-#, php-format
 msgid "%1$d control(s) need review: %2$s"
 msgstr ""
 
@@ -486,19 +478,43 @@ msgstr ""
 msgid "The stored WP 2FA policy is not readable; it was not changed."
 msgstr ""
 
-#: mizzey-site/src/Security/Cli/SecurityCommand.php:93
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:95
 msgid "The two-factor baseline did not persist."
 msgstr ""
 
-#: mizzey-site/src/Security/Cli/SecurityCommand.php:95
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:97
 msgid "Two-factor sign-in is now required for administrators and shop managers. Staff enrol at their next sign-in."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:123
+msgid "CoreX login protection is not available."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:132
+msgid "The sign-in baseline did not persist."
+msgstr ""
+
+#: mizzey-site/src/Security/Cli/SecurityCommand.php:134
+msgid "The sign-in limit is on: five failures in five minutes lock that sign-in for fifteen minutes."
 msgstr ""
 
 #: mizzey-site/src/Security/RecoveryLimiter.php:89
 msgid "Too many password reset requests. Please wait a few minutes and try again."
 msgstr ""
 
-#: mizzey-site/src/Security/TwoFactor.php:136
+#: mizzey-site/src/Security/SignInMessages.php:49
+msgid "Too many failed sign-in attempts. Please wait a few minutes and try again."
+msgstr ""
+
+#: mizzey-site/src/Security/SignupCheck.php:119
+msgid "Leave this field empty"
+msgstr ""
+
+#: mizzey-site/src/Security/SignupCheck.php:134
+msgid "We could not create your account. Please reload the page and try again."
+msgstr ""
+
+#: mizzey-site/src/Security/TwoFactor.php:139
 msgid "Set up two-factor sign-in before using this."
 msgstr ""
 

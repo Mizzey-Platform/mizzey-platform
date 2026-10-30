@@ -1,0 +1,55 @@
+t46 to t49 run against the site code on origin/main: CoreX and WooCommerce as they are, the AUTH-15 code absent.
+Recorded after the code was written, with the final scenarios; the files were restored afterwards.
+t48 verifies WordPress's own session behaviour, which this feature documents and does not change, so it passes here.
+
+===== t46 (exit 1)
+FAIL  t46-sign-in-limit            AUTH-15: login attempts are rate limited per identity and address, with a documented setting
+      Error: The sign-in baseline command failed: Error: 'sign-in-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _sign_in.php:61
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+===== t47 (exit 1)
+FAIL  t47-signup-check             AUTH-15: every route that creates an account applies a check that a scripted submission fails
+      FAIL  AC-2 [account] the registration form carries a token and a trap field
+      Error: Class "MizzeySite\Security\SignupCheck" not found at EvalFile_Command.php(85) : eval()'d code:53
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed
+===== t48 (exit 0)
+PASS  t48-sessions                 AUTH-15: sessions are handled securely and expire per the documented policy
+      PASS  AC-3 signing in sets the authentication and logged-in cookies
+      PASS  AC-3 both cookies are HttpOnly
+      N/A   AC-3 Secure is asserted on staging over HTTPS; this runtime is HTTP
+      PASS  AC-3 without "remember me" the authentication lasts two days
+      PASS  AC-3 without "remember me" the browser keeps the cookies only for the session
+      PASS  AC-3 with "remember me" the authentication lasts fourteen days
+      PASS  AC-3 with "remember me" the browser Expires is the authentication expiry plus twelve hours
+      PASS  AC-3 the server session expires when the cookie says it does
+      PASS  AC-3 a fresh session authenticates (the control for the next case)
+      PASS  AC-3 the session behind the cookie is found on the server
+      PASS  AC-3 a cookie whose server session has expired no longer authenticates
+      PASS  AC-3 signing out rejects that session's cookies; another session continues
+      PASS  AC-3 two sessions authenticate before the change
+      PASS  AC-3 the password was changed through the account page (status 302)
+      PASS  AC-3 after a password change, cookies issued before it no longer authenticate
+      PASS  AC-3 and the person who changed it keeps working replacement cookies
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 0 failed
+===== t49 (exit 1)
+FAIL  t49-sign-in-browser          AUTH-15: the account forms and the sign-in flows work in a real browser in both languages
+      PASS  the browser ran the forms
+            {"route":"account","lang":"en","email":"t4x-br-acct-en-1283567451@example.invalid","tokenField":0,"trapField":0,"trapVisible":null,"landed":"http:\/\/mizzey.local\/my-account\/","notice":""}
+      FAIL  AC-2 [account, en] the form carries the check, its trap hidden from people
+      PASS  AC-2 [account, en] a person's submission creates the account
+            {"route":"account","lang":"ar","email":"t4x-br-acct-ar-287188406@example.invalid","tokenField":0,"trapField":0,"trapVisible":null,"landed":"http:\/\/mizzey.local\/ar\/my-account\/","notice":""}
+      FAIL  AC-2 [account, ar] the form carries the check, its trap hidden from people
+      PASS  AC-2 [account, ar] a person's submission creates the account
+            {"route":"checkout","email":"t4x-br-checkout-324140127@example.invalid","payloadHasCheck":false,"payloadTrapEmpty":null,"checkoutStatus":200,"landed":"http:\/\/mizzey.local\/checkout\/order-received\/10940\/?key=wc_order_CYIVpYGKSw1p3","notice":"","validation":""}
+      FAIL  AC-2 [checkout] the Store API request carries the check and succeeds
+      PASS  AC-2 [checkout] a person's submission creates the account
+            {"route":"checkout-trap","email":"t4x-br-checkout-trap-1508709121@example.invalid","trapRendered":0,"payloadTrap":null,"checkoutStatus":200,"landed":"http:\/\/mizzey.local\/checkout\/"}
+      FAIL  AC-2 [checkout-trap] a filled trap reaches the server unchanged and no account is created
+            {"route":"order-received","email":"t4x-br-offer-2233513888@example.invalid","formFound":1,"tokenField":0,"landed":"http:\/\/mizzey.local\/checkout\/order-received\/10939\/?key=wc_order_yU3l2MjF2GHNJ#create-account"}
+      FAIL  AC-2 [order-received] the rendered form carries the check
+      PASS  AC-2 [order-received] a person's submission creates the account
+      Error: The sign-in baseline command failed: Error: 'sign-in-baseline' is not a registered subcommand of 'mizzey security'. See 'wp help mizzey security' for available subcommands. at _sign_in.php:61
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+1 scenarios, 1 failed

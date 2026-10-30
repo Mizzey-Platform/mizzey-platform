@@ -19,3 +19,15 @@ msgstr "طلبات كثيرة لإعادة تعيين كلمة المرور. ي�
 #: mizzey-site/src/Security/XmlRpc.php:40
 msgid "XML-RPC is not available on this site."
 msgstr "خدمة XML-RPC غير متاحة على هذا الموقع."
+
+#: mizzey-site/src/Security/SignInMessages.php
+msgid "Too many failed sign-in attempts. Please wait a few minutes and try again."
+msgstr "محاولات تسجيل دخول خاطئة كثيرة. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى."
+
+#: mizzey-site/src/Security/SignupCheck.php
+msgid "We could not create your account. Please reload the page and try again."
+msgstr "تعذر إنشاء حسابك. يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
+
+#: mizzey-site/src/Security/SignupCheck.php
+msgid "Leave this field empty"
+msgstr "اترك هذا الحقل فارغًا"

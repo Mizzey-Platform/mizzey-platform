@@ -87,7 +87,9 @@ run(
 		// two-factor scenarios apply it and restore it. So the check rightly names two_factor_roles and exits 1 here;
 		// t43 proves it exits 0 when the whole baseline, two-factor included, is in force.
 		$check( 1 === preg_match( '/^two_factor_roles\treview/m', $text ), 'the unenforced runtime reports two_factor_roles as review' );
-		foreach ( array( 'two_factor_active', 'two_factor_bypass', 'two_factor_key' ) as $key ) {
+		// Likewise the sign-in limit (specs/009-sign-in-protection): t46 applies it and restores it.
+		$check( 1 === preg_match( '/^sign_in_limit\treview/m', $text ), 'the runtime without the sign-in baseline reports sign_in_limit as review' );
+		foreach ( array( 'two_factor_active', 'two_factor_bypass', 'two_factor_key', 'signup_check', 'account_writers', 'wordpress_registration' ) as $key ) {
 			$check( 1 === preg_match( '/^' . preg_quote( $key, '/' ) . '\tpass/m', $text ), "and {$key} as pass" );
 		}
 		$check( 1 === $code && false !== strpos( $text, 'two_factor_roles' ), "so the command exits 1 naming two_factor_roles, and nothing else of this feature (exit {$code})" );

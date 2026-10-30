@@ -17,6 +17,7 @@ use MizzeySite\Security\Cli\SecurityCommand;
 
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_two_factor.php';
+require_once __DIR__ . '/_sign_in.php';
 
 /**
  * Run a WP-CLI command line in its own process.
@@ -98,7 +99,8 @@ run(
 		$check( false !== strpos( $pending, $manager->user_login ) && false !== strpos( $pending, $second->user_login ), 'AC-5 after the policy changes, every staff member still to enrol is reported' );
 		$check( '' !== $pending && false === strpos( $pending, $enrolled->user_login ), 'AC-5 and a staff member already enrolled is not' );
 
-		// AC-5: the check on the full baseline.
+		// AC-5: the check on the full baseline, the sign-in limit included (specs/009-sign-in-protection).
+		sign_in_baseline( $s );
 		$baseline = t43_wp( 'mizzey security check' );
 		foreach ( array( 'two_factor_active', 'two_factor_roles', 'two_factor_bypass', 'two_factor_key' ) as $row ) {
 			$check( 'pass' === t43_row( $baseline['out'], $row ), "AC-5 on the baseline, {$row} passes" );
