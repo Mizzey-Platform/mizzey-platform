@@ -327,7 +327,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 7,
    "depends_on": [],
    "erp_blocked": "no",
@@ -437,7 +437,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 9,
    "depends_on": [
     {
@@ -769,13 +769,13 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#254",
-     "reason": "Product details page, not yet delivered",
-     "blocking": true
+     "reason": "Product details page, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#245",
@@ -789,7 +789,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #254, #245"
+     "note": "Not yet delivered: #245"
     },
     {
      "id": "OD-05",
@@ -988,7 +988,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 19,
    "depends_on": [
     {
@@ -1325,7 +1325,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 25,
    "depends_on": [
     {
@@ -3276,18 +3276,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "In progress",
    "delivery_order": 55,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#290",
@@ -3303,11 +3303,6 @@
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "Google sign-in credentials",
      "class": "Vendor or account input",
@@ -3372,13 +3367,13 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#305",
@@ -3412,7 +3407,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253, #305"
+     "note": "Not yet delivered: #305"
     },
     {
      "id": "OD-04",
@@ -3468,28 +3463,23 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 57,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
@@ -3537,13 +3527,13 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#305",
@@ -3572,7 +3562,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253, #305"
+     "note": "Not yet delivered: #305"
     },
     {
      "id": "OD-09",
@@ -3629,13 +3619,13 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#254",
-     "reason": "The product page the reviews are submitted and shown on (PDP-17), not yet delivered",
-     "blocking": true
+     "reason": "The product page the reviews are submitted and shown on (PDP-17), not yet delivered. D-22 (30 October 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#248",
@@ -3651,11 +3641,6 @@
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #254"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
