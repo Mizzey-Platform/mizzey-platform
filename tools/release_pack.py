@@ -333,8 +333,8 @@ def leave_out(contents: Contents, left_out: list[str]) -> None:
 
     `corex-release.json` lists every folder the package holds, what each holds, and where each namespace loads
     from. The entries of the folders left out are removed from it, so it describes the archive as shipped. The
-    Composer autoloader keeps its entries for them: it is only asked for a class when an add-on is active, and an
-    add-on that is not installed cannot be.
+    Composer autoloader keeps its entries for them. CoreX loads an add-on's classes only when the add-on is
+    installed and active, and no code kept in the archive asks for them otherwise (checked on CoreX v0.47.0).
     """
     if not left_out:
         return

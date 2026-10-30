@@ -255,6 +255,12 @@ class TheCoreXPluginsTheStoreDoesNotRun(Fixture):
         (self.dist / "wp-content" / "plugins" / "corex-ui").rmdir()
         self.refused("lacks the CoreX plugins the store runs: corex-ui")
 
+    def test_a_tree_whose_description_does_not_list_one_the_store_runs_is_refused(self):
+        described = json.loads((self.dist / "corex-release.json").read_text(encoding="utf-8"))
+        described["plugins"].remove("corex-media")
+        (self.dist / "corex-release.json").write_text(json.dumps(described), encoding="utf-8")
+        self.refused("lacks the CoreX plugins the store runs: corex-media")
+
     def test_the_staging_tools_run_the_same_eight(self):
         # The staging tool activates these, so a release that left one out would fail on staging, not here.
         import importlib
