@@ -74,12 +74,14 @@ SERVER_SUPPLIED = {
     "wpml-cms-nav": ("wpml-cms-nav", "plugin.php"),
     "wcml": ("woocommerce-multilingual", "wpml-woocommerce.php"),
 }
-# The CoreX plugins the store runs: the same eight the staging tool activates. The CoreX builder packages every
-# CoreX plugin and add-on; the others (bookings, careers, the site kits and the rest) are not part of this store,
-# so they are left out of the release and cannot be activated on a site that runs it. A CoreX plugin that a later
-# pin adds is left out too, until it is named here.
-COREX_CARRIED = ("corex-blocks", "corex-config", "corex-core", "corex-email", "corex-forms", "corex-guides",
-                 "corex-media", "corex-ui")
+# The CoreX plugins the store uses: the same list the staging tool links. Eight run now. CoreX Captcha is carried
+# switched off: it connects the challenge service that D-21 requires on every public form, and is switched on once
+# the owner chooses the provider and the keys exist in the client's account. The CoreX builder packages every CoreX
+# plugin and add-on; the others (bookings, careers, the site kits and the rest) are not part of this store, so they
+# are left out of the release and cannot be activated on a site that runs it. A CoreX plugin that a later pin adds
+# is left out too, until it is named here.
+COREX_CARRIED = ("corex-blocks", "corex-captcha", "corex-config", "corex-core", "corex-email", "corex-forms",
+                 "corex-guides", "corex-media", "corex-ui")
 COREX_MANIFEST = "corex-release.json"
 # Written at runtime, so absent from the archive and linked to a writable place by the deploy.
 RUNTIME_WRITABLE = ("wp-content/uploads", "wp-content/languages/wpml")
