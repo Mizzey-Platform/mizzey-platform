@@ -47,7 +47,7 @@
       "ignore": "Names the varying attributes only; their values are read from their own columns"
     },
     "asin1": {
-      "ignore": "Amazon's own identifier; the store has no field for it"
+      "to": "source_asin"
     },
     "image-url": {
       "ignore": "Images are migrated by #296 (MIG-16), subject to CR-08"

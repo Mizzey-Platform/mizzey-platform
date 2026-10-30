@@ -253,6 +253,7 @@ additional parsing work. The eventual load belongs to the neighbouring migration
 | Id | Safeguard | Why | Custom code? |
 |---|---|---|---|
 | S-1 | A checksum of the catalogue records and their related data before and after each run, excluding Import Run records, printed in the report | Shows whether the catalogue's recorded state changed; does not prove that no intermediate write occurred | Yes, small |
+| S-2 | Amazon's ASIN is kept as a hidden source reference: mapped to `source_asin`, carried in the validation report, and stored by the load (#247) as hidden product data, never shown to customers, never searched and not editable as a store field. Approved by the owner on 30 October 2026; no register row covers ASIN and EX-27 excludes Amazon features, so a visible field stays out | Ties each product to its Amazon listing for later matching and support | Yes, one mapping entry |
 
 ## Future or Option C items (not built)
 

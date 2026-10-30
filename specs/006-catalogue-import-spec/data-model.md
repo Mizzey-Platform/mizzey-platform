@@ -9,7 +9,7 @@ Nothing here is a new database table. The tool reads the catalogue and writes fi
 | `version` | Required mapping version; every run reports it. Mapping validation checks the supported format, the delimiter and encoding (or workbook-sheet configuration, once a workbook format is agreed), unique source headers, explicit targets or ignore reasons, row-type interpretation and a compatible rules version |
 | `rules_version` | The version of `contracts/initial-load-rules.md` the mapping assumes |
 | `source` | `format` (`tsv`, or `csv` where needed; another format only once agreed) and `encoding` (default `UTF-8`); the format sets the delimiter |
-| `columns` | One entry per source header: `to` (a store field: `sku`, `name`, `description`, `regular_price`, `parent_sku`, `row_type`, `name_ar`, `description_ar`, or `attribute_<slug>`) or `ignore` with the reason as its value. No field is filled twice |
+| `columns` | One entry per source header: `to` (a store field: `sku`, `name`, `description`, `regular_price`, `parent_sku`, `row_type`, `name_ar`, `description_ar`, `source_asin`, or `attribute_<slug>`) or `ignore` with the reason as its value. No field is filled twice |
 | `row_type` | `values`: each source value of the `row_type` column and the row type it means (simple, variable, variation) |
 | `note` | Optional: free text for the Developer |
 

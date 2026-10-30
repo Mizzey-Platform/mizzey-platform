@@ -40,6 +40,7 @@ run(
 		$check( array() === array_filter( $reasons, fn ( $e ) => '' === trim( $e['ignore'] ) ), 'AC-2: every column not imported says why (' . count( $reasons ) . ' columns)' );
 		$ok_check = HeaderCheck::check( $header, $mapping );
 		$check( array() === $ok_check['failures'] && $ok_check['complete'], 'the fixture header fits the mapping completely' );
+		$check( 'asin1' === $mapping->columnFor( 'source_asin' ), 'the ASIN column is kept as the hidden source reference, not ignored (owner, 30 October 2026)' );
 
 		$cases = array(
 			'header-mismatch.tsv'   => array( 'F1', false ),
@@ -54,9 +55,9 @@ run(
 			$check( in_array( $code, $codes, true ) && ( array() === $result['failures'] ) === $runs && ! $result['complete'], "{$file}: reports {$code}, " . ( $runs ? 'does not stop the run, and is not complete' : 'stops the run' ) );
 		}
 
-		$without_ignored = array_values( array_diff( $header, array( 'asin1' ) ) );
+		$without_ignored = array_values( array_diff( $header, array( 'open-date' ) ) );
 		$absent          = HeaderCheck::check( $without_ignored, $mapping );
-		$check( array() === $absent['failures'] && array( 'asin1' ) === $absent['absent_ignored'], 'a column recorded as not imported may be absent without failing' );
+		$check( array() === $absent['failures'] && array( 'open-date' ) === $absent['absent_ignored'], 'a column recorded as not imported may be absent without failing' );
 
 		$base = json_decode( (string) file_get_contents( CatalogueCommand::defaultMapping() ), true );
 		$bad  = array(
