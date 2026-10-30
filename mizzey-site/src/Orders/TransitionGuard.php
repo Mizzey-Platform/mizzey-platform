@@ -38,8 +38,6 @@ final class TransitionGuard
     /** @var \WeakMap<\WC_Order,string>|null Reasons given for an order REST is creating, which has no id yet. */
     private static ?\WeakMap $newReasons = null;
 
-    /** @var array<int,true> Orders inside `payment_complete()`, between its first hook and its status decision. */
-    private static array $completing = [];
 
     public static function register(): void
     {
@@ -48,8 +46,6 @@ final class TransitionGuard
         add_filter('woocommerce_bulk_action_ids', [self::class, 'bulk'], 10, 3);
         add_filter('woocommerce_rest_pre_insert_shop_order_object', [self::class, 'rest'], 10, 3);
         add_action('woocommerce_before_order_object_save', [self::class, 'beforeSave'], PHP_INT_MAX, 1);
-        add_action('woocommerce_pre_payment_complete', [self::class, 'paymentStarting'], 10, 1);
-        add_action('woocommerce_payment_complete', [self::class, 'paymentFinished'], 1, 1);
         add_filter('woocommerce_payment_complete_order_status', [self::class, 'paymentStatus'], 20, 3);
         add_action('admin_notices', [self::class, 'notices']);
     }
@@ -385,40 +381,16 @@ final class TransitionGuard
      */
     public static function paymentStatus($status, $orderId = 0, $order = null)
     {
-        // WooCommerce also asks this filter whether to stamp the paid date; only the decision inside
-        // payment_complete() is changed, so an ordinary cash order is not marked paid before the cash is collected.
-        if (! isset(self::$completing[(int) $orderId])) {
-            return $status;
-        }
-        unset(self::$completing[(int) $orderId]);
+        // WooCommerce also asks this filter, from maybe_set_date_paid(), whether to stamp the paid date, and asks it
+        // only while no paid date is set. payment_complete() sets the paid date before asking, so a set paid date
+        // means a payment was completed: only then is the decision changed, and an ordinary cash order is never
+        // marked paid before the cash is collected.
         $order = $order instanceof \WC_Order ? $order : wc_get_order((int) $orderId);
-        if ($status === 'completed' && $order instanceof \WC_Order && StatusModel::isCash($order)) {
+        if ($status === 'completed' && $order instanceof \WC_Order && StatusModel::isCash($order) && $order->get_date_paid('edit') !== null) {
             return 'processing';
         }
 
         return $status;
-    }
-
-    /** @param mixed $orderId */
-    public static function paymentFinished($orderId): void
-    {
-        unset(self::$completing[(int) $orderId]);
-    }
-
-    /**
-     * Marks an order whose payment completion will ask for its next status: only one in a status WooCommerce completes
-     * payment from, so the mark is always used by that same call and never left for a later paid-date check.
-     *
-     * @param mixed $orderId
-     */
-    public static function paymentStarting($orderId): void
-    {
-        unset(self::$completing[(int) $orderId]);
-        $order = wc_get_order((int) $orderId);
-        $valid = (array) apply_filters('woocommerce_valid_order_statuses_for_payment_complete', ['on-hold', 'pending', 'failed', 'cancelled'], $order);
-        if ($order instanceof \WC_Order && $order->has_status($valid)) {
-            self::$completing[(int) $orderId] = true;
-        }
     }
 
     /**

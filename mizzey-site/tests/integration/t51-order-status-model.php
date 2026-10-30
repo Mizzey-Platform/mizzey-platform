@@ -233,6 +233,13 @@ run(
 		$cod_confirmed->payment_complete( 't51-repeat' );
 		t51_fresh( $cod_confirmed->get_id() )->update_status( 'processing' );
 		$check( null === t51_fresh( $cod_confirmed->get_id() )->get_date_paid(), 'AC-5 a payment completion on a cash order past payment leaves nothing behind that marks it paid later' );
+		$aborted = t51_order( $s, $product, 'pending', 'cod' );
+		$abort   = static function () { throw new \Exception( 't51 aborted payment' ); };
+		add_action( 'woocommerce_pre_payment_complete', $abort, 99 );
+		$aborted->payment_complete( 't51-aborted' );
+		remove_action( 'woocommerce_pre_payment_complete', $abort, 99 );
+		t51_fresh( $aborted->get_id() )->update_status( 'processing' );
+		$check( null === t51_fresh( $aborted->get_id() )->get_date_paid(), 'AC-5 an aborted payment completion leaves nothing behind that marks a cash order paid when it is confirmed' );
 
 		// AC-2: an order with a real status never goes back to a draft.
 		$draft = t51_order( $s, $product, 'processing' );
