@@ -228,6 +228,11 @@ run(
 		$check( null !== TransitionGuard::problem( '', StatusModel::SHIPPED, '', true ) && str_contains( (string) TransitionGuard::problem( '', StatusModel::SHIPPED, '', true ), 'Allowed next: Pending Payment, Confirmed, On hold, Payment Failed, Cancelled.' ), 'AC-2 the message for a new order lists the starting statuses' );
 		$cod_confirmed = t51_order( $s, $product, 'processing', 'cod' );
 		$check( null === $cod_confirmed->get_date_paid(), 'AC-5 an ordinary cash order is not marked paid when it is confirmed' );
+		$cod_confirmed->update_status( StatusModel::PREPARING );
+		$cod_confirmed = t51_fresh( $cod_confirmed->get_id() );
+		$cod_confirmed->payment_complete( 't51-repeat' );
+		t51_fresh( $cod_confirmed->get_id() )->update_status( 'processing' );
+		$check( null === t51_fresh( $cod_confirmed->get_id() )->get_date_paid(), 'AC-5 a payment completion on a cash order past payment leaves nothing behind that marks it paid later' );
 
 		// AC-2: an order with a real status never goes back to a draft.
 		$draft = t51_order( $s, $product, 'processing' );

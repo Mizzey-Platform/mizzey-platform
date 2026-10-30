@@ -49,6 +49,7 @@ final class TransitionGuard
         add_filter('woocommerce_rest_pre_insert_shop_order_object', [self::class, 'rest'], 10, 3);
         add_action('woocommerce_before_order_object_save', [self::class, 'beforeSave'], PHP_INT_MAX, 1);
         add_action('woocommerce_pre_payment_complete', [self::class, 'paymentStarting'], 10, 1);
+        add_action('woocommerce_payment_complete', [self::class, 'paymentFinished'], 1, 1);
         add_filter('woocommerce_payment_complete_order_status', [self::class, 'paymentStatus'], 20, 3);
         add_action('admin_notices', [self::class, 'notices']);
     }
@@ -399,9 +400,25 @@ final class TransitionGuard
     }
 
     /** @param mixed $orderId */
+    public static function paymentFinished($orderId): void
+    {
+        unset(self::$completing[(int) $orderId]);
+    }
+
+    /**
+     * Marks an order whose payment completion will ask for its next status: only one in a status WooCommerce completes
+     * payment from, so the mark is always used by that same call and never left for a later paid-date check.
+     *
+     * @param mixed $orderId
+     */
     public static function paymentStarting($orderId): void
     {
-        self::$completing[(int) $orderId] = true;
+        unset(self::$completing[(int) $orderId]);
+        $order = wc_get_order((int) $orderId);
+        $valid = (array) apply_filters('woocommerce_valid_order_statuses_for_payment_complete', ['on-hold', 'pending', 'failed', 'cancelled'], $order);
+        if ($order instanceof \WC_Order && $order->has_status($valid)) {
+            self::$completing[(int) $orderId] = true;
+        }
     }
 
     /**
