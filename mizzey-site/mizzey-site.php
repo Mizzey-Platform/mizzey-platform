@@ -37,6 +37,7 @@ require_once __DIR__ . '/src/Security/SignInMessages.php';
 require_once __DIR__ . '/src/Security/RecoveryLimiter.php';
 require_once __DIR__ . '/src/Security/CommentSurface.php';
 require_once __DIR__ . '/src/Security/TwoFactor.php';
+require_once __DIR__ . '/src/Security/TwoFactorIssuer.php';
 require_once __DIR__ . '/src/Security/SignupCheck.php';
 require_once __DIR__ . '/src/Security/SignupOfferRender.php';
 require_once __DIR__ . '/src/Security/SignupRestCallback.php';

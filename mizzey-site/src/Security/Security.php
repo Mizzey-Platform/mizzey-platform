@@ -28,6 +28,7 @@ final class Security
         RecoveryLimiter::register();
         CommentSurface::register();
         TwoFactor::register();
+        TwoFactorIssuer::register();
         SignupRoutes::register();
 
         if (defined('WP_CLI') && WP_CLI) {
