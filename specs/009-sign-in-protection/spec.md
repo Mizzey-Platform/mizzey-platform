@@ -17,7 +17,7 @@ element. The owner started it on that basis.
 
 | ID | Scope | Stage | Register wording (short, verbatim) |
 |---|---|---|---|
-| AUTH-15 | P1 [key] | S1 | Secure session handling, protection against automated account creation, and rate limiting on login attempts |
+| AUTH-15 | P1 | S1 | Secure session handling, protection against automated account creation, and rate limiting on login attempts |
 
 Story: Functional Specification MS-SPC-2026-032 v1.4, US-06-05 (Account security), the three criteria that trace to
 AUTH-15: "Sessions are handled securely and expire per the documented policy"; "Login attempts are rate limited, and the
