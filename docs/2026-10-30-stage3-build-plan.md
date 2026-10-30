@@ -27,7 +27,7 @@ kept the stage order (D2). D-22 replaces D-20 D2 and narrows D8 for the slices b
   status labels customers see and the shared email layout. Some of it needs block-checkout and cart extensions in
   JavaScript (cart to wishlist, the free-shipping prompt, address selection, checkout review and errors), so it is
   integration work with its own budget, not a stylesheet pass. The D-21 performance and accessibility gates apply
-  from then.
+  to every customer screen a slice ships, native ones included, from the first slice.
 - **Postponed dependencies.** For the function layer only, D-22 stops treating the design system (#250), the header
   and navigation (#253) and the product page (#254) as blocking predecessors. They stay blocking for the
   presentation layer, and every other recorded dependency stands.
@@ -51,7 +51,7 @@ proves them over HTTP and in a browser, in both languages.
 | 1 | E-ROLE-1 roles, the part Stage 3 needs | #251 | The capabilities the Stage 3 admin screens are checked against (promotions, orders, refunds kept separate, D-10) | None | CX-01 stays pending; no deferred role is pulled in |
 | 2 | E-RULES-2 launch business rules | #290 | BR-001, BR-002, BR-004, BR-006, BR-008 to BR-010; BR-003 and BR-007 through the seam | None | OD-03 and OD-04: the recorded example defaults, admin-configurable (C7) |
 | 2 | E-ADM-7 promotions in admin | #289 | Create, schedule, pause, reactivate, usage kept | None | None |
-| 2 | E-SF-7 accounts, rest of #305 | #305 | Registration, one account per email across manual and Google sign-in, guest checkout and guest conversion (AUTH-07, AUTH-11), consent kept separate (AUTH-09). AUTH-15 is verified technically and its baseline is applied on staging; client acceptance is pending | Sign-in and registration screens | Google OAuth: a developer test client in staging until the client-owned one exists |
+| 2 | E-SF-7 accounts, rest of #305 | #305 | Registration, one account per email across manual and Google sign-in, guest checkout and guest conversion (AUTH-07, AUTH-11), consent kept separate (AUTH-09). AUTH-15 is verified locally and its baseline was applied on staging on 30 October; the staging verification in specs/009 (T017) is not yet recorded, and client acceptance is pending | Sign-in and registration screens | Google OAuth: a developer test client in staging until the client-owned one exists |
 | 2 | E-SF-6 cart, after #305 | #306 | Cart merge on register, sign-in and Google (P-001), guest retention as a setting (CART-16), stock re-validation through the seam, free-shipping prompt data, related products from the Upsells field (D-19) | Cart and mini-cart screens | Guest retention default: proposed 30 days, owner to confirm |
 | 2 | E-SF-10 wishlist | #307 | B17 minimal wishlist keyed to the canonical product, guest lifetime, idempotent merge on sign-in (CART-17), recently viewed | Wishlist screens | None |
 | 3 | E-SF-8 checkout | #255 | Order placement in both languages, BR-005 price snapshot, ENT-08 order snapshot, CHK validation messages in both languages (CHK-11), and the stock safeguard below | Checkout screens | OD-09 VAT: placeholder fields until the client's answer |
@@ -88,7 +88,7 @@ in (D-10). Each keeps the class the backlog records:
 | OD-03 welcome discount, OD-04 free shipping | Configurable working default | The client's real values replace the examples |
 | OD-05 cash on delivery | Configurable working default | The launch switch only |
 | CR-06 real sample export, CR-07 report availability | Blocks final acceptance | The final #249 run and the mapping #295 can do |
-| CX-04 import runs | Resolved by the owner (D-12), not client-confirmed | How runs are recorded |
+| CX-04 import runs | Blocks final acceptance (resolved by the owner in D-12, not client-confirmed) | How runs are recorded, until the client acknowledges it |
 | CR-09 full catalogue export | Blocks production or launch only | The full load |
 | CR-08 image rights | Content or client input | Whether images are imported at all |
 | Google OAuth client in a client-owned account | Vendor or account input | Google sign-in outside staging |
