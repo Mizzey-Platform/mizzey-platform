@@ -108,7 +108,8 @@ more", saves it, and it applies by itself on those dates.
 
 - Several automatic promotions qualify for one cart: one applies, because one promotion applies per order unless
   separately configured (Part One 1.6). The one that gives the customer the larger discount applies; on a tie, the one
-  created first. **Owner to confirm (Q1).** The setting that lets promotions combine is BR-004, #290's.
+  created first. **Confirmed by the owner on 31 October 2026 (Q1).** The setting that lets promotions combine is
+  BR-004, #290's.
 - A customer enters a code while an automatic promotion applies: WooCommerce's own rules decide as configured on each
   promotion ("individual use only"); automatic promotions are created individual-use. #290 adds the combination
   setting.

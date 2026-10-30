@@ -33,5 +33,5 @@
 
 - Native coverage names WooCommerce's coupon fields because the Mizzey template requires the native mechanism and its
   evidence.
-- Q1 (which automatic promotion applies when several qualify: the larger discount, then the earliest created) is the
-  recommended default written into the spec, for the owner to confirm.
+- Q1 (which automatic promotion applies when several qualify: the larger discount, then the earliest created) was
+  confirmed by the owner on 31 October 2026.
