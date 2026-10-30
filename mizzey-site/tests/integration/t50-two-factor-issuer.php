@@ -64,7 +64,31 @@ run(
 		$check( $named === t50_qr( $staff, $key ), 'FR-008 a translation of the title does not change the entry' );
 		remove_filter( 'option_blogname', $translated );
 
-		$check( false !== strpos( site_url(), '://' ) && false !== strpos( site_url( 'wp-login.php' ), 'wp-login.php' ), 'FR-008 every other site_url() is untouched' );
+		$original_url = site_url();
+		$check( false !== strpos( $original_url, '://' ) && false !== strpos( site_url( 'wp-login.php' ), 'wp-login.php' ), 'FR-008 ordinary site_url() calls are untouched' );
+		// A site_url() made by a callback running inside WP 2FA's builder is not renamed.
+		$nested_url  = null;
+		$capture_url = static function ( $title ) use ( &$nested_url ) {
+			$nested_url = site_url();
+			return $title;
+		};
+		add_filter( WP_2FA_PREFIX . 'totp_title', $capture_url );
+		try {
+			$check( $named === t50_qr( $staff, $key ), 'FR-008 with a title callback present the entry is still named' );
+		} finally {
+			remove_filter( WP_2FA_PREFIX . 'totp_title', $capture_url );
+		}
+		$check( $original_url === $nested_url, 'FR-008 a callback inside the builder still gets the site address' );
+		// A title that is not autoloaded is still found.
+		$autoloaded = array_key_exists( 'blogname', wp_load_alloptions() );
+		try {
+			wp_set_option_autoload( 'blogname', false );
+			wp_cache_delete( 'alloptions', 'options' );
+			$check( ! array_key_exists( 'blogname', wp_load_alloptions() ) && $named === t50_qr( $staff, $key ), 'FR-008 a title that is not autoloaded still names the entry' );
+		} finally {
+			wp_set_option_autoload( 'blogname', $autoloaded );
+			wp_cache_delete( 'alloptions', 'options' );
+		}
 
 		// Over HTTP: the set-up screen's own "new key" request returns a QR code for the title.
 		two_factor_baseline( $s );

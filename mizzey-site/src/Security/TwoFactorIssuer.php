@@ -47,19 +47,32 @@ final class TwoFactorIssuer
      */
     public static function name(): string
     {
-        $stored = wp_load_alloptions()['blogname'] ?? '';
+        $stored = wp_load_alloptions()['blogname'] ?? null;
+        if ($stored === null) {
+            // Not autoloaded: read the stored value directly, not through the translation filters.
+            global $wpdb;
+            $stored = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1", 'blogname')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
         $name   = wp_specialchars_decode(is_string($stored) ? $stored : '', ENT_QUOTES);
         $name   = str_replace(':', ' ', $name);
 
         return trim((string) preg_replace('/\s+/u', ' ', $name));
     }
 
+    /**
+     * Whether the `site_url()` call being answered was made directly by one of WP 2FA's two name builders, not by a
+     * callback running inside them. Each pinned builder makes exactly one bare call.
+     */
     private static function calledByTotp(): bool
     {
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10) as $frame) {
-            if (($frame['class'] ?? '') === self::TOTP && in_array($frame['function'] ?? '', self::BUILDERS, true)) {
-                return true;
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        foreach ($trace as $index => $frame) {
+            if (($frame['function'] ?? '') !== 'site_url' || isset($frame['class'])) {
+                continue;
             }
+            $caller = $trace[$index + 1] ?? [];
+
+            return ($caller['class'] ?? '') === self::TOTP && in_array($caller['function'] ?? '', self::BUILDERS, true);
         }
 
         return false;
