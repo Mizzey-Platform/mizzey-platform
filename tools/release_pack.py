@@ -13,6 +13,10 @@ store also needs, at the versions `stack.lock.json` records, and writes two file
 What it adds. WooCommerce and the carrier plugin, from wordpress.org. The Arabic language packs of WordPress and
 of WooCommerce, from wordpress.org. `mizzey-release.json`, the manifest.
 
+What it leaves out of the built tree. The CoreX plugins and add-ons the store does not run (`COREX_CARRIED` names
+the ones it does), so a site running the release cannot activate them. The manifest names them under
+`plugins.left_out`, and `corex-release.json` is rewritten to describe the archive as shipped.
+
 What it never adds. The translation plugin family is paid software, and this repository, its releases and its
 workflow artifacts are public. The manifest lists those five plugins with their versions under
 `plugins.server_supplied`, and the server puts them in at deploy time from a folder of its own and checks them
@@ -70,6 +74,13 @@ SERVER_SUPPLIED = {
     "wpml-cms-nav": ("wpml-cms-nav", "plugin.php"),
     "wcml": ("woocommerce-multilingual", "wpml-woocommerce.php"),
 }
+# The CoreX plugins the store runs: the same eight the staging tool activates. The CoreX builder packages every
+# CoreX plugin and add-on; the others (bookings, careers, the site kits and the rest) are not part of this store,
+# so they are left out of the release and cannot be activated on a site that runs it. A CoreX plugin that a later
+# pin adds is left out too, until it is named here.
+COREX_CARRIED = ("corex-blocks", "corex-config", "corex-core", "corex-email", "corex-forms", "corex-guides",
+                 "corex-media", "corex-ui")
+COREX_MANIFEST = "corex-release.json"
 # Written at runtime, so absent from the archive and linked to a writable place by the deploy.
 RUNTIME_WRITABLE = ("wp-content/uploads", "wp-content/languages/wpml")
 # Never in a release, wherever they came from. Compared with each path segment, lower case.
@@ -204,10 +215,15 @@ def check_tree(dist: Path, wordpress: str) -> dict:
     if found != wordpress:
         raise Refused(f"the built tree holds WordPress {found}, stack.lock.json records {wordpress} as tested")
     built = json.loads(release.read_text(encoding="utf-8"))
+    plugins = sorted(built.get("plugins", []))
+    missing = [name for name in COREX_CARRIED if name not in plugins or not (dist / "wp-content" / "plugins" / name).is_dir()]
+    if missing:
+        raise Refused(f"the built tree lacks the CoreX plugins the store runs: {', '.join(missing)}")
     # The builder installs production packages only. Recorded rather than assumed, so a tree that carries the test
     # toolchain says so in the manifest.
     vendor = "dev" if (dist / VENDOR / "pestphp").exists() else "production"
-    return {"plugins": sorted(built.get("plugins", [])), "themes": sorted(built.get("themes", [])), "vendor": vendor}
+    return {"plugins": plugins, "themes": sorted(built.get("themes", [])), "vendor": vendor,
+            "left_out": [name for name in plugins if name.startswith("corex-") and name not in COREX_CARRIED]}
 
 
 def refuse_forbidden(paths) -> None:
@@ -312,9 +328,36 @@ def add_language_packs(contents: Contents, lock: dict, origin: Origin) -> None:
             contents.packs.append({"pack": label, "source": url, "sha256": sha256(data)})
 
 
-def assemble(dist: Path, lock: dict, origin: Origin) -> Contents:
+def leave_out(contents: Contents, left_out: list[str]) -> None:
+    """Drop the CoreX plugins the store does not run, and keep CoreX's own description of the package true.
+
+    `corex-release.json` lists every folder the package holds, what each holds, and where each namespace loads
+    from. The entries of the folders left out are removed from it, so it describes the archive as shipped. The
+    Composer autoloader keeps its entries for them: it is only asked for a class when an add-on is active, and an
+    add-on that is not installed cannot be.
+    """
+    if not left_out:
+        return
+    folders = tuple(f"wp-content/plugins/{name}" for name in left_out)
+    for name in [n for n in contents.on_disk if n.startswith(tuple(f + "/" for f in folders))]:
+        del contents.on_disk[name]
+    described = json.loads(contents.on_disk.pop(COREX_MANIFEST).read_text(encoding="utf-8"))
+    described["plugins"] = [p for p in described.get("plugins", []) if p not in left_out]
+    if "release_paths" in described:
+        described["release_paths"] = [p for p in described["release_paths"] if p not in folders]
+    if isinstance(described.get("contents"), dict):
+        described["contents"] = {p: v for p, v in described["contents"].items() if p not in folders}
+    psr4 = (described.get("autoload") or {}).get("psr4")
+    if isinstance(psr4, dict):
+        described["autoload"]["psr4"] = {ns: path for ns, path in psr4.items()
+                                         if not str(path).startswith(tuple(f + "/" for f in folders))}
+    contents.added[COREX_MANIFEST] = (json.dumps(described, indent=2) + "\n").encode("utf-8")
+
+
+def assemble(dist: Path, lock: dict, origin: Origin, left_out: list[str] | None = None) -> Contents:
     """Everything the archive will hold, except its manifest."""
     contents = Contents(tree_files(dist))
+    leave_out(contents, left_out or [])
     add_plugins(contents, lock, origin)
     add_language_packs(contents, lock, origin)
     for guard in ("wp-content/index.php", "wp-content/plugins/index.php", "wp-content/themes/index.php"):
@@ -336,7 +379,8 @@ def build_manifest(build: Build, lock: dict, built: dict, contents: Contents) ->
         "php": corex.get("php"),
         "corex": {"version": corex["version"], "commit": corex["commit"], "vendor": built["vendor"]},
         "plugins": {
-            "built": built["plugins"],
+            "built": [name for name in built["plugins"] if name not in built["left_out"]],
+            "left_out": built["left_out"],
             "bundled": contents.plugins,
             "server_supplied": [
                 {"slug": slug, "version": stack[component]["version"], "main_file": f"{slug}/{main_file}"}
@@ -374,7 +418,7 @@ def pack(tag: str, dist: Path, out: Path, origin: Origin | None = None) -> dict:
     lock = read_lock(origin.root)
     built = check_tree(dist, lock["wordpress"])
     build = origin.build(tag)
-    contents = assemble(dist, lock, origin)
+    contents = assemble(dist, lock, origin, built["left_out"])
     manifest = build_manifest(build, lock, built, contents)
     contents.added[MANIFEST] = (json.dumps(manifest, indent=1) + "\n").encode("utf-8")
 
