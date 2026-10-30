@@ -144,7 +144,12 @@ final class StatusModel
      */
     public static function next(string $from): array
     {
-        return self::TRANSITIONS[self::bare($from)] ?? array_keys(self::TRANSITIONS);
+        $from = self::bare($from);
+        if (in_array($from, self::STARTING, true)) {
+            return self::INITIAL;
+        }
+
+        return self::TRANSITIONS[$from] ?? array_keys(self::TRANSITIONS);
     }
 
     public static function isDelivered(\WC_Order $order): bool

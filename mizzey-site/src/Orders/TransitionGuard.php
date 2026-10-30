@@ -38,6 +38,9 @@ final class TransitionGuard
     /** @var \WeakMap<\WC_Order,string>|null Reasons given for an order REST is creating, which has no id yet. */
     private static ?\WeakMap $newReasons = null;
 
+    /** @var array<int,true> Orders inside `payment_complete()`, between its first hook and its status decision. */
+    private static array $completing = [];
+
     public static function register(): void
     {
         add_action('woocommerce_process_shop_order_meta', [self::class, 'screen'], 1, 1);
@@ -45,6 +48,7 @@ final class TransitionGuard
         add_filter('woocommerce_bulk_action_ids', [self::class, 'bulk'], 10, 3);
         add_filter('woocommerce_rest_pre_insert_shop_order_object', [self::class, 'rest'], 10, 3);
         add_action('woocommerce_before_order_object_save', [self::class, 'beforeSave'], PHP_INT_MAX, 1);
+        add_action('woocommerce_pre_payment_complete', [self::class, 'paymentStarting'], 10, 1);
         add_filter('woocommerce_payment_complete_order_status', [self::class, 'paymentStatus'], 20, 3);
         add_action('admin_notices', [self::class, 'notices']);
     }
@@ -214,7 +218,7 @@ final class TransitionGuard
 
             return;
         }
-        if (! $draft && ! StatusModel::allowed($from, $to)) {
+        if (! StatusModel::allowed($from, $to)) {
             self::refuse($order, $from, $to, $data);
 
             return;
@@ -380,12 +384,24 @@ final class TransitionGuard
      */
     public static function paymentStatus($status, $orderId = 0, $order = null)
     {
+        // WooCommerce also asks this filter whether to stamp the paid date; only the decision inside
+        // payment_complete() is changed, so an ordinary cash order is not marked paid before the cash is collected.
+        if (! isset(self::$completing[(int) $orderId])) {
+            return $status;
+        }
+        unset(self::$completing[(int) $orderId]);
         $order = $order instanceof \WC_Order ? $order : wc_get_order((int) $orderId);
         if ($status === 'completed' && $order instanceof \WC_Order && StatusModel::isCash($order)) {
             return 'processing';
         }
 
         return $status;
+    }
+
+    /** @param mixed $orderId */
+    public static function paymentStarting($orderId): void
+    {
+        self::$completing[(int) $orderId] = true;
     }
 
     /**

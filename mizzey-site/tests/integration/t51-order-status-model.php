@@ -219,6 +219,15 @@ run(
 		$s->track_order( $new_cash->get_id() );
 		$check( 'completed' !== t51_fresh( $new_cash->get_id() )->get_status(), 'AC-5 a new cash order cannot be created as Delivered' );
 		$check( ! StatusModel::allowed( 'auto-draft', StatusModel::SHIPPED ) && StatusModel::allowed( 'auto-draft', 'processing' ) && StatusModel::allowed( 'checkout-draft', 'pending' ), 'AC-2 a new or draft order starts as Pending Payment, Confirmed, On hold, Payment Failed or Cancelled' );
+		$direct = new \WC_Order();
+		$direct->add_product( $product, 1 );
+		$direct->set_status( StatusModel::SHIPPED );
+		$direct->save();
+		$s->track_order( $direct->get_id() );
+		$check( 'pending' === t51_fresh( $direct->get_id() )->get_status(), 'AC-2 [code] a new order saved directly as Shipped is kept as Pending Payment' );
+		$check( null !== TransitionGuard::problem( '', StatusModel::SHIPPED, '', true ) && str_contains( (string) TransitionGuard::problem( '', StatusModel::SHIPPED, '', true ), 'Allowed next: Pending Payment, Confirmed, On hold, Payment Failed, Cancelled.' ), 'AC-2 the message for a new order lists the starting statuses' );
+		$cod_confirmed = t51_order( $s, $product, 'processing', 'cod' );
+		$check( null === $cod_confirmed->get_date_paid(), 'AC-5 an ordinary cash order is not marked paid when it is confirmed' );
 
 		// AC-2: an order with a real status never goes back to a draft.
 		$draft = t51_order( $s, $product, 'processing' );
