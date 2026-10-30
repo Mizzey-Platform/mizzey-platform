@@ -63,7 +63,7 @@ AC-1 to AC-3 express US-06-05's AUTH-15 criteria. AC-4 is an engineering safegua
 | AC-1 | Login attempts are rate limited on the WordPress sign-in page and on the account page, in both languages: after the documented number of failures for one submitted login identity (trimmed and lowercased) paired with one resolved address within the window, further attempts for that pair, even with the right password, are refused until the lockout period ends, with a translated message; other identities and other addresses are unaffected. The limit is a documented setting the owner can change | AUTH-15 | provisional |
 | AC-2 | Every enabled public route that creates an account applies the check above before any account (and, at checkout, before any order processing) is created: the account page's registration, account creation at checkout, account creation after purchase, and WordPress's own registration if it is ever opened. A submission that fails it creates no account; a person using the page passes it. A public account writer without a checked route is reported, never counted as protected. The method and its limits are documented | AUTH-15 | provisional |
 | AC-3 | Sessions are handled securely and expire per the documented policy: WordPress's authentication and logged-in cookies are HTTP-only, and secure under the verified HTTPS configuration; authentication lifetime and browser persistence follow the documented native policy; signing out invalidates the current session's cookies; a password change invalidates cookies issued before it (a self-service change may issue replacement cookies and keep the person signed in) | AUTH-15 | provisional |
-| AC-4 | One command reports whether these protections are in force: the sign-in limit on with its settings and default addresses served; the check attached to each covered route; each known public account writer either checked or inactive; WordPress's registration closed or checked (an engineering safeguard supporting AUTH-15, not a contractual criterion) | AUTH-15 | provisional |
+| AC-4 | One command reports whether these protections are in force: the sign-in limit on with its settings and default addresses served; the check attached to each covered route; each known public account writer either checked, verified closed to account creation, or inactive; WordPress's registration closed or checked (an engineering safeguard supporting AUTH-15, not a contractual criterion) | AUTH-15 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -133,8 +133,9 @@ the pre-change cookies.
   customer creation uses `create_customers`. WP-CLI is a trusted path. WordPress's REST user creation calls
   `wp_insert_user()` directly and is protected by its capability check, not by this feature.
 - **Inactive writers.** WooCommerce's stock-notification signup can create accounts when its settings allow it (both off
-  by default and on the runtime); the classic checkout is not the site's checkout. Each is inventoried and reported; one
-  that becomes active without a checked route makes the check say review.
+  by default and on the runtime); the classic checkout is not offered by the site's page, but its native handlers remain
+  registered. The inventory tells an inactive feature from an available handler whose account creation is verified
+  closed by the guard. An enabled writer that is neither checked nor verified closed makes the check say review.
 - **A visitor without JavaScript** cannot pass the checkout or after-purchase checks; both are JavaScript forms already,
   so nobody is newly excluded. The account page's form works without JavaScript.
 - **Early, expired or used tokens** get a translated message asking the person to try again; the page issues a fresh
@@ -184,9 +185,10 @@ the pre-change cookies.
   effective filters, the absence of a native idle timeout and of an explicit SameSite attribute, and the difference
   between authentication cookies and WooCommerce's cart-session cookie. HTTPS acceptance needs correct HTTPS detection
   behind the proxy, an HTTPS home URL and secure cookies. No WordPress session behaviour is changed.
-- **FR-007**: `wp mizzey security check` MUST report, as controls: `sign_in_limit` (CoreX on, the baseline settings,
-  default addresses served), `signup_check` (each covered route's enforcement and rendering present, and a self-test of
-  the verifier), `account_writers` (each inventoried public writer checked or inactive), `wordpress_registration` (closed,
+- **FR-007**: `wp mizzey security check` MUST report, as controls: `sign_in_limit` (CoreX enabled, its enforcer attached,
+  valid effective settings reported, default addresses served; an owner's change to valid threshold or timing settings
+  does not fail it), `signup_check` (each covered route's enforcement and rendering present, and a self-test of
+  the verifier), `account_writers` (each inventoried public writer checked, verified closed to account creation, or inactive), `wordpress_registration` (closed,
   or open and checked). The existing `corex_login_protection` fact becomes `sign_in_limit`.
 - **FR-008**: The method, its limits, the settings and recovery MUST be documented for the handover in
   `docs/security-baseline.md`. Recovery for a locked-out administrator: waiting out the lockout, or, with server access,
@@ -198,7 +200,7 @@ the pre-change cookies.
 
 | Entity | Where | Notes |
 |---|---|---|
-| Spent token | A transient per used nonce, until the token's expiry | Makes tokens single-use. Holds no personal data |
+| Spent token | A non-autoloaded options row per claimed nonce, inserted atomically and kept for the token's whole validity | Exactly one request may claim a nonce; a storage failure refuses. Holds no personal data |
 
 CoreX keeps its attempts in its own table.
 
