@@ -64,8 +64,10 @@ run(
 			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );
 			$ok = $ok && $condition;
 		};
-		$auth_prefix   = ( is_ssl() ? 'wordpress_sec_' : 'wordpress_' ) . COOKIEHASH . '=';
-		$logged_prefix = 'wordpress_logged_in_' . COOKIEHASH . '=';
+		// The scheme of the address the requests go to, not of this process.
+		$https         = 'https' === wp_parse_url( site_url( 'wp-login.php', 'login_post' ), PHP_URL_SCHEME );
+		$auth_prefix   = ( $https ? SECURE_AUTH_COOKIE : AUTH_COOKIE ) . '=';
+		$logged_prefix = LOGGED_IN_COOKIE . '=';
 		$day           = DAY_IN_SECONDS;
 
 		list( $user, $password ) = two_factor_user( $s, 'customer' );
@@ -74,7 +76,11 @@ run(
 		$in    = t48_line( $short['lines'], $logged_prefix );
 		$check( '' !== $auth && '' !== $in, 'AC-3 signing in sets the authentication and logged-in cookies' );
 		$check( false !== stripos( $auth, 'httponly' ) && false !== stripos( $in, 'httponly' ), 'AC-3 both cookies are HttpOnly' );
-		$s->note( is_ssl() ? ( ( false !== stripos( $auth, 'secure' ) ? 'PASS  ' : 'FAIL  ' ) . 'AC-3 over HTTPS the authentication cookie is Secure' ) : 'N/A   AC-3 Secure is asserted on staging over HTTPS; this runtime is HTTP' );
+		if ( $https ) {
+			$check( 1 === preg_match( '/;\s*secure(?:;|$)/i', $auth ) && 1 === preg_match( '/;\s*secure(?:;|$)/i', $in ), 'AC-3 over HTTPS both the authentication and the logged-in cookie are Secure' );
+		} else {
+			$s->note( 'N/A   AC-3 Secure is asserted on staging over HTTPS; this runtime is HTTP' );
+		}
 		$check( abs( t48_embedded( $auth ) - ( time() + 2 * $day ) ) < 120, 'AC-3 without "remember me" the authentication lasts two days' );
 		$check( 0 === t48_expires( $auth ) && 0 === t48_expires( $in ), 'AC-3 without "remember me" the browser keeps the cookies only for the session' );
 

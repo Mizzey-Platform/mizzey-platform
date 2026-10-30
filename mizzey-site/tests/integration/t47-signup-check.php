@@ -236,6 +236,32 @@ run(
 		$code = $answer->as_error() ? $answer->as_error()->get_error_code() : '';
 		$check( 400 === $answer->get_status() && 'mizzey_signup_check' === $code && 0 === $ran, "AC-2 [checkout] a refused request is answered before the checkout handler runs (status {$answer->get_status()}, {$code}, handler hooks {$ran})" );
 
+		// A draft order kept in the visitor's session for a retry is left unchanged by a refused request, and is the order
+		// the same session then places with a valid check: proof the fixture is the order the Store API reuses.
+		$email   = $fresh( 'co-retry' );
+		$cart    = t47_cart( $product->get_id() );
+		$payload = json_decode( (string) base64_decode( strtr( explode( '.', $cart['headers']['Cart-Token'] )[1] ?? '', '-_', '+/' ) ), true );
+		$session = (string) ( $payload['user_id'] ?? '' );
+		$draft   = wc_create_order( array( 'status' => 'checkout-draft', 'created_via' => 'store-api' ) );
+		$draft->add_product( $product, 1 );
+		$draft->calculate_totals();
+		$draft->save();
+		$s->track_order( $draft->get_id() );
+		$sessions = $wpdb->prefix . 'woocommerce_sessions';
+		$stored   = maybe_unserialize( (string) $wpdb->get_var( $wpdb->prepare( "SELECT session_value FROM {$sessions} WHERE session_key = %s", $session ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$placed   = false;
+		if ( is_array( $stored ) ) {
+			$stored['store_api_draft_order'] = $draft->get_id();
+			$placed = false !== $wpdb->update( $sessions, array( 'session_value' => maybe_serialize( $stored ) ), array( 'session_key' => $session ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
+		$stamp  = static fn ( \WC_Order $o ): array => array( $o->get_status(), (string) $o->get_date_modified(), $o->get_billing_email(), $o->get_total(), $o->get_customer_id() );
+		$before = $stamp( wc_get_order( $draft->get_id() ) );
+		$r      = sign_in_json( 'POST', $checkout, t47_checkout_body( $email, true, null ), $cart['headers'], $cart['cookies'] );
+		wp_cache_flush();
+		$check( $placed && 400 === $r['status'] && $before === $stamp( wc_get_order( $draft->get_id() ) ), "AC-2 [checkout] a refused request leaves the session's retry order unchanged (draft {$draft->get_id()})" );
+		$r = sign_in_json( 'POST', $checkout, t47_checkout_body( $email, true, array( 'token' => t47_token( 'checkout', 10 ), 'trap' => '' ) ), $cart['headers'], $cart['cookies'] );
+		$check( 200 === $r['status'] && (int) ( $r['data']['order_id'] ?? 0 ) === $draft->get_id(), 'AC-2 [checkout] and with a valid check that same order is placed (the fixture is the retry order)' );
+
 		// Registration required: create_account omitted still creates an account, so the check applies.
 		update_option( 'woocommerce_enable_guest_checkout', 'no' );
 		$email = $fresh( 'co-req' );
@@ -300,7 +326,7 @@ run(
 
 		// ---- AC-2, the classic checkout's handlers stay closed to account creation -----------------------------
 		$page = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 't47 classic checkout', 'post_content' => '[woocommerce_checkout]' ) );
-		$s->track_post( $page );
+		$s->on_finish( static function () use ( $page ): void { wp_delete_post( $page, true ); } );
 		$jar  = two_factor_http( 'GET', add_query_arg( 'add-to-cart', $product->get_id(), home_url( '/' ) ) );
 		$form = two_factor_http( 'GET', get_permalink( $page ), array(), $jar['cookies'] );
 		$email = $fresh( 'classic' );
@@ -360,10 +386,59 @@ run(
 		} catch ( \RuntimeException $e ) {
 			$thrown = true;
 		}
-		$_POST = array( 'create-account' => '1', 'email' => 'x', 'mizzey_signup_token' => t47_token( 'order-received', 10 ), 'mizzey_signup_extra' => '' );
-		$after = wc_create_new_customer( $fresh( 'guard-after-throw' ), '', 'Pw-' . wp_generate_password( 18, false ) );
+		$after_email = $fresh( 'guard-after-throw' );
+		$_POST       = array( 'create-account' => '1', 'email' => $after_email, 'mizzey_signup_token' => t47_token( 'order-received', 10 ), 'mizzey_signup_extra' => '' );
+		$after       = wc_create_new_customer( $after_email, '', 'Pw-' . wp_generate_password( 18, false ) );
 		$_POST = array();
 		$check( $thrown && is_wp_error( $after ), 'FR-003 a render callback that throws leaves no order-received authorisation behind' );
+		// An account-page permit does not survive a later refusal in the same registration.
+		if ( null === WC()->session ) {
+			WC()->initialize_session();
+		}
+		$later_email = $fresh( 'guard-later' );
+		$later       = static function ( \WP_Error $error ): \WP_Error {
+			$error->add( 't47_later', 'refused by a later check' );
+			return $error;
+		};
+		add_filter( 'woocommerce_process_registration_errors', $later, 20 );
+		$_POST = array( 'register' => 'Register', 'email' => $later_email, 'password' => 'Pw-' . wp_generate_password( 18, false ), 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ), 'mizzey_signup_token' => t47_token( 'account', 10 ), 'mizzey_signup_extra' => '' );
+		SignupRoutes::processAccountRegistration();
+		$_POST = array();
+		remove_filter( 'woocommerce_process_registration_errors', $later, 20 );
+		wc_clear_notices();
+		$reused = wc_create_new_customer( $later_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		$check( ! sign_in_account_exists( $later_email ) || is_wp_error( $reused ), 'FR-003 after a later refusal, the account permit cannot be used by another operation' );
+		$check( is_wp_error( $reused ), 'FR-003 and the second attempt is refused' );
+
+		// A checkout permit does not outlive the checkout handler, and a nested request cannot use its parent's.
+		$co_email = $fresh( 'guard-checkout' );
+		$request  = new \WP_REST_Request( 'POST', '/wc/store/v1/checkout' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( t47_checkout_body( $co_email, true, array( 'token' => t47_token( 'checkout', 10 ), 'trap' => '' ) ) ) );
+		rest_do_request( $request );
+		$open   = SignupRoutes::openFrames();
+		$leaked = wc_create_new_customer( $co_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		$check( 0 === $open['frames'] && is_wp_error( $leaked ), 'FR-003 after the checkout handler ends, no frame or permit remains (frames ' . $open['frames'] . ')' );
+		$parent       = new \WP_REST_Request( 'POST', '/wc/store/v1/checkout' );
+		$parent_email = $fresh( 'guard-parent' );
+		$parent->set_param( 'create_account', true );
+		$parent->set_param( 'billing_address', array( 'email' => $parent_email ) );
+		$parent->set_param( 'extensions', array( 'mizzey-signup' => array( 'token' => t47_token( 'checkout', 10 ), 'trap' => '' ) ) );
+		$checkout_handler = null;
+		foreach ( rest_get_server()->get_routes()['/wc/store/v1/checkout'] ?? array() as $candidate ) {
+			if ( isset( $candidate['methods']['POST'] ) ) {
+				$checkout_handler = $candidate;
+			}
+		}
+		SignupRoutes::restBefore( null, (array) $checkout_handler, $parent );
+		$child = new \WP_REST_Request( 'GET', '/wp/v2/types' );
+		SignupRoutes::restBefore( null, array( 'callback' => '__return_true' ), $child );
+		$from_child = wc_create_new_customer( $parent_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		SignupRoutes::restAfter( null, array(), $child );
+		$from_parent = wc_create_new_customer( $parent_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		SignupRoutes::restAfter( null, array(), $parent );
+		$check( null !== $checkout_handler && is_wp_error( $from_child ) && ! is_wp_error( $from_parent ), 'FR-003 a nested request cannot use its parent\'s permit; the parent still can after the child ends' );
+
 		list( $plain_customer ) = two_factor_user( $s, 'customer' );
 		wp_set_current_user( $plain_customer->ID );
 		$by_customer = wc_create_new_customer( $fresh( 'guard-customer' ), '', 'Pw-' . wp_generate_password( 18, false ) );

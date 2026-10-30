@@ -52,10 +52,12 @@ final class SignupRoutes
     public static function register(): void
     {
         add_filter('woocommerce_process_registration_errors', [self::class, 'account'], 10, 4);
+        add_action('wp_loaded', [self::class, 'wrapAccountHandler'], 19);
         add_filter('registration_errors', [self::class, 'wordpress'], 10, 3);
         add_filter('woocommerce_registration_errors', [self::class, 'guard'], 999, 3);
         add_filter('rest_request_before_callbacks', [self::class, 'restBefore'], 10, 3);
         add_filter('rest_request_after_callbacks', [self::class, 'restAfter'], 10, 3);
+        add_filter('rest_endpoints', [self::class, 'wrapCheckoutHandler']);
         add_filter('register_block_type_args', [self::class, 'wrapOffer'], 10, 2);
         add_filter('render_block_' . self::OFFER_BLOCK, [self::class, 'offerToken']);
         add_action('woocommerce_register_form', [self::class, 'accountFields']);
@@ -68,6 +70,9 @@ final class SignupRoutes
 
     public static function account(WP_Error $error, mixed $username, mixed $password, mixed $email): WP_Error
     {
+        if ($error->has_errors()) {
+            return $error;
+        }
         if (SignupCheck::verify('account', self::posted(SignupCheck::FIELD_TOKEN), self::posted(SignupCheck::FIELD_TRAP))) {
             self::grant('account', (string) $email);
         } else {
@@ -87,27 +92,59 @@ final class SignupRoutes
     }
 
     /**
+     * Run WooCommerce's account-page registration with its own permits: a permit its adapter grants is gone when the
+     * handler returns, even when a later validation step refused the registration.
+     */
+    public static function wrapAccountHandler(): void
+    {
+        $callback = ['WC_Form_Handler', 'process_registration'];
+        $priority = has_action('wp_loaded', $callback);
+        if ($priority === false) {
+            return;
+        }
+        remove_action('wp_loaded', $callback, $priority);
+        add_action('wp_loaded', [self::class, 'processAccountRegistration'], $priority);
+    }
+
+    public static function processAccountRegistration(): void
+    {
+        $previous      = self::$permits;
+        self::$permits = [];
+        try {
+            \WC_Form_Handler::process_registration();
+        } finally {
+            self::$permits = $previous;
+        }
+    }
+
+    /**
      * @param mixed $response An earlier result, kept if it is already an error.
      * @param array<string,mixed> $handler
      */
     public static function restBefore(mixed $response, array $handler, WP_REST_Request $request): mixed
     {
+        $depth          = count(self::$frames);
         self::$frames[] = ['request' => $request, 'permit' => null];
-        if (is_wp_error($response) || ! self::isCheckoutHandler($handler) || $request->get_method() !== 'POST') {
-            return $response;
-        }
-        if (! self::checkoutCreatesAccount($request)) {
-            return $response;
-        }
-        $extensions = $request['extensions'];
-        $signup     = is_array($extensions) && is_array($extensions[self::STORE_NAMESPACE] ?? null) ? $extensions[self::STORE_NAMESPACE] : [];
-        if (! SignupCheck::verify('checkout', $signup['token'] ?? null, $signup['trap'] ?? null)) {
-            return new WP_Error(self::ERROR, SignupCheck::message(), ['status' => 400]);
-        }
-        $billing = $request['billing_address'];
-        self::$frames[array_key_last(self::$frames)]['permit'] = self::normalise(is_array($billing) ? (string) ($billing['email'] ?? '') : '');
+        try {
+            if (is_wp_error($response) || ! self::isCheckoutHandler($handler) || $request->get_method() !== 'POST') {
+                return $response;
+            }
+            if (! self::checkoutCreatesAccount($request)) {
+                return $response;
+            }
+            $extensions = $request['extensions'];
+            $signup     = is_array($extensions) && is_array($extensions[self::STORE_NAMESPACE] ?? null) ? $extensions[self::STORE_NAMESPACE] : [];
+            if (! SignupCheck::verify('checkout', $signup['token'] ?? null, $signup['trap'] ?? null)) {
+                return new WP_Error(self::ERROR, SignupCheck::message(), ['status' => 400]);
+            }
+            $billing = $request['billing_address'];
+            self::$frames[$depth]['permit'] = self::normalise(is_array($billing) ? (string) ($billing['email'] ?? '') : '');
 
-        return $response;
+            return $response;
+        } catch (Throwable $error) {
+            array_splice(self::$frames, $depth);
+            throw $error;
+        }
     }
 
     /**
@@ -123,6 +160,59 @@ final class SignupRoutes
         }
 
         return $response;
+    }
+
+    /**
+     * Wrap the Store API checkout handler ({@see SignupRestCallback}), the only handler a permit is granted for.
+     *
+     * @param array<string,mixed> $endpoints
+     *
+     * @return array<string,mixed>
+     */
+    public static function wrapCheckoutHandler(array $endpoints): array
+    {
+        foreach ($endpoints as $route => $handlers) {
+            if (! is_array($handlers)) {
+                continue;
+            }
+            foreach ($handlers as $key => $handler) {
+                if (is_array($handler) && self::isCheckoutHandler($handler) && ! ($handler['callback'] instanceof SignupRestCallback)) {
+                    $endpoints[$route][$key]['callback'] = new SignupRestCallback($handler['callback']);
+                }
+            }
+        }
+
+        return $endpoints;
+    }
+
+    /**
+     * Run the checkout handler; when it ends, however it ends, its permit is spent. Frames left above it by nested
+     * requests that threw are removed; if the handler itself throws, its own frame goes too, because
+     * `rest_request_after_callbacks` will not run for it.
+     */
+    public static function callCheckout(callable $callback, WP_REST_Request $request): mixed
+    {
+        $frame = null;
+        for ($i = count(self::$frames) - 1; $i >= 0; $i--) {
+            if (self::$frames[$i]['request'] === $request) {
+                $frame = $i;
+                break;
+            }
+        }
+        $completed = false;
+        try {
+            $result    = $callback($request);
+            $completed = true;
+
+            return $result;
+        } finally {
+            if ($frame !== null && isset(self::$frames[$frame]) && self::$frames[$frame]['request'] === $request) {
+                array_splice(self::$frames, $frame + ($completed ? 1 : 0));
+                if ($completed) {
+                    self::$frames[$frame]['permit'] = null;
+                }
+            }
+        }
     }
 
     /**
@@ -197,6 +287,18 @@ final class SignupRoutes
         }
     }
 
+    /**
+     * How many REST frames are open, and whether the top one holds a permit. For the scenarios.
+     *
+     * @return array{frames:int,permit:bool}
+     */
+    public static function openFrames(): array
+    {
+        $top = self::$frames === [] ? null : self::$frames[array_key_last(self::$frames)];
+
+        return ['frames' => count(self::$frames), 'permit' => $top !== null && $top['permit'] !== null];
+    }
+
     public static function clearPermits(): void
     {
         self::$permits = [];
@@ -258,6 +360,7 @@ final class SignupRoutes
             'token'     => $checkout ? SignupCheck::issue('checkout') : '',
             'tokenName' => SignupCheck::FIELD_TOKEN,
             'trapName'  => SignupCheck::FIELD_TRAP,
+            'trapLabel' => __('Leave this field empty', 'mizzey-site'),
         ]);
     }
 
@@ -301,6 +404,12 @@ final class SignupRoutes
                 return false;
             }
         }
+        return self::offerWrapped() && has_filter('rest_endpoints', [self::class, 'wrapCheckoutHandler']) !== false
+            && has_action('wp_loaded', [self::class, 'processAccountRegistration']) !== false;
+    }
+
+    private static function offerWrapped(): bool
+    {
         $offer = \WP_Block_Type_Registry::get_instance()->get_registered(self::OFFER_BLOCK);
 
         return $offer !== null && $offer->render_callback instanceof SignupOfferRender;
@@ -320,7 +429,7 @@ final class SignupRoutes
         return [
             'account page'           => has_filter('woocommerce_process_registration_errors', [self::class, 'account']) !== false && $guarded ? 'checked' : 'unchecked',
             'block checkout'         => has_filter('rest_request_before_callbacks', [self::class, 'restBefore']) !== false && $guarded ? 'checked' : 'unchecked',
-            'order-received offer'   => has_filter('register_block_type_args', [self::class, 'wrapOffer']) !== false && $guarded ? 'checked' : 'unchecked',
+            'order-received offer'   => self::offerWrapped() && $guarded ? 'checked' : 'unchecked',
             'wordpress registration' => ! get_option('users_can_register') ? 'inactive' : (has_filter('registration_errors', [self::class, 'wordpress']) !== false ? 'checked' : 'unchecked'),
             'classic checkout'       => $guarded ? 'closed' : 'unchecked',
             'stock notifications'    => $stock ? 'unchecked' : 'inactive',
@@ -344,8 +453,13 @@ final class SignupRoutes
     private static function isCheckoutHandler(array $handler): bool
     {
         $callback = $handler['callback'] ?? null;
+        if ($callback instanceof SignupRestCallback) {
+            $callback = $callback->original();
+        }
 
-        return is_array($callback) && ($callback[0] ?? null) instanceof \Automattic\WooCommerce\StoreApi\Routes\V1\Checkout;
+        return is_array($callback)
+            && ($callback[0] ?? null) instanceof \Automattic\WooCommerce\StoreApi\Routes\V1\Checkout
+            && ($callback[1] ?? null) === 'get_response';
     }
 
     private static function posted(string $name): mixed
@@ -364,20 +478,28 @@ final class SignupRoutes
      */
     public static function selfTest(): bool
     {
+        $probe = null;
+        $ok    = false;
         try {
             $fresh = SignupCheck::issue('account');
             $aged  = SignupCheck::issue('account', time() - 10);
-            $ok    = SignupCheck::inspect('account', $fresh, '') === null
+            $probe = SignupCheck::inspect('account', $aged, '');
+            $ok    = $probe !== null
+                && SignupCheck::inspect('account', $fresh, '') === null
                 && SignupCheck::verify('account', $aged, '')
                 && ! SignupCheck::verify('account', $aged, '');
-            $probe = SignupCheck::inspect('account', $aged, '');
-            if ($probe !== null) {
-                SignupCheck::forget($probe['nonce']);
-            }
-
-            return $ok;
         } catch (Throwable) {
-            return false;
+            $ok = false;
+        } finally {
+            if ($probe !== null) {
+                try {
+                    SignupCheck::forget($probe['nonce']);
+                } catch (Throwable) {
+                    $ok = false;
+                }
+            }
         }
+
+        return $ok;
     }
 }

@@ -77,8 +77,8 @@ async function registerOnAccountPage(browser, plan, lang) {
 		await page.fill('form.register input[name="password"]', plan.password);
 	}
 	await wait(4000);
-	// Submitted with Enter in the password field: the pointer click on the button lands on an overlapping element in
-	// this headless window and submits nothing, while a person's click and Enter both submit.
+	// Keyboard submission, with Enter in the password field. A pointer click on the button submitted nothing in the
+	// observed headless run; this case does not establish that pointer submission works.
 	await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {}), page.press('form.register input[name="password"]', 'Enter')]);
 	row.landed = page.url();
 	row.notice = (await page.locator('.woocommerce-error, .woocommerce-notices-wrapper').allInnerTexts()).join(' ').trim().slice(0, 300);
@@ -148,6 +148,64 @@ async function checkoutWithAccount(browser, plan) {
 	return row;
 }
 
+async function checkoutWithTrapFilled(browser, plan) {
+	const context = await browser.newContext();
+	const page = await context.newPage();
+	const row = { route: 'checkout-trap', email: plan.checkoutTrap.email };
+	await page.goto(plan.checkout.addToCart, { waitUntil: 'domcontentloaded' });
+	await page.goto(plan.checkout.url, { waitUntil: 'networkidle' });
+	page.on('request', (request) => {
+		if (request.method() === 'POST' && /\/wc\/store\/v1\/checkout/.test(request.url())) {
+			try {
+				const body = JSON.parse(request.postData() || '{}');
+				row.payloadTrap = body.extensions && body.extensions['mizzey-signup'] ? body.extensions['mizzey-signup'].trap : null;
+			} catch (error) {
+				row.payloadError = String(error);
+			}
+		}
+	});
+	page.on('response', (response) => {
+		if (response.request().method() === 'POST' && /\/wc\/store\/v1\/checkout/.test(response.url())) {
+			row.checkoutStatus = response.status();
+		}
+	});
+	await page.fill('#email', row.email);
+	const create = page.locator('.wc-block-checkout__create-account input[type="checkbox"]');
+	if (await create.count()) {
+		await create.check();
+	}
+	const password = page.getByLabel(/password/i).first();
+	await password.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+	if (await password.count()) {
+		await password.fill(plan.password);
+	}
+	for (const [field, value] of Object.entries(plan.checkout.billing)) {
+		const input = page.locator(`#billing-${field}`);
+		if (await input.count() && await input.isEditable()) {
+			await input.fill(value);
+		}
+	}
+	const state = page.locator('#billing-state');
+	if (await state.count() && (await state.evaluate((el) => el.tagName)) === 'SELECT') {
+		await state.selectOption(plan.checkout.state);
+	}
+	// What a form-filling script does: put a value in every input, the hidden one included.
+	row.trapRendered = await page.locator('input[name="mizzey_signup_extra"]').count();
+	await page.evaluate(() => {
+		const trap = document.querySelector('input[name="mizzey_signup_extra"]');
+		if (trap) {
+			trap.value = 'https://spam.example';
+			trap.dispatchEvent(new Event('input', { bubbles: true }));
+		}
+	});
+	await wait(4000);
+	await page.click('.wc-block-components-checkout-place-order-button');
+	await page.waitForResponse((response) => /\/wc\/store\/v1\/checkout/.test(response.url()) && response.request().method() === 'POST', { timeout: 45000 }).catch(() => {});
+	row.landed = page.url();
+	await context.close();
+	return row;
+}
+
 async function orderReceivedOffer(browser, plan) {
 	const page = await (await browser.newContext()).newPage();
 	const row = { route: 'order-received', email: plan.orderReceived.email };
@@ -178,7 +236,7 @@ async function signInFlows(browser, plan) {
 		for (const from of plan.signIn[lang].pages) {
 			await page.goto(from, { waitUntil: 'domcontentloaded' });
 			const links = await page.$$eval('a[href]', (anchors) => anchors.map((a) => a.href).filter((href) => /wp-login\.php|corex-login|lost-password|my-account/.test(href)));
-			for (const href of [...new Set(links)].slice(0, 12)) {
+			for (const href of [...new Set(links)]) {
 				const response = await context.request.get(href, { maxRedirects: 5 }).catch((error) => ({ status: () => 0, url: () => String(error) }));
 				rows.push({ flow: 'printed link', lang, from, href, status: response.status(), landed: response.url() });
 			}
@@ -258,6 +316,7 @@ async function signInFlows(browser, plan) {
 			results.forms.push(await registerOnAccountPage(browser, plan, 'en'));
 			results.forms.push(await registerOnAccountPage(browser, plan, 'ar'));
 			results.forms.push(await checkoutWithAccount(browser, plan));
+			results.forms.push(await checkoutWithTrapFilled(browser, plan));
 			results.forms.push(await orderReceivedOffer(browser, plan));
 		} else {
 			results.flows = await signInFlows(browser, plan);

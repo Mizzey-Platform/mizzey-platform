@@ -39,6 +39,7 @@ require_once __DIR__ . '/src/Security/CommentSurface.php';
 require_once __DIR__ . '/src/Security/TwoFactor.php';
 require_once __DIR__ . '/src/Security/SignupCheck.php';
 require_once __DIR__ . '/src/Security/SignupOfferRender.php';
+require_once __DIR__ . '/src/Security/SignupRestCallback.php';
 require_once __DIR__ . '/src/Security/SignupRoutes.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';

@@ -110,6 +110,7 @@ run(
 					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000' ),
 				),
 				'screenshotDir' => get_temp_dir(),
+				'checkoutTrap'  => array( 'email' => $fresh( 'br-checkout-trap' ) ),
 				'orderReceived' => array( 'url' => $order->get_checkout_order_received_url(), 'email' => $order_email ),
 			)
 		);
@@ -122,6 +123,10 @@ run(
 			}
 			if ( 'checkout' === $row['route'] ) {
 				$check( true === ( $row['payloadHasCheck'] ?? null ) && true === ( $row['payloadTrapEmpty'] ?? null ) && 200 === ( $row['checkoutStatus'] ?? 0 ), "AC-2 [{$where}] the Store API request carries the check and succeeds" );
+			}
+			if ( 'checkout-trap' === $row['route'] ) {
+				$check( (int) ( $row['trapRendered'] ?? 0 ) > 0 && 'https://spam.example' === ( $row['payloadTrap'] ?? null ) && 400 === ( $row['checkoutStatus'] ?? 0 ) && ! sign_in_account_exists( (string) $row['email'] ), "AC-2 [{$where}] a filled trap reaches the server unchanged and no account is created" );
+				continue;
 			}
 			if ( 'order-received' === $row['route'] ) {
 				$check( (int) $row['formFound'] > 0 && (int) $row['tokenField'] > 0, "AC-2 [{$where}] the rendered form carries the check" );

@@ -258,10 +258,20 @@ final class BaselineReport
         } catch (\Throwable) {
             return self::row('sign_in_limit', false, __('CoreX login protection settings are not readable', 'mizzey-site'));
         }
+        // The lockout check and the failure recorder: without the second, failures never lead to a lockout.
         $enforced = false;
         foreach ((array) ($GLOBALS['wp_filter']['authenticate']->callbacks[30] ?? []) as $callback) {
-            if (is_array($callback['function'] ?? null) && $callback['function'][0] instanceof \Corex\Config\Security\LoginProtection\LoginProtectionEnforcer) {
-                $enforced = true;
+            $function = $callback['function'] ?? null;
+            if (! is_array($function)
+                || ! ($function[0] ?? null) instanceof \Corex\Config\Security\LoginProtection\LoginProtectionEnforcer
+                || ($function[1] ?? null) !== 'blockLockedOut'
+                || (int) ($callback['accepted_args'] ?? 0) < 3
+            ) {
+                continue;
+            }
+            $enforced = has_action('wp_login_failed', [$function[0], 'recordFailure']) !== false;
+            if ($enforced) {
+                break;
             }
         }
 
