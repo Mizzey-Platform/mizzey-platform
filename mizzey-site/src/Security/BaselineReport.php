@@ -128,13 +128,17 @@ final class BaselineReport
     }
 
     /**
+     * The staff WP 2FA's policy in force requires to enrol who have not. Judged with WP 2FA's own reporting call, which
+     * reads the live policy and writes nothing: the state WP 2FA keeps per user is refreshed for only the first user read
+     * in a process, so after a policy change it is stale for the rest. Counted as pending when it cannot be told.
+     *
      * @return array{key:string,status:string,detail:string}
      */
     private static function pendingStaff(): array
     {
         $pending = array_filter(
             get_users(['role__in' => self::TWO_FACTOR_ROLES, 'number' => 500]),
-            static fn (\WP_User $user): bool => TwoFactor::active() && TwoFactor::pending($user),
+            static fn (\WP_User $user): bool => TwoFactor::active() && self::mustEnrol($user),
         );
 
         return ['key' => 'two_factor_pending_staff', 'status' => (string) count($pending), 'detail' => sprintf(
@@ -142,6 +146,20 @@ final class BaselineReport
             __('Staff still to set up two-factor sign-in: %s (reported, not judged here)', 'mizzey-site'),
             $pending === [] ? __('none', 'mizzey-site') : implode(', ', array_map(static fn (\WP_User $u): string => $u->user_login, $pending)),
         )];
+    }
+
+    private static function mustEnrol(\WP_User $user): bool
+    {
+        $helper = '\WP2FA\Admin\Helpers\User_Helper';
+        if (! class_exists($helper)) {
+            return true;
+        }
+        try {
+            // Without a user object, WP 2FA answers from the policy and the user's enabled methods, as its reports do.
+            return (bool) $helper::user_must_configure_2fa(null, (array) $user->roles, $user->user_login, $user->ID);
+        } catch (\Throwable) {
+            return true;
+        }
     }
 
     /**

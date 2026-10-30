@@ -85,7 +85,18 @@ run(
 		$owner_choice['enforced_roles'] = array( 'administrator' );
 		\WP2FA\WP2FA::update_plugin_settings( $owner_choice, false, WP_2FA_POLICY_SETTINGS_NAME );
 		$check( '0' === $enforced(), 'AC-2 when the owner requires it for administrators only, a shop manager is not' );
+		// A second shop manager, judged in its own request under the same policy: WP 2FA now holds "optional" for both.
+		list( $second ) = two_factor_user( $s, 'shop_manager' );
+		t43_wp( 'eval ' . escapeshellarg( "\\WP2FA\\Admin\\Helpers\\User_Helper::is_enforced( get_user_by( 'id', " . $second->ID . " ), true );" ) );
+		list( $enrolled ) = two_factor_user( $s, 'shop_manager' );
+		two_factor_enrol( $enrolled );
 		\WP2FA\WP2FA::update_plugin_settings( $policy, false, WP_2FA_POLICY_SETTINGS_NAME );
+		// AC-5: the staff-to-enrol report follows the policy in force, not a state WP 2FA kept from an earlier policy. WP 2FA
+		// refreshes that state for the first user it reads in a process only, so a report over many staff must not rely on it.
+		$report  = t43_wp( 'mizzey security check' );
+		$pending = 1 === preg_match( '/^two_factor_pending_staff\t\d+\t(.*)$/m', $report['out'], $line ) ? $line[1] : '';
+		$check( false !== strpos( $pending, $manager->user_login ) && false !== strpos( $pending, $second->user_login ), 'AC-5 after the policy changes, every staff member still to enrol is reported' );
+		$check( '' !== $pending && false === strpos( $pending, $enrolled->user_login ), 'AC-5 and a staff member already enrolled is not' );
 
 		// AC-5: the check on the full baseline.
 		$baseline = t43_wp( 'mizzey security check' );
