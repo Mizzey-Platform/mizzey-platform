@@ -71,8 +71,28 @@ final class FixtureStockSource implements StockSource
         return $base;
     }
 
-    /** Applies a change once per key; a change that would take stock below zero is refused. */
+    /**
+     * Applies a change once per key; a change that would take stock below zero is refused. Under a MySQL named lock, so
+     * two requests taking the last unit take turns.
+     */
     public function adjust(StockItem $item, int $delta, string $operationKey): int
+    {
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . 'stock_fixture', 0, 64);
+        $held = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if (! $held) {
+            throw new StockSourceUnavailable('fixture busy');
+        }
+        try {
+            wp_cache_delete(self::LEDGER, 'options');
+
+            return $this->apply($item, $delta, $operationKey);
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
+    private function apply(StockItem $item, int $delta, string $operationKey): int
     {
         $ledger = self::ledger();
         if (! isset($ledger[$operationKey])) {

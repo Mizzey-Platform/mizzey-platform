@@ -40,7 +40,7 @@ final class WishlistRoutes
         register_rest_route(self::NS, '/wishlist/items', ['methods' => 'POST', 'callback' => [self::class, 'add'], 'permission_callback' => '__return_true', 'args' => $id]);
         register_rest_route(self::NS, '/wishlist/items/(?P<id>\d+)', ['methods' => 'DELETE', 'callback' => [self::class, 'remove'], 'permission_callback' => '__return_true', 'args' => $id]);
         register_rest_route(self::NS, '/wishlist/items/(?P<id>\d+)/cart', ['methods' => 'POST', 'callback' => [self::class, 'move'], 'permission_callback' => '__return_true', 'args' => $id]);
-        register_rest_route(self::NS, '/wishlist/from-cart', ['methods' => 'POST', 'callback' => [self::class, 'fromCart'], 'permission_callback' => '__return_true', 'args' => ['key' => ['type' => 'string', 'required' => true, 'pattern' => '^[a-f0-9]{32}$']]]);
+        register_rest_route(self::NS, '/wishlist/from-cart', ['methods' => 'POST', 'callback' => [self::class, 'fromCart'], 'permission_callback' => [self::class, 'fromVisitorsPage'], 'args' => ['key' => ['type' => 'string', 'required' => true, 'pattern' => '^[a-f0-9]{32}$']]]);
         register_rest_route(self::NS, '/recently-viewed', ['methods' => 'GET', 'callback' => [self::class, 'recent'], 'permission_callback' => '__return_true']);
     }
 
@@ -70,6 +70,32 @@ final class WishlistRoutes
         $moved = Wishlist::moveToCart((int) $request['id']);
 
         return $moved === true ? new \WP_REST_Response(['items' => self::items(Wishlist::ids())], 200) : $moved;
+    }
+
+    /** Starts with "woocommerce", so WooCommerce ties a guest's nonce to their session (`nonce_user_logged_out`). */
+    public const NONCE = 'woocommerce-mizzey-wishlist';
+
+    /** The nonce the storefront sends as X-Mizzey-Nonce; on the Store API cart as extensions.mizzey.wishlist_nonce. */
+    public static function nonce(): string
+    {
+        return wp_create_nonce(self::NONCE);
+    }
+
+    /**
+     * A cart line is changed only by a request from the visitor's own pages: the nonce is tied to the visitor's session
+     * (a guest's WooCommerce session, a customer's sign-in), so a page elsewhere cannot use the visitor's cookies to
+     * empty their cart.
+     */
+    public static function fromVisitorsPage(\WP_REST_Request $request): bool|\WP_Error
+    {
+        if (function_exists('wc_load_cart') && ! WC()->session) {
+            wc_load_cart();
+        }
+        $nonce = (string) $request->get_header('x_mizzey_nonce');
+
+        return $nonce !== '' && wp_verify_nonce($nonce, self::NONCE)
+            ? true
+            : new \WP_Error('mizzey_wishlist_bad_nonce', __('Please reload the page and try again.', 'mizzey-site'), ['status' => 403]);
     }
 
     public static function fromCart(\WP_REST_Request $request): \WP_REST_Response|\WP_Error

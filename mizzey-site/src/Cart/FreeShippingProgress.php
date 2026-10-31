@@ -43,7 +43,7 @@ final class FreeShippingProgress
         woocommerce_store_api_register_endpoint_data([
             'endpoint'        => CartSchema::IDENTIFIER,
             'namespace'       => 'mizzey',
-            'data_callback'   => static fn (): array => ['free_shipping' => self::of(WC()->cart)],
+            'data_callback'   => static fn (): array => ['free_shipping' => self::of(WC()->cart), 'wishlist_nonce' => \MizzeySite\Wishlist\WishlistRoutes::nonce()],
             'schema_callback' => static fn (): array => [
                 'free_shipping' => [
                     'description' => 'What the cart still needs for free shipping.',
@@ -55,6 +55,12 @@ final class FreeShippingProgress
                         'items_needed'  => ['type' => ['integer', 'null']],
                         'amount_needed' => ['type' => ['string', 'null']],
                     ],
+                ],
+                'wishlist_nonce' => [
+                    'description' => 'The nonce for moving a cart line to the wishlist (X-Mizzey-Nonce).',
+                    'type'        => 'string',
+                    'context'     => ['view', 'edit'],
+                    'readonly'    => true,
                 ],
             ],
             'schema_type'     => ARRAY_A,
@@ -82,14 +88,14 @@ final class FreeShippingProgress
         ];
     }
 
-    /** Whether every package already has a free rate. */
+    /** Whether what the customer is charged for shipping is nothing: the chosen rate of every package costs nothing. */
     private static function free(): bool
     {
         $packages = WC()->shipping()->get_packages();
-        foreach ($packages as $package) {
-            $rates = (array) ($package['rates'] ?? []);
-            $free  = array_filter($rates, static fn ($rate): bool => $rate instanceof \WC_Shipping_Rate && ($rate->get_method_id() === 'free_shipping' || (float) $rate->get_cost() <= 0));
-            if ($free === []) {
+        $chosen   = (array) (WC()->session ? WC()->session->get('chosen_shipping_methods', []) : []);
+        foreach ($packages as $index => $package) {
+            $rate = ((array) ($package['rates'] ?? []))[$chosen[$index] ?? ''] ?? null;
+            if (! $rate instanceof \WC_Shipping_Rate || (float) $rate->get_cost() + array_sum(array_map('floatval', (array) $rate->get_taxes())) > 0) {
                 return false;
             }
         }
@@ -97,9 +103,45 @@ final class FreeShippingProgress
         return $packages !== [];
     }
 
+    /**
+     * Whether a free-shipping promotion would make shipping free here: every package's zone has a free shipping method
+     * that a coupon satisfies (requires a coupon, or a coupon or the minimum, or both with the minimum met).
+     */
+    private static function couponsShipFree(\WC_Cart $cart): bool
+    {
+        $packages = WC()->shipping()->get_packages();
+        foreach ($packages as $package) {
+            $takes = false;
+            foreach (\WC_Shipping_Zones::get_zone_matching_package($package)->get_shipping_methods(true) as $method) {
+                $requires = $method->id === 'free_shipping' ? (string) $method->get_option('requires') : '';
+                $takes    = $takes || in_array($requires, ['coupon', 'either'], true)
+                    || ($requires === 'both' && round(self::compared($cart, $method), wc_get_price_decimals()) >= (float) $method->get_option('min_amount'));
+            }
+            if (! $takes) {
+                return false;
+            }
+        }
+
+        return $packages !== [];
+    }
+
+    /** The amount a free shipping method compares with its minimum, as WC_Shipping_Free_Shipping::is_available() does (11.1.0). */
+    private static function compared(\WC_Cart $cart, \WC_Shipping_Method $method): float
+    {
+        $compared = (float) $cart->get_displayed_subtotal();
+        if ($method->get_option('ignore_discounts') !== 'yes') {
+            $compared -= (float) $cart->get_discount_total() + ($cart->display_prices_including_tax() ? (float) $cart->get_discount_tax() : 0.0);
+        }
+
+        return $compared;
+    }
+
     /** The fewest more units an automatic free-shipping promotion needs, or null. */
     private static function itemsNeeded(\WC_Cart $cart): ?int
     {
+        if (! self::couponsShipFree($cart)) {
+            return null;
+        }
         $needed = null;
         foreach (AutomaticPromotions::codes() as $code) {
             $coupon  = new \WC_Coupon($code);
@@ -132,13 +174,7 @@ final class FreeShippingProgress
                 if ($method->id !== 'free_shipping' || ! in_array($method->get_option('requires'), ['min_amount', 'either'], true)) {
                     continue;
                 }
-                // As WC_Shipping_Free_Shipping::is_available() compares it (11.1.0): the discount, with its tax when
-                // prices are shown with tax, comes off unless the method ignores discounts.
-                $compared = (float) $cart->get_displayed_subtotal();
-                if ($method->get_option('ignore_discounts') !== 'yes') {
-                    $compared -= (float) $cart->get_discount_total() + ($cart->display_prices_including_tax() ? (float) $cart->get_discount_tax() : 0.0);
-                }
-                $short = (float) $method->get_option('min_amount') - round($compared, wc_get_price_decimals());
+                $short = (float) $method->get_option('min_amount') - round(self::compared($cart, $method), wc_get_price_decimals());
                 if ($short > 0 && ($needed === null || $short < $needed)) {
                     $needed = $short;
                 }

@@ -195,3 +195,7 @@ msgstr "خفّضنا كمية %s إلى المتوفر."
 #: mizzey-site/src/Wishlist/Wishlist.php
 msgid "This item is not in your cart."
 msgstr "هذا المنتج ليس في سلتك."
+
+#: mizzey-site/src/Wishlist/WishlistRoutes.php
+msgid "Please reload the page and try again."
+msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."

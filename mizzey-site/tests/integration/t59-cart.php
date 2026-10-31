@@ -142,6 +142,14 @@ run(
 		$back    = $fixture->adjust( $five->get_id(), 2, "{$tag}-op3" );
 		$check( ! $unbound->isKnown() && FixtureStockSource::enabled() && array( 5, FixtureStockSource::UNCOUNTED ) === $levels && 3 === $changed->quantity && 3 === $again->quantity && ! $over->isKnown() && 5 === $back->quantity && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'Fixture: unbound until switched on outside production; it answers 5 for a counted item and the uncounted level for the rest; a change applies once per key, one below zero is refused, and the WooCommerce stock field is never written' );
 		delete_option( FixtureStockSource::LEDGER );
+		$order_for = wc_create_order();
+		$order_for->add_product( $five, 2 );
+		$order_for->save();
+		$s->track_order( $order_for->get_id() );
+		$order_for->update_status( 'processing' );
+		wc_reduce_stock_levels( $order_for->get_id() );
+		$order_for->update_status( 'cancelled' );
+		$check( 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 5 === StockGateway::make()->level( $five->get_id() )->quantity, 'D-19 an order processed and cancelled changes neither WooCommerce\'s own stock nor what the fixture answers: WooCommerce\'s order stock writers are off' );
 		$bound_wins = static fn () => new T59Source( array() );
 		add_filter( StockGateway::SOURCE_FILTER, $bound_wins );
 		$real = StockGateway::make()->level( $five->get_id() );
@@ -154,6 +162,16 @@ run(
 		$check( array( $five->get_id() => 5, $open->get_id() => 1, $one->get_id() => 1 ) === t59_quantities( $merged['cart'] ) && in_array( 't59 cream', $merged['lowered'], true ), 'CART-18 the same line\'s quantities are added (2 + 4) and capped at the 5 in stock; a saved-only line stays; a guest-only line sold one at a time comes in as 1; the customer is told (' . wp_json_encode( t59_quantities( $merged['cart'] ) ) . ')' );
 		$gone = CartMerge::combine( t59_line( $five, 1 ), array(), new StockGateway( new T59Source( array( $five->get_id() => 0 ) ), 1, null, 0 ) );
 		$kept = CartMerge::combine( t59_line( $five, 3 ), array(), new StockGateway( new T59Source( array() ), 1, null, 0 ) );
+		$two_local = $s->simple_product( 't59 oil', '80', null );
+		$two_local->set_manage_stock( true );
+		$two_local->set_stock_quantity( 2 );
+		$two_local->save();
+		$ten     = new StockGateway( new T59Source( array( $two_local->get_id() => 10, $five->get_id() => 5 ) ), 1, null, 0 );
+		$adapter = CartMerge::combine( t59_line( $two_local, 3 ), t59_line( $two_local, 3 ), $ten );
+		$other   = t59_line( $five, 4 );
+		$other_k = (string) array_key_first( $other );
+		$shared  = CartMerge::combine( t59_line( $five, 4 ), array( 'x' . substr( $other_k, 1 ) => array_merge( $other[ $other_k ], array( 'key' => 'x' . substr( $other_k, 1 ) ) ) ), $ten );
+		$check( array( $two_local->get_id() => 6 ) === t59_quantities( $adapter['cart'] ) && array( $five->get_id() => 5 ) === t59_quantities( $shared['cart'] ), 'CART-18, D-19 the merge is capped by the stock the source confirms, not WooCommerce\'s own field (6 kept with 2 there and 10 confirmed); two lines of one stock item share its 5 (' . wp_json_encode( t59_quantities( $shared['cart'] ) ) . ')' );
 		$check( array() === $gone['cart'] && array( $five->get_id() => 3 ) === t59_quantities( $kept['cart'] ), 'CART-18 an item the source says is sold out leaves the merged cart; an unanswered question caps nothing (the cart check then refuses it)' );
 
 		// CART-13, CART-14, CART-15: every sign-in marks the merge, whatever set the cookie.
@@ -177,6 +195,14 @@ run(
 		wp_cache_flush();
 		$saved = get_user_meta( $customer, '_woocommerce_persistent_cart_' . get_current_blog_id(), true );
 		$check( sign_in_has_session( $signed ) && array( $five->get_id() => 2, $open->get_id() => 3 ) === t59_quantities( (array) ( $saved['cart'] ?? array() ) ), '[HTTP] CART-14, CART-09 a guest with 2 creams and 2 soaps signs in to an account whose saved cart holds 1 soap: the account\'s cart holds 2 creams and 3 soaps, no line lost or doubled (' . wp_json_encode( t59_quantities( (array) ( $saved['cart'] ?? array() ) ) ) . ')' );
+		$elsewhere = sign_in_account( 'en', "{$tag}-c@example.invalid", $password );
+		two_factor_http( 'GET', $account, array(), $elsewhere['cookies'] );
+		$again_form = two_factor_http( 'GET', $account, array(), array() );
+		$again      = two_factor_http( 'POST', $account, array( 'username' => "{$tag}-c@example.invalid", 'password' => $password, 'woocommerce-login-nonce' => two_factor_field( $again_form['body'], 'woocommerce-login-nonce' ), '_wp_http_referer' => wp_parse_url( $account, PHP_URL_PATH ), 'login' => 'Log in' ), $again_form['cookies'] );
+		two_factor_http( 'GET', $account, array(), $again['cookies'] );
+		wp_cache_flush();
+		$after = get_user_meta( $customer, '_woocommerce_persistent_cart_' . get_current_blog_id(), true );
+		$check( sign_in_has_session( $elsewhere ) && array( $five->get_id() => 2, $open->get_id() => 3 ) === t59_quantities( (array) ( $after['cart'] ?? array() ) ), '[HTTP] CART-09, CART-18 signing in again from other browsers, with no guest cart, restores the account\'s cart and doubles nothing (' . wp_json_encode( t59_quantities( (array) ( $after['cart'] ?? array() ) ) ) . ')' );
 		sign_in_forget( array( "{$tag}-c@example.invalid" ) );
 
 		// [HTTP] CART-13: a guest cart, then registering on the account page.
@@ -248,9 +274,29 @@ run(
 		AutomaticPromotions::forget();
 		$single   = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$no_coupon = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$check( null === $no_coupon['items_needed'] && '400.00' === $no_coupon['amount_needed'], 'CART-07 where no free shipping method takes a promotion, no item target is promised; only the amount (' . wp_json_encode( $no_coupon ) . ')' );
 		$two->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$two->save();
 		AutomaticPromotions::forget();
+		$pickup = $zone->add_shipping_method( 'flat_rate' );
+		update_option( "woocommerce_flat_rate_{$pickup}_settings", array( 'enabled' => 'yes', 'title' => 'Pickup', 'cost' => '0', 'tax_status' => 'none' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		t59_cart( array( $open->get_id() => 1 ) );
+		WC()->session->set( 'chosen_shipping_methods', array( "flat_rate:{$flat}" ) );
+		WC()->cart->calculate_totals();
+		$paid_chosen = FreeShippingProgress::of( WC()->cart );
+		WC()->session->set( 'chosen_shipping_methods', array( "flat_rate:{$pickup}" ) );
+		WC()->cart->calculate_totals();
+		$free_chosen = FreeShippingProgress::of( WC()->cart );
+		$zone->delete_shipping_method( $pickup );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		WC()->session->set( 'chosen_shipping_methods', array() );
+		$check( false === $paid_chosen['free'] && true === $free_chosen['free'], 'CART-07 a free pickup on offer does not make shipping free while the paid delivery is the one chosen' );
 		$by_value = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 1 ) ) );
 		$over     = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 2 ) ) );
 		$check( false === $single['free'] && 1 === $single['items_needed'] && '400.00' === $single['amount_needed'] && true === $pair['free'], 'CART-07 one unit needs one more item for the two-unit promotion (or 400 more for the 500 minimum); two units ship free (' . wp_json_encode( $single ) . ')' );
@@ -282,6 +328,14 @@ run(
 		$miss  = Wishlist::fromCart( str_repeat( 'a', 32 ) );
 		$check( true === $moved && in_array( $open->get_id(), Wishlist::ids(), true ) && WC()->cart->is_empty() && is_wp_error( $miss ), 'CART-04 moving a line saves it to the wishlist and takes it out of the cart; a line not in the cart changes nothing' );
 		Wishlist::remove( $open->get_id() );
+		$visitor  = t59_store();
+		$put_in   = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $open->get_id(), 'quantity' => 1 ), $visitor['auth'], $visitor['cookies'] );
+		$line_key = (string) ( $put_in['data']['items'][0]['key'] ?? '' );
+		$wl_nonce = (string) ( $put_in['data']['extensions']['mizzey']['wishlist_nonce'] ?? '' );
+		$forged   = sign_in_json( 'POST', rest_url( 'mizzey/v1/wishlist/from-cart' ), array( 'key' => $line_key ), array(), $put_in['cookies'] );
+		$moved_in = sign_in_json( 'POST', rest_url( 'mizzey/v1/wishlist/from-cart' ), array( 'key' => $line_key ), array( 'X-Mizzey-Nonce' => $wl_nonce ), $put_in['cookies'] );
+		$left     = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null, array(), $moved_in['cookies'] );
+		$check( '' !== $line_key && '' !== $wl_nonce && 403 === $forged['status'] && 200 === $moved_in['status'] && array() === ( $left['data']['items'] ?? null ), '[HTTP] CART-04 moving a line needs the nonce tied to the visitor\'s session: without it 403, with it the line moves (' . $forged['status'] . ', ' . $moved_in['status'] . ')' );
 
 		// CART-01, CART-02, CART-03, CART-05, CART-06: WooCommerce's Store API cart.
 		$native  = t59_store();
