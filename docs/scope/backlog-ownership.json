@@ -405,7 +405,7 @@
     }
    ],
    "data_integrity": "B1 measured (closed); M17 open; C3, C4",
-   "acceptance_evidence": "Contract tests on the adapter against a mock; both language records of an item resolve to one stock identity.",
+   "acceptance_evidence": "Contract tests on the adapter against a mock; both language records of an item resolve to one stock identity. specs/012-erp-adapter-seam verification.md: technically verified; merged 31 October 2026 as d3f0e76 (PR #444); staging verification and acceptance pending.",
    "not_in_slice": [
     "ERP-09 (OUT)",
     "INT-14 (P3)"
@@ -539,7 +539,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Permission tests per role (DOD-06); AC-11.",
+   "acceptance_evidence": "Permission tests per role (DOD-06); AC-11. specs/013-launch-roles verification.md: technically verified; merged 31 October 2026 as 2d0b4a6 (PR #445); staging verification and acceptance pending.",
    "not_in_slice": [
     "ROLE-03 (DEF)",
     "ROLE-04 (DEF)",
@@ -2227,7 +2227,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A promotion and a coupon created, scheduled, paused and reactivated from admin, with the usage count intact after the pause.",
+   "acceptance_evidence": "A promotion and a coupon created, scheduled, paused and reactivated from admin, with the usage count intact after the pause. specs/014-promotions-admin verification.md: technically verified; merged 31 October 2026 as 7750794 (PR #446); staging verification and acceptance pending.",
    "not_in_slice": [
     "ADM-112 (P2)",
     "ADM-114 (P2)",
