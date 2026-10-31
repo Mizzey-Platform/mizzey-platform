@@ -74,6 +74,7 @@ require_once __DIR__ . '/src/Accounts/VerificationOnRegistration.php';
 require_once __DIR__ . '/src/Accounts/MarketingConsent.php';
 require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
+require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
@@ -166,6 +167,8 @@ MizzeySite\Accounts\VerificationOnRegistration::register();
 MizzeySite\Accounts\MarketingConsent::register();
 MizzeySite\Accounts\PhoneSignIn::register();
 MizzeySite\Accounts\SignInLink::register();
+// Google sign-in, one account per email (AUTH-10, AUTH-13; D-24). See specs/024-google-sign-in.
+MizzeySite\Accounts\GoogleSignIn::register();
 
 // The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
