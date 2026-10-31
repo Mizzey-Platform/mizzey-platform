@@ -75,6 +75,10 @@ require_once __DIR__ . '/src/Stock/StockSource.php';
 require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
 require_once __DIR__ . '/src/Stock/StockIdentity.php';
 require_once __DIR__ . '/src/Stock/StockGateway.php';
+require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
+require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
+require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -135,3 +139,9 @@ if (defined('WP_CLI') && WP_CLI) {
     }
     unset($mizzey_cli_arguments);
 }
+
+// Product reviews: eligibility by delivered purchase (D-17), moderation, the rating, the invitation. REV-01 to REV-05,
+// specs/020-reviews.
+MizzeySite\Reviews\ReviewEligibility::register();
+MizzeySite\Reviews\ReviewModeration::register();
+MizzeySite\Reviews\ReviewInvitation::register();
