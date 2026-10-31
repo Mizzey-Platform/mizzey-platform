@@ -42,6 +42,9 @@ final class ReviewEligibility
         add_action('rest_insert_comment', [self::class, 'restRating'], 10, 3);
         add_filter('woocommerce_rest_pre_insert_product_review', [self::class, 'checkWooRest'], 10, 2);
         add_filter('woocommerce_product_review_comment_form_args', [self::class, 'formArgs'], 20, 1);
+        add_filter('rest_pre_dispatch', [self::class, 'wooRestStatus'], 10, 3);
+        add_action('wp_insert_comment', [self::class, 'unlock'], 0);
+        add_action('shutdown', [self::class, 'unlock']);
     }
 
     /** Null when the user may review the product, or the reason they may not. */
@@ -146,12 +149,77 @@ final class ReviewEligibility
         if ($request->get_param('status') !== null && $request->get_param('status') !== 'hold') {
             return new \WP_Error('mizzey_review_status', __('Only staff who moderate reviews can publish one.', 'mizzey-site'), ['status' => 403]);
         }
-        $reason = self::refusal(get_current_user_id(), (int) ($prepared['comment_post_ID'] ?? 0));
+        $reason = self::reasonFor(get_current_user_id(), (int) ($prepared['comment_post_ID'] ?? 0));
         if ($reason === null && ! self::validRating($request->get_param('rating'))) {
             $reason = self::NO_RATING;
         }
+        if ($reason !== null) {
+            return new \WP_Error('mizzey_review_' . $reason, self::message($reason), ['status' => 403]);
+        }
+        // The review is the signed-in customer's, under their own name and email, not one the request makes up.
+        $user                             = wp_get_current_user();
+        $prepared['user_id']              = $user->ID;
+        $prepared['comment_author']       = $user->display_name;
+        $prepared['comment_author_email'] = $user->user_email;
 
-        return $reason !== null ? new \WP_Error('mizzey_review_' . $reason, self::message($reason), ['status' => 403]) : $prepared;
+        return $prepared;
+    }
+
+    /**
+     * WooCommerce's REST reviews routes, any version, update and batch included: only staff who moderate may set a
+     * review's status, and only they may change a review at all.
+     *
+     * @param mixed $result
+     * @param mixed $server
+     * @param mixed $request
+     * @return mixed
+     */
+    public static function wooRestStatus($result, $server, $request)
+    {
+        if ($result !== null || ! $request instanceof \WP_REST_Request || self::moderator(get_current_user_id())
+            || preg_match('#^/wc/v\d+/products/reviews#i', $request->get_route()) !== 1 || $request->get_method() === 'GET') {
+            return $result;
+        }
+        $changes = in_array($request->get_method(), ['PUT', 'PATCH', 'DELETE'], true) || str_contains(strtolower($request->get_route()), '/batch')
+            || preg_match('#/reviews/\d+#', $request->get_route()) === 1;
+        if ($changes || $request->get_param('status') !== null && $request->get_param('status') !== 'hold') {
+            return new \WP_Error('mizzey_review_status', __('Only staff who moderate reviews can publish one.', 'mizzey-site'), ['status' => 403]);
+        }
+
+        return $result;
+    }
+
+    /** The lock held between a submission's check and its insert, released once the review is stored. */
+    private static ?string $lock = null;
+
+    /**
+     * Takes the lock for the customer's review of the product, so two submissions at once cannot both pass the check
+     * for one review; false when it cannot be taken.
+     */
+    private static function lockFor(int $userId, int $productId): bool
+    {
+        global $wpdb;
+        $group = self::group($productId);
+        $name  = substr('mz_' . $wpdb->prefix . 'review_' . $userId . '_' . ($group[0] ?? $productId), 0, 64);
+        if (self::$lock === $name) {
+            return true;
+        }
+        self::unlock();
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $name)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return false;
+        }
+        self::$lock = $name;
+
+        return true;
+    }
+
+    public static function unlock(): void
+    {
+        global $wpdb;
+        if (self::$lock !== null) {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::$lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            self::$lock = null;
+        }
     }
 
     /** @param mixed $rating */
@@ -191,13 +259,20 @@ final class ReviewEligibility
             'title_reply_after'    => '',
             'fields'               => [],
             'comment_field'        => '',
-            'must_log_in'          => '',
-            'logged_in_as'         => '',
-            'comment_notes_before' => sprintf('<p class="woocommerce-verification-required mizzey-review-%1$s">%2$s</p>', esc_attr($reason), esc_html(self::message($reason))),
+            // WordPress prints the notes before the fields to guests and the signed-in line to customers: both carry the
+            // reason, and so does the sign-in prompt when reviews need an account.
+            'must_log_in'          => self::reasonHtml($reason),
+            'logged_in_as'         => self::reasonHtml($reason),
+            'comment_notes_before' => self::reasonHtml($reason),
             'comment_notes_after'  => '',
             'submit_button'        => '',
             'submit_field'         => '',
         ]);
+    }
+
+    private static function reasonHtml(string $reason): string
+    {
+        return sprintf('<p class="woocommerce-verification-required mizzey-review-%s">%s</p>', esc_attr($reason), esc_html(self::message($reason)));
     }
 
     /** @param array<string,mixed> $data */
@@ -210,7 +285,15 @@ final class ReviewEligibility
 
     private static function reasonFor(int $userId, int $productId): ?string
     {
-        return self::moderator($userId) ? null : self::refusal($userId, $productId);
+        if (self::moderator($userId)) {
+            return null;
+        }
+        // Checked under the customer's lock for this product, held until the review is stored.
+        if ($userId > 0 && ! self::lockFor($userId, $productId)) {
+            return self::ALREADY_REVIEWED;
+        }
+
+        return self::refusal($userId, $productId);
     }
 
     /**
@@ -251,13 +334,21 @@ final class ReviewEligibility
                 // A line refunded in full, by its quantity or by its amount, does not count.
                 if ($item instanceof \WC_Order_Item_Product && in_array((int) $item->get_product_id(), $group, true)
                     && (int) $item->get_quantity() + (int) $order->get_qty_refunded_for_item((int) $itemId) > 0
-                    && (float) $order->get_total_refunded_for_item((int) $itemId) < (float) $item->get_total()) {
+                    && ! self::refundedInFull($order, (int) $itemId, $item)) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /** A line refunded in full by its amount: something was refunded, and at least what the line cost. */
+    private static function refundedInFull(\WC_Order $order, int $itemId, \WC_Order_Item_Product $item): bool
+    {
+        $refunded = (float) $order->get_total_refunded_for_item($itemId);
+
+        return $refunded > 0 && $refunded >= (float) $item->get_total();
     }
 
     /** @param list<int> $group */
