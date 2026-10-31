@@ -134,6 +134,21 @@ run(
 		$unproven = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-5", 'email' => "{$tag}-unproven@example.invalid", 'email_verified' => false ) + $good );
 		$check( $staff_id > 0 && is_wp_error( $staff ) && 'mizzey_google_staff' === $staff->get_error_code() && '' === get_user_meta( $staff_id, GoogleSignIn::SUBJECT, true ) && is_wp_error( $unproven ) && false === get_user_by( 'email', "{$tag}-unproven@example.invalid" ), 'AUTH-10 a staff account cannot be signed in to with Google, and an email Google has not verified makes no account' );
 
+		// A good code with a state that is not this browser's: only the state's binding to the cookie refuses it.
+		$other_start = new \WP_REST_Request( 'GET', '/mizzey/v1/google/start' );
+		parse_str( (string) wp_parse_url( (string) ( rest_do_request( $other_start )->get_headers()['Location'] ?? '' ), PHP_URL_QUERY ), $other_flow );
+		$other_saved   = get_transient( 'mizzey_google_' . hash( 'sha256', (string) ( $other_flow['state'] ?? '' ) ) );
+		$good['nonce'] = (string) ( $other_saved['nonce'] ?? '' );
+		$_COOKIE[ GoogleSignIn::COOKIE ] = 'someone-elses-state';
+		$crossed = new \WP_REST_Request( 'GET', '/mizzey/v1/google/callback' );
+		$crossed->set_param( 'state', (string) ( $other_flow['state'] ?? '' ) );
+		$crossed->set_param( 'code', 'good-code' );
+		$crossed_answer = rest_do_request( $crossed );
+		$crossed_user   = get_current_user_id();
+		unset( $_COOKIE[ GoogleSignIn::COOKIE ] );
+		wp_set_current_user( 0 );
+		$check( 0 === $crossed_user && false !== strpos( (string) ( $crossed_answer->get_headers()['Location'] ?? '' ), 'mizzey-google=refused' ), 'AUTH-10 a good code with a state that is not bound to this browser\'s cookie signs no one in (login CSRF)' );
+
 		// The callback, in this process with the start's state and cookie: signs in and returns to where it began.
 		add_filter( 'send_auth_cookies', '__return_false' );
 		$s->on_finish( static function () { remove_filter( 'send_auth_cookies', '__return_false' ); } );
