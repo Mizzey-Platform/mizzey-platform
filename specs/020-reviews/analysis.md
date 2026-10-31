@@ -1,0 +1,9 @@
+# Analysis and review record: product reviews
+
+Written and built by Claude Code (lead). Codex (gpt-6.1-sol, read-only) reviewed as a second opinion. Every finding
+was checked against WordPress's and WooCommerce 11.1.0's source before it was applied, and each fix has a t61 check that
+fails when the fix is removed (`evidence/mutation.txt`), unless the record says why it cannot have one.
+
+| Round | Verdict | Findings, and what was done |
+|---|---|---|
+| 1 | FIX FIRST | One High, seven Medium, one Low. WooCommerce's REST reviews endpoint skipped the rule and let staff without moderation rights publish: guarded, and only staff who moderate may set a status. A second review could arrive through the REST comments endpoint as a plain comment, and WPML narrowed the duplicate check to one language: the check counts every review type in both languages, and REST reviews are stored as reviews. Closing comments hid the whole Reviews tab: the tab and approved reviews stay, and the form shows only the reason to someone who may not review. A review without a rating could be stored: every route needs a rating of 1 to 5, and REST keeps it. A line refunded in full by amount alone still counted: not any more. A subject staff set, translated by WooCommerce Multilingual, was bypassed: their path is kept, and the defaults follow the order's language. Two deliveries at once could send two invitations: one, under a lock per order. Two products with one name lost a link: one link per product |
