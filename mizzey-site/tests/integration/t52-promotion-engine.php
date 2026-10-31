@@ -390,6 +390,29 @@ run(
 			$done->save();
 		}
 		$zone->delete_shipping_method( $free_min );
+		// Eighth review round: the discount keeps its fractions of a cent until the remaining total is rounded, as
+		// WooCommerce does. Entered with tax, shown without it, tax rounded at subtotal: 100 with 20 percent tax shows
+		// 83.33; 20 off leaves 66.666..., which rounds to 66.67 and meets a 66.67 free shipping minimum. So 20 off
+		// (saves 20, ships free) beats 10 off, created earlier, and WooCommerce itself ships the cart free.
+		update_option( 'woocommerce_tax_round_at_subtotal', 'yes' );
+		$free_edge = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free_edge}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '66.67', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$ten_off    = t52_coupon( $s, "{$tag}autoten", array( 'discount_type' => 'fixed_product', 'amount' => '10', 'individual_use' => true, 'product_ids' => array( $taxed->get_id() ), 'date_created' => time() - 7 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$twenty_off = t52_coupon( $s, "{$tag}autotwentyedge", array( 'discount_type' => 'fixed_product', 'amount' => '20', 'individual_use' => true, 'product_ids' => array( $taxed->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		t52_cart( array( $taxed->get_id() => 1 ) );
+		$edge_free = false;
+		foreach ( WC()->shipping()->get_packages() as $package ) {
+			foreach ( (array) $package['rates'] as $rate ) {
+				$edge_free = $edge_free || 'free_shipping' === $rate->get_method_id();
+			}
+		}
+		$check( array( wc_format_coupon_code( $twenty_off->get_code() ) ) === t52_applied() && $edge_free, 'Q1 at the free shipping minimum to a fraction of a cent: 20 off that WooCommerce still ships free beats 10 off (' . implode( ',', t52_applied() ) . ', free shipping ' . ( $edge_free ? 'yes' : 'no' ) . ')' );
+		foreach ( array( $ten_off, $twenty_off ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		$zone->delete_shipping_method( $free_edge );
 		update_option( 'woocommerce_tax_round_at_subtotal', $round_before );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		foreach ( $tax_before as $name => $value ) {

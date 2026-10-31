@@ -127,7 +127,8 @@ more", saves it, and it applies by itself on those dates.
   discount's tax included, whether prices are shown with tax or without it, and a free shipping minimum sees the
   discount as the cart shows it. Lines are priced as WooCommerce's own totals discount them, so a tax-exempt
   customer's price entered with tax is discounted without that tax, and prices are rebuilt from the unrounded tax so
-  they sort as WooCommerce sorts them. Shipping counts with its tax. Paid shipping rates are taken as the zone calculates them for the
+  they sort as WooCommerce sorts them. As WooCommerce does, the discount keeps its fractions of a cent until the
+  remaining total is rounded for a free shipping minimum. Shipping counts with its tax. Paid shipping rates are taken as the zone calculates them for the
   cart: the store's rates are fixed per governorate (the carrier's rate card), so a promotion does not change them. A
   paid rate that depends on the cart's discounted value is not modelled; the store does not use one.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept

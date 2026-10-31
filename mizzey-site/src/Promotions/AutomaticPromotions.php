@@ -130,7 +130,7 @@ final class AutomaticPromotions
         $discounts->set_items(self::items($cart));
         $discounts->apply_coupon($coupon, false);
         $byItem = (array) $discounts->get_discounts_by_item(true);
-        $paid   = self::discountWithTax($cart, $byItem, true);
+        $paid   = (int) round(self::discountWithTax($cart, $byItem, true));
         $shown  = self::shownDiscount($cart, $byItem);
 
         return $paid + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
@@ -142,7 +142,7 @@ final class AutomaticPromotions
      *
      * @param array<string,float|int> $byItem Cents of discount by cart item key.
      */
-    public static function shownDiscount(\WC_Cart $cart, array $byItem): int
+    public static function shownDiscount(\WC_Cart $cart, array $byItem): float
     {
         return self::discountWithTax($cart, $byItem, $cart->display_prices_including_tax());
     }
@@ -192,7 +192,7 @@ final class AutomaticPromotions
      *
      * @param array<string,float|int> $byItem Cents of discount by cart item key.
      */
-    private static function discountWithTax(\WC_Cart $cart, array $byItem, bool $withTax): int
+    private static function discountWithTax(\WC_Cart $cart, array $byItem, bool $withTax): float
     {
         $entered = wc_prices_include_tax();
         $total   = 0.0;
@@ -204,7 +204,8 @@ final class AutomaticPromotions
             $total += (float) $cents * $factor;
         }
 
-        return (int) round($total);
+        // Unrounded: WooCommerce rounds only the remaining total it compares with a free shipping minimum.
+        return $total;
     }
 
     /**
@@ -283,7 +284,7 @@ final class AutomaticPromotions
      * store's rates are fixed per governorate (the carrier's rate card), so a promotion does not change them. A rate that
      * depends on the cart's discounted value is not modelled (recorded in the specification).
      */
-    public static function shippingCost(\WC_Cart $cart, int $discountCents, bool $freeCoupon): int
+    public static function shippingCost(\WC_Cart $cart, float $discountCents, bool $freeCoupon): int
     {
         $cents = 0;
         foreach (WC()->shipping()->get_packages() as $package) {
@@ -321,7 +322,7 @@ final class AutomaticPromotions
      * WooCommerce does, the discount counts only when the method does not ignore discounts; shown with tax, it counts
      * with its tax.
      */
-    private static function minimumMet(\WC_Cart $cart, \WC_Shipping_Method $method, int $discountCents): bool
+    private static function minimumMet(\WC_Cart $cart, \WC_Shipping_Method $method, float $discountCents): bool
     {
         $total = (float) $cart->get_displayed_subtotal();
         if ($method->get_option('ignore_discounts') !== 'yes') {
