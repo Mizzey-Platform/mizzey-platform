@@ -60,14 +60,19 @@ combination setting is BR-004's, built by #290: this slice verifies the conditio
 
 1. **Given** the coupon screen, **When** staff mark a promotion automatic with its conditions and dates, **Then** it
    applies to a qualifying cart with no code.
-2. **Given** a coupon code with a per-customer limit that a customer has used, **When** staff pause it (set it to
-   Draft), **Then** the code is refused, its use count and its record of who used it are unchanged.
-3. **Given** the paused promotion, **When** staff publish it again, **Then** it applies again, and the customer who
-   used it up still cannot use it again.
+2. **Given** a coupon code a customer used on an order, **When** staff tick Paused on the coupon screen, **Then** a new
+   cart is refused it ("This coupon is paused."), and its use count and record of who used it are unchanged.
+3. **Given** the paused promotion, **When** that order is cancelled, **Then** its use is reversed as for a live one.
+4. **Given** the paused promotion, **When** staff untick Paused, **Then** it applies again.
 
 ### Edge Cases
 
-- Pausing is WordPress's Draft status, deactivating is the same, and deleting (Trash) is a separate, deliberate act.
+- Pausing and deactivating are one act, the Paused box; deleting (Trash) is a separate, deliberate act.
+- Pausing stops new use. An order that already has the promotion keeps it, also when its coupons are recalculated:
+  pausing does not rewrite placed orders.
+- The promotion stays published while paused, so WooCommerce keeps finding it by code to record and reverse its use.
+  WordPress's Draft status is not a pause: WooCommerce looks a coupon up by code to record or reverse a use, finds no
+  draft, and the counts would drift; and a code that is the coupon's own number still loads as a draft.
 - An automatic promotion paused while carts hold it is taken off them on their next calculation (#281's settle()).
 - A start date in the future keeps the promotion waiting; an end before the start is refused on save (#281).
 
@@ -78,10 +83,10 @@ combination setting is BR-004's, built by #290: this slice verifies the conditio
 | Create a coupon code | WooCommerce's coupon screen | Native, used as is |
 | Create an automatic promotion, its start date, minimum items, first order, cap | The Mizzey settings #281 adds to the coupon screen | Built by #281 |
 | End date | WooCommerce's coupon expiry date | Native, used as is |
-| Pause, deactivate, reactivate | WordPress's Draft and Publish statuses: WooCommerce finds only published coupons by code (`WC_Coupon_Data_Store_CPT::get_ids_by_code()`, WooCommerce 11.1.0), and keeps `usage_count` and `_used_by` on the post | Native, used as is |
+| Pause, deactivate, reactivate | WordPress's Draft status | Gap: WooCommerce records and reverses a use by looking the coupon up by code (`wc-order-functions.php`), which finds no draft, so counts drift while paused; a numeric code loads a draft by id (`WC_Coupon::__construct`). A Mizzey Paused setting keeps the coupon published and is refused in WooCommerce's own validity check (`woocommerce_coupon_is_valid`) |
 | Usage history | WooCommerce's coupon usage count and per-customer record | Native, used as is |
 
-No code is written for this slice: every criterion it can meet now is met natively or by #281, and t55 proves it.
+One setting is added (Paused); everything else is native or #281's, and t55 proves it.
 
 ## Requirements
 
@@ -89,8 +94,10 @@ No code is written for this slice: every criterion it can meet now is met native
 
 - **FR-001**: A promotion set up on the coupon screen MUST apply as set: automatic or by code (AC-1, AC-2).
 - **FR-002**: A promotion MUST NOT apply before its start or after its end (AC-3).
-- **FR-003**: A paused promotion MUST NOT apply, and pausing and reactivating MUST NOT change its use count or its
-  record of who used it (AC-4).
+- **FR-003**: A Paused box on the coupon screen MUST stop the promotion applying to any new cart or order, by any route
+  WooCommerce validates a coupon on, while keeping it published; pausing and reactivating MUST NOT change its use count
+  or its record of who used it, and use MUST still be recorded and reversed while it is paused (AC-4).
+- **FR-004**: The coupon list MUST show "Paused" beside a paused promotion (AC-4).
 
 ### Key Entities
 
@@ -116,4 +123,4 @@ October 2026.
 
 ## Assumptions
 
-- "Pause or deactivate" is one act in WooCommerce: unpublishing the coupon. Staff see the status in the coupon list.
+- "Pause or deactivate" is one act: the Paused box. Staff see "Paused" beside the promotion in the coupon list.

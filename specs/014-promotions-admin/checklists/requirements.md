@@ -33,4 +33,4 @@
 
 - Native coverage names the coupon screen and WordPress's post statuses because the Mizzey template requires the
   native mechanism and its evidence.
-- No code is written; ADM-111's combination setting is #290's (BR-004).
+- One setting (Paused) is added; ADM-111's combination setting is #290's (BR-004).

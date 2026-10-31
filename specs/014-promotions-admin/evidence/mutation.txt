@@ -1,0 +1,4 @@
+Deliberate defects, each run against t55 and then reverted (31 October 2026):
+
+M1  a paused promotion is not refused                                 -> t55 fails (3 checks)
+M2  the Paused box is not saved                                       -> t55 fails (3 checks)
