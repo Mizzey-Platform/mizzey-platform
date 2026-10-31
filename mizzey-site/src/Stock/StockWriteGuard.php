@@ -81,21 +81,30 @@ final class StockWriteGuard
         }
         // A product being made holds its props as data, not as changes: all of its stock starts as WooCommerce's own.
         if ($product->get_id() <= 0) {
-            $product->set_props(array_combine(self::PROPS, array_map([self::class, 'fresh'], self::PROPS)));
+            foreach (self::PROPS as $prop) {
+                self::put($product, $prop, self::fresh($prop));
+            }
 
             return;
         }
         $changes = $product->get_changes();
         $stored  = $product->get_data();
-        $back    = [];
         foreach (self::PROPS as $prop) {
             if (array_key_exists($prop, $changes)) {
-                $back[$prop] = $stored[$prop] ?? null;
+                self::put($product, $prop, $stored[$prop] ?? null);
             }
         }
-        if ($back !== []) {
-            $product->set_props($back);
-        }
+    }
+
+    /** One stock prop set back, through its own setter: set_props() skips a null, which is a stock of none. */
+    private static function put(\WC_Product $product, string $prop, mixed $value): void
+    {
+        match ($prop) {
+            'stock_quantity' => $product->set_stock_quantity($value === null ? '' : $value),
+            'stock_status'   => $product->set_stock_status((string) $value),
+            'manage_stock'   => $product->set_manage_stock((bool) $value),
+            'backorders'     => $product->set_backorders((string) $value),
+        };
     }
 
     /** A new product's stock as WooCommerce starts it, with nothing written locally. */
