@@ -10,8 +10,8 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7.
 | Evidence | What it shows |
 |---|---|
 | `evidence/final-suite.txt`, `final-suite.json` | The whole suite, serially, at `c5c6c80` (after the fourth review), on the development runtime as it stood (not a fresh baseline reset): 50 scenarios, 2 failed, every other one passing or fact-finding. See the note below |
-| t57, t52 and t55 at the final commit | Pass. The only change after `c5c6c80` is the fifth review's change to the promotion choice and its two checks; t57 (these rules), t52 (the promotion engine it extends) and t55 (promotions in admin) are the scenarios it touches |
-| `evidence/mutation.txt` | Twenty-eight deliberate defects, each caught by t57 |
+| t57, t52 and t55 at the final commit | Pass. The only changes after `c5c6c80` are the fifth and sixth reviews' changes to the promotion choice and their three checks; t57 (these rules), t52 (the promotion engine it extends) and t55 (promotions in admin) are the scenarios it touches |
+| `evidence/mutation.txt` | Twenty-nine deliberate defects, each caught by t57 |
 | `analysis.md` | The read-only review rounds |
 
 **The two failures.** `t17` and `t25` fail because of eleven product records ("t11 B1-...", ids 56486 to 56496) that an

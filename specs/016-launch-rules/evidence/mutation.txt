@@ -39,3 +39,12 @@ After the fourth review (31 October 2026):
 M24  the free shipping baseline ignores the simulated discount         -> t57 fails
 M25  an entered free shipping code is ignored in the estimates         -> t57 fails
 M26  individual-use candidates ranked beside entered codes             -> t57 fails
+
+After the fifth review (31 October 2026):
+
+M27  free shipping paired with the best discount only                  -> t57 fails
+M28  the paid saving taken on the difference of discounts              -> t57 fails
+
+After the sixth review (31 October 2026):
+
+M29  a discount that loses alone is not paired with free shipping      -> t57 fails
