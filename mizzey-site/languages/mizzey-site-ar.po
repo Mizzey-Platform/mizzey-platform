@@ -163,6 +163,44 @@ msgstr "تعذّرت إضافة هذا المنتج إلى سلتك، لذلك �
 msgid "This product could not be found."
 msgstr "تعذّر العثور على هذا المنتج."
 
+#: mizzey-site/src/Cart/CartStock.php
+#. translators: %s: product name.
+#, php-format
+msgid "We could not confirm that %s is in stock. Please try again in a few minutes."
+msgstr "لم نتمكن من التأكد من توفر %s في المخزون. يرجى المحاولة مرة أخرى بعد بضع دقائق."
+
+#: mizzey-site/src/Cart/CartStock.php
+#. translators: 1: units available, 2: product name.
+#, php-format
+msgid "Only %1$d of %2$s is available. Please change the quantity in your cart."
+msgid_plural "Only %1$d of %2$s are available. Please change the quantity in your cart."
+msgstr[0] "لا تتوفر أي قطعة من %2$s. يرجى تعديل الكمية في سلتك."
+msgstr[1] "تتوفر قطعة واحدة فقط من %2$s. يرجى تعديل الكمية في سلتك."
+msgstr[2] "تتوفر قطعتان فقط من %2$s. يرجى تعديل الكمية في سلتك."
+msgstr[3] "تتوفر %1$d قطع فقط من %2$s. يرجى تعديل الكمية في سلتك."
+msgstr[4] "تتوفر %1$d قطعة فقط من %2$s. يرجى تعديل الكمية في سلتك."
+msgstr[5] "تتوفر %1$d قطعة فقط من %2$s. يرجى تعديل الكمية في سلتك."
+
+#: mizzey-site/src/Cart/CartStock.php
+#. translators: %s: product name.
+#, php-format
+msgid "%s is out of stock. Please remove it from your cart."
+msgstr "%s غير متوفر في المخزون. يرجى إزالته من سلتك."
+
+#: mizzey-site/src/Cart/CartMerge.php
+#. translators: %s: product names.
+#, php-format
+msgid "We lowered the quantity of %s to what is available."
+msgstr "خفّضنا كمية %s إلى المتوفر."
+
+#: mizzey-site/src/Wishlist/Wishlist.php
+msgid "This item is not in your cart."
+msgstr "هذا المنتج ليس في سلتك."
+
+#: mizzey-site/src/Wishlist/WishlistRoutes.php
+msgid "Please reload the page and try again."
+msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
+
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "You have already reviewed this product. Thank you."
 msgstr "لقد قيّمت هذا المنتج من قبل. شكرًا لك."

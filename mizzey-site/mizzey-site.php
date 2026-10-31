@@ -87,6 +87,13 @@ require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
 require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
+require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
+require_once __DIR__ . '/src/Cart/CartStock.php';
+require_once __DIR__ . '/src/Cart/CartMerge.php';
+require_once __DIR__ . '/src/Cart/GuestCartRetention.php';
+require_once __DIR__ . '/src/Cart/FreeShippingProgress.php';
+require_once __DIR__ . '/src/Cart/CartSuggestions.php';
 require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
 require_once __DIR__ . '/src/Wishlist/Wishlist.php';
 require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
@@ -130,6 +137,14 @@ MizzeySite\Orders\TransitionGuard::register();
 
 // Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
 MizzeySite\Roles\RefundCapability::register();
+// The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
+MizzeySite\Stock\FixtureStockSource::register();
+MizzeySite\Stock\LocalStockWriters::register();
+MizzeySite\Cart\CartStock::register();
+MizzeySite\Cart\CartMerge::register();
+MizzeySite\Cart\GuestCartRetention::register();
+MizzeySite\Cart\FreeShippingProgress::register();
+MizzeySite\Cart\CartSuggestions::register();
 // The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
 MizzeySite\Wishlist\Wishlist::register();
 MizzeySite\Wishlist\RecentlyViewed::register();
