@@ -75,7 +75,8 @@ final class PhoneSignIn
             }
         }
         foreach ($holders as $normal => $users) {
-            if (count(array_unique($users)) === 1 && get_option(self::claimName($normal)) === false && self::claim($normal, $users[0])) {
+            // claim() keeps a claim another account holds and takes over one whose owner no longer holds it.
+            if (count(array_unique($users)) === 1 && self::claim($normal, $users[0])) {
                 update_user_meta($users[0], self::HELD, $normal);
             }
         }
