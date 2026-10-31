@@ -128,7 +128,8 @@ account page, registration and any route that sets WordPress's sign-in cookie; t
 - **FR-001**: Every stock question the cart asks MUST go through the stock gateway and fail closed; nothing in the cart
   may write stock (AC-7).
 - **FR-002**: Outside production, a stand-in stock fixture MAY be switched on (`mizzey_stock_fixture`); it MUST answer
-  from the record's stock fields, refuse every change, never bind on production, and yield to a bound adapter.
+  from the record's stock fields less its own ledger of changes (once per operation key), never write WooCommerce's
+  stock, never bind on production, and yield to a bound adapter.
 - **FR-003**: Every sign-in MUST mark the saved cart to merge; the merge MUST combine quantities, keep every line of
   both carts, cap each item at what can be bought, tell the customer when a quantity was lowered, and save the result
   to the account (AC-6, AC-9, AC-10, AC-13).

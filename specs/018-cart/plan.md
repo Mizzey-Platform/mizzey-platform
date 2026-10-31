@@ -34,7 +34,7 @@ assignment, and moving a line to the wishlist. The designed cart and mini-cart a
 | Piece | What it does |
 |---|---|
 | `CartStock` | On `woocommerce_check_cart_items`: lines counted together by stock identity, each asked of the gateway; unknown, short and sold out each named as an error, which blocks checkout on both carts |
-| `FixtureStockSource` | Bound by the gateway's filter when `mizzey_stock_fixture` is `yes` and the site is not production; answers from the canonical record's stock fields; refuses changes |
+| `FixtureStockSource` | Bound by the gateway's filter when `mizzey_stock_fixture` is `yes` and the site is not production; answers from the canonical record's stock fields less its own ledger of changes, once per key; never writes WooCommerce's stock |
 | `CartMerge` | `set_logged_in_cookie` marks the merge for every sign-in; on `woocommerce_load_cart_from_session`, before WooCommerce's own merge, the saved and guest carts are combined and capped (sold individually, purchase limit, confirmed stock), WooCommerce's mark is cleared, the result is saved to the account and a notice names lowered items |
 | `GuestCartRetention` | The guest session lasts the set days (30), renewed a day before it ends; the setting under General |
 | `FreeShippingProgress` | Items needed for an automatic free-shipping promotion the cart otherwise qualifies for, and the amount needed for a free shipping method's minimum, measured as WooCommerce measures it; on the Store API cart |
@@ -50,7 +50,7 @@ assignment, and moving a line to the wishlist. The designed cart and mini-cart a
 | AC-4 | One unit: one more item, or 400 more; two units: free; no item promotion: 200 more, then free; [HTTP] on the Store API cart |
 | AC-5 | The assigned product not in the cart, never Cross-sells; nothing assigned, nothing; [HTTP] on the Store API cart |
 | AC-6, AC-10 | [HTTP] A guest with 2 creams and 2 soaps signs in to an account saving 1 soap: 2 creams and 3 soaps saved; any route that sets the sign-in cookie marks the merge |
-| AC-7 | No source: every line unconfirmed; short and sold out named; enough raises nothing; the cart check adds errors; the fixture's answers and its refusal to write; a bound adapter wins |
+| AC-7 | No source: every line unconfirmed; short and sold out named; enough raises nothing; the cart check adds errors; the fixture's answers, its ledger applied once per key, never WooCommerce's stock; a bound adapter wins |
 | AC-9 | [HTTP] A guest cart, then registering: kept |
 | AC-11 | [HTTP] The guest session cookie lasts 30 days; the setting, its fallback, a signed-in session unchanged |
 | AC-13 | 2 + 4 capped at 5; saved-only and guest-only lines kept; sold individually as 1; sold out removed; unanswered not capped |

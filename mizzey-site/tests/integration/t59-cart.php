@@ -132,8 +132,13 @@ run(
 		update_option( FixtureStockSource::OPTION, 'yes' );
 		$fixture = StockGateway::make();
 		$levels  = array( $fixture->level( $five->get_id() )->quantity, $fixture->level( $open->get_id() )->quantity );
-		$changed = $fixture->adjust( $five->get_id(), -1, "{$tag}-op" );
-		$check( ! $unbound->isKnown() && FixtureStockSource::enabled() && array( 5, FixtureStockSource::UNCOUNTED ) === $levels && ! $changed->isKnown() && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'Fixture: unbound until switched on outside production; it answers 5 for a counted item and the uncounted level for the rest, and refuses every change' );
+		$s->on_finish( static function () { delete_option( FixtureStockSource::LEDGER ); } );
+		$changed = $fixture->adjust( $five->get_id(), -2, "{$tag}-op" );
+		$again   = $fixture->adjust( $five->get_id(), -2, "{$tag}-op" );
+		$over    = $fixture->adjust( $five->get_id(), -9, "{$tag}-op2" );
+		$back    = $fixture->adjust( $five->get_id(), 2, "{$tag}-op3" );
+		$check( ! $unbound->isKnown() && FixtureStockSource::enabled() && array( 5, FixtureStockSource::UNCOUNTED ) === $levels && 3 === $changed->quantity && 3 === $again->quantity && ! $over->isKnown() && 5 === $back->quantity && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'Fixture: unbound until switched on outside production; it answers 5 for a counted item and the uncounted level for the rest; a change applies once per key, one below zero is refused, and the WooCommerce stock field is never written' );
+		delete_option( FixtureStockSource::LEDGER );
 		$bound_wins = static fn () => new T59Source( array() );
 		add_filter( StockGateway::SOURCE_FILTER, $bound_wins );
 		$real = StockGateway::make()->level( $five->get_id() );
