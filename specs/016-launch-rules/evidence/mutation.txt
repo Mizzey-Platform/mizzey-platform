@@ -1,0 +1,8 @@
+Deliberate defects, each run against t57 and then reverted (31 October 2026):
+
+M1  the welcome discount is not issued                                -> t57 fails (2 checks)
+M2  the template is accepted as a code                                -> t57 fails (1 check)
+M3  welcome coupons are store-wide automatic promotions               -> t57 fails (1 check)
+M4  combining off does not force one promotion per order              -> t57 fails (1 check)
+M5  combining on is ignored                                           -> t57 fails (1 check)
+M6  any role gets a welcome discount                                  -> t57 fails (1 check)
