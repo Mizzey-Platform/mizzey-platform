@@ -277,23 +277,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 6,
    "depends_on": [
     {
      "ref": "#249",
-     "reason": "Catalogue import specification, not yet delivered: the only development blocker",
+     "reason": "Catalogue import specification. Satisfied: merged 29 October 2026 as ee49727 (PR #423), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #249"
-    },
     {
      "id": "CR-06",
      "class": "Blocks final acceptance",
@@ -327,7 +322,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "Verified",
    "delivery_order": 7,
    "depends_on": [],
    "erp_blocked": "no",
@@ -350,7 +345,7 @@
     }
    ],
    "data_integrity": "A5 duplicate SKU resolution",
-   "acceptance_evidence": "The specification, and a validation report over the real export stating per row the resolved product id and whether it is the source-language original.",
+   "acceptance_evidence": "The specification, and a validation report over the real export stating per row the resolved product id and whether it is the source-language original. specs/006-catalogue-import-spec verification record: merged 29 October 2026 as ee49727 (PR #423); AC-1 to AC-7 pass against the fixture. Status Verified, not Accepted: AC-8 waits for the real export (CR-06) and the report type (CR-07), and the DOD-04 staging verification is not done.",
    "not_in_slice": [
     "PRE-05 (DLV, owned by E-PRE-7)",
     "PRE-06 (DLV, owned by E-PRE-7)",
@@ -2590,23 +2585,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 45,
    "depends_on": [
     {
      "ref": "#249",
-     "reason": "The import specification and its column mapping",
+     "reason": "The import specification and its column mapping. Satisfied: merged 29 October 2026 as ee49727 (PR #423), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #249"
-    },
     {
      "id": "CR-06, CR-07",
      "class": "Blocks final acceptance",
@@ -2649,23 +2639,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 46,
    "depends_on": [
     {
      "ref": "#249",
-     "reason": "The import specification names the image source references",
+     "reason": "The import specification names the image source references. Satisfied: merged 29 October 2026 as ee49727 (PR #423), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #249"
-    },
     {
      "id": "CR-08, OD-26",
      "class": "Content or client input",
