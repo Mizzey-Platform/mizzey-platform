@@ -265,7 +265,11 @@ run(
 		$check( array() !== $rates && in_array( 'cod', $methods, true ) && isset( $cart['data']['totals']['total_shipping'] ), '[HTTP] CHK-03, CHK-04, CHK-08 the checkout offers shipping methods with their cost, the payment methods, and a total breakdown' );
 		$missing = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( "{$tag}-m@example.invalid", null ), $auth, $cart['cookies'] );
 		$ar_url  = add_query_arg( 'lang', 'ar', rest_url( 'wc/store/v1/checkout' ) );
-		$missing_ar = sign_in_json( 'POST', $ar_url, t60_body( "{$tag}-m@example.invalid", null ), $auth, $cart['cookies'] );
+		// Its own cart: the store clears a cart when the language changes (WooCommerce Multilingual's cart setting).
+		$store_ar   = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
+		$auth_ar    = array( 'Cart-Token' => sign_in_header( $store_ar, 'cart-token' ), 'Nonce' => sign_in_header( $store_ar, 'nonce' ) );
+		$cart_ar    = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $five->get_id(), 'quantity' => 1 ), $auth_ar, $store_ar['cookies'] );
+		$missing_ar = sign_in_json( 'POST', $ar_url, t60_body( "{$tag}-m@example.invalid", null ), $auth_ar, $cart_ar['cookies'] );
 		// The Store API names the field in the error's details.
 		$said    = (string) wp_json_encode( $missing['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
 		$said_ar = (string) wp_json_encode( $missing_ar['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
