@@ -14,3 +14,4 @@ Apache's behaviour before it was applied, and each fix given a t66 check that fa
 Limits, recorded: two requests at once cannot be made in one PHP process, so the per-review lock has no concurrency
 test; on a server that ignores `.htaccess` the folder stays closed only by a hosting rule or `MIZZEY_REVIEW_PHOTOS_DIR`,
 and uploads are refused until the probe sees it refused.
+| 5 | READY | No High or Medium findings |
