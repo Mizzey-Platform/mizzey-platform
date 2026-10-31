@@ -147,6 +147,23 @@ final class AutomaticPromotions
     }
 
     /**
+     * The discount, in cents by cart item, of the coupons applied together in WooCommerce's order.
+     *
+     * @param list<\WC_Coupon> $coupons
+     * @return array<string,float|int>
+     */
+    private static function discountByItem(\WC_Cart $cart, array $coupons): array
+    {
+        $discounts = new \WC_Discounts($cart);
+        $discounts->set_items(self::items($cart));
+        foreach (self::inWooCommerceOrder($coupons) as $each) {
+            $discounts->apply_coupon($each, false);
+        }
+
+        return (array) $discounts->get_discounts_by_item(true);
+    }
+
+    /**
      * Coupons in the order WooCommerce's totals apply them, which matters with sequential discounts: fixed per product,
      * then percentage, then fixed cart (`woocommerce_coupon_sort` may change it), then a smaller item limit, then a
      * smaller amount, then the newer (`WC_Cart_Totals::get_coupons_from_cart()`, `sort_coupons_callback()`, 11.1.0).
@@ -242,13 +259,15 @@ final class AutomaticPromotions
      */
     private static function measure(\WC_Cart $cart, \WC_Coupon $coupon, float $already, array $before): array
     {
-        $discounts = new \WC_Discounts($cart);
-        $discounts->set_items(self::items($cart));
-        $all = [...array_map(static fn (string $code): \WC_Coupon => new \WC_Coupon($code), $before), $coupon];
-        foreach (self::inWooCommerceOrder($all) as $each) {
-            $discounts->apply_coupon($each, false);
+        // What the promotion adds: the discount with it, less the discount without it, line by line, both applied in
+        // WooCommerce's order, so a line the entered codes already take to nothing gains nothing from it.
+        $held   = array_map(static fn (string $code): \WC_Coupon => new \WC_Coupon($code), $before);
+        $with   = self::discountByItem($cart, [...$held, $coupon]);
+        $without = $held !== [] ? self::discountByItem($cart, $held) : [];
+        $byItem = [];
+        foreach ($with as $key => $cents) {
+            $byItem[$key] = (float) $cents - (float) ($without[$key] ?? 0);
         }
-        $byItem = (array) ($discounts->get_discounts(true)[$coupon->get_code()] ?? []);
         $paid   = self::paidSaving($cart, $byItem);
         $shown  = self::shownDiscount($cart, $byItem);
 
