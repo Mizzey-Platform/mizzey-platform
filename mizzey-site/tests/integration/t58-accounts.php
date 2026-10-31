@@ -181,7 +181,9 @@ run(
 		delete_option( PhoneSignIn::BACKFILLED );
 		PhoneSignIn::backfill();
 		$check( $late === PhoneSignIn::holder( $n1 ) && null === PhoneSignIn::holder( $n2 ) && $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 numbers saved before claims existed are claimed once by their one holder; a number two accounts saved is claimed by neither; a claimed number is left as it is (' . wp_json_encode( array( PhoneSignIn::holder( $n1 ), $late, PhoneSignIn::holder( $n2 ), PhoneSignIn::holder( '01012345678' ), $mobile, get_option( PhoneSignIn::CLAIM . '_' . $n1 ), get_user_meta( $late, PhoneSignIn::HELD, true ) ) ) . ')' );
-		$s->on_finish( static function () use ( $n1 ) { delete_option( PhoneSignIn::CLAIM . '_' . $n1 ); } );
+		$s->on_finish( static function () use ( $n1, $n2 ) { delete_option( PhoneSignIn::CLAIM . '_' . $n1 ); delete_option( PhoneSignIn::CLAIM . '_' . $n2 ); } );
+		$third = t58_register( $s, "{$tag}-third@example.invalid", $password, array( PhoneSignIn::FIELD => $n2 ) );
+		$check( $third > 0 && null === PhoneSignIn::holder( $n2 ) && PhoneSignIn::RESERVED === get_option( PhoneSignIn::CLAIM . '_' . $n2 ), 'AUTH-02 a number two accounts saved before claims existed stays reserved: a third account saving it later does not sign in with it' );
 		$numbered = t58_user( $s, array( 'user_login' => $n1, 'user_email' => "{$tag}-num@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
 		update_user_meta( $numbered, PhoneSignIn::FIELD, $n4 );
 		$typed = $n4;

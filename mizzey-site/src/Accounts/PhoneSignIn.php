@@ -39,6 +39,8 @@ final class PhoneSignIn
     public const HELD = '_mizzey_phone';
     public const CLAIM = 'mizzey_phone';
     public const BACKFILLED = 'mizzey_phone_claims_backfilled';
+    /** The claim's value for a number several accounts held before claims existed: reserved, so nobody signs in with it. */
+    public const RESERVED = '0';
 
     /** The username identity() resolved a number to in this request, which is not read as a number again. */
     private static ?string $resolved = null;
@@ -75,8 +77,14 @@ final class PhoneSignIn
             }
         }
         foreach ($holders as $normal => $users) {
-            // claim() keeps a claim another account holds and takes over one whose owner no longer holds it.
-            if (count(array_unique($users)) === 1 && self::claim($normal, $users[0])) {
+            // claim() keeps a claim another account holds and takes over one whose owner no longer holds it. A number
+            // several accounts hold is reserved for none until staff remove the reservation.
+            if (count(array_unique($users)) > 1) {
+                global $wpdb;
+                $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", self::claimName($normal), self::RESERVED)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                wp_cache_delete(self::claimName($normal), 'options');
+                wp_cache_delete('notoptions', 'options');
+            } elseif (self::claim($normal, $users[0])) {
                 update_user_meta($users[0], self::HELD, $normal);
             }
         }
@@ -168,7 +176,15 @@ final class PhoneSignIn
         }
         self::release($userId);
         if ($normal !== null && self::claim($normal, $userId)) {
-            update_user_meta($userId, self::HELD, $normal);
+            // Another write to this account's phone may have landed meanwhile: the claim follows only the saved value.
+            wp_cache_delete($userId, 'user_meta');
+            if (self::normalise((string) get_user_meta($userId, self::FIELD, true)) === $normal) {
+                update_user_meta($userId, self::HELD, $normal);
+            } else {
+                global $wpdb;
+                $wpdb->delete($wpdb->options, ['option_name' => self::claimName($normal), 'option_value' => (string) $userId]); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                wp_cache_delete(self::claimName($normal), 'options');
+            }
         }
     }
 
@@ -213,7 +229,10 @@ final class PhoneSignIn
         $won      = $inserted === 1;
         if (! $won) {
             $owner = (int) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            $stale = $owner !== $userId && get_user_meta($owner, self::HELD, true) !== $normal;
+            // Stale when the owner's saved billing phone is no longer the number (or the account is gone): a claim still
+            // being completed is not, because the owner's phone was saved before it claimed. A reservation never is.
+            wp_cache_delete($owner, 'user_meta');
+            $stale = $owner > 0 && $owner !== $userId && self::normalise((string) get_user_meta($owner, self::FIELD, true)) !== $normal;
             $won   = $owner === $userId || ($stale && $wpdb->update($wpdb->options, ['option_value' => (string) $userId], ['option_name' => $name, 'option_value' => (string) $owner]) === 1); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
         wp_cache_delete('notoptions', 'options');
