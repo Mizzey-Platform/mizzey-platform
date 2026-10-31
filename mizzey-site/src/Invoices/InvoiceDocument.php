@@ -162,14 +162,26 @@ final class InvoiceDocument
         return sprintf('<tr><td>' . $cell . '</td><td class="mizzey-invoice-amount">' . $cell . '</td></tr>', esc_html($label), esc_html(self::money($amount, $order)));
     }
 
-    /**
-     * An amount in the order's currency, as plain text, with the store's own number of decimals, not the viewer's
-     * currency's (WooCommerce Multilingual changes wc_get_price_decimals() with the visitor's currency).
-     */
+    /** An amount in the order's currency, as plain text, with that currency's number of decimals. */
     public static function money(float $amount, \WC_Order $order): string
     {
-        $decimals = max(0, (int) get_option('woocommerce_price_num_decimals', 2));
+        return html_entity_decode(wp_strip_all_tags(wc_price($amount, ['currency' => $order->get_currency(), 'decimals' => self::decimals($order->get_currency())])), ENT_QUOTES, 'UTF-8');
+    }
 
-        return html_entity_decode(wp_strip_all_tags(wc_price($amount, ['currency' => $order->get_currency(), 'decimals' => $decimals])), ENT_QUOTES, 'UTF-8');
+    /**
+     * The decimals of a currency, read as stored and not through the viewer's currency (WooCommerce Multilingual
+     * filters both wc_get_price_decimals() and the option): the store's own for its currency, WooCommerce
+     * Multilingual's setting for another, else the store's own.
+     */
+    public static function decimals(string $currency): int
+    {
+        global $wpdb;
+        $raw      = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'woocommerce_price_num_decimals')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $store    = is_numeric($raw) ? (int) $raw : 2;
+        $base     = (string) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'woocommerce_currency')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $settings = maybe_unserialize((string) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", '_wcml_settings'))); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $other    = is_array($settings) ? ($settings['currency_options'][$currency]['num_decimals'] ?? null) : null;
+
+        return max(0, $currency !== $base && is_numeric($other) ? (int) $other : $store);
     }
 }

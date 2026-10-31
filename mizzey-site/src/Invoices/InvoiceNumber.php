@@ -124,12 +124,14 @@ final class InvoiceNumber
         return $written !== false && self::counter() === $next;
     }
 
-    /** Whether another order already holds the number. */
+    /** Whether another order already holds the number, a trashed one included; a failed query counts as held. */
     private static function taken(string $number): bool
     {
-        $holders = wc_get_orders(['limit' => 1, 'return' => 'ids', 'status' => array_keys(wc_get_order_statuses()), 'meta_query' => [['key' => self::NUMBER, 'value' => $number]]]); // phpcs:ignore WordPress.DB.SlowDBQuery
+        global $wpdb;
+        $statuses = array_merge(array_keys(wc_get_order_statuses()), ['trash']);
+        $holders  = wc_get_orders(['limit' => 1, 'return' => 'ids', 'status' => $statuses, 'meta_query' => [['key' => self::NUMBER, 'value' => $number]]]); // phpcs:ignore WordPress.DB.SlowDBQuery
 
-        return $holders !== [];
+        return $holders !== [] || $wpdb->last_error !== '';
     }
 
     /** When the invoice was issued (a Unix time), or null. */

@@ -104,6 +104,14 @@ run(
 		$third   = t64_order( $s, $buyer, $product, 'processing' );
 		$number3 = InvoiceNumber::of( $third->get_id() );
 		$check( '' !== $number3 && ! in_array( $number3, array( $number1, $number2 ), true ), "ADM-92 with the counter set back to a number already used, the next order still gets a number no other order holds ({$number3})" );
+		// A trashed order keeps its number: the counter set back to it, the next order still gets another.
+		$trashed = t64_order( $s, $buyer, $product, 'processing' );
+		$held_by_trash = InvoiceNumber::of( $trashed->get_id() );
+		wc_get_order( $trashed->get_id() )->delete( false );
+		update_option( InvoiceNumber::COUNTER, (string) (int) substr( $held_by_trash, 4 ), false );
+		$fourth  = t64_order( $s, $buyer, $product, 'processing' );
+		$number4 = InvoiceNumber::of( $fourth->get_id() );
+		$check( '' !== $held_by_trash && '' !== $number4 && $number4 !== $held_by_trash, "ADM-92 a trashed order keeps its number: with the counter set back to it, the next order gets another ({$held_by_trash}, then {$number4})" );
 		$check( 1 === preg_match( '/^T64-(\d{6})$/', $number1, $a ) && 1 === preg_match( '/^T64-(\d{6})$/', $number2, $b ) && (int) $b[1] === (int) $a[1] + 1 && $again === $number1 && '' === InvoiceNumber::of( $unpaid->get_id() ) && '' === InvoiceNumber::issue( $unpaid->get_id() ) && ! InvoiceNumber::issuable( $unpaid ), "ADM-92 a paid order gets its invoice number once, the next in sequence; an unpaid one gets none ({$number1}, {$number2}, again {$again})" );
 
 		// AC-2: what it carries. A gift-wrap fee of 15 on the first order: 180 + 50 + 15 = 245.
@@ -120,6 +128,24 @@ run(
 		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', '100.00', '200.00', 'Discount', '20.00', '50.00', '15.00', '245.00', 'Refunded', '30.00', '215.00' );
 		$missing = array_values( array_filter( $wants, static fn ( string $want ): bool => false === strpos( $text, $want ) ) );
 		$check( array() === $missing && 245.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, a fee of 15, total 245, the refund of 30 and the net 215 (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
+
+		// An order in a currency of three decimals, from a request in the store's own: its amounts keep three.
+		sign_in_keep_option( $s, '_wcml_settings' );
+		$wcml = get_option( '_wcml_settings', array() );
+		$wcml = is_array( $wcml ) ? $wcml : array();
+		$wcml['currency_options']['KWD']['num_decimals'] = 3;
+		update_option( '_wcml_settings', $wcml );
+		$dinar = t64_order( $s, $buyer, $product, 'processing' );
+		$dinar->set_currency( 'KWD' );
+		foreach ( $dinar->get_items() as $dinar_item ) {
+			$dinar_item->set_subtotal( '123.456' );
+			$dinar_item->set_total( '123.456' );
+			$dinar_item->save();
+		}
+		$dinar->calculate_totals( false );
+		$dinar->save();
+		$dinar_text = wp_strip_all_tags( str_replace( '<', ' <', InvoiceDocument::html( wc_get_order( $dinar->get_id() ) ) ) );
+		$check( false !== strpos( $dinar_text, '123.456' ) && false !== strpos( $dinar_text, '173.456' ), 'ADM-92 an order in a three-decimal currency keeps its three decimals on the invoice (123.456, and 173.456 with shipping)' );
 
 		// AC-3: an Arabic order.
 		$arabic = t64_order( $s, $buyer, $product, 'processing', 'ar' );
