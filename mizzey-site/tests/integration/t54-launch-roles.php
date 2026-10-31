@@ -120,8 +120,8 @@ run(
 		$product = $s->simple_product( 't54 product', '100', null );
 		$order   = $s->order_for( $product, 1 );
 		$route   = '/wc/v3/orders/' . $order->get_id() . '/refunds';
-		t54_as( $manager->ID );
 		$manager->add_cap( RefundCapability::CAP, false );
+		t54_as( $manager->ID );
 		$refused = t54_rest( 'POST', $route, array( 'amount' => '10', 'api_refund' => false ) );
 		$none    = count( wc_get_order( $order->get_id() )->get_refunds() );
 		$check( 403 === $refused->get_status() && 0 === $none && current_user_can( 'edit_shop_orders' ), "AC-4 [REST] a shop manager who edits orders but lacks the refund capability is refused ({$refused->get_status()}), and the order has no refund" );
