@@ -1,0 +1,13 @@
+# Analysis and review record: accounts
+
+Written and built by Claude Code (lead). Codex (gpt-6.1-sol, read-only) reviewed as a second opinion. Every finding
+was checked against WooCommerce 11.1.0's, WordPress's and CoreX's source before it was applied, and each fix has a t58
+check that fails when the fix is removed (`evidence/mutation.txt`).
+
+| Round | Verdict | Findings, and what was done |
+|---|---|---|
+| 1 | FIX FIRST | One High, seven Medium, one Low. CoreX's lockout counted each spelling of a mobile number separately: the number now becomes its account's username before the lockout sees it. Two requests could both redeem one link: the link is spent by one delete only one request can win. Opening a link signed the browser in at once (a link sent by someone else, or opened by a mail scanner): the account page now asks to confirm, by a form tied to the visitor's own session, and a visitor signed in elsewhere is not switched. A username spelled like a number could win over the number's holder, and uniqueness was checked only at registration: a claim registry, one insert per number, kept in step with every write of the billing phone, and no generated username spelled like a number. A link stayed valid after a password or email change: it is bound to both. The shared limit test now alternates real password resets with links. Timing and the number check at registration were kept that round, and reopened in round 2 |
+| 2 | FIX FIRST | Five Medium. A delayed release could delete another account's new claim: the delete names the owner. A number could be resolved twice in one sign-in: once. Numbers saved before claims existed were unclaimed: claimed once, none for a number several accounts hold. Registration said whether a number belonged to a customer: it no longer refuses one, and the new account keeps it for delivery without signing in with it; an unknown number costs the same password work at sign-in. The link request answered after its work, so its time said whether an email had a customer account: the work runs after the answer is sent where PHP runs under FPM (to be confirmed on staging); on a development runtime without FPM it still runs within the request |
+
+Known limits, recorded in the specification: the link request's timing is equal only where PHP-FPM sends the answer
+first; WooCommerce's own registration form says whether an email already has an account (native, AUTH-01).

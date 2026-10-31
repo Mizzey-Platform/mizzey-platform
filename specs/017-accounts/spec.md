@@ -156,3 +156,6 @@ October 2026.
 
 - B16's numeric limits, proposed as working defaults (owner decisions, not client confirmations): a sign-in link lives
   15 minutes and works once; requests share the recovery limits of 3 per account and 10 per address in 15 minutes.
+- Known limits: the sign-in link request answers in the same time for every email only where PHP runs under FPM,
+  which sends the answer before the work; WooCommerce's own registration form says whether an email already has an
+  account (native, AUTH-01).

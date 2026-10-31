@@ -171,6 +171,14 @@ run(
 		do_action_ref_array( 'wp_authenticate', array( &$typed, &$pass ) );
 		$once  = apply_filters( 'authenticate', null, $typed, $password );
 		$check( '01122233344' === $typed && $once instanceof \WP_User && $numbered === $once->ID, 'AUTH-02 a number is resolved once: an account whose username is another holder\'s number signs in as itself, not as that holder' );
+		$leaver = t58_register( $s, "{$tag}-leaver@example.invalid", $password, array( PhoneSignIn::FIELD => '01277788899' ) );
+		$held_before = PhoneSignIn::holder( '01277788899' );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $leaver );
+		$after_delete = get_option( PhoneSignIn::CLAIM . '_01277788899' );
+		update_option( PhoneSignIn::CLAIM . '_01277788899', '999999999', false );
+		$heir = t58_register( $s, "{$tag}-heir@example.invalid", $password, array( PhoneSignIn::FIELD => '01277788899' ) );
+		$check( $leaver === $held_before && false === $after_delete && $heir === PhoneSignIn::holder( '01277788899' ), 'AUTH-02 deleting an account releases its number; a claim left by an account that no longer holds it is taken over by the next account to save the number' );
 		$other = t58_register( $s, "{$tag}-other@example.invalid", $password );
 		update_user_meta( $other, PhoneSignIn::FIELD, '+201012345678' );
 		$kept_holder = PhoneSignIn::holder( '01012345678' );

@@ -18,7 +18,7 @@ defined('ABSPATH') || exit;
  * protection, and responses that disclose nothing.
  *
  * A customer asks with their email (`POST mizzey/v1/sign-in-link`); the answer is the same whether or not an account
- * exists, and the work is done after the answer is sent (`fastcgi_finish_request()`, under PHP-FPM as on the servers),
+ * exists, and the work is done after the answer is sent (`fastcgi_finish_request()`, where PHP runs under FPM),
  * so the time it takes does not say whether the email has an account, or a staff one. For a customer account, a link
  * valid for 15 minutes (`mizzey_sign_in_link_lifetime`) is emailed; asking again
  * replaces it. Requests count against the password-reset limits (`RecoveryLimiter`: per account and per address), so

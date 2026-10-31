@@ -51,7 +51,8 @@ final class PhoneSignIn
         add_action('added_user_meta', [self::class, 'changed'], 10, 4);
         add_action('updated_user_meta', [self::class, 'changed'], 10, 4);
         add_action('deleted_user_meta', [self::class, 'removed'], 10, 3);
-        add_action('deleted_user', [self::class, 'release'], 10, 1);
+        // Before the account's meta is deleted, so its claim can be found and released.
+        add_action('delete_user', [self::class, 'release'], 10, 1);
         add_action('wp_authenticate', [self::class, 'identity'], 0, 1);
         add_filter('authenticate', [self::class, 'authenticate'], 19, 3);
         add_filter('woocommerce_new_customer_username', [self::class, 'username'], 10, 1);
@@ -198,15 +199,27 @@ final class PhoneSignIn
         delete_user_meta($userId, self::HELD);
     }
 
-    /** One insert that only one account can win; false when the number is already claimed. */
+    /**
+     * One insert that only one account can win; false when another account holds the number. A claim whose owner no
+     * longer holds the number (an account deleted or changed without its release) is taken over by one update naming
+     * that owner, which only one account can win too.
+     */
     private static function claim(string $normal, int $userId): bool
     {
         global $wpdb;
-        $inserted = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", self::claimName($normal), (string) $userId)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $name     = self::claimName($normal);
+        $inserted = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", $name, (string) $userId)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $won      = $inserted === 1;
+        if (! $won) {
+            $owner = (int) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $stale = $owner !== $userId && get_user_meta($owner, self::HELD, true) !== $normal;
+            $won   = $owner === $userId || ($stale && $wpdb->update($wpdb->options, ['option_value' => (string) $userId], ['option_name' => $name, 'option_value' => (string) $owner]) === 1); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
         wp_cache_delete('notoptions', 'options');
-        wp_cache_delete(self::claimName($normal), 'options');
+        wp_cache_delete($name, 'options');
+        wp_cache_delete('alloptions', 'options');
 
-        return $inserted === 1;
+        return $won;
     }
 
     private static function claimName(string $normal): string
