@@ -187,7 +187,7 @@ run(
 		$rest_review->set_param( 'content', 'And again.' );
 		$twice = rest_do_request( $rest_review );
 		wp_set_current_user( 0 );
-		$check( is_string( $no_rating ) && false !== strpos( $no_rating, 'rating' ) && 400 === $unrated->get_status() && 201 === $rated->get_status() && 5 === (int) get_comment_meta( $rated_id, 'rating', true ) && '0' === (string) get_comment( $rated_id )->comment_approved && 'review' === get_comment( $rated_id )->comment_type && 403 === $twice->get_status(), 'REV-01, D-17 a review with no rating is refused on the form post and on REST; a rated REST review keeps its rating and is held; a second one is refused (' . $unrated->get_status() . ', ' . $rated->get_status() . ', ' . $twice->get_status() . ')' );
+		$check( is_string( $no_rating ) && false !== strpos( $no_rating, 'rating' ) && 400 === $unrated->get_status() && 201 === $rated->get_status() && 5 === (int) get_comment_meta( $rated_id, 'rating', true ) && '0' === (string) get_comment( $rated_id )->comment_approved && 'review' === get_comment( $rated_id )->comment_type && in_array( $twice->get_status(), array( 400, 403 ), true ) && ReviewEligibility::ALREADY_REVIEWED === ReviewEligibility::refusal( $eligible_rest, $cream->get_id() ), 'REV-01, D-17 a review with no rating is refused on the form post and on REST; a rated REST review keeps its rating and is held; a second one is refused (' . $unrated->get_status() . ', ' . $rated->get_status() . ', ' . $twice->get_status() . ')' );
 
 		// WooCommerce's REST reviews endpoint: the same rule, and no publishing without moderation rights.
 		$editor = t61_customer( $s, "{$tag}-editor" );
