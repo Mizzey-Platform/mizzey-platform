@@ -269,6 +269,7 @@ run(
 		if ( $account ) {
 			$s->track_user( $account->ID );
 		}
+		wp_cache_flush(); // The offer ran in the web server's process; read the order as it is stored.
 		$linked = (int) wc_get_order( $guest_order->get_id() )->get_customer_id();
 		$check( 0 === $before_link && $account && $account->ID === $linked, '[HTTP] BR-008 a guest order, then the account made from the order-received page, has the order linked to it (status ' . ( $offer['status'] ?? '?' ) . ', account ' . ( $account ? $account->ID : 'none' ) . ', linked ' . $linked . ')' );
 
