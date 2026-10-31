@@ -147,7 +147,9 @@ run(
 		// REV-05: the invitation after delivery, once, in the order's language.
 		$mails  = array();
 		$guest  = t61_order( $s, 0, $balm, 'processing', "{$tag}-guest@example.invalid" );
-		$to_guest = static fn () => array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-guest@example.invalid" && false !== strpos( (string) ( $m['message'] ?? '' ), '#reviews' ) ) );
+		$to_guest = static function () use ( &$mails, $tag ): array {
+			return array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-guest@example.invalid" && false !== strpos( (string) ( $m['message'] ?? '' ), '#reviews' ) ) );
+		};
 		$guest  = t61_walk( $guest, 'completed' );
 		$sent   = count( $to_guest() );
 		ReviewInvitation::delivered( $guest->get_id() );
@@ -162,7 +164,7 @@ run(
 		$arabic->save();
 		$s->track_order( $arabic->get_id() );
 		t61_walk( $arabic, 'completed' );
-		$invites = array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-ar@example.invalid" ) );
+		$invites = array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-ar@example.invalid" && false !== strpos( (string) ( $m['message'] ?? '' ), '#reviews' ) ) );
 		$subject = (string) ( $invites[0]['subject'] ?? '' );
 		$check( false !== strpos( $subject, 'ما رأيك' ) && get_locale() !== 'ar', 'REV-05 an Arabic order\'s invitation is in Arabic, and the site\'s language is restored after (' . $subject . ')' );
 
