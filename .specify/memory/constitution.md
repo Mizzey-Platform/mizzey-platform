@@ -1,6 +1,6 @@
 # Mizzey Launch Platform Constitution
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-22 (governance PR #235, merged as `7986d85`) | **Last Amended**: 2026-10-05
+**Version**: 2.0.0 | **Ratified**: 2026-09-22 (governance PR #235, merged as `7986d85`) | **Last Amended**: 2026-10-31 (D-24)
 
 This constitution governs every specification, plan, task and pull request in this repository. Spec Kit reads it
 through `/speckit-plan` (Constitution Check) and `/speckit-analyze`.
@@ -68,10 +68,12 @@ register. The checker enforces both halves.
 An ERP-dependent (P1-E) row gets no final acceptance criteria until PRE-09 is approved. Work on it before then is
 limited to seams that hold whatever PRE-09 decides. No ERP mechanism is chosen before the ERP team's input.
 
-### M-4. Native first
+### M-4. Native first, then our own code
 
-A requirement is met with WooCommerce, WPML/WCML or an approved plugin before any custom code. Custom code needs a
-gap recorded with evidence (probe, verdict, source reference or failing test) in the spec's Native coverage table.
+A requirement is met with WooCommerce or WPML/WCML where they cover it. Where they do not, it is built as our own code
+on CoreX and `mizzey-site`, not with a ready-made third-party plugin, unless the owner approves a named plugin over our
+own code, with the reason recorded (D-24). Custom code needs a gap recorded with evidence (probe, verdict, source
+reference or failing test) in the spec's Native coverage table.
 
 ### M-5. Three lists
 
