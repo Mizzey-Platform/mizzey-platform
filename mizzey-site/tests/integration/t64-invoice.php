@@ -85,6 +85,8 @@ run(
 				InvoiceSettings::PREFIX   => 'T64-',
 			)
 		);
+		// The counter is the store's: put back as it was.
+		sign_in_keep_option( $s, InvoiceNumber::COUNTER );
 		$tag      = 't64' . wp_rand( 1000, 9999 );
 		$password = 'Pw-' . wp_generate_password( 18, false );
 		$product  = $s->simple_product( 't64 serum', '100', null );
