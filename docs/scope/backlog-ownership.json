@@ -1726,7 +1726,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 31,
    "depends_on": [],
    "erp_blocked": "no",

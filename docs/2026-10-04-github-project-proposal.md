@@ -111,7 +111,7 @@ Neither template invents acceptance criteria. Criteria come from the spec, which
 ## The 74 PBIs, as the live board holds them
 
 **Read from the live Project, which is the operational state; this document records it, never the reverse.**
-Regenerated 30 October 2026, by `tools/gen_backlog_docs.py` from the live Project.
+Regenerated 31 October 2026, by `tools/gen_backlog_docs.py` from the live Project.
 
 | Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -145,7 +145,7 @@ Regenerated 30 October 2026, by `tools/gen_backlog_docs.py` from the live Projec
 | 28 | #278 | Everyday admin tasks in the standard administration: quick product entry, bulk edits, search, export, mobile checks | E-ADM | 12 ids, listed in the issue | **mixed** | **S1** | **Ready** | **partial** | none | A5 verified defect, bounded (SKU lookup); A12 (the list-table bulk-edit channel was not measured) | ERP input: PRE-09 | #267: context, not a blocker; #245: context, not a blocker |
 | 29 | #279 | Customer records in admin: profile, internal notes, and suspension with a reason | E-ADM | ADM-100, ADM-103, ADM-104 | **mixed** | **S1** | **Ready** | **no** | none | - | - | - |
 | 30 | #280 | Order management in admin: find, annotate, ship, cancel, refund and print | E-ADM | 7 ids, listed in the issue | **mixed** | **S1** | **Ready** | **no** | none | B7 measured working on the WooCommerce side; D7, F1, F3 not yet tested | Content or client input: OD-09; Blocks production or launch only: OD-18 | #248: context, not a blocker; #291: context, not a blocker; #283: context, not a blocker |
-| 31 | #281 | Promotion engine: discounts, conditions, limits and schedules configurable from admin | E-RULES | 17 ids, listed in the issue | **P1** | **S1** | **Ready** | **no** | none | - | - | - |
+| 31 | #281 | Promotion engine: discounts, conditions, limits and schedules configurable from admin | E-RULES | 17 ids, listed in the issue | **P1** | **S1** | **In progress** | **no** | none | - | - | - |
 | 32 | #282 | Merchandising controls: badges, featured products, manual ordering, curated collections and related products | E-RULES | 7 ids, listed in the issue | **P1** | **S1** | **Ready** | **no** | needs design | A12 (catalog_visibility and other fields do not follow a code-level save) | Blocks final acceptance: OD-01 | #250: context, not a blocker |
 | 33 | #283 | Payments through Paymob: verified callbacks, no duplicate charge, refunds from the order screen | E-ORD | 16 ids, listed in the issue | **mixed** | **S1** | **Ready** | **no** | needs design | B8 not yet tested (failed payment, both languages); F3 not yet tested multilingually | Vendor or account input: CR-01, Wallet approval; Configurable working default: OD-19, OD-05 | #248: context, not a blocker; #255: context, not a blocker; #245: context, not a blocker |
 | 34 | #284 | Transactional email service, Google Analytics with Tag Manager, Meta Pixel and the Merchant Center feed connected | E-INT | INT-05, INT-09, INT-10, INT-12 | **mixed** | **S1** | **Ready** | **no** | none | - | Vendor or account input: Email provider account, Google, Meta and Merchant Center accounts; Configurable working default: OD-21; Blocks production or launch only: OD-18 | #245: context, not a blocker |
