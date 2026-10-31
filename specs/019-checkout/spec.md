@@ -146,7 +146,9 @@ October 2026.
 
 ## Assumptions
 
-- A release the stock source does not answer stays for reconciliation (logged by the gateway); a refund's restocking is
-  the ERP's, not WooCommerce's.
+- A release or undo the stock source does not answer is marked unsettled for reconciliation with the ERP (PRE-09);
+  a refund's restocking is the ERP's, not WooCommerce's.
+- A paid order the stock source refuses (a payment callback that arrives without a reservation) cannot be refused here:
+  it is marked for staff with a note, and the status model decides where it may move next.
 - The classic checkout is not the storefront's (the block checkout is); it reserves the same way, and its address does
   not carry the district fields.
