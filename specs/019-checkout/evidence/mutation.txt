@@ -49,3 +49,4 @@ After the sixth review (31 October 2026):
 M26 the stock work on the caller copy of the order                    -> t60 fails (3 checks)
 M27 a paid status trusts the caller copy                              -> t60 fails (1 check)
 M28 a failure release without the stored status                       -> t60 fails (1 check)
+M29 the cached copies kept under the lock                             -> t60 fails (1 check)
