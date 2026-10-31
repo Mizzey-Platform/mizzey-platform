@@ -144,3 +144,12 @@ msgstr "استخدم هذا الرابط لتسجيل الدخول إلى حسا
 %1$s
 
 يعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
+
+msgid "You are already signed in to another account. Sign out first to use this sign-in link."
+msgstr "أنت مسجّل الدخول بالفعل إلى حساب آخر. سجّل الخروج أولاً لاستخدام رابط تسجيل الدخول هذا."
+
+msgid "Sign in with the link from your email?"
+msgstr "هل تريد تسجيل الدخول بالرابط الموجود في بريدك الإلكتروني؟"
+
+msgid "Sign in"
+msgstr "تسجيل الدخول"

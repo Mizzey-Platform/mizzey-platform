@@ -134,6 +134,24 @@ run(
 		$nobody   = wp_authenticate( '01099999999', $password );
 		$check( $by_phone instanceof \WP_User && $mobile === $by_phone->ID && is_wp_error( $wrong ) && is_wp_error( $nobody ), 'AUTH-02 the mobile number signs in with the account\'s password; a wrong password or an unknown number signs in to nothing' );
 		sign_in_forget( array( '01012345678', '01099999999' ) );
+		$spelled = '010-1234 5678';
+		$secret  = 'x';
+		do_action_ref_array( 'wp_authenticate', array( &$spelled, &$secret ) );
+		$check( get_userdata( $mobile )->user_login === $spelled && get_userdata( $mobile )->user_login === PhoneSignIn::canonical( '+20 10 1234 5678' ) && '01099999999' === PhoneSignIn::canonical( '0020-109-999-9999' ), 'AUTH-02 every spelling of a held number reaches sign-in, and CoreX\'s lockout, as its account\'s username; an unheld number as its one spelling' );
+		$lookalike = (int) wp_insert_user( array( 'user_login' => '01012345678', 'user_email' => "{$tag}-look@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
+		$s->track_user( $lookalike );
+		$as_number = wp_authenticate( '01012345678', $password );
+		$generated = (string) apply_filters( 'woocommerce_new_customer_username', '01012345678', "01012345678@example.invalid", array(), '' );
+		$check( $as_number instanceof \WP_User && $mobile === $as_number->ID && '01012345678' !== $generated && null === PhoneSignIn::normalise( $generated ), 'AUTH-02 a number signs in to the account holding it, not to a username spelled like it; no generated username is spelled like a number (' . $generated . ')' );
+		$other = t58_register( $s, "{$tag}-other@example.invalid", $password );
+		update_user_meta( $other, PhoneSignIn::FIELD, '+201012345678' );
+		$kept_holder = PhoneSignIn::holder( '01012345678' );
+		update_user_meta( $mobile, PhoneSignIn::FIELD, '01155555555' );
+		$moved = PhoneSignIn::holder( '01155555555' );
+		$freed = PhoneSignIn::holder( '01012345678' );
+		update_user_meta( $mobile, PhoneSignIn::FIELD, '01012345678' );
+		$check( $mobile === $kept_holder && $mobile === $moved && null === $freed && $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 another account saving a held number in another spelling does not take it; the holder changing number frees the old one and holds the new one' );
+		delete_option( PhoneSignIn::CLAIM . '_01155555555' );
 
 		// AUTH-03: sign-in over HTTP, and a failure that does not say whether the email exists.
 		$session  = sign_in_account( 'en', "{$tag}-m@example.invalid", $password );
@@ -198,7 +216,7 @@ run(
 		$check( 1 === count( $mails ) && "{$tag}-keen@example.invalid" === ( $mails[0]['to'] ?? '' ) && '' !== $token && ! $wrong_token && $first && ! $second, 'AUTH-12 a customer asking gets one link by email; a wrong token does not spend it; it works once' );
 		$mails = array();
 		SignInLink::request( "{$tag}-keen@example.invalid" );
-		update_user_meta( $keen, SignInLink::META, array_merge( (array) get_user_meta( $keen, SignInLink::META, true ), array( 'until' => time() - 1 ) ) );
+		update_user_meta( $keen, SignInLink::META, strtok( (string) get_user_meta( $keen, SignInLink::META, true ), '|' ) . '|' . ( time() - 1 ) );
 		$late_link = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $lt ) ? $lt[1] : '';
 		$check( '' !== $late_link && ! SignInLink::redeem( $keen, $late_link ), 'AUTH-12 an expired link signs in to nothing' );
 		$mails = array();
@@ -213,11 +231,36 @@ run(
 		$req2->set_param( 'email', "{$tag}-unknown@example.invalid" );
 		$unknown = rest_do_request( $req2 );
 		$check( 1 === count( $mails ) && 202 === $known->get_status() && $known->get_data() === $unknown->get_data() && 202 === $unknown->get_status(), 'AUTH-12 staff are sent no link; for a known and an unknown email the answer is the same' );
+		$mails     = array();
+		$w_login   = get_userdata( $welcomed )->user_login;
+		$recovered = array( retrieve_password( $w_login ), retrieve_password( $w_login ) );
+		SignInLink::request( "{$tag}-w@example.invalid" );
+		SignInLink::request( "{$tag}-w@example.invalid" );
+		$limited   = retrieve_password( $w_login );
+		$check( true === $recovered[0] && true === $recovered[1] && 3 === count( $mails ) && is_wp_error( $limited ) && in_array( RecoveryLimiter::ERROR, $limited->get_error_codes(), true ), 'AUTH-12 links and password resets share one limit: two resets and a link reach three; a second link and a third reset are refused (' . count( $mails ) . ' mails)' );
+		RecoveryLimiter::forget( $keen, '127.0.0.1' );
 		$mails = array();
-		for ( $i = 0; $i < 4; $i++ ) {
-			SignInLink::request( "{$tag}-w@example.invalid" );
-		}
-		$check( 3 === count( $mails ), 'AUTH-12 requests share the password-reset limit: three links per account in the window (' . count( $mails ) . ')' );
+		SignInLink::request( "{$tag}-keen@example.invalid" );
+		$bound = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $bt ) ? $bt[1] : '';
+		wp_set_password( 'Pw-' . wp_generate_password( 18, false ), $keen );
+		clean_user_cache( $keen );
+		$check( '' !== $bound && ! SignInLink::redeem( $keen, $bound ), 'AUTH-12 a link sent before the password changed signs in to nothing' );
+		$mails = array();
+		SignInLink::request( "{$tag}-keen@example.invalid" );
+		$raced = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $rt ) ? $rt[1] : '';
+		$fired = false;
+		$rival = static function ( $query ) use ( $keen, &$fired ) {
+			global $wpdb;
+			if ( ! $fired && is_string( $query ) && str_starts_with( ltrim( $query ), 'DELETE' ) && false !== strpos( $query, SignInLink::META ) ) {
+				$fired = true;
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE user_id = %d AND meta_key = %s", $keen, SignInLink::META ) );
+			}
+			return $query;
+		};
+		add_filter( 'query', $rival );
+		$lost = SignInLink::redeem( $keen, $raced );
+		remove_filter( 'query', $rival );
+		$check( '' !== $raced && ! $lost, 'AUTH-12 of two requests holding one live link, the one whose delete finds it already spent does not sign in' );
 		RecoveryLimiter::forget( $welcomed, '127.0.0.1' );
 		RecoveryLimiter::forget( $keen, '127.0.0.1' );
 		RecoveryLimiter::forget( $quiet, '127.0.0.1' );
@@ -225,9 +268,14 @@ run(
 		$mails = array();
 		SignInLink::request( "{$tag}-keen@example.invalid" );
 		$http_token = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $ht ) ? $ht[1] : '';
-		$followed   = two_factor_http( 'GET', add_query_arg( array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen ), wc_get_page_permalink( 'myaccount' ) ) );
-		$again      = two_factor_http( 'GET', add_query_arg( array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen ), wc_get_page_permalink( 'myaccount' ) ) );
-		$check( '' !== $http_token && sign_in_has_session( $followed ) && ! sign_in_has_session( $again ), '[HTTP] AUTH-12 following the link signs the customer in; following it again does not' );
+		$opened     = two_factor_http( 'GET', add_query_arg( array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen ), wc_get_page_permalink( 'myaccount' ) ) );
+		$nonce      = two_factor_field( $opened['body'], '_wpnonce' );
+		$fields     = array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen, '_wpnonce' => $nonce );
+		$foreign    = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields );
+		$followed   = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
+		$again      = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
+		$check( '' !== $http_token && ! sign_in_has_session( $opened ) && '' !== $nonce && ! sign_in_has_session( $foreign ), '[HTTP] AUTH-12 opening the link signs no one in and asks to confirm; the confirmation from another browser session is refused' );
+		$check( sign_in_has_session( $followed ) && ! sign_in_has_session( $again ), '[HTTP] AUTH-12 confirming in the browser that opened the link signs the customer in; confirming again does not' );
 
 		return $ok;
 	}
