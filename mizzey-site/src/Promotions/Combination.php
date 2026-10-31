@@ -46,6 +46,38 @@ final class Combination
     }
 
     /**
+     * Whether this promotion may not join what the cart or order holds: with combining off, any other promotion
+     * (anotherHeld()); with it on, on an order, an individual-use coupon on either side, because WooCommerce never
+     * checks individual use when a coupon is added to an order.
+     *
+     * @param mixed $object
+     */
+    public static function conflicts(\WC_Coupon $coupon, $object): bool
+    {
+        if (! self::allowed()) {
+            return self::anotherHeld($coupon, $object);
+        }
+        if (! $object instanceof \WC_Order) {
+            return false;
+        }
+        $code   = wc_format_coupon_code($coupon->get_code());
+        $others = array_diff(array_map('wc_format_coupon_code', $object->get_coupon_codes()), [$code]);
+        if ($others === []) {
+            return false;
+        }
+        if ($coupon->get_individual_use()) {
+            return true;
+        }
+        foreach ($others as $other) {
+            if ((new \WC_Coupon($other))->get_individual_use()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Whether, with combining off, the cart or order holds another promotion this one would join: on a cart, a coupon
      * that is applied but is not the latest applied; on an order, any other coupon. A cart's own winner selection asks
      * about coupons not yet applied, which this leaves alone.
