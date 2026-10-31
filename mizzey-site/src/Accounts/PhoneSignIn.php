@@ -96,7 +96,7 @@ final class PhoneSignIn
     public static function field(): void
     {
         printf(
-            '<p class="woocommerce-form-row form-row"><label for="reg_billing_phone">%1$s <span class="optional">%2$s</span></label><input type="tel" class="woocommerce-Input input-text" name="%3$s" id="reg_billing_phone" autocomplete="tel" dir="ltr" /></p>',
+            '<p class="woocommerce-form-row form-row"><label for="reg_billing_phone">%s <span class="optional">%s</span></label><input type="tel" class="woocommerce-Input input-text" name="%s" id="reg_billing_phone" autocomplete="tel" dir="ltr" /></p>',
             esc_html__('Mobile number', 'mizzey-site'),
             esc_html__('(optional)', 'mizzey-site'),
             esc_attr(self::FIELD)
