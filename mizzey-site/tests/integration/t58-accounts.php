@@ -139,8 +139,8 @@ run(
 		$session  = sign_in_account( 'en', "{$tag}-m@example.invalid", $password );
 		$no_one   = sign_in_account( 'en', "{$tag}-nobody@example.invalid", 'Pw-whatever-1' );
 		$bad_pass = sign_in_account( 'en', "{$tag}-m@example.invalid", 'Pw-whatever-1' );
-		$message  = static fn ( array $a ): string => preg_match( '/woocommerce-error[^>]*>(.*?)<\/ul>/s', $a['body'], $m ) ? trim( wp_strip_all_tags( $m[1] ) ) : '';
-		$check( sign_in_has_session( $session ) && '' !== $message( $no_one ) && $message( $no_one ) === $message( $bad_pass ), '[HTTP] AUTH-03 signing in on the account page starts a session; an unknown email and a wrong password get the same message (' . $message( $no_one ) . ')' );
+		$generic  = 'Invalid username, email address or incorrect password';
+		$check( sign_in_has_session( $session ) && ! sign_in_has_session( $no_one ) && ! sign_in_has_session( $bad_pass ) && false !== strpos( $no_one['body'], $generic ) && false !== strpos( $bad_pass['body'], $generic ), '[HTTP] AUTH-03 signing in on the account page starts a session; an unknown email and a wrong password both get the one generic message (as t40 checks in both languages)' );
 		sign_in_forget( array( "{$tag}-m@example.invalid", "{$tag}-nobody@example.invalid" ) );
 
 		// AUTH-04, AUTH-16: the reset link works once, and not after it expires.
