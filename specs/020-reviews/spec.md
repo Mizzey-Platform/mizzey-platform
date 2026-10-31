@@ -128,4 +128,4 @@ October 2026.
 
 - The invitation is sent at the moment of delivery; a delay before sending is not asked for.
 - D-23's images (up to 5 per review, moderated with it) are the second part of #309, with their own review of how an
-  image stays private until its review is approved.
+  image stays private until its review is approved: specs/025-review-photos.
