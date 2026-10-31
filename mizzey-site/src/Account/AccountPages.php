@@ -30,8 +30,6 @@ final class AccountPages
 {
     public const WISHLIST = 'wishlist';
 
-    /** The statuses an order's progress shows, in order. */
-    private const PROGRESS = ['processing', StatusModel::PREPARING, StatusModel::SHIPPED, StatusModel::OUT_FOR_DELIVERY, StatusModel::COD_COLLECTED, 'completed'];
 
     public static function register(): void
     {
@@ -58,8 +56,10 @@ final class AccountPages
      */
     public static function progress(\WC_Order $order): array
     {
-        $steps = [];
-        foreach (self::PROGRESS as $status) {
+        // Every status the order recorded entering (specs/010), the unhappy ones included, in the order entered.
+        $steps    = [];
+        $statuses = array_map(static fn (string $key): string => str_starts_with($key, 'wc-') ? substr($key, 3) : $key, array_keys(wc_get_order_statuses()));
+        foreach ($statuses as $status) {
             $at = StatusModel::enteredAt($order, $status);
             if ($at !== null) {
                 $steps[] = ['status' => $status, 'name' => StatusModel::name($status), 'at' => $at];
@@ -94,7 +94,7 @@ final class AccountPages
         }
         echo '<ol class="mizzey-order-progress">';
         foreach (self::progress($order) as $step) {
-            printf('<li class="mizzey-order-progress-%s">%s <time>%s</time></li>', esc_attr($step['status']), esc_html($step['name']), esc_html(wc_format_datetime(new \WC_DateTime('@' . $step['at']))));
+            printf('<li class="mizzey-order-progress-%s">%s <time>%s</time></li>', esc_attr($step['status']), esc_html($step['name']), esc_html((string) wp_date(wc_date_format(), $step['at'])));
         }
         echo '</ol></section>';
     }

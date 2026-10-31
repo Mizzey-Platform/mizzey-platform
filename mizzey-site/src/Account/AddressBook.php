@@ -61,6 +61,30 @@ final class AddressBook
         ]);
     }
 
+    /**
+     * Runs a change of the customer's book under a MySQL named lock, so two requests at once cannot overwrite each
+     * other's change; the book is read afresh inside it.
+     *
+     * @template T
+     * @param callable(): T $work
+     * @return T|\WP_Error
+     */
+    private static function locked(int $userId, callable $work)
+    {
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . 'address_book_' . $userId, 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return new \WP_Error('mizzey_address_busy', __('Please try again in a moment.', 'mizzey-site'), ['status' => 409]);
+        }
+        try {
+            wp_cache_delete($userId, 'user_meta');
+
+            return $work();
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
     /** @return list<array<string,mixed>> */
     public static function all(int $userId): array
     {
@@ -75,6 +99,12 @@ final class AddressBook
      * @param array<string,mixed> $input
      */
     public static function add(int $userId, array $input): string|\WP_Error
+    {
+        return self::locked($userId, static fn () => self::addUnlocked($userId, $input));
+    }
+
+    /** @param array<string,mixed> $input */
+    private static function addUnlocked(int $userId, array $input): string|\WP_Error
     {
         $book = self::all($userId);
         if (count($book) >= self::CAPACITY) {
@@ -99,6 +129,12 @@ final class AddressBook
     /** @param array<string,mixed> $input */
     public static function edit(int $userId, string $id, array $input): true|\WP_Error
     {
+        return self::locked($userId, static fn () => self::editUnlocked($userId, $id, $input));
+    }
+
+    /** @param array<string,mixed> $input */
+    private static function editUnlocked(int $userId, string $id, array $input): true|\WP_Error
+    {
         $book  = self::all($userId);
         $index = self::find($book, $id);
         if ($index === null) {
@@ -119,18 +155,31 @@ final class AddressBook
 
     public static function delete(int $userId, string $id): true|\WP_Error
     {
-        $book  = self::all($userId);
-        $index = self::find($book, $id);
-        if ($index === null) {
-            return self::missing();
-        }
-        array_splice($book, $index, 1);
-        self::store($userId, $book);
+        return self::locked($userId, static function () use ($userId, $id) {
+            $book  = self::all($userId);
+            $index = self::find($book, $id);
+            if ($index === null) {
+                return self::missing();
+            }
+            $wasDefault = (bool) $book[$index]['default'];
+            array_splice($book, $index, 1);
+            // One default while the book holds an address: the first left takes over, and the checkout's copy with it.
+            if ($wasDefault && $book !== []) {
+                $book[0]['default'] = true;
+                self::copyToWooCommerce($userId, $book[0]);
+            }
+            self::store($userId, $book);
 
-        return true;
+            return true;
+        });
     }
 
     public static function makeDefault(int $userId, string $id): true|\WP_Error
+    {
+        return self::locked($userId, static fn () => self::makeDefaultUnlocked($userId, $id));
+    }
+
+    private static function makeDefaultUnlocked(int $userId, string $id): true|\WP_Error
     {
         $book  = self::all($userId);
         $index = self::find($book, $id);

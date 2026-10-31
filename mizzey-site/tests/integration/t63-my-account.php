@@ -16,6 +16,8 @@ use MizzeySite\Emails\Shipped;
 use MizzeySite\Wishlist\Wishlist;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_sign_in.php';
+require_once __DIR__ . '/_two_factor.php';
 
 /** A customer for the scenario, tracked for removal; 0 when WordPress refuses it. */
 function t63_customer( Scenario $s, string $login ): int {
@@ -66,6 +68,12 @@ run(
 		$deleted = AddressBook::delete( $laila, (string) $first );
 		$check( true === $edited && is_wp_error( $foreign ) && true === $deleted && 1 === count( AddressBook::all( $laila ) ) && (string) $second === AddressBook::all( $laila )[0]['id'], 'ACCT-04 an address is edited and deleted; another customer cannot touch it' );
 
+		$third = AddressBook::add( $laila, t63_address( array( 'city' => 'Tanta', 'state' => 'EG-03', 'address_1' => '8 Station Road' ) ) );
+		AddressBook::delete( $laila, (string) $second );
+		$after_delete = AddressBook::all( $laila );
+		$customer     = new \WC_Customer( $laila );
+		$check( 1 === count( $after_delete ) && (string) $third === $after_delete[0]['id'] && true === $after_delete[0]['default'] && 'Tanta' === $customer->get_billing_city(), 'ACCT-04 deleting the default makes the address left the default, and the checkout copy follows' );
+		$second = $third;
 		for ( $i = 0; $i < AddressBook::CAPACITY; $i++ ) {
 			AddressBook::add( $other, t63_address() );
 		}
@@ -82,6 +90,12 @@ run(
 		$added = rest_do_request( $post );
 		$list  = rest_do_request( new \WP_REST_Request( 'GET', '/mizzey/v1/account/addresses' ) );
 		wp_set_current_user( 0 );
+		$password = 'Pw-' . wp_generate_password( 18, false );
+		wp_set_password( $password, $laila );
+		$signed   = sign_in_account( 'en', (string) get_userdata( $laila )->user_login, $password );
+		$forged   = sign_in_json( 'POST', rest_url( 'mizzey/v1/account/addresses' ), t63_address(), array(), $signed['cookies'] );
+		sign_in_forget( array( (string) get_userdata( $laila )->user_login ) );
+		$check( sign_in_has_session( $signed ) && 401 === $forged['status'], '[HTTP] ACCT-04 a request carrying the sign-in cookies of the customer but not the REST nonce of WordPress is refused, so another site cannot change the book (' . $forged['status'] . ')' );
 		$check( 401 === $guest->get_status() && 201 === $added->get_status() && 2 === count( (array) ( $list->get_data()['addresses'] ?? array() ) ), 'ACCT-04 the REST routes answer a visitor 401 and act on the signed-in customer\'s own book (' . $guest->get_status() . ', ' . $added->get_status() . ')' );
 
 		// ACCT-07: order tracking, the shipment and the progress.
@@ -101,6 +115,17 @@ run(
 		$order->update_meta_data( Shipped::TRACKING, 'BST-55210' );
 		$order->save();
 		$steps = array_column( AccountPages::progress( $order ), 'status' );
+		$failed_order = wc_create_order( array( 'customer_id' => $laila ) );
+		$failed_order->add_product( $product, 1 );
+		$failed_order->calculate_totals();
+		$failed_order->save();
+		$s->track_order( $failed_order->get_id() );
+		foreach ( array( 'processing', 'preparing', 'shipped', 'delivery-failed' ) as $step ) {
+			$failed_order = wc_get_order( $failed_order->get_id() );
+			$failed_order->update_status( $step );
+		}
+		$failed_steps = array_column( AccountPages::progress( wc_get_order( $failed_order->get_id() ) ), 'status' );
+		$check( 'delivery-failed' === end( $failed_steps ), 'ACCT-07 an order whose delivery failed shows that step too (' . implode( ',', $failed_steps ) . ')' );
 		$on_account = static fn () => true;
 		add_filter( 'woocommerce_is_account_page', $on_account );
 		ob_start();
