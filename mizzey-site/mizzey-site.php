@@ -98,6 +98,9 @@ require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
 require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/Emails/OrderLanguage.php';
+require_once __DIR__ . '/src/Emails/EmailAdditions.php';
+require_once __DIR__ . '/src/Emails/Shipped.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -184,3 +187,8 @@ if (defined('WP_CLI') && WP_CLI) {
 MizzeySite\Reviews\ReviewEligibility::register();
 MizzeySite\Reviews\ReviewModeration::register();
 MizzeySite\Reviews\ReviewInvitation::register();
+
+// Customer emails: the welcome discount and the payment retry link added to WooCommerce's own, and the Shipped email.
+// NOTF-01 to NOTF-13, specs/021-emails.
+MizzeySite\Emails\EmailAdditions::register();
+MizzeySite\Emails\Shipped::register();

@@ -269,3 +269,55 @@ msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "Only staff who moderate reviews can publish one."
 msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."
+
+#: mizzey-site/src/Emails/EmailAdditions.php
+#. translators: %s: a percentage, such as 10.
+#, php-format
+msgid "%s%% off"
+msgstr "خصم %s%%"
+
+#: mizzey-site/src/Emails/EmailAdditions.php
+#. translators: 1: what the discount gives, 2: the code, 3: the last day it can be used.
+#, php-format
+msgid "Your welcome gift: %1$s your first order with the code %2$s, until %3$s."
+msgstr "هدية الترحيب: %1$s على طلبك الأول بالكود %2$s، حتى %3$s."
+
+#: mizzey-site/src/Emails/EmailAdditions.php
+#. translators: 1: what the discount gives, 2: the code.
+#, php-format
+msgid "Your welcome gift: %1$s your first order with the code %2$s."
+msgstr "هدية الترحيب: %1$s على طلبك الأول بالكود %2$s."
+
+#: mizzey-site/src/Emails/EmailAdditions.php
+#. translators: %s: the address to pay for the order again.
+#, php-format
+msgid "To try again, pay for your order here: %s"
+msgstr "للمحاولة مرة أخرى، ادفع قيمة طلبك من هنا: %s"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order #{order_number} is on its way"
+msgstr "طلبك رقم {order_number} في الطريق إليك"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order has shipped"
+msgstr "تم شحن طلبك"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order has been handed to the carrier."
+msgstr "تم تسليم طلبك إلى شركة الشحن."
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+#. translators: 1: carrier name, 2: tracking number.
+#, php-format
+msgid "Carrier: %1$s. Tracking number: %2$s."
+msgstr "شركة الشحن: %1$s. رقم التتبع: %2$s."
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+#. translators: %s: the tracking page's address.
+#, php-format
+msgid "Track it here: %s"
+msgstr "تتبّع شحنتك من هنا: %s"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "We will send you the tracking details as soon as the carrier gives them to us."
+msgstr "سنرسل إليك تفاصيل التتبع فور وصولها من شركة الشحن."
