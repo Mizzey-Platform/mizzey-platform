@@ -86,7 +86,7 @@ PRE-03b's.
 | Rating and text, average, display | WooCommerce's product reviews (`_wc_average_rating` over approved reviews) | Native, verified |
 | Who may review | WooCommerce's "verified owners" setting counts any paid order, not a delivered one | Gap: `ReviewEligibility` (D-17) |
 | Moderation | WordPress approves a returning commenter at once unless moderation is on | Gap: `ReviewModeration` holds every review |
-| Invitation | None | Gap: `ReviewInvitation`, a WooCommerce email |
+| Invitation | WooCommerce 11's "Customer review request" is a beta feature, off by default, with its own review page; D-17 keeps it off (that page is another submission route) | Gap: `ReviewInvitation`, a WooCommerce email |
 
 ## Requirements
 
