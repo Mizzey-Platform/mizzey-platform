@@ -276,3 +276,23 @@ msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "Only staff who moderate reviews can publish one."
 msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+msgid "Please choose a photo."
+msgstr "يرجى اختيار صورة."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+#. translators: %d: the most photos a review may have.
+#, php-format
+msgid "A review can have up to %d photos."
+msgstr "يمكن أن يحتوي التقييم على %d صور كحد أقصى."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+msgid "This photo could not be used. Please send a JPEG, PNG or WebP image under 5 MB."
+msgstr "تعذّر استخدام هذه الصورة. يرجى إرسال صورة بصيغة JPEG أو PNG أو WebP بحجم أقل من 5 ميجابايت."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+#. translators: %s: the product's name.
+#, php-format
+msgid "A customer's photo of %s"
+msgstr "صورة من أحد العملاء لمنتج %s"
