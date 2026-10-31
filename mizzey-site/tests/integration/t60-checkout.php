@@ -209,7 +209,7 @@ run(
 		$late_source->levels[ $five->get_id() ] = 5;
 		WC()->session->set( 'order_awaiting_payment', null );
 		remove_filter( StockGateway::SOURCE_FILTER, $bind_late );
-		$check( $late_ok && 'marked' === $stuck_status && $after_trash === $before_trash + 1 && 1 === ( $held_back[ $five->get_id() ] ?? 0 ) && array() === $retry_problems, 'CHK-12 an order paid without a reservation is reserved then, or marked for staff when refused; an unpaid order trashed releases its stock; the visitor\'s own unpaid order counts as theirs at the cart check (' . $stuck_status . ')' );
+		$check( $late_ok && 'marked' === $stuck_status && $after_trash === $before_trash + 1 && 1 === ( $held_back[ $five->get_id() ] ?? 0 ) && array() === $retry_problems, 'CHK-12 an order paid without a reservation is reserved then, or marked for staff when refused; an unpaid order trashed releases its stock; the visitor\'s own unpaid order counts as theirs at the cart check (' . wp_json_encode( array( $late_ok, $stuck_status, $before_trash, $after_trash, $held_back, $retry_problems ) ) . ')' );
 		$bind = static fn () => $source;
 		add_filter( StockGateway::SOURCE_FILTER, $bind );
 		$cancel = t60_order( $s, array( $five->get_id() => 1 ) );
@@ -278,7 +278,7 @@ run(
 		$made     = wc_get_order( $order_id );
 		$district = $made ? (string) $made->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) : '';
 		$ledger   = (array) get_option( FixtureStockSource::LEDGER, array() );
-		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ')' );
+		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ' ' . wp_strip_all_tags( (string) ( $placed['data']['message'] ?? '' ) ) . ')' );
 		$five->set_regular_price( '150' );
 		$five->save();
 		$item = $made ? current( $made->get_items() ) : null;
