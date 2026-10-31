@@ -14,5 +14,5 @@ Each task names its test. `t52` is `mizzey-site/tests/integration/t52-promotion-
 | T006 | Wire into `mizzey-site.php` | t52 |
 | T007 | Write `t52-promotion-engine`, the native rows included (rewards, value, products, categories, brands, limits, expiry, exclusions) | itself |
 | T008 | Full suite on a clean baseline; mutation checks; Codex review | suite |
-| T009 | Staging, on the owner's approval: a promotion created on the coupon screen and seen in the cart | `verification.md` |
+| T009 | Staging, on the owner's approval: done 31 October 2026 on v0.1.8 (t52 on staging; a promotion saved through the coupon screen's handler, seen in the block cart over HTTP); the coupon screen seen in a browser remains, with the owner's staff sign-in | `verification.md`, `evidence/staging-T009.txt` |
 | T010 | Client acceptance through MS-UAT-2026-027 (DOD-09), with Stage 3 after Stage 2 (D-22) | `verification.md` |

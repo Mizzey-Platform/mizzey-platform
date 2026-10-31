@@ -1,0 +1,36 @@
+T009, staging, 31 October 2026 (04:03 to 04:20 Cairo), release v0.1.8 (7691fdb), on the owner's order.
+
+Before: backup set 20261031-040333-manual. Deployed with bin/deploy (checksum matches; the five WPML plugins added from
+the server's folder; rollback: bin/deploy mizzeystaging --rollback). After deploy: staging.py build, no problems;
+staging.py check 6/6 PASS; wp mizzey security check, every baseline passes (client_operator still to enrol in
+two-factor sign-in, reported, as on v0.1.7).
+
+1. t52-promotion-engine run on staging (WP-CLI eval-file, MariaDB 11.4, Redis object cache), the test folder copied
+   into the container's /tmp and deleted afterwards.
+   - First run: 55 of 65. Eight free-shipping checks failed because staging's own zone for Egypt (zone 1, order 0)
+     matched before t52's zone, so its free shipping methods never applied. t52 now moves the other zones after its own
+     for the run and puts their order back at the end (this PR). Zone 1 was at order 0 again after the run.
+   - Second run: 63 of 65. The two [HTTP] checks cannot pass from inside the container: the store's address there is
+     the public one, behind Cloudflare Access, which answers with its sign-in page (status 200, no cart). Item 2 does
+     the HTTP part from the server host instead.
+   - After t52 prints its verdict, the process ends with a fatal error in WooCommerce Multilingual's attribute lookup
+     (WCML\Attributes\LookupTable, at shutdown) for a product the scenario had already deleted. It is outside this
+     feature and after the verdict; recorded, not repaired here.
+
+2. A promotion created through the coupon screen's own save handler (WC_Meta_Box_Coupon_Data::save): automatic, 10
+   percent, maximum discount 50. Saved as automatic and individual-use, cap 50 (coupon 272).
+   The block cart's own requests over HTTP to the server's web server (Host mizzey-staging.localhost, no Cloudflare):
+   GET /wp-json/wc/store/v1/cart (Cart-Token and Nonce issued), add-item for product 59 (100.00) 201. The cart lists
+   the promotion with no code entered: coupons [t009-staging-auto-8388], total_items 10000, total_discount 1000,
+   total_price 14000 (minor unit 2; the staging flat shipping included).
+
+3. Clean-up: the cart item removed (200); coupon 272 deleted; the automatic promotion list empty afterwards; the
+   scripts deleted from the container and the host.
+
+Found on staging and repaired in this PR: AutomaticPromotions called WC_Cart::is_coupon_emails_allowed(), which
+WooCommerce 11.1 deprecates ("will be removed soon"); the notice was in the staging log 8 times. It now calls
+Automattic\WooCommerce\Utilities\DiscountsUtil::is_coupon_emails_allowed(), the replacement WooCommerce names. Staging
+gets it with the next release.
+
+Not done here: the coupon screen seen in a browser on staging needs a staff sign-in with the owner's authenticator
+(ADM-131). The screen's save handler ran on staging in-process (item 2, and t52 AC-8).

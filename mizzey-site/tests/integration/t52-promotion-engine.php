@@ -236,6 +236,18 @@ run(
 		$zone->add_location( 'EG', 'country' );
 		$zone->save();
 		$s->on_finish( static function () use ( $zone ) { $zone->delete(); } );
+		// WooCommerce matches the first zone by order, then id, so a site's own zone for Egypt (staging has one) would
+		// take the package. The other zones move after this one for the run and get their order back at the end.
+		foreach ( \WC_Shipping_Zones::get_zones() as $other ) {
+			if ( (int) $other['id'] === $zone->get_id() ) {
+				continue;
+			}
+			$moved = new \WC_Shipping_Zone( (int) $other['id'] );
+			$order = $moved->get_zone_order();
+			$moved->set_zone_order( $order + 1000 );
+			$moved->save();
+			$s->on_finish( static function () use ( $moved, $order ) { $moved->set_zone_order( $order ); $moved->save(); } );
+		}
 		$flat = $zone->add_shipping_method( 'flat_rate' );
 		update_option( "woocommerce_flat_rate_{$flat}_settings", array( 'enabled' => 'yes', 'title' => 'Flat', 'cost' => '50', 'tax_status' => 'none' ) );
 		$free = $zone->add_shipping_method( 'free_shipping' );
