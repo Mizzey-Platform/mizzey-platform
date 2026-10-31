@@ -105,9 +105,11 @@ final class FreeShippingProgress
 
     /**
      * Whether a free-shipping promotion would make shipping free here: every package's zone has a free shipping method
-     * that a coupon satisfies (requires a coupon, or a coupon or the minimum, or both with the minimum met).
+     * that a coupon satisfies (requires a coupon, or a coupon or the minimum, or both with the minimum met). When more
+     * discount may join at the target ($moreDiscount), a minimum that counts discounts is not taken as met, as the
+     * discount may take the cart under it.
      */
-    private static function couponsShipFree(\WC_Cart $cart): bool
+    private static function couponsShipFree(\WC_Cart $cart, bool $moreDiscount = false): bool
     {
         $packages = WC()->shipping()->get_packages();
         foreach ($packages as $package) {
@@ -115,7 +117,8 @@ final class FreeShippingProgress
             foreach (\WC_Shipping_Zones::get_zone_matching_package($package)->get_shipping_methods(true) as $method) {
                 $requires = $method->id === 'free_shipping' ? (string) $method->get_option('requires') : '';
                 $takes    = $takes || in_array($requires, ['coupon', 'either'], true)
-                    || ($requires === 'both' && round(self::compared($cart, $method), wc_get_price_decimals()) >= (float) $method->get_option('min_amount'));
+                    || ($requires === 'both' && ! ($moreDiscount && $method->get_option('ignore_discounts') !== 'yes')
+                        && round(self::compared($cart, $method), wc_get_price_decimals()) >= (float) $method->get_option('min_amount'));
             }
             if (! $takes) {
                 return false;
@@ -139,9 +142,6 @@ final class FreeShippingProgress
     /** The fewest more units an automatic free-shipping promotion needs, or null. */
     private static function itemsNeeded(\WC_Cart $cart): ?int
     {
-        if (! self::couponsShipFree($cart)) {
-            return null;
-        }
         // An automatic promotion does not stand beside a code the customer entered when promotions do not combine, nor
         // beside an entered individual-use code; an individual-use promotion stands beside no entered code
         // (AutomaticPromotions::winners(), specs/016).
@@ -155,7 +155,8 @@ final class FreeShippingProgress
         $others      = array_values(array_filter(AutomaticPromotions::codes(), static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping()));
         $combining   = \MizzeySite\Promotions\Combination::allowed();
         $exclusive   = array_filter($others, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== [];
-        if ($blocked) {
+        // Another automatic promotion may join at the target with a discount of its own.
+        if ($blocked || ! self::couponsShipFree($cart, $others !== [])) {
             return null;
         }
         $needed = null;
@@ -163,7 +164,8 @@ final class FreeShippingProgress
             $coupon  = new \WC_Coupon($code);
             $minimum = PromotionSettings::minItems($coupon);
             $competed = $others !== [] && (! $combining || $exclusive || $coupon->get_individual_use());
-            if (! $coupon->get_free_shipping() || $minimum <= 0 || $competed || ($entered !== [] && $coupon->get_individual_use())) {
+            if (! $coupon->get_free_shipping() || $minimum <= 0 || $competed || ($entered !== [] && $coupon->get_individual_use())
+                || ((float) $coupon->get_amount() > 0 && ! self::couponsShipFree($cart, true))) {
                 continue;
             }
             // The promotion as it would stand with its item minimum met: valid then, the units are what is missing.
