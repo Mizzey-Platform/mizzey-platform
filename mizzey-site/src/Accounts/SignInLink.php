@@ -177,7 +177,7 @@ final class SignInLink
         $userId = absint($_GET[self::USER]);
         // phpcs:enable WordPress.Security.NonceVerification.Recommended
         printf(
-            '<form class="mizzey-sign-in-link" method="post" action="%1$s"><p>%2$s</p><input type="hidden" name="%3$s" value="%4$s" /><input type="hidden" name="%5$s" value="%6$d" />%7$s<p><button type="submit" class="button">%8$s</button></p></form>',
+            '<form class="mizzey-sign-in-link" method="post" action="%s"><p>%s</p><input type="hidden" name="%s" value="%s" /><input type="hidden" name="%s" value="%d" />%s<p><button type="submit" class="button">%s</button></p></form>',
             esc_url(wc_get_page_permalink('myaccount')),
             esc_html__('Sign in with the link from your email?', 'mizzey-site'),
             esc_attr(self::PARAM),
