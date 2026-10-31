@@ -23,7 +23,7 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7.
 
 ## 2. Staging
 
-Not done. On the owner's approval, with the next release.
+Done 31 October 2026 on release v0.1.9, on the owner's order, after backup set 20261031-184401-manual; build clean, the staging check 6 of 6, every security baseline passing (`docs/2026-10-31-stage3-staging-verification.md`). t61 passes on staging, 14 of 14.
 
 ## 3. Client acceptance
 

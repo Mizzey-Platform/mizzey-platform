@@ -22,7 +22,7 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7, mPDF 8.3.1.
 
 ## 2. Staging
 
-Not done. On the owner's approval, with the release pack carrying `mizzey-site/lib/`.
+Done 31 October 2026 on release v0.1.9, on the owner's order, after backup set 20261031-184401-manual; build clean, the staging check 6 of 6, every security baseline passing (`docs/2026-10-31-stage3-staging-verification.md`). t64 passes on staging, 10 of 10, with `mizzey-site/lib/` in the release; the download over HTTP through the server's web server and PHP-FPM.
 
 ## 3. Client acceptance
 

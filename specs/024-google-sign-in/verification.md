@@ -21,7 +21,7 @@ request reaches Google.
 
 ## 2. Staging
 
-Not done. On the owner's approval, with a developer test OAuth client.
+Done 31 October 2026 on release v0.1.9, on the owner's order, after backup set 20261031-184401-manual; build clean, the staging check 6 of 6, every security baseline passing (`docs/2026-10-31-stage3-staging-verification.md`). t65 passes on staging, 11 of 11, Google's side answered by the scenario's stand-in. A real Google round trip waits for a developer test OAuth client (a vendor input).
 
 ## 3. Client acceptance
 
