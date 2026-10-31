@@ -15,6 +15,9 @@
  * @package MizzeySite\Tests\Staging
  */
 
+// The seed stands in for the ERP's projection, so it may set stock (D-19 item 5; StockWriteGuard).
+add_filter( 'mizzey_stock_write_permitted', '__return_true' );
+
 defined( 'ABSPATH' ) || exit;
 defined( 'MIZZEY_STAGING' ) && MIZZEY_STAGING || WP_CLI::error( 'staging only' );
 

@@ -91,6 +91,7 @@ require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 require_once __DIR__ . '/src/Reviews/ReviewPhotos.php';
 require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
 require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
+require_once __DIR__ . '/src/Stock/StockWriteGuard.php';
 require_once __DIR__ . '/src/Cart/CartStock.php';
 require_once __DIR__ . '/src/Cart/CartMerge.php';
 require_once __DIR__ . '/src/Cart/GuestCartRetention.php';
@@ -154,6 +155,7 @@ MizzeySite\Roles\RefundCapability::register();
 // The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
 MizzeySite\Stock\FixtureStockSource::register();
 MizzeySite\Stock\LocalStockWriters::register();
+MizzeySite\Stock\StockWriteGuard::register();
 MizzeySite\Cart\CartStock::register();
 MizzeySite\Cart\CartMerge::register();
 MizzeySite\Cart\GuestCartRetention::register();
