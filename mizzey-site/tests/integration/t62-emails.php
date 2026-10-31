@@ -89,7 +89,7 @@ run(
 		update_user_meta( $user_id, '_mizzey_marketing_consent', array( 'given' => false, 'at' => time(), 'source' => 'registration' ) );
 		$order = t62_walk( $order, 'processing' );
 		$confirmed = $to( $buyer );
-		$check( 1 <= count( $confirmed ) && false !== stripos( (string) $confirmed[0]['subject'], (string) $order->get_order_number() ), 'NOTF-02, NOTF-11 a placed order sends its confirmation, though the customer declined marketing (' . ( $confirmed[0]['subject'] ?? 'none' ) . ')' );
+		$check( 1 <= count( $confirmed ) && false !== strpos( (string) $confirmed[0]['message'], (string) $order->get_order_number() ), 'NOTF-02, NOTF-11 a placed order sends its confirmation, though the customer declined marketing (' . ( $confirmed[0]['subject'] ?? 'none' ) . ')' );
 
 		// NOTF-04: Shipped, with the carrier and tracking number, once.
 		$mails = array();
