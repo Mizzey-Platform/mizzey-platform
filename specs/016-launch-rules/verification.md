@@ -32,7 +32,7 @@ touches promotions, refunds or accounts. Removing the records, or a baseline res
 
 ## 2. Staging (T007)
 
-Not done. On the owner's approval, with the next release.
+Done 31 October 2026 on release v0.1.9, on the owner's order, after backup set 20261031-184401-manual; build clean, the staging check 6 of 6, every security baseline passing (`docs/2026-10-31-stage3-staging-verification.md`). t57 passes on staging, 39 of 39, its HTTP checks through the server's web server and PHP-FPM.
 
 ## 3. Client acceptance (T008)
 

@@ -29,7 +29,7 @@ and `t52`: their checkouts had no district, which this branch requires; updated 
 
 ## 2. Staging
 
-Not done. On the owner's approval: the fixture and cash on delivery switched on there, a test order in both languages.
+Done 31 October 2026 on release v0.1.9, on the owner's order, after backup set 20261031-184401-manual; build clean, the staging check 6 of 6, every security baseline passing (`docs/2026-10-31-stage3-staging-verification.md`). t60 passes on staging, 29 of 29, with its stock fixture and cash on delivery: an order placed over HTTP through the server's web server and PHP-FPM, the district messages in English and Arabic.
 
 ## 3. Client acceptance
 

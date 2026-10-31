@@ -22,8 +22,7 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0, PHP 8.3 with GD, Apache (WAMP).
 
 ## 2. Staging
 
-Not done. On the owner's approval; on a server that ignores `.htaccess`, the folder refusal set by the host or
-`MIZZEY_REVIEW_PHOTOS_DIR` outside the public folder.
+Not done. Release v0.1.9 is on staging (`docs/2026-10-31-stage3-staging-verification.md`), and t66 there is refused as designed: uploads answer 503 because the server is Caddy, which does not read `.htaccess`, so the private folder is not closed. It waits for the owner's choice: a hosting rule refusing `/wp-content/uploads/mizzey-review-photos/`, or `MIZZEY_REVIEW_PHOTOS_DIR` outside the public folder.
 
 ## 3. Client acceptance
 
