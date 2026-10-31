@@ -12,3 +12,4 @@ After the first review (31 October 2026):
 M7  any product is viewable                                           -> t56 fails (6 checks)
 M8  the cart is not loaded before a move                              -> t56 fails (1 check)
 M9  the signature does not name its cookie                            -> t56 fails (1 check)
+M10 an unviewable translation is shown                               -> t56 fails (1 check)
