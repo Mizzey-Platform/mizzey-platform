@@ -16,7 +16,8 @@ defined('ABSPATH') || exit;
  * controlled through the designated adapter"), refused on the server, not hidden.
  *
  * - Every product and variation save keeps its stored stock: a change to the stock quantity, the stock status, stock
- *   management or backorders is put back (`woocommerce_before_product_object_save`, and the variation's), whoever makes
+ *   management or backorders is put back (`woocommerce_before_product_object_save`, which variations fire too; a new
+ *   product's are put back to WooCommerce's defaults), whoever makes
  *   it: the product and variation editors, quick and bulk edit, variation bulk actions, the CSV importer, the REST API,
  *   WP-CLI, the carrier's webhook. WooCommerce's direct stock update (`wc_update_product_stock()`) writes nothing
  *   (`woocommerce_update_product_stock_query`). The REST API refuses a stock change with a 403.
@@ -41,7 +42,6 @@ final class StockWriteGuard
     public static function register(): void
     {
         add_action('woocommerce_before_product_object_save', [self::class, 'keep'], 1, 1);
-        add_action('woocommerce_before_product_variation_object_save', [self::class, 'keep'], 1, 1);
         add_filter('woocommerce_update_product_stock_query', [self::class, 'query'], 999, 1);
         add_filter('woocommerce_rest_pre_insert_product_object', [self::class, 'rest'], 1, 2);
         add_filter('woocommerce_rest_pre_insert_product_variation_object', [self::class, 'rest'], 1, 2);
@@ -79,14 +79,6 @@ final class StockWriteGuard
         if (! $product instanceof \WC_Product || self::permitted()) {
             return;
         }
-        // A product being made holds its props as data, not as changes: all of its stock starts as WooCommerce's own.
-        if ($product->get_id() <= 0) {
-            foreach (self::PROPS as $prop) {
-                self::put($product, $prop, self::fresh($prop));
-            }
-
-            return;
-        }
         $changes = $product->get_changes();
         $stored  = $product->get_data();
         foreach (self::PROPS as $prop) {
@@ -107,11 +99,6 @@ final class StockWriteGuard
         };
     }
 
-    /** A new product's stock as WooCommerce starts it, with nothing written locally. */
-    private static function fresh(string $prop): mixed
-    {
-        return ['stock_quantity' => null, 'stock_status' => 'instock', 'manage_stock' => false, 'backorders' => 'no'][$prop];
-    }
 
     /**
      * @param mixed $sql

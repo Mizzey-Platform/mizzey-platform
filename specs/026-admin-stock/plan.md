@@ -13,7 +13,7 @@ the admin, with one way through for the ERP's projection.
 |---|---|
 | Stack | WordPress 7.1.4, WooCommerce 11.1.0 (`stack.lock.json`) |
 | Code | `mizzey-site/src/Stock/StockWriteGuard.php` |
-| Extension points | `woocommerce_before_product_object_save`, `woocommerce_before_product_variation_object_save`; `woocommerce_update_product_stock_query`; `woocommerce_rest_pre_insert_product_object` and its variation filter; `woocommerce_admin_stock_html`; `woocommerce_product_options_stock_status`; `woocommerce_variation_options_inventory`; `admin_head` |
+| Extension points | `woocommerce_before_product_object_save` (variations fire it too); `woocommerce_update_product_stock_query`; `woocommerce_rest_pre_insert_product_object` and its variation filter; `woocommerce_admin_stock_html`; `woocommerce_product_options_stock_status`; `woocommerce_variation_options_inventory`; `admin_head` |
 | Testing | `t67-admin-stock`, in process, with the harness's permit taken away |
 
 ## Constitution Check
