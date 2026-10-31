@@ -100,23 +100,33 @@ run(
 		$number1 = InvoiceNumber::of( $first->get_id() );
 		$number2 = InvoiceNumber::of( $second->get_id() );
 		$again   = InvoiceNumber::issue( $first->get_id() );
+		update_option( InvoiceNumber::COUNTER, (string) (int) substr( $number1, 4 ), false );
+		$third   = t64_order( $s, $buyer, $product, 'processing' );
+		$number3 = InvoiceNumber::of( $third->get_id() );
+		$check( '' !== $number3 && ! in_array( $number3, array( $number1, $number2 ), true ), "ADM-92 with the counter set back to a number already used, the next order still gets a number no other order holds ({$number3})" );
 		$check( 1 === preg_match( '/^T64-(\d{6})$/', $number1, $a ) && 1 === preg_match( '/^T64-(\d{6})$/', $number2, $b ) && (int) $b[1] === (int) $a[1] + 1 && $again === $number1 && '' === InvoiceNumber::of( $unpaid->get_id() ) && '' === InvoiceNumber::issue( $unpaid->get_id() ) && ! InvoiceNumber::issuable( $unpaid ), "ADM-92 a paid order gets its invoice number once, the next in sequence; an unpaid one gets none ({$number1}, {$number2}, again {$again})" );
 
-		// AC-2: what it carries.
+		// AC-2: what it carries. A gift-wrap fee of 15 on the first order: 180 + 50 + 15 = 245.
+		$fee = new \WC_Order_Item_Fee();
+		$fee->set_name( 't64 gift wrap' );
+		$fee->set_total( '15' );
+		$first->add_item( $fee );
+		$first->calculate_totals( false );
+		$first->save();
+		$first = wc_get_order( $first->get_id() );
 		wc_create_refund( array( 'order_id' => $first->get_id(), 'amount' => '20', 'reason' => 't64' ) );
 		$html  = InvoiceDocument::html( wc_get_order( $first->get_id() ) );
 		$text  = wp_strip_all_tags( str_replace( '<', ' <', $html ) );
-		$money = static fn ( float $amount ): string => InvoiceDocument::money( $amount, $first );
-		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', $money( 100 ), $money( 200 ), $money( -20 ), $money( 50 ), $money( (float) $first->get_total() ), 'Refunded', $money( (float) $first->get_total() - 20 ) );
+		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', '100.00', '200.00', '20.00', '50.00', '15.00', '245.00', 'Refunded', '225.00' );
 		$missing = array_values( array_filter( $wants, static fn ( string $want ): bool => false === strpos( $text, $want ) ) );
-		$check( array() === $missing && 230.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, total 230, the refund and the net (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
+		$check( array() === $missing && 245.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, a fee of 15, total 245, the refund of 20 and the net 225 (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
 
 		// AC-3: an Arabic order.
 		$arabic      = t64_order( $s, $buyer, $product, 'processing', 'ar' );
 		$arabic_html = InvoiceDocument::html( $arabic );
 		$check( InvoiceDocument::rtl( $arabic ) && false !== strpos( $arabic_html, 'dir="rtl"' ) && false !== strpos( $arabic_html, 'فاتورة' ) && false !== strpos( $arabic_html, 'رقم الفاتورة' ), 'ADM-92 an Arabic order\'s invoice is in Arabic, right to left' );
 		$pdf = InvoicePdf::bytes( $arabic );
-		$check( str_starts_with( $pdf, '%PDF-' ) && strlen( $pdf ) > 2000 && '' === InvoicePdf::bytes( $unpaid ), 'ADM-92 the invoice renders as a PDF; an unpaid order has none (' . strlen( $pdf ) . ' bytes)' );
+		$check( str_starts_with( $pdf, '%PDF-' ) && strlen( $pdf ) > 2000 && false !== strpos( $pdf, 'DejaVuSans' ) && '' === InvoicePdf::bytes( $unpaid ), 'ADM-92 the invoice renders as a PDF; an unpaid order has none (' . strlen( $pdf ) . ' bytes)' );
 
 		// AC-4: over HTTP.
 		$signed  = sign_in_account( 'en', "{$tag}-buyer", $password );
@@ -126,8 +136,20 @@ run(
 		$file    = '' !== $link ? two_factor_http( 'GET', $link, array(), $signed['cookies'] ) : array( 'status' => 0, 'body' => '' );
 		$bare    = two_factor_http( 'GET', add_query_arg( InvoiceRoutes::QUERY, $first->get_id(), home_url( '/' ) ), array(), $signed['cookies'] );
 		$intruder = sign_in_account( 'en', "{$tag}-other", $password );
-		$stolen   = '' !== $link ? two_factor_http( 'GET', $link, array(), $intruder['cookies'] ) : array( 'status' => 0 );
-		$check( '' !== $link && ! $pending && 200 === $file['status'] && str_starts_with( (string) $file['body'], '%PDF-' ) && 403 === $bare['status'] && 403 === $stolen['status'], '[HTTP] ACCT-12 the customer downloads a paid order\'s invoice as a PDF from the account\'s orders, and an unpaid order shows none; without the nonce, or as another customer, it is refused (' . $file['status'] . ', ' . $bare['status'] . ', ' . $stolen['status'] . ')' );
+		// A nonce that is the intruder's own, for the buyer's order: only the ownership check can refuse it.
+		$their_cookie = '';
+		foreach ( sign_in_jar( $intruder['cookies'] ) as $c ) {
+			if ( LOGGED_IN_COOKIE === $c->name ) {
+				$their_cookie = (string) $c->value;
+			}
+		}
+		$_COOKIE[ LOGGED_IN_COOKIE ] = $their_cookie;
+		wp_set_current_user( $other );
+		$their_nonce = wp_create_nonce( InvoiceRoutes::ACTION . '_' . $first->get_id() );
+		unset( $_COOKIE[ LOGGED_IN_COOKIE ] );
+		wp_set_current_user( 0 );
+		$stolen = two_factor_http( 'GET', add_query_arg( array( InvoiceRoutes::QUERY => $first->get_id(), '_wpnonce' => $their_nonce ), home_url( '/' ) ), array(), $intruder['cookies'] );
+		$check( '' !== $link && ! $pending && 200 === $file['status'] && str_starts_with( (string) $file['body'], '%PDF-' ) && 403 === $bare['status'] && 403 === $stolen['status'], '[HTTP] ACCT-12 the customer downloads a paid order\'s invoice as a PDF from the account\'s orders, and an unpaid order shows none; without the nonce, or as another customer with a nonce of their own, it is refused (' . $file['status'] . ', ' . $bare['status'] . ', ' . $stolen['status'] . ')' );
 
 		$manager = wp_insert_user( array( 'user_login' => "{$tag}-manager", 'user_email' => "{$tag}-manager@example.invalid", 'user_pass' => $password, 'role' => 'shop_manager' ) );
 		$manager = is_wp_error( $manager ) ? 0 : (int) $manager;

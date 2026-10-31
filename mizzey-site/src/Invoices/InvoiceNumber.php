@@ -16,7 +16,9 @@ defined('ABSPATH') || exit;
  * An order's invoice number and date (ADM-92): issued once, the first time the order reaches a paid status, or the first
  * time its invoice is asked for if it was paid before invoices existed; never for an unpaid, failed or cancelled order.
  * Numbers run in sequence from one counter, under a database lock, so two orders paid at once never share a number;
- * the prefix is a setting (InvoiceSettings).
+ * the prefix is a setting (InvoiceSettings). It fails closed: a counter that cannot be read or moved on, or a number
+ * another order already holds, issues nothing, and the number is kept only once the counter has moved past it, so a
+ * failure leaves at most a gap, never a repeat.
  *
  * See specs/023-invoice.
  */
@@ -78,17 +80,56 @@ final class InvoiceNumber
             if ($known !== '') {
                 return $known;
             }
-            $next   = max(1, (int) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", self::COUNTER))); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            $number = InvoiceSettings::prefix() . str_pad((string) $next, 6, '0', STR_PAD_LEFT);
-            update_option(self::COUNTER, (string) ($next + 1), false);
+            $next = self::counter();
+            if ($next === null) {
+                return '';
+            }
+            // Past any number another order already holds, should the counter ever have been set back.
+            while (self::taken($number = InvoiceSettings::prefix() . str_pad((string) $next, 6, '0', STR_PAD_LEFT))) {
+                $next++;
+            }
+            if (! self::moveCounter($next + 1)) {
+                return '';
+            }
             $order->update_meta_data(self::NUMBER, $number);
             $order->update_meta_data(self::ISSUED, (string) time());
             $order->save_meta_data();
 
-            return $number;
+            return self::of($orderId) === $number ? $number : '';
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
+    }
+
+    /** The next number, read from the database: 1 when no invoice was ever issued, null when it cannot be read. */
+    private static function counter(): ?int
+    {
+        global $wpdb;
+        $value = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", self::COUNTER)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if ($wpdb->last_error !== '') {
+            return null;
+        }
+
+        return $value === null ? 1 : max(1, (int) $value);
+    }
+
+    /** Moves the counter on, and answers whether the database holds the new value. */
+    private static function moveCounter(int $next): bool
+    {
+        global $wpdb;
+        $written = $wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off') ON DUPLICATE KEY UPDATE option_value = VALUES(option_value)", self::COUNTER, (string) $next)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        wp_cache_delete(self::COUNTER, 'options');
+        wp_cache_delete('notoptions', 'options');
+
+        return $written !== false && self::counter() === $next;
+    }
+
+    /** Whether another order already holds the number. */
+    private static function taken(string $number): bool
+    {
+        $holders = wc_get_orders(['limit' => 1, 'return' => 'ids', 'status' => array_keys(wc_get_order_statuses()), 'meta_query' => [['key' => self::NUMBER, 'value' => $number]]]); // phpcs:ignore WordPress.DB.SlowDBQuery
+
+        return $holders !== [];
     }
 
     /** When the invoice was issued (a Unix time), or null. */

@@ -103,7 +103,9 @@ final class InvoiceDocument
         $out .= '</tbody></table>';
 
         $out .= '<table class="mizzey-invoice-totals" width="100%">';
-        $out .= self::total(__('Subtotal', 'mizzey-site'), (float) $order->get_subtotal(), $order);
+        // The lines' stored subtotals: WooCommerce's get_subtotal() rounds with the viewer's currency precision.
+        $subtotal = array_sum(array_map(static fn ($item): float => $item instanceof \WC_Order_Item_Product ? (float) $item->get_subtotal() : 0.0, $order->get_items()));
+        $out     .= self::total(__('Subtotal', 'mizzey-site'), $subtotal, $order);
         if ((float) $order->get_discount_total() > 0) {
             $out .= self::total(__('Discount', 'mizzey-site'), -(float) $order->get_discount_total(), $order);
         }
@@ -160,9 +162,14 @@ final class InvoiceDocument
         return sprintf('<tr><td>' . $cell . '</td><td class="mizzey-invoice-amount">' . $cell . '</td></tr>', esc_html($label), esc_html(self::money($amount, $order)));
     }
 
-    /** An amount in the order's currency, as plain text. */
+    /**
+     * An amount in the order's currency, as plain text, with the store's own number of decimals, not the viewer's
+     * currency's (WooCommerce Multilingual changes wc_get_price_decimals() with the visitor's currency).
+     */
     public static function money(float $amount, \WC_Order $order): string
     {
-        return html_entity_decode(wp_strip_all_tags(wc_price($amount, ['currency' => $order->get_currency()])), ENT_QUOTES, 'UTF-8');
+        $decimals = max(0, (int) get_option('woocommerce_price_num_decimals', 2));
+
+        return html_entity_decode(wp_strip_all_tags(wc_price($amount, ['currency' => $order->get_currency(), 'decimals' => $decimals])), ENT_QUOTES, 'UTF-8');
     }
 }
