@@ -32,6 +32,30 @@ final class EgyptianAddress
     {
         add_filter('woocommerce_get_country_locale', [self::class, 'locale'], 10, 1);
         add_action('woocommerce_init', [self::class, 'fields']);
+        add_action('woocommerce_checkout_validate_order_before_payment', [self::class, 'beforePayment'], 10, 2);
+    }
+
+    /**
+     * Before any Store API payment of an order, paying an existing order included: an Egyptian address has its
+     * district.
+     *
+     * @param mixed $order
+     * @param mixed $errors
+     */
+    public static function beforePayment($order, $errors): void
+    {
+        if (! $order instanceof \WC_Order || ! $errors instanceof \WP_Error) {
+            return;
+        }
+        foreach (['billing', 'shipping'] as $type) {
+            $country = $type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
+            if ($country === 'EG' && trim((string) $order->get_meta("_wc_{$type}/" . self::DISTRICT)) === '' && ($type === 'billing' || $order->needs_shipping_address())) {
+                /* translators: %s: the field's name. */
+                $errors->add('mizzey_district_missing', sprintf(__('%s is required.', 'mizzey-site'), __('District', 'mizzey-site')));
+
+                return;
+            }
+        }
     }
 
     /**

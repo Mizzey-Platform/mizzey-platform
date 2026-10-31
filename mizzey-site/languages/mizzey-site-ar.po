@@ -231,3 +231,9 @@ msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أ
 #: mizzey-site/src/Checkout/OrderStock.php
 msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
 msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#. translators: %s: the field's name.
+#, php-format
+msgid "%s is required."
+msgstr "%s مطلوب."

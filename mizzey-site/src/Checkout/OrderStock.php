@@ -149,11 +149,12 @@ final class OrderStock
     public static function active(\WC_Order $order): bool
     {
         $record = self::record($order);
-        if ($record === []) {
+        $lines  = self::lines($order);
+        if ($record === [] || array_keys($record) != array_keys($lines)) {
             return false;
         }
-        foreach ($record as $line) {
-            if ($line['state'] !== 'reserved') {
+        foreach ($record as $itemId => $line) {
+            if ($line['state'] !== 'reserved' || $line['record'] !== $lines[$itemId][0] || $line['qty'] !== $lines[$itemId][1]) {
                 return false;
             }
         }
@@ -161,14 +162,49 @@ final class OrderStock
         return true;
     }
 
+    /** @return array<int,array{0:int,1:int}> Order item id => [product or variation record, quantity]. */
+    private static function lines(\WC_Order $order): array
+    {
+        $lines = [];
+        foreach ($order->get_items() as $itemId => $item) {
+            if ($item instanceof \WC_Order_Item_Product && (int) $item->get_quantity() > 0) {
+                $lines[(int) $itemId] = [(int) ($item->get_variation_id() ?: $item->get_product_id()), (int) $item->get_quantity()];
+            }
+        }
+
+        return $lines;
+    }
+
     /** Reserves every line not already reserved; on any failure, undoes this attempt's reservations and answers false. */
     public static function reserve(\WC_Order $order, StockGateway $gateway): bool
     {
+        // What changed since the last reservation: a line removed, or now another product, gives back what it held; a
+        // line whose quantity changed takes or gives back the difference, under keys of its own.
+        $before = self::record($order);
+        $lines  = self::lines($order);
+        foreach ($before as $itemId => $old) {
+            $now = $lines[$itemId] ?? null;
+            if ($old['state'] === 'reserved' && ($now === null || $now[0] !== $old['record'])) {
+                $released = $gateway->adjust($old['record'], $old['qty'], self::key($order, $itemId, $old['gen'], 'release'))->isKnown();
+                $before[$itemId]['state'] = $released ? 'released' : 'unsettled';
+            } elseif ($old['state'] === 'reserved' && $now[1] !== $old['qty']) {
+                $delta  = $now[1] - $old['qty'];
+                $answer = $gateway->adjust($old['record'], -$delta, self::key($order, $itemId, $old['gen'], 'resize-' . $now[1]));
+                if (! $answer->isKnown()) {
+                    self::save($order, $before);
+
+                    return false;
+                }
+                $before[$itemId]['qty'] = $now[1];
+            }
+        }
+        self::save($order, $before);
         $record = self::plan($order);
         $taken  = [];
         $ok     = true;
+        $current = self::lines($order);
         foreach ($record as $itemId => $line) {
-            if ($line['state'] === 'reserved') {
+            if ($line['state'] === 'reserved' || ! isset($current[$itemId])) {
                 continue;
             }
             $answer = $gateway->adjust($line['record'], -$line['qty'], self::key($order, $itemId, $line['gen'], 'reserve'));
@@ -248,13 +284,8 @@ final class OrderStock
     {
         $before = self::record($order);
         $plan   = [];
-        foreach ($order->get_items() as $itemId => $item) {
-            if (! $item instanceof \WC_Order_Item_Product || (int) $item->get_quantity() <= 0) {
-                continue;
-            }
-            $record = (int) ($item->get_variation_id() ?: $item->get_product_id());
-            $qty    = (int) $item->get_quantity();
-            $old    = $before[(int) $itemId] ?? null;
+        foreach (self::lines($order) as $itemId => [$record, $qty]) {
+            $old    = $before[$itemId] ?? null;
             $same   = $old !== null && $old['record'] === $record && $old['qty'] === $qty;
             $gen    = $old !== null ? $old['gen'] : 0;
             $state  = 'new';
@@ -264,7 +295,13 @@ final class OrderStock
             } elseif ($old !== null) {
                 $gen++;
             }
-            $plan[(int) $itemId] = ['record' => $record, 'qty' => $qty, 'gen' => $gen, 'state' => $state];
+            $plan[$itemId] = ['record' => $record, 'qty' => $qty, 'gen' => $gen, 'state' => $state];
+        }
+        // A line no longer on the order keeps its record, so an unsettled one stays for reconciliation.
+        foreach ($before as $itemId => $old) {
+            if (! isset($plan[$itemId]) && $old['state'] !== 'released') {
+                $plan[$itemId] = $old;
+            }
         }
 
         return $plan;
