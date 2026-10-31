@@ -41,7 +41,7 @@ the site changed.
 | My Account | #308 | 022 | t63 | 10 of 10 |
 | Invoice, ADM-92 | #280 | 023 | t64 | 10 of 10, with `mizzey-site/lib/` in the release |
 | Google sign-in | #305 | 024 | t65 | 11 of 11, Google's side answered by the scenario's stand-in |
-| Photos in reviews (gift) | #309 | 025 | t66 | Not verified: see below |
+| Photos in reviews (gift) | #309 | 025 | t66 | 6 of 6, after the two fixes below |
 | Stock in the admin | #316, #317 | 026 | t67 | 13 of 13; AC-1 and AC-2 stay pending PRE-09 |
 
 ## Found on staging
@@ -51,10 +51,16 @@ the site changed.
   (t63's first run). Development's copy is now carried to staging beside WPML's files (#463), and the staging plugin
   answers the carrier plugin's request from it: 27 governorates listed. t57 to t60, t63 and t64 were run again with
   it and pass.
-- **Photos in reviews.** Uploads are refused (503) on staging, as designed: the server is Caddy, which does not read
-  `.htaccess`, so the private folder is not closed and the feature will not store a photo there. It needs a hosting
-  rule refusing `/wp-content/uploads/mizzey-review-photos/`, or `MIZZEY_REVIEW_PHOTOS_DIR` outside the public folder:
-  an owner's choice about the server, not made here.
+- **Photos in reviews.** Uploads were refused (503) on staging, as designed, for two reasons. The server is Caddy,
+  which does not read `.htaccess`, so the private folder was not closed: on the owner's choice the staging site's
+  Caddy file now refuses `/wp-content/uploads/mizzey-review-photos/*` (hosting-stack 8b093ec, backup
+  20261031-210006-manual first). And the feature's folder check asks the site's own address, which on the server
+  went out through Cloudflare Access and met its sign-in redirect: the staging plugin now sends the site's requests to
+  itself to Caddy inside Docker (#466). t66 then passed, 6 of 6. Two attempts before that left test records
+  (two products, set to draft; two held reviews, trashed; six test users, deleted).
+- **Staging memory.** The staging PHP container is capped at 512 MB with up to 8 workers of about 130 MB each. One
+  worker was killed for memory during a t66 attempt that ran inside that container (502). The passing run ran the
+  scenario from the cron container. Raising the cap is the owner's server setting; production is a different host.
 - **WooCommerce Multilingual at shutdown.** As on v0.1.8, a scenario that deletes products ends, after its verdict,
   with a fatal error in WooCommerce Multilingual's attribute lookup. Once it stopped t53's clean-up before its test
   page was removed; that page (283) was moved to the trash. No other test record was left: no test user, coupon or
@@ -65,4 +71,3 @@ the site changed.
 - A real Google sign-in round trip: it needs a developer test OAuth client (a vendor input).
 - The screens, in a browser: they wait for the design (D-22, PRE-03b), and a staff sign-in needs the owner's
   authenticator.
-- Photos in reviews, until the hosting choice above.
