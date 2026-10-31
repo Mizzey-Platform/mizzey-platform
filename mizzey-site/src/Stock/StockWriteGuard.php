@@ -483,6 +483,20 @@ final class StockWriteGuard
         return true;
     }
 
+    /** @param mixed $postId */
+    public static function deleting($postId): void
+    {
+        if (in_array(get_post_type((int) $postId), ['product', 'product_variation'], true)) {
+            self::$deleting[(int) $postId] = true;
+        }
+    }
+
+    /** @param mixed $postId */
+    public static function deleted($postId): void
+    {
+        unset(self::$deleting[(int) $postId]);
+    }
+
     /**
      * After a refused direct stock update, the product object is read again, so it does not carry the refused figure.
      *
