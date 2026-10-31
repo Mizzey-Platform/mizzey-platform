@@ -148,8 +148,9 @@ run(
 		$s->track_order( $order_for->get_id() );
 		$order_for->update_status( 'processing' );
 		wc_reduce_stock_levels( $order_for->get_id() );
+		$while_processing = (int) wc_get_product( $five->get_id() )->get_stock_quantity();
 		$order_for->update_status( 'cancelled' );
-		$check( 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 5 === StockGateway::make()->level( $five->get_id() )->quantity, 'D-19 an order processed and cancelled changes neither WooCommerce\'s own stock nor what the fixture answers: WooCommerce\'s order stock writers are off' );
+		$check( 5 === $while_processing && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 5 === StockGateway::make()->level( $five->get_id() )->quantity, 'D-19 an order processed and cancelled changes neither WooCommerce\'s own stock nor what the fixture answers: WooCommerce\'s order stock writers are off' );
 		$bound_wins = static fn () => new T59Source( array() );
 		add_filter( StockGateway::SOURCE_FILTER, $bound_wins );
 		$real = StockGateway::make()->level( $five->get_id() );
