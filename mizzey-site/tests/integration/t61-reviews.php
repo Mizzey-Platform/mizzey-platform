@@ -53,7 +53,8 @@ function t61_walk( \WC_Order $order, string $status ): \WC_Order {
 /** A review submitted the way the product page's form does, as the user; the comment id, or the refusal's message. */
 function t61_post( int $user, int $product, int $rating ) {
 	wp_set_current_user( $user );
-	$_POST['rating'] = (string) $rating;
+	$_POST['rating']          = (string) $rating;
+	$_POST['comment_post_ID'] = (string) $product;
 	$thrower         = static fn () => static function ( $message ) { throw new \RuntimeException( is_string( $message ) ? $message : 'died' ); };
 	add_filter( 'wp_die_handler', $thrower );
 	try {
@@ -63,7 +64,7 @@ function t61_post( int $user, int $product, int $rating ) {
 		return $e->getMessage();
 	} finally {
 		remove_filter( 'wp_die_handler', $thrower );
-		unset( $_POST['rating'] );
+		unset( $_POST['rating'], $_POST['comment_post_ID'] );
 		wp_set_current_user( 0 );
 	}
 }
@@ -146,11 +147,12 @@ run(
 		// REV-05: the invitation after delivery, once, in the order's language.
 		$mails  = array();
 		$guest  = t61_order( $s, 0, $balm, 'processing', "{$tag}-guest@example.invalid" );
+		$to_guest = static fn () => array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-guest@example.invalid" && false !== strpos( (string) ( $m['message'] ?? '' ), '#reviews' ) ) );
 		$guest  = t61_walk( $guest, 'completed' );
-		$sent   = count( $mails );
+		$sent   = count( $to_guest() );
 		ReviewInvitation::delivered( $guest->get_id() );
-		$first_mail = $mails[0] ?? array();
-		$check( 1 === $sent && 1 === count( $mails ) && "{$tag}-guest@example.invalid" === ( $first_mail['to'] ?? '' ) && false !== strpos( (string) ( $first_mail['message'] ?? '' ), 't61 balm' ) && false !== strpos( (string) ( $first_mail['message'] ?? '' ), '#reviews' ) && '' !== wc_get_order( $guest->get_id() )->get_meta( ReviewInvitation::SENT ), 'REV-05 a delivered order sends one invitation to its billing email, linking its products\' reviews; delivered again, none more' );
+		$first_mail = $to_guest()[0] ?? array();
+		$check( 1 === $sent && 1 === count( $to_guest() ) && "{$tag}-guest@example.invalid" === ( $first_mail['to'] ?? '' ) && false !== strpos( (string) ( $first_mail['message'] ?? '' ), 't61 balm' ) && false !== strpos( (string) ( $first_mail['message'] ?? '' ), '#reviews' ) && '' !== wc_get_order( $guest->get_id() )->get_meta( ReviewInvitation::SENT ), 'REV-05 a delivered order sends one invitation to its billing email, linking its products\' reviews; delivered again, none more' );
 		$mails  = array();
 		$arabic = wc_create_order( array( 'customer_id' => 0 ) );
 		$arabic->add_product( $balm, 1 );
@@ -160,7 +162,8 @@ run(
 		$arabic->save();
 		$s->track_order( $arabic->get_id() );
 		t61_walk( $arabic, 'completed' );
-		$subject = (string) ( $mails[0]['subject'] ?? '' );
+		$invites = array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-ar@example.invalid" ) );
+		$subject = (string) ( $invites[0]['subject'] ?? '' );
 		$check( false !== strpos( $subject, 'ما رأيك' ) && get_locale() !== 'ar', 'REV-05 an Arabic order\'s invitation is in Arabic, and the site\'s language is restored after (' . $subject . ')' );
 
 		return $ok;
