@@ -116,8 +116,7 @@ final class WelcomeDiscount
             'usage_limit_per_user'        => 1,
             'date_expires'                => self::days($template) > 0 ? time() + self::days($template) * DAY_IN_SECONDS : null,
         ]);
-        // WooCommerce keeps a coupon's brand conditions as post meta (`WC_Brands_Coupons`), not as props.
-        foreach ([PromotionSettings::MAX_DISCOUNT, PromotionSettings::MIN_ITEMS, 'product_brands', 'exclude_product_brands'] as $key) {
+        foreach ([PromotionSettings::MAX_DISCOUNT, PromotionSettings::MIN_ITEMS] as $key) {
             $coupon->update_meta_data($key, (string) $template->get_meta($key, true));
         }
         $coupon->update_meta_data(PromotionSettings::AUTOMATIC, 'yes');
@@ -125,6 +124,14 @@ final class WelcomeDiscount
         $coupon->update_meta_data(self::OWNER, (string) $user->ID);
         $coupon->save();
         if ($coupon->get_id()) {
+            // WooCommerce keeps a coupon's brand conditions as post meta of their own (`WC_Brands_Coupons`), lists of
+            // term ids, not as coupon props.
+            foreach (['product_brands', 'exclude_product_brands'] as $key) {
+                $brands = get_post_meta($template->get_id(), $key, true);
+                if ($brands !== '' && $brands !== []) {
+                    update_post_meta($coupon->get_id(), $key, $brands);
+                }
+            }
             update_user_meta($user->ID, self::USER_META, $coupon->get_id());
             $issued[] = $hash;
             update_option(self::ISSUED, array_values(array_unique($issued)), false);

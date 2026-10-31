@@ -63,8 +63,15 @@ final class AutomaticPromotions
         $automatic = self::automaticCodes();
         $applied   = array_map('wc_format_coupon_code', $cart->get_applied_coupons());
         $entered   = array_values(array_diff($applied, $automatic));
+        // With combining off the cart holds one code: the latest entered (BR-004), also when combining was switched
+        // off while the cart held more. WooCommerce re-validates applied coupons only on the cart and checkout pages.
+        $extra = ! Combination::allowed() && count($entered) > 1 ? array_slice($entered, 0, -1) : [];
+        if ($extra !== []) {
+            $entered = array_values(array_diff($entered, $extra));
+            $applied = array_values(array_diff($applied, $extra));
+        }
         $winners   = $cart->is_empty() ? [] : self::winners($cart, $automatic, $entered);
-        $remove    = array_values(array_diff(array_intersect($applied, $automatic), $winners));
+        $remove    = [...$extra, ...array_values(array_diff(array_intersect($applied, $automatic), $winners))];
         $add       = array_values(array_diff($winners, $applied));
         if ($remove === [] && $add === []) {
             return;

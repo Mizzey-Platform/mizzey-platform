@@ -48,17 +48,24 @@ final class RefundIntegrity
             }
             $asked = abs((float) ($line['refund_total'] ?? 0)) + array_sum(array_map(static fn ($t) => abs((float) $t), (array) ($line['refund_tax'] ?? [])));
             $paid  = (float) $item->get_total() + (float) $item->get_total_tax();
-            if ($asked > $paid - self::refunded($order, (int) $itemId) + self::TOLERANCE) {
+            $skip = $refund instanceof \WC_Order_Refund ? (int) $refund->get_id() : 0;
+            if ($asked > $paid - self::refunded($order, (int) $itemId, $skip) + self::TOLERANCE) {
                 throw new \Exception(esc_html__('A refund cannot exceed what was paid for an item.', 'mizzey-site'));
             }
         }
     }
 
-    /** What earlier refunds returned for one line of the order, with its tax. */
-    private static function refunded(\WC_Order $order, int $itemId): float
+    /**
+     * What earlier refunds returned for one line of the order, with its tax. The refund being made is left out:
+     * WooCommerce has saved it once by the time it asks (`calculate_totals()` inside `wc_create_refund()`).
+     */
+    private static function refunded(\WC_Order $order, int $itemId, int $skip): float
     {
         $back = 0.0;
         foreach ($order->get_refunds() as $refund) {
+            if ($skip > 0 && (int) $refund->get_id() === $skip) {
+                continue;
+            }
             foreach ($refund->get_items(['line_item', 'shipping', 'fee']) as $refunded) {
                 if ((int) $refunded->get_meta('_refunded_item_id', true) === $itemId) {
                     $back += abs((float) $refunded->get_total()) + abs((float) $refunded->get_total_tax());
