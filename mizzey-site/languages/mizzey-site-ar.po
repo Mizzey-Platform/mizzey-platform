@@ -134,16 +134,8 @@ msgstr "انتهت صلاحية رابط تسجيل الدخول هذا أو ا�
 #: mizzey-site/src/Accounts/SignInLink.php
 #. translators: 1: the sign-in link, 2: minutes it stays valid.
 #, php-format
-msgid "Use this link to sign in to your account:
-
-%1$s
-
-It works once and expires in %2$d minutes. If you did not ask for it, you can ignore this email."
-msgstr "استخدم هذا الرابط لتسجيل الدخول إلى حسابك:
-
-%1$s
-
-يعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
+msgid "Use this link to sign in to your account:\n\n%1$s\n\nIt works once and expires in %2$d minutes. If you did not ask for it, you can ignore this email."
+msgstr "استخدم هذا الرابط لتسجيل الدخول إلى حسابك:\n\n%1$s\n\nيعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
 
 msgid "You are already signed in to another account. Sign out first to use this sign-in link."
 msgstr "أنت مسجّل الدخول بالفعل إلى حساب آخر. سجّل الخروج أولاً لاستخدام رابط تسجيل الدخول هذا."
