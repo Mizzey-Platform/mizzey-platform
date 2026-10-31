@@ -167,14 +167,16 @@ run(
 		imagedestroy( $rgba );
 		$heavy      = $files[] = t66_file( (string) ob_get_clean(), '.png' );
 		$was_limit  = ini_get( 'memory_limit' );
-		$cap        = static fn () => '128M';
+		// 150 MB above what this process already holds: less than the decoder would need for it.
+		$headroom   = (int) ceil( ( memory_get_usage( true ) + 150 * 1024 * 1024 ) / 1048576 ) . 'M';
+		$cap        = static fn () => $headroom;
 		add_filter( 'image_memory_limit', $cap );
-		ini_set( 'memory_limit', '128M' ); // phpcs:ignore WordPress.PHP.IniSet
+		$capped     = false !== ini_set( 'memory_limit', $headroom ); // phpcs:ignore WordPress.PHP.IniSet
 		$too_heavy  = t66_upload( $users['reviewer'], (int) $review, array( $heavy ) );
 		ini_set( 'memory_limit', (string) $was_limit ); // phpcs:ignore WordPress.PHP.IniSet
 		remove_filter( 'image_memory_limit', $cap );
 		$photos = ReviewPhotos::photos( (int) $review );
-		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && 400 === $too_heavy->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer, a sixth photo, and a 4000 by 4000 transparent picture under a 128 MB limit are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status(), $too_heavy->get_status() ) ) . ')' );
+		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && $capped && 400 === $too_heavy->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer, a sixth photo, and a 4000 by 4000 transparent picture with 150 MB to spare are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status(), $too_heavy->get_status() ) ) . ')' );
 
 		// AC-2: stored cleaned, in a folder the web server refuses.
 		$stored = isset( $photos[0] ) ? (string) file_get_contents( ReviewPhotos::dir() . $photos[0]['file'] ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions
@@ -199,7 +201,7 @@ run(
 		$late_photo['file'] = bin2hex( random_bytes( 16 ) ) . '.jpg';
 		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], ReviewPhotos::dir() . $late_photo['file'] );
 		update_comment_meta( (int) $review, ReviewPhotos::META, array_merge( ReviewPhotos::photos( (int) $review ), array( $late_photo ) ) );
-		$racing = sign_in_json( 'GET', ReviewPhotos::url( (int) $review, 3 ) );
+		$racing = sign_in_json( 'GET', ReviewPhotos::url( (int) $review, count( ReviewPhotos::photos( (int) $review ) ) - 1 ) );
 		ob_start();
 		do_action( 'woocommerce_review_after_comment_text', get_comment( (int) $review ) );
 		$markup = (string) ob_get_clean();
