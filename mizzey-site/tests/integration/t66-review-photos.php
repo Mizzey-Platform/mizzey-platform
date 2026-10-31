@@ -167,11 +167,11 @@ run(
 		imagedestroy( $rgba );
 		$heavy      = $files[] = t66_file( (string) ob_get_clean(), '.png' );
 		$was_limit  = ini_get( 'memory_limit' );
-		// A busy worker: 256 MB, WordPress's limit for images, with 150 MB already held.
+		// A busy worker: 256 MB, WordPress's limit for images, with all but about 60 MB already held.
 		$cap       = static fn () => '256M';
 		add_filter( 'image_memory_limit', $cap );
 		$capped    = false !== ini_set( 'memory_limit', '256M' ); // phpcs:ignore WordPress.PHP.IniSet
-		$ballast   = str_repeat( 'x', 150 * 1024 * 1024 );
+		$ballast   = str_repeat( 'x', max( 0, 256 * 1024 * 1024 - memory_get_usage( true ) - 60 * 1024 * 1024 ) );
 		$too_heavy = t66_upload( $users['reviewer'], (int) $review, array( $heavy ) );
 		unset( $ballast );
 		ini_set( 'memory_limit', (string) $was_limit ); // phpcs:ignore WordPress.PHP.IniSet
