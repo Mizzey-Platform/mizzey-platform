@@ -122,10 +122,12 @@ final class AutomaticPromotions
         $discount   = array_values(array_diff($candidates, $shipping));
         $joinable   = array_values(array_filter($shipping, static fn (string $code): bool => ! $individual($code)));
         // Measured after the entered codes, simulated with each candidate (measure()).
-        $discounts = self::candidates($cart, $discount, $entered);
-        // Each promotion alone, valued after the entered codes only.
+        // Every qualifying discount, also one that loses money alone: free shipping beside it may make up for it.
+        $discounts = self::candidates($cart, $discount, $entered, false);
+        $saving    = array_values(array_filter($discounts, static fn (array $each): bool => $each['value'] > 0));
+        // Each promotion alone, valued after the entered codes only, when it saves something.
         $options = [];
-        foreach ([$discounts[0] ?? null, self::best($cart, $shipping, $entered)] as $alone) {
+        foreach ([$saving[0] ?? null, self::best($cart, $shipping, $entered)] as $alone) {
             if ($alone !== null) {
                 $options[] = ['codes' => [$alone['code']], 'value' => $alone['value'], 'created' => $alone['created'], 'id' => $alone['id']];
             }
@@ -134,7 +136,7 @@ final class AutomaticPromotions
         // the cart under a free shipping minimum: a discount that loses alone can win with free shipping beside it.
         foreach ($discounts as $each) {
             $ship = $individual($each['code']) ? null : self::best($cart, $joinable, [...$entered, $each['code']]);
-            if ($ship !== null) {
+            if ($ship !== null && $each['value'] + $ship['value'] > 0) {
                 $options[] = ['codes' => [$each['code'], $ship['code']], 'value' => $each['value'] + $ship['value'], 'created' => $each['created'], 'id' => $each['id']];
             }
         }
@@ -208,14 +210,14 @@ final class AutomaticPromotions
     }
 
     /**
-     * Every qualifying automatic promotion among `$codes` that saves the customer something, with its value, best
-     * first.
+     * Every qualifying automatic promotion among `$codes` with its value, best first: only those that save the
+     * customer something, unless `$savingOnly` is false.
      *
      * @param list<string> $codes
      * @param list<string> $before
      * @return list<array{code:string,value:int,created:int,id:int}>
      */
-    private static function candidates(\WC_Cart $cart, array $codes, array $before): array
+    private static function candidates(\WC_Cart $cart, array $codes, array $before, bool $savingOnly = true): array
     {
         $found = [];
         foreach ($codes as $code) {
@@ -232,7 +234,7 @@ final class AutomaticPromotions
                 'id'      => $coupon->get_id(),
             ];
             // A promotion that saves the customer nothing, or makes them pay more, is not applied.
-            if ($candidate['value'] > 0) {
+            if (! $savingOnly || $candidate['value'] > 0) {
                 $found[] = $candidate;
             }
         }

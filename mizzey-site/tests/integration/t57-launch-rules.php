@@ -483,7 +483,22 @@ run(
 		$expected = array( t57_code( $one_thirty ), t57_code( $ship_auto ) );
 		sort( $expected );
 		$check( $expected === $paired, 'BR-004 on: 130 off with free shipping (saves 130) beats 90 off alone (saves 90), though 130 off alone loses the 500 minimum and saves only 80 (' . implode( ',', $paired ) . ')' );
-		foreach ( array( $ninety, $one_thirty, $ship_auto ) as $done ) {
+		$ninety->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$ninety->save();
+		$one_thirty->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$one_thirty->save();
+		// Round six: 20 off a 510 cart loses the 500 minimum (saves 20, costs 50) and is no promotion alone, but with
+		// the free shipping beside it saves 20, so both apply.
+		$five_ten_off = t57_screen( $s, "{$tag}fivetenoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '20', 'mizzey_automatic' => 'yes' ) );
+		$five_ten_off->set_individual_use( false );
+		$five_ten_off->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_ten->get_id() => 1 ) );
+		$rescued  = t57_applied();
+		$expected = array( t57_code( $five_ten_off ), t57_code( $ship_auto ) );
+		sort( $expected );
+		$check( $expected === $rescued, 'BR-004 on: 20 off taking 510 under the 500 minimum loses money alone, yet with free shipping beside it saves 20, so both apply (' . implode( ',', $rescued ) . ')' );
+		foreach ( array( $five_ten_off, $ship_auto ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
 		}
