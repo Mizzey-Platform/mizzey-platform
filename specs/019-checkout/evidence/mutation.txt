@@ -14,3 +14,14 @@ M6 (a refused Store API placement goes through) was not caught at first: the car
 now calls the placement hook with a source that refuses: see below.
 
 M6 a refused Store API placement goes through                         -> t60 fails (1 check)
+
+After the first and second reviews (31 October 2026):
+
+M9  an edited order still counts as reserved                          -> t60 fails (1 check)
+M10 a changed quantity is not resized                                 -> t60 fails (2 checks)
+M11 the visitor's own reservation is not counted                      -> t60 fails (1 check)
+M12 paying an order skips the district                                -> t60 fails (1 check)
+M13 a release uses the current lines, not the record                  -> t60 fails (1 check)
+M14 an unanswered reserve asks under a new key                        -> t60 fails (1 check)
+M15 a paid order without a reservation is left alone                  -> t60 fails (1 check)
+M16 trashing an unpaid order keeps its stock                          -> t60 fails (1 check)
