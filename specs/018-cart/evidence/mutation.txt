@@ -36,3 +36,9 @@ After the third review (31 October 2026):
 
 M21 one at a time per line, not per item                              -> t59 fails (2 checks)
 M22 an item target while another automatic promotion stands           -> t59 fails (1 check)
+
+After the fifth, sixth and seventh reviews (31 October 2026):
+
+M23 an item target beside an individual-use automatic promotion       -> t59 fails (1 check)
+M24 a minimum after discounts taken as met beside another discount    -> t59 fails (1 check)
+M25 a discount that also ships free not counted                       -> t59 fails (1 check)
