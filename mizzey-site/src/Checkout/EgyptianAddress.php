@@ -33,6 +33,31 @@ final class EgyptianAddress
         add_filter('woocommerce_get_country_locale', [self::class, 'locale'], 10, 1);
         add_action('woocommerce_init', [self::class, 'fields']);
         add_action('woocommerce_checkout_validate_order_before_payment', [self::class, 'beforePayment'], 10, 2);
+        add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'payingOrder'], 10, 2);
+    }
+
+    /**
+     * Paying an existing order through the Store API (`/checkout/{id}`): WooCommerce sets the address it is sent on the
+     * order but not the address's additional fields, so the district and landmark sent with it are kept here, on the
+     * order WooCommerce then saves and checks.
+     *
+     * @param mixed $order
+     * @param mixed $request
+     */
+    public static function payingOrder($order, $request): void
+    {
+        if (! $order instanceof \WC_Order || ! $request instanceof \WP_REST_Request || preg_match('#^/wc/store(/v\d+)?/checkout/\d+$#', $request->get_route()) !== 1) {
+            return;
+        }
+        $fields = \Automattic\WooCommerce\Blocks\Package::container()->get(\Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class);
+        foreach (['billing', 'shipping'] as $type) {
+            $address = $request->get_param($type . '_address') ?? ($type === 'shipping' ? $request->get_param('billing_address') : null);
+            foreach ([self::DISTRICT, self::LANDMARK] as $key) {
+                if (is_array($address) && isset($address[$key]) && is_scalar($address[$key])) {
+                    $fields->persist_field_for_order($key, sanitize_text_field((string) $address[$key]), $order, $type, false);
+                }
+            }
+        }
     }
 
     /**

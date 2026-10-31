@@ -33,6 +33,8 @@ final class T60Source implements StockSource {
 	public function level( StockItem $item ): int { return $this->levels[ $item->id ] ?? 0; }
 	/** Items whose change is applied and then answered with a timeout, as a source that applied but never replied. */
 	public array $silent = array();
+	/** @var callable|null Called with each key once its change is applied, before the answer. */
+	public $after = null;
 	public function adjust( StockItem $item, int $delta, string $operationKey ): int {
 		if ( in_array( $item->id, $this->refuse, true ) ) {
 			throw new StockSourceRefused( 'refused' );
@@ -40,6 +42,9 @@ final class T60Source implements StockSource {
 		if ( ! isset( $this->applied[ $operationKey ] ) ) {
 			$this->applied[ $operationKey ] = $delta;
 			$this->levels[ $item->id ]       = ( $this->levels[ $item->id ] ?? 0 ) + $delta;
+		}
+		if ( null !== $this->after ) {
+			( $this->after )( $operationKey );
 		}
 		if ( in_array( $item->id, $this->silent, true ) ) {
 			throw new \MizzeySite\Stock\StockSourceUnavailable( 'timeout' );
@@ -170,6 +175,67 @@ run(
 		$check( ! $stale && $resized && 1 === $after_grow && OrderStock::active( wc_get_order( $grown->get_id() ) ) === false, 'CHK-12 an order edited from 1 to 3 is not taken as reserved; reserving again takes the 2 more, and its release gives back 3 (' . $after_grow . ' left while it held 3 and the other order 1)' );
 		OrderStock::release( wc_get_order( $edited->get_id() ), $edit_gate );
 		$check( 5 === $edit_source->levels[ $five->get_id() ], 'CHK-12 an order edited from 1 to 4 after placement releases the 1 it reserved, not 4 (' . $edit_source->levels[ $five->get_id() ] . ' left)' );
+		// A quantity changed back and forth asks under a new key each time: 1, 3, 1, then 3 again holds 3.
+		$cycle_source = new T60Source( array( $five->get_id() => 5 ) );
+		$cycle_gate   = new StockGateway( $cycle_source, 1, null, 0 );
+		$cycle        = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $cycle, $cycle_gate );
+		$cycle_levels = array();
+		foreach ( array( 3, 1, 3 ) as $cycle_qty ) {
+			foreach ( wc_get_order( $cycle->get_id() )->get_items() as $cycle_item ) {
+				$cycle_item->set_quantity( $cycle_qty );
+				$cycle_item->save();
+			}
+			OrderStock::reserve( wc_get_order( $cycle->get_id() ), $cycle_gate );
+			$cycle_levels[] = $cycle_source->levels[ $five->get_id() ];
+		}
+		OrderStock::release( wc_get_order( $cycle->get_id() ), $cycle_gate );
+		$check( array( 2, 4, 2 ) === $cycle_levels && 5 === $cycle_source->levels[ $five->get_id() ], 'CHK-12 an order resized from 1 to 3, back to 1 and to 3 again takes and gives back each change, and its release gives back all (' . wp_json_encode( $cycle_levels ) . ', ' . $cycle_source->levels[ $five->get_id() ] . ' after release)' );
+		// A crash after an undo reached the source, before the record was saved: the next placement does not take the
+		// undone line as reserved. The source keeps what the record held when the undo was applied, and it is put back.
+		$crash_source = new T60Source( array( $five->get_id() => 5, $two->get_id() => 2 ), array( $two->get_id() ) );
+		$crash_gate   = new StockGateway( $crash_source, 1, null, 0 );
+		$crash        = t60_order( $s, array( $five->get_id() => 1, $two->get_id() => 1 ) );
+		$at_crash     = null;
+		$crash_source->after = static function ( string $key ) use ( &$at_crash, $crash ): void {
+			if ( null === $at_crash && str_ends_with( $key, '-undo' ) ) {
+				wp_cache_flush();
+				$at_crash = wc_get_order( $crash->get_id() )->get_meta( OrderStock::RECORD );
+			}
+		};
+		$crash_first = OrderStock::reserve( $crash, $crash_gate );
+		$crash_source->after  = null;
+		$crash_source->refuse = array();
+		$restored = wc_get_order( $crash->get_id() );
+		$restored->update_meta_data( OrderStock::RECORD, is_array( $at_crash ) ? $at_crash : array() );
+		$restored->save_meta_data();
+		$crash_again = OrderStock::reserve( wc_get_order( $crash->get_id() ), $crash_gate );
+		$check( ! $crash_first && null !== $at_crash && $crash_again && 4 === $crash_source->levels[ $five->get_id() ] && 1 === $crash_source->levels[ $two->get_id() ], 'CHK-12 a crash between an undo and saving the record leaves the undo on the record, so placing again reserves the line afresh (' . wp_json_encode( $crash_source->levels ) . ')' );
+		// The same crash before the undo reached the source: the next placement sends the undo first, so the line's
+		// stock is not held twice.
+		$lost_source = new T60Source( array( $five->get_id() => 5, $two->get_id() => 2 ), array( $two->get_id() ) );
+		$lost_gate   = new StockGateway( $lost_source, 1, null, 0 );
+		$lost        = t60_order( $s, array( $five->get_id() => 1, $two->get_id() => 1 ) );
+		$lost_record = null;
+		$lost_key    = '';
+		$lost_source->after = static function ( string $key ) use ( &$lost_record, &$lost_key, $lost ): void {
+			if ( null === $lost_record && str_ends_with( $key, '-undo' ) ) {
+				wp_cache_flush();
+				$lost_record = wc_get_order( $lost->get_id() )->get_meta( OrderStock::RECORD );
+				$lost_key    = $key;
+			}
+		};
+		OrderStock::reserve( $lost, $lost_gate );
+		$lost_source->after  = null;
+		$lost_source->refuse = array();
+		// The undo never arrived.
+		$lost_source->levels[ $five->get_id() ] -= (int) ( $lost_source->applied[ $lost_key ] ?? 0 );
+		unset( $lost_source->applied[ $lost_key ] );
+		$lost_order = wc_get_order( $lost->get_id() );
+		$lost_order->update_meta_data( OrderStock::RECORD, is_array( $lost_record ) ? $lost_record : array() );
+		$lost_order->save_meta_data();
+		$lost_again = OrderStock::reserve( wc_get_order( $lost->get_id() ), $lost_gate );
+		$check( '' !== $lost_key && $lost_again && 4 === $lost_source->levels[ $five->get_id() ] && 1 === $lost_source->levels[ $two->get_id() ], 'CHK-12 a crash before an undo reached the source: placing again sends the undo first, so the line holds its stock once (' . wp_json_encode( $lost_source->levels ) . ')' );
 		// A reserve that the source applied but never answered: asked again with the same key, taken once.
 		$quiet_source = new T60Source( array( $five->get_id() => 5 ) );
 		$quiet_source->silent = array( $five->get_id() );
@@ -288,6 +354,24 @@ run(
 		$five->save();
 		$item = $made ? current( $made->get_items() ) : null;
 		$check( $item && 200.0 === (float) wc_get_order( $order_id )->get_subtotal() && 100.0 === (float) $item->get_subtotal() / max( 1, $item->get_quantity() ), 'BR-005, ENT-08 a later price change leaves the order\'s item price as charged (100 a unit)' );
+		// [HTTP] Paying an existing Egyptian order that has no district, through the Store API: the district sent with it
+		// is kept and the order paid; sent without one, refused.
+		$unpaid = t60_order( $s, array( $five->get_id() => 1 ) );
+		$unpaid->set_billing_email( "{$tag}-u@example.invalid" );
+		$unpaid->set_billing_country( 'EG' );
+		$unpaid->set_status( 'pending' );
+		$unpaid->save();
+		$pay_body = static function ( ?string $district ) use ( $tag, $unpaid ): array {
+			return array_merge( t60_body( "{$tag}-u@example.invalid", $district ), array( 'key' => $unpaid->get_order_key(), 'billing_email' => "{$tag}-u@example.invalid" ) );
+		};
+		$pay_url  = rest_url( 'wc/store/v1/checkout/' . $unpaid->get_id() );
+		$store3   = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
+		$auth3    = array( 'Cart-Token' => sign_in_header( $store3, 'cart-token' ), 'Nonce' => sign_in_header( $store3, 'nonce' ) );
+		$pay_none = sign_in_json( 'POST', $pay_url, $pay_body( null ), $auth3, $store3['cookies'] );
+		$pay_with = sign_in_json( 'POST', $pay_url, $pay_body( 'Heliopolis' ), $auth3, $store3['cookies'] );
+		wp_cache_flush();
+		$paid = wc_get_order( $unpaid->get_id() );
+		$check( 200 !== $pay_none['status'] && 200 === $pay_with['status'] && $paid && 'Heliopolis' === (string) $paid->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) && 'pending' !== $paid->get_status(), '[HTTP] CHK-01 paying an existing Egyptian order through the Store API keeps the district sent with it, and is refused without one (' . $pay_none['status'] . ' ' . ( $pay_none['data']['code'] ?? '' ) . ', ' . $pay_with['status'] . ' ' . wp_strip_all_tags( (string) ( $pay_with['data']['message'] ?? '' ) ) . ')' );
 		update_option( FixtureStockSource::OPTION, 'no' );
 		$store2 = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
 		$auth2  = array( 'Cart-Token' => sign_in_header( $store2, 'cart-token' ), 'Nonce' => sign_in_header( $store2, 'nonce' ) );
