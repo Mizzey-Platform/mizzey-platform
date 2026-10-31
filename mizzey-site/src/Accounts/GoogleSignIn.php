@@ -19,10 +19,15 @@ defined('ABSPATH') || exit;
  *   `GET mizzey/v1/google/callback`, which exchanges the code with Google's token endpoint over TLS, server to server,
  *   and checks the ID token's issuer, audience, expiry and nonce (OpenID Connect Core 3.1.3.7: an ID token received
  *   straight from the token endpoint is validated by TLS in place of its signature).
- * - The account: the one already linked to that Google account; else, when Google says the email is verified, the
- *   account with that email, now linked (its email marked verified, which links its guest orders, B14; an account
- *   whose email was never verified here has its password replaced and its sessions ended first, so whoever registered
- *   it cannot keep using it); else a new customer account, with marketing consent left unset (AUTH-09).
+ * - The account: the one already linked to that Google account; else, when Google is the authority for the email (a
+ *   Gmail address, or one in the Google Workspace domain the token names) and says it is verified, the account with
+ *   that email, now linked (its email marked verified, which links its guest orders, B14; an account whose email was
+ *   never verified here has its password replaced and its sessions ended first, so whoever registered it cannot keep
+ *   using it); else a new customer account, with marketing consent left unset (AUTH-09), its email marked verified
+ *   only when Google is the authority for it. An email Google is not the authority for is never linked to an existing
+ *   account: Google's verification of it may be stale (a mailbox that has changed hands).
+ * - One account per email: the account is found or made under a lock per email, which WooCommerce's own registration
+ *   takes too (`woocommerce_registration_errors`), so the two cannot both create one at once.
  * - Staff accounts (any role beyond a customer) cannot sign in this way: they sign in with their password and two
  *   factors (specs/008).
  * - Off until the client ID and secret are set: the secret from `MIZZEY_GOOGLE_CLIENT_SECRET` in the configuration, or
@@ -49,6 +54,58 @@ final class GoogleSignIn
         add_action('woocommerce_login_form_end', [self::class, 'button']);
         add_action('woocommerce_register_form_end', [self::class, 'button']);
         add_filter('woocommerce_general_settings', [self::class, 'settings'], 30, 1);
+        add_filter('woocommerce_registration_errors', [self::class, 'registering'], 999, 3);
+        add_action('woocommerce_created_customer', [self::class, 'unlockEmail'], 999);
+        add_action('shutdown', [self::class, 'unlockEmail']);
+    }
+
+    /** The email lock this request holds, released once the account is made. */
+    private static ?string $emailLock = null;
+
+    /**
+     * WooCommerce's registration takes the same email lock and checks the email again inside it.
+     *
+     * @param mixed $errors
+     * @param mixed $username
+     * @param mixed $email
+     * @return mixed
+     */
+    public static function registering($errors, $username, $email)
+    {
+        if ($errors instanceof \WP_Error && is_string($email) && is_email($email) && ! $errors->has_errors()) {
+            if (! self::lockEmail($email)) {
+                $errors->add('mizzey_registration_busy', __('Please try again in a moment.', 'mizzey-site'));
+            } elseif (email_exists($email)) {
+                $errors->add('registration-error-email-exists', __('An account is already registered with your email address. Please log in.', 'mizzey-site'));
+            }
+        }
+
+        return $errors;
+    }
+
+    private static function lockEmail(string $email): bool
+    {
+        global $wpdb;
+        $name = substr('mz_' . $wpdb->prefix . 'email_' . hash('sha256', strtolower(trim($email))), 0, 64);
+        if (self::$emailLock === $name) {
+            return true;
+        }
+        self::unlockEmail();
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $name)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return false;
+        }
+        self::$emailLock = $name;
+
+        return true;
+    }
+
+    public static function unlockEmail(): void
+    {
+        global $wpdb;
+        if (self::$emailLock !== null) {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::$emailLock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            self::$emailLock = null;
+        }
     }
 
     public static function enabled(): bool
@@ -100,18 +157,20 @@ final class GoogleSignIn
         $state  = $request instanceof \WP_REST_Request ? (string) $request->get_param('state') : '';
         $code   = $request instanceof \WP_REST_Request ? (string) $request->get_param('code') : '';
         $cookie = isset($_COOKIE[self::COOKIE]) ? sanitize_text_field(wp_unslash($_COOKIE[self::COOKIE])) : '';
-        $saved  = $state !== '' ? get_transient(self::key($state)) : false;
-        if ($state !== '') {
-            delete_transient(self::key($state));
-        }
+        $bound  = $state !== '' && $cookie !== '' && hash_equals($state, $cookie);
+        $saved  = $bound ? get_transient(self::key($state)) : false;
+        // Claimed once: only the request whose delete removes the flow goes on.
+        $claimed = $bound && is_array($saved) && delete_transient(self::key($state));
         self::cookie('', time() - HOUR_IN_SECONDS);
-        if (! self::enabled() || ! is_array($saved) || $cookie === '' || ! hash_equals($state, $cookie) || $code === '') {
+        if (! self::enabled() || ! $claimed || $code === '') {
             return self::back(self::accountUrl(), 'refused');
         }
         $claims = self::exchange($code, (string) $saved['verifier'], (string) $saved['nonce']);
         $user   = is_wp_error($claims) ? $claims : self::account($claims);
         if (is_wp_error($user)) {
-            return self::back(self::accountUrl(), (string) $user->get_error_code() === 'mizzey_google_staff' ? 'staff' : 'refused');
+            $why = ['mizzey_google_staff' => 'staff', 'mizzey_google_link' => 'link'][(string) $user->get_error_code()] ?? 'refused';
+
+            return self::back(self::accountUrl(), $why);
         }
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID, true);
@@ -156,7 +215,7 @@ final class GoogleSignIn
         if (! is_array($claims)
             || ! in_array((string) ($claims['iss'] ?? ''), self::ISSUERS, true)
             || ! in_array(self::clientId(), $aud, true)
-            || (count($aud) > 1 && (string) ($claims['azp'] ?? '') !== self::clientId())
+            || ((count($aud) > 1 || isset($claims['azp'])) && (string) ($claims['azp'] ?? '') !== self::clientId())
             || (int) ($claims['exp'] ?? 0) <= time()
             || $nonce === '' || ! hash_equals($nonce, (string) ($claims['nonce'] ?? ''))
             || (string) ($claims['sub'] ?? '') === '') {
@@ -174,17 +233,28 @@ final class GoogleSignIn
      */
     public static function account(array $claims)
     {
-        $sub      = (string) $claims['sub'];
-        $email    = sanitize_email((string) ($claims['email'] ?? ''));
-        $verified = ($claims['email_verified'] ?? false) === true || ($claims['email_verified'] ?? '') === 'true';
-        $linked   = get_users(['meta_key' => self::SUBJECT, 'meta_value' => $sub, 'number' => 1]); // phpcs:ignore WordPress.DB.SlowDBQuery
-        $user     = $linked[0] ?? null;
+        $sub       = (string) $claims['sub'];
+        $email     = sanitize_email((string) ($claims['email'] ?? ''));
+        $verified  = ($claims['email_verified'] ?? false) === true || ($claims['email_verified'] ?? '') === 'true';
+        $authority = $verified && self::authoritative($email, (string) ($claims['hd'] ?? ''));
+        $linked    = get_users(['meta_key' => self::SUBJECT, 'meta_value' => $sub, 'number' => 1]); // phpcs:ignore WordPress.DB.SlowDBQuery
+        $user      = $linked[0] ?? null;
         if (! $user instanceof \WP_User) {
             if (! $verified || ! is_email($email)) {
                 return new \WP_Error('mizzey_google_email', 'unverified_email');
             }
+            if (! self::lockEmail($email)) {
+                return new \WP_Error('mizzey_google_busy', 'busy');
+            }
             $user = get_user_by('email', $email) ?: null;
+            if ($user instanceof \WP_User && ! $authority) {
+                self::unlockEmail();
+
+                return new \WP_Error('mizzey_google_link', 'not_authoritative');
+            }
             if ($user instanceof \WP_User && ! self::customer($user)) {
+                self::unlockEmail();
+
                 return new \WP_Error('mizzey_google_staff', 'staff');
             }
             if ($user instanceof \WP_User) {
@@ -201,21 +271,39 @@ final class GoogleSignIn
                 ]);
                 add_action('woocommerce_created_customer', [VerificationOnRegistration::class, 'send'], 20, 1);
                 if (is_wp_error($id)) {
+                    self::unlockEmail();
+
                     return $id;
                 }
                 $user = get_userdata((int) $id);
                 if (! $user instanceof \WP_User) {
+                    self::unlockEmail();
+
                     return new \WP_Error('mizzey_google_account', 'account');
                 }
             }
             update_user_meta($user->ID, self::SUBJECT, $sub);
-            self::markVerified($user->ID);
+            if ($authority) {
+                self::markVerified($user->ID);
+            }
+            self::unlockEmail();
         }
         if (! self::customer($user)) {
             return new \WP_Error('mizzey_google_staff', 'staff');
         }
 
         return $user;
+    }
+
+    /**
+     * Whether Google is the authority for the email: a Gmail address, or one in the Google Workspace domain the token
+     * names (`hd`). For any other address Google's verification may be stale.
+     */
+    private static function authoritative(string $email, string $domain): bool
+    {
+        $at = strtolower((string) substr((string) strrchr($email, '@'), 1));
+
+        return in_array($at, ['gmail.com', 'googlemail.com'], true) || ($domain !== '' && $at === strtolower($domain));
     }
 
     /** A customer, and nothing more: staff sign in with their password and two factors. */
@@ -241,7 +329,9 @@ final class GoogleSignIn
         if ($said !== '') {
             $text = $said === 'staff'
                 ? __('Staff accounts sign in with their password.', 'mizzey-site')
-                : __('Google sign-in did not complete. Please try again.', 'mizzey-site');
+                : ($said === 'link'
+                    ? __('An account with this email already exists. Please sign in with your password.', 'mizzey-site')
+                    : __('Google sign-in did not complete. Please try again.', 'mizzey-site'));
             printf('<p class="mizzey-google-sign-in-notice">%s</p>', esc_html($text));
         }
     }

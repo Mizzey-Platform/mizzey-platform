@@ -65,17 +65,18 @@ run(
 		$check( 302 === $forged['status'] && false !== strpos( (string) $forged['location'], 'mizzey-google=refused' ) && false === get_transient( 'mizzey_google_' . hash( 'sha256', (string) ( $asked['state'] ?? '' ) ) ), '[HTTP] AUTH-10 a callback without the browser\'s state cookie is refused, and its state is spent (' . $forged['status'] . ')' );
 
 		// The ID token's checks.
-		$good    = array( 'iss' => 'https://accounts.google.com', 'aud' => $client, 'exp' => time() + 300, 'nonce' => 'n-1', 'sub' => "{$tag}-sub-1", 'email' => "{$tag}-new@example.invalid", 'email_verified' => true, 'given_name' => 'Hana', 'family_name' => 'Adel' );
+		$good    = array( 'iss' => 'https://accounts.google.com', 'aud' => $client, 'exp' => time() + 300, 'nonce' => 'n-1', 'sub' => "{$tag}-sub-1", 'email' => "{$tag}-new@example.invalid", 'email_verified' => true, 'hd' => 'example.invalid', 'given_name' => 'Hana', 'family_name' => 'Adel' );
 		$valid   = GoogleSignIn::claims( t65_token( $good ), 'n-1' );
 		$refused = array(
 			'issuer'   => GoogleSignIn::claims( t65_token( array( 'iss' => 'https://evil.example' ) + $good ), 'n-1' ),
 			'audience' => GoogleSignIn::claims( t65_token( array( 'aud' => 'other-client' ) + $good ), 'n-1' ),
 			'expired'  => GoogleSignIn::claims( t65_token( array( 'exp' => time() - 5 ) + $good ), 'n-1' ),
 			'nonce'    => GoogleSignIn::claims( t65_token( $good ), 'n-2' ),
+			'azp'      => GoogleSignIn::claims( t65_token( array( 'azp' => 'other-client' ) + $good ), 'n-1' ),
 			'garbage'  => GoogleSignIn::claims( 'not-a-token', 'n-1' ),
 		);
 		$passed = array_keys( array_filter( $refused, static fn ( $r ) => ! is_wp_error( $r ) ) );
-		$check( is_array( $valid ) && array() === $passed, 'AUTH-10 an ID token is taken only with Google\'s issuer, this client as audience, an expiry ahead and the nonce sent' . ( array() === $passed ? '' : ' (passed: ' . implode( ', ', $passed ) . ')' ) );
+		$check( is_array( $valid ) && array() === $passed, 'AUTH-10 an ID token is taken only with Google\'s issuer, this client as audience and as the party it was issued to, an expiry ahead and the nonce sent' . ( array() === $passed ? '' : ' (passed: ' . implode( ', ', $passed ) . ')' ) );
 
 		// The code exchange, against a mocked token endpoint.
 		$sent = array();
@@ -95,12 +96,16 @@ run(
 
 		// AUTH-13: one account per email.
 		$password = 'Pw-' . wp_generate_password( 18, false );
+		$guest    = wc_create_order();
+		$guest->set_billing_email( "{$tag}-new@example.invalid" );
+		$guest->save();
+		$s->track_order( $guest->get_id() );
 		$created  = GoogleSignIn::account( $good );
 		$again    = GoogleSignIn::account( array( 'email' => "{$tag}-changed@example.invalid" ) + $good );
 		if ( $created instanceof \WP_User ) {
 			$s->track_user( $created->ID );
 		}
-		$check( $created instanceof \WP_User && array( 'customer' ) === array_values( $created->roles ) && "{$tag}-new@example.invalid" === $created->user_email && "{$tag}-sub-1" === get_user_meta( $created->ID, GoogleSignIn::SUBJECT, true ) && VerificationOnRegistration::verified( $created->ID ) && 'Hana' === get_user_meta( $created->ID, 'first_name', true ) && $again instanceof \WP_User && $again->ID === $created->ID, 'AUTH-10, AUTH-13 a new Google user becomes one customer account, its email verified; signing in again, even with a changed Google email, is the same account' );
+		$check( $created instanceof \WP_User && array( 'customer' ) === array_values( $created->roles ) && "{$tag}-new@example.invalid" === $created->user_email && "{$tag}-sub-1" === get_user_meta( $created->ID, GoogleSignIn::SUBJECT, true ) && VerificationOnRegistration::verified( $created->ID ) && 'Hana' === get_user_meta( $created->ID, 'first_name', true ) && $again instanceof \WP_User && $again->ID === $created->ID && $created->ID === (int) wc_get_order( $guest->get_id() )->get_customer_id(), 'AUTH-10, AUTH-13 a new Google user becomes one customer account, its email verified and its earlier guest order linked; signing in again, even with a changed Google email, is the same account' );
 
 		$known_id  = t65_user( $s, "{$tag}-known@example.invalid", 'customer', $password );
 		$class     = '\\Automattic\\WooCommerce\\Internal\\CustomerEmailVerification\\EmailVerificationService';
@@ -108,10 +113,21 @@ run(
 		$known     = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-2", 'email' => "{$tag}-known@example.invalid" ) + $good );
 		$kept      = $known instanceof \WP_User && wp_check_password( $password, get_userdata( $known_id )->user_pass, $known_id );
 		$squat_id  = t65_user( $s, "{$tag}-squat@example.invalid", 'customer', $password );
+		$squat_token = \WP_Session_Tokens::get_instance( $squat_id )->create( time() + HOUR_IN_SECONDS );
 		$squatted  = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-3", 'email' => "{$tag}-squat@example.invalid" ) + $good );
 		clean_user_cache( $squat_id );
-		$replaced  = $squatted instanceof \WP_User && $squatted->ID === $squat_id && ! wp_check_password( $password, get_userdata( $squat_id )->user_pass, $squat_id ) && VerificationOnRegistration::verified( $squat_id );
-		$check( $known instanceof \WP_User && $known->ID === $known_id && $kept && $replaced, 'AUTH-13 a Google sign-in with the email of an existing customer signs in to that account; one whose email was never verified here has its password replaced first, so whoever registered it cannot keep it' );
+		$replaced  = $squatted instanceof \WP_User && $squatted->ID === $squat_id && ! wp_check_password( $password, get_userdata( $squat_id )->user_pass, $squat_id ) && VerificationOnRegistration::verified( $squat_id ) && ! \WP_Session_Tokens::get_instance( $squat_id )->verify( $squat_token );
+		$check( $known instanceof \WP_User && $known->ID === $known_id && $kept && $replaced, 'AUTH-13 a Google sign-in with the email of an existing customer signs in to that account; one whose email was never verified here has its password replaced and its sessions ended first, so whoever registered it cannot keep it' );
+
+		// An address Google is not the authority for: never linked to an existing account, and a new account from it is
+		// not taken as verified.
+		$outside_id = t65_user( $s, "{$tag}-outside@example.invalid", 'customer', $password );
+		$outside    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-6", 'email' => "{$tag}-outside@example.invalid", 'hd' => '' ) + $good );
+		$fresh      = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-7", 'email' => "{$tag}-fresh@example.invalid", 'hd' => '' ) + $good );
+		if ( $fresh instanceof \WP_User ) {
+			$s->track_user( $fresh->ID );
+		}
+		$check( is_wp_error( $outside ) && 'mizzey_google_link' === $outside->get_error_code() && '' === get_user_meta( $outside_id, GoogleSignIn::SUBJECT, true ) && $fresh instanceof \WP_User && ! VerificationOnRegistration::verified( $fresh->ID ), 'AUTH-13 an email Google is not the authority for (not Gmail, not the token\'s Workspace domain) is never linked to an existing account, and a new account from it is not taken as verified' );
 
 		$staff_id = t65_user( $s, "{$tag}-staff@example.invalid", 'shop_manager', $password );
 		$staff    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-4", 'email' => "{$tag}-staff@example.invalid" ) + $good );
@@ -130,13 +146,17 @@ run(
 		$back = new \WP_REST_Request( 'GET', '/mizzey/v1/google/callback' );
 		$back->set_param( 'state', (string) ( $flow['state'] ?? '' ) );
 		$back->set_param( 'code', 'good-code' );
+		$issued = 0;
+		$catch  = static function ( $cookie, $expire, $expiration, $user_id ) use ( &$issued ) { $issued = (int) $user_id; };
+		add_action( 'set_logged_in_cookie', $catch, 10, 4 );
 		$landed = rest_do_request( $back );
+		remove_action( 'set_logged_in_cookie', $catch, 10 );
 		$signed = get_current_user_id();
 		unset( $_COOKIE[ GoogleSignIn::COOKIE ] );
 		wp_set_current_user( 0 );
-		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $created instanceof \WP_User && $signed === $created->ID, 'AUTH-10 the callback with the state, its cookie and a good code signs the customer in and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
+		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $created instanceof \WP_User && $signed === $created->ID && $issued === $created->ID, 'AUTH-10 the callback with the state, its cookie and a good code signs the customer in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
 
-		sign_in_forget( array( "{$tag}-known", "{$tag}-squat", "{$tag}-staff" ) );
+		sign_in_forget( array( "{$tag}-known", "{$tag}-squat", "{$tag}-staff", "{$tag}-outside" ) );
 		return $ok;
 	}
 );
