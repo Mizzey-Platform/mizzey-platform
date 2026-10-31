@@ -191,7 +191,7 @@ run(
 		$held = sign_in_json( 'GET', $url );
 		wp_set_current_user( $users['moderator'] );
 		set_current_screen( 'edit-comments' );
-		$admin_list = (string) ReviewPhotos::adminList( 'Lovely texture.', get_comment( (int) $review ) );
+		$admin_list = (string) apply_filters( 'comment_text', 'Lovely texture.', get_comment( (int) $review ), array() );
 		set_current_screen( 'front' );
 		wp_set_current_user( 0 );
 		wp_set_comment_status( (int) $review, 'approve' );
@@ -218,8 +218,15 @@ run(
 		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], $orphan );
 		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], $young );
 		touch( $orphan, time() - HOUR_IN_SECONDS );
+		// A list left on a review that no longer exists refers to nothing.
+		$dangling = ReviewPhotos::dir() . bin2hex( random_bytes( 16 ) ) . '.jpg';
+		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], $dangling );
+		touch( $dangling, time() - HOUR_IN_SECONDS );
+		$gone_review = (int) $GLOBALS['wpdb']->get_var( "SELECT MAX(comment_ID) FROM {$GLOBALS['wpdb']->comments}" ) + 1000;
+		add_metadata( 'comment', $gone_review, ReviewPhotos::META, array( array( 'file' => basename( $dangling ), 'alt' => '', 'width' => 1, 'height' => 1 ) ) );
 		$swept = ReviewPhotos::sweep();
-		$check( $swept >= 1 && ! is_file( $orphan ) && is_file( $young ) && is_file( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'] ), 'D-23 a stored photo no review refers to is swept away once it is ten minutes old; a younger one, and every photo a review refers to, stay (' . $swept . ' swept)' );
+		delete_metadata( 'comment', $gone_review, ReviewPhotos::META );
+		$check( $swept >= 2 && ! is_file( $orphan ) && ! is_file( $dangling ) && is_file( $young ) && is_file( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'] ), 'D-23 a stored photo no existing review refers to (none, or a review since deleted) is swept away once it is ten minutes old; a younger one, and every photo a review refers to, stay (' . $swept . ' swept)' );
 		wp_delete_file( $young );
 
 		$paths = array_map( static fn ( array $p ): string => ReviewPhotos::dir() . $p['file'], ReviewPhotos::photos( (int) $review ) );

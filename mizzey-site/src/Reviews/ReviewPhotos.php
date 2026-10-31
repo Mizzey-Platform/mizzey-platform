@@ -430,8 +430,8 @@ final class ReviewPhotos
     }
 
     /**
-     * Removes every stored photo no review refers to, once it is ten minutes old (a younger one may belong to an upload
-     * still running). Answers how many went.
+     * Removes every stored photo no existing review refers to (a list left on a deleted review counts for nothing),
+     * once it is ten minutes old (a younger one may belong to an upload still running). Answers how many went.
      */
     public static function sweep(): int
     {
@@ -441,7 +441,7 @@ final class ReviewPhotos
             return 0;
         }
         $kept = [];
-        foreach ((array) $wpdb->get_col($wpdb->prepare("SELECT meta_value FROM {$wpdb->commentmeta} WHERE meta_key = %s", self::META)) as $value) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        foreach ((array) $wpdb->get_col($wpdb->prepare("SELECT m.meta_value FROM {$wpdb->commentmeta} m INNER JOIN {$wpdb->comments} c ON c.comment_ID = m.comment_id WHERE m.meta_key = %s", self::META)) as $value) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             foreach ((array) maybe_unserialize($value) as $photo) {
                 if (is_array($photo) && isset($photo['file'])) {
                     $kept[(string) $photo['file']] = true;
