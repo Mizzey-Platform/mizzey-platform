@@ -19,13 +19,14 @@ defined('ABSPATH') || exit;
  *   `GET mizzey/v1/google/callback`, which exchanges the code with Google's token endpoint over TLS, server to server,
  *   and checks the ID token's issuer, audience, expiry and nonce (OpenID Connect Core 3.1.3.7: an ID token received
  *   straight from the token endpoint is validated by TLS in place of its signature).
- * - The account: the one already linked to that Google account; else, when Google is the authority for the email (a
- *   Gmail address, or one in the Google Workspace domain the token names) and says it is verified, the account with
- *   that email, now linked (its email marked verified, which links its guest orders, B14; an account whose email was
- *   never verified here has its password replaced and its sessions ended first, so whoever registered it cannot keep
- *   using it); else a new customer account, with marketing consent left unset (AUTH-09), its email marked verified
- *   only when Google is the authority for it. An email Google is not the authority for is never linked to an existing
- *   account: Google's verification of it may be stale (a mailbox that has changed hands).
+ * - Only for an email Google is the authority for (a Gmail address, or one in the Google Workspace domain the token
+ *   names) and says is verified: for any other, Google's verification may be stale (a mailbox that has changed
+ *   hands), so Google sign-in is refused and the customer signs in or registers with their email and password.
+ * - The account: the one already linked to that Google account; else the account with that email, now linked (its
+ *   email marked verified, which links its guest orders, B14; an account whose email was never verified here has its
+ *   password replaced and its sessions ended first, so whoever registered it cannot keep using it); else a new
+ *   customer account, its email verified, with marketing consent left unset (AUTH-09). A new account is let through
+ *   the sign-up check (AUTH-15, specs/009) by a permit for its email in the callback's own request.
  * - One account per email: the account is found or made under a lock per email, which WooCommerce's own registration
  *   takes too (`woocommerce_registration_errors`), so the two cannot both create one at once.
  * - Staff accounts (any role beyond a customer) cannot sign in this way: they sign in with their password and two
@@ -236,22 +237,20 @@ final class GoogleSignIn
         $sub       = (string) $claims['sub'];
         $email     = sanitize_email((string) ($claims['email'] ?? ''));
         $verified  = ($claims['email_verified'] ?? false) === true || ($claims['email_verified'] ?? '') === 'true';
-        $authority = $verified && self::authoritative($email, (string) ($claims['hd'] ?? ''));
+        $authority = self::authoritative($email, (string) ($claims['hd'] ?? ''));
         $linked    = get_users(['meta_key' => self::SUBJECT, 'meta_value' => $sub, 'number' => 1]); // phpcs:ignore WordPress.DB.SlowDBQuery
         $user      = $linked[0] ?? null;
         if (! $user instanceof \WP_User) {
             if (! $verified || ! is_email($email)) {
                 return new \WP_Error('mizzey_google_email', 'unverified_email');
             }
+            if (! $authority) {
+                return new \WP_Error('mizzey_google_link', 'not_authoritative');
+            }
             if (! self::lockEmail($email)) {
                 return new \WP_Error('mizzey_google_busy', 'busy');
             }
             $user = get_user_by('email', $email) ?: null;
-            if ($user instanceof \WP_User && ! $authority) {
-                self::unlockEmail();
-
-                return new \WP_Error('mizzey_google_link', 'not_authoritative');
-            }
             if ($user instanceof \WP_User && ! self::customer($user)) {
                 self::unlockEmail();
 
@@ -266,6 +265,7 @@ final class GoogleSignIn
             } else {
                 // Google has verified the email: no verification message is sent for it.
                 remove_action('woocommerce_created_customer', [VerificationOnRegistration::class, 'send'], 20);
+                \MizzeySite\Security\SignupRoutes::grantVerifiedIdentity($email);
                 $id = wc_create_new_customer($email, '', wp_generate_password(32, true, true), [
                     'first_name' => sanitize_text_field((string) ($claims['given_name'] ?? '')),
                     'last_name'  => sanitize_text_field((string) ($claims['family_name'] ?? '')),
@@ -284,9 +284,7 @@ final class GoogleSignIn
                 }
             }
             update_user_meta($user->ID, self::SUBJECT, $sub);
-            if ($authority) {
-                self::markVerified($user->ID);
-            }
+            self::markVerified($user->ID);
             self::unlockEmail();
         }
         if (! self::customer($user)) {
@@ -331,7 +329,7 @@ final class GoogleSignIn
             $text = $said === 'staff'
                 ? __('Staff accounts sign in with their password.', 'mizzey-site')
                 : ($said === 'link'
-                    ? __('An account with this email already exists. Please sign in with your password.', 'mizzey-site')
+                    ? __('Please sign in or register with your email and password.', 'mizzey-site')
                     : __('Google sign-in did not complete. Please try again.', 'mizzey-site'));
             printf('<p class="mizzey-google-sign-in-notice">%s</p>', esc_html($text));
         }

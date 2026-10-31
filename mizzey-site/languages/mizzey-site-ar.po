@@ -280,5 +280,5 @@ msgid "An account is already registered with your email address. Please log in."
 msgstr "يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول."
 
 #: mizzey-site/src/Accounts/GoogleSignIn.php
-msgid "An account with this email already exists. Please sign in with your password."
-msgstr "يوجد حساب بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول بكلمة المرور."
+msgid "Please sign in or register with your email and password."
+msgstr "يرجى تسجيل الدخول أو إنشاء حساب بالبريد الإلكتروني وكلمة المرور."

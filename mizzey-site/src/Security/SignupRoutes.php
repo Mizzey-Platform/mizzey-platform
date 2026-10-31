@@ -288,6 +288,18 @@ final class SignupRoutes
     }
 
     /**
+     * A REST route that verified the person another way, Google sign-in's checked ID token (specs/024), permits one
+     * insertion for its email in the request being dispatched; it is spent with the request's frame.
+     */
+    public static function grantVerifiedIdentity(string $email): void
+    {
+        $email = self::normalise($email);
+        if ($email !== '' && self::$frames !== []) {
+            self::$frames[array_key_last(self::$frames)]['permit'] = $email;
+        }
+    }
+
+    /**
      * How many REST frames are open, and whether the top one holds a permit. For the scenarios.
      *
      * @return array{frames:int,permit:bool}

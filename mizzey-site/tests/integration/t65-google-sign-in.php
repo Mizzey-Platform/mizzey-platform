@@ -127,7 +127,7 @@ run(
 		if ( $fresh instanceof \WP_User ) {
 			$s->track_user( $fresh->ID );
 		}
-		$check( is_wp_error( $outside ) && 'mizzey_google_link' === $outside->get_error_code() && '' === get_user_meta( $outside_id, GoogleSignIn::SUBJECT, true ) && $fresh instanceof \WP_User && ! VerificationOnRegistration::verified( $fresh->ID ), 'AUTH-13 an email Google is not the authority for (not Gmail, not the token\'s Workspace domain) is never linked to an existing account, and a new account from it is not taken as verified' );
+		$check( is_wp_error( $outside ) && 'mizzey_google_link' === $outside->get_error_code() && '' === get_user_meta( $outside_id, GoogleSignIn::SUBJECT, true ) && is_wp_error( $fresh ) && false === get_user_by( 'email', "{$tag}-fresh@example.invalid" ), 'AUTH-13 an email Google is not the authority for (not Gmail, not the token\'s Workspace domain) signs in to nothing: it is never linked to an existing account, and makes none' );
 
 		$staff_id = t65_user( $s, "{$tag}-staff@example.invalid", 'shop_manager', $password );
 		$staff    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-4", 'email' => "{$tag}-staff@example.invalid" ) + $good );
@@ -142,6 +142,10 @@ run(
 		parse_str( (string) wp_parse_url( (string) ( rest_do_request( $begin )->get_headers()['Location'] ?? '' ), PHP_URL_QUERY ), $flow );
 		$saved = get_transient( 'mizzey_google_' . hash( 'sha256', (string) ( $flow['state'] ?? '' ) ) );
 		$good['nonce'] = (string) ( $saved['nonce'] ?? '' );
+		$good['sub']   = "{$tag}-sub-8";
+		$good['email'] = "{$tag}-callback@example.invalid";
+		// The sign-up check as an anonymous request meets it, not as WP-CLI.
+		add_filter( 'mizzey_signup_trust_cli', '__return_false' );
 		$_COOKIE[ GoogleSignIn::COOKIE ] = (string) ( $flow['state'] ?? '' );
 		$back = new \WP_REST_Request( 'GET', '/mizzey/v1/google/callback' );
 		$back->set_param( 'state', (string) ( $flow['state'] ?? '' ) );
@@ -152,9 +156,14 @@ run(
 		$landed = rest_do_request( $back );
 		remove_action( 'set_logged_in_cookie', $catch, 10 );
 		$signed = get_current_user_id();
+		remove_filter( 'mizzey_signup_trust_cli', '__return_false' );
+		$made   = get_user_by( 'email', "{$tag}-callback@example.invalid" );
+		if ( $made instanceof \WP_User ) {
+			$s->track_user( $made->ID );
+		}
 		unset( $_COOKIE[ GoogleSignIn::COOKIE ] );
 		wp_set_current_user( 0 );
-		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $created instanceof \WP_User && $signed === $created->ID && $issued === $created->ID, 'AUTH-10 the callback with the state, its cookie and a good code signs the customer in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
+		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $made instanceof \WP_User && $signed === $made->ID && $issued === $made->ID, 'AUTH-10 the callback with the state, its cookie and a good code, for someone new, makes their account through the sign-up check, signs them in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
 
 		sign_in_forget( array( "{$tag}-known", "{$tag}-squat", "{$tag}-staff", "{$tag}-outside" ) );
 		return $ok;
