@@ -592,11 +592,11 @@ final class AutomaticPromotions
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
             'meta_query'       => [
                 ['key' => PromotionSettings::AUTOMATIC, 'value' => 'yes'],
-                // A customer's own welcome discount is a candidate for that customer only (automaticCodes()).
-                ['key' => WelcomeDiscount::OWNER, 'compare' => 'NOT EXISTS'],
             ],
             'suppress_filters' => true,
         ]);
+        // A customer's own welcome discount is a candidate for that customer only (automaticCodes()).
+        $ids = array_filter($ids, static fn ($id): bool => get_post_meta((int) $id, WelcomeDiscount::OWNER, true) === '');
         $codes = array_values(array_filter(array_map(static fn ($id) => wc_format_coupon_code((string) get_post_field('post_title', (int) $id, 'raw')), $ids)));
         set_transient(self::CACHE, $codes, DAY_IN_SECONDS);
 
