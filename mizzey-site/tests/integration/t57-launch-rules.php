@@ -350,6 +350,64 @@ run(
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		delete_option( Combination::OPTION );
 		AutomaticPromotions::forget();
+		// BR-004, on: WooCommerce's coupon order with sequential discounts; individual-use free shipping valued alone;
+		// a cart whose code becomes individual-use keeps one; one claim per email.
+		update_option( Combination::OPTION, 'yes' );
+		$sequential = get_option( 'woocommerce_calc_discounts_sequentially', 'no' );
+		$s->on_finish( static function () use ( $sequential ) { update_option( 'woocommerce_calc_discounts_sequentially', $sequential ); } );
+		update_option( 'woocommerce_calc_discounts_sequentially', 'yes' );
+		$two_hundred = $s->simple_product( 't57 duo', '200', null );
+		$cart_off    = t57_screen( $s, "{$tag}cartoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '100' ) );
+		$half        = t57_screen( $s, "{$tag}half", array( 'discount_type' => 'percent', 'coupon_amount' => '50', 'mizzey_automatic' => 'yes' ) );
+		$sixty       = t57_screen( $s, "{$tag}sixty", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '60', 'mizzey_automatic' => 'yes', 'product_ids' => array( $two_hundred->get_id() ) ) );
+		foreach ( array( $half, $sixty ) as $loose ) {
+			$loose->set_individual_use( false );
+			$loose->save();
+		}
+		AutomaticPromotions::forget();
+		t57_cart( array( $two_hundred->get_id() => 1 ), array( $cart_off->get_code() ) );
+		$ordered = t57_applied();
+		$check( in_array( t57_code( $half ), $ordered, true ) && ! in_array( t57_code( $sixty ), $ordered, true ), 'BR-004 on, sequential: WooCommerce takes 50 percent before a fixed cart 100, so the 50 percent (100 more off) beats a fixed 60 (' . implode( ',', $ordered ) . ')' );
+		foreach ( array( $half, $sixty ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( 'woocommerce_calc_discounts_sequentially', $sequential );
+		$five_fifty = $s->simple_product( 't57 set', '550', null );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$sixty_off = t57_screen( $s, "{$tag}sixtyoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '60', 'mizzey_automatic' => 'yes' ) );
+		$sixty_off->set_individual_use( false );
+		$sixty_off->save();
+		$lone_ship = t57_screen( $s, "{$tag}loneship", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0', 'free_shipping' => 'yes', 'mizzey_automatic' => 'yes', 'individual_use' => 'yes' ) );
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_fifty->get_id() => 1 ) );
+		$alone = t57_applied();
+		$check( array( t57_code( $sixty_off ) ) === $alone, 'BR-004 on: an individual-use free shipping is valued alone (worth nothing on a cart that already ships free), so the 60 off applies rather than it (' . implode( ',', $alone ) . ')' );
+		foreach ( array( $sixty_off, $lone_ship ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		AutomaticPromotions::forget();
+		$tenoff->set_individual_use( false );
+		$tenoff->save();
+		$five->set_individual_use( false );
+		$five->save();
+		t57_cart( array( $cheap->get_id() => 2 ), array( $tenoff->get_code(), $five->get_code() ) );
+		$pair = t57_applied();
+		$tenoff->set_individual_use( true );
+		$tenoff->save();
+		WC()->cart->calculate_totals();
+		wc_clear_notices();
+		$check( 2 === count( $pair ) && array( t57_code( $five ) ) === t57_applied(), 'BR-004 on: two codes held, then one is made individual-use: the cart keeps one (' . implode( ',', t57_applied() ) . ')' );
+		$tenoff->set_individual_use( false );
+		$tenoff->save();
+		delete_option( Combination::OPTION );
+		$claim_email = "{$tag}-claim@example.invalid";
+		$s->on_finish( static function () use ( $claim_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', wc_strtolower( $claim_email ) ) ); } );
+		$check( WelcomeDiscount::claim( $claim_email ) && ! WelcomeDiscount::claim( strtoupper( $claim_email ) ), 'BR-001 an email is claimed once, whatever its case: the second claim fails' );
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();

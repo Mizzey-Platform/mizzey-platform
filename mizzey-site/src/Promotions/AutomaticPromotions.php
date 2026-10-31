@@ -63,9 +63,11 @@ final class AutomaticPromotions
         $automatic = self::automaticCodes();
         $applied   = array_map('wc_format_coupon_code', $cart->get_applied_coupons());
         $entered   = array_values(array_diff($applied, $automatic));
-        // With combining off the cart holds one code: the latest entered (BR-004), also when combining was switched
-        // off while the cart held more. WooCommerce re-validates applied coupons only on the cart and checkout pages.
-        $extra = ! Combination::allowed() && count($entered) > 1 ? array_slice($entered, 0, -1) : [];
+        // With combining off, or when one of the entered codes is individual-use, the cart holds one code: the latest
+        // entered (BR-004), also when the setting or a coupon's box changed while the cart held more. WooCommerce
+        // re-validates applied coupons only on the cart and checkout pages.
+        $solo  = array_filter($entered, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use());
+        $extra = count($entered) > 1 && (! Combination::allowed() || $solo !== []) ? array_slice($entered, 0, -1) : [];
         if ($extra !== []) {
             $entered = array_values(array_diff($entered, $extra));
             $applied = array_values(array_diff($applied, $extra));
@@ -120,20 +122,47 @@ final class AutomaticPromotions
         foreach ($entered as $code) {
             $already += (float) wc_add_number_precision($cart->get_coupon_discount_amount($code, ! $cart->display_prices_including_tax()));
         }
-        $solo = static fn (?array $option): bool => $option !== null && (new \WC_Coupon($option['code']))->get_individual_use();
-        $best = self::best($cart, $discount, $already, $entered);
-        // Free shipping is valued after the chosen discount, which can take the cart under a free shipping minimum.
-        $ship = $best !== null && ! $solo($best)
-            ? self::best($cart, $shipping, $already + $best['shown'], [...$entered, $best['code']])
-            : self::best($cart, $shipping, $already, $entered);
-        if ($best !== null && $ship !== null && ! $solo($best) && ! $solo($ship)) {
-            return [$best['code'], $ship['code']];
+        $individual = static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use();
+        $solo       = static fn (?array $option): bool => $option !== null && $individual($option['code']);
+        $joinable   = array_values(array_filter($shipping, static fn (string $code): bool => ! $individual($code)));
+        $best       = self::best($cart, $discount, $already, $entered);
+        // Each promotion alone, valued after the entered codes only; an individual-use one never beside an entered code.
+        $options = [];
+        foreach ([$best, self::best($cart, $shipping, $already, $entered)] as $alone) {
+            if ($alone !== null && ! ($solo($alone) && $entered !== [])) {
+                $options[] = ['codes' => [$alone['code']], 'value' => $alone['value'], 'created' => $alone['created'], 'id' => $alone['id']];
+            }
         }
-        // Otherwise one at most: an individual-use promotion stands alone, and never beside an entered code.
-        $single = array_values(array_filter([$best, $ship], static fn (?array $option): bool => $option !== null && ! ($solo($option) && $entered !== [])));
-        usort($single, static fn (array $a, array $b): int => self::better($a, $b) ? -1 : 1);
+        // The discount with free shipping that can join it, valued after that discount, which can take the cart
+        // under a free shipping minimum.
+        if ($best !== null && ! $solo($best)) {
+            $ship = self::best($cart, $joinable, $already + $best['shown'], [...$entered, $best['code']]);
+            if ($ship !== null) {
+                $options[] = ['codes' => [$best['code'], $ship['code']], 'value' => $best['value'] + $ship['value'], 'created' => $best['created'], 'id' => $best['id']];
+            }
+        }
+        usort($options, static fn (array $a, array $b): int => self::better($a, $b) ? -1 : 1);
 
-        return $single !== [] ? [$single[0]['code']] : [];
+        return $options !== [] ? $options[0]['codes'] : [];
+    }
+
+    /**
+     * Coupons in the order WooCommerce's totals apply them, which matters with sequential discounts: fixed per product,
+     * then percentage, then fixed cart (`woocommerce_coupon_sort` may change it), then a smaller item limit, then a
+     * smaller amount, then the newer (`WC_Cart_Totals::get_coupons_from_cart()`, `sort_coupons_callback()`, 11.1.0).
+     *
+     * @param list<\WC_Coupon> $coupons
+     * @return list<\WC_Coupon>
+     */
+    private static function inWooCommerceOrder(array $coupons): array
+    {
+        $rank = static fn (\WC_Coupon $c): int => (int) apply_filters('woocommerce_coupon_sort', ['fixed_product' => 1, 'percent' => 2, 'fixed_cart' => 3][$c->get_discount_type()] ?? 0, $c);
+        usort($coupons, static function (\WC_Coupon $a, \WC_Coupon $b) use ($rank): int {
+            return [$rank($a), $a->get_limit_usage_to_x_items(), (float) $a->get_amount(), -$a->get_id()]
+                <=> [$rank($b), $b->get_limit_usage_to_x_items(), (float) $b->get_amount(), -$b->get_id()];
+        });
+
+        return $coupons;
     }
 
     /** A promotion whose only reward is free shipping. */
@@ -215,10 +244,10 @@ final class AutomaticPromotions
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->set_items(self::items($cart));
-        foreach ($before as $code) {
-            $discounts->apply_coupon(new \WC_Coupon($code), false);
+        $all = [...array_map(static fn (string $code): \WC_Coupon => new \WC_Coupon($code), $before), $coupon];
+        foreach (self::inWooCommerceOrder($all) as $each) {
+            $discounts->apply_coupon($each, false);
         }
-        $discounts->apply_coupon($coupon, false);
         $byItem = (array) ($discounts->get_discounts(true)[$coupon->get_code()] ?? []);
         $paid   = self::paidSaving($cart, $byItem);
         $shown  = self::shownDiscount($cart, $byItem);

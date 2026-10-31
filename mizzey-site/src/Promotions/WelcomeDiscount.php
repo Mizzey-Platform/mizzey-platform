@@ -90,10 +90,9 @@ final class WelcomeDiscount
         if ($template === null || ! is_email($user->user_email)) {
             return;
         }
-        // One claim per email, made atomically: add_option() inserts a unique row, or fails when the email already has
-        // one, so two registrations at once cannot both pass.
-        $claim = self::ISSUED . '_' . hash('sha256', wc_strtolower($user->user_email));
-        if (! add_option($claim, (string) time(), '', false)) {
+        // One claim per email, made atomically: an insert that does nothing when the email's claim row exists, so two
+        // registrations at once cannot both pass (add_option() upserts, so it cannot tell them apart).
+        if (! self::claim($user->user_email)) {
             return;
         }
         $coupon = new \WC_Coupon();
@@ -135,6 +134,17 @@ final class WelcomeDiscount
             }
             update_user_meta($user->ID, self::USER_META, $coupon->get_id());
         }
+    }
+
+    /** Claims the email's one welcome discount; false when it was claimed before, by this or any account. */
+    public static function claim(string $email): bool
+    {
+        global $wpdb;
+        $name     = self::ISSUED . '_' . hash('sha256', wc_strtolower($email));
+        $inserted = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", $name, '1')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        wp_cache_delete('notoptions', 'options');
+
+        return $inserted === 1;
     }
 
     /** The customer's own welcome discount code while it can still be used, or null. */
