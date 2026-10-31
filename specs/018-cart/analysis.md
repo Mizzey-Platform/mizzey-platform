@@ -13,3 +13,4 @@ fix is removed (`evidence/mutation.txt`).
 | 5 | FIX FIRST | One Medium. With promotions combining, an individual-use automatic promotion could still win at the target: no item target is promised while an automatic promotion the free shipping cannot stand beside is running |
 | 6 | FIX FIRST | One Medium. Free shipping needing the promotion and a minimum after discounts could lose its minimum to an automatic discount joining at the target: such a method is not taken as met while a discount may join |
 | 7 | FIX FIRST | One Medium. A discount promotion that also gave free shipping was not counted as one that may join: every other automatic promotion with a discount counts, and so does the free-shipping promotion's own |
+| 8 | READY | No High or Medium findings beyond the recorded limit on WooCommerce's own stock checks |
