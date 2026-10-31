@@ -219,6 +219,14 @@ run(
 		$arabic = t56_http( 'GET', $ar_url . 'wishlist', $added['cookies'] );
 		$check( 200 === $empty['status'] && array() === $empty['body']['items'] && 201 === $added['status'] && $en === ( $again['body']['items'][0]['canonical'] ?? 0 ), "[HTTP] a guest saves a product and finds it on the next request ({$added['status']})" );
 		$check( $ar === ( $arabic['body']['items'][0]['id'] ?? 0 ), '[HTTP] on the Arabic address the saved product comes back as its Arabic record' );
+		$secret_en = catalogue_simple( $s, "{$tag}-S", 't56 open' );
+		$secret_ar = catalogue_duplicate( $s, $secret_en );
+		wp_update_post( array( 'ID' => $secret_ar, 'post_status' => 'draft', 'post_title' => 't56 unpublished translation' ) );
+		$with_secret = t56_http( 'POST', $base . 'wishlist/items', $added['cookies'], array( 'id' => $secret_en ) );
+		$secret_view = t56_http( 'GET', $ar_url . 'wishlist', $with_secret['cookies'] );
+		$secret_ids  = array_column( (array) ( $secret_view['body']['items'] ?? array() ), 'id' );
+		$check( $secret_ar > 0 && in_array( $secret_en, $secret_ids, true ) && ! in_array( $secret_ar, $secret_ids, true ) && false === strpos( wp_json_encode( $secret_view['body'] ), 't56 unpublished translation' ), '[HTTP] a published product whose Arabic translation is a draft comes back as the published record on the Arabic address, disclosing nothing of the draft' );
+		$added['cookies'] = t56_http( 'DELETE', $base . "wishlist/items/{$secret_en}", $with_secret['cookies'] )['cookies'];
 		$hidden = t56_http( 'POST', $base . 'wishlist/items', $added['cookies'], array( 'id' => $draft->get_id() ) );
 		$check( 404 === $hidden['status'] && false === strpos( wp_json_encode( $hidden['body'] ), 't56 draft' ), "[HTTP] saving a draft product is refused ({$hidden['status']}) and its name is not disclosed" );
 		$store   = rest_url( 'wc/store/v1/' );

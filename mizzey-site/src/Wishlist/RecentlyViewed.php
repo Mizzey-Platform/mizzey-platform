@@ -60,8 +60,8 @@ final class RecentlyViewed
             if ($id === $skip) {
                 continue;
             }
-            $shown = CanonicalProduct::inCurrentLanguage($id);
-            if ($shown instanceof \WC_Product && $shown->is_visible() && Wishlist::viewable($shown)) {
+            $shown = Wishlist::shown($id);
+            if ($shown instanceof \WC_Product && $shown->is_visible()) {
                 $out[] = $shown;
             }
             if (count($out) >= $limit) {

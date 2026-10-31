@@ -39,6 +39,21 @@ final class Wishlist
     }
 
     /**
+     * The record to show for a canonical product: its translation in the current language when the visitor may see
+     * it, otherwise the canonical record itself, so a draft or private translation discloses nothing.
+     */
+    public static function shown(int $canonicalId): ?\WC_Product
+    {
+        $local = CanonicalProduct::inCurrentLanguage($canonicalId);
+        if (self::viewable($local)) {
+            return $local;
+        }
+        $canonical = wc_get_product($canonicalId);
+
+        return self::viewable($canonical) ? $canonical : null;
+    }
+
+    /**
      * Whether the visitor may see the product: published (a variation, and its parent), or readable by them. A draft,
      * private or trashed product is neither saved nor shown, so the wishlist discloses nothing that is not on sale.
      *
@@ -97,7 +112,7 @@ final class Wishlist
         if ($canonical === null || ! in_array($canonical->get_id(), self::stored(get_current_user_id()), true)) {
             return new \WP_Error('mizzey_wishlist_not_saved', __('This item is not in your wishlist.', 'mizzey-site'), ['status' => 404]);
         }
-        $shown = CanonicalProduct::inCurrentLanguage($canonical->get_id()) ?? $canonical;
+        $shown = self::shown($canonical->get_id()) ?? $canonical;
         if (! $shown->is_in_stock()) {
             return new \WP_Error('mizzey_wishlist_out_of_stock', __('This item is out of stock, so it stays in your wishlist.', 'mizzey-site'), ['status' => 409]);
         }

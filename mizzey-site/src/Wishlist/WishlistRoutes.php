@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace MizzeySite\Wishlist;
 
-use MizzeySite\Catalogue\CanonicalProduct;
-
 defined('ABSPATH') || exit;
 
 /**
@@ -87,7 +85,7 @@ final class WishlistRoutes
     {
         $out = [];
         foreach ($canonicalIds as $id) {
-            $shown = CanonicalProduct::inCurrentLanguage($id);
+            $shown = Wishlist::shown($id);
             if ($shown instanceof \WC_Product) {
                 $out[] = self::item($shown, $id);
             }
