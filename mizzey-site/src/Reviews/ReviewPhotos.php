@@ -23,9 +23,10 @@ defined('ABSPATH') || exit;
  *   `MIZZEY_REVIEW_PHOTOS_DIR` from the configuration when set (outside the site's public folder), else
  *   `uploads/mizzey-review-photos/` with an `.htaccess` refusal, used only once a request to a file in it is seen
  *   refused (checked again daily); until then no photo is accepted.
- * - A photo is shown, and served, only while its review is approved and only if it was attached before that approval,
- *   so a photo that arrives as a moderator approves waits for the next approval; staff who moderate see every photo,
- *   in the admin's list of comments too. A review deleted takes its files with it.
+ * - Approving a review records the photos it has at that moment; a photo is shown, and served, only while its review
+ *   is approved and only if it is one of those, so a photo that arrives as a moderator approves waits for the next
+ *   approval. Staff who moderate see every photo, in the admin's list of comments too. A review deleted takes its files
+ *   with it: the deletion holds the review's lock until it is done, so no upload finishes into a deleted review.
  * - Each photo has alternative text: the reviewer's, or a description naming the product.
  *
  * The designed upload form and gallery are PRE-03b's; the approved review's photos are listed under its text.
@@ -35,7 +36,7 @@ defined('ABSPATH') || exit;
 final class ReviewPhotos
 {
     public const META       = '_mizzey_review_photos';
-    public const APPROVED   = '_mizzey_review_approved_at';
+    public const APPROVED   = '_mizzey_review_approved_photos';
     public const STORAGE    = 'mizzey_review_photos_storage';
     public const QUERY      = 'mizzey-review-photo';
     public const MAX        = 5;
@@ -53,6 +54,17 @@ final class ReviewPhotos
         add_filter('comment_text', [self::class, 'adminList'], 20, 2);
         add_action('transition_comment_status', [self::class, 'approved'], 10, 3);
         add_action('delete_comment', [self::class, 'forget'], 10, 1);
+        add_action('deleted_comment', [self::class, 'deleted'], 10, 1);
+    }
+
+    /** The review being deleted, whose lock is held until the deletion is done. */
+    private static ?string $deleting = null;
+
+    private static function lockName(int $id): string
+    {
+        global $wpdb;
+
+        return substr('mz_' . $wpdb->prefix . 'review_photos_' . $id, 0, 64);
     }
 
     public static function routes(): void
@@ -87,7 +99,7 @@ final class ReviewPhotos
         if (! self::storageReady()) {
             return new \WP_Error('mizzey_photo_storage', __('Photos cannot be added right now. Please try again later.', 'mizzey-site'), ['status' => 503]);
         }
-        $lock = substr('mz_' . $wpdb->prefix . 'review_photos_' . $id, 0, 64);
+        $lock = self::lockName($id);
         if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             return new \WP_Error('mizzey_photo_busy', __('Please try again in a moment.', 'mizzey-site'), ['status' => 409]);
         }
@@ -134,7 +146,7 @@ final class ReviewPhotos
      * The photo checked, cleaned and stored, or why not.
      *
      * @param array{tmp_name:string,size:int,error:int} $file
-     * @return array{file:string,alt:string,width:int,height:int,at:float}|\WP_Error
+     * @return array{file:string,alt:string,width:int,height:int}|\WP_Error
      */
     private static function store(array $file, string $alt)
     {
@@ -177,7 +189,7 @@ final class ReviewPhotos
             return $refused;
         }
 
-        return ['file' => $name, 'alt' => $alt, 'width' => $width, 'height' => $height, 'at' => microtime(true)];
+        return ['file' => $name, 'alt' => $alt, 'width' => $width, 'height' => $height];
     }
 
     /** Whether there is the memory to decode an image of this size, and a scaled copy of it. */
@@ -188,7 +200,9 @@ final class ReviewPhotos
         if ($limit <= 0) {
             return true;
         }
-        $needed = (int) ($width * $height * 5 + self::KEEP_SIDE * self::KEEP_SIDE * 4 + 16 * 1024 * 1024);
+        // GD's truecolour image, the decoder's own row and palette buffers, and the scaled copy: a decoder can hold about
+        // twice the image again while it works.
+        $needed = (int) ($width * $height * 10 + self::KEEP_SIDE * self::KEEP_SIDE * 4 + 32 * 1024 * 1024);
 
         return $limit - memory_get_usage(true) > $needed;
     }
@@ -245,7 +259,7 @@ final class ReviewPhotos
         return sprintf(__('A customer\'s photo of %s', 'mizzey-site'), get_the_title($productId));
     }
 
-    /** @return list<array{file:string,alt:string,width:int,height:int,at?:float}> */
+    /** @return list<array{file:string,alt:string,width:int,height:int}> */
     public static function photos(int $commentId): array
     {
         $photos = get_comment_meta($commentId, self::META, true);
@@ -254,7 +268,7 @@ final class ReviewPhotos
     }
 
     /**
-     * When a review is approved, the moment is kept: only photos attached before it are shown.
+     * When a review is approved, the photos it has then are recorded, read under the review's lock: only those are shown.
      *
      * @param mixed $new
      * @param mixed $old
@@ -262,8 +276,22 @@ final class ReviewPhotos
      */
     public static function approved($new, $old, $comment): void
     {
-        if ($new === 'approved' && $comment instanceof \WP_Comment && get_post_type((int) $comment->comment_post_ID) === 'product') {
-            update_comment_meta((int) $comment->comment_ID, self::APPROVED, (string) microtime(true));
+        global $wpdb;
+        if ($new !== 'approved' || ! $comment instanceof \WP_Comment || get_post_type((int) $comment->comment_post_ID) !== 'product') {
+            return;
+        }
+        $id   = (int) $comment->comment_ID;
+        $lock = self::lockName($id);
+        $held = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        try {
+            wp_cache_delete($id, 'comment_meta');
+            // Without the lock, nothing is recorded: the photos stay hidden until the review is approved again.
+            $files = $held ? array_map(static fn (array $photo): string => (string) $photo['file'], self::photos($id)) : [];
+            update_comment_meta($id, self::APPROVED, $files);
+        } finally {
+            if ($held) {
+                $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            }
         }
     }
 
@@ -273,19 +301,19 @@ final class ReviewPhotos
     }
 
     /**
-     * Whether a photo may be seen by this visitor: staff who moderate see every photo; anyone else, only one attached
-     * before its review was approved, while it is approved.
+     * Whether a photo may be seen by this visitor: staff who moderate see every photo; anyone else, only one its
+     * review had when it was approved, while it is approved.
      *
-     * @param array{at?:float} $photo
+     * @param array{file:string} $photo
      */
     public static function visible(\WP_Comment $comment, array $photo): bool
     {
         if (current_user_can('moderate_comments')) {
             return true;
         }
-        $approvedAt = (float) get_comment_meta((int) $comment->comment_ID, self::APPROVED, true);
+        $approved = get_comment_meta((int) $comment->comment_ID, self::APPROVED, true);
 
-        return (string) $comment->comment_approved === '1' && $approvedAt > 0 && (float) ($photo['at'] ?? PHP_FLOAT_MAX) < $approvedAt;
+        return (string) $comment->comment_approved === '1' && is_array($approved) && in_array((string) $photo['file'], $approved, true);
     }
 
     public static function serve(): void
@@ -349,10 +377,30 @@ final class ReviewPhotos
         return $out !== '' ? '<ul class="mizzey-review-photos">' . $out . '</ul>' : '';
     }
 
-    /** @param mixed $commentId */
+    /**
+     * Before a review is deleted: its lock is taken, and held until the deletion is done (`deleted`), and its files go.
+     *
+     * @param mixed $commentId
+     */
     public static function forget($commentId): void
     {
-        self::remove(self::photos((int) $commentId));
+        global $wpdb;
+        $id = (int) $commentId;
+        if (self::$deleting === null && (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', self::lockName($id))) === 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            self::$deleting = self::lockName($id);
+        }
+        wp_cache_delete($id, 'comment_meta');
+        self::remove(self::photos($id));
+    }
+
+    /** @param mixed $commentId */
+    public static function deleted($commentId): void
+    {
+        global $wpdb;
+        if (self::$deleting !== null && self::$deleting === self::lockName((int) $commentId)) {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::$deleting)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            self::$deleting = null;
+        }
     }
 
     public static function dir(): string
@@ -388,14 +436,26 @@ final class ReviewPhotos
         if (is_array($seen) && ($seen['at'] ?? 0) > time() - DAY_IN_SECONDS) {
             return ! empty($seen['refused']);
         }
-        $probe = 'probe-' . bin2hex(random_bytes(8)) . '.txt';
-        $mark  = bin2hex(random_bytes(16));
-        file_put_contents($dir . $probe, $mark); // phpcs:ignore WordPress.WP.AlternativeFunctions
-        $answer  = wp_remote_get(trailingslashit((string) wp_upload_dir(null, false)['baseurl']) . 'mizzey-review-photos/' . $probe, ['timeout' => 10, 'redirection' => 0, 'sslverify' => false]);
-        wp_delete_file($dir . $probe);
-        // Refused only when the server answered and did not hand the file over; no answer is no proof.
-        $refused = ! is_wp_error($answer) && (int) wp_remote_retrieve_response_code($answer) !== 200 && ! str_contains((string) wp_remote_retrieve_body($answer), $mark);
-        update_option(self::STORAGE, ['refused' => $refused, 'at' => time()], false);
+        // A probe file of each kind stored here; each must be refused on purpose (401, 403 or 404), never handed over,
+        // redirected, or lost in a server error, for the folder to count as closed.
+        $refused = true;
+        foreach (['jpg', 'png', 'webp', 'txt'] as $ext) {
+            $probe = 'probe-' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $mark  = bin2hex(random_bytes(16));
+            if (file_put_contents($dir . $probe, $mark) === false) { // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $refused = false;
+                break;
+            }
+            $answer = wp_remote_get(trailingslashit((string) wp_upload_dir(null, false)['baseurl']) . 'mizzey-review-photos/' . $probe, ['timeout' => 10, 'redirection' => 0, 'sslverify' => false]);
+            wp_delete_file($dir . $probe);
+            $code    = is_wp_error($answer) ? 0 : (int) wp_remote_retrieve_response_code($answer);
+            $refused = in_array($code, [401, 403, 404], true) && ! str_contains((string) wp_remote_retrieve_body($answer), $mark);
+            if (! $refused) {
+                break;
+            }
+        }
+        // A refusal is trusted for a day; anything else is asked again at the next upload.
+        update_option(self::STORAGE, ['refused' => $refused, 'at' => $refused ? time() : 0], false);
 
         return $refused;
     }

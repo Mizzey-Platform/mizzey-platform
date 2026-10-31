@@ -158,8 +158,23 @@ run(
 			$extra[] = $files[] = t66_file( t66_image( 200, 200, 'jpeg' ), '.jpg' );
 		}
 		$sixth  = t66_upload( $users['reviewer'], (int) $review, $extra );
+		// Under a 128 MB memory limit, a 4000 by 4000 picture with transparency is more than the decoder can hold.
+		$rgba  = imagecreatetruecolor( 4000, 4000 );
+		imagesavealpha( $rgba, true );
+		imagefill( $rgba, 0, 0, imagecolorallocatealpha( $rgba, 10, 20, 30, 60 ) );
+		ob_start();
+		imagepng( $rgba, null, 9 );
+		imagedestroy( $rgba );
+		$heavy      = $files[] = t66_file( (string) ob_get_clean(), '.png' );
+		$was_limit  = ini_get( 'memory_limit' );
+		$cap        = static fn () => '128M';
+		add_filter( 'image_memory_limit', $cap );
+		ini_set( 'memory_limit', '128M' ); // phpcs:ignore WordPress.PHP.IniSet
+		$too_heavy  = t66_upload( $users['reviewer'], (int) $review, array( $heavy ) );
+		ini_set( 'memory_limit', (string) $was_limit ); // phpcs:ignore WordPress.PHP.IniSet
+		remove_filter( 'image_memory_limit', $cap );
 		$photos = ReviewPhotos::photos( (int) $review );
-		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer and a sixth photo are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status() ) ) . ')' );
+		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && 400 === $too_heavy->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer, a sixth photo, and a 4000 by 4000 transparent picture under a 128 MB limit are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status(), $too_heavy->get_status() ) ) . ')' );
 
 		// AC-2: stored cleaned, in a folder the web server refuses.
 		$stored = isset( $photos[0] ) ? (string) file_get_contents( ReviewPhotos::dir() . $photos[0]['file'] ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions
@@ -178,9 +193,11 @@ run(
 		wp_set_current_user( 0 );
 		wp_set_comment_status( (int) $review, 'approve' );
 		$open = sign_in_json( 'GET', $url );
-		// A photo that arrives as the moderator approves: attached after the approval, it waits for the next one.
-		$late_photo        = ReviewPhotos::photos( (int) $review )[0];
-		$late_photo['at']  = microtime( true ) + 5;
+		// A photo committed just after the approval recorded the review's photos, as a racing upload would: it waits for
+		// the next approval.
+		$late_photo         = ReviewPhotos::photos( (int) $review )[0];
+		$late_photo['file'] = bin2hex( random_bytes( 16 ) ) . '.jpg';
+		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], ReviewPhotos::dir() . $late_photo['file'] );
 		update_comment_meta( (int) $review, ReviewPhotos::META, array_merge( ReviewPhotos::photos( (int) $review ), array( $late_photo ) ) );
 		$racing = sign_in_json( 'GET', ReviewPhotos::url( (int) $review, 3 ) );
 		ob_start();
@@ -190,7 +207,7 @@ run(
 		wp_set_comment_status( (int) $review, 'hold' );
 		$rejected = sign_in_json( 'GET', $url );
 		$cache    = strtolower( sign_in_header( $open, 'cache-control' ) );
-		$check( 404 === $held['status'] && false !== strpos( $admin_list, 'mizzey-review-photo=' ) && 200 === $open['status'] && false !== strpos( $cache, 'no-store' ) && 404 === $racing['status'] && 404 === $rejected['status'] && false !== strpos( $markup, 'alt="A jar of cream on a shelf"' ) && false !== strpos( $markup, 't66 cream' ) && 3 === substr_count( $markup, '<img' ) && in_array( $late->get_status(), array( 401, 403 ), true ), '[HTTP] D-23 a photo is served only while its review is approved, never cached, and only if attached before the approval; staff who moderate see held ones in the admin list; it is shown with its alternative text (the reviewer\'s, or one naming the product); none can be added once published (' . implode( ', ', array( $held['status'], $open['status'], $racing['status'], $rejected['status'], $late->get_status(), $cache ) ) . ')' );
+		$check( 404 === $held['status'] && false !== strpos( $admin_list, 'mizzey-review-photo=' ) && 200 === $open['status'] && false !== strpos( $cache, 'no-store' ) && 404 === $racing['status'] && 404 === $rejected['status'] && false !== strpos( $markup, 'alt="A jar of cream on a shelf"' ) && false !== strpos( $markup, 't66 cream' ) && 3 === substr_count( $markup, '<img' ) && in_array( $late->get_status(), array( 401, 403 ), true ), '[HTTP] D-23 a photo is served only while its review is approved, never cached, and only if the review had it when approved; staff who moderate see held ones in the admin list; it is shown with its alternative text (the reviewer\'s, or one naming the product); none can be added once published (' . implode( ', ', array( $held['status'], $open['status'], $racing['status'], $rejected['status'], $late->get_status(), $cache ) ) . ')' );
 
 		$paths = array_map( static fn ( array $p ): string => ReviewPhotos::dir() . $p['file'], ReviewPhotos::photos( (int) $review ) );
 		wp_delete_comment( (int) $review, true );
