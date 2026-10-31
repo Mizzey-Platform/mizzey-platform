@@ -135,9 +135,15 @@ run(
 		$arabic->calculate_totals();
 		$arabic->save();
 		$s->track_order( $arabic->get_id() );
-		t62_walk( $arabic, 'shipped' );
+		// WooCommerce Multilingual's own emails on the way leave the request in the order's language: back to English
+		// before shipping, so the Shipped email has to switch by itself.
+		$arabic = t62_walk( $arabic, 'preparing' );
+		do_action( 'wpml_switch_language', 'en' );
+		switch_to_locale( 'en_US' );
+		$arabic->update_status( 'shipped' );
+		$after_locale = get_locale();
 		$arabic_mails = array_values( array_filter( $to( "{$tag}-ar@example.invalid" ), static fn ( $m ) => false !== strpos( (string) ( $m['message'] ?? '' ), 'شركة الشحن' ) || false !== strpos( (string) ( $m['message'] ?? '' ), 'التتبع' ) ) );
-		$check( 1 === count( $arabic_mails ) && false !== strpos( (string) $arabic_mails[0]['subject'], 'في الطريق' ), 'NOTF-04, D6 an Arabic order\'s Shipped email is in Arabic (' . ( $arabic_mails[0]['subject'] ?? 'none' ) . ')' );
+		$check( 1 === count( $arabic_mails ) && false !== strpos( (string) $arabic_mails[0]['subject'], 'في الطريق' ) && 'en_US' === $after_locale, 'NOTF-04, D6 an Arabic order\'s Shipped email is in Arabic (' . ( $arabic_mails[0]['subject'] ?? 'none' ) . ')' );
 
 		return $ok;
 	}
