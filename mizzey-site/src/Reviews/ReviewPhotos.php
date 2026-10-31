@@ -25,8 +25,11 @@ defined('ABSPATH') || exit;
  *   refused (checked again daily); until then no photo is accepted.
  * - Approving a review records the photos it has at that moment; a photo is shown, and served, only while its review
  *   is approved and only if it is one of those, so a photo that arrives as a moderator approves waits for the next
- *   approval. Staff who moderate see every photo, in the admin's list of comments too. A review deleted takes its files
- *   with it: the deletion holds the review's lock until it is done, so no upload finishes into a deleted review.
+ *   approval. An upload checks, after it is saved and still under the lock, that its review is still held, and takes
+ *   its photos back otherwise, so an approval that lands while it runs records the review without them. Staff who
+ *   moderate see every photo, in the admin's list of comments too. A review deleted takes its files with it (the
+ *   deletion holds the review's lock until it is done); a stored photo no review refers to, after a deletion that could
+ *   not take the lock or any failure, is swept away (`sweep()`, after such a deletion and daily).
  * - Each photo has alternative text: the reviewer's, or a description naming the product.
  *
  * The designed upload form and gallery are PRE-03b's; the approved review's photos are listed under its text.
@@ -55,7 +58,21 @@ final class ReviewPhotos
         add_action('transition_comment_status', [self::class, 'approved'], 10, 3);
         add_action('delete_comment', [self::class, 'forget'], 10, 1);
         add_action('deleted_comment', [self::class, 'deleted'], 10, 1);
+        add_action(self::SWEEP, [self::class, 'sweep']);
+        add_action('init', [self::class, 'schedule']);
     }
+
+    public const SWEEP = 'mizzey_review_photos_sweep';
+
+    public static function schedule(): void
+    {
+        if (! wp_next_scheduled(self::SWEEP)) {
+            wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', self::SWEEP);
+        }
+    }
+
+    /** Whether the review being deleted could not be locked, so its files are swept after the deletion. */
+    private static bool $sweepAfter = false;
 
     /** The review being deleted, whose lock is held until the deletion is done. */
     private static ?string $deleting = null;
@@ -122,18 +139,20 @@ final class ReviewPhotos
                 }
                 $made[] = $photo;
             }
-            // Still held, as read from the database now: a review approved meanwhile takes none of them.
+            $all   = array_merge($photos, $made);
+            $saved = update_comment_meta($id, self::META, $all) || self::photos($id) === $all;
+            // Still held, read from the database after the save: an approval or a deletion that landed while this ran
+            // takes none of them (the approval waits on this lock, then records the review without them).
             $status = (string) $wpdb->get_var($wpdb->prepare("SELECT comment_approved FROM {$wpdb->comments} WHERE comment_ID = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            if ($status !== '0') {
+            if (! $saved || $status !== '0') {
+                if ($saved) {
+                    update_comment_meta($id, self::META, $photos);
+                }
                 self::remove($made);
 
-                return new \WP_Error('rest_forbidden', __('Photos can be added only while the review waits for moderation.', 'mizzey-site'), ['status' => 403]);
-            }
-            $all = array_merge($photos, $made);
-            if (! update_comment_meta($id, self::META, $all) && self::photos($id) !== $all) {
-                self::remove($made);
-
-                return new \WP_Error('mizzey_photo_refused', __('This photo could not be used. Please send a JPEG, PNG or WebP image under 5 MB.', 'mizzey-site'), ['status' => 500]);
+                return $saved
+                    ? new \WP_Error('rest_forbidden', __('Photos can be added only while the review waits for moderation.', 'mizzey-site'), ['status' => 403])
+                    : new \WP_Error('mizzey_photo_refused', __('This photo could not be used. Please send a JPEG, PNG or WebP image under 5 MB.', 'mizzey-site'), ['status' => 500]);
             }
 
             return new \WP_REST_Response(['photos' => count($all)], 201);
@@ -386,8 +405,11 @@ final class ReviewPhotos
     {
         global $wpdb;
         $id = (int) $commentId;
-        if (self::$deleting === null && (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', self::lockName($id))) === 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if (self::$deleting === null && (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 30)', self::lockName($id))) === 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             self::$deleting = self::lockName($id);
+        } else {
+            // WordPress offers no way to stop the deletion: what an upload adds meanwhile is swept after it.
+            self::$sweepAfter = true;
         }
         wp_cache_delete($id, 'comment_meta');
         self::remove(self::photos($id));
@@ -401,6 +423,44 @@ final class ReviewPhotos
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::$deleting)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             self::$deleting = null;
         }
+        if (self::$sweepAfter) {
+            self::$sweepAfter = false;
+            self::sweep();
+        }
+    }
+
+    /**
+     * Removes every stored photo no review refers to, once it is ten minutes old (a younger one may belong to an upload
+     * still running). Answers how many went.
+     */
+    public static function sweep(): int
+    {
+        global $wpdb;
+        $dir = self::dir();
+        if (! is_dir($dir)) {
+            return 0;
+        }
+        $kept = [];
+        foreach ((array) $wpdb->get_col($wpdb->prepare("SELECT meta_value FROM {$wpdb->commentmeta} WHERE meta_key = %s", self::META)) as $value) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            foreach ((array) maybe_unserialize($value) as $photo) {
+                if (is_array($photo) && isset($photo['file'])) {
+                    $kept[(string) $photo['file']] = true;
+                }
+            }
+        }
+        if ($wpdb->last_error !== '') {
+            return 0;
+        }
+        $gone = 0;
+        foreach ((array) scandir($dir) as $name) {
+            $path = $dir . $name;
+            if (preg_match('/^[0-9a-f]{32}\.(jpg|png|webp)$/', (string) $name) === 1 && ! isset($kept[$name]) && is_file($path) && filemtime($path) < time() - 10 * MINUTE_IN_SECONDS) {
+                wp_delete_file($path);
+                $gone++;
+            }
+        }
+
+        return $gone;
     }
 
     public static function dir(): string

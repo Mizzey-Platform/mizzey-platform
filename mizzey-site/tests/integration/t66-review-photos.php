@@ -209,6 +209,16 @@ run(
 		$cache    = strtolower( sign_in_header( $open, 'cache-control' ) );
 		$check( 404 === $held['status'] && false !== strpos( $admin_list, 'mizzey-review-photo=' ) && 200 === $open['status'] && false !== strpos( $cache, 'no-store' ) && 404 === $racing['status'] && 404 === $rejected['status'] && false !== strpos( $markup, 'alt="A jar of cream on a shelf"' ) && false !== strpos( $markup, 't66 cream' ) && 3 === substr_count( $markup, '<img' ) && in_array( $late->get_status(), array( 401, 403 ), true ), '[HTTP] D-23 a photo is served only while its review is approved, never cached, and only if the review had it when approved; staff who moderate see held ones in the admin list; it is shown with its alternative text (the reviewer\'s, or one naming the product); none can be added once published (' . implode( ', ', array( $held['status'], $open['status'], $racing['status'], $rejected['status'], $late->get_status(), $cache ) ) . ')' );
 
+		// The sweep: a stored photo no review refers to goes once it is ten minutes old; a referred one, and a young one, stay.
+		$orphan = ReviewPhotos::dir() . bin2hex( random_bytes( 16 ) ) . '.jpg';
+		$young  = ReviewPhotos::dir() . bin2hex( random_bytes( 16 ) ) . '.jpg';
+		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], $orphan );
+		copy( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'], $young );
+		touch( $orphan, time() - HOUR_IN_SECONDS );
+		$swept = ReviewPhotos::sweep();
+		$check( $swept >= 1 && ! is_file( $orphan ) && is_file( $young ) && is_file( ReviewPhotos::dir() . ReviewPhotos::photos( (int) $review )[0]['file'] ), 'D-23 a stored photo no review refers to is swept away once it is ten minutes old; a younger one, and every photo a review refers to, stay (' . $swept . ' swept)' );
+		wp_delete_file( $young );
+
 		$paths = array_map( static fn ( array $p ): string => ReviewPhotos::dir() . $p['file'], ReviewPhotos::photos( (int) $review ) );
 		wp_delete_comment( (int) $review, true );
 		$review = 0;
