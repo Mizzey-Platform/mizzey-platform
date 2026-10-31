@@ -78,6 +78,8 @@ run(
 				'woocommerce_enable_signup_and_login_from_checkout' => 'yes',
 				'woocommerce_enable_guest_checkout'                 => 'yes',
 				'woocommerce_cod_settings'                          => array_merge( is_array( $cod ) ? $cod : array(), array( 'enabled' => 'yes', 'enable_for_virtual' => 'yes' ) ),
+				// The cart asks the stock source and fails closed (specs/018): the development fixture stands in.
+				\MizzeySite\Stock\FixtureStockSource::OPTION        => 'yes',
 			)
 		);
 		$product = $s->simple_product( 't49 virtual item', '50', null );
