@@ -84,8 +84,17 @@ final class InvoiceNumber
             if ($next === null) {
                 return '';
             }
-            // Past any number another order already holds, should the counter ever have been set back.
-            while (self::taken($number = InvoiceSettings::prefix() . str_pad((string) $next, 6, '0', STR_PAD_LEFT))) {
+            // Past any number another order already holds, should the counter ever have been set back; a query that
+            // fails issues nothing, at once.
+            for ($tries = 0; ; $tries++) {
+                $number = InvoiceSettings::prefix() . str_pad((string) $next, 6, '0', STR_PAD_LEFT);
+                $held   = self::taken($number);
+                if ($held === null || $tries >= 1000) {
+                    return '';
+                }
+                if (! $held) {
+                    break;
+                }
                 $next++;
             }
             if (! self::moveCounter($next + 1)) {
@@ -124,14 +133,17 @@ final class InvoiceNumber
         return $written !== false && self::counter() === $next;
     }
 
-    /** Whether another order already holds the number, a trashed one included; a failed query counts as held. */
-    private static function taken(string $number): bool
+    /** Whether another order already holds the number, a trashed one included; null when the query failed. */
+    private static function taken(string $number): ?bool
     {
         global $wpdb;
         $statuses = array_merge(array_keys(wc_get_order_statuses()), ['trash']);
         $holders  = wc_get_orders(['limit' => 1, 'return' => 'ids', 'status' => $statuses, 'meta_query' => [['key' => self::NUMBER, 'value' => $number]]]); // phpcs:ignore WordPress.DB.SlowDBQuery
+        if ($wpdb->last_error !== '') {
+            return null;
+        }
 
-        return $holders !== [] || $wpdb->last_error !== '';
+        return $holders !== [];
     }
 
     /** When the invoice was issued (a Unix time), or null. */

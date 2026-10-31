@@ -112,6 +112,17 @@ run(
 		$fourth  = t64_order( $s, $buyer, $product, 'processing' );
 		$number4 = InvoiceNumber::of( $fourth->get_id() );
 		$check( '' !== $held_by_trash && '' !== $number4 && $number4 !== $held_by_trash, "ADM-92 a trashed order keeps its number: with the counter set back to it, the next order gets another ({$held_by_trash}, then {$number4})" );
+		// The database failing the check for a number already held: nothing is issued, at once, and the lock is let go.
+		$broken = static function ( $query ) {
+			return is_string( $query ) && 0 === stripos( ltrim( $query ), 'SELECT' ) && false !== strpos( $query, InvoiceNumber::NUMBER ) && false !== strpos( $query, "'T64-" ) ? 'SELECT * FROM t64_no_such_table' : $query;
+		};
+		add_filter( 'query', $broken );
+		$started   = microtime( true );
+		$stalled   = t64_order( $s, $buyer, $product, 'processing' );
+		$took      = microtime( true ) - $started;
+		remove_filter( 'query', $broken );
+		$lock_free = 1 === (int) $GLOBALS['wpdb']->get_var( $GLOBALS['wpdb']->prepare( 'SELECT IS_FREE_LOCK(%s)', substr( 'mz_' . $GLOBALS['wpdb']->prefix . 'invoice_number', 0, 64 ) ) );
+		$check( '' === InvoiceNumber::of( $stalled->get_id() ) && $took < 10 && $lock_free, sprintf( 'ADM-92 when the database fails the check for a number already held, no number is issued, at once, and the numbering lock is free again (%.1f s)', $took ) );
 		$check( 1 === preg_match( '/^T64-(\d{6})$/', $number1, $a ) && 1 === preg_match( '/^T64-(\d{6})$/', $number2, $b ) && (int) $b[1] === (int) $a[1] + 1 && $again === $number1 && '' === InvoiceNumber::of( $unpaid->get_id() ) && '' === InvoiceNumber::issue( $unpaid->get_id() ) && ! InvoiceNumber::issuable( $unpaid ), "ADM-92 a paid order gets its invoice number once, the next in sequence; an unpaid one gets none ({$number1}, {$number2}, again {$again})" );
 
 		// AC-2: what it carries. A gift-wrap fee of 15 on the first order: 180 + 50 + 15 = 245.
