@@ -1,0 +1,6 @@
+Deliberate defects, each run against t54 and then reverted (31 October 2026):
+
+M1  the REST guard lets everything through                            -> t54 fails (3 checks)
+M2  the order screen guard lets everything through                    -> t54 fails (1 check)
+M3  the capability is given again on every load                       -> t54 fails (1 check)
+M4  deleting a refund is not covered                                  -> t54 fails (1 check)

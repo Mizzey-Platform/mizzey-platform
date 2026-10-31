@@ -24,12 +24,14 @@ final class PromotionSettings
     public const MAX_DISCOUNT = '_mizzey_max_discount';
     public const MIN_ITEMS    = '_mizzey_min_items';
     public const FIRST_ORDER  = '_mizzey_first_order';
+    public const PAUSED       = '_mizzey_paused';
 
     public static function register(): void
     {
         add_action('woocommerce_coupon_options', [self::class, 'generalFields'], 10, 2);
         add_action('woocommerce_coupon_options_usage_restriction', [self::class, 'restrictionFields'], 10, 2);
         add_action('woocommerce_coupon_options_save', [self::class, 'save'], 10, 2);
+        add_filter('display_post_states', [self::class, 'listState'], 10, 2);
     }
 
     public static function automatic(\WC_Coupon $coupon): bool
@@ -62,12 +64,43 @@ final class PromotionSettings
     }
 
     /**
+     * A paused promotion applies to no new cart or order (ADM-115). It stays published, so WooCommerce keeps finding
+     * it by code to record and reverse its use, and its usage history is untouched; orders that already have it keep it.
+     */
+    public static function paused(\WC_Coupon $coupon): bool
+    {
+        return $coupon->get_meta(self::PAUSED, true) === 'yes';
+    }
+
+    /**
+     * "Paused" beside a paused promotion's title in the coupon list.
+     *
+     * @param mixed $states
+     * @param mixed $post
+     * @return mixed
+     */
+    public static function listState($states, $post)
+    {
+        if (is_array($states) && $post instanceof \WP_Post && $post->post_type === 'shop_coupon' && get_post_meta($post->ID, self::PAUSED, true) === 'yes') {
+            $states['mizzey_paused'] = __('Paused', 'mizzey-site');
+        }
+
+        return $states;
+    }
+
+    /**
      * The General tab: apply automatically, start date, maximum discount.
      *
      * @param mixed $couponId
      */
     public static function generalFields($couponId, \WC_Coupon $coupon): void
     {
+        woocommerce_wp_checkbox([
+            'id'          => 'mizzey_paused',
+            'label'       => __('Paused', 'mizzey-site'),
+            'description' => __('A paused promotion applies to no new cart or order. Its usage history is kept, and orders that already have it keep it. Untick to reactivate.', 'mizzey-site'),
+            'value'       => self::paused($coupon) ? 'yes' : 'no',
+        ]);
         woocommerce_wp_checkbox([
             'id'          => 'mizzey_automatic',
             'label'       => __('Apply automatically', 'mizzey-site'),
@@ -134,6 +167,7 @@ final class PromotionSettings
         $maxInput     = wc_format_decimal(sanitize_text_field(wp_unslash((string) ($_POST['mizzey_max_discount'] ?? ''))));
         $minItems     = absint(wp_unslash((string) ($_POST['mizzey_min_items'] ?? '0')));
         $firstOrder   = isset($_POST['mizzey_first_order']) ? 'yes' : 'no';
+        $paused       = isset($_POST['mizzey_paused']) ? 'yes' : 'no';
         // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         $coupon->update_meta_data(self::AUTOMATIC, $automatic);
@@ -159,6 +193,7 @@ final class PromotionSettings
         $coupon->update_meta_data(self::MAX_DISCOUNT, $max);
         $coupon->update_meta_data(self::MIN_ITEMS, $minItems > 0 ? (string) $minItems : '');
         $coupon->update_meta_data(self::FIRST_ORDER, $firstOrder);
+        $coupon->update_meta_data(self::PAUSED, $paused);
         $coupon->save();
         AutomaticPromotions::forget();
     }
