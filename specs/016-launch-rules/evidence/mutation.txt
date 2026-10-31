@@ -6,3 +6,15 @@ M3  welcome coupons are store-wide automatic promotions               -> t57 fai
 M4  combining off does not force one promotion per order              -> t57 fails (1 check)
 M5  combining on is ignored                                           -> t57 fails (1 check)
 M6  any role gets a welcome discount                                  -> t57 fails (1 check)
+
+After the first review (31 October 2026):
+
+M7   a welcome code works for anyone                                  -> t57 fails (1 check)
+M8   eligibility ignores the account email                            -> t57 fails (1 check)
+M9   an email can get a second welcome                                -> t57 fails (1 check)
+M10  settle keeps every entered code                                  -> t57 fails (1 check)
+M11  an order takes a second code                                     -> t57 fails (1 check)
+M12  the Store API refuses instead of replacing                       -> t57 fails (1 check)
+M13  entered codes are not measured in                                -> t57 fails (1 check)
+M14  brand conditions are not copied                                  -> t57 fails (1 check)
+M15  no refund ceiling per line                                       -> t57 fails (1 check)

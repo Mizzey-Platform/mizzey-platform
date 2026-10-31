@@ -35,7 +35,9 @@ for PRE-09 behind the stock seam.
 | `WelcomeDiscount::codeFor()` | The customer's own code while usable, a candidate in `AutomaticPromotions::automaticCodes()` |
 | `PromotionRules::valid()` | Refuses the template as a code |
 | `Combination` | The setting in WooCommerce's general settings; `woocommerce_coupon_get_individual_use` true for every coupon when off |
-| `AutomaticPromotions::winners()` | Off: #281's one winner, none beside an entered code. On: the best discount and the best free-shipping promotion, joining entered codes, an individual-use promotion alone |
+| `AutomaticPromotions::winners()` | Off: #281's one winner, none beside an entered code, and only the latest entered code kept. On: the best discount and the best free-shipping promotion, measured with the entered codes' discount taken off, joining entered codes, an individual-use promotion alone |
+| `Combination::anotherHeld()`, `replaces()` | Off: a second code refused on an order; a new code replaces the held one on the Store API as on the classic cart |
+| `RefundIntegrity` | On `woocommerce_create_refund`: each line's refund at most what it was paid after discounts, less earlier refunds |
 
 ## Criterion to test map
 

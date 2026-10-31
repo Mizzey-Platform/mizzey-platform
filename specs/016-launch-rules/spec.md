@@ -88,6 +88,10 @@ and change, and #255 (checkout) routes order placement, cancellation and failure
 
 - No template, or a paused one: no welcome discount is issued.
 - A staff account gets no welcome discount; only accounts with the Customer role do.
+- A welcome discount is its customer's alone: another account, or a guest giving that customer's email, is refused.
+- New customers only: a guest's earlier order under the account's email counts, whatever billing email is given; an
+  email gets one welcome discount ever, also when its account is deleted and made again.
+- The template's conditions are copied, brand conditions included.
 - A customer's own welcome discount is a candidate for that customer only, not one of the store's automatic promotions
   every cart is measured against.
 - With combining on, at most one automatic discount and one automatic free shipping apply, as #281 chooses each.
@@ -100,8 +104,8 @@ and change, and #255 (checkout) routes order placement, cancellation and failure
 |---|---|---|
 | Welcome discount per new customer | None: WooCommerce has no account-creation reward | Gap: a template coupon and a per-customer copy |
 | Free shipping on two items | Free shipping method: minimum amount or a coupon, no item count (P-011) | #281's minimum items on an automatic free-shipping promotion; configuration, no new code |
-| Combination | Each coupon's "Individual use only" box | Gap: one store setting decides, default one promotion per order |
-| Refund ceiling | `wc_create_refund()` refuses more than remains (P-014) | Native, verified |
+| Combination | Each coupon's "Individual use only" box; WooCommerce never checks it on an order, and the Store API refuses where the classic cart replaces | Gap: one store setting decides, default one promotion per order, enforced on carts (also when switched off), orders and the Store API alike |
+| Refund ceiling | `wc_create_refund()` refuses more than remains of the order (P-014), but lets one line get back more than was paid for it within that total | Gap for the item: `RefundIntegrity` checks each line against what it was paid after discounts, less earlier refunds |
 | Guest route back | WooCommerce's order-received account offer links the order (`CreateAccount::process_form_post()`), guarded by AUTH-15 | Native, verified |
 | Free shipping overrides the rate | `woocommerce_shipping_hide_rates_when_free` | Native, configuration, verified |
 | Non-negative total | WooCommerce caps a cart discount at the cart | Native, verified |
@@ -118,7 +122,9 @@ and change, and #255 (checkout) routes order placement, cancellation and failure
 - **FR-004**: A store setting MUST decide whether promotions combine, off by default; off, every promotion is
   individual-use; on, each coupon's own box decides, and the best automatic discount and free shipping may join entered
   codes (AC-4).
-- **FR-005**: Every customer-facing message MUST be translated (FIX-04).
+- **FR-005**: A refund MUST NOT return more for a line than was paid for it after discounts, less earlier refunds
+  (AC-5).
+- **FR-006**: Every customer-facing message MUST be translated (FIX-04).
 
 ### Key Entities
 
