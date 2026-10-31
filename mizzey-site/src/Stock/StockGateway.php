@@ -48,6 +48,14 @@ final class StockGateway
         );
     }
 
+    /** The gateway for a display: one attempt, no pause, so a slow or absent source does not hold a page. */
+    public static function quick(): self
+    {
+        $source = apply_filters(self::SOURCE_FILTER, null);
+
+        return new self($source instanceof StockSource ? $source : new UnconfiguredStockSource(), 1, null, 0);
+    }
+
     public function level(int $productId): StockAnswer
     {
         $item = StockIdentity::resolve($productId);

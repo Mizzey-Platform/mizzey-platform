@@ -13,6 +13,10 @@
 
 namespace MizzeySite\Tests\Integration;
 
+// The scenarios' fixtures stand in for the ERP's projection, so they may set stock (D-19 item 5; StockWriteGuard).
+// t67 takes the permit away to check the guard.
+add_filter( 'mizzey_stock_write_permitted', '__return_true' );
+
 use Automattic\WooCommerce\Internal\Features\FeaturesController;
 
 if ( ! class_exists( 'WooCommerce' ) ) {
