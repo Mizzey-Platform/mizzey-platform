@@ -158,8 +158,8 @@ run(
 			$extra[] = $files[] = t66_file( t66_image( 200, 200, 'jpeg' ), '.jpg' );
 		}
 		$sixth  = t66_upload( $users['reviewer'], (int) $review, $extra );
-		// Under a 128 MB memory limit, a 4000 by 4000 picture with transparency is more than the decoder can hold.
-		$rgba  = imagecreatetruecolor( 4000, 4000 );
+		// With memory already held, a 4000 by 3000 picture with transparency is more than the decoder can hold.
+		$rgba  = imagecreatetruecolor( 4000, 3000 );
 		imagesavealpha( $rgba, true );
 		imagefill( $rgba, 0, 0, imagecolorallocatealpha( $rgba, 10, 20, 30, 60 ) );
 		ob_start();
@@ -167,16 +167,17 @@ run(
 		imagedestroy( $rgba );
 		$heavy      = $files[] = t66_file( (string) ob_get_clean(), '.png' );
 		$was_limit  = ini_get( 'memory_limit' );
-		// 150 MB above what this process already holds: less than the decoder would need for it.
-		$headroom   = (int) ceil( ( memory_get_usage( true ) + 150 * 1024 * 1024 ) / 1048576 ) . 'M';
-		$cap        = static fn () => $headroom;
+		// A busy worker: 256 MB, WordPress's limit for images, with 150 MB already held.
+		$cap       = static fn () => '256M';
 		add_filter( 'image_memory_limit', $cap );
-		$capped     = false !== ini_set( 'memory_limit', $headroom ); // phpcs:ignore WordPress.PHP.IniSet
-		$too_heavy  = t66_upload( $users['reviewer'], (int) $review, array( $heavy ) );
+		$capped    = false !== ini_set( 'memory_limit', '256M' ); // phpcs:ignore WordPress.PHP.IniSet
+		$ballast   = str_repeat( 'x', 150 * 1024 * 1024 );
+		$too_heavy = t66_upload( $users['reviewer'], (int) $review, array( $heavy ) );
+		unset( $ballast );
 		ini_set( 'memory_limit', (string) $was_limit ); // phpcs:ignore WordPress.PHP.IniSet
 		remove_filter( 'image_memory_limit', $cap );
 		$photos = ReviewPhotos::photos( (int) $review );
-		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && $capped && 400 === $too_heavy->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer, a sixth photo, and a 4000 by 4000 transparent picture with 150 MB to spare are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status(), $too_heavy->get_status() ) ) . ')' );
+		$check( 201 === $got_webp->get_status() && 400 === $faked->get_status() && 400 === $too_wide->get_status() && 400 === $bombed->get_status() && in_array( $stolen->get_status(), array( 401, 403 ), true ) && 400 === $sixth->get_status() && $capped && 400 === $too_heavy->get_status() && 3 === count( $photos ), 'D-23 a WebP is attached; a script named .jpg, an image over 6000 pixels a side, one of 36 million pixels (filesize ' . size_format( filesize( $bomb ) ) . '), another customer, a sixth photo, and a 4000 by 3000 transparent picture in a busy worker are refused (' . implode( ', ', array( $got_webp->get_status(), $faked->get_status(), $too_wide->get_status(), $bombed->get_status(), $stolen->get_status(), $sixth->get_status(), $too_heavy->get_status() ) ) . ')' );
 
 		// AC-2: stored cleaned, in a folder the web server refuses.
 		$stored = isset( $photos[0] ) ? (string) file_get_contents( ReviewPhotos::dir() . $photos[0]['file'] ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions

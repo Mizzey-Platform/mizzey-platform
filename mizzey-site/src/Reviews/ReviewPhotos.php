@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
  *   `POST mizzey/v1/reviews/{id}/photos`, files `photos[]` and optional `alt[]`, signed in, with WordPress's REST nonce.
  *   Uploads to one review are taken one at a time, under a lock, and only while the review is still held.
  * - Each file is checked by its content, not its name: JPEG, PNG or WebP only, at most 5 MB, 6000 pixels a side and
- *   16 million pixels, and only when the memory to decode it is there; then decoded and encoded again, at most 2000
+ *   12 million pixels, and only when the memory to decode it is there; then decoded and encoded again, at most 2000
  *   pixels a side, which drops its location, camera and colour profile data and anything that is not the picture.
  * - Stored under a random name, served only through the site and never cached. The folder is
  *   `MIZZEY_REVIEW_PHOTOS_DIR` from the configuration when set (outside the site's public folder), else
@@ -45,7 +45,7 @@ final class ReviewPhotos
     public const MAX        = 5;
     public const MAX_BYTES  = 5 * 1024 * 1024;
     public const MAX_SIDE   = 6000;
-    public const MAX_PIXELS = 16000000;
+    public const MAX_PIXELS = 12000000;
     public const KEEP_SIDE  = 2000;
     private const TYPES     = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
 

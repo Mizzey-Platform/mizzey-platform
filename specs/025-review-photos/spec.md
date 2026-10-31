@@ -97,6 +97,6 @@ Contractual stage: S1 for REV-03, delivered with Stage 3 (D-22). The photos are 
 
 ## Assumptions
 
-- The caps (5 MB, 6000 pixels, kept at 2000 pixels) are set here, as D-23 item 3 asks the spec to set them.
+- The caps (5 MB, 6000 pixels a side, 12 million pixels, kept at 2000 pixels) are set here, as D-23 item 3 asks the spec to set them.
 - On a web server that does not read `.htaccess` (nginx), the folder is refused by a hosting rule; the random names
   and the site's own serving keep it closed meanwhile.
