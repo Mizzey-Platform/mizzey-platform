@@ -26,3 +26,8 @@ M17 an item target where no free method takes it                      -> t59 fai
 M18 WooCommerce order stock writers left on                           -> t59 fails (1 check)
 
 The fixture's ledger lock guards two requests at once, which one PHP process cannot create: no mutation check.
+
+After the second review (31 October 2026):
+
+M19 a change the fixture could not store is reported as made          -> t59 fails (1 check)
+M20 an item target beside an entered individual-use code              -> t59 fails (1 check)
