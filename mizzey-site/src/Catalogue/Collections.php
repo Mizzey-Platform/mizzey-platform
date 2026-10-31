@@ -50,6 +50,19 @@ final class Collections
     {
         add_action('init', [self::class, 'registerTaxonomy'], 9);
         add_filter('taxonomy_template_hierarchy', [self::class, 'useProductArchiveTemplate']);
+        add_action('admin_head', [self::class, 'adminColumnWidth']);
+    }
+
+    /**
+     * The products list's Collections column gets a width, as WooCommerce gives its own taxonomy columns: without one,
+     * a crowded table squeezes it to a letter a line and stretches the header row.
+     */
+    public static function adminColumnWidth(): void
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if ($screen instanceof \WP_Screen && $screen->id === 'edit-product') {
+            echo '<style>.column-taxonomy-product_collection{width:9%}</style>';
+        }
     }
 
     /**
