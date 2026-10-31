@@ -25,3 +25,21 @@ M13 a release uses the current lines, not the record                  -> t60 fai
 M14 an unanswered reserve asks under a new key                        -> t60 fails (1 check)
 M15 a paid order without a reservation is left alone                  -> t60 fails (1 check)
 M16 trashing an unpaid order keeps its stock                          -> t60 fails (1 check)
+
+After the third review (31 October 2026):
+
+M17 a resize reuses its key for the same quantity                     -> t60 fails (1 check)
+M18 the undo is sent before it is on the record                       -> t60 fails (1 check)
+M19 an undo cut short is not sent again first                         -> t60 fails (1 check)
+M20 paying an order drops the district sent                           -> t60 fails (1 check)
+
+After the fourth and fifth reviews (31 October 2026):
+
+M21 the release is sent before it is on the record                    -> t60 fails (1 check)
+M22 an unanswered resize counts as reserved                           -> t60 fails (1 check)
+M23 the reserve is sent before it is on the record                    -> t60 fails (1 check)
+M24 the record not read again under the lock                          -> t60 fails (1 check)
+M25 an unanswered reserve not settled on release                      -> t60 fails (1 check)
+
+The lock itself guards two requests at once, which one PHP process cannot create; M24 checks the record read again
+inside it, which is what keeps a second payment from working on a stale record.
