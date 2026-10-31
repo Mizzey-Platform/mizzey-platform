@@ -466,6 +466,68 @@ run(
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		AutomaticPromotions::forget();
+		// BR-004, on, round five: a discount that loses alone can win with free shipping beside it; the paid saving
+		// does not credit a candidate with the rounding of the entered codes' tax.
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$ninety     = t57_screen( $s, "{$tag}ninety", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '90', 'mizzey_automatic' => 'yes' ) );
+		$one_thirty = t57_screen( $s, "{$tag}onethirty", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '130', 'mizzey_automatic' => 'yes' ) );
+		$ship_auto  = t57_screen( $s, "{$tag}shipauto", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0', 'free_shipping' => 'yes', 'mizzey_automatic' => 'yes' ) );
+		foreach ( array( $ninety, $one_thirty, $ship_auto ) as $loose ) {
+			$loose->set_individual_use( false );
+			$loose->save();
+		}
+		AutomaticPromotions::forget();
+		t57_cart( array( $six_hundred->get_id() => 1 ) );
+		$paired = t57_applied();
+		$expected = array( t57_code( $one_thirty ), t57_code( $ship_auto ) );
+		sort( $expected );
+		$check( $expected === $paired, 'BR-004 on: 130 off with free shipping (saves 130) beats 90 off alone (saves 90), though 130 off alone loses the 500 minimum and saves only 80 (' . implode( ',', $paired ) . ')' );
+		$ninety->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$ninety->save();
+		$one_thirty->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$one_thirty->save();
+		// Round six: 20 off a 510 cart loses the 500 minimum (saves 20, costs 50) and is no promotion alone, but with
+		// the free shipping beside it saves 20, so both apply.
+		$five_ten_off = t57_screen( $s, "{$tag}fivetenoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '20', 'mizzey_automatic' => 'yes' ) );
+		$five_ten_off->set_individual_use( false );
+		$five_ten_off->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_ten->get_id() => 1 ) );
+		$rescued  = t57_applied();
+		$expected = array( t57_code( $five_ten_off ), t57_code( $ship_auto ) );
+		sort( $expected );
+		$check( $expected === $rescued, 'BR-004 on: 20 off taking 510 under the 500 minimum loses money alone, yet with free shipping beside it saves 20, so both apply (' . implode( ',', $rescued ) . ')' );
+		foreach ( array( $five_ten_off, $ship_auto ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$tax_options = array( 'woocommerce_calc_taxes', 'woocommerce_prices_include_tax', 'woocommerce_tax_round_at_subtotal' );
+		$tax_before  = array_combine( $tax_options, array_map( 'get_option', $tax_options ) );
+		$s->on_finish( static function () use ( $tax_before ) { foreach ( $tax_before as $name => $value ) { update_option( $name, $value ); } } );
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		update_option( 'woocommerce_tax_round_at_subtotal', 'no' );
+		$rate_id = \WC_Tax::_insert_tax_rate( array( 'tax_rate_country' => '', 'tax_rate' => '20.0000', 'tax_rate_name' => 't57 VAT', 'tax_rate_priority' => 1, 'tax_rate_shipping' => 0, 'tax_rate_class' => '' ) );
+		$s->on_finish( static function () use ( $rate_id ) { \WC_Tax::_delete_tax_rate( $rate_id ); } );
+		$one_pound = $s->simple_product( 't57 sachet', '1', null );
+		$three_ent = t57_screen( $s, "{$tag}threeent", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0.03' ) );
+		$three_ent->set_individual_use( false );
+		$three_ent->save();
+		$three_auto = t57_screen( $s, "{$tag}threeauto", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0.03', 'mizzey_automatic' => 'yes' ) );
+		$three_auto->set_individual_use( false );
+		$three_auto->save();
+		t57_cart( array( $one_pound->get_id() => 1 ), array( $three_ent->get_code() ) );
+		$marginal = AutomaticPromotions::value( WC()->cart, $three_auto, array( t57_code( $three_ent ) ) );
+		$check( 3 === $marginal, "BR-004 on, tax per line: a 1.00 line at 20 percent with .03 entered, .03 more takes the tax from .19 to .19, so it saves 3 cents, not 4 ({$marginal})" );
+		$three_auto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$three_auto->save();
+		foreach ( $tax_before as $name => $value ) {
+			update_option( $name, $value );
+		}
+		AutomaticPromotions::forget();
 		delete_option( Combination::OPTION );
 		$claim_email = "{$tag}-claim@example.invalid";
 		$s->on_finish( static function () use ( $claim_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', wc_strtolower( $claim_email ) ) ); } );

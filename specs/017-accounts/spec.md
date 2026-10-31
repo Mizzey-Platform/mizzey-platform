@@ -93,8 +93,9 @@ Provisional: verified by automated tests; acceptance follows manual testing on s
 
 ### Edge Cases
 
-- A mobile number is one account's: registering it again is refused; a number held by no account, or ambiguously,
-  signs in to nothing.
+- A mobile number signs in to one account, the first to hold it, whatever wrote it; another account registering or
+  saving it keeps it for delivery without being told, and cannot sign in with it. Numbers saved before this existed
+  are claimed once; a number several accounts hold signs in to none. An unknown number costs the same password work.
 - A sign-in link: a wrong token does not spend it; asking again replaces it; requests share the password-reset limits
   (per account and per address), so neither route multiplies the other; the answer is the same whether or not an
   account exists.
@@ -155,3 +156,6 @@ October 2026.
 
 - B16's numeric limits, proposed as working defaults (owner decisions, not client confirmations): a sign-in link lives
   15 minutes and works once; requests share the recovery limits of 3 per account and 10 per address in 15 minutes.
+- Known limits: the sign-in link request answers in the same time for every email only where PHP runs under FPM,
+  which sends the answer before the work; WooCommerce's own registration form says whether an email already has an
+  account (native, AUTH-01).

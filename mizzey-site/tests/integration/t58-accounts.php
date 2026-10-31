@@ -40,6 +40,24 @@ function t58_register( Scenario $s, string $email, string $password, array $post
 	return (int) $id;
 }
 
+/**
+ * A user made for the scenario, tracked for removal; 0 when WordPress refuses it. A customer left with the same login
+ * by an interrupted earlier run is removed first, so a fixed login can be reused.
+ */
+function t58_user( Scenario $s, array $args ): int {
+	$left = get_user_by( 'login', (string) $args['user_login'] );
+	if ( $left && $left->ID > 1 && array( 'customer' ) === array_values( (array) $left->roles ) ) {
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $left->ID );
+	}
+	$id = wp_insert_user( $args );
+	if ( is_wp_error( $id ) || (int) $id <= 1 ) {
+		return 0;
+	}
+	$s->track_user( (int) $id );
+	return (int) $id;
+}
+
 run(
 	new Scenario( 't58-accounts', 'AUTH-01 to AUTH-09, AUTH-11, AUTH-12, AUTH-14, AUTH-16: accounts' ),
 	function ( Scenario $s ): bool {
@@ -128,7 +146,7 @@ run(
 		$_POST    = array( PhoneSignIn::FIELD => '12345' );
 		$bad      = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-z@example.invalid" );
 		$_POST    = array();
-		$check( '01012345678' === get_user_meta( $mobile, PhoneSignIn::FIELD, true ) && ! $errors->has_errors() && in_array( 'mizzey_phone_taken', $taken->get_error_codes(), true ) && in_array( 'mizzey_phone_invalid', $bad->get_error_codes(), true ), 'AUTH-02 a mobile number given at registration is kept in its local form; another account cannot take it; a malformed one is refused' );
+		$check( '01012345678' === get_user_meta( $mobile, PhoneSignIn::FIELD, true ) && ! $errors->has_errors() && ! $taken->has_errors() && in_array( 'mizzey_phone_invalid', $bad->get_error_codes(), true ), 'AUTH-02 a mobile number given at registration is kept in its local form; a number another account holds is not refused, so the form does not say whose it is; a malformed one is refused' );
 		$by_phone = wp_authenticate( '0020 10 1234 5678', $password );
 		$wrong    = wp_authenticate( '01012345678', 'not-the-password' );
 		$nobody   = wp_authenticate( '01099999999', $password );
@@ -138,11 +156,48 @@ run(
 		$secret  = 'x';
 		do_action_ref_array( 'wp_authenticate', array( &$spelled, &$secret ) );
 		$check( get_userdata( $mobile )->user_login === $spelled && get_userdata( $mobile )->user_login === PhoneSignIn::canonical( '+20 10 1234 5678' ) && '01099999999' === PhoneSignIn::canonical( '0020-109-999-9999' ), 'AUTH-02 every spelling of a held number reaches sign-in, and CoreX\'s lockout, as its account\'s username; an unheld number as its one spelling' );
-		$lookalike = (int) wp_insert_user( array( 'user_login' => '01012345678', 'user_email' => "{$tag}-look@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
-		$s->track_user( $lookalike );
+		$lookalike = t58_user( $s, array( 'user_login' => '01012345678', 'user_email' => "{$tag}-look@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
 		$as_number = wp_authenticate( '01012345678', $password );
 		$generated = (string) apply_filters( 'woocommerce_new_customer_username', '01012345678', "01012345678@example.invalid", array(), '' );
 		$check( $as_number instanceof \WP_User && $mobile === $as_number->ID && '01012345678' !== $generated && null === PhoneSignIn::normalise( $generated ), 'AUTH-02 a number signs in to the account holding it, not to a username spelled like it; no generated username is spelled like a number (' . $generated . ')' );
+		$second = t58_register( $s, "{$tag}-second@example.invalid", $password, array( PhoneSignIn::FIELD => '01012345678' ) );
+		$check( $second > 0 && '01012345678' === get_user_meta( $second, PhoneSignIn::FIELD, true ) && $mobile === PhoneSignIn::holder( '01012345678' ) && '' === get_user_meta( $second, PhoneSignIn::HELD, true ), 'AUTH-02 an account registered with a number another account holds keeps it for delivery and does not sign in with it' );
+		$wpdb_stale = $GLOBALS['wpdb'];
+		$wpdb_stale->insert( $wpdb_stale->usermeta, array( 'user_id' => $second, 'meta_key' => PhoneSignIn::HELD, 'meta_value' => '01012345678' ) );
+		wp_cache_flush();
+		PhoneSignIn::release( $second );
+		$check( $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 a stale release by an account that no longer owns a number leaves the claim of the account that holds it' );
+		// Numbers of this run only, so a number an interrupted earlier run left on its users is not met again.
+		$n1 = '0112' . wp_rand( 1000000, 9999999 );
+		$n2 = '0115' . wp_rand( 1000000, 9999999 );
+		$n4 = '0109' . wp_rand( 1000000, 9999999 );
+		$late = t58_user( $s, array( 'user_login' => "{$tag}-late", 'user_email' => "{$tag}-late@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
+		$shared = t58_user( $s, array( 'user_login' => "{$tag}-shared", 'user_email' => "{$tag}-shared@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
+		global $wpdb;
+		foreach ( array( array( $late, $n1 ), array( $shared, $n2 ), array( $second, $n2 ) ) as $raw ) {
+			$wpdb->insert( $wpdb->usermeta, array( 'user_id' => $raw[0], 'meta_key' => PhoneSignIn::FIELD, 'meta_value' => $raw[1] ) );
+		}
+		wp_cache_flush();
+		delete_option( PhoneSignIn::BACKFILLED );
+		PhoneSignIn::backfill();
+		$check( $late === PhoneSignIn::holder( $n1 ) && null === PhoneSignIn::holder( $n2 ) && $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 numbers saved before claims existed are claimed once by their one holder; a number two accounts saved is claimed by neither; a claimed number is left as it is (' . wp_json_encode( array( PhoneSignIn::holder( $n1 ), $late, PhoneSignIn::holder( $n2 ), PhoneSignIn::holder( '01012345678' ), $mobile, get_option( PhoneSignIn::CLAIM . '_' . $n1 ), get_user_meta( $late, PhoneSignIn::HELD, true ) ) ) . ')' );
+		$s->on_finish( static function () use ( $n1 ) { delete_option( PhoneSignIn::CLAIM . '_' . $n1 ); } );
+		$numbered = t58_user( $s, array( 'user_login' => $n1, 'user_email' => "{$tag}-num@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
+		update_user_meta( $numbered, PhoneSignIn::FIELD, $n4 );
+		$typed = $n4;
+		$pass  = $password;
+		do_action_ref_array( 'wp_authenticate', array( &$typed, &$pass ) );
+		$once  = apply_filters( 'authenticate', null, $typed, $password );
+		$check( $n1 === $typed && $once instanceof \WP_User && $numbered === $once->ID, 'AUTH-02 a number is resolved once: an account whose username is another holder\'s number signs in as itself, not as that holder' );
+		$n3 = '0127' . wp_rand( 1000000, 9999999 );
+		$leaver = t58_register( $s, "{$tag}-leaver@example.invalid", $password, array( PhoneSignIn::FIELD => $n3 ) );
+		$held_before = PhoneSignIn::holder( $n3 );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $leaver );
+		$after_delete = get_option( PhoneSignIn::CLAIM . '_' . $n3 );
+		update_option( PhoneSignIn::CLAIM . '_' . $n3, '999999999', false );
+		$heir = t58_register( $s, "{$tag}-heir@example.invalid", $password, array( PhoneSignIn::FIELD => $n3 ) );
+		$check( $leaver === $held_before && false === $after_delete && $heir === PhoneSignIn::holder( $n3 ), 'AUTH-02 deleting an account releases its number; a claim left by an account that no longer holds it is taken over by the next account to save the number' );
 		$other = t58_register( $s, "{$tag}-other@example.invalid", $password );
 		update_user_meta( $other, PhoneSignIn::FIELD, '+201012345678' );
 		$kept_holder = PhoneSignIn::holder( '01012345678' );
@@ -158,7 +213,7 @@ run(
 		$no_one   = sign_in_account( 'en', "{$tag}-nobody@example.invalid", 'Pw-whatever-1' );
 		$bad_pass = sign_in_account( 'en', "{$tag}-m@example.invalid", 'Pw-whatever-1' );
 		$generic  = 'Invalid username, email address or incorrect password';
-		$check( sign_in_has_session( $session ) && ! sign_in_has_session( $no_one ) && ! sign_in_has_session( $bad_pass ) && false !== strpos( $no_one['body'], $generic ) && false !== strpos( $bad_pass['body'], $generic ), '[HTTP] AUTH-03 signing in on the account page starts a session; an unknown email and a wrong password both get the one generic message (as t40 checks in both languages)' );
+		$check( sign_in_has_session( $session ) && ! sign_in_has_session( $no_one ) && ! sign_in_has_session( $bad_pass ) && false !== strpos( $no_one['body'], $generic ) && false !== strpos( $bad_pass['body'], $generic ), '[HTTP] AUTH-03 signing in on the account page starts a session; an unknown email and a wrong password both get the one generic message (as t40 checks in both languages; ' . $session['status'] . ' ' . $no_one['status'] . ' ' . $bad_pass['status'] . ' ' . substr( wp_strip_all_tags( $session['body'] ), 0, 200 ) . ')' );
 		sign_in_forget( array( "{$tag}-m@example.invalid", "{$tag}-nobody@example.invalid" ) );
 
 		// AUTH-04, AUTH-16: the reset link works once, and not after it expires.
@@ -220,8 +275,7 @@ run(
 		$late_link = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $lt ) ? $lt[1] : '';
 		$check( '' !== $late_link && ! SignInLink::redeem( $keen, $late_link ), 'AUTH-12 an expired link signs in to nothing' );
 		$mails = array();
-		$staff = (int) wp_insert_user( array( 'user_login' => "{$tag}-staff", 'user_email' => "{$tag}-staff@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'shop_manager' ) );
-		$s->track_user( $staff );
+		$staff = t58_user( $s, array( 'user_login' => "{$tag}-staff", 'user_email' => "{$tag}-staff@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'shop_manager' ) );
 		SignInLink::request( "{$tag}-staff@example.invalid" );
 		SignInLink::request( "{$tag}-nobody@example.invalid" );
 		$req     = new \WP_REST_Request( 'POST', '/mizzey/v1/sign-in-link' );
@@ -230,7 +284,9 @@ run(
 		$req2    = new \WP_REST_Request( 'POST', '/mizzey/v1/sign-in-link' );
 		$req2->set_param( 'email', "{$tag}-unknown@example.invalid" );
 		$unknown = rest_do_request( $req2 );
-		$check( 1 === count( $mails ) && 202 === $known->get_status() && $known->get_data() === $unknown->get_data() && 202 === $unknown->get_status(), 'AUTH-12 staff are sent no link; for a known and an unknown email the answer is the same' );
+		$before  = count( $mails );
+		SignInLink::flush();
+		$check( 0 === $before && false !== has_action( 'shutdown', array( SignInLink::class, 'afterAnswer' ) ) && 1 === count( $mails ) && 202 === $known->get_status() && $known->get_data() === $unknown->get_data() && 202 === $unknown->get_status(), 'AUTH-12 staff are sent no link; for a known and an unknown email the answer is the same, and the link is sent only after the answer' );
 		$mails     = array();
 		$w_login   = get_userdata( $welcomed )->user_login;
 		$recovered = array( retrieve_password( $w_login ), retrieve_password( $w_login ) );
