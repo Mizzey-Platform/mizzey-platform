@@ -95,10 +95,17 @@ require_once __DIR__ . '/src/Cart/CartMerge.php';
 require_once __DIR__ . '/src/Cart/GuestCartRetention.php';
 require_once __DIR__ . '/src/Cart/FreeShippingProgress.php';
 require_once __DIR__ . '/src/Cart/CartSuggestions.php';
+require_once __DIR__ . '/src/Checkout/EgyptianAddress.php';
+require_once __DIR__ . '/src/Checkout/OrderStock.php';
 require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
 require_once __DIR__ . '/src/Wishlist/Wishlist.php';
 require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
 require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
+require_once __DIR__ . '/src/Emails/OrderLanguage.php';
+require_once __DIR__ . '/src/Emails/EmailAdditions.php';
+require_once __DIR__ . '/src/Emails/Shipped.php';
+require_once __DIR__ . '/src/Account/AddressBook.php';
+require_once __DIR__ . '/src/Account/AccountPages.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -146,6 +153,9 @@ MizzeySite\Cart\CartMerge::register();
 MizzeySite\Cart\GuestCartRetention::register();
 MizzeySite\Cart\FreeShippingProgress::register();
 MizzeySite\Cart\CartSuggestions::register();
+// The checkout: the Egyptian address and stock reserved at placement (#255). See specs/019-checkout.
+MizzeySite\Checkout\EgyptianAddress::register();
+MizzeySite\Checkout\OrderStock::register();
 // The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
 MizzeySite\Wishlist\Wishlist::register();
 MizzeySite\Wishlist\RecentlyViewed::register();
@@ -188,3 +198,12 @@ if (defined('WP_CLI') && WP_CLI) {
 MizzeySite\Reviews\ReviewEligibility::register();
 MizzeySite\Reviews\ReviewModeration::register();
 MizzeySite\Reviews\ReviewInvitation::register();
+
+// Customer emails: the welcome discount and the payment retry link added to WooCommerce's own, and the Shipped email.
+// NOTF-01 to NOTF-13, specs/021-emails.
+MizzeySite\Emails\EmailAdditions::register();
+MizzeySite\Emails\Shipped::register();
+
+// The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
+MizzeySite\Account\AddressBook::register();
+MizzeySite\Account\AccountPages::register();

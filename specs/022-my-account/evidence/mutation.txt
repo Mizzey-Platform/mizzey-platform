@@ -1,0 +1,16 @@
+Deliberate defects, each run against t63 and then reverted (31 October 2026, after the first review):
+
+M1 another customer edits an address                                  -> t63 fails (1 check)
+M2 an address without a district is kept                              -> t63 fails (4 checks)
+M3 the default changes the sign-in number                             -> t63 fails (1 check)
+M4 deleting the default leaves none                                   -> t63 fails (1 check)
+
+M5 (no tracking on the order view) was not caught at first: t63 called the tracking directly. It now renders it
+through WooCommerce's order details hook, and M5 fails it (1 check).
+
+The address book's lock guards two requests at once, which one PHP process cannot create: no mutation check.
+
+After the Wishlist item moved to the storefront's Wishlist page (31 October 2026):
+
+M6 no wishlist in the menu                                            -> t63 fails (1 check)
+M7 the wishlist opens a page under the account                        -> t63 fails (1 check)
