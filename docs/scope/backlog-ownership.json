@@ -4177,7 +4177,7 @@
     }
    ],
    "data_integrity": "C12 requires ERP clarification",
-   "acceptance_evidence": "Pending PRE-09.",
+   "acceptance_evidence": "Pending PRE-09. The function layer, specs/026-admin-stock (D-19 item 5: every local stock writer refused on the server, the admin's stock fields locked, the adapter's projection the only way in), merged 31 October 2026 as ed8bfb0 (PR #461), technically verified; the ERP mechanism, staging verification and acceptance pending.",
    "not_in_slice": [
     "ADM-76 (P2)",
     "ADM-78 (P3)",
@@ -4239,7 +4239,7 @@
     }
    ],
    "data_integrity": "B2 measured working; B3 measured defect, conditional on group integrity; C12",
-   "acceptance_evidence": "Pending PRE-09.",
+   "acceptance_evidence": "Pending PRE-09. The function layer, specs/026-admin-stock (the products list and both editors show the stock source's figure, or that it is not known), merged 31 October 2026 as ed8bfb0 (PR #461), technically verified against the fixture source; the ERP's figure, staging verification and acceptance pending.",
    "not_in_slice": [
     "ADM-71 (P1-E, stage -, owned by E-ADM-4b)",
     "ADM-73 (P1-E, stage -, owned by E-ADM-4b)",
