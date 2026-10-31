@@ -303,7 +303,8 @@ final class StockWriteGuard
     {
         global $wpdb;
         $words = 'JOIN|INNER|LEFT|RIGHT|OUTER|CROSS|STRAIGHT_JOIN|NATURAL|ON|USING|WHERE|SET|ORDER|LIMIT|VALUES|SELECT';
-        if (preg_match('/(?<![\w.])`?' . preg_quote($wpdb->postmeta, '/') . '`?(?![\w.])(?:\s+(?:AS\s+)?(?!(?:' . $words . ')\b)`?(\w+)`?)?/i', $tables, $found) !== 1) {
+        $pattern = sprintf('/(?<![\w.])`?%s`?(?![\w.])(?:\s+(?:AS\s+)?(?!(?:%s)\b)`?(\w+)`?)?/i', preg_quote($wpdb->postmeta, '/'), $words);
+        if (preg_match($pattern, $tables, $found) !== 1) {
             return null;
         }
 
@@ -314,7 +315,7 @@ final class StockWriteGuard
     private static function insertRefused(string $sql, string $mask, array $literals): bool
     {
         global $wpdb;
-        $into = '/^\s*(?:INSERT|REPLACE)\s+(?:(?:LOW_PRIORITY|DELAYED|HIGH_PRIORITY|IGNORE)\s+)*(?:INTO\s+)?`?' . preg_quote($wpdb->postmeta, '/') . '`?(?![\w.])\s*/i';
+        $into = sprintf('/^\s*(?:INSERT|REPLACE)\s+(?:(?:LOW_PRIORITY|DELAYED|HIGH_PRIORITY|IGNORE)\s+)*(?:INTO\s+)?`?%s`?(?![\w.])\s*/i', preg_quote($wpdb->postmeta, '/'));
         if (preg_match($into, $mask, $head) !== 1) {
             return false;
         }
@@ -417,11 +418,12 @@ final class StockWriteGuard
         if (self::onlyOtherKey($where === null ? '' : substr($mask, $where), $where ?? 0, $literals)) {
             return false;
         }
-        $skip = self::$deleting === [] ? '' : ' AND w.post_id NOT IN (' . implode(',', array_map('intval', array_keys(self::$deleting))) . ')';
+        // A product being deleted takes its stock rows with it (0 stands for none).
+        $skip = implode(',', array_map('intval', array_keys(self::$deleting))) ?: '0';
         self::$inQuery = true;
         try {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $held = $wpdb->get_var("SELECT COUNT(*) FROM (SELECT `{$alias}`.post_id, `{$alias}`.meta_key FROM {$from}{$condition}) w INNER JOIN {$wpdb->posts} p ON p.ID = w.post_id WHERE p.post_type IN ('product', 'product_variation') AND w.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders'){$skip}");
+            $held = $wpdb->get_var("SELECT COUNT(*) FROM (SELECT `{$alias}`.post_id, `{$alias}`.meta_key FROM {$from}{$condition}) w INNER JOIN {$wpdb->posts} p ON p.ID = w.post_id WHERE p.post_type IN ('product', 'product_variation') AND w.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders') AND w.post_id NOT IN ({$skip})");
             $failed = $wpdb->last_error !== '';
         } finally {
             self::$inQuery = false;
