@@ -169,6 +169,7 @@ run(
 
 		// The adapter's projection writes; a stale copy saved afterwards does not undo it; a parent follows.
 		$stale = wc_get_product( $id );
+		$parent_before = t67_stored( $parent->get_id() )['status'];
 		StockWriteGuard::projection( static function () use ( $id, $variation ) {
 			$projected = wc_get_product( $id );
 			$projected->set_stock_quantity( 12 );
@@ -179,7 +180,7 @@ run(
 		$stale->set_name( 't67 serum stale' );
 		$stale->save();
 		clean_post_cache( $parent->get_id() );
-		$check( '12' === t67_stored( $id )['qty'] && '6' === t67_stored( $variation->get_id() )['qty'] && 'instock' === t67_stored( $parent->get_id() )['status'] && ! StockWriteGuard::permitted(), 'D-19 the adapter\'s projection writes the stock and brings the variable parent back in stock; a copy loaded before it and saved after it does not undo it (' . wp_json_encode( array( t67_stored( $id )['qty'], t67_stored( $variation->get_id() ), t67_stored( $parent->get_id() )['status'] ) ) . ')' );
+		$check( '12' === t67_stored( $id )['qty'] && 6 === (int) t67_stored( $variation->get_id() )['qty'] && 'outofstock' === $parent_before && 'instock' === t67_stored( $parent->get_id() )['status'] && ! StockWriteGuard::permitted(), 'D-19 the adapter\'s projection writes the stock and brings the variable parent back in stock; a copy loaded before it and saved after it does not undo it (' . wp_json_encode( array( t67_stored( $id )['qty'], t67_stored( $variation->get_id() ), t67_stored( $parent->get_id() )['status'] ) ) . ')' );
 
 		// AC-2: the figure from the stock source, read once, in the list and the editors; the fields disabled.
 		$source = new T67Source( 7 );
