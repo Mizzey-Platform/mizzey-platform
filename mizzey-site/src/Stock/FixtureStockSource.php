@@ -84,7 +84,10 @@ final class FixtureStockSource implements StockSource
             throw new StockSourceUnavailable('fixture busy');
         }
         try {
+            // Read inside the lock from the database, not from a cache that may still say the ledger does not exist.
             wp_cache_delete(self::LEDGER, 'options');
+            wp_cache_delete('notoptions', 'options');
+            wp_cache_delete('alloptions', 'options');
 
             return $this->apply($item, $delta, $operationKey);
         } finally {
@@ -100,7 +103,10 @@ final class FixtureStockSource implements StockSource
                 throw new StockSourceRefused('not enough stock');
             }
             $ledger[$operationKey] = [$item->id, $delta];
-            update_option(self::LEDGER, $ledger, false);
+            // A change that was not stored did not happen: the gateway answers unknown, never the old level as done.
+            if (! update_option(self::LEDGER, $ledger, false)) {
+                throw new StockSourceUnavailable('ledger not written');
+            }
         }
 
         return $this->level($item);

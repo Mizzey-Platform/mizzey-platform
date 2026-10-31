@@ -142,11 +142,21 @@ final class FreeShippingProgress
         if (! self::couponsShipFree($cart)) {
             return null;
         }
+        // An automatic promotion does not stand beside a code the customer entered when promotions do not combine, nor
+        // beside an entered individual-use code; an individual-use promotion stands beside no entered code
+        // (AutomaticPromotions::winners(), specs/016).
+        $automatic = AutomaticPromotions::automaticCodes();
+        $entered   = array_values(array_diff(array_map('wc_format_coupon_code', $cart->get_applied_coupons()), $automatic));
+        $blocked   = $entered !== [] && (! \MizzeySite\Promotions\Combination::allowed()
+            || array_filter($entered, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== []);
+        if ($blocked) {
+            return null;
+        }
         $needed = null;
         foreach (AutomaticPromotions::codes() as $code) {
             $coupon  = new \WC_Coupon($code);
             $minimum = PromotionSettings::minItems($coupon);
-            if (! $coupon->get_free_shipping() || $minimum <= 0) {
+            if (! $coupon->get_free_shipping() || $minimum <= 0 || ($entered !== [] && $coupon->get_individual_use())) {
                 continue;
             }
             // The promotion as it would stand with its item minimum met: valid then, the units are what is missing.
