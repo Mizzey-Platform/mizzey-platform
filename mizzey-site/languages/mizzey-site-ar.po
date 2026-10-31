@@ -304,3 +304,7 @@ msgstr "لا يمكن إضافة الصور الآن. يرجى المحاولة 
 #: mizzey-site/src/Reviews/ReviewPhotos.php
 msgid "Photos can be added only while the review waits for moderation."
 msgstr "يمكن إضافة الصور فقط أثناء انتظار التقييم للمراجعة."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+msgid "Please try again in a moment."
+msgstr "يرجى المحاولة مرة أخرى بعد قليل."
