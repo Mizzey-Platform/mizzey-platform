@@ -128,11 +128,12 @@ final class CartMerge
             if (! array_key_exists($identity, $remaining)) {
                 $answer               = $gateway->level($record);
                 $remaining[$identity] = $answer->isKnown() ? (int) $answer->quantity : null;
+                // One of an item sold one at a time, for all its lines (its language records) together.
+                if ($product->is_sold_individually()) {
+                    $remaining[$identity] = $remaining[$identity] === null ? 1 : min($remaining[$identity], 1);
+                }
             }
             $cap = $remaining[$identity];
-            if ($product->is_sold_individually()) {
-                $cap = $cap === null ? 1 : min($cap, 1);
-            }
             $wanted = (int) $line['quantity'];
             $kept   = $cap === null ? $wanted : max(0, min($wanted, $cap));
             if ($remaining[$identity] !== null) {

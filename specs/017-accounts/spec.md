@@ -158,4 +158,6 @@ October 2026.
   15 minutes and works once; requests share the recovery limits of 3 per account and 10 per address in 15 minutes.
 - Known limits: the sign-in link request answers in the same time for every email only where PHP runs under FPM,
   which sends the answer before the work; WooCommerce's own registration form says whether an email already has an
-  account (native, AUTH-01).
+  account (native, AUTH-01). Without a one-time code (SMS, P2, INT-07), phone sign-in can be used to test whether a
+  number is held: registering with it and trying it tells; only proof of owning the number would end that. A number
+  several accounts held before claims existed stays reserved for none until staff remove its reservation.

@@ -177,6 +177,11 @@ run(
 		$other   = t59_line( $five, 4 );
 		$other_k = (string) array_key_first( $other );
 		$shared  = CartMerge::combine( t59_line( $five, 4 ), array( 'x' . substr( $other_k, 1 ) => array_merge( $other[ $other_k ], array( 'key' => 'x' . substr( $other_k, 1 ) ) ) ), $ten );
+		$one_line  = t59_line( $one, 1 );
+		$one_key   = (string) array_key_first( $one_line );
+		$one_other = array( 'y' . substr( $one_key, 1 ) => array_merge( $one_line[ $one_key ], array( 'key' => 'y' . substr( $one_key, 1 ) ) ) );
+		$singles   = CartMerge::combine( $one_line, $one_other, $gateway );
+		$check( array( $one->get_id() => 1 ) === t59_quantities( $singles['cart'] ), 'CART-18 an item sold one at a time is one in the merged cart, across all its lines (' . wp_json_encode( t59_quantities( $singles['cart'] ) ) . ')' );
 		$check( array( $two_local->get_id() => 6 ) === t59_quantities( $adapter['cart'] ) && array( $five->get_id() => 5 ) === t59_quantities( $shared['cart'] ), 'CART-18, D-19 the merge is capped by the stock the source confirms, not WooCommerce\'s own field (6 kept with 2 there and 10 confirmed); two lines of one stock item share its 5 (' . wp_json_encode( t59_quantities( $shared['cart'] ) ) . ')' );
 		$check( array() === $gone['cart'] && array( $five->get_id() => 3 ) === t59_quantities( $kept['cart'] ), 'CART-18 an item the source says is sold out leaves the merged cart; an unanswered question caps nothing (the cart check then refuses it)' );
 
@@ -293,6 +298,18 @@ run(
 		$beside = FreeShippingProgress::of( $with_code );
 		$with_code->remove_coupons();
 		update_option( \MizzeySite\Promotions\Combination::OPTION, $combine_before );
+		$twenty_pc = new \WC_Coupon();
+		$twenty_pc->set_code( "{$tag}twentypc" );
+		$twenty_pc->set_props( array( 'discount_type' => 'percent', 'amount' => '20' ) );
+		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		$twenty_pc->save();
+		$s->on_finish( static function () use ( $twenty_pc ) { wp_delete_post( $twenty_pc->get_id(), true ); AutomaticPromotions::forget(); } );
+		AutomaticPromotions::forget();
+		$competing = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$twenty_pc->save();
+		AutomaticPromotions::forget();
+		$check( null === $competing['items_needed'], 'CART-07, BR-004 with promotions not combining and another automatic promotion standing in the cart, no item target is promised for the free-shipping one (' . wp_json_encode( $competing ) . ')' );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );

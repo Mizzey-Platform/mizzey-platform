@@ -107,7 +107,9 @@ final class SignInLink
             return;
         }
         $token = wp_generate_password(40, false, false);
-        update_user_meta($user->ID, self::META, self::hash($user, $token) . '|' . (time() + self::lifetime()));
+        if (! self::store($user, self::hash($user, $token) . '|' . (time() + self::lifetime()))) {
+            return;
+        }
         $link = add_query_arg([self::PARAM => $token, self::USER => $user->ID], wc_get_page_permalink('myaccount'));
         wp_mail(
             $user->user_email,
@@ -208,6 +210,26 @@ final class SignInLink
         wp_cache_delete($userId, 'user_meta');
 
         return $live && $match && $deleted === 1;
+    }
+
+    /**
+     * The account's one live link, replacing any earlier one: under a MySQL named lock per account, so two requests at
+     * once cannot leave two rows; false when the lock cannot be taken (nothing is sent).
+     */
+    private static function store(\WP_User $user, string $value): bool
+    {
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . 'sign_in_link_' . $user->ID, 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return false;
+        }
+        try {
+            delete_user_meta($user->ID, self::META);
+
+            return add_user_meta($user->ID, self::META, $value, true) !== false;
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
     }
 
     /** Customer accounts only: staff sign in with their password and two-factor (ADM-131). */
