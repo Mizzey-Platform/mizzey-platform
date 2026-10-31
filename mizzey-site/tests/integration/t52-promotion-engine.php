@@ -537,6 +537,10 @@ run(
 		$cod_before = get_option( 'woocommerce_cod_settings' );
 		$s->on_finish( static function () use ( $cod_before ) { update_option( 'woocommerce_cod_settings', $cod_before ); } );
 		update_option( 'woocommerce_cod_settings', array_merge( (array) $cod_before, array( 'enabled' => 'yes' ) ) );
+		// The cart asks the stock source and fails closed (specs/018): the development fixture stands in.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		$guest   = t52_store( 'GET', 'cart', array(), array() );
 		t52_store( 'POST', 'cart/add-item', array( 'id' => $cream->get_id(), 'quantity' => 1 ), $guest['headers'] );
 		$coupon  = t52_store( 'POST', 'cart/apply-coupon', array( 'code' => $first->get_code() ), $guest['headers'] );
