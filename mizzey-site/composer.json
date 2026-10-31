@@ -1,0 +1,17 @@
+{
+    "name": "mizzey/mizzey-site",
+    "description": "Libraries bundled inside mizzey-site. mPDF renders the invoice (ADM-92); see lib/README.md.",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.3",
+        "mpdf/mpdf": "8.3.1"
+    },
+    "config": {
+        "vendor-dir": "lib",
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.3.6"
+        }
+    }
+}

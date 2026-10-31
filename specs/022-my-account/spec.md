@@ -33,13 +33,13 @@ Stories: Functional Specification MS-SPC-2026-032 v1.4, the account stories, the
 
 | ID | Scope | Why it matters here |
 |---|---|---|
-| ADM-92 | P1-L | The invoice document is #280's; it waits for the owner's choice of an approved invoice plugin (M-4), and ACCT-12 downloads it |
+| ADM-92 | P1-L | The invoice document is #280's (specs/023-invoice, our own code under D-24); ACCT-12 downloads it |
 | ACCT-09, ACCT-11, ACCT-13 | P1-L S2 | Reorder, notification preferences and the deletion request: the second release |
 
 ## Open contract items
 
-- ACCT-12 is P1-L with no reduction written in Part One 1.2: it waits for ADM-92's invoice (#280), which waits for the
-  owner's choice of an approved invoice plugin, or his approval of custom code (M-4).
+- ACCT-12 is P1-L with no reduction written in Part One 1.2: its download is built in specs/023-invoice, on ADM-92's
+  invoice (#280).
 
 ## Contractual acceptance criteria [checked]
 
@@ -53,7 +53,7 @@ Stories: Functional Specification MS-SPC-2026-032 v1.4, the account stories, the
 | AC-6 | The customer downloads an order's invoice from the account | ACCT-12 | provisional |
 
 Provisional: verified by automated tests; acceptance follows manual testing on staging and the client's approval.
-AC-6 is not built here: it waits for #280's invoice (ADM-92). AC-1 and AC-3 are WooCommerce's own account pages (B9).
+AC-6 is built in specs/023-invoice, on #280's invoice (ADM-92), and tested by t64. AC-1 and AC-3 are WooCommerce's own account pages (B9).
 The designed screens are PRE-03b's.
 
 ## User Scenarios & Testing *(mandatory)*
