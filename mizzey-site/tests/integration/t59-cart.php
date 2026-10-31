@@ -142,6 +142,11 @@ run(
 		$back    = $fixture->adjust( $five->get_id(), 2, "{$tag}-op3" );
 		$check( ! $unbound->isKnown() && FixtureStockSource::enabled() && array( 5, FixtureStockSource::UNCOUNTED ) === $levels && 3 === $changed->quantity && 3 === $again->quantity && ! $over->isKnown() && 5 === $back->quantity && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'Fixture: unbound until switched on outside production; it answers 5 for a counted item and the uncounted level for the rest; a change applies once per key, one below zero is refused, and the WooCommerce stock field is never written' );
 		delete_option( FixtureStockSource::LEDGER );
+		$refuse_write = static fn ( $new, $old ) => $old;
+		add_filter( 'pre_update_option_' . FixtureStockSource::LEDGER, $refuse_write, 10, 2 );
+		$unwritten = $fixture->adjust( $five->get_id(), -1, "{$tag}-lost" );
+		remove_filter( 'pre_update_option_' . FixtureStockSource::LEDGER, $refuse_write, 10 );
+		$check( ! $unwritten->isKnown() && 5 === $fixture->level( $five->get_id() )->quantity, 'Fixture: a change it could not store is not reported as made: the answer is unknown, and the level is unchanged' );
 		$order_for = wc_create_order();
 		$order_for->add_product( $five, 2 );
 		$order_for->save();
@@ -274,6 +279,17 @@ run(
 		$s->on_finish( static function () use ( $two ) { wp_delete_post( $two->get_id(), true ); AutomaticPromotions::forget(); } );
 		AutomaticPromotions::forget();
 		$single   = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		$entered  = new \WC_Coupon();
+		$entered->set_code( "{$tag}entered" );
+		$entered->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '5' ) );
+		$entered->save();
+		$s->on_finish( static function () use ( $entered ) { wp_delete_post( $entered->get_id(), true ); } );
+		$with_code = t59_cart( array( $open->get_id() => 1 ) );
+		$with_code->apply_coupon( $entered->get_code() );
+		$with_code->calculate_totals();
+		wc_clear_notices();
+		$beside = FreeShippingProgress::of( $with_code );
+		$with_code->remove_coupons();
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
@@ -303,6 +319,7 @@ run(
 		$check( false === $paid_chosen['free'] && true === $free_chosen['free'], 'CART-07 a free pickup on offer does not make shipping free while the paid delivery is the one chosen (' . wp_json_encode( array( $paid_chosen['free'], $free_chosen['free'], $chosen_seen ) ) . ')' );
 		$by_value = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 1 ) ) );
 		$over     = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 2 ) ) );
+		$check( null === $beside['items_needed'], 'CART-07, BR-004 with promotions not combining, a code the customer entered keeps the automatic free shipping out, so no item target is promised (' . wp_json_encode( $beside ) . ')' );
 		$check( false === $single['free'] && 1 === $single['items_needed'] && '400.00' === $single['amount_needed'] && true === $pair['free'], 'CART-07 one unit needs one more item for the two-unit promotion (or 400 more for the 500 minimum); two units ship free (' . wp_json_encode( $single ) . ')' );
 		$check( null === $by_value['items_needed'] && '200.00' === $by_value['amount_needed'] && true === $over['free'], 'CART-07 with no item promotion, a 300 cart needs 200 more for the minimum; a 600 cart ships free (' . wp_json_encode( $by_value ) . ')' );
 		$api = t59_store();
