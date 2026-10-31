@@ -158,9 +158,9 @@ final class GoogleSignIn
         $code   = $request instanceof \WP_REST_Request ? (string) $request->get_param('code') : '';
         $cookie = isset($_COOKIE[self::COOKIE]) ? sanitize_text_field(wp_unslash($_COOKIE[self::COOKIE])) : '';
         $bound  = $state !== '' && $cookie !== '' && hash_equals($state, $cookie);
-        $saved  = $bound ? get_transient(self::key($state)) : false;
-        // Claimed once: only the request whose delete removes the flow goes on.
-        $claimed = $bound && is_array($saved) && delete_transient(self::key($state));
+        $saved  = $state !== '' ? get_transient(self::key($state)) : false;
+        // Spent by any request that presents it; claimed once: only the request whose delete removes it goes on.
+        $claimed = is_array($saved) && delete_transient(self::key($state)) && $bound;
         self::cookie('', time() - HOUR_IN_SECONDS);
         if (! self::enabled() || ! $claimed || $code === '') {
             return self::back(self::accountUrl(), 'refused');
@@ -261,6 +261,7 @@ final class GoogleSignIn
                 if (! VerificationOnRegistration::verified($user->ID)) {
                     // Whoever registered this email here without proving it cannot keep the account.
                     wp_set_password(wp_generate_password(32, true, true), $user->ID);
+                    \WP_Session_Tokens::get_instance($user->ID)->destroy_all();
                 }
             } else {
                 // Google has verified the email: no verification message is sent for it.
