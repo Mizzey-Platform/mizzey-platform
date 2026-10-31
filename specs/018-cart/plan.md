@@ -35,7 +35,7 @@ assignment, and moving a line to the wishlist. The designed cart and mini-cart a
 |---|---|
 | `CartStock` | On `woocommerce_check_cart_items`: lines counted together by stock identity, each asked of the gateway; unknown, short and sold out each named as an error, which blocks checkout on both carts |
 | `FixtureStockSource` | Bound by the gateway's filter when `mizzey_stock_fixture` is `yes` and the site is not production; answers from the canonical record's stock fields less its own ledger of changes, once per key; never writes WooCommerce's stock |
-| `CartMerge` | `set_logged_in_cookie` marks the merge for every sign-in; on `woocommerce_load_cart_from_session`, before WooCommerce's own merge, the saved and guest carts are combined and capped (sold individually, purchase limit, confirmed stock), WooCommerce's mark is cleared, the result is saved to the account and a notice names lowered items |
+| `CartMerge` | `set_logged_in_cookie` marks the merge for every sign-in; on `woocommerce_load_cart_from_session`, before WooCommerce's own merge, the saved and guest carts are combined and capped (the purchase limit, one for an item sold individually, and confirmed stock), WooCommerce's mark is cleared, the result is saved to the account and a notice names lowered items |
 | `GuestCartRetention` | The guest session lasts the set days (30), renewed a day before it ends; the setting under General |
 | `FreeShippingProgress` | Items needed for an automatic free-shipping promotion the cart otherwise qualifies for, and the amount needed for a free shipping method's minimum, measured as WooCommerce measures it; on the Store API cart |
 | `CartSuggestions` | The cart's suggestions are its items' Upsells, less what is in the cart |

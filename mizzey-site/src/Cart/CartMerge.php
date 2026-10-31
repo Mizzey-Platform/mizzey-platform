@@ -24,8 +24,8 @@ defined('ABSPATH') || exit;
  * - every sign-in marks the saved cart to merge, whatever signed the customer in (the account page, a sign-in link,
  *   a social sign-in plugin): the mark follows the logged-in cookie being set;
  * - the merge runs first (`woocommerce_load_cart_from_session`) and combines quantities of the same line, keeps every
- *   other line of both carts, and caps each item at what can be bought: one for an item sold individually, the
- *   product's purchase limit, and the stock the stock source confirms (an unanswered question caps nothing here; the
+ *   other line of both carts, and caps each item at what can be bought: the product's purchase limit (one for an
+ *   item sold individually), and the stock the stock source confirms (an unanswered question caps nothing here; the
  *   cart check then says so, CartStock). Prices are WooCommerce's own: each line is priced from its product as the
  *   cart loads.
  *
@@ -119,10 +119,8 @@ final class CartMerge
     /** The most of the item that can be bought, or null when nothing limits it. */
     private static function cap(\WC_Product $product, int $record, StockGateway $gateway): ?int
     {
-        $caps = [];
-        if ($product->is_sold_individually()) {
-            $caps[] = 1;
-        }
+        // The purchase limit is 1 for an item sold one at a time (WC_Product::get_max_purchase_quantity()).
+        $caps  = [];
         $limit = (int) $product->get_max_purchase_quantity();
         if ($limit > 0) {
             $caps[] = $limit;

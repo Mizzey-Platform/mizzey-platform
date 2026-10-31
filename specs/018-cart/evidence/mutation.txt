@@ -1,0 +1,15 @@
+Deliberate defects, each run against t59 and then reverted (31 October 2026):
+
+M1  an unanswered stock question passes                               -> t59 fails (1 check)
+M2  the merge replaces a line instead of adding                       -> t59 fails (2 checks)
+M3  the merge ignores confirmed stock                                 -> t59 fails (1 check)
+M5  a sign-in does not mark the merge                                 -> t59 fails (2 checks)
+M6  the merged cart is not saved to the account                       -> t59 fails (2 checks)
+M7  the guest window is ignored                                       -> t59 fails (1 check)
+M8  no items-needed figure                                            -> t59 fails (1 check)
+M9  suggestions read the Cross-sells field                            -> t59 fails (2 checks)
+M10 the fixture applies a key twice                                   -> t59 fails (1 check)
+M11 a line moved to the wishlist stays in the cart                    -> t59 fails (1 check)
+
+M4 (an item sold one at a time merged as more) was not caught: WooCommerce's purchase limit is already 1 for such an
+item, so the separate cap was redundant and was removed.

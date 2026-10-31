@@ -72,10 +72,13 @@ function t59_quantities( array $cart ): array {
 	return $out;
 }
 
-/** The Store API cart's headers for writes, and its cookies. */
+/**
+ * The Store API cart's nonce for writes, and its cookies. The cart is kept in WooCommerce's session cookie, as a
+ * browser's is, not under a Cart-Token header, so the account page sees the same cart.
+ */
 function t59_store( array $cookies = array() ): array {
 	$cart = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null, array(), $cookies );
-	return array( 'auth' => array( 'Cart-Token' => sign_in_header( $cart, 'cart-token' ), 'Nonce' => sign_in_header( $cart, 'nonce' ) ), 'cookies' => $cart['cookies'], 'cart' => $cart );
+	return array( 'auth' => array( 'Nonce' => sign_in_header( $cart, 'nonce' ) ), 'cookies' => $cart['cookies'], 'cart' => $cart );
 }
 
 run(
@@ -165,8 +168,8 @@ run(
 		update_user_meta( $customer, '_woocommerce_persistent_cart_' . get_current_blog_id(), array( 'cart' => t59_line( $open, 1 ) ) );
 		update_option( FixtureStockSource::OPTION, 'yes' );
 		$guest = t59_store();
-		sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $five->get_id(), 'quantity' => 2 ), $guest['auth'], $guest['cookies'] );
-		$add   = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $open->get_id(), 'quantity' => 2 ), $guest['auth'], $guest['cookies'] );
+		$first = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $five->get_id(), 'quantity' => 2 ), $guest['auth'], $guest['cookies'] );
+		$add   = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $open->get_id(), 'quantity' => 2 ), $guest['auth'], $first['cookies'] );
 		$account = wc_get_page_permalink( 'myaccount' );
 		$form    = two_factor_http( 'GET', $account, array(), $add['cookies'] );
 		$signed  = two_factor_http( 'POST', $account, array( 'username' => "{$tag}-c@example.invalid", 'password' => $password, 'woocommerce-login-nonce' => two_factor_field( $form['body'], 'woocommerce-login-nonce' ), '_wp_http_referer' => wp_parse_url( $account, PHP_URL_PATH ), 'login' => 'Log in' ), $form['cookies'] );
