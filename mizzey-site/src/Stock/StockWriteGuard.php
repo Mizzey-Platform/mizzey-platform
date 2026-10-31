@@ -15,44 +15,62 @@ defined('ABSPATH') || exit;
  * local stock writer may alter the effective available stock. Any permitted ERP-derived projection write must be
  * controlled through the designated adapter"), refused on the server, not hidden.
  *
- * - Every product and variation save keeps its stored stock: a change to the stock quantity, the stock status, stock
- *   management or backorders is put back (`woocommerce_before_product_object_save`, which variations fire too; a new
- *   product's are put back to WooCommerce's defaults), whoever makes
- *   it: the product and variation editors, quick and bulk edit, variation bulk actions, the CSV importer, the REST API,
- *   WP-CLI, the carrier's webhook. WooCommerce's direct stock update (`wc_update_product_stock()`) writes nothing
- *   (`woocommerce_update_product_stock_query`). The REST API refuses a stock change with a 403.
+ * - At the storage boundary, for the stock keys of products and variations (`_stock`, `_stock_status`,
+ *   `_manage_stock`, `_backorders`): WordPress's metadata API refuses an addition, an update or a deletion, by key or by
+ *   meta id (its short-circuit filters), and `$wpdb` refuses a raw write to those keys in the post meta table (the
+ *   `query` filter), which is where WooCommerce's direct stock update and WooCommerce Multilingual's stock
+ *   synchronisation write. Every writer goes through one of the two: the product and variation editors, quick and bulk
+ *   edit, variation bulk actions, the CSV importer, the REST API, WP-CLI, the carrier's webhook. A product being made
+ *   stores WooCommerce's defaults only; a product being deleted takes its stock meta with it. After a refused direct
+ *   update the product object is read again, so it does not carry the refused figure.
+ * - The REST API refuses a request that sends a stock field (any version, batches and nested variations included,
+ *   `inventory_delta` too) with a 403; schema defaults are not counted as sent.
  * - The one way through is `StockWriteGuard::projection()`, for the adapter's ERP-derived projection once PRE-09 says
- *   how WooCommerce's fields carry the ERP figure. Test fixtures and staging seeds, which stand in for the ERP, hold a
- *   permit through the `mizzey_stock_write_permitted` filter; the site's own code never sets it.
- * - The product editor and the products list show the figure from the stock source (the adapter), with the fields
- *   locked; a store that has no stock source shows it as not known.
+ *   how WooCommerce's fields carry the ERP figure; it finishes WooCommerce's deferred parent synchronisation inside
+ *   itself, so a variable product's status follows its variations. Test fixtures and staging seeds, which stand in
+ *   for the ERP, hold a permit through the `mizzey_stock_write_permitted` filter; the site's own code never sets it.
+ * - The product editor and the products list show the figure from the stock source (the adapter, read once, kept five
+ *   minutes), with the stored figure hidden and the stock controls disabled.
  *
- * Not covered, and recorded: a direct database write outside WooCommerce (no PHP hook can refuse it).
+ * Not covered, and recorded: a database write outside `$wpdb` (no PHP hook can refuse it).
  *
  * Register ids: ERP-07, ADM-70, ADM-72 (the function layer; the mechanism waits for PRE-09). See specs/026-admin-stock.
  */
 final class StockWriteGuard
 {
-    public const PERMIT = 'mizzey_stock_write_permitted';
-    private const PROPS = ['stock_quantity', 'stock_status', 'manage_stock', 'backorders'];
-    private const REST  = ['stock_quantity', 'stock_status', 'manage_stock', 'backorders', 'in_stock'];
+    public const PERMIT    = 'mizzey_stock_write_permitted';
+    public const KEYS      = ['_stock', '_stock_status', '_manage_stock', '_backorders'];
+    public const FIGURE    = 'mizzey_stock_figure_';
+    private const DEFAULTS = ['_stock' => '', '_stock_status' => 'instock', '_manage_stock' => 'no', '_backorders' => 'no'];
+    private const REST     = ['stock_quantity', 'stock_status', 'manage_stock', 'backorders', 'in_stock', 'inventory_delta'];
 
     private static int $projecting = 0;
 
+    /** @var array<int,true> Products being deleted, whose stock meta goes with them. */
+    private static array $deleting = [];
+
     public static function register(): void
     {
-        add_action('woocommerce_before_product_object_save', [self::class, 'keep'], 1, 1);
-        add_filter('woocommerce_update_product_stock_query', [self::class, 'query'], 999, 1);
-        add_filter('woocommerce_rest_pre_insert_product_object', [self::class, 'rest'], 1, 2);
-        add_filter('woocommerce_rest_pre_insert_product_variation_object', [self::class, 'rest'], 1, 2);
+        add_filter('add_post_metadata', [self::class, 'metaAdd'], 1, 5);
+        add_filter('update_post_metadata', [self::class, 'metaUpdate'], 1, 5);
+        add_filter('delete_post_metadata', [self::class, 'metaDelete'], 1, 5);
+        add_filter('update_post_metadata_by_mid', [self::class, 'metaByMid'], 1, 2);
+        add_filter('delete_post_metadata_by_mid', [self::class, 'metaByMid'], 1, 2);
+        add_filter('query', [self::class, 'query'], 1);
+        add_action('before_delete_post', [self::class, 'deleting'], 1, 1);
+        add_action('deleted_post', [self::class, 'deleted'], 99, 1);
+        add_action('woocommerce_product_set_stock', [self::class, 'reread'], 0, 1);
+        add_action('woocommerce_variation_set_stock', [self::class, 'reread'], 0, 1);
+        add_filter('rest_pre_dispatch', [self::class, 'rest'], 1, 3);
         add_filter('woocommerce_admin_stock_html', [self::class, 'listColumn'], 20, 2);
         add_action('woocommerce_product_options_stock_status', [self::class, 'editor']);
         add_action('woocommerce_variation_options_inventory', [self::class, 'variationEditor'], 10, 3);
-        add_action('admin_head', [self::class, 'lockFields']);
+        add_action('admin_enqueue_scripts', [self::class, 'lockFields']);
     }
 
     /**
-     * The adapter's way to write an ERP-derived projection into WooCommerce's stock fields.
+     * The adapter's way to write an ERP-derived projection into WooCommerce's stock fields; WooCommerce's deferred
+     * parent synchronisation is finished inside it.
      *
      * @template T
      * @param callable(): T $work
@@ -62,7 +80,12 @@ final class StockWriteGuard
     {
         self::$projecting++;
         try {
-            return $work();
+            $result = $work();
+            if (class_exists(\WC_Post_Data::class)) {
+                \WC_Post_Data::do_deferred_product_sync();
+            }
+
+            return $result;
         } finally {
             self::$projecting--;
         }
@@ -73,70 +96,173 @@ final class StockWriteGuard
         return self::$projecting > 0 || apply_filters(self::PERMIT, false) === true;
     }
 
-    /** @param mixed $product */
-    public static function keep($product): void
+    /** Whether a write of this key, to this object, is refused. */
+    private static function refused(int $objectId, string $key): bool
     {
-        if (! $product instanceof \WC_Product || self::permitted()) {
-            return;
-        }
-        $changes = $product->get_changes();
-        $stored  = $product->get_data();
-        foreach (self::PROPS as $prop) {
-            if (array_key_exists($prop, $changes)) {
-                self::put($product, $prop, $stored[$prop] ?? null);
-            }
-        }
+        return in_array($key, self::KEYS, true) && ! self::permitted() && ! isset(self::$deleting[$objectId])
+            && in_array(get_post_type($objectId), ['product', 'product_variation'], true);
     }
-
-    /** One stock prop set back, through its own setter: set_props() skips a null, which is a stock of none. */
-    private static function put(\WC_Product $product, string $prop, mixed $value): void
-    {
-        match ($prop) {
-            'stock_quantity' => $product->set_stock_quantity($value === null ? '' : $value),
-            'stock_status'   => $product->set_stock_status((string) $value),
-            'manage_stock'   => $product->set_manage_stock((bool) $value),
-            'backorders'     => $product->set_backorders((string) $value),
-        };
-    }
-
 
     /**
+     * A product being made stores WooCommerce's default stock only.
+     *
+     * @param mixed $check
+     * @param mixed $objectId
+     * @param mixed $key
+     * @param mixed $value
+     * @param mixed $unique
+     * @return mixed
+     */
+    public static function metaAdd($check, $objectId, $key, $value = null, $unique = false)
+    {
+        if ($check !== null || ! self::refused((int) $objectId, (string) $key)) {
+            return $check;
+        }
+
+        return (string) maybe_serialize($value) === self::DEFAULTS[(string) $key] ? null : false;
+    }
+
+    /**
+     * @param mixed $check
+     * @param mixed $objectId
+     * @param mixed $key
+     * @param mixed $value
+     * @param mixed $previous
+     * @return mixed
+     */
+    public static function metaUpdate($check, $objectId, $key, $value = null, $previous = '')
+    {
+        if ($check !== null || ! self::refused((int) $objectId, (string) $key)) {
+            return $check;
+        }
+        // A product's first stock meta is an addition; WordPress makes it through update when none exists.
+        if (! metadata_exists('post', (int) $objectId, (string) $key)) {
+            return self::metaAdd(null, $objectId, $key, $value);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed $check
+     * @param mixed $objectId
+     * @param mixed $key
+     * @param mixed $value
+     * @param mixed $all
+     * @return mixed
+     */
+    public static function metaDelete($check, $objectId, $key, $value = '', $all = false)
+    {
+        return $check === null && self::refused((int) $objectId, (string) $key) ? false : $check;
+    }
+
+    /**
+     * @param mixed $check
+     * @param mixed $metaId
+     * @return mixed
+     */
+    public static function metaByMid($check, $metaId)
+    {
+        $meta = $check === null ? get_metadata_by_mid('post', (int) $metaId) : false;
+
+        return is_object($meta) && self::refused((int) $meta->post_id, (string) $meta->meta_key) ? false : $check;
+    }
+
+    /**
+     * A raw write to a stock key in the post meta table, as WooCommerce's direct stock update and WooCommerce
+     * Multilingual's synchronisation make, is replaced by a query that writes nothing.
+     *
      * @param mixed $sql
      * @return mixed
      */
     public static function query($sql)
     {
         global $wpdb;
+        if (! is_string($sql) || self::permitted() || preg_match('/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i', $sql) !== 1
+            || stripos($sql, $wpdb->postmeta) === false || preg_match("/['\"`](_stock|_stock_status|_manage_stock|_backorders)['\"`]/", $sql) !== 1) {
+            return $sql;
+        }
+        // A delete of a product being deleted goes through.
+        foreach (array_keys(self::$deleting) as $id) {
+            if (preg_match('/\bpost_id`?\s*=\s*' . $id . '\b/', $sql) === 1) {
+                return $sql;
+            }
+        }
 
-        // A query that writes nothing in place of the stock update.
-        return self::permitted() ? $sql : $wpdb->prepare('SELECT %d', 1);
+        return $wpdb->prepare('SELECT %d', 0);
+    }
+
+    /** @param mixed $postId */
+    public static function deleting($postId): void
+    {
+        if (in_array(get_post_type((int) $postId), ['product', 'product_variation'], true)) {
+            self::$deleting[(int) $postId] = true;
+        }
+    }
+
+    /** @param mixed $postId */
+    public static function deleted($postId): void
+    {
+        unset(self::$deleting[(int) $postId]);
     }
 
     /**
+     * After a refused direct stock update, the product object is read again, so it does not carry the refused figure.
+     *
      * @param mixed $product
+     */
+    public static function reread($product): void
+    {
+        if (! $product instanceof \WC_Product || self::permitted() || $product->get_id() <= 0) {
+            return;
+        }
+        wp_cache_delete($product->get_id(), 'post_meta');
+        $product->set_stock_quantity((string) get_post_meta($product->get_id(), '_stock', true));
+        $product->set_stock_status((string) get_post_meta($product->get_id(), '_stock_status', true));
+        $product->apply_changes();
+    }
+
+    /**
+     * @param mixed $result
+     * @param mixed $server
      * @param mixed $request
      * @return mixed
      */
-    public static function rest($product, $request)
+    public static function rest($result, $server, $request)
     {
-        if (! $request instanceof \WP_REST_Request || self::permitted()) {
-            return $product;
+        if ($result !== null || ! $request instanceof \WP_REST_Request || self::permitted() || $request->get_method() === 'GET'
+            || preg_match('#^/wc/v\d+/products(/|$)#', $request->get_route()) !== 1) {
+            return $result;
         }
-        foreach (self::REST as $field) {
-            if ($request->get_param($field) !== null) {
+        // What the request sent, not the schema's defaults.
+        $sent  = array_merge((array) $request->get_query_params(), (array) $request->get_body_params(), (array) $request->get_json_params());
+        $items = [$sent];
+        foreach (['create', 'update'] as $batch) {
+            foreach ((array) ($sent[$batch] ?? []) as $item) {
+                $items[] = (array) $item;
+            }
+        }
+        foreach ($items as $item) {
+            if (array_intersect(self::REST, array_keys($item)) !== []) {
                 return new \WP_Error('mizzey_stock_read_only', __('Stock comes from the stock source and cannot be changed here.', 'mizzey-site'), ['status' => 403]);
             }
         }
 
-        return $product;
+        return $result;
     }
 
-    /** The quantity the stock source reports, or null when it is not known. */
+    /** The quantity the stock source reports, read once and kept five minutes, or null when it is not known. */
     public static function figure(int $productId): ?int
     {
-        $answer = StockGateway::make()->level($productId);
+        $kept = get_transient(self::FIGURE . $productId);
+        if (is_array($kept)) {
+            return $kept['q'];
+        }
+        $answer = StockGateway::quick()->level($productId);
+        $figure = $answer->isKnown() ? (int) $answer->quantity : null;
+        set_transient(self::FIGURE . $productId, ['q' => $figure], 5 * MINUTE_IN_SECONDS);
 
-        return $answer->isKnown() ? (int) $answer->quantity : null;
+        return $figure;
     }
 
     private static function label(int $productId): string
@@ -183,13 +309,19 @@ final class StockWriteGuard
         }
     }
 
-    /** On the product screens, the stock fields shown locked; the server refuses a change whatever is sent. */
-    public static function lockFields(): void
+    /**
+     * On the product screens, the stored figure is hidden and the stock controls disabled (a disabled field is not
+     * sent); the server refuses a change whatever is sent.
+     *
+     * @param mixed $hook
+     */
+    public static function lockFields($hook): void
     {
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         if (! $screen instanceof \WP_Screen || ! in_array($screen->id, ['product', 'edit-product'], true) || self::permitted()) {
             return;
         }
-        echo '<style>#_stock,#_stock_status,#_manage_stock,#_backorders,.stock_qty_field,.stock_status_field,.manage_stock_field,.backorder_field,.variable_manage_stock,.show_if_variation_manage_stock,.variable_stock_status{pointer-events:none;opacity:.55}</style>';
+        $file = WP_PLUGIN_DIR . '/mizzey-site/assets/admin-stock.js';
+        wp_enqueue_script('mizzey-admin-stock', plugins_url('mizzey-site/assets/admin-stock.js'), ['jquery'], is_readable($file) ? (string) filemtime($file) : null, true);
     }
 }
