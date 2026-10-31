@@ -88,6 +88,11 @@ run(
 			$p->save();
 		}
 
+		// The customer exists before any guest activity: creating an account merges the guest's lists into it.
+		t56_guest();
+		$customer = (int) wp_insert_user( array( 'user_login' => "{$tag}-c", 'user_email' => "{$tag}-c@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
+		$s->track_user( $customer );
+
 		// WISH-01, B17: one entry per canonical product, saved and removed by either language record.
 		t56_guest();
 		$first  = Wishlist::add( $en );
@@ -123,8 +128,6 @@ run(
 		$check( array( $c, $b ) === Wishlist::ids(), 'WISH-03 the list holds at most its capacity, the oldest dropped' );
 
 		// US-11-06: the guest's list joins the account's on sign-in, without duplicates, and the guest's is cleared.
-		$customer = (int) wp_insert_user( array( 'user_login' => "{$tag}-c", 'user_email' => "{$tag}-c@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
-		$s->track_user( $customer );
 		update_user_meta( $customer, Wishlist::META, array( $b, $en ) );
 		$user = get_user_by( 'id', $customer );
 		do_action( 'wp_login', $user->user_login, $user );
