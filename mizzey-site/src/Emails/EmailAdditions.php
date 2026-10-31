@@ -45,7 +45,10 @@ final class EmailAdditions
         $userId = $user instanceof \WP_User ? $user->ID : (is_numeric($user) ? (int) $user : 0);
         $code   = $userId > 0 ? WelcomeDiscount::codeFor($userId) : null;
         $coupon = $code !== null ? new \WC_Coupon($code) : null;
-        if (! $coupon instanceof \WC_Coupon || ! $coupon->get_id()) {
+        // Only a code the customer can still use: not expired, and not used up.
+        $expired = $coupon instanceof \WC_Coupon && $coupon->get_date_expires() && $coupon->get_date_expires()->getTimestamp() < time();
+        $usedUp  = $coupon instanceof \WC_Coupon && $coupon->get_usage_limit() > 0 && $coupon->get_usage_count() >= $coupon->get_usage_limit();
+        if (! $coupon instanceof \WC_Coupon || ! $coupon->get_id() || $expired || $usedUp) {
             return $content;
         }
         $value   = $coupon->is_type('percent')
@@ -73,8 +76,10 @@ final class EmailAdditions
         if (! $order instanceof \WC_Order || ! $order->needs_payment()) {
             return $content;
         }
+        // A link in the HTML email, whose text is the address itself, so the plain text email (tags removed) keeps it.
+        $url  = $order->get_checkout_payment_url();
         /* translators: %s: the address to pay for the order again. */
-        $line = sprintf(__('To try again, pay for your order here: %s', 'mizzey-site'), $order->get_checkout_payment_url());
+        $line = sprintf(__('To try again, pay for your order here: %s', 'mizzey-site'), sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($url)));
 
         return trim((string) $content . "\n\n" . $line);
     }

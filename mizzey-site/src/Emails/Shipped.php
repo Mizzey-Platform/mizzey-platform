@@ -81,6 +81,13 @@ final class Shipped
 
     private static function send(int $id): void
     {
+        // Read from storage under the lock: another request may have sent it while this one waited with the order
+        // already loaded.
+        clean_post_cache($id);
+        if (class_exists('\Automattic\WooCommerce\Caches\OrderCache')) {
+            wc_get_container()->get(\Automattic\WooCommerce\Caches\OrderCache::class)->remove($id);
+        }
+        wp_cache_delete($id, 'orders');
         $order = wc_get_order($id);
         $email = WC()->mailer()->get_emails()['MizzeySite_Customer_Shipped'] ?? null;
         if (! $order instanceof \WC_Order || $order->get_meta(self::SENT) !== '' || ! $email instanceof ShippedEmail) {
