@@ -1,0 +1,1361 @@
+PASS  t02-simple-cost              AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Set 137.5, read back 137.5
+      Set 0, read back NULL
+      Set blank (null), read back NULL
+      Fact: zero is stored as no cost (native zero-to-null conversion). Not a contract criterion.
+PASS  t03-variation-cost           AC-1
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      50ml: set 40.0, read 40.0, additive false, effective 40.0
+      100ml: set 70.0, read 70.0, additive false, effective 70.0
+      200ml: set NULL, read NULL, additive false, effective 0.0
+PASS  t04-order-line-snapshot      AC-2
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Order cost at sale: 200.0; line cost 200.0
+      After product cost changed to 999: order 200.0; line 200.0
+PASS  t07-csv-import-cost          AC-4
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Import: 4 imported, 0 failed, 0 skipped
+      T07-S1: expected 111.25, imported 111.25
+      T07-S2: expected 95.0, imported 95.0
+      T07-S3: expected NULL, imported NULL
+      T07-V-50: expected 40.0, imported 40.0
+      T07-V-100: expected 70.0, imported 70.0
+PASS  t08-no-public-exposure       AC-5
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      visitor product page (simple): HTTP 200, cost absent, the product page itself
+      visitor product page (variable): HTTP 200, cost absent, the product page itself
+      visitor Store API product: HTTP 200, cost absent
+      visitor Store API variable: HTTP 200, cost absent
+      visitor Store API list: HTTP 200, cost absent
+      visitor REST v3 product: HTTP 401, cost absent
+      visitor REST v3 variations: HTTP 401, cost absent
+      customer /wc/store/v1/products/44508: status 200, cost absent
+      customer /wc/store/v1/products/44509: status 200, cost absent
+      customer /wc/v3/products/44508: status 403, cost absent
+      customer /wc/v3/products/44509/variations: status 403, cost absent
+      customer My Account order view (1580 bytes): cost absent
+      Not tested: order emails (not sent in the local runtime).
+FACT  t09-staff-visibility         AC-6 (pending CX-01)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      administrator: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      shop_manager: edit_products=yes, REST v3 status 200, cost {"values":[{"defined_value":222.33,"effective_value":222.33}],"total_value":222.33}
+      editor: edit_products=no, REST v3 status 403, cost not returned
+      author: edit_products=no, REST v3 status 403, cost not returned
+      contributor: edit_products=no, REST v3 status 403, cost not returned
+      subscriber: edit_products=no, REST v3 status 403, cost not returned
+      customer: edit_products=no, REST v3 status 403, cost not returned
+PASS  t11-cost-sync-matrix         AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      WPML setting _cogs_total_value=1; WPML downloaded configuration present; mizzey-site/wpml-config.xml present
+      OK   part1 crud-created simple, duplicate: AR 120
+      OK   part1 crud-created variations, duplicate: AR 40/70
+      OK   part1 crud-created simple, editor: AR 120
+      OK   part1 crud-created variations, editor: AR 40/70
+      OK   duplicate simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   duplicate variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation import-http (the SKU reached the translation, so the cost is unchanged and the two still agree): set 40: EN none AR none; change 44: EN none AR none | orders EN 0 AR 0 | price/stock/sku/status unchanged
+      OK   duplicate variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   duplicate variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+      OK   editor simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor simple crud-web: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+      OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 44619'->'منتج 44619 - S' (generated variation title, rewritten on any save)
+      OK   editor variation import-http (the SKU reached the translation, so the cost is unchanged and the two still agree): set 40: EN none AR none; change 44: EN none AR none | orders EN 0 AR 0 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 44627'->'منتج 44627 - S' (generated variation title, rewritten on any save)
+      OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 44635'->'منتج 44635 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 44643'->'منتج 44643 - S' (generated variation title, rewritten on any save)
+      OK   editor variation crud-web: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged | noted: AR post_title 'منتج 44651'->'منتج 44651 - S' (generated variation title, rewritten on any save)
+PASS  t12-cost-sync-identity       AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   identity: trid 134/134; EN 44659 original='1' source=NULL; AR 44660 original='0' source='en'. The sync copies outwards only from the element WPML flags as the original
+           for comparison, the separately cached wpml_original_element_id says EN '44659' and AR '44659'. It can be stale inside one long-running process, which is why the sync does not use it
+      OK   simple: EN 100 AR 100; products written 44659,44660 (expected 44659,44660); unrelated pair 55/55 and untranslated 77 unchanged
+      OK   variations: changed EN S only. AR S 33 (want 33), AR L 22 (want 22, the sibling must not move); written 44665,44668 (expected 44665,44668)
+      OK   untranslated product: cost 88, written 44663 (expected 44663, and nothing else)
+      OK   deleted Arabic variation 44669: EN L cost 44, written 44666 (expected 44666 only); AR S still 33, unrelated product still 88
+      OK   writing 999 onto the translation: EN 100 (must stay 100, translations never push back), AR 100 (the original owns it), override logged
+      OK   a later change on the original still reaches the translation: EN 105 AR 105
+      OK   second pair created in the same process, with no cache flush: EN 250 AR 250
+      Creating a translation when a cost already exists is covered by t11 part 1 (WPML duplicate and WCML editor, simple and variations).
+PASS  t13-cost-sync-semantics      AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   first cost: set 100 x1 -> EN 100 (want 100), AR 100 (want 100), translation written 1 time(s) (want 1)
+      OK   increase: set 150 x1 -> EN 150 (want 150), AR 150 (want 150), translation written 1 time(s) (want 1)
+      OK   decrease: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 1 time(s) (want 1)
+      OK   unchanged: set 80 x1 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   saved three times: set 80 x3 -> EN 80 (want 80), AR 80 (want 80), translation written 0 time(s) (want 0)
+      OK   cleared: set none x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      OK   set again: set 60 x1 -> EN 60 (want 60), AR 60 (want 60), translation written 1 time(s) (want 1)
+      OK   zero: set 0 x1 -> EN none (want none), AR none (want none), translation written 1 time(s) (want 1)
+      Zero is stored by WooCommerce as no cost, on the original and therefore on the translation. A deliberate zero cannot be told from an uncosted product: recorded for OD-12, not worked around here.
+      OK   forced failure on translation 44677: EN1 500 AR1 10 (stale, as expected); the unrelated pair EN2 600 AR2 600 still synchronised; logged to mizzey-cost-sync: yes (1 line(s))
+      OK   retry after the failure was removed: saving the original again repaired the translation, EN1 500 AR1 500. Nothing polls: the repair happens on the next supported save
+      OK   re-entrancy: one save of the original produced the writes [44675,44674] and stopped (expected [44675,44674]: the translation, nested inside the save of the original, then the original). Neither write started another pass
+PASS  t14-arabic-content-after-sync AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   duplicate simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name source-language, as a duplicate keeps it | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T141", attributes "", order line "t11 T141" (), Store API HTTP 200, id 44681 (asked for 44681), name "t11 T141", price 30000, cost fields none
+           stored post_title: "t11 T141" as it was created, "t11 T141" after an ordinary save, "t11 T141" after the cost sync
+      OK   duplicate variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name source-language, as a duplicate keeps it | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "t11 T142 - S", attributes "Size: S", order line "t11 T142 - S" (), Store API HTTP 200, id 44687 (asked for 44687), name "t11 T142", price 20000, cost fields none
+           stored post_title: "t11 T142 - S" as it was created, "t11 T142 - S" after an ordinary save, "t11 T142 - S" after the cost sync
+      OK   editor simple: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name authored in Arabic | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 44692", attributes "", order line "منتج 44692" (), Store API HTTP 200, id 44693 (asked for 44693), name "منتج 44692", price 30000, cost fields none
+           stored post_title: "منتج 44692" as it was created, "منتج 44692" after an ordinary save, "منتج 44692" after the cost sync
+      OK   editor variation: AR cost 123.5, Arabic order line cost 123.5, unrelated field kept, Arabic name authored in Arabic | authored fields changed: none | customer visible changes: none
+           what the Arabic customer reads, unchanged by the sync: name "منتج 44696 - S", attributes "Size: S", order line "منتج 44696 - S" (), Store API HTTP 200, id 44699 (asked for 44699), name "منتج 44696", price 20000, cost fields none
+           stored post_title: "منتج 44696" as it was created, "منتج 44696 - S" after an ordinary save, "منتج 44696 - S" after the cost sync
+      Store API check, negative control: control passes: a planted cogs_value and a planted _cogs_total_value custom field are both reported (cogs_value=123.5, meta_data.0.key=_cogs_total_value); a cost field nested three levels down is reported (product.extensions.0.cost_of_goods=7); the real response is still clean
+      The rendered Arabic storefront page is not tested here: WPML serves Arabic from /ar/ URLs, which need web server rewrite configuration this runtime does not have. It stays a staging and UAT check.
+FAIL  t15-cost-sync-entrypoints    AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   admin-http simple: woocommerce_update_product fired for the English post in context "admin"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: save_post_product(EN)@admin, woocommerce_update_product(EN)@admin x2, woocommerce_update_product(AR)@admin, save_post_product(AR)@admin
+      OK   admin-http variation: woocommerce_update_product_variation fired for the English post in context "admin+ajax"; save_post for it: yes (WPML and WCML can run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN parent)@admin+ajax x2, save_post_product_variation(EN sibling)@admin+ajax, woocommerce_update_product_variation(EN sibling)@admin+ajax, save_post_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(EN)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_ajax_save_product_variations(EN parent)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax
+      FAIL import-http simple: woocommerce_update_product fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN none AR none
+           hooks: woocommerce_update_product(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(AR)@admin+ajax
+      FAIL import-http variation: woocommerce_update_product_variation fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN none AR none
+           hooks: save_post_product_variation(AR)@admin+ajax, woocommerce_update_product_variation(AR)@admin+ajax, woocommerce_product_import_inserted_product_object(AR)@admin+ajax, woocommerce_update_product(AR parent)@admin+ajax
+      OK   rest-http simple: woocommerce_update_product fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@rest, woocommerce_update_product(AR)@rest
+      OK   rest-http variation: woocommerce_update_product_variation fired for the English post in context "rest"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@rest, woocommerce_update_product_variation(AR)@rest, woocommerce_update_product(AR parent)@rest, woocommerce_update_product(EN parent)@rest
+      OK   crud-cli simple: woocommerce_update_product fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@cli, woocommerce_update_product(AR)@cli
+      OK   crud-cli variation: woocommerce_update_product_variation fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@cli, woocommerce_update_product_variation(AR)@cli
+      OK   crud-web simple: woocommerce_update_product fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product(EN)@front, woocommerce_update_product(AR)@front
+      OK   crud-web variation: woocommerce_update_product_variation fired for the English post in context "front"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+           hooks: woocommerce_update_product_variation(EN)@front, woocommerce_update_product_variation(AR)@front, woocommerce_update_product(AR parent)@front, woocommerce_update_product(EN parent)@front
+      crud-cli covers WooCommerce CRUD and WP-CLI; crud-web covers front-end application code, webhooks and cron, which run in the same context.
+PASS  t16-translation-cost-ownership AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      OK   crud-cli simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-cli variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   rest-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   rest-http variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-web simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   crud-web variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+      OK   admin-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+           also written by the channel itself, not by the cost rule: _bosta_sku: null -> [""]; _last_translation_edit_mode: null -> ["native-editor"]; _wpml_word_count: null -> ["0"]
+      OK   admin-http variation: the channel cannot reach the translation (variation not in the loaded admin panel). AR 100 EN 100, unchanged
+      OK   import-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes | the importer matches by SKU, and the row reached the translation, so nothing changed
+      OK   import-http variation: wrote 999 to the translation -> AR 999, EN 999 (want 999 for both), Arabic order recorded 999; language and translation group unchanged: yes; authored fields changed: none; override logged: no | the importer matches by SKU, and the row reached the English original, so the change flowed outwards
+      Unsupported by design, and not detectable: a direct database or update_post_meta() write bypasses the WooCommerce data store, so no filter can see it. The project forbids direct meta writes on products (woo-guard rule 2).
+      Not bidirectional: nothing here lets a translation become the source of a cost. The original is the only copy that can change it.
+FACT  t17-multilingual-stock       B1 (probe, no criterion)
+      Fixtures: F1 simple stock 5 (EN 44794 / AR 44795), F2 simple stock 1 (EN 44796 / AR 44797), F3 variable (EN 44798, variations EN 44799,44800 / AR 44802,44803), F4 untranslated control (44804)
+      --- step 1: baseline, before any order ---
+        F1 EN       id=44794 lang=en trid=134/db=134 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        F1 AR       id=44795 lang=ar trid=134/db=134 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        F2 EN       id=44796 lang=en trid=135/db=135 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        F2 AR       id=44797 lang=ar trid=135/db=135 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        F3 EN S     id=44799 lang=en trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        F3 AR S     id=44802 lang=ar trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        F3 EN L     id=44800 lang=en trid=138/db=138 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - L" type=post_product_variation
+        F3 AR L     id=44803 lang=ar trid=138/db=138 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        F4 control  id=44804 lang=en trid=139/db=139 sku=B1-CONTROL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CONTROL" type=post_product
+      --- step 2, English order on F1: ordered 1 of id=44794 in en  ---
+        EN before  id=44794 lang=en trid=134/db=134 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        EN after   id=44794 lang=en trid=134/db=134 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR before  id=44795 lang=ar trid=134/db=134 sku=B1-FIVE | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR after   id=44795 lang=ar trid=134/db=134 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        moved: EN 10 -> 9, AR 10 -> 9
+        hooks:  woocommerce_update_product(44794), woocommerce_product_set_stock(44794)
+      --- step 3, Arabic order on F1 (the core question): ordered 1 of id=44795 in ar  ---
+        EN before  id=44794 lang=en trid=134/db=134 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        EN after   id=44794 lang=en trid=134/db=134 sku=B1-FIVE | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR before  id=44795 lang=ar trid=134/db=134 sku=B1-FIVE | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-FIVE" type=post_product
+        AR after   id=44795 lang=ar trid=134/db=134 sku=B1-FIVE | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-FIVE" type=post_product
+        moved: EN 9 -> 8, AR 9 -> 8
+        hooks:  woocommerce_update_product(44795), woocommerce_product_set_stock(44795)
+      --- step 4, Arabic order on F3 variation S: ordered 1 of id=44802 in ar  ---
+        EN before  id=44799 lang=en trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        EN after   id=44799 lang=en trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        AR before  id=44802 lang=ar trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        AR after   id=44802 lang=ar trid=136/db=136 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        moved: EN 5 -> 5, AR 5 -> 4
+        hooks:  save_post_product_variation(44802), save_post(44802), woocommerce_update_product_variation(44802), woocommerce_variation_set_stock(44802)
+        sibling check, F3 L: EN id=44800 lang=en trid=138/db=138 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - L" type=post_product_variation / AR id=44803 lang=ar trid=138/db=138 sku=B1-VAR-L | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+      --- step 5, English order on F3 variation S: ordered 1 of id=44799 in en  ---
+        EN before  id=44799 lang=en trid=137/db=137 sku=B1-VAR-S | _stock='5' _stock_status=instock | lookup='5'/'instock' | crud=5 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        EN after   id=44799 lang=en trid=137/db=137 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-VAR - S" type=post_product_variation
+        AR before  id=44802 lang=ar trid=136/db=136 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        AR after   id=44802 lang=ar trid=136/db=136 sku=B1-VAR-S | _stock='4' _stock_status=instock | lookup='4'/'instock' | crud=4 | manage=yes | title="t11 B1-CONTROL" type=post_product_variation
+        moved: EN 5 -> 4, AR 4 -> 4
+        hooks:  woocommerce_update_product_variation(44799), woocommerce_variation_set_stock(44799)
+      --- step 6: the last unit of F2, Arabic first then English ---
+      --- step 6a, Arabic order on F2 (stock 1): ordered 1 of id=44797 in ar  ---
+        EN before  id=44796 lang=en trid=135/db=135 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        EN after   id=44796 lang=en trid=135/db=135 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR before  id=44797 lang=ar trid=135/db=135 sku=B1-ONE | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR after   id=44797 lang=ar trid=135/db=135 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        moved: EN 1 -> 0, AR 1 -> 0
+        hooks:  woocommerce_update_product(44797), woocommerce_product_set_stock(44797)
+        after the Arabic sale, the ENGLISH record reports: in_stock=no, has_enough_stock(1)=no, quantity=0
+      --- step 6b, English order on the same item: ordered 1 of id=44796 in en  ---
+        EN before  id=44796 lang=en trid=135/db=135 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        EN after   id=44796 lang=en trid=135/db=135 sku=B1-ONE | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR before  id=44797 lang=ar trid=135/db=135 sku=B1-ONE | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE" type=post_product
+        AR after   id=44797 lang=ar trid=135/db=135 sku=B1-ONE | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE" type=post_product
+        moved: EN 0 -> -1, AR 0 -> -1
+        hooks:  woocommerce_update_product(44796), woocommerce_product_set_stock(44796)
+      --- step 7: the last unit, English first then Arabic, on a fresh pair ---
+      --- step 7a, English order on F5 (stock 1): ordered 1 of id=44811 in en  ---
+        EN before  id=44811 lang=en trid=140/db=140 sku=B1-ONE2 | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        EN after   id=44811 lang=en trid=140/db=140 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR before  id=44813 lang=ar trid=140/db=140 sku=B1-ONE2 | _stock='1' _stock_status=instock | lookup='1'/'instock' | crud=1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR after   id=44813 lang=ar trid=140/db=140 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        moved: EN 1 -> 0, AR 1 -> 0
+        hooks:  woocommerce_update_product(44811), woocommerce_product_set_stock(44811)
+        after the English sale, the ARABIC record reports: in_stock=no, has_enough_stock(1)=no, quantity=0
+      --- step 7b, Arabic order on the same item: ordered 1 of id=44813 in ar  ---
+        EN before  id=44811 lang=en trid=140/db=140 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        EN after   id=44811 lang=en trid=140/db=140 sku=B1-ONE2 | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR before  id=44813 lang=ar trid=140/db=140 sku=B1-ONE2 | _stock='0' _stock_status=outofstock | lookup='0'/'outofstock' | crud=0 | manage=yes | title="t11 B1-ONE2" type=post_product
+        AR after   id=44813 lang=ar trid=140/db=140 sku=B1-ONE2 | _stock='-1' _stock_status=outofstock | lookup='-1'/'outofstock' | crud=-1 | manage=yes | title="t11 B1-ONE2" type=post_product
+        moved: EN 0 -> -1, AR 0 -> -1
+        hooks:  woocommerce_update_product(44813), woocommerce_product_set_stock(44813)
+      --- step 8: cancellation and restoration (WooCommerce only, no ERP) ---
+        after an Arabic order of 2: EN id=44816 lang=en trid=141/db=141 sku=B1-CANCEL | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-CANCEL" type=post_product
+                                    AR id=44817 lang=ar trid=141/db=141 sku=B1-CANCEL | _stock='8' _stock_status=instock | lookup='8'/'instock' | crud=8 | manage=yes | title="t11 B1-CANCEL" type=post_product
+        after cancelling it:        EN id=44816 lang=en trid=141/db=141 sku=B1-CANCEL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CANCEL" type=post_product
+                                    AR id=44817 lang=ar trid=141/db=141 sku=B1-CANCEL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CANCEL" type=post_product
+        hooks:  woocommerce_update_product(44817), woocommerce_product_set_stock(44817)
+      --- step 9: three more Arabic orders on F1, looking for cache-dependent behaviour ---
+        run 1: EN crud=7 lookup='7' | AR crud=7 lookup='7'
+        run 2: EN crud=6 lookup='6' | AR crud=6 lookup='6'
+        run 3: EN crud=5 lookup='5' | AR crud=5 lookup='5'
+      --- step 10: untranslated control, to separate WPML from WooCommerce ---
+        before id=44804 lang=en trid=139/db=139 sku=B1-CONTROL | _stock='10' _stock_status=instock | lookup='10'/'instock' | crud=10 | manage=yes | title="t11 B1-CONTROL" type=post_product
+        after  id=44804 lang=en trid=139/db=139 sku=B1-CONTROL | _stock='9' _stock_status=instock | lookup='9'/'instock' | crud=9 | manage=yes | title="t11 B1-CONTROL" type=post_product
+      --- which WPML and WCML callbacks are registered on the stock-relevant hooks ---
+        save_post@10 WPML_Gutenberg_Integration::clear_translations_cache_on_post_save
+        save_post@100 WPML_Media_Attachments_Duplication::save_post_actions
+        save_post@100 WPML_Admin_Post_Actions::save_post_actions
+        save_post@9223372036854775806 WCML_Downloadable_Products::saveProductMode
+        save_post@9223372036854775807 WCML\Synchronization\Hooks::synchronizeProductTranslationsOnSave
+        save_post@9223372036854775807 WPML_PB_Integration::queue_save_post_actions
+        woocommerce_product_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+        woocommerce_variation_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+      This scenario measures and does not judge. No stock synchronisation fix is implemented here.
+FACT  t18-synced-fields            A12 (probe, no criterion)
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      === simple products: one field at a time on the English original, through WooCommerce CRUD ===
+        regular_price       EN 300 -> 321 | AR 300 -> 300 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PDP-05, PLP-08, BR-005]
+        sale_price          EN  -> 299 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PROMO rows, BR-005]
+        cost                EN (none) -> 77.5 | AR (none) -> 77.5 | save_post: did NOT fire | FOLLOWED  [ADM-27, RPT-11]
+        sku                 EN A12-F8C461 -> A12-CHANGED-40023 | AR A12-F8C461 -> A12-F8C461 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-33, MIG-13, ERP-08]
+        stock_quantity      EN 10 -> 6 | AR 10 -> 6 | save_post: did NOT fire | FOLLOWED  [ERP-01, ADM-70, RPT-10]
+        stock_status        EN instock -> instock | AR instock -> instock | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [ERP-02, PDP-12, RPT-10]
+        manage_stock        EN yes -> no | AR yes -> yes | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-70, ERP-07]
+        weight              EN  -> 2.5 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        length              EN  -> 12 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        status              EN publish -> draft | AR publish -> draft | save_post: fired | FOLLOWED  [ADM-30, SSC rows]
+        catalog_visibility  EN visible -> hidden | AR visible -> visible | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-30, PLP rows]
+        name                EN t11 A12-B06893 -> A12 renamed in English | AR t11 A12-B06893 -> A12 renamed in English | save_post: fired | FOLLOWED  [NFR-04, SSC-12]
+        custom_field        EN  -> changed-by-t18 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ENT rows, developer-owned meta]
+        category            EN uncategorized -> a12-category | AR uncategorized -> (none) | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-60, PLP-03]
+      === variation products: one field at a time on the English original, through WooCommerce CRUD ===
+        regular_price       EN 200 -> 321 | AR 200 -> 200 | save_post: did NOT fire | *** DID NOT FOLLOW ***  [PDP-05, PLP-08, BR-005]
+        sale_price          EN  ->  | AR  ->  | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [PROMO rows, BR-005]
+        cost                EN (none) -> 77.5 | AR (none) -> 77.5 | save_post: did NOT fire | FOLLOWED  [ADM-27, RPT-11]
+        sku                 REFUSED by WooCommerce: Invalid or duplicated SKU.  [ADM-33, MIG-13, ERP-08]
+        stock_quantity      EN 5 -> 6 | AR 5 -> 6 | save_post: did NOT fire | FOLLOWED  [ERP-01, ADM-70, RPT-10]
+        stock_status        EN instock -> instock | AR instock -> instock | save_post: did NOT fire | NOT APPLIED on the original, nothing to measure  [ERP-02, PDP-12, RPT-10]
+        manage_stock        EN yes -> no | AR yes -> yes | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ADM-70, ERP-07]
+        weight              EN  -> 2.5 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        length              EN  -> 12 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [SHIP rows, ADM-40]
+        status              EN publish -> draft | AR publish -> publish | save_post: fired | *** DID NOT FOLLOW ***  [ADM-30, SSC rows]
+        catalog_visibility  not a variation field in WooCommerce, not measured  [ADM-30, PLP rows]
+        name                EN t11 A12V-B06893 - S -> t11 A12V-B06893 - S | AR t11 A12V-B06893 - S -> t11 A12V-B06893 - S | save_post: fired | NOT APPLIED on the original, nothing to measure  [NFR-04, SSC-12]
+        custom_field        EN  -> changed-by-t18 | AR  ->  | save_post: did NOT fire | *** DID NOT FOLLOW ***  [ENT rows, developer-owned meta]
+        category            not a variation field in WooCommerce, not measured  [ADM-60, PLP-03]
+      === WCML synchronisation components present in this version ===
+        Attachments, Attributes, DownloadableFiles, Linked, Meta, Post, Stock, Synchronizer, SynchronizerForMeta, Taxonomies, VariationAttachments, VariationMeta, VariationTaxonomies, Variations
+      === which WPML and WCML callbacks sit on the hooks a product save can fire ===
+        save_post@10 WPML_Gutenberg_Integration::clear_translations_cache_on_post_save
+        save_post@100 WPML_Media_Attachments_Duplication::save_post_actions
+        save_post@100 WPML_Admin_Post_Actions::save_post_actions
+        save_post@9223372036854775806 WCML_Downloadable_Products::saveProductMode
+        save_post@9223372036854775807 WCML\Synchronization\Hooks::synchronizeProductTranslationsOnSave
+        save_post@9223372036854775807 WPML_PB_Integration::queue_save_post_actions
+        woocommerce_product_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+        woocommerce_variation_set_stock@9 WCML\Synchronization\Hooks::syncProductStock
+      Measured on the crud-cli channel only. wp-admin and the wp-admin importer fire save_post (t15), so a field WCML synchronises on save_post is expected to follow there: recorded as a hypothesis, not a measurement.
+FACT  t19-translation-group-integrity A11 (probe, no criterion)
+      === 1. WP-CLI long-running process, one product created afterwards (the known reproducer) ===
+        --- wpcli-create-after ---
+          before EN parent  id=44935 type=variable trid=134 el='post_product' lang='en' src=NULL | title="t11 A11-1" sku=A11-1 stock=NULL price=(none) attrs=(none) children=2
+          before EN var S   id=44936 type=variation trid=135 el='post_product_variation' lang='en' src=NULL | title="t11 A11-1 - S" sku=A11-1-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=44938 type=variable trid=134 el='post_product' lang='ar' src='en' | title="منتج 44935" sku=A11-1 stock=NULL price=(none) attrs=(none) children=2
+          before AR var S   id=44939 type=variation trid=135 el='post_product_variation' lang='ar' src='en' | title="منتج 44935 - S" sku=A11-1-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=44940 type=variation trid=136 el='post_product_variation' lang='ar' src='en' | title="منتج 44935 - L" sku=A11-1-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10
+          MOVED  AR parent  trid 134 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 44935 - S' -> 't11 A11-1-AFTER'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 44935 - L' -> 't11 A11-1-AFTER'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 2. WP-CLI, nothing created afterwards (negative control) ===
+        --- wpcli-nothing-after ---
+          before EN parent  id=44943 type=variable trid=138 el='post_product' lang='en' src=NULL | title="t11 A11-2" sku=A11-2 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=44945 type=variation trid=139 el='post_product_variation' lang='en' src=NULL | title="t11 A11-2 - S" sku=A11-2-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=44947 type=variable trid=138 el='post_product' lang='ar' src='en' | title="منتج 44943" sku=A11-2 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=44948 type=variation trid=139 el='post_product_variation' lang='ar' src='en' | title="منتج 44943 - S" sku=A11-2-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=44949 type=variation trid=140 el='post_product_variation' lang='ar' src='en' | title="منتج 44943 - L" sku=A11-2-L stock=5 price=200 attrs=size=L children=NULL
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === 3. A migration-shaped batch: ten products created after the translation, one process ===
+        --- batch-ten-after ---
+          before EN parent  id=44951 type=variable trid=141 el='post_product' lang='en' src=NULL | title="t11 A11-3" sku=A11-3 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=44952 type=variation trid=142 el='post_product_variation' lang='en' src=NULL | title="t11 A11-3 - S" sku=A11-3-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=44954 type=variable trid=141 el='post_product' lang='ar' src='en' | title="منتج 44951" sku=A11-3 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=44955 type=variation trid=142 el='post_product_variation' lang='ar' src='en' | title="منتج 44951 - S" sku=A11-3-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=44956 type=variation trid=143 el='post_product_variation' lang='ar' src='en' | title="منتج 44951 - L" sku=A11-3-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10; children 4 -> 2
+          MOVED  AR parent  trid 141 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 44951 - S' -> 't11 A11-3-B10'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 44951 - L' -> 't11 A11-3-B10'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 4. All source products created first, translations only afterwards ===
+          AR var S after the whole batch: id=44983 type=variation trid=155 el='post_product_variation' lang='ar' src='en' | title="منتج 44968 - S" sku=A11-4-S stock=5 price=200 attrs=size=S children=NULL
+          consequence: EN 5 -> 4 ==> group intact
+      === 5. Interleaved: create, translate, create, translate ===
+        (the second pair is the one measured, after a translation already happened in this process)
+        --- interleaved ---
+          before EN parent  id=44992 type=variable trid=170 el='post_product' lang='en' src=NULL | title="t11 A11-5B" sku=A11-5B stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=44993 type=variation trid=171 el='post_product_variation' lang='en' src=NULL | title="t11 A11-5B - S" sku=A11-5B-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=44995 type=variable trid=170 el='post_product' lang='ar' src='en' | title="منتج 44992" sku=A11-5B stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=44996 type=variation trid=171 el='post_product_variation' lang='ar' src='en' | title="منتج 44992 - S" sku=A11-5B-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=44997 type=variation trid=172 el='post_product_variation' lang='ar' src='en' | title="منتج 44992 - L" sku=A11-5B-L stock=5 price=200 attrs=size=L children=NULL
+          MOVED  EN parent  stock NULL -> 10; children 4 -> 2
+          MOVED  AR parent  trid 170 -> NULL; el_type 'post_product' -> NULL; lang 'ar' -> NULL; src 'en' -> NULL
+          MOVED  AR var S   title 'منتج 44992 - S' -> 't11 A11-5-AFTER'; attrs 'size=S' -> ''
+          MOVED  AR var L   title 'منتج 44992 - L' -> 't11 A11-5-AFTER'; attrs 'size=L' -> ''
+          consequence: an Arabic variation sale moved EN 5 -> 5  ==> *** GROUP DETACHED, stock diverged, overselling possible ***
+      === 6. WPML duplicate instead of the WCML editor, one product created afterwards ===
+        --- duplicate-create-after ---
+          before EN parent  id=45000 type=variable trid=174 el='post_product' lang='en' src=NULL | title="t11 A11-6" sku=A11-6 stock=NULL price=(none) attrs=(none) children=2
+          before EN var S   id=45002 type=variation trid=175 el='post_product_variation' lang='en' src=NULL | title="t11 A11-6 - S" sku=A11-6-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=45004 type=variable trid=174 el='post_product' lang='ar' src='en' | title="t11 A11-6" sku=A11-6 stock=5 price=(none) attrs=(none) children=2
+          before AR var S   id=45005 type=variation trid=175 el='post_product_variation' lang='ar' src='en' | title="t11 A11-6 - S" sku=A11-6-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=45006 type=variation trid=176 el='post_product_variation' lang='ar' src='en' | title="t11 A11-6 - L" sku=A11-6-L stock=5 price=200 attrs=size=L children=NULL
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === 7. The native CSV importer creates the later products ===
+        --- importer-create-after ---
+          before EN parent  id=45011 type=variable trid=178 el='post_product' lang='en' src=NULL | title="t11 A11-7" sku=A11-7 stock=NULL price=(none) attrs=(none) children=4
+          before EN var S   id=45012 type=variation trid=179 el='post_product_variation' lang='en' src=NULL | title="t11 A11-7 - S" sku=A11-7-S stock=5 price=200 attrs=size=S children=NULL
+          before AR parent  id=45014 type=variable trid=178 el='post_product' lang='ar' src='en' | title="منتج 45011" sku=A11-7 stock=NULL price=(none) attrs=(none) children=4
+          before AR var S   id=45015 type=variation trid=179 el='post_product_variation' lang='ar' src='en' | title="منتج 45011 - S" sku=A11-7-S stock=5 price=200 attrs=size=S children=NULL
+          before AR var L   id=45016 type=variation trid=180 el='post_product_variation' lang='ar' src='en' | title="منتج 45011 - L" sku=A11-7-L stock=5 price=200 attrs=size=L children=NULL
+          native CSV importer: ok: imported 3
+          nothing moved on any of the five records
+          consequence: an Arabic variation sale moved EN 5 -> 4  ==> group intact, stock synchronised
+      === A11 summary ===
+        wpcli-create-after               CORRUPTED
+        wpcli-nothing-after              intact
+        batch-ten-after                  CORRUPTED
+        sources-first-then-translate     intact
+        interleaved                      CORRUPTED
+        duplicate-create-after           intact
+        importer-create-after            intact
+      wp-admin itself is one request per save, so the single-request case is covered by case 2 and by the per-request nature of the admin channel; the wp-admin translation screen is a browser flow this runtime cannot drive and stays a staging check.
+      No fix is implemented here. If sequencing alone prevents the defect, a migration runbook invariant is preferred over runtime code.
+FACT  t20-price-integrity          price matrix (probe, no criterion)
+      admin-http, admin-variation and import-http fire save_post, so WPML and WCML can run. rest-http, crud-cli and crud-web do not, for a meta-only change (t15).
+      === channel: admin-http ===
+        admin-http       simple    regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        admin-http       simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: admin-variation ===
+        admin-variation  variation regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        admin-variation  variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: import-http ===
+        import-http      simple    regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        import-http      simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+        import-http      variation regular_price EN reg=444 sale=- price=444 | AR reg=444 sale=- price=444 | Arabic order charged 444.00 | save_post fired | FOLLOWED
+        import-http      variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=150 price=150 | Arabic order charged 150.00 | save_post fired | FOLLOWED
+      === channel: rest-http ===
+        rest-http        simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        rest-http        variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === channel: crud-cli ===
+        crud-cli         simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-cli         variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === channel: crud-web ===
+        crud-web         simple    regular_price EN reg=444 sale=- price=444 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         simple    sale_price    EN reg=300 sale=150 price=150 | AR reg=300 sale=- price=300 | Arabic order charged 300.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         variation regular_price EN reg=444 sale=- price=444 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+        crud-web         variation sale_price    EN reg=200 sale=150 price=150 | AR reg=200 sale=- price=200 | Arabic order charged 200.00 | save_post fired | *** STALE ARABIC PRICE ***
+      === a price written directly onto the Arabic record (ownership question) ===
+        crud-cli         wrote 999 to the translation -> EN reg=300 sale=- price=300 | AR reg=999 sale=- price=999 | Arabic order charged 999.00 | the translation kept its own price
+        rest-http        wrote 999 to the translation -> EN reg=300 sale=- price=300 | AR reg=999 sale=- price=999 | Arabic order charged 999.00 | the translation kept its own price
+      === the scheduled-sales cron in WooCommerce (wc_scheduled_sales) ===
+        active sale 150 from 2026-10-30 to 2026-11-02, set in one wp-admin save (ok)
+        both on sale after that admin save: EN reg=300 sale=150 price=150 | AR reg=300 sale=150 price=150
+        end date moved to 2026-10-30 on both records, by raw meta write, nothing else changed
+        still on sale, still agreeing:      EN reg=300 sale=150 price=300 | AR reg=300 sale=150 price=300
+        after wc_scheduled_sales(): EN reg=300 sale=150 price=300 | AR reg=300 sale=150 price=300 | Arabic order charged 300.00 | the two agree
+      The rendered Arabic storefront page is not served by this runtime, so what the customer is served is measured as the effective price on the product the Arabic context resolves, plus the amount an Arabic order charges. The rendered page stays a staging check.
+PASS  t21-bilingual-baseline       AC-1 to AC-8
+      permalink_structure: /%postname%/
+      htaccess present: yes
+      enabled languages: ar, en
+      default language: en
+      [clean session] GET / -> 200 <html lang="en-US">
+      [clean session] cookies set by / : none
+      [clean session] GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [clean session] GET /ar/shop/ -> 200 <html dir="rtl" lang="ar">
+      [clean session] /ar/shop/ shows the shop page: yes
+      [one session] 1. GET / -> 200 <html lang="en-US">
+      [one session] 1. set-cookie: none
+      [one session] 2. GET /ar/ -> 200 <html dir="rtl" lang="ar">
+      [one session] 2. set-cookie: none
+      [one session] cookies carried into request 3: none
+      [one session] 3. GET / -> 200 <html lang="en-US">
+      shop: en=5 ar=19
+      cart: en=6 ar=20
+      myaccount: en=8 ar=22
+      translation group: ar, en
+      resolved Arabic counterpart: 45131, source language: en
+      theme templates: 2, Arabic-specific: 0
+      plugin text domain loader hooked on init: yes
+      fact: the mechanism is asserted below through the shipped Arabic catalogue, or a temporary one when none ships.
+      theme languages directory: present
+      translation template: present
+      probe: the first string of the shipped Arabic catalogue
+      probe in Arabic: طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.
+      probe in English: Too many password reset requests. Please wait a few minutes and try again.
+      fact: WordPress 7.1 loads translations lazily, so is_textdomain_loaded() reads false until a string is requested even though the loader returned true
+      admin locale (WPLANG): en_US
+PASS  t22-information-architecture AC-242-01 to AC-242-07, G-1
+      ok   IA-01 home             en=200/en-US  ar=200/ar rtl
+      ok   IA-08 cart             en=200/en-US  ar=200/ar rtl
+      ok   IA-09 checkout         en=302/-  ar=302/- (empty-cart redirect)
+           IA-09 redirect targets: en -> http://mizzey.local/cart/ | ar -> http://mizzey.local/ar/cart/
+      ok   IA-11 wishlist         en=200/en-US  ar=200/ar rtl
+      ok   IA-17 my-account       en=200/en-US  ar=200/ar rtl
+      ok   IA-21 track-your-order en=200/en-US  ar=200/ar rtl
+      ok   IA-24 about            en=200/en-US  ar=200/ar rtl
+      ok   IA-25 contact-us       en=200/en-US  ar=200/ar rtl
+      ok   IA-26 help             en=200/en-US  ar=200/ar rtl
+      ok   IA-27 authenticity-guarantee en=200/en-US  ar=200/ar rtl
+      ok   IA-28 shipping-policy  en=200/en-US  ar=200/ar rtl
+      ok   IA-29 returns-and-refunds en=200/en-US  ar=200/ar rtl
+      ok   IA-30 privacy-policy   en=200/en-US  ar=200/ar rtl
+      ok   IA-31 terms-and-conditions en=200/en-US  ar=200/ar rtl
+      ok   IA-32 offers           en=200/en-US  ar=200/ar rtl
+      ok   IA-02 shop             en=200/en-US  ar=200/ar rtl
+      ok   IA-16 lost-password    en=200  ar=200 (lost-password-ar)
+      ok   IA-18 edit-address     en=200  ar=200 (edit-address-ar)
+      ok   IA-19 orders           en=200  ar=200 (orders-ar)
+      G-1 page records duplicating an endpoint slug: none
+      ok   IA-03 product_cat      translatable=yes archive=200 http://mizzey.local/product-category/t22-fixture-product_cat/
+      ok   IA-05 product_brand    translatable=yes archive=200 http://mizzey.local/brand/t22-fixture-product_brand/
+      ok   IA-04 product_collection translatable=yes archive=200 http://mizzey.local/collection/t22-fixture-product_collection/
+      ok   IA-06 search          en=200  ar=200 (http://mizzey.local/ar/?s=mizzey)
+      AC-242-06 order-received as a page record: none, correct
+      AC-242-06 order-received endpoint query var: order-received
+PASS  t23-seo-fundamentals         AC-242-08 to AC-242-15
+      AC-242-08 permalink_structure: /%postname%/
+      AC-242-08 pages reachable only by ?page_id=: none
+      ok   AC-242-09 front page     <link rel="canonical" href="http://mizzey.local/" /> (count=1)
+      ok   AC-242-09 Arabic root    <link rel="canonical" href="http://mizzey.local/ar/" /> (count=1)
+      ok   AC-242-09 shop archive   <link rel="canonical" href="http://mizzey.local/shop/" /> (count=1)
+      ok   AC-242-09 singular page  <link rel="canonical" href="http://mizzey.local/about/" /> (count=1)
+      AC-242-10 sitemap status=200, 25 English and 16 Arabic page URLs
+      AC-242-10 Arabic pages published: 16
+      AC-242-11 robots.txt status=200, sitemap line=present, contracted paths disallowed: none
+      AC-242-13 structured-data types on the product page: BreadcrumbList, Product
+      AC-242-13 WC_Structured_Data present: yes, product generator wired: yes, breadcrumb generator wired: yes
+      AC-242-13 the product template is PDP-01 to PDP-24 (#254) and the structured-data row itself is MKT-16 (E-MKT-2). Nothing is built here: what the page emits today comes from the platform's own template.
+      AC-242-12 woocommerce_breadcrumb available: yes, core/breadcrumbs block registered: yes
+      AC-242-12 emission depends on a storefront template: the header and navigation are NAV rows (#253) and the product page is PDP (#254). The mechanism is present and unsuppressed here.
+      AC-242-14 about                  description present
+      AC-242-14 contact-us             description present
+      AC-242-14 terms-and-conditions   description present
+      AC-242-14 a page with no content emits: nothing, correct
+      AC-242-15 alt-text mechanism: core attachment meta _wp_attachment_image_alt, and wp_get_attachment_image emits the attribute. This feature introduces no images, so there is no image of its own to carry alt text; the mechanism is available for the content slices.
+      FR-013 emitted under the probe filters: <meta name="description" content="t23 override probe" /> <link rel="canonical" href="http://mizzey.local/t23-override-probe/" />
+      FR-013 meta description overridable by filter: yes
+      FR-013 canonical overridable by filter: yes
+      FR-014 metadata storage introduced by this feature: none. Each value is derived from the record WordPress already holds, so a later override field becomes the source rather than a second store.
+      fact: wp-sitemap-users in the index: no
+PASS  t24-stock-report-physical-items AC-246-01 to AC-246-08
+      Stored state: the pair holds lookup stock 2 (en) and 2 (ar): two records, one item.
+      PASS  [en] the report answers
+      PASS  [en] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), arabic, size(en), pair(en), english
+      PASS  [en] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [en] no line is repeated
+      PASS  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [en] the session language is unchanged after the report: 'en'
+      PASS  [ar] the report answers
+      PASS  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), arabic, size(en), pair(en), english
+      PASS  [ar] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [ar] no line is repeated
+      PASS  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [ar] the session language is unchanged after the report: 'ar'
+      PASS  [all] the report answers
+      PASS  [all] AC-246-01, 03, 07 low-stock lists each physical item once: orphan(ar), arabic, size(en), pair(en), english
+      PASS  [all] AC-246-02 out-of-stock lists each physical item once: out(en)
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 5 of 5, out 1 of 1
+      PASS  [all] the session language is unchanged after the report: 'all'
+      PASS  AC-246-04 the three language contexts return the same list and the same totals
+      PASS  AC-246-06 two per page gives 3 pages for 5 items
+      PASS  AC-246-06 walking every page yields 5 distinct lines for a total of 5
+      PASS  AC-246-06 no fixture is lost or repeated at a page boundary
+      PASS  sorted by stock_quantity asc: one line per item, total 5, order kept
+      PASS  sorted by stock_quantity desc: one line per item, total 5, order kept
+      PASS  sorted by sku asc: one line per item, total 5, order kept
+      PASS  sorted by stock_status asc: one line per item, total 5, order kept
+      PASS  [en] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [en] AC-246-08 the export total is 5, the screen total 5
+      PASS  [ar] AC-246-08 the export holds each physical item once: T24-ARABIC, T24-ENGLISH, T24-ORPHAN, T24-PAIR, T24-VAR-S
+      PASS  [ar] AC-246-08 the export total is 5, the screen total 5
+      PASS  with no stock filter, each fixture item is still one line: parent(en), arabic, orphan(ar), size(en), pair(en), english, roomy(en), out(en)
+      PASS  FR-010 reading the report changed no stored stock value on any record
+      PASS  FR-010 an ordinary product query in an English session is still scoped to English: pair(en), english
+PASS  t25-stock-report-volume      AC-246-06 at the 5,000 item sizing baseline
+      Seeded 5000 physical items as 10000 product records, each language record holding its own stock row of 1.
+      PASS  [en] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 498 ms
+      PASS  [ar] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 294 ms
+      PASS  [all] total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 18 ms
+      PASS  the last page, 200, holds 25 lines (expected 25)
+      NOTE  a signed-in REST request that reads no product takes 852 ms here
+      PASS  [ar, over HTTP at http://mizzey.local/ar/wp-json/] status 200, total 5000 (expected 5000), first page 25 distinct lines of which 25 are source-language records, 1109 ms for the whole request
+      PASS  [ar, over HTTP] the summary under the table: {"lowstock":5000,"instock":5000,"outofstock":0,"onbackorder":0,"products":5000} (low stock expected 5000), 1639 ms for the whole request
+      PLAN  SIMPLE wc_product_meta_lookup: type ALL, key none, rows 10000
+      PLAN  SIMPLE mz_posts: type eq_ref, key PRIMARY, rows 1
+      PLAN  SIMPLE low_stock_amount_meta: type ref, key meta_key, rows 1
+      PLAN  SIMPLE <subquery2>: type eq_ref, key <auto_distinct_key>, rows 1
+      PLAN  MATERIALIZED mizzey_rival: type ALL, key none, rows 10082
+      PLAN  MATERIALIZED mizzey_rival_post: type eq_ref, key PRIMARY, rows 1
+      PLAN  MATERIALIZED mizzey_self: type ref, key trid, rows 19
+PASS  t26-stock-report-real-request AC-246-01 to AC-246-08, through the signed-in HTTP request the screen makes
+      PASS  [en] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [en] the report answers over HTTP
+      PASS  [en] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [en] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [en] no line is repeated
+      PASS  [en] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [en] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [en] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [en] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  [ar] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/ar/wp-json/
+      PASS  [ar] the report answers over HTTP
+      PASS  [ar] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [ar] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [ar] no line is repeated
+      PASS  [ar] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [ar] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [ar] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [ar] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  [all] the signed-in Analytics Stock screen answers 200 and hands the browser the REST address http://mizzey.local/wp-json/
+      PASS  [all] the report answers over HTTP
+      PASS  [all] AC-246-01, 03, 07 low-stock lists each physical item once: arabic, size(en), orphan(ar), pair(en), english
+      PASS  [all] AC-246-02, 03 out-of-stock lists each physical item once: out(en), out-arabic
+      PASS  [all] no line is repeated
+      PASS  [all] AC-246-05 each line shows the item's one figure, the pair 2 and not 4
+      PASS  [all] AC-246-06 the total equals the lines: low 5 of 5, out 2 of 2
+      PASS  [all] AC-246-06 the summary under the table counts physical items: summary {"lowstock":5,"instock":7,"outofstock":2,"onbackorder":0,"products":9}, lists {"products":9,"lowstock":5,"outofstock":2,"instock":7,"onbackorder":0}
+      PASS  [all] the in-process dispatch and the HTTP request return the same low-stock list: in process pair(en), english, arabic, size(en), orphan(ar); over HTTP pair(en), english, arabic, size(en), orphan(ar)
+      PASS  AC-246-04 the three admin language contexts return the same lists, the same totals and the same summary
+      PASS  [ar] AC-246-06 two per page gives 3 pages for 5 items
+      PASS  [ar] AC-246-06 walking every page yields 5 distinct lines for a total of 5
+      PASS  [ar] AC-246-06 no fixture is lost or repeated at a page boundary
+      PASS  [ar] sorted by stock_quantity asc: one line per item, total 5, order kept
+      PASS  [ar] sorted by stock_quantity desc: one line per item, total 5, order kept
+      PASS  [ar] sorted by sku asc: one line per item, total 5, order kept
+      PASS  [en] the probe ran in a front-end request: wp-admin false, WP-CLI false, language en
+      PASS  [en] AC-246-08 the export holds each physical item once: T26-ARABIC, T26-ENGLISH, T26-ORPHAN, T26-PAIR, T26-VAR-S
+      PASS  [en] AC-246-08 the export total is 5, the screen total 5
+      PASS  [en] FR-010 an ordinary product query in the same request is still scoped to its language: english, pair(en)
+      PASS  [ar] the probe ran in a front-end request: wp-admin false, WP-CLI false, language ar
+      PASS  [ar] AC-246-08 the export holds each physical item once: T26-ARABIC, T26-ENGLISH, T26-ORPHAN, T26-PAIR, T26-VAR-S
+      PASS  [ar] AC-246-08 the export total is 5, the screen total 5
+      PASS  [ar] FR-010 an ordinary product query in the same request is still scoped to its language: arabic, pair(ar)
+PASS  t27-storefront-guard         test infrastructure: a storefront scenario cannot pass on a placeholder
+      PASS  the baseline leaves the store open to visitors: woocommerce_coming_soon is 'no'
+      PASS  [en] with the store open, http://mizzey.local/shop/ is no shell and shows the shop page
+      PASS  [ar] with the store open, http://mizzey.local/ar/shop/ is no shell and shows the shop page
+      PASS  [en] the placeholder answers 200, which is why a status check cannot see it
+      PASS  [en] the guard names it: the commerce "coming soon" page
+      PASS  [en] the placeholder does not pass for the shop page, although its title is in the document head
+      PASS  [en] a scenario fetching it fails by name: Storefront guard: http://mizzey.local/shop/ answered 200 with the commerce "coming soon" page, not the page that was asked for.
+      PASS  [ar] the placeholder answers 200, which is why a status check cannot see it
+      PASS  [ar] the guard names it: the commerce "coming soon" page
+      PASS  [ar] the placeholder does not pass for the shop page, although its title is in the document head
+      PASS  [ar] a scenario fetching it fails by name: Storefront guard: http://mizzey.local/ar/shop/ answered 200 with the commerce "coming soon" page, not the page that was asked for.
+      PASS  the switch is restored and the shop is served again
+      PASS  in maintenance the home address answers 503 and the guard names it: a maintenance or "service unavailable" page (status 503)
+      PASS  maintenance is lifted and the home page is served again
+PASS  t28-archive-language-links   AC-242-05, AC-242-09: term archives and the addresses they point at, over HTTP
+      PASS  [product-category, en] AC-242-05 the documented address /product-category/t28-product-category/ answers 200
+      PASS  [product-category, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [product-category, en] AC-242-09 one canonical link, and it is the archive's own address: /product-category/t28-product-category/
+      PASS  [product-category, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  [product-category, en] canonical leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, en] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, en] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, en] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, ar] AC-242-05 the documented address /ar/product-category/t28-product-category-ar/ answers 200
+      PASS  [product-category, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [product-category, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/product-category/t28-product-category-ar/
+      PASS  [product-category, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  [product-category, ar] canonical leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, ar] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  [product-category, ar] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [product-category, ar] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  [brand, en] AC-242-05 the documented address /brand/t28-brand/ answers 200
+      PASS  [brand, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [brand, en] AC-242-09 one canonical link, and it is the archive's own address: /brand/t28-brand/
+      PASS  [brand, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  [brand, en] canonical leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, en] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  [brand, en] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, en] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, ar] AC-242-05 the documented address /ar/brand/t28-brand-ar/ answers 200
+      PASS  [brand, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [brand, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/brand/t28-brand-ar/
+      PASS  [brand, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  [brand, ar] canonical leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  [brand, ar] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  [brand, ar] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [brand, ar] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  [collection, en] AC-242-05 the documented address /collection/t28-collection/ answers 200
+      PASS  [collection, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [collection, en] AC-242-09 one canonical link, and it is the archive's own address: /collection/t28-collection/
+      PASS  [collection, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      PASS  [collection, en] canonical leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  [collection, en] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  [collection, en] hreflang en leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  [collection, en] hreflang x-default leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  [collection, ar] AC-242-05 the documented address /ar/collection/t28-collection-ar/ answers 200
+      PASS  [collection, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  [collection, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/collection/t28-collection-ar/
+      PASS  [collection, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      PASS  [collection, ar] canonical leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  [collection, ar] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  [collection, ar] hreflang en leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  [collection, ar] hreflang x-default leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  the queued rebuild of the routing rules ran inside an Arabic request
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-05 the documented address /product-category/t28-product-category/ answers 200
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [product-category, en] AC-242-09 one canonical link, and it is the archive's own address: /product-category/t28-product-category/
+      PASS  after an Arabic-request rebuild [product-category, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  after an Arabic-request rebuild [product-category, en] canonical leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, en] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-05 the documented address /ar/product-category/t28-product-category-ar/ answers 200
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [product-category, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/product-category/t28-product-category-ar/
+      PASS  after an Arabic-request rebuild [product-category, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/product-category/t28-product-category-ar/","en":"/product-category/t28-product-category/","x-default":"/product-category/t28-product-category/"}
+      PASS  after an Arabic-request rebuild [product-category, ar] canonical leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang ar leads to /ar/product-category/t28-product-category-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang en leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [product-category, ar] hreflang x-default leads to /product-category/t28-product-category/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-05 the documented address /brand/t28-brand/ answers 200
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [brand, en] AC-242-09 one canonical link, and it is the archive's own address: /brand/t28-brand/
+      PASS  after an Arabic-request rebuild [brand, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  after an Arabic-request rebuild [brand, en] canonical leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, en] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, ar] AC-242-05 the documented address /ar/brand/t28-brand-ar/ answers 200
+      PASS  after an Arabic-request rebuild [brand, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [brand, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/brand/t28-brand-ar/
+      PASS  after an Arabic-request rebuild [brand, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/brand/t28-brand-ar/","en":"/brand/t28-brand/","x-default":"/brand/t28-brand/"}
+      PASS  after an Arabic-request rebuild [brand, ar] canonical leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [brand, ar] hreflang ar leads to /ar/brand/t28-brand-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [brand, ar] hreflang en leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [brand, ar] hreflang x-default leads to /brand/t28-brand/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [collection, en] AC-242-05 the documented address /collection/t28-collection/ answers 200
+      PASS  after an Arabic-request rebuild [collection, en] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [collection, en] AC-242-09 one canonical link, and it is the archive's own address: /collection/t28-collection/
+      PASS  after an Arabic-request rebuild [collection, en] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      PASS  after an Arabic-request rebuild [collection, en] canonical leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [collection, en] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [collection, en] hreflang en leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [collection, en] hreflang x-default leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [collection, ar] AC-242-05 the documented address /ar/collection/t28-collection-ar/ answers 200
+      PASS  after an Arabic-request rebuild [collection, ar] AC-242-05 the page is the term's archive: it shows the term and the product assigned to it
+      PASS  after an Arabic-request rebuild [collection, ar] AC-242-09 one canonical link, and it is the archive's own address: /ar/collection/t28-collection-ar/
+      PASS  after an Arabic-request rebuild [collection, ar] NFR-03 the language links are English, Arabic and x-default, each at its counterpart's documented address: {"ar":"/ar/collection/t28-collection-ar/","en":"/collection/t28-collection/","x-default":"/collection/t28-collection/"}
+      PASS  after an Arabic-request rebuild [collection, ar] canonical leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [collection, ar] hreflang ar leads to /ar/collection/t28-collection-ar/, which answers 200 with the ar term
+      PASS  after an Arabic-request rebuild [collection, ar] hreflang en leads to /collection/t28-collection/, which answers 200 with the en term
+      PASS  after an Arabic-request rebuild [collection, ar] hreflang x-default leads to /collection/t28-collection/, which answers 200 with the en term
+PASS  t29-cost-before-translation  AC-3
+      Cost of Goods Sold before this scenario: off; enabled for the run and restored after.
+      Baseline: WPML downloaded configuration PRESENT, so this run does not test the site declaration; setting for _cogs_total_value 1; mizzey-site/wpml-config.xml present
+      OK   simple product, duplicate: English 120, Arabic 120
+      OK   product with variants, duplicate: English 40/70, Arabic 40/70
+      OK   simple product, editor: English 120, Arabic 120
+      OK   product with variants, editor: English 40/70, Arabic 40/70
+PASS  t30-catalogue-read           MIG-01 AC-1: the agreed export is read row for row, identifiers and text kept
+      PASS  AC-1: the header has its 16 columns (16)
+      PASS  AC-1: the byte-order mark is stripped from the first header ('seller-sku')
+      PASS  AC-1: every data row is read (23)
+      PASS  AC-1: row numbers count the header as row 1
+      PASS  AC-1: the first SKU is read as written
+      PASS  AC-1: Arabic text, Arabic digits included, is read intact
+      PASS  AC-1: a trailing space in a SKU is kept, not trimmed
+      PASS  AC-1: a short row is kept short, for the rules to judge
+      PASS  the preview read stops at its row limit
+      PASS  an empty file reads as no header and no rows
+      PASS  a UTF-16 file is read row for row, Arabic intact
+      PASS  a quoted first header after a byte-order mark reads as its name
+      PASS  a cell spanning lines stays one cell, and the next row is numbered by its line
+      PASS  text that does not convert from the declared encoding stops the read
+PASS  t31-catalogue-mapping        MIG-04 AC-2: every column mapped or recorded as not imported; a misfit refused
+      PASS  the mapping states its version (0.1.0-fixture) and rules version 1
+      PASS  AC-2: every fixture header is mapped or recorded as not imported
+      PASS  AC-2: every column not imported says why (4 columns)
+      PASS  the fixture header fits the mapping completely
+      PASS  the ASIN column is kept as the hidden source reference, not ignored (owner, 30 October 2026)
+      PASS  header-mismatch.tsv: reports F1, stops the run
+      PASS  duplicate-headers.tsv: reports F2, stops the run
+      PASS  extra-column.tsv: reports W2, does not stop the run, and is not complete
+      PASS  empty.tsv: reports F3, stops the run
+      PASS  a column recorded as not imported may be absent without failing
+      PASS  a mapping with no version is refused
+      PASS  a mapping with another rules version is refused
+      PASS  a mapping with unagreed format is refused
+      PASS  a mapping with ignore without reason is refused
+      PASS  a mapping with unknown field is refused
+      PASS  a mapping with field filled twice is refused
+PASS  t32-catalogue-preview        MIG-03 AC-3: the preview shows the first rows under the mapping, Arabic intact
+      PASS  AC-3: the preview exits 0 (exit 0)
+      PASS  AC-3: it names the mapping version and the rules version
+      PASS  AC-3: it names the format and the encoding it read with
+      PASS  AC-3: it reports the header check
+      PASS  AC-3: it shows rows by number and type
+      PASS  AC-3: it stops at the row limit
+      PASS  AC-3: Arabic text is shown as parsed
+      PASS  AC-3: fields are shown under their store names
+      PASS  a file the mapping does not fit stops with exit 1 and names F1 (exit 1)
+      PASS  an unlisted column is reported, and the mapping is not called complete
+      PASS  an unreadable file is a usage error, exit 2 (exit 2)
+PASS  t33-catalogue-outcomes       MIG-06 AC-4: one outcome per row, with its reason, by the documented rules
+      PASS  the validation completes, exit 0 (exit 0)
+      PASS  AC-4: every data row has one report line (23)
+      PASS  AC-4 'MZ-VIT-C-1000': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-SER-30': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-SER-50': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-SER': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-UPD-001': update by U1 (got update U1: The SKU belongs to the source-language original 55181.)
+      PASS  AC-4 'MZ-UPD-002': update by U1 (got update U1: The SKU belongs to the source-language original 55183.)
+      PASS  AC-4 'MZ-NOPRICE': reject by R1 (got reject R1: The required value "regular_price" is empty.)
+      PASS  AC-4 'MZ-DUP-1': reject by R2 (got reject R2: The SKU is repeated on rows 9, 10, so which row is the product cannot be decided.)
+      PASS  AC-4 'mz-dup-1': reject by R2 (got reject R2: The SKU is repeated on rows 9, 10, so which row is the product cannot be decided.)
+      PASS  AC-4 'MZ-TRX-001': reject by R3 (got reject R3: The SKU belongs only to a translation whose source-language original is missing or in the trash.)
+      PASS  AC-4 'MZ-AMB-001': reject by R4 (got reject R4: The SKU belongs to unrelated store records: 55186, 55187.)
+      PASS  AC-4 'MZ-ORPHAN-1': reject by R5 (got reject R5: The parent SKU is neither in the file nor in the store.)
+      PASS  AC-4 'MZ-BADPRICE': reject by R6 (got reject R6: The price "12,50" is not a number.)
+      PASS  AC-4 'MZ-BUNDLE': reject by R7 (got reject R7: The row type "bundle" is not one the mapping knows.)
+      PASS  AC-4 'mz-near-001 ': update by U1 (got update U1: The SKU belongs to the source-language original 55188.)
+      PASS  AC-4 'MZ-NOAR': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-LIP-01': reject by R5 (got reject R5: The parent on row 19 is rejected, so it cannot hold variations.)
+      PASS  AC-4 'MZ-LIP': reject by R1 (got reject R1: The required value "name" is empty.)
+      PASS  AC-4 'MZ-WRONG-1': reject by R5 (got reject R5: The parent SKU belongs to a store record that cannot hold variations (not a variable product, or its identity is unresolved).)
+      PASS  AC-4 'MZ-WIDE': reject by R8 (got reject R8: The row has 3 cells and the header has 16 columns.)
+      PASS  AC-4 'MZ-STOREVAR-1': create by C1 (got create C1: No store record has this SKU.)
+      PASS  AC-4 'MZ-KIND-1': reject by R9 (got reject R9: The SKU belongs to a store variation, and the row is a simple.)
+      PASS  AC-4 'MZ-MULTI': reject by R7 (got reject R7: The row type "bundle" is not one the mapping knows.)
+      PASS  several issues on one row are all kept (MZ-MULTI: R7 R6)
+      PASS  a near match is an update with W1 and its evidence (55188=MZ-NEAR-001 (collation))
+      PASS  an empty Arabic name on a create is W3, and the row is still created
+      PASS  a parent written after its variations is still their parent
+      PASS  a variation of a rejected parent is rejected for that reason
+      PASS  a partial update, blank cells and all, is an update
+      PASS  the same rows in reverse order give the same outcomes
+      PASS  an empty file fails at file level with no row outcomes (exit 1)
+      PASS  a header-only file completes with no rows (exit 0)
+PASS  t34-catalogue-no-write       MIG-03/MIG-06 AC-5: preview and validation write nothing to the catalogue
+      PASS  [preview] the command did its work: exit 0, expected 0
+      PASS  AC-5 [preview] every protected table is unchanged
+      PASS  [validate] the command did its work: exit 0, expected 0
+      PASS  AC-5 [validate] every protected table is unchanged
+      PASS  [validate, file failure] the command did its work: exit 1, expected 1
+      PASS  AC-5 [validate, file failure] every protected table is unchanged
+      PASS  AC-5: a WordPress API write to the catalogue is refused before it runs
+      PASS  AC-5: a catalogue write written as direct SQL is refused before it runs
+      PASS  AC-5: a catalogue write written as a leading line comment is refused before it runs
+      PASS  AC-5: a catalogue write written as repeated block comments is refused before it runs
+      PASS  AC-5: a catalogue write written as an executable comment is refused before it runs
+      PASS  AC-5: a catalogue write written as a quoted identifier is refused before it runs
+      PASS  AC-5: a catalogue write written as a common table expression is refused before it runs
+      PASS  AC-5: a catalogue write written as a CTE named like a read is refused before it runs
+      PASS  an option write whose value mentions a catalogue table is allowed: values are not statements
+      PASS  a read of a catalogue table is allowed
+      PASS  AC-5: a write attempted during a run stops it with exit 3 (exit 3)
+      PASS  the run record says guard-refused, not completed ('guard-refused')
+      PASS  and the catalogue is unchanged
+      PASS  AC-5: a write during the load of WordPress is refused with exit 3 and its reason, and the run does not start (exit 3)
+      PASS  and no run is recorded, completed or otherwise
+      PASS  and the catalogue is unchanged
+PASS  t35-catalogue-sku-resolution MIG-06 AC-6: each SKU resolves to its store record and language role
+      PASS  the validation completes with a line per row (exit 0, 13 lines)
+      PASS  AC-6 a WPML duplicate pair resolves to the English original and lists the translation (U1 55205 original [55206] )
+      PASS  AC-6 a separately translated pair resolves to the original (U1 55207 original [55208] )
+      PASS  AC-6 no match is a create with no record (C1   [] W3)
+      PASS  AC-6 two unrelated records sharing a SKU are rejected, both named (R4   [] R4 W3)
+      PASS  AC-6 a record with no language details is an identity problem, not an original (R3   [] R3 W3)
+      PASS  AC-6 a translation whose original is in the trash is rejected as a translation (R3  translation [] R3 W3)
+      PASS  AC-6 an original whose translation carries the SKU is found, with W4 (U1 55214 original [55215] W4)
+      PASS  AC-6 a trashed record is not a match (C1   [] W3)
+      PASS  AC-6 a case and whitespace variant matches as the store would, with its evidence (55217=MZ-R-CASE (collation))
+      PASS  AC-6 a variation resolves to the store variation (U1 55221 original [] )
+      PASS  AC-6 a SKU equal under the column collation (STRAßE and STRASSE) matches, with W1 (U1 55218 original [] W1)
+      PASS  AC-6 a SKU that differs under the collation (STRASE) does not match (C1   [] W3)
+      PASS  AC-6 a leading space is trimmed, as the loader trims it, and reported with W1 (U1 55219 original [] W1)
+      PASS  AC-6 a trailing non-breaking space resolves as the collation compares it
+      PASS  and the repeated-SKU rule uses the same equality
+PASS  t36-catalogue-issue-list     MIG-19 AC-7: every Client issue reaches the list, actionable, and only those
+      PASS  the validation completes (exit 0)
+      PASS  AC-7: the list is UTF-8 with a byte-order mark, for Excel
+      PASS  AC-7: 'MZ-NOPRICE' carries its R1 issue
+      PASS  AC-7: 'MZ-DUP-1' carries its R2 issue
+      PASS  AC-7: 'mz-dup-1' carries its R2 issue
+      PASS  AC-7: 'MZ-ORPHAN-1' carries its R5 issue
+      PASS  AC-7: 'MZ-BADPRICE' carries its R6 issue
+      PASS  AC-7: 'MZ-BUNDLE' carries its R7 issue
+      PASS  AC-7: 'MZ-WIDE' carries its R8 issue
+      PASS  AC-7: 'MZ-NOAR' carries its W3 issue
+      PASS  AC-7: 'MZ-LIP-01' carries its R5 issue
+      PASS  AC-7: 'MZ-LIP' carries its R1 issue
+      PASS  AC-7: 'MZ-MULTI' carries its R6 issue
+      PASS  AC-7: the W3 issue belongs to a row that is still created
+      PASS  AC-7: every line names the row, the field, the problem and the correction (15 lines)
+      PASS  AC-7: no issue the Developer resolves is on the Client list (store identity, near matches, a store parent of the wrong type)
+      PASS  AC-7: a variation of a parent rejected for a store-identity defect is rejected, and neither is on the Client list
+      fact: the Developer reviews this list before it is sent (quickstart step 6); the scenario proves the list, not the review
+PASS  t37-catalogue-run-record     CX-04: each run supplies the Import Run payload, as a fixture-adapter record
+      PASS  the run completes and writes run.json (exit 0)
+      PASS  CX-04: the file is referenced
+      PASS  CX-04: the mapping used and its version (mizzey-site/import/catalogue-mapping.json)
+      PASS  CX-04: the rules version
+      PASS  CX-04: the counts agree with the report ({"rows":23,"create":6,"update":3,"reject":14,"client_issues":15,"developer_issues":5})
+      PASS  CX-04: the outcome is completed, with no error reference
+      PASS  CX-04: the actor (wp-cli)
+      PASS  CX-04: started and finished times
+      PASS  CX-04: the reports it names exist
+      PASS  FR-010: it says fixture-adapter, not persisted (ENT-19 is #273's)
+      PASS  a file-level failure is recorded with its reason (exit 1)
+      PASS  and with no invented row outcomes
+      PASS  an output directory holding an earlier run is refused and the earlier record is kept (exit 2)
+      PASS  output that cannot be written is a usage error, never a completed run (exit 2)
+FACT  t38-catalogue-volume         FR-012: a 5,000-row export validated whole; time and memory recorded
+      fact: 5000 rows in the file, exit 0
+      fact: counts {"rows":5000,"create":5000,"update":0,"reject":0,"client_issues":5000,"developer_issues":0}
+      fact: elapsed 3.4 s for the whole command, peak memory 204.0 MB
+      PASS  every row is accounted for
+PASS  t39-security-exposure        NFR-05: no generator mark, no XML-RPC, no account discovery for visitors
+      PASS  [home (en)] http://mizzey.local/ answers 200 (got 200)
+      PASS  [home (en)] AC-1: no generator meta tag
+      PASS  [home (en)] AC-2: no X-Pingback header
+      PASS  [home (en)] AC-2: no RSD, pingback or manifest link
+      PASS  [home (ar)] http://mizzey.local/ar/ answers 200 (got 200)
+      PASS  [home (ar)] AC-1: no generator meta tag
+      PASS  [home (ar)] AC-2: no X-Pingback header
+      PASS  [home (ar)] AC-2: no RSD, pingback or manifest link
+      PASS  [post] http://mizzey.local/t39-post/ answers 200 (got 200)
+      PASS  [post] AC-1: no generator meta tag
+      PASS  [post] AC-2: no X-Pingback header
+      PASS  [post] AC-2: no RSD, pingback or manifest link
+      PASS  [product] http://mizzey.local/product/t39-product/ answers 200 (got 200)
+      PASS  [product] AC-1: no generator meta tag
+      PASS  [product] AC-2: no X-Pingback header
+      PASS  [product] AC-2: no RSD, pingback or manifest link
+      PASS  [shop (ar)] http://mizzey.local/ar/shop/ answers 200 (got 200)
+      PASS  [shop (ar)] AC-1: no generator meta tag
+      PASS  [shop (ar)] AC-2: no X-Pingback header
+      PASS  [shop (ar)] AC-2: no RSD, pingback or manifest link
+      PASS  [feed] http://mizzey.local/feed/ answers 200 (got 200)
+      PASS  [feed] AC-1: no generator element or attribute
+      PASS  [comments feed] http://mizzey.local/comments/feed/ answers 200 (got 200)
+      PASS  [comments feed] AC-1: no generator element or attribute
+      PASS  AC-2: system.listMethods is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: system.getCapabilities is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: system.multicall is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: pingback.ping is refused with 403 and no XML-RPC answer (status 403)
+      PASS  AC-2: xmlrpc.php?rsd is refused (status 403)
+      PASS  AC-2: pings are closed on a post
+      PASS  AC-3: a visitor is refused the users collection (status 401)
+      PASS  AC-3: a visitor is refused the users single user (status 401)
+      PASS  AC-3: a visitor is refused the users collection, query (status 401)
+      PASS  AC-3: a visitor is refused the users single user, query (status 401)
+      PASS  AC-3: an editor keeps the users collection the block editor reads (status 200)
+      PASS  AC-3: the native refusal of the edit context to an editor still holds (status 403)
+      PASS  AC-3 [en] ?author= for a existing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [en] ?author= for a missing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [ar] ?author= for a existing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3 [ar] ?author= for a missing account answers 404 with no slug (status 404, location '')
+      PASS  AC-3: the sitemap index lists no users sitemap
+      PASS  AC-3: the product sitemap is still listed
+      PASS  AC-3: the users sitemap does not exist (status 404)
+PASS  t40-security-accounts        NFR-05: application passwords, sign-in messages and recovery limits
+      PASS  AC-4: not available to a customer
+      PASS  AC-4: not available to a shop manager
+      PASS  AC-4: available to an administrator
+      PASS  AC-4: a customer cannot authenticate with an application password stored for them (application_passwords_disabled_for_user)
+      PASS  AC-4: an administrator still can
+      PASS  AC-4 [HTTP] a stored application password for the customer is refused (status 401)
+      PASS  AC-4 [HTTP] a stored application password for the administrator authenticates (status 200)
+      PASS  AC-5: wrong password, unknown username and unknown email give one answer (authentication_failed: <strong>Error:</strong> Invalid username, email address or incorrect password.)
+      PASS  AC-5: each failure still fires wp_login_failed, which CoreX counts
+      PASS  AC-5: CoreX's lockout error passes unchanged
+      PASS  AC-5: the right password still signs in
+      PASS  AC-5: empty credentials keep their own answer (empty_username)
+      PASS  AC-5 [wp-login] the generic message for a real and an unknown account ('Error: Invalid username, email address or incorrect password.' / 'Error: Invalid username, email address or incorrect password.')
+      PASS  AC-5 [account, en] the generic message for a real and an unknown account ('Error: Invalid username, email address or incorrect password.' / 'Error: Invalid username, email address or incorrect password.')
+      PASS  AC-5 [account, ar] the generic message for a real and an unknown account ('خطأ: اسم المستخدم أو عنوان البريد الإلكتروني غير صالح أو كلمة المرور غير صحيحة.' / 'خطأ: اسم المستخدم أو عنوان البريد الإلكتروني غير صالح أو كلمة المرور غير صحيحة.')
+      PASS  AC-6 [WordPress] three requests for one account pass, the fourth is refused with no email (sent+mail, sent+mail, sent+mail, mizzey_recovery_limited)
+      PASS  AC-6 [WooCommerce] three requests for one account pass, the fourth is refused with the message and no email (sent+mail, sent+mail, sent+mail, refused:Too many password reset requests. Please wait a few minutes and try again.)
+      PASS  AC-6: the eleventh request from one address is refused, whatever the accounts (invalidcombo, mizzey_recovery_limited)
+      PASS  AC-6: the limits are a setting: a filtered limit of one refuses the second request
+      PASS  AC-6: the username and the email of one account share one allowance (sent, sent, sent, mizzey_recovery_limited)
+      PASS  AC-6: invalid settings fall back safely ({"account":3,"address":10,"window":900})
+      PASS  AC-6 [account, en] the fourth request reads the refusal in the visitor's language ('Too many password reset requests. Please wait a few minutes and try again.')
+      PASS  AC-6 [account, ar] the fourth request reads the refusal in the visitor's language ('طلبات كثيرة لإعادة تعيين كلمة المرور. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.')
+PASS  t41-security-check           NFR-05: comments closed outside products; the security check reports the baseline
+      PASS  AC-7: a post stored as open has comments and pings closed
+      PASS  AC-7: a page stored as open has comments and pings closed
+      PASS  AC-7: a product with reviews allowed keeps them open
+      PASS  AC-7: a product with reviews off stays closed
+      PASS  AC-7 [HTTP] a comment on a post is refused (status 403)
+      PASS  AC-7 [HTTP] a product review is stored with rating 5 (status 302)
+      PASS  AC-7 [HTTP] a trackback is refused
+      PASS  AC-8: the report lists every control of this feature (generator, xmlrpc, account_discovery, application_passwords, sign_in_message, recovery_limit, comment_surface, file_changes_disabled, file_editor_disabled, debug_display_off, two_factor_active, two_factor_roles, two_factor_bypass, two_factor_key, two_factor_pending_staff, sign_in_limit, signup_check, account_writers, wordpress_registration)
+      PASS  AC-8: every control passes on the baseline
+      fact: configuration rows reported, not judged by this feature: file_changes_disabled=off, file_editor_disabled=on, debug_display_off=on, two_factor_active=pass, two_factor_roles=review, two_factor_bypass=pass, two_factor_key=pass, two_factor_pending_staff=0, sign_in_limit=review, signup_check=pass, account_writers=pass, wordpress_registration=pass
+      PASS  AC-8: with the XML-RPC control switched off, the report says review
+      PASS  AC-8: the command reports generator as pass
+      PASS  AC-8: the command reports xmlrpc as pass
+      PASS  AC-8: the command reports account_discovery as pass
+      PASS  AC-8: the command reports application_passwords as pass
+      PASS  AC-8: the command reports sign_in_message as pass
+      PASS  AC-8: the command reports recovery_limit as pass
+      PASS  AC-8: the command reports comment_surface as pass
+      PASS  the unenforced runtime reports two_factor_roles as review
+      PASS  the runtime without the sign-in baseline reports sign_in_limit as review
+      PASS  and two_factor_active as pass
+      PASS  and two_factor_bypass as pass
+      PASS  and two_factor_key as pass
+      PASS  and signup_check as pass
+      PASS  and account_writers as pass
+      PASS  and wordpress_registration as pass
+      PASS  so the command exits 1 naming two_factor_roles, and nothing else of this feature (exit 1)
+      PASS  AC-8: with a control switched off, the command names it and exits 1 (exit 1)
+PASS  t42-two-factor-sign-in       ADM-131: with two-factor in force, a password alone gives no session
+      PASS  AC-1 [wp-login] the right password alone brings the two-factor challenge
+      PASS  AC-1 [wp-login] and no session: the cookies it leaves do not open the administration
+      PASS  AC-1 [wp-login] a wrong code is refused, and the challenge is shown again
+      PASS  AC-1 [wp-login] the right code completes sign-in (status 302)
+      PASS  AC-1 [REST] a wrong code is refused (status 200)
+      PASS  AC-1 [REST] and a replacement transaction is issued for the retry
+      PASS  AC-1 [REST] the right code with that transaction completes sign-in (status 200)
+      PASS  AC-1 [account, en] the right password alone brings the challenge and no session
+      PASS  AC-1 [account, en] the right code completes sign-in
+      PASS  AC-1 [account, ar] the right password alone brings the challenge and no session
+      PASS  AC-1 [account, ar] the right code completes sign-in
+      PASS  AC-2 an enrolled shop manager is challenged too
+      PASS  AC-2 an unenrolled customer-only account signs in with no challenge (status 302)
+      PASS  FR-007 [home (visitor)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [product (visitor)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [home (customer)] loads no WP 2FA asset (status 200)
+      PASS  FR-007 [account (customer)] loads no WP 2FA asset (status 200)
+PASS  t43-two-factor-policy        ADM-131: the baseline command, the owner's setting, and the protection check
+      PASS  FR-002 the baseline command succeeds with an unrelated field and contrary exclusions present
+      PASS  FR-002 the baseline command sets every owned field
+      PASS  FR-002 and keeps an unrelated field as it was
+      PASS  FR-002 through WP 2FA's API: the stored policy hash is the hash of this policy
+      PASS  AC-5 with email codes on, the policy row says review
+      PASS  AC-5 with passkeys on, the policy row says review
+      PASS  AC-5 with expiry action changed, the policy row says review
+      PASS  AC-2 with the baseline, a shop manager is required to use two-factor
+      PASS  AC-2 when the owner requires it for administrators only, a shop manager is not
+      PASS  AC-5 after the policy changes, every staff member still to enrol is reported
+      PASS  AC-5 and a staff member already enrolled is not
+      PASS  AC-5 on the baseline, two_factor_active passes
+      PASS  AC-5 on the baseline, two_factor_roles passes
+      PASS  AC-5 on the baseline, two_factor_bypass passes
+      PASS  AC-5 on the baseline, two_factor_key passes
+      PASS  AC-5 and the check exits 0 (exit 0)
+      PASS  AC-5 the staff still to enrol are reported
+      PASS  AC-5 with the emergency bypass on, the bypass row says review and the check exits 1
+      PASS  AC-5 DISABLE_2FA_LOGIN=false is not a bypass
+      PASS  AC-5 with a database fallback key, the key row says review
+      PASS  AC-5 with a leftover database key row, the key row says review
+      PASS  and the check never prints a key value
+      PASS  AC-5 with WP 2FA deactivated, the active row says review and the check exits 1
+      PASS  and WP 2FA is active again
+PASS  t44-two-factor-enrolment-guard ADM-131: a staff member who must enrol can do nothing privileged first
+      PASS  before the baseline, the shop manager signs in normally
+      PASS  AC-3 [pre-existing session] an administration page sends to set-up (status 302)
+      PASS  AC-3 [pre-existing session] the orders screen sends to set-up (status 302)
+      PASS  AC-3 [pre-existing session] the set-up exception cannot dispatch page=wc-settings (status 403)
+      PASS  AC-3 [pre-existing session] the set-up exception cannot dispatch import=wordpress (status 302)
+      PASS  AC-3 [pre-existing session] the set-up screen opens (status 200)
+      PASS  AC-3 [pre-existing session] an administration action is refused (status 302, location 'http://mizzey.local/wp-admin/profile.php?show=wp-2fa-setup')
+      PASS  AC-3 [pre-existing session] a privileged REST call with a valid nonce is refused (status 403)
+      PASS  AC-3 [pre-existing session] WP 2FA's sign-in route passes the guard and rejects the forged transaction (status 403)
+      PASS  AC-3 [pre-existing session] an unlisted background action is refused
+      PASS  AC-3 [pre-existing session] reset and unlock actions are refused while pending
+      PASS  AC-3 [new session] an administration page sends to set-up (status 302)
+      PASS  AC-3 [new session] the orders screen sends to set-up (status 302)
+      PASS  AC-3 [new session] the set-up exception cannot dispatch page=wc-settings (status 403)
+      PASS  AC-3 [new session] the set-up exception cannot dispatch import=wordpress (status 302)
+      PASS  AC-3 [new session] the set-up screen opens (status 200)
+      PASS  AC-3 [new session] an administration action is refused (status 302, location 'http://mizzey.local/wp-admin/profile.php?show=wp-2fa-setup')
+      PASS  AC-3 [new session] a privileged REST call with a valid nonce is refused (status 403)
+      PASS  AC-3 [new session] WP 2FA's sign-in route passes the guard and rejects the forged transaction (status 403)
+      PASS  AC-3 [new session] an unlisted background action is refused
+      PASS  AC-3 [new session] reset and unlock actions are refused while pending
+      PASS  AC-3 the allowed enrolment action completes enrolment (status 200)
+      PASS  AC-3 once enrolled, the administration opens (status 200)
+      PASS  AC-3 once enrolled, the same REST call works (status 200)
+      PASS  AC-3 a customer who is also a shop manager is pending as staff
+      PASS  AC-3 a pending administrator's application password is refused (status 403)
+PASS  t45-two-factor-recovery      ADM-131: backup codes work once; a reset follows the written runbook
+      PASS  the enrolment gives backup codes (10)
+      PASS  AC-4 a backup code completes sign-in
+      PASS  AC-4 the same backup code is refused when used again
+      PASS  AC-4 another unused backup code still works
+      PASS  AC-4 the runbook's two commands run (exits 0 and 0)
+      PASS  AC-4 the reset ends the administrator's sessions
+      PASS  AC-4 after the reset, the password is no longer followed by a challenge
+      PASS  AC-4 and the administrator is sent to enrol again before anything else
+      PASS  the shop_manager who attempts the reset is signed in with two factors
+      PASS  AC-4 a shop_manager cannot reset an administrator's second factor
+      PASS  AC-4 and the administrator's second factor is kept
+      PASS  the administrator who attempts the reset is signed in with two factors
+      PASS  AC-4 a administrator can reset an administrator's second factor
+      PASS  AC-4 and the administrator's second factor is removed
+      PASS  AC-4 the reset administrator must enrol again
+PASS  t46-sign-in-limit            AUTH-15: login attempts are rate limited per identity and address, with a documented setting
+      PASS  FR-001 the command sets the five fields
+      PASS  FR-001 and keeps the others as they were
+      PASS  AC-1 [wp-login] after five failures the right password is refused with the message
+      PASS  AC-1 [wp-login] another identity from the same address signs in
+      PASS  AC-1 [account, en] after five failures the right password is refused with the translated message
+      PASS  AC-1 [account, ar] after five failures the right password is refused with the translated message
+      PASS  AC-1 the email is a separate identity from the username
+      PASS  AC-1 case and surrounding spaces count as one identity
+      PASS  AC-1 a forwarding header from an untrusted connection does not change the address
+      PASS  AC-1 behind a trusted proxy, the same identity from another address is unaffected
+      PASS  AC-1 after the lockout period the identity signs in
+      PASS  AC-1 and protection stayed on
+      PASS  ADM-131 the challenge appears and a wrong code is refused with the limit on
+      PASS  ADM-131 the right code then completes sign-in
+      PASS  AC-4 with the baseline, sign_in_limit passes
+      PASS  AC-4 an owner's change to valid settings still passes
+      PASS  AC-4 with the default address hidden, sign_in_limit says review
+      PASS  AC-4 with the limit off, sign_in_limit says review
+PASS  t47-signup-check             AUTH-15: every route that creates an account applies a check that a scripted submission fails
+      PASS  AC-2 [account] the registration form carries a token and a trap field
+      PASS  AC-2 [account] no token creates no account and shows the message
+      PASS  AC-2 [account] a malformed token creates no account and shows the message
+      PASS  AC-2 [account] an array token creates no account and shows the message
+      PASS  AC-2 [account] an oversized token creates no account and shows the message
+      PASS  AC-2 [account] a tampered token creates no account and shows the message
+      PASS  AC-2 [account] a future token creates no account and shows the message
+      PASS  AC-2 [account] another route's token creates no account and shows the message
+      PASS  AC-2 [account] an expired token creates no account and shows the message
+      PASS  AC-2 [account] a filled trap creates no account and shows the message
+      PASS  AC-2 [account] a token used straight away (under 3 seconds) creates no account
+      PASS  AC-2 [account] a failed native nonce is WooCommerce's refusal, not the signup check's
+      PASS  AC-2 [account] a valid token creates the account
+      PASS  AC-2 [account] the same token a second time creates nothing
+      PASS  AC-2 [account, ar] no token creates no account and shows the Arabic message
+      PASS  AC-2 [account, ar] a valid token creates the account
+      PASS  AC-2 [account] two concurrent requests with one token create at most one account (1)
+      PASS  AC-2 [checkout] account creation without the check is refused before any order (status 400)
+      PASS  AC-2 [checkout] with a valid check the order is placed and the account created (status 200)
+      PASS  AC-2 [checkout] a filled trap is refused
+      PASS  AC-2 [checkout] a guest order without an account needs no check (status 200)
+      PASS  AC-2 [checkout] a refused request is answered before the checkout handler runs (status 400, mizzey_signup_check, handler hooks 0)
+      PASS  AC-2 [checkout] a refused request leaves the session's retry order unchanged (draft 55261)
+      PASS  AC-2 [checkout] and with a valid check that same order is placed (the fixture is the retry order)
+      PASS  AC-2 [checkout, required] with create_account omitted and no check, refused (status 400)
+      PASS  AC-2 [checkout, required] with a valid check the account is created (status 200)
+      PASS  AC-2 [checkout] a signed-in customer's checkout needs no check (status 200)
+      PASS  AC-2 [checkout] the predicate follows the effective registration filters against contrary options
+      PASS  AC-2 [order-received] without the check no account is created
+      PASS  AC-2 [order-received] another route's token is refused
+      PASS  AC-2 [order-received] with a valid check the account is created
+      PASS  AC-2 [classic checkout] with a valid native nonce, no account and no order
+      PASS  AC-2 [wordpress] the form carries the check, and without it no account is created
+      PASS  AC-2 [wordpress] with a valid check the account is created
+      PASS  FR-005 the minimum age is 3 seconds, inclusive
+      PASS  FR-005 the maximum age is 7,200 seconds, inclusive
+      PASS  FR-005 a token is single-use, and clearing caches does not restore it
+      PASS  FR-005 when the claim cannot be stored, the check refuses
+      PASS  FR-003 an anonymous insertion with no verified route is refused
+      PASS  FR-003 one permit allows one insertion, for its own email only
+      PASS  FR-003 a render callback that throws leaves no order-received authorisation behind
+      PASS  FR-003 after a later refusal, the account permit cannot be used by another operation
+      PASS  FR-003 and the second attempt is refused
+      PASS  FR-003 after the checkout handler ends, no frame or permit remains (frames 0)
+      PASS  FR-003 a nested request cannot use its parent's permit; the parent still can after the child ends
+      PASS  FR-003 a signed-in customer cannot create accounts; a shop manager (create_customers) can
+      PASS  FR-003 WP-CLI keeps its native behaviour
+      PASS  AC-4 signup_check passes
+      PASS  AC-4 account_writers passes
+      PASS  AC-4 wordpress_registration passes
+      PASS  AC-4 with the account adapter removed, signup_check says review
+      PASS  AC-4 with stock-notification account creation on, account_writers says review
+      PASS  AC-4 with WordPress registration open and unchecked, wordpress_registration says review
+PASS  t48-sessions                 AUTH-15: sessions are handled securely and expire per the documented policy
+      PASS  AC-3 signing in sets the authentication and logged-in cookies
+      PASS  AC-3 both cookies are HttpOnly
+      N/A   AC-3 Secure is asserted on staging over HTTPS; this runtime is HTTP
+      PASS  AC-3 without "remember me" the authentication lasts two days
+      PASS  AC-3 without "remember me" the browser keeps the cookies only for the session
+      PASS  AC-3 with "remember me" the authentication lasts fourteen days
+      PASS  AC-3 with "remember me" the browser Expires is the authentication expiry plus twelve hours
+      PASS  AC-3 the server session expires when the cookie says it does
+      PASS  AC-3 a fresh session authenticates (the control for the next case)
+      PASS  AC-3 the session behind the cookie is found on the server
+      PASS  AC-3 a cookie whose server session has expired no longer authenticates
+      PASS  AC-3 signing out rejects that session's cookies; another session continues
+      PASS  AC-3 two sessions authenticate before the change
+      PASS  AC-3 the password was changed through the account page (status 302)
+      PASS  AC-3 after a password change, cookies issued before it no longer authenticate
+      PASS  AC-3 and the person who changed it keeps working replacement cookies
+PASS  t49-sign-in-browser          AUTH-15: the account forms and the sign-in flows work in a real browser in both languages
+      PASS  the browser ran the forms
+            {"route":"account","lang":"en","email":"t4x-br-acct-en-369343197@example.invalid","tokenField":1,"trapField":1,"trapVisible":false,"landed":"http:\/\/mizzey.local\/my-account\/","notice":""}
+      PASS  AC-2 [account, en] the form carries the check, its trap hidden from people
+      PASS  AC-2 [account, en] a person's submission creates the account
+            {"route":"account","lang":"ar","email":"t4x-br-acct-ar-978724930@example.invalid","tokenField":1,"trapField":1,"trapVisible":false,"landed":"http:\/\/mizzey.local\/ar\/my-account\/","notice":""}
+      PASS  AC-2 [account, ar] the form carries the check, its trap hidden from people
+      PASS  AC-2 [account, ar] a person's submission creates the account
+            {"route":"checkout","email":"t4x-br-checkout-193836178@example.invalid","payloadHasCheck":true,"payloadTrapEmpty":true,"checkoutStatus":200,"landed":"http:\/\/mizzey.local\/checkout\/order-received\/55270\/?key=wc_order_ALWmohD4BruO7","notice":"","validation":""}
+      PASS  AC-2 [checkout] the Store API request carries the check and succeeds
+      PASS  AC-2 [checkout] a person's submission creates the account
+            {"route":"checkout-trap","email":"t4x-br-checkout-trap-3394818912@example.invalid","trapRendered":1,"payloadTrap":"https:\/\/spam.example","checkoutStatus":400,"landed":"http:\/\/mizzey.local\/checkout\/"}
+      PASS  AC-2 [checkout-trap] a filled trap reaches the server unchanged and no account is created
+            {"route":"order-received","email":"t4x-br-offer-2583926476@example.invalid","formFound":1,"tokenField":1,"landed":"http:\/\/mizzey.local\/checkout\/order-received\/55269\/?key=wc_order_WjoHSQ6BluBGJ#create-account"}
+      PASS  AC-2 [order-received] the rendered form carries the check
+      PASS  AC-2 [order-received] a person's submission creates the account
+      PASS  the browser ran the flows
+            {"flow":"reset link","lang":"en","landed":"http:\/\/mizzey.local\/my-account\/lost-password\/?show-reset-form=true&action","form":true,"htmlLang":"en-US"}
+      PASS  FR-002 [en] the reset link opens the reset form, in its language
+            {"flow":"account sign-in","lang":"en","landed":"http:\/\/mizzey.local\/my-account\/","signedIn":true,"htmlLang":"en-US"}
+      PASS  FR-002 [en] the account page's sign-in works, in its language
+            {"flow":"sign-out","lang":"en","signedOut":true,"htmlLang":"en-US"}
+      PASS  FR-002 [en] sign-out works, in its language
+            {"flow":"lost password","lang":"en","landed":"http:\/\/mizzey.local\/my-account\/lost-password\/?reset-link-sent=true","confirmed":true,"htmlLang":"en-US"}
+      PASS  FR-002 [en] lost password sends the link, in its language
+            {"flow":"reset link","lang":"ar","landed":"http:\/\/mizzey.local\/ar\/my-account\/lost-password-ar\/?show-reset-form=true&action","form":true,"htmlLang":"ar"}
+      PASS  FR-002 [ar] the reset link opens the reset form, in its language
+            {"flow":"account sign-in","lang":"ar","landed":"http:\/\/mizzey.local\/ar\/my-account\/","signedIn":true,"htmlLang":"ar"}
+      PASS  FR-002 [ar] the account page's sign-in works, in its language
+            {"flow":"sign-out","lang":"ar","signedOut":true,"htmlLang":"ar"}
+      PASS  FR-002 [ar] sign-out works, in its language
+            {"flow":"lost password","lang":"ar","landed":"http:\/\/mizzey.local\/ar\/my-account\/lost-password-ar\/?reset-link-sent=true","confirmed":true,"htmlLang":"ar"}
+      PASS  FR-002 [ar] lost password sends the link, in its language
+            {"flow":"wp sign-in","entry":"wp-login.php","challenge":false,"signedIn":true,"landed":"http:\/\/mizzey.local\/my-account\/"}
+      PASS  FR-002 [wp-login.php] signs in
+            {"flow":"wp sign-in","entry":"CoreX address","challenge":false,"signedIn":true,"landed":"http:\/\/mizzey.local\/my-account\/"}
+      PASS  FR-002 [CoreX address] signs in
+            {"flow":"wp sign-in","entry":"two-factor","challenge":true,"signedIn":true,"landed":"http:\/\/mizzey.local\/wp-admin\/profile.php"}
+      PASS  FR-002 [two-factor] signs in through the challenge
+      PASS  FR-002 every sign-in link the pages print resolves
+PASS  t50-two-factor-issuer        ADM-131 addition: the authenticator entry carries the site's title
+      PASS  FR-008 WP 2FA can draw the QR code on this runtime
+      PASS  FR-008 the QR code names the entry after the site's title
+      PASS  FR-008 without the filter, WP 2FA names it after the address (the control)
+      PASS  FR-008 a colon in the title is removed (the label is name:login)
+      PASS  FR-008 a translation of the title does not change the entry
+      PASS  FR-008 ordinary site_url() calls are untouched
+      PASS  FR-008 with a title callback present the entry is still named
+      PASS  FR-008 a callback inside the builder still gets the site address
+      PASS  FR-008 a title that is not autoloaded still names the entry
+      PASS  FR-008 [HTTP] the set-up screen's new key comes with a QR code for the title (status 200)
+PASS  t51-order-status-model       ORD-01 to ORD-14, ADM-86, ADM-87: the order status model
+      Order storage: HPOS
+      PASS  AC-1 pending is named "Pending Payment"
+      PASS  AC-1 failed is named "Payment Failed"
+      PASS  AC-1 processing is named "Confirmed"
+      PASS  AC-1 preparing is named "Preparing"
+      PASS  AC-1 shipped is named "Shipped"
+      PASS  AC-1 out-for-delivery is named "Out for Delivery"
+      PASS  AC-1 cod-collected is named "COD Collected, Awaiting Remittance"
+      PASS  AC-1 completed is named "Delivered"
+      PASS  AC-1 cancelled is named "Cancelled"
+      PASS  AC-1 refunded is named "Refunded"
+      PASS  AC-1 delivery-failed is named "Delivery Failed / Returned to Origin"
+      PASS  AC-1 the new statuses are registered with WordPress
+      PASS  AC-1 the names are translated into Arabic (بانتظار الدفع | فشل الدفع | تم التأكيد | قيد التجهيز | تم التوصيل | تعذّر التوصيل / أُعيد إلى المصدر)
+      PASS  AC-5 a customer sees COD Collected as Delivered (Delivered)
+      PASS  FR-011 Preparing, Shipped, Out for Delivery and COD Collected are paid; Delivery Failed is not
+      PASS  FR-011 the legacy sales reports count them too
+      PASS  AC-2 staff move to preparing accepted
+      PASS  AC-2 staff move to shipped accepted
+      PASS  AC-2 staff move to out-for-delivery accepted
+      PASS  AC-2 staff move to completed accepted
+      PASS  AC-8 the first entry into each status is recorded at the time of the move
+      PASS  FR-010 stock unchanged across the new statuses (stays 9)
+      PASS  AC-7 each staff move is in the timeline under the staff member's name (4 notes)
+      PASS  AC-8 orders are found by when they were delivered, from order data
+      PASS  FR-009 a Delivered order is in the delivered set with its delivery time
+      PASS  AC-8 going out for delivery again keeps the first time
+      PASS  AC-2 [code] Confirmed to Delivered refused: status and completed date unchanged in storage
+      PASS  AC-2 [code] no status-change hook and no transition note followed the refusal
+      PASS  AC-2 [code] the refusal is noted on the order and the rest of the save went ahead
+      PASS  AC-2 [code] a stale copy cannot move a Delivered order back to Preparing, and no hook fires
+      PASS  AC-2 [code] the refused stale copy does not erase the completed date
+      PASS  AC-2 [code] a stale copy asking for the status already stored fires no second transition
+      PASS  AC-5 a new cash order cannot be created as Delivered
+      PASS  AC-2 a new or draft order starts as Pending Payment, Confirmed, On hold, Payment Failed or Cancelled
+      PASS  AC-2 [code] a new order saved directly as Shipped is kept as Pending Payment
+      PASS  AC-2 the message for a new order lists the starting statuses
+      PASS  AC-5 an ordinary cash order is not marked paid when it is confirmed
+      PASS  AC-5 a payment completion on a cash order past payment leaves nothing behind that marks it paid later
+      PASS  AC-5 an aborted payment completion leaves nothing behind that marks a cash order paid when it is confirmed
+      PASS  AC-2 [code] a Confirmed order cannot become a draft, so it cannot skip to Delivered through one
+      PASS  AC-2 payment_complete moves Pending Payment to Confirmed
+      PASS  AC-7 the payment-driven change is in the timeline
+      PASS  AC-5 completing the payment of a cash order confirms it, instead of the WooCommerce jump to Delivered
+      PASS  AC-2 [code] a just-created order in memory cannot jump to Delivered
+      PASS  AC-2 a failed payment, then on hold, are allowed
+      PASS  AC-2 a payment arriving after cancellation revives the order as Confirmed
+      PASS  AC-2 [screen] Confirmed to Delivered refused
+      PASS  AC-2 [screen] the person is told which moves are allowed
+      PASS  AC-3 [screen] a cancellation without a reason is refused
+      PASS  AC-2 [screen] Confirmed to Preparing accepted
+      PASS  AC-3 [screen] with a reason: cancelled, the reason and the person stored
+      PASS  AC-3, AC-7 the reason is in the timeline under the staff member's name
+      PASS  AC-6 a paid order that was cancelled can still be refunded in full
+      PASS  AC-2 [list button] the check runs before WooCommerce's handler
+      PASS  AC-2 [list button] Confirmed to Delivered refused, Confirmed to Preparing allowed
+      PASS  AC-2 [bulk] the Confirmed order moves to Preparing, the Delivered one is left out and unchanged
+      PASS  AC-3 [bulk] no cancellation in bulk, because no reason can be given
+      PASS  AC-2 [bulk] the refused orders are reported
+      PASS  AC-2 [REST] Confirmed to Delivered is a 400 and the order is unchanged (status 400)
+      PASS  AC-3 [REST] a staff cancellation without a reason is a 400 (status 400)
+      PASS  AC-7 [REST] an allowed staff move is attributed to the person (status 200)
+      PASS  AC-3 [REST] with a reason the cancellation is stored (status 200)
+      PASS  AC-3 [REST] creating an order as Cancelled without a reason is a 400 (status 400)
+      PASS  AC-3 [REST] creating an order as Cancelled with a reason stores it (status 201)
+      PASS  AC-2 [REST] creating an order directly as Shipped is a 400, not a 201 the guard then undoes (status 400)
+      PASS  AC-3 the unpaid-order timeout records its reason
+      PASS  AC-3 a customer's own cancellation records its reason
+      PASS  AC-2 a Shipped order cannot be cancelled
+      PASS  AC-4 Delivery Failed is not delivered and cannot become Delivered
+      PASS  AC-4 Delivery Failed cannot be cancelled (stock restoration belongs to the ERP)
+      PASS  AC-5 a cash order cannot skip COD Collected on its way to Delivered
+      PASS  AC-5 COD Collected is delivered, with the time delivery was established
+      PASS  AC-5 the "order complete" email stays for a prepaid order and is not sent when a cash order's remittance is recorded
+      PASS  AC-5 COD Collected leads to Delivered, and delivery dates from collection
+      PASS  AC-5 COD Collected is refused from Confirmed
+      PASS  AC-5 COD Collected is refused for a prepaid order
+      PASS  AC-6 a partial refund is recorded and leaves the status
+      PASS  AC-6 a full refund sets Refunded, from Shipped too
+      PASS  FR-013 (D6) an order placed in Arabic stores its language as order data (ar)
+      PASS  FR-012 the order's language stays as stored after a status move
+PASS  t52-promotion-engine         PROMO-01 to PROMO-23: the promotion engine
+      PASS  AC-1 a percentage and a fixed discount on a 150 cart give 15 and 30
+      PASS  AC-1 a free-shipping promotion applies
+      PASS  AC-2 below the minimum cart value the promotion is refused (native)
+      PASS  AC-2 two Beauty units of seven are below a minimum of three Beauty items (This coupon needs at least 3 items in your cart.)
+      PASS  AC-2 the reason is given in Arabic (تتطلب هذه القسيمة 3 منتجات على الأقل في سلتك.)
+      PASS  AC-2 three Beauty units meet it, and only Beauty is discounted
+      PASS  AC-2 a product condition refuses a cart without the product (native)
+      PASS  AC-2 a brand condition refuses a cart without the brand (native core Brands)
+      PASS  AC-2 with the brand in the cart, only the brand's product is discounted (native)
+      PASS  AC-2 a customer with an earlier order is refused
+      PASS  AC-2 a customer whose only earlier order failed is a first-order customer
+      PASS  AC-2 a guest is judged by billing email
+      PASS  AC-2 a guest with a new email is allowed
+      PASS  AC-2 an order is not counted against itself: the first order of a newcomer qualifies in order context
+      PASS  AC-2 an order for a returning customer is refused in order context
+      PASS  AC-3 an automatic promotion applies with no code when it qualifies
+      PASS  AC-3 it leaves when the cart stops qualifying
+      PASS  Q1 of two qualifying automatic promotions (20 and 25 off) the larger applies, alone
+      PASS  Q1 on a tie (20 and 20) the one created first applies
+      PASS  AC-3 a code the customer enters takes the place of the automatic promotion
+      PASS  AC-3 removing the code brings the automatic promotion back
+      PASS  AC-3 switching a promotion off as automatic (saved through WooCommerce) takes effect at once
+      PASS  AC-3, AC-4 a guest whose email has used up a promotion gets the next one instead (t522461auto10)
+      PASS  AC-1, Q1 free shipping worth 50 beats 20 off, ships free, and stays chosen over repeated calculations (t522461autoship | t522461autoship | t522461autoship)
+      PASS  AC-3 with paid rates hidden once shipping is free, the choice is still stable (t522461autoship | t522461autoship | t522461autoship)
+      PASS  AC-3 where the order already ships free by its amount, the free-shipping promotion is worth nothing and does not win
+      PASS  Q1 a 10 off that would push a 100 cart below the 95 free shipping minimum is not applied: free shipping stays available, and the choice is stable ( |  | )
+      PASS  AC-3 where no free shipping method takes a coupon, the free-shipping promotion is worth nothing and does not win
+      PASS  Q1 with 20 percent tax on one line only (shown 220), 20 off that line counts as 24 shown, takes the cart to 196 under a 197 free shipping minimum, and is not applied (220)
+      PASS  Q1 shown incl tax: 20 off a 20 percent taxed line (saves 24) beats 21 off a zero-rated line (saves 21), created earlier (t522461autotaxed)
+      PASS  Q1 shown excl tax: 20 off a 20 percent taxed line (saves 24) beats 21 off a zero-rated line (saves 21), created earlier (t522461autotaxed)
+      PASS  Q1 free shipping of 50 plus 10 tax (saves 60) beats 45 off a 20 percent taxed line (saves 54), created earlier (t522461autoship)
+      PASS  Q1 prices entered with 20 percent tax, a tax-exempt customer: 20 percent off the taxed line (saves 16.67) loses to 18 off the zero-rated line, created later (t522461autountaxed18)
+      PASS  Q1 50 percent off one item, which WooCommerce puts on the zero-rated line and so loses free shipping, does not beat 20 off that keeps it (t522461autotwenty)
+      PASS  Q1 at the free shipping minimum to a fraction of a cent: 20 off that WooCommerce still ships free beats 10 off (t522461autotwentyedge, free shipping yes)
+      PASS  Q1 with tax rounded per line, 100.03 off that saves 120.04 beats 100.03 off that saves 120.03, created earlier (t522461autoeven)
+      PASS  Q1 at a per-line-rounded free shipping minimum: 100.02 off, which WooCommerce ships free, beats 100.03 off, which WooCommerce does not (t522461auto10002, free with it yes, free with 100.03 no)
+      PASS  Q1 with tax rounded at subtotal, 100.02 off the taxed line (WooCommerce total 2130.01) beats 120.02 off the zero-rated line, created earlier (total 2130.02) (t522461autosubtaxed)
+      PASS  AC-3 an email list matches regardless of letter case, as WooCommerce does
+      PASS  AC-3 [HTTP] the block cart lists the automatic promotion with its discount (status 201, discount 2000)
+      PASS  AC-2 [HTTP] the code applies to a guest cart, and checkout with a returning customer's email refuses it for that reason (apply 200, checkout 409 woocommerce_rest_cart_coupon_error: The &quot;t522461first&quot; coupon has been removed from your cart: This coupon is for a first order only.)
+      PASS  AC-4 the total usage limit stops the promotion (native)
+      PASS  AC-4 the per-customer limit stops the promotion (native)
+      PASS  AC-5 before its start and after its expiry a promotion is refused
+      PASS  AC-5 an automatic promotion does not apply before its start
+      PASS  AC-6 the excluded category and product are not discounted (native)
+      PASS  AC-3 an automatic promotion limited to an account email applies when the billing email differs, as WooCommerce accepts
+      PASS  AC-4 a guest using the email of an account that used the promotion up is not given it
+      PASS  AC-4 a customer whose billing email used the promotion up as a guest is not given it
+      PASS  AC-3 switching the flag off while a cart holds the promotion removes it and applies the next, without rebuilding the cart
+      PASS  AC-5 an expired automatic promotion does not apply
+      PASS  AC-2, AC-5 the first-order and not-yet-active reasons are given in Arabic
+      PASS  AC-7 after a deep discount on one line, a capped 50 percent that fits under its cap is not lowered (60.01)
+      PASS  AC-7 10 percent of 2,000 is capped at 150
+      PASS  AC-7 where WooCommerce would add a leftover cent (50 percent of 66.66, cap 33.32) the cap still holds
+      PASS  AC-7 the cart total shows the capped discount ( 33.32 )
+      PASS  AC-7 across several lines and odd prices the cap holds to the cent
+      PASS  AC-7 below the cap the discount is the full percentage
+      PASS  AC-7 a fixed cart discount of 100 capped at 40 gives 40
+      PASS  AC-7 with the item limit (50 percent of one 100 item), the cap of 30 holds
+      PASS  AC-7 with sequential discounts, after a fixed 30, the capped promotion gives its cap of 20
+      PASS  AC-7 on an order, applying and recalculating the coupons keeps the cap (150)
+      PASS  AC-8 every setting saves through the coupon screen, and an automatic promotion becomes individual-use
+      PASS  AC-5 a start after the expiry is not saved
+      PASS  AC-7 a cap is not saved on a fixed per-product discount
+PASS  t53-erp-adapter-seam         ERP-01, ERP-02, INT-16: the ERP adapter seam
+      PASS  AC-2 a product's English (55372) and Arabic (55373) records resolve to one stock identity, the English source (product 55372 (t534741-SIMPLE))
+      PASS  AC-2 a variation's English (55375) and Arabic (55378) records resolve to one identity, the variation's, not its parent's (variation 55375 (t534741-VAR-S))
+      PASS  AC-2 a page, a missing record and no record have no stock identity
+      PASS  AC-1, AC-3 with no adapter configured the answer is unknown (refused), not sellable, and the refusal is not retried (1 attempt)
+      PASS  AC-3 the gateway the store builds, with no adapter bound, sells nothing
+      PASS  AC-1 the adapter bound through mizzey_stock_source is asked about the Arabic record under its English identity, and answers 7
+      PASS  AC-3 7 known units: 7 sellable, 8 not, and no quantity of 0
+      PASS  AC-4, AC-6 two failures and an answer: three attempts, each logged under mizzey-stock (warning,warning,debug)
+      PASS  AC-3, AC-4 a source that keeps failing is asked three times, then the answer is unknown (unavailable after 3 attempts)
+      PASS  AC-4 a refusal is not retried, and the answer is unknown
+      PASS  AC-3, AC-6 an adapter that breaks its contract fails closed at once, logged as an error
+      PASS  AC-3 an item the source does not know is refused, so unknown
+      PASS  AC-5 2 units off 10, the first answer lost after the change: the retry carries the same key and the stock is 8, not 6 (8)
+      PASS  AC-5 the same change asked for again, from the English record, is not applied twice
+      PASS  FR-005 a change of zero, or without an operation key, is refused before the source is asked
+      PASS  FR-007 a change through the gateway writes nothing to WooCommerce's stock field (still 5)
+versions: {"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+49 scenarios, 1 failed
