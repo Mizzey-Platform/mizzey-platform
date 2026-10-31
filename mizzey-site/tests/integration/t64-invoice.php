@@ -114,17 +114,24 @@ run(
 		$first->calculate_totals( false );
 		$first->save();
 		$first = wc_get_order( $first->get_id() );
-		wc_create_refund( array( 'order_id' => $first->get_id(), 'amount' => '20', 'reason' => 't64' ) );
+		wc_create_refund( array( 'order_id' => $first->get_id(), 'amount' => '30', 'reason' => 't64' ) );
 		$html  = InvoiceDocument::html( wc_get_order( $first->get_id() ) );
 		$text  = wp_strip_all_tags( str_replace( '<', ' <', $html ) );
-		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', '100.00', '200.00', '20.00', '50.00', '15.00', '245.00', 'Refunded', '225.00' );
+		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', '100.00', '200.00', 'Discount', '20.00', '50.00', '15.00', '245.00', 'Refunded', '30.00', '215.00' );
 		$missing = array_values( array_filter( $wants, static fn ( string $want ): bool => false === strpos( $text, $want ) ) );
-		$check( array() === $missing && 245.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, a fee of 15, total 245, the refund of 20 and the net 225 (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
+		$check( array() === $missing && 245.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, a fee of 15, total 245, the refund of 30 and the net 215 (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
 
 		// AC-3: an Arabic order.
-		$arabic      = t64_order( $s, $buyer, $product, 'processing', 'ar' );
+		$arabic = t64_order( $s, $buyer, $product, 'processing', 'ar' );
+		// Asked for from an English request: the order's emails may have left the language switched, so it is set first.
+		do_action( 'wpml_switch_language', 'en' );
+		$switched    = switch_to_locale( 'en_US' );
 		$arabic_html = InvoiceDocument::html( $arabic );
-		$check( InvoiceDocument::rtl( $arabic ) && false !== strpos( $arabic_html, 'dir="rtl"' ) && false !== strpos( $arabic_html, 'فاتورة' ) && false !== strpos( $arabic_html, 'رقم الفاتورة' ), 'ADM-92 an Arabic order\'s invoice is in Arabic, right to left' );
+		$english     = InvoiceDocument::html( $first );
+		if ( $switched ) {
+			restore_previous_locale();
+		}
+		$check( InvoiceDocument::rtl( $arabic ) && false !== strpos( $arabic_html, 'dir="rtl"' ) && false !== strpos( $arabic_html, 'فاتورة' ) && false !== strpos( $arabic_html, 'رقم الفاتورة' ) && false !== strpos( $english, 'Invoice number' ) && false === strpos( $english, 'رقم الفاتورة' ), 'ADM-92 asked for from an English request, an Arabic order\'s invoice is in Arabic, right to left, and an English order\'s in English' );
 		$pdf = InvoicePdf::bytes( $arabic );
 		$check( str_starts_with( $pdf, '%PDF-' ) && strlen( $pdf ) > 2000 && false !== strpos( $pdf, 'DejaVuSans' ) && '' === InvoicePdf::bytes( $unpaid ), 'ADM-92 the invoice renders as a PDF; an unpaid order has none (' . strlen( $pdf ) . ' bytes)' );
 
