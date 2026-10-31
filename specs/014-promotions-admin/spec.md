@@ -42,7 +42,7 @@ above.
 | # | Criterion | Traces | Status |
 |---|---|---|---|
 | AC-1 | Staff create an automatic promotion, or a coupon code, from the coupon screen, and it applies to a cart as set | ADM-110 | provisional |
-| AC-2 | Conditions, rewards, limits and exclusions are set from the same screen, plus the combination setting in BR-004 | ADM-111 | provisional |
+| AC-2 | Conditions, rewards, limits and exclusions are set from the same screen, plus the setting that says whether promotions combine | ADM-111 | provisional |
 | AC-3 | A promotion is scheduled with a start and an end: it does not apply before its start or after its end | ADM-113 | provisional |
 | AC-4 | A promotion is paused and reactivated without losing its usage history: paused, it stops applying (a code is refused, an automatic one is taken off carts that hold it); reactivated, it applies again with its use count and per-customer history intact | ADM-115 | provisional |
 
