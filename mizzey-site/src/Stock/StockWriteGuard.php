@@ -257,8 +257,13 @@ final class StockWriteGuard
                 return $wpdb->prepare('SELECT %d', 0);
             }
         }
-        // Rows named by meta id or by post id: refused when any is a product's stock key.
-        if (preg_match('/^\s*(UPDATE|DELETE)\b/i', $sql) === 1 && preg_match_all('/\b(meta_id|post_id)`?\s*(?:=\s*(\d+)|IN\s*\(([\d,\s]+)\))/i', $sql, $refs, PREG_SET_ORDER) > 0) {
+        // Rows named by meta id or by post id, with no key in the condition: refused when any is a product's stock
+        // key. A condition naming a key names one already shown above not to be a stock key.
+        $where = preg_split('/\bWHERE\b/i', $sql, 2)[1] ?? '';
+        if (preg_match('/^\s*(UPDATE|DELETE)\b/i', $sql) === 1 && preg_match('/\bmeta_key`?\s*(=|IN\b)/i', $where) !== 1
+            && preg_match_all('/\b(meta_id|post_id)`?\s*(?:=\s*(\d+)|IN\s*\(([\d,\s]+)\))/i', $where, $refs, PREG_SET_ORDER) > 0) {
+            // A product being deleted takes its stock rows with it.
+            $skip = self::$deleting === [] ? '' : ' AND m.post_id NOT IN (' . implode(',', array_map('intval', array_keys(self::$deleting))) . ')';
             self::$inQuery = true;
             try {
                 foreach ($refs as $ref) {
@@ -267,7 +272,7 @@ final class StockWriteGuard
                         continue;
                     }
                     $column = strtolower($ref[1]) === 'meta_id' ? 'm.meta_id' : 'm.post_id';
-                    $held   = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} m INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE {$column} IN ({$ids}) AND p.post_type IN ('product', 'product_variation') AND m.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders')"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    $held   = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} m INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE {$column} IN ({$ids}) AND p.post_type IN ('product', 'product_variation') AND m.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders'){$skip}"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                     if ($held > 0) {
                         return $wpdb->prepare('SELECT %d', 0);
                     }
