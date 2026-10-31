@@ -243,7 +243,17 @@ run(
 		$check( is_wp_error( $over ) && is_wp_error( $over_line ) && $fine instanceof \WC_Order_Refund && is_wp_error( $more ), 'BR-006 601 back on a 600 order is refused, also for its line; 600 is refunded; then even 1 more is refused' );
 
 		// BR-008: a guest orders, then the order-received offer links the order to the new account.
-		sign_in_options( $s, array( 'woocommerce_enable_guest_checkout' => 'yes', 'woocommerce_enable_delayed_account_creation' => 'yes', 'woocommerce_registration_generate_password' => 'no' ) );
+		sign_in_options(
+			$s,
+			array(
+				'woocommerce_enable_guest_checkout'                 => 'yes',
+				'woocommerce_enable_delayed_account_creation'       => 'yes',
+				'woocommerce_enable_myaccount_registration'         => 'yes',
+				'woocommerce_registration_generate_username'        => 'yes',
+				'woocommerce_registration_generate_password'        => 'no',
+				'woocommerce_enable_signup_and_login_from_checkout' => 'yes',
+			)
+		);
 		$guest_email = "{$tag}-guest@example.invalid";
 		$guest_order = wc_create_order();
 		$guest_order->add_product( $mid, 1 );
@@ -254,13 +264,13 @@ run(
 		$guest_order->save();
 		$s->track_order( $guest_order->get_id() );
 		$before_link = (int) $guest_order->get_customer_id();
-		two_factor_http( 'POST', $guest_order->get_checkout_order_received_url(), array( 'create-account' => '1', 'email' => $guest_email, 'password' => 'Pw-' . wp_generate_password( 18, false ), '_wpnonce' => wp_create_nonce( 'wc_create_account' ), 'mizzey_signup_token' => SignupCheck::issue( 'order-received', time() - 10 ), 'mizzey_signup_extra' => '' ) );
+		$offer = two_factor_http( 'POST', $guest_order->get_checkout_order_received_url(), array( 'create-account' => '1', 'email' => $guest_email, 'password' => 'Pw-' . wp_generate_password( 18, false ), '_wpnonce' => wp_create_nonce( 'wc_create_account' ), 'mizzey_signup_token' => SignupCheck::issue( 'order-received', time() - 10 ), 'mizzey_signup_extra' => '' ) );
 		$account = get_user_by( 'email', $guest_email );
 		if ( $account ) {
 			$s->track_user( $account->ID );
 		}
 		$linked = (int) wc_get_order( $guest_order->get_id() )->get_customer_id();
-		$check( 0 === $before_link && $account && $account->ID === $linked, '[HTTP] BR-008 a guest order, then the account made from the order-received page, has the order linked to it' );
+		$check( 0 === $before_link && $account && $account->ID === $linked, '[HTTP] BR-008 a guest order, then the account made from the order-received page, has the order linked to it (status ' . ( $offer['status'] ?? '?' ) . ', account ' . ( $account ? $account->ID : 'none' ) . ', linked ' . $linked . ')' );
 
 		return $ok;
 	}
