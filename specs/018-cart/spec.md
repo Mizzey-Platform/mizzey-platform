@@ -65,7 +65,7 @@ above.
 | AC-5 | Cart suggestions are the related products the staff assign to the cart's items; nothing when nothing is assigned | CART-08 | provisional |
 | AC-6 | A signed-in customer's cart is the same on every device and session | CART-09 | provisional |
 | AC-7 | Stock is re-validated through the stock source when the cart is viewed and before checkout; a line whose stock cannot be confirmed blocks checkout | CART-10 | pending PRE-09 |
-| AC-8 | The empty cart offers suggestions, and the header offers a mini-cart (WooCommerce's cart blocks, designed after PRE-03b) | CART-11, CART-12 | provisional |
+| AC-8 | The empty cart offers suggestions, and the header offers a mini-cart | CART-11, CART-12 | provisional |
 | AC-9 | A guest who fills a cart and then registers keeps every item | CART-13 | provisional |
 | AC-10 | A guest who signs in has the cart merged with the saved cart, with no item lost and no duplicate line, whatever route signed them in | CART-14, CART-15 | provisional |
 | AC-11 | A guest's cart survives closing the browser within a window that is a setting | CART-16 | provisional |
