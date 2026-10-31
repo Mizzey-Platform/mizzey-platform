@@ -116,7 +116,7 @@ performance gates.
 - **FR-001**: Egypt's address MUST take governorate (required), city, street and building, district (required) and a
   landmark (optional), and hide the postcode and second line (AC-1).
 - **FR-002**: No WooCommerce order path MAY change stock: checkout holds, reduction, restoration, refund restocking and
-  line-edit adjustment are off (AC-7).
+  line-edit adjustment are off (`LocalStockWriters`, specs/018; verified again here) (AC-7).
 - **FR-003**: At placement, on the block and classic checkouts, each line MUST be reserved through the gateway, once
   per line; any failure MUST release the lines reserved and refuse the order before payment, with a message (AC-7).
 - **FR-004**: A cancelled or failed order MUST release its reservation once (AC-7).
