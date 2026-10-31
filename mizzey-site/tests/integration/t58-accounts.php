@@ -145,6 +145,11 @@ run(
 		$check( $as_number instanceof \WP_User && $mobile === $as_number->ID && '01012345678' !== $generated && null === PhoneSignIn::normalise( $generated ), 'AUTH-02 a number signs in to the account holding it, not to a username spelled like it; no generated username is spelled like a number (' . $generated . ')' );
 		$second = t58_register( $s, "{$tag}-second@example.invalid", $password, array( PhoneSignIn::FIELD => '01012345678' ) );
 		$check( $second > 0 && '01012345678' === get_user_meta( $second, PhoneSignIn::FIELD, true ) && $mobile === PhoneSignIn::holder( '01012345678' ) && '' === get_user_meta( $second, PhoneSignIn::HELD, true ), 'AUTH-02 an account registered with a number another account holds keeps it for delivery and does not sign in with it' );
+		$wpdb_stale = $GLOBALS['wpdb'];
+		$wpdb_stale->insert( $wpdb_stale->usermeta, array( 'user_id' => $second, 'meta_key' => PhoneSignIn::HELD, 'meta_value' => '01012345678' ) );
+		wp_cache_flush();
+		PhoneSignIn::release( $second );
+		$check( $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 a stale release by an account that no longer owns a number leaves the claim of the account that holds it' );
 		$late = (int) wp_insert_user( array( 'user_login' => "{$tag}-late", 'user_email' => "{$tag}-late@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
 		$s->track_user( $late );
 		$shared = (int) wp_insert_user( array( 'user_login' => "{$tag}-shared", 'user_email' => "{$tag}-shared@example.invalid", 'user_pass' => $password, 'role' => 'customer' ) );
