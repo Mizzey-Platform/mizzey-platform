@@ -43,6 +43,7 @@ final class ReviewEligibility
         add_filter('woocommerce_rest_pre_insert_product_review', [self::class, 'checkWooRest'], 10, 2);
         add_filter('woocommerce_product_review_comment_form_args', [self::class, 'formArgs'], 20, 1);
         add_filter('rest_pre_dispatch', [self::class, 'wooRestStatus'], 10, 3);
+        add_filter('rest_pre_dispatch', [self::class, 'commentsRest'], 10, 3);
         add_action('wp_insert_comment', [self::class, 'unlock'], 0);
         add_action('shutdown', [self::class, 'unlock']);
     }
@@ -167,7 +168,8 @@ final class ReviewEligibility
 
     /**
      * WooCommerce's REST reviews routes, any version, update and batch included: only staff who moderate may set a
-     * review's status, and only they may change a review at all.
+     * review's status, and only they may change a review at all. The older nested routes (`/products/{id}/reviews`, v1
+     * and v2) insert a review without any of the checks above, so only staff who moderate may write through them.
      *
      * @param mixed $result
      * @param mixed $server
@@ -177,12 +179,37 @@ final class ReviewEligibility
     public static function wooRestStatus($result, $server, $request)
     {
         if ($result !== null || ! $request instanceof \WP_REST_Request || self::moderator(get_current_user_id())
-            || preg_match('#^/wc/v\d+/products/reviews#i', $request->get_route()) !== 1 || $request->get_method() === 'GET') {
+            || preg_match('#^/wc/v\d+/products/(\d+/)?reviews#i', $request->get_route()) !== 1 || $request->get_method() === 'GET') {
             return $result;
         }
         $changes = in_array($request->get_method(), ['PUT', 'PATCH', 'DELETE'], true) || str_contains(strtolower($request->get_route()), '/batch')
-            || preg_match('#/reviews/\d+#', $request->get_route()) === 1;
+            || preg_match('#/reviews/\d+#', $request->get_route()) === 1 || preg_match('#^/wc/v\d+/products/\d+/#i', $request->get_route()) === 1;
         if ($changes || $request->get_param('status') !== null && $request->get_param('status') !== 'hold') {
+            return new \WP_Error('mizzey_review_status', __('Only staff who moderate reviews can publish one.', 'mizzey-site'), ['status' => 403]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * WordPress's REST comments endpoint, for a comment on a product or one being moved onto a product: only staff who
+     * moderate may change it. WordPress lets anyone who may edit the product edit its comments, status included.
+     *
+     * @param mixed $result
+     * @param mixed $server
+     * @param mixed $request
+     * @return mixed
+     */
+    public static function commentsRest($result, $server, $request)
+    {
+        if ($result !== null || ! $request instanceof \WP_REST_Request || $request->get_method() === 'GET' || self::moderator(get_current_user_id())
+            || preg_match('#^/wp/v2/comments/(\d+)#i', $request->get_route(), $match) !== 1) {
+            return $result;
+        }
+        $comment = get_comment((int) $match[1]);
+        $onto    = $request->get_param('post');
+        if (($comment instanceof \WP_Comment && get_post_type((int) $comment->comment_post_ID) === 'product')
+            || ($onto !== null && get_post_type((int) $onto) === 'product')) {
             return new \WP_Error('mizzey_review_status', __('Only staff who moderate reviews can publish one.', 'mizzey-site'), ['status' => 403]);
         }
 
@@ -200,7 +227,8 @@ final class ReviewEligibility
     {
         global $wpdb;
         $group = self::group($productId);
-        $name  = substr('mz_' . $wpdb->prefix . 'review_' . $userId . '_' . ($group[0] ?? $productId), 0, 64);
+        // The lowest id in the translation group, the same whichever language the review arrives in.
+        $name  = substr('mz_' . $wpdb->prefix . 'review_' . $userId . '_' . ($group === [] ? $productId : min($group)), 0, 64);
         if (self::$lock === $name) {
             return true;
         }

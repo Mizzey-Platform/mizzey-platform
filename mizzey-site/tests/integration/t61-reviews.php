@@ -221,6 +221,47 @@ run(
 		$check( in_array( $approved->get_status(), array( 401, 403 ), true ) && is_int( $first ) && '1' !== (string) get_comment( $first )->comment_approved || ! is_int( $first ), 'D-17 a held review cannot be approved through the REST reviews update of WooCommerce by someone without moderation rights (' . $approved->get_status() . ')' );
 		$check( in_array( $woo_answer->get_status(), array( 401, 403 ), true ), 'D-17 WooCommerce\'s REST reviews endpoint refuses a review from someone without moderation rights or a delivery, and an approved status from them (' . $woo_answer->get_status() . ' ' . ( $woo_answer->get_data()['code'] ?? '' ) . ')' );
 
+		// The older nested routes, and WordPress's own comments endpoint, from someone who may edit any product but not
+		// moderate: no review written, none approved.
+		get_userdata( $editor )->add_cap( 'edit_others_products' );
+		get_userdata( $editor )->add_cap( 'edit_published_products' );
+		wp_set_current_user( $editor );
+		$legacy = new \WP_REST_Request( 'POST', '/wc/v2/products/' . $cream->get_id() . '/reviews' );
+		$legacy->set_param( 'review', "{$tag} legacy route review" );
+		$legacy->set_param( 'name', 'Someone' );
+		$legacy->set_param( 'email', "{$tag}-legacy@example.invalid" );
+		$legacy->set_param( 'rating', 5 );
+		$legacy_answer = rest_do_request( $legacy );
+		$legacy_made   = get_comments( array( 'post_id' => $cream->get_id(), 'search' => "{$tag} legacy route review", 'status' => 'all', 'fields' => 'ids' ) );
+		$comments      = array_merge( $comments, array_map( 'intval', $legacy_made ) );
+		$legacy_put    = new \WP_REST_Request( 'PUT', '/wc/v1/products/' . $cream->get_id() . '/reviews/' . ( is_int( $first ) ? $first : 0 ) );
+		$legacy_put->set_param( 'review', 'Changed.' );
+		$legacy_put_answer = rest_do_request( $legacy_put );
+		$core_approve = new \WP_REST_Request( 'POST', '/wp/v2/comments/' . ( is_int( $first ) ? $first : 0 ) );
+		$core_approve->set_param( 'status', 'approved' );
+		$core_answer = rest_do_request( $core_approve );
+		wp_set_current_user( 0 );
+		clean_comment_cache( is_int( $first ) ? $first : 0 );
+		$check( in_array( $legacy_answer->get_status(), array( 401, 403 ), true ) && array() === $legacy_made && in_array( $legacy_put_answer->get_status(), array( 401, 403 ), true ), 'D-17 WooCommerce\'s older nested reviews routes (v1, v2) neither take a review nor change one from someone without moderation rights (' . $legacy_answer->get_status() . ', ' . $legacy_put_answer->get_status() . ')' );
+		$check( is_int( $first ) && in_array( $core_answer->get_status(), array( 401, 403 ), true ) && '0' === (string) get_comment( $first )->comment_approved, 'D-17 a held review cannot be approved through WordPress\'s REST comments endpoint by someone who may edit the product but not moderate (' . $core_answer->get_status() . ')' );
+
+		// One customer's lock for one product is the same in either language, so two submissions at once, one per
+		// language, cannot both pass the one-review check.
+		$cream_ar = $s->simple_product( 't61 cream ar', '120', null );
+		$trid     = (int) apply_filters( 'wpml_element_trid', null, $cream->get_id(), 'post_product' );
+		do_action( 'wpml_set_element_language_details', array( 'element_id' => $cream_ar->get_id(), 'element_type' => 'post_product', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+		$lock_for = new \ReflectionMethod( ReviewEligibility::class, 'lockFor' );
+		$lock_for->setAccessible( true );
+		$held_lock = new \ReflectionProperty( ReviewEligibility::class, 'lock' );
+		$held_lock->setAccessible( true );
+		$lock_for->invoke( null, $keen, $cream->get_id() );
+		$lock_en = $held_lock->getValue();
+		ReviewEligibility::unlock();
+		$lock_for->invoke( null, $keen, $cream_ar->get_id() );
+		$lock_ar = $held_lock->getValue();
+		ReviewEligibility::unlock();
+		$check( $trid > 0 && 2 === count( ReviewEligibility::group( $cream_ar->get_id() ) ) && is_string( $lock_en ) && $lock_en === $lock_ar, 'D-17 a customer\'s review lock for a product is one lock across its languages (' . var_export( $lock_en, true ) . ', ' . var_export( $lock_ar, true ) . ')' );
+
 		// REV-01, REV-04: the rating required, and the average from approved reviews only.
 		$rating_required = get_option( 'woocommerce_review_rating_required' );
 		$before = (float) wc_get_product( $cream->get_id() )->get_average_rating();
