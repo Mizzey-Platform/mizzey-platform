@@ -308,9 +308,17 @@ run(
 		$s->on_finish( static function () use ( $twenty_pc ) { wp_delete_post( $twenty_pc->get_id(), true ); AutomaticPromotions::forget(); } );
 		AutomaticPromotions::forget();
 		$competing = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		$combine_was = get_option( \MizzeySite\Promotions\Combination::OPTION );
+		update_option( \MizzeySite\Promotions\Combination::OPTION, 'yes' );
+		$twenty_pc->set_individual_use( true );
+		$twenty_pc->save();
+		AutomaticPromotions::forget();
+		$exclusive_competing = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		update_option( \MizzeySite\Promotions\Combination::OPTION, $combine_was );
 		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$twenty_pc->save();
 		AutomaticPromotions::forget();
+		$check( null === $exclusive_competing['items_needed'], 'CART-07, BR-004 with promotions combining, an individual-use automatic promotion that competes at the target also keeps the item target unpromised (' . wp_json_encode( $exclusive_competing ) . ')' );
 		$check( null === $competing['items_needed'], 'CART-07, BR-004 with promotions not combining and another automatic promotion that competes at the two-unit target, no item target is promised for the free-shipping one (' . wp_json_encode( $competing ) . ')' );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
