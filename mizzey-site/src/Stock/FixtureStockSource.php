@@ -71,8 +71,31 @@ final class FixtureStockSource implements StockSource
         return $base;
     }
 
-    /** Applies a change once per key; a change that would take stock below zero is refused. */
+    /**
+     * Applies a change once per key; a change that would take stock below zero is refused. Under a MySQL named lock, so
+     * two requests taking the last unit take turns.
+     */
     public function adjust(StockItem $item, int $delta, string $operationKey): int
+    {
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . 'stock_fixture', 0, 64);
+        $held = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if (! $held) {
+            throw new StockSourceUnavailable('fixture busy');
+        }
+        try {
+            // Read inside the lock from the database, not from a cache that may still say the ledger does not exist.
+            wp_cache_delete(self::LEDGER, 'options');
+            wp_cache_delete('notoptions', 'options');
+            wp_cache_delete('alloptions', 'options');
+
+            return $this->apply($item, $delta, $operationKey);
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
+    private function apply(StockItem $item, int $delta, string $operationKey): int
     {
         $ledger = self::ledger();
         if (! isset($ledger[$operationKey])) {
@@ -80,7 +103,10 @@ final class FixtureStockSource implements StockSource
                 throw new StockSourceRefused('not enough stock');
             }
             $ledger[$operationKey] = [$item->id, $delta];
-            update_option(self::LEDGER, $ledger, false);
+            // A change that was not stored did not happen: the gateway answers unknown, never the old level as done.
+            if (! update_option(self::LEDGER, $ledger, false)) {
+                throw new StockSourceUnavailable('ledger not written');
+            }
         }
 
         return $this->level($item);

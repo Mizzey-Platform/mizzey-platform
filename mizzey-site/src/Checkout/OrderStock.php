@@ -17,11 +17,7 @@ defined('ABSPATH') || exit;
  * Stock at order placement goes through the adapter, and no WooCommerce order path changes stock on its own (CHK-12,
  * D-19 item 5, the Stage 3 build plan's stock safeguard).
  *
- * WooCommerce's own order stock writers are switched off: the checkout hold (`woocommerce_hold_stock_for_checkout`),
- * the reduction at payment or placement (`woocommerce_can_reduce_order_stock`,
- * `woocommerce_payment_complete_reduce_order_stock`), the restoration on cancellation
- * (`woocommerce_can_restore_order_stock`), refund restocking (`woocommerce_can_restock_refunded_items`) and the
- * adjustment when an order line is edited (`woocommerce_prevent_adjust_line_item_product_stock`).
+ * WooCommerce's own order stock writers are switched off by LocalStockWriters (specs/018).
  *
  * Instead, when an order is placed (block checkout and classic checkout), each line is reserved with the stock source
  * through the gateway, with an operation key per order line, so a retried placement reserves once. If any line cannot
@@ -41,10 +37,6 @@ final class OrderStock
 
     public static function register(): void
     {
-        foreach (['woocommerce_hold_stock_for_checkout', 'woocommerce_can_reduce_order_stock', 'woocommerce_payment_complete_reduce_order_stock', 'woocommerce_can_restore_order_stock', 'woocommerce_can_restock_refunded_items'] as $filter) {
-            add_filter($filter, '__return_false', 999);
-        }
-        add_filter('woocommerce_prevent_adjust_line_item_product_stock', '__return_true', 999);
         add_action('woocommerce_store_api_checkout_order_processed', [self::class, 'placedThroughStoreApi'], 0, 1);
         add_action('woocommerce_checkout_order_processed', [self::class, 'placedThroughClassic'], 0, 3);
         add_action('woocommerce_order_status_cancelled', [self::class, 'released'], 10, 1);

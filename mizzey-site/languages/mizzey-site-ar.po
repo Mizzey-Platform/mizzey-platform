@@ -223,3 +223,7 @@ msgstr "أقرب علامة مميزة"
 #: mizzey-site/src/Checkout/EgyptianAddress.php
 msgid "Nearest landmark (optional)"
 msgstr "أقرب علامة مميزة (اختياري)"
+
+#: mizzey-site/src/Wishlist/WishlistRoutes.php
+msgid "Please reload the page and try again."
+msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
