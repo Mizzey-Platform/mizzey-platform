@@ -79,12 +79,18 @@ final class StockWriteGuard
         if (! $product instanceof \WC_Product || self::permitted()) {
             return;
         }
+        // A product being made holds its props as data, not as changes: all of its stock starts as WooCommerce's own.
+        if ($product->get_id() <= 0) {
+            $product->set_props(array_combine(self::PROPS, array_map([self::class, 'fresh'], self::PROPS)));
+
+            return;
+        }
         $changes = $product->get_changes();
         $stored  = $product->get_data();
         $back    = [];
         foreach (self::PROPS as $prop) {
             if (array_key_exists($prop, $changes)) {
-                $back[$prop] = $product->get_id() > 0 ? ($stored[$prop] ?? null) : self::fresh($prop);
+                $back[$prop] = $stored[$prop] ?? null;
             }
         }
         if ($back !== []) {
