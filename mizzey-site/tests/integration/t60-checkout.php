@@ -31,6 +31,8 @@ final class T60Source implements StockSource {
 	public function __construct( public array $levels, public array $refuse = array() ) {}
 	public function name(): string { return 't60'; }
 	public function level( StockItem $item ): int { return $this->levels[ $item->id ] ?? 0; }
+	/** Items whose change is applied and then answered with a timeout, as a source that applied but never replied. */
+	public array $silent = array();
 	public function adjust( StockItem $item, int $delta, string $operationKey ): int {
 		if ( in_array( $item->id, $this->refuse, true ) ) {
 			throw new StockSourceRefused( 'refused' );
@@ -38,6 +40,9 @@ final class T60Source implements StockSource {
 		if ( ! isset( $this->applied[ $operationKey ] ) ) {
 			$this->applied[ $operationKey ] = $delta;
 			$this->levels[ $item->id ]       = ( $this->levels[ $item->id ] ?? 0 ) + $delta;
+		}
+		if ( in_array( $item->id, $this->silent, true ) ) {
+			throw new \MizzeySite\Stock\StockSourceUnavailable( 'timeout' );
 		}
 		return $this->levels[ $item->id ];
 	}
@@ -114,7 +119,7 @@ run(
 		$order   = t60_order( $s, array( $five->get_id() => 2, $two->get_id() => 1 ) );
 		$first   = OrderStock::reserve( $order, $gateway );
 		$again   = OrderStock::reserve( wc_get_order( $order->get_id() ), $gateway );
-		$check( $first && $again && 2 === count( $source->applied ) && 3 === $source->levels[ $five->get_id() ] && 1 === $source->levels[ $two->get_id() ] && 'yes' === wc_get_order( $order->get_id() )->get_meta( OrderStock::RESERVED ), 'CHK-12 each line is reserved with the source, once: placing again reserves nothing more (' . wp_json_encode( $source->levels ) . ')' );
+		$check( $first && $again && 2 === count( $source->applied ) && 3 === $source->levels[ $five->get_id() ] && 1 === $source->levels[ $two->get_id() ] && OrderStock::active( wc_get_order( $order->get_id() ) ), 'CHK-12 each line is reserved with the source, once: placing again reserves nothing more (' . wp_json_encode( $source->levels ) . ')' );
 		$released = OrderStock::release( wc_get_order( $order->get_id() ), $gateway );
 		$twice    = OrderStock::release( wc_get_order( $order->get_id() ), $gateway );
 		$check( $released && $twice && 5 === $source->levels[ $five->get_id() ] && 2 === $source->levels[ $two->get_id() ] && 4 === count( $source->applied ), 'CHK-12, BR-007 a cancelled order releases each line once' );
@@ -142,6 +147,52 @@ run(
 		}
 		remove_filter( StockGateway::SOURCE_FILTER, $no_source );
 		$check( 'mizzey_stock_not_reserved 409' === $thrown && false !== strpos( $classic, 'reserve the stock' ), 'CHK-12 a placement the source refuses is refused before payment: a 409 on the Store API, a message on the classic checkout (' . $thrown . ')' );
+		// An edited order releases what it reserved, not what it now holds.
+		$edit_source = new T60Source( array( $five->get_id() => 5 ) );
+		$edit_gate   = new StockGateway( $edit_source, 1, null, 0 );
+		$edited      = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $edited, $edit_gate );
+		$edited = wc_get_order( $edited->get_id() );
+		foreach ( $edited->get_items() as $edited_item ) {
+			$edited_item->set_quantity( 4 );
+			$edited_item->save();
+		}
+		OrderStock::release( wc_get_order( $edited->get_id() ), $edit_gate );
+		$check( 5 === $edit_source->levels[ $five->get_id() ], 'CHK-12 an order edited from 1 to 4 after placement releases the 1 it reserved, not 4 (' . $edit_source->levels[ $five->get_id() ] . ' left)' );
+		// A reserve that the source applied but never answered: asked again with the same key, taken once.
+		$quiet_source = new T60Source( array( $five->get_id() => 5 ) );
+		$quiet_source->silent = array( $five->get_id() );
+		$quiet = t60_order( $s, array( $five->get_id() => 2 ) );
+		$unanswered = OrderStock::reserve( $quiet, new StockGateway( $quiet_source, 2, null, 0 ) );
+		$quiet_source->silent = array();
+		$answered = OrderStock::reserve( wc_get_order( $quiet->get_id() ), new StockGateway( $quiet_source, 1, null, 0 ) );
+		$check( ! $unanswered && $answered && 3 === $quiet_source->levels[ $five->get_id() ], 'CHK-12 a reserve the source applied but did not answer is asked again with the same key, so the stock is taken once (' . $quiet_source->levels[ $five->get_id() ] . ' left of 5)' );
+		// Paid without a reservation (a payment callback): reserved then; refused, the order is put on hold.
+		$late_source = new T60Source( array( $five->get_id() => 5 ) );
+		$bind_late   = static fn () => $late_source;
+		add_filter( StockGateway::SOURCE_FILTER, $bind_late );
+		$late = t60_order( $s, array( $five->get_id() => 1 ) );
+		$late->update_status( 'processing' );
+		$late_ok = OrderStock::active( wc_get_order( $late->get_id() ) );
+		$late_source->refuse = array( $five->get_id() );
+		$stuck = t60_order( $s, array( $five->get_id() => 1 ) );
+		$stuck->update_status( 'processing' );
+		$stuck_status = '' !== wc_get_order( $stuck->get_id() )->get_meta( OrderStock::UNRESERVED ) ? 'marked' : 'unmarked';
+		$late_source->refuse = array();
+		// An unpaid order trashed releases what it reserved.
+		$trashed = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $trashed, StockGateway::make() );
+		$before_trash = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $trashed->get_id() )->delete( false );
+		$after_trash = $late_source->levels[ $five->get_id() ];
+		// What the visitor's own unpaid order holds is theirs at the cart check.
+		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $mine, StockGateway::make() );
+		WC()->session->set( 'order_awaiting_payment', $mine->get_id() );
+		$held_back = apply_filters( 'mizzey_cart_stock_held', array() );
+		WC()->session->set( 'order_awaiting_payment', null );
+		remove_filter( StockGateway::SOURCE_FILTER, $bind_late );
+		$check( $late_ok && 'marked' === $stuck_status && $after_trash === $before_trash + 1 && 1 === ( $held_back[ $five->get_id() ] ?? 0 ), 'CHK-12 an order paid without a reservation is reserved then, or marked for staff when refused; an unpaid order trashed releases its stock; the visitor\'s own unpaid order counts as theirs at the cart check (' . $stuck_status . ')' );
 		$bind = static fn () => $source;
 		add_filter( StockGateway::SOURCE_FILTER, $bind );
 		$cancel = t60_order( $s, array( $five->get_id() => 1 ) );
@@ -149,12 +200,12 @@ run(
 		$cancel = wc_get_order( $cancel->get_id() );
 		$cancel->update_status( 'cancelled' );
 		remove_filter( StockGateway::SOURCE_FILTER, $bind );
-		$check( 'yes' === wc_get_order( $cancel->get_id() )->get_meta( OrderStock::RELEASED ) && 5 === $source->levels[ $five->get_id() ], 'CHK-12, BR-007 an order moved to Cancelled releases its reservation' );
+		$check( ! OrderStock::active( wc_get_order( $cancel->get_id() ) ) && 'released' === ( current( OrderStock::record( wc_get_order( $cancel->get_id() ) ) )['state'] ?? '' ) && 5 === $source->levels[ $five->get_id() ], 'CHK-12, BR-007 an order moved to Cancelled releases its reservation' );
 
 		// CHK-01: the Egyptian address structure.
 		$locale = WC()->countries->get_country_locale()['EG'] ?? array();
 		$fields = \Automattic\WooCommerce\Blocks\Package::container()->get( \Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class )->get_fields_for_location( 'address' );
-		$check( true === ( $locale['state']['required'] ?? null ) && 'Governorate' === ( $locale['state']['label'] ?? '' ) && true === ( $locale['postcode']['hidden'] ?? null ) && true === ( $locale['address_2']['hidden'] ?? null ) && isset( $fields[ EgyptianAddress::DISTRICT ], $fields[ EgyptianAddress::LANDMARK ] ) && true === $fields[ EgyptianAddress::DISTRICT ]['required'] && false === $fields[ EgyptianAddress::LANDMARK ]['required'], 'CHK-01 governorate required, city, street and building; postcode and second line hidden; district required and landmark optional as checkout address fields' );
+		$check( true === ( $locale['state']['required'] ?? null ) && 'Governorate' === ( $locale['state']['label'] ?? '' ) && true === ( $locale['postcode']['hidden'] ?? null ) && true === ( $locale['address_2']['hidden'] ?? null ) && isset( $fields[ EgyptianAddress::DISTRICT ], $fields[ EgyptianAddress::LANDMARK ] ) && 'EG' === ( $fields[ EgyptianAddress::DISTRICT ]['required']['customer']['properties']['address']['properties']['country']['const'] ?? '' ) && 'EG' === ( $fields[ EgyptianAddress::DISTRICT ]['hidden']['customer']['properties']['address']['properties']['country']['not']['const'] ?? '' ) && false === $fields[ EgyptianAddress::LANDMARK ]['required'], 'CHK-01 governorate required, city, street and building; postcode and second line hidden; district required and landmark optional as checkout address fields, for an Egyptian address only' );
 
 		// [HTTP] CHK-01, CHK-11, CHK-12, BR-005: the Store API checkout.
 		update_option( FixtureStockSource::OPTION, 'yes' );
@@ -198,7 +249,7 @@ run(
 		$made     = wc_get_order( $order_id );
 		$district = $made ? (string) $made->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) : '';
 		$ledger   = (array) get_option( FixtureStockSource::LEDGER, array() );
-		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && 'yes' === $made->get_meta( OrderStock::RESERVED ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ')' );
+		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ')' );
 		$five->set_regular_price( '150' );
 		$five->save();
 		$item = $made ? current( $made->get_items() ) : null;

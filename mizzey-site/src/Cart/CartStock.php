@@ -64,10 +64,19 @@ final class CartStock
             $wanted[$key] = ($wanted[$key] ?? 0) + (int) $line['quantity'];
             $names[$key]  = [$record, $product->get_name()];
         }
+        // What the visitor's own unpaid order already reserved counts as theirs, so a retried checkout is not refused for
+        // it (`mizzey_cart_stock_held`, specs/019).
+        $held = [];
+        foreach ((array) apply_filters('mizzey_cart_stock_held', []) as $heldRecord => $heldQuantity) {
+            $heldItem = StockIdentity::resolve((int) $heldRecord);
+            $heldKey  = $heldItem !== null ? $heldItem->id : -(int) $heldRecord;
+            $held[$heldKey] = ($held[$heldKey] ?? 0) + (int) $heldQuantity;
+        }
         $problems = [];
         foreach ($wanted as $key => $quantity) {
             [$record, $name] = $names[$key];
             $answer = $gateway->level($record);
+            $quantity = max(0, $quantity - ($held[$key] ?? 0));
             if (! $answer->isKnown()) {
                 /* translators: %s: product name. */
                 $problems[] = sprintf(__('We could not confirm that %s is in stock. Please try again in a few minutes.', 'mizzey-site'), $name);

@@ -227,3 +227,7 @@ msgstr "أقرب علامة مميزة (اختياري)"
 #: mizzey-site/src/Wishlist/WishlistRoutes.php
 msgid "Please reload the page and try again."
 msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
+
+#: mizzey-site/src/Checkout/OrderStock.php
+msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
+msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
