@@ -103,6 +103,13 @@ run(
 		$var->set_stock_quantity( 77 );
 		$var->save();
 		$after = t67_stored( $id );
+		$zeroed = wc_get_product( $id );
+		$zeroed->set_stock_quantity( 0 );
+		$zeroed->save();
+		clean_post_cache( $id );
+		$hidden_term = has_term( 'outofstock', 'product_visibility', $id );
+		$lookup      = (string) $wpdb->get_var( $wpdb->prepare( "SELECT stock_status FROM {$wpdb->wc_product_meta_lookup} WHERE product_id = %d", $id ) );
+		$check( ! $hidden_term && 'instock' === $lookup && '5' === t67_stored( $id )['qty'], "ERP-07, D-19 a refused save of 0 moves neither the out-of-stock visibility term nor the lookup row ({$lookup})" );
 		$check( '5' === $after['qty'] && 'instock' === $after['status'] && 'no' === $after['backorder'] && 'yes' === $after['manage'] && 't67 serum renamed' === get_the_title( $id ) && '0' === t67_stored( $variation->get_id() )['qty'], 'ERP-07, D-19 a product\'s and a variation\'s save keeps their stored stock, status, backorders and stock management, while the rest of the edit is kept (' . wp_json_encode( $after ) . ')' );
 
 		// The metadata API, by key and by id, and a raw query as WooCommerce Multilingual writes.
@@ -114,8 +121,14 @@ run(
 		delete_metadata_by_mid( 'post', $mid );
 		$wpdb->update( $wpdb->postmeta, array( 'meta_value' => '96' ), array( 'post_id' => $id, 'meta_key' => '_stock' ) );
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = '95' WHERE post_id = %d AND meta_key = '_stock'", $id ) );
+		$mid_now = (int) $wpdb->get_var( $wpdb->prepare( "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s", $id, '_stock' ) );
+		$wpdb->update( $wpdb->postmeta, array( 'meta_value' => '94' ), array( 'meta_id' => $mid_now ) );
+		$wpdb->query( "DELETE FROM {$wpdb->postmeta} WHERE meta_id IN ({$mid_now})" );
+		delete_post_meta_by_key( '_stock' );
+		update_post_meta( $id, '_STOCK', '93' );
+		update_post_meta( $id, '_stock ', '92' );
 		$raw = t67_stored( $id );
-		$check( '5' === $raw['qty'] && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key and by meta id, and a raw query on the post meta table, change no stored stock (' . wp_json_encode( $raw ) . ')' );
+		$check( '5' === $raw['qty'] && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key, by meta id and for every object, a key in another case or with a trailing space, and a raw query naming a key, a meta id or none, change no stored stock (' . wp_json_encode( $raw ) . ')' );
 
 		// WooCommerce's direct stock update: nothing written, and the object read again.
 		$direct  = wc_get_product( $id );
@@ -123,6 +136,13 @@ run(
 		$direct->set_name( 't67 serum again' );
 		$direct->save();
 		$check( '5' === t67_stored( $id )['qty'] && 5 === (int) $direct->get_stock_quantity() && 5 === (int) $answer, 'ERP-07, D-19 WooCommerce\'s direct stock update writes nothing, and the product object keeps the stored figure, so a later save cannot write the refused one (' . var_export( $answer, true ) . ')' );
+
+		// Bulk edit sets a price, then the stock, then saves: the price is kept.
+		$bulk = wc_get_product( $id );
+		$bulk->set_regular_price( '150' );
+		wc_update_product_stock( $bulk, 1, 'set', true );
+		$bulk->save();
+		$check( '150' === (string) wc_get_product( $id )->get_regular_price() && '5' === t67_stored( $id )['qty'], 'ERP-07 a bulk edit keeps the price it sets while its stock change is refused' );
 
 		// A new product made with stock stores none.
 		$made = new \WC_Product_Simple();
@@ -133,7 +153,8 @@ run(
 		$made->save();
 		$s->track_post( $made->get_id() );
 		$fresh = t67_stored( $made->get_id() );
-		$check( in_array( $fresh['qty'], array( null, '' ), true ) && in_array( $fresh['manage'], array( null, 'no' ), true ) && in_array( $fresh['status'], array( null, 'instock' ), true ), 'ERP-07, D-19 a new product made with a stock figure stores none (' . wp_json_encode( $fresh ) . ')' );
+		$fresh_lookup = (string) $wpdb->get_var( $wpdb->prepare( "SELECT stock_status FROM {$wpdb->wc_product_meta_lookup} WHERE product_id = %d", $made->get_id() ) );
+		$check( in_array( $fresh['qty'], array( null, '' ), true ) && 'no' === $fresh['manage'] && 'instock' === $fresh['status'] && 'no' === $fresh['backorder'] && 'instock' === $fresh_lookup, 'ERP-07, D-19 a new product made with a stock figure stores WooCommerce\'s defaults only, its lookup row in stock (' . wp_json_encode( $fresh ) . ", {$fresh_lookup})" );
 
 		// A product deleted takes its stock meta with it.
 		$doomed_id = $doomed->get_id();
@@ -154,6 +175,7 @@ run(
 			'variation' => t67_rest( 'PUT', '/wc/v3/products/' . $parent->get_id() . '/variations/' . $variation->get_id(), array( 'stock_quantity' => 50 ) ),
 			'batch'     => t67_rest( 'POST', '/wc/v3/products/batch', array( 'update' => array( array( 'id' => $id, 'stock_quantity' => 50 ) ) ) ),
 			'delta'     => t67_rest( 'PUT', "/wc/v3/products/{$id}", array( 'inventory_delta' => 3 ) ),
+			'v1 nested' => t67_rest( 'PUT', '/wc/v1/products/' . $parent->get_id(), array( 'variations' => array( array( 'id' => $variation->get_id(), 'stock_quantity' => 99 ) ) ) ),
 		);
 		$create  = new \WP_REST_Request( 'POST', '/wc/v3/products' );
 		$create->set_header( 'content-type', 'application/json' );

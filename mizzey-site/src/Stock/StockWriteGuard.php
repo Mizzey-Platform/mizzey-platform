@@ -15,11 +15,15 @@ defined('ABSPATH') || exit;
  * local stock writer may alter the effective available stock. Any permitted ERP-derived projection write must be
  * controlled through the designated adapter"), refused on the server, not hidden.
  *
+ * - Before a product or variation is saved without the permit, its stock settings are set to those stored now (read
+ *   from the database, so never a stale copy's), so WooCommerce's visibility terms and lookup rows follow the real
+ *   stock; a product being made starts from WooCommerce's defaults.
  * - At the storage boundary, for the stock keys of products and variations (`_stock`, `_stock_status`,
- *   `_manage_stock`, `_backorders`): WordPress's metadata API refuses an addition, an update or a deletion, by key or by
+ *   `_manage_stock`, `_backorders`, compared as MySQL compares them: case, trailing spaces and accents aside):
+ *   WordPress's metadata API refuses an addition, an update or a deletion, by key, for every object at once, or by
  *   meta id (its short-circuit filters), and `$wpdb` refuses a raw write to those keys in the post meta table (the
- *   `query` filter), which is where WooCommerce's direct stock update and WooCommerce Multilingual's stock
- *   synchronisation write. Every writer goes through one of the two: the product and variation editors, quick and bulk
+ *   `query` filter), naming a key or only meta ids or a post id, which is where WooCommerce's direct stock update and
+ *   WooCommerce Multilingual's stock synchronisation and clean-up write. Every writer goes through one of the two: the product and variation editors, quick and bulk
  *   edit, variation bulk actions, the CSV importer, the REST API, WP-CLI, the carrier's webhook. A product being made
  *   stores WooCommerce's defaults only; a product being deleted takes its stock meta with it. After a refused direct
  *   update the product object is read again, so it does not carry the refused figure.
@@ -49,8 +53,14 @@ final class StockWriteGuard
     /** @var array<int,true> Products being deleted, whose stock meta goes with them. */
     private static array $deleting = [];
 
+    /** Set when the metadata API lets WooCommerce's default through: the one insert that follows is let through too. */
+    private static bool $passNext = false;
+
+    private static bool $inQuery = false;
+
     public static function register(): void
     {
+        add_action('woocommerce_before_product_object_save', [self::class, 'keep'], 1, 1);
         add_filter('add_post_metadata', [self::class, 'metaAdd'], 1, 5);
         add_filter('update_post_metadata', [self::class, 'metaUpdate'], 1, 5);
         add_filter('delete_post_metadata', [self::class, 'metaDelete'], 1, 5);
@@ -96,11 +106,44 @@ final class StockWriteGuard
         return self::$projecting > 0 || apply_filters(self::PERMIT, false) === true;
     }
 
+    /** A meta key as MySQL's usual collation compares it: case, trailing spaces and accents aside. */
+    private static function normal(string $key): string
+    {
+        return strtolower(rtrim(remove_accents($key)));
+    }
+
+    private static function protectedKey(string $key): bool
+    {
+        return in_array(self::normal($key), self::KEYS, true);
+    }
+
     /** Whether a write of this key, to this object, is refused. */
     private static function refused(int $objectId, string $key): bool
     {
-        return in_array($key, self::KEYS, true) && ! self::permitted() && ! isset(self::$deleting[$objectId])
+        return self::protectedKey($key) && ! self::permitted() && ! isset(self::$deleting[$objectId])
             && in_array(get_post_type($objectId), ['product', 'product_variation'], true);
+    }
+
+    /**
+     * A product saved without the permit takes the stock settings stored now, so nothing derived from them (its
+     * visibility terms, its lookup row) follows a refused figure; a product being made takes WooCommerce's defaults.
+     *
+     * @param mixed $product
+     */
+    public static function keep($product): void
+    {
+        if (! $product instanceof \WC_Product || self::permitted()) {
+            return;
+        }
+        $id = (int) $product->get_id();
+        if ($id > 0) {
+            wp_cache_delete($id, 'post_meta');
+        }
+        $stored = static fn (string $key): string => $id > 0 ? (string) get_post_meta($id, $key, true) : self::DEFAULTS[$key];
+        $product->set_manage_stock($stored('_manage_stock') === 'yes');
+        $product->set_stock_quantity($stored('_stock'));
+        $product->set_backorders($stored('_backorders') !== '' ? $stored('_backorders') : 'no');
+        $product->set_stock_status($stored('_stock_status') !== '' ? $stored('_stock_status') : 'instock');
     }
 
     /**
@@ -119,7 +162,10 @@ final class StockWriteGuard
             return $check;
         }
 
-        return (string) maybe_serialize($value) === self::DEFAULTS[(string) $key] ? null : false;
+        $default = (string) maybe_serialize($value) === self::DEFAULTS[self::normal((string) $key)];
+        self::$passNext = $default;
+
+        return $default ? null : false;
     }
 
     /**
@@ -153,7 +199,15 @@ final class StockWriteGuard
      */
     public static function metaDelete($check, $objectId, $key, $value = '', $all = false)
     {
-        return $check === null && self::refused((int) $objectId, (string) $key) ? false : $check;
+        if ($check !== null) {
+            return $check;
+        }
+        // A deletion for every object at once (delete_post_meta_by_key) names no object.
+        if ($all && self::protectedKey((string) $key) && ! self::permitted()) {
+            return false;
+        }
+
+        return self::refused((int) $objectId, (string) $key) ? false : $check;
     }
 
     /**
@@ -178,18 +232,52 @@ final class StockWriteGuard
     public static function query($sql)
     {
         global $wpdb;
-        if (! is_string($sql) || self::permitted() || preg_match('/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i', $sql) !== 1
-            || stripos($sql, $wpdb->postmeta) === false || preg_match("/['\"`](_stock|_stock_status|_manage_stock|_backorders)['\"`]/", $sql) !== 1) {
+        if (! is_string($sql) || self::$inQuery || preg_match('/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i', $sql) !== 1
+            || stripos($sql, $wpdb->postmeta) === false) {
+            return $sql;
+        }
+        if (self::$passNext) {
+            self::$passNext = false;
+
+            return $sql;
+        }
+        if (self::permitted()) {
             return $sql;
         }
         // A delete of a product being deleted goes through.
         foreach (array_keys(self::$deleting) as $id) {
-            if (preg_match('/\bpost_id`?\s*=\s*' . $id . '\b/', $sql) === 1) {
+            if (preg_match('/\bpost_id`?\s*(=\s*|IN\s*\(\s*)' . $id . '\b/i', $sql) === 1) {
                 return $sql;
             }
         }
+        // A stock key named in the query, as MySQL would compare it.
+        preg_match_all("/'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"/", $sql, $quoted);
+        foreach (array_merge($quoted[1], $quoted[2]) as $literal) {
+            if (self::protectedKey(stripslashes((string) $literal))) {
+                return $wpdb->prepare('SELECT %d', 0);
+            }
+        }
+        // Rows named by meta id or by post id: refused when any is a product's stock key.
+        if (preg_match('/^\s*(UPDATE|DELETE)\b/i', $sql) === 1 && preg_match_all('/\b(meta_id|post_id)`?\s*(?:=\s*(\d+)|IN\s*\(([\d,\s]+)\))/i', $sql, $refs, PREG_SET_ORDER) > 0) {
+            self::$inQuery = true;
+            try {
+                foreach ($refs as $ref) {
+                    $ids = implode(',', array_map('intval', preg_split('/[\s,]+/', trim(($ref[2] ?? '') !== '' ? $ref[2] : ($ref[3] ?? '')), -1, PREG_SPLIT_NO_EMPTY)));
+                    if ($ids === '') {
+                        continue;
+                    }
+                    $column = strtolower($ref[1]) === 'meta_id' ? 'm.meta_id' : 'm.post_id';
+                    $held   = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} m INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE {$column} IN ({$ids}) AND p.post_type IN ('product', 'product_variation') AND m.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders')"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    if ($held > 0) {
+                        return $wpdb->prepare('SELECT %d', 0);
+                    }
+                }
+            } finally {
+                self::$inQuery = false;
+            }
+        }
 
-        return $wpdb->prepare('SELECT %d', 0);
+        return $sql;
     }
 
     /** @param mixed $postId */
@@ -216,10 +304,8 @@ final class StockWriteGuard
         if (! $product instanceof \WC_Product || self::permitted() || $product->get_id() <= 0) {
             return;
         }
-        wp_cache_delete($product->get_id(), 'post_meta');
-        $product->set_stock_quantity((string) get_post_meta($product->get_id(), '_stock', true));
-        $product->set_stock_status((string) get_post_meta($product->get_id(), '_stock_status', true));
-        $product->apply_changes();
+        // Only the stock settings, so the edit's other pending changes (a price set before it) are kept.
+        self::keep($product);
     }
 
     /**
@@ -240,6 +326,12 @@ final class StockWriteGuard
         foreach (['create', 'update'] as $batch) {
             foreach ((array) ($sent[$batch] ?? []) as $item) {
                 $items[] = (array) $item;
+            }
+        }
+        // Version 1 takes a product's variations inside it, in a batch too.
+        foreach ($items as $item) {
+            foreach ((array) ($item['variations'] ?? []) as $nested) {
+                $items[] = (array) $nested;
             }
         }
         foreach ($items as $item) {
