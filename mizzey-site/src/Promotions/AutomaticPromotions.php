@@ -117,38 +117,51 @@ final class AutomaticPromotions
     }
 
     /**
-     * What the promotion saves the customer on this cart, in cents: its discount, plus the shipping it saves. Each
-     * candidate is measured on its own, against the cart with no automatic promotion, so the promotion applied at the
-     * moment never changes the comparison: what the customer would pay for shipping without any automatic promotion,
-     * less what they would pay with this one (its discount can move the cart below a free shipping minimum; its free
-     * shipping can make shipping free).
+     * What the promotion saves the customer on this cart, in cents: the cut in what they pay (the discount with the
+     * tax it removes, whatever the display setting), plus the shipping it saves. Each candidate is measured on its
+     * own, against the cart with no automatic promotion, so the promotion applied at the moment never changes the
+     * comparison: what the customer would pay for shipping without any automatic promotion, less what they would pay
+     * with this one (its discount can move the cart below a free shipping minimum; its free shipping can make shipping
+     * free).
      */
     public static function value(\WC_Cart $cart, \WC_Coupon $coupon): int
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->apply_coupon($coupon, false);
-        $cents   = (int) round(array_sum($discounts->get_discounts_by_coupon(true)));
-        $shown   = self::shownDiscount($cart, (array) $discounts->get_discounts_by_item(true));
+        $byItem = (array) $discounts->get_discounts_by_item(true);
+        $paid   = self::discountWithTax($cart, $byItem, true);
+        $shown  = self::shownDiscount($cart, $byItem);
 
-        return $cents + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
+        return $paid + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
     }
 
     /**
-     * The discount as the free shipping minimum sees it, in cents: with each line's own tax when prices are shown with
-     * tax and entered without it, or without it in the opposite case, so a cart mixing tax rates is measured exactly.
+     * The discount as the free shipping minimum sees it, in cents: with tax when prices are shown with tax, without it
+     * otherwise, each line at its own rate, so a cart mixing tax rates is measured exactly.
      *
      * @param array<string,float|int> $byItem Cents of discount by cart item key.
      */
     public static function shownDiscount(\WC_Cart $cart, array $byItem): int
     {
+        return self::discountWithTax($cart, $byItem, $cart->display_prices_including_tax());
+    }
+
+    /**
+     * A discount, in cents, with or without its tax, each line at its own tax rate. WooCommerce discounts prices as they
+     * are entered (`WC_Discounts::set_items_from_cart()`, WooCommerce 11.1.0), so tax is added when prices are entered
+     * without it, and taken out when they are entered with it.
+     *
+     * @param array<string,float|int> $byItem Cents of discount by cart item key.
+     */
+    private static function discountWithTax(\WC_Cart $cart, array $byItem, bool $withTax): int
+    {
         $entered = wc_prices_include_tax();
-        $shown   = $cart->display_prices_including_tax();
         $total   = 0.0;
         foreach ($byItem as $key => $cents) {
-            $line  = $cart->get_cart_item((string) $key);
-            $sub   = (float) ($line['line_subtotal'] ?? 0);
-            $rate  = $sub > 0 ? (float) ($line['line_subtotal_tax'] ?? 0) / $sub : 0.0;
-            $factor = (! $entered && $shown) ? 1 + $rate : (($entered && ! $shown) ? 1 / (1 + $rate) : 1.0);
+            $line   = $cart->get_cart_item((string) $key);
+            $sub    = (float) ($line['line_subtotal'] ?? 0);
+            $rate   = $sub > 0 ? (float) ($line['line_subtotal_tax'] ?? 0) / $sub : 0.0;
+            $factor = (! $entered && $withTax) ? 1 + $rate : (($entered && ! $withTax) ? 1 / (1 + $rate) : 1.0);
             $total += (float) $cents * $factor;
         }
 

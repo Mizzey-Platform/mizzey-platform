@@ -321,10 +321,23 @@ run(
 		t52_cart( array( $taxed->get_id() => 1, $untaxed->get_id() => 1 ) );
 		$shown_subtotal = (float) WC()->cart->get_displayed_subtotal();
 		$check( 220.0 === $shown_subtotal && ! in_array( wc_format_coupon_code( $taxed_off->get_code() ), t52_applied(), true ), "Q1 with 20 percent tax on one line only (shown 220), 20 off that line counts as 24 shown, takes the cart to 196 under a 197 free shipping minimum, and is not applied ({$shown_subtotal})" );
+		// Fifth review round: the winner is the larger cut in what the customer pays, the discount's tax included,
+		// whether prices are shown with tax or without it. 20 off the taxed line saves 24; 21 off the zero-rated line,
+		// created earlier, saves 21.
+		$zone->delete_shipping_method( $free_taxed );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$untaxed_off = t52_coupon( $s, "{$tag}autountaxed", array( 'discount_type' => 'fixed_product', 'amount' => '21', 'individual_use' => true, 'product_ids' => array( $untaxed->get_id() ), 'date_created' => time() - 3 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		foreach ( array( 'incl', 'excl' ) as $display ) {
+			update_option( 'woocommerce_tax_display_cart', $display );
+			update_option( 'woocommerce_tax_display_shop', $display );
+			t52_cart( array( $taxed->get_id() => 1, $untaxed->get_id() => 1 ) );
+			$check( array( wc_format_coupon_code( $taxed_off->get_code() ) ) === t52_applied(), "Q1 shown {$display} tax: 20 off a 20 percent taxed line (saves 24) beats 21 off a zero-rated line (saves 21), created earlier (" . implode( ',', t52_applied() ) . ')' );
+		}
+		$untaxed_off->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$untaxed_off->save();
 		foreach ( $tax_before as $name => $value ) {
 			update_option( $name, $value );
 		}
-		$zone->delete_shipping_method( $free_taxed );
 		foreach ( array( $auto_a, $auto_b ) as $other ) {
 			$other->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
 			$other->save();
