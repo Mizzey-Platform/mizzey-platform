@@ -146,7 +146,7 @@ run(
 		$check( is_string( $refused ) && false !== strpos( $refused, 'delivered' ) && $held && '0' === (string) $held->comment_approved && is_string( $second ) && false !== strpos( $second, 'already reviewed' ), 'REV-02, REV-03, D-17 the form post refuses a customer without a delivery; a delivered customer\'s review is held for moderation; a second review of the same product is refused (' . ( is_string( $refused ) ? $refused : 'accepted' ) . ')' );
 
 		// A returning commenter, whom WordPress would approve at once, is held too.
-		$known_id = wp_insert_comment( array( 'comment_post_ID' => $balm->get_id(), 'comment_content' => 'Earlier, approved.', 'comment_author' => 'Amount', 'comment_author_email' => (string) get_userdata( $by_amount )->user_email, 'user_id' => $by_amount, 'comment_approved' => 1, 'comment_type' => 'review' ) );
+		$known_id = wp_insert_comment( array( 'comment_post_ID' => $balm->get_id(), 'comment_content' => 'Earlier, approved.', 'comment_author' => 'Amount', 'comment_author_email' => (string) get_userdata( $by_amount )->user_email, 'user_id' => $by_amount, 'comment_approved' => 1, 'comment_type' => 'review', 'comment_date' => gmdate( 'Y-m-d H:i:s', time() - HOUR_IN_SECONDS ), 'comment_date_gmt' => gmdate( 'Y-m-d H:i:s', time() - HOUR_IN_SECONDS ) ) );
 		$comments[] = (int) $known_id;
 		$moderation_before = array( get_option( 'comment_moderation' ), get_option( 'comment_previously_approved' ) );
 		$s->on_finish( static function () use ( $moderation_before ) { update_option( 'comment_moderation', $moderation_before[0] ); update_option( 'comment_previously_approved', $moderation_before[1] ); } );
@@ -156,7 +156,7 @@ run(
 		if ( is_int( $returning ) ) {
 			$comments[] = $returning;
 		}
-		$check( is_int( $returning ) && '0' === (string) get_comment( $returning )->comment_approved, 'REV-03 a customer with an approved comment before, whom WordPress would publish at once, has the review held for moderation' );
+		$check( is_int( $returning ) && '0' === (string) get_comment( $returning )->comment_approved, 'REV-03 a customer with an approved comment before, whom WordPress would publish at once, has the review held for moderation (' . ( is_int( $returning ) ? get_comment( $returning )->comment_approved : $returning ) . ')' );
 
 		// The REST comments endpoint.
 		wp_set_current_user( $waiting );
