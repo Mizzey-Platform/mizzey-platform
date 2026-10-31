@@ -166,3 +166,7 @@ October 2026.
 - The guest cart window of 30 days is a proposed working default (an owner decision, not a client confirmation).
 - The stock fixture stands in for PRE-09's adapter on development and staging only (D-10, M-3); production keeps the
   unconfigured source until the real adapter is bound.
+- Known limit: WooCommerce's own stock checks (the classic cart, the Store API's validation and quantity limits) read
+  WooCommerce's stock field, the ERP's projection under D-19. They are stricter than the adapter, never looser: a stale
+  projection can refuse a sale the ERP would allow, never confirm one it would refuse. Keeping the projection in step is
+  the ERP integration's (PRE-09).
