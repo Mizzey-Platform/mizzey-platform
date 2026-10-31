@@ -28,8 +28,10 @@ defined('ABSPATH') || exit;
  * crash cut short, or one left unanswered, is sent again as it was, under its own key, which the source applies once,
  * before anything else is asked for the order; an order cancelled with a reserve unanswered asks it again, then gives
  * back what it took. A line whose resize is still unanswered does not count as reserved.
- * Each order's reservation work runs under a lock of its own (MySQL GET_LOCK), with the record read again from the
- * database inside it, so two payments of one order at once cannot work from the same stale record.
+ * Each order's reservation work runs under a lock of its own (MySQL GET_LOCK), on the order loaded again inside it
+ * (its lines, status and record as stored), so two payments of one order at once, or a payment's success and failure
+ * arriving together, cannot work from a stale copy: a release happens only while the order is still cancelled, failed
+ * or unpaid, and a paid status reserves only while the order is still there and holds no reservation.
  * Releases use the record, not the order's current lines, so an order edited after placement releases what was taken.
  *
  * - Placement, on the block checkout, the classic checkout and pay-for-order: each line not already reserved is
@@ -129,19 +131,38 @@ final class OrderStock
         }
         $to = (string) $to;
         if (in_array($to, ['cancelled', 'failed'], true)) {
-            self::release($order, StockGateway::make());
+            self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), ['cancelled', 'failed'], true) || self::releaseLocked($fresh, StockGateway::make()));
 
             return;
         }
-        if (in_array($to, self::HOLDING, true) && ! self::active($order)) {
-            if (self::reserve($order, StockGateway::make())) {
-                $order->delete_meta_data(self::UNRESERVED);
-                $order->save_meta_data();
-            } elseif ($order->get_meta(self::UNRESERVED) === '') {
-                $order->update_meta_data(self::UNRESERVED, (string) time());
-                $order->save_meta_data();
-                $order->add_order_note(__('The stock for this order could not be reserved with the stock source. Check it before fulfilling the order.', 'mizzey-site'));
+        if (! in_array($to, self::HOLDING, true)) {
+            return;
+        }
+        $held = self::locked($order, static function (\WC_Order $fresh): bool {
+            if (! in_array($fresh->get_status(), self::HOLDING, true) || self::active($fresh)) {
+                return true;
             }
+            if (! self::reserveLocked($fresh, StockGateway::make())) {
+                return false;
+            }
+            $fresh->delete_meta_data(self::UNRESERVED);
+            $fresh->save_meta_data();
+
+            return true;
+        });
+        if (! $held) {
+            self::markUnreserved((int) $order->get_id());
+        }
+    }
+
+    /** A paid order the source would not reserve, or whose lock could not be taken: marked once, with a note for staff. */
+    private static function markUnreserved(int $orderId): void
+    {
+        $order = wc_get_order($orderId);
+        if ($order instanceof \WC_Order && $order->get_meta(self::UNRESERVED) === '') {
+            $order->update_meta_data(self::UNRESERVED, (string) time());
+            $order->save_meta_data();
+            $order->add_order_note(__('The stock for this order could not be reserved with the stock source. Check it before fulfilling the order.', 'mizzey-site'));
         }
     }
 
@@ -149,8 +170,8 @@ final class OrderStock
     public static function beforeRemoval($orderId): void
     {
         $order = wc_get_order((int) $orderId);
-        if ($order instanceof \WC_Order && in_array($order->get_status(), self::UNPAID, true)) {
-            self::release($order, StockGateway::make());
+        if ($order instanceof \WC_Order) {
+            self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), self::UNPAID, true) || self::releaseLocked($fresh, StockGateway::make()));
         }
     }
 
@@ -187,20 +208,20 @@ final class OrderStock
     /** Reserves every line not already reserved; on any failure, undoes this attempt's reservations and answers false. */
     public static function reserve(\WC_Order $order, StockGateway $gateway): bool
     {
-        return self::locked($order, static fn (): bool => self::reserveLocked($order, $gateway));
+        return self::locked($order, static fn (\WC_Order $fresh): bool => self::reserveLocked($fresh, $gateway));
     }
 
     /** Releases the reserved lines of the record once; answers whether nothing reserved remains. */
     public static function release(\WC_Order $order, StockGateway $gateway): bool
     {
-        return self::locked($order, static fn (): bool => self::releaseLocked($order, $gateway));
+        return self::locked($order, static fn (\WC_Order $fresh): bool => self::releaseLocked($fresh, $gateway));
     }
 
     /**
-     * Runs the order's reservation work under its lock, the record read again from the database first; false when the
-     * lock cannot be taken.
+     * Runs the order's reservation work under its lock, on the order loaded again (the caller's copy may hold lines, a
+     * status or a record another request has changed since); false when the lock cannot be taken.
      *
-     * @param callable():bool $work
+     * @param callable(\WC_Order):bool $work
      */
     private static function locked(\WC_Order $order, callable $work): bool
     {
@@ -210,9 +231,13 @@ final class OrderStock
             return false;
         }
         try {
-            $order->read_meta_data(true);
+            $fresh = wc_get_order($order->get_id());
+            if (! $fresh instanceof \WC_Order) {
+                return false;
+            }
+            $fresh->read_meta_data(true);
 
-            return $work();
+            return $work($fresh);
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $name)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
