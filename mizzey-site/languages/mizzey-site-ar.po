@@ -322,7 +322,6 @@ msgstr "تتبّع شحنتك من هنا: %s"
 msgid "We will send you the tracking details as soon as the carrier gives them to us."
 msgstr "سنرسل إليك تفاصيل التتبع فور وصولها من شركة الشحن."
 
-<<<<<<< HEAD
 #: mizzey-site/src/Account/AddressBook.php
 #. translators: %d: the most addresses a book holds.
 #, php-format
@@ -360,10 +359,9 @@ msgstr "قائمة أمنياتك فارغة."
 #: mizzey-site/src/Account/AddressBook.php
 msgid "Please try again in a moment."
 msgstr "يرجى المحاولة مرة أخرى بعد قليل."
-=======
+
 #: mizzey-site/src/Checkout/EgyptianAddress.php
 #. translators: %s: the field's name.
 #, php-format
 msgid "%s is required."
 msgstr "%s مطلوب."
->>>>>>> 021-emails
