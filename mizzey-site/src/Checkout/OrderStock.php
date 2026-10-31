@@ -231,6 +231,7 @@ final class OrderStock
             return false;
         }
         try {
+            self::forget((int) $order->get_id());
             $fresh = wc_get_order($order->get_id());
             if (! $fresh instanceof \WC_Order) {
                 return false;
@@ -241,6 +242,30 @@ final class OrderStock
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $name)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
+    }
+
+    /**
+     * Drops what this request holds of the order in memory (WooCommerce's order object cache, its item list, each item
+     * and each item's meta, and the order's post cache), so the copy loaded next is the one stored, whatever another
+     * request changed since.
+     */
+    private static function forget(int $orderId): void
+    {
+        global $wpdb;
+        if (class_exists(\Automattic\WooCommerce\Caches\OrderCache::class)) {
+            wc_get_container()->get(\Automattic\WooCommerce\Caches\OrderCache::class)->remove($orderId);
+        }
+        $store = \WC_Data_Store::load('order');
+        if (method_exists($store->get_current_class_name(), 'clear_cached_data')) {
+            $store->clear_cached_data([$orderId]);
+        }
+        $itemIds = $wpdb->get_col($wpdb->prepare("SELECT order_item_id FROM {$wpdb->prefix}woocommerce_order_items WHERE order_id = %d", $orderId)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        foreach ($itemIds as $itemId) {
+            wp_cache_delete('item-' . (int) $itemId, 'order-items');
+            wp_cache_delete((int) $itemId, 'order_item_meta');
+        }
+        wp_cache_delete('order-items-' . $orderId, 'orders');
+        clean_post_cache($orderId);
     }
 
     private static function reserveLocked(\WC_Order $order, StockGateway $gateway): bool

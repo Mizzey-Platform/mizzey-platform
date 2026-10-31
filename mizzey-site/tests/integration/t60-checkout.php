@@ -332,6 +332,20 @@ run(
 		OrderStock::reserve( wc_get_order( $copied->get_id() ), $copy_gate );
 		OrderStock::reserve( $old_copy, $copy_gate );
 		$check( 2 === $copy_source->levels[ $five->get_id() ] && OrderStock::active( wc_get_order( $copied->get_id() ) ), 'CHK-12 a placement from a copy of the order loaded before another request changed it to 3 keeps the 3 held (' . $copy_source->levels[ $five->get_id() ] . ' left of 5)' );
+		// Another request changes the stored quantity to 3 while this one still holds the order, at 1, in its caches: the
+		// stock work under the lock reads the stored 3 and takes the 2 more.
+		$cached_source = new T60Source( array( $five->get_id() => 5 ) );
+		$cached_gate   = new StockGateway( $cached_source, 1, null, 0 );
+		$cached        = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $cached, $cached_gate );
+		$warm = wc_get_order( $cached->get_id() );
+		foreach ( $warm->get_items() as $warm_item ) {
+			$warm_item->get_quantity();
+			// As another request writes it: straight to the database, past this request's caches.
+			$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'woocommerce_order_itemmeta', array( 'meta_value' => '3' ), array( 'order_item_id' => $warm_item->get_id(), 'meta_key' => '_qty' ) );
+		}
+		OrderStock::reserve( wc_get_order( $cached->get_id() ), $cached_gate );
+		$check( 2 === $cached_source->levels[ $five->get_id() ], 'CHK-12 a quantity another request stored as 3, while this request still holds the order at 1 in its caches, is reserved as 3 (' . $cached_source->levels[ $five->get_id() ] . ' left of 5)' );
 		// A payment's failure and success arriving together: the failure releases, then the success, from a copy loaded
 		// while the order was still reserved, reserves again instead of trusting its copy.
 		$race_source = new T60Source( array( $five->get_id() => 5 ) );
