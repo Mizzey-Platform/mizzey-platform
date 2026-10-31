@@ -38,7 +38,7 @@ trace to the rows above.
 
 | ID | Scope | Why it matters here |
 |---|---|---|
-| AUTH-10, AUTH-13 | P1 | Google sign-in and one account per email across Google and manual registration: the approved plugin (PL-02, Nextend Social Login, D-2026-09-09) waits for the owner's approval to install it, and an OAuth client in a client-owned Google account (a vendor input). A second PR of #305 |
+| AUTH-10, AUTH-13 | P1 | Google sign-in and one account per email across Google and manual registration: the second PR of #305, specs/024-google-sign-in, our own code under D-24 (no plugin); the OAuth client in a client-owned Google account is a vendor input |
 | AUTH-15 | P1 | Secure sessions, the check against scripted account creation and the sign-in limit: done (specs/009, #427) |
 | AUTH-10a | P2 | Social login beyond Google is not built |
 

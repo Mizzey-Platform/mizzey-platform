@@ -206,41 +206,9 @@ msgstr "خفّضنا كمية %s إلى المتوفر."
 msgid "This item is not in your cart."
 msgstr "هذا المنتج ليس في سلتك."
 
-#: mizzey-site/src/Checkout/OrderStock.php
-msgid "We could not reserve the stock for your order. Please try again in a few minutes."
-msgstr "لم نتمكن من حجز المخزون لطلبك. يرجى المحاولة مرة أخرى بعد بضع دقائق."
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "Governorate"
-msgstr "المحافظة"
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "City"
-msgstr "المدينة"
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "Street and building"
-msgstr "الشارع ورقم المبنى"
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "District"
-msgstr "الحي"
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "Nearest landmark"
-msgstr "أقرب علامة مميزة"
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-msgid "Nearest landmark (optional)"
-msgstr "أقرب علامة مميزة (اختياري)"
-
 #: mizzey-site/src/Wishlist/WishlistRoutes.php
 msgid "Please reload the page and try again."
 msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
-
-#: mizzey-site/src/Checkout/OrderStock.php
-msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
-msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
 
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "You have already reviewed this product. Thank you."
@@ -279,6 +247,82 @@ msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "Only staff who moderate reviews can publish one."
 msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Continue with Google"
+msgstr "المتابعة باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Staff accounts sign in with their password."
+msgstr "تسجيل دخول حسابات الموظفين يكون بكلمة المرور."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in did not complete. Please try again."
+msgstr "لم يكتمل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in"
+msgstr "تسجيل الدخول باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "The OAuth client of the store's Google Cloud project. Sign-in with Google is offered once both are set."
+msgstr "عميل OAuth الخاص بمشروع Google Cloud للمتجر. يُتاح تسجيل الدخول باستخدام Google بعد ضبط القيمتين."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client ID"
+msgstr "معرّف العميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client secret"
+msgstr "الرمز السري للعميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Left empty when it is set in the configuration file."
+msgstr "يُترك فارغًا إذا كان مضبوطًا في ملف الإعدادات."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Please try again in a moment."
+msgstr "يرجى المحاولة مرة أخرى بعد لحظات."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "An account is already registered with your email address. Please log in."
+msgstr "يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Please sign in or register with your email and password."
+msgstr "يرجى تسجيل الدخول أو إنشاء حساب بالبريد الإلكتروني وكلمة المرور."
+
+#: mizzey-site/src/Checkout/OrderStock.php
+msgid "We could not reserve the stock for your order. Please try again in a few minutes."
+msgstr "لم نتمكن من حجز المخزون لطلبك. يرجى المحاولة مرة أخرى بعد بضع دقائق."
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Governorate"
+msgstr "المحافظة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "City"
+msgstr "المدينة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Street and building"
+msgstr "الشارع ورقم المبنى"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "District"
+msgstr "الحي"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Nearest landmark"
+msgstr "أقرب علامة مميزة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Nearest landmark (optional)"
+msgstr "أقرب علامة مميزة (اختياري)"
+
+#: mizzey-site/src/Checkout/OrderStock.php
+msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
+msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
 
 #. translators: %s: a percentage, such as 10.
 #: mizzey-site/src/Emails/EmailAdditions.php
@@ -361,10 +405,6 @@ msgstr "تتبّع شحنتك"
 #: mizzey-site/src/Account/AccountPages.php
 msgid "Wishlist"
 msgstr "قائمة الأمنيات"
-
-#: mizzey-site/src/Account/AddressBook.php
-msgid "Please try again in a moment."
-msgstr "يرجى المحاولة مرة أخرى بعد قليل."
 
 #. translators: %s: the field's name.
 #: mizzey-site/src/Checkout/EgyptianAddress.php
