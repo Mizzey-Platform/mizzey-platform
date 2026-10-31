@@ -33,5 +33,4 @@
 
 - Native coverage names WooCommerce's emails and WooCommerce Multilingual's language handling because the Mizzey template
   requires the native mechanism and its evidence.
-- The sending service is #284's; the shared email layout
-  are PRE-03b's.
+- The sending service is #284's; the shared email layout is PRE-03b's.
