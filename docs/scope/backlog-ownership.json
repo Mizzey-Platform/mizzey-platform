@@ -381,7 +381,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 8,
    "depends_on": [
     {
@@ -520,7 +520,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 11,
    "depends_on": [
     {
@@ -1983,7 +1983,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 35,
    "depends_on": [
     {
@@ -2208,7 +2208,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 39,
    "depends_on": [
     {
@@ -2257,7 +2257,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In review",
    "delivery_order": 40,
    "depends_on": [
     {
@@ -3448,7 +3448,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 57,
    "depends_on": [
     {
@@ -3599,7 +3599,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 59,
    "depends_on": [
     {
