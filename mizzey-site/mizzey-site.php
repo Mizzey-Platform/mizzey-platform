@@ -68,6 +68,7 @@ require_once __DIR__ . '/src/Promotions/DiscountCap.php';
 require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
 require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
