@@ -38,6 +38,9 @@ final class PromotionRules
         if (! $valid) {
             return false;
         }
+        if (PromotionSettings::paused($coupon)) {
+            throw new \Exception(esc_html__('This coupon is paused.', 'mizzey-site'), 113);
+        }
         $starts = PromotionSettings::starts($coupon);
         if ($starts !== null && time() < $starts) {
             throw new \Exception(esc_html__('This coupon is not active yet.', 'mizzey-site'), 109);

@@ -62,10 +62,19 @@ require_once __DIR__ . '/src/Orders/StatusModel.php';
 require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
+require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
 require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
+require_once __DIR__ . '/src/Stock/StockItem.php';
+require_once __DIR__ . '/src/Stock/StockAnswer.php';
+require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
+require_once __DIR__ . '/src/Stock/StockSourceRefused.php';
+require_once __DIR__ . '/src/Stock/StockSource.php';
+require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
+require_once __DIR__ . '/src/Stock/StockIdentity.php';
+require_once __DIR__ . '/src/Stock/StockGateway.php';
 require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
 require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
@@ -106,6 +115,9 @@ MizzeySite\Security\Security::register();
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
+
+// Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
+MizzeySite\Roles\RefundCapability::register();
 MizzeySite\Orders\CancellationField::register();
 
 // The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,
