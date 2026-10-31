@@ -72,10 +72,13 @@ function t59_quantities( array $cart ): array {
 	return $out;
 }
 
-/** The Store API cart's headers for writes, and its cookies. */
+/**
+ * The Store API cart's nonce for writes, and its cookies. The cart is kept in WooCommerce's session cookie, as a
+ * browser's is, not under a Cart-Token header, so the account page sees the same cart.
+ */
 function t59_store( array $cookies = array() ): array {
 	$cart = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null, array(), $cookies );
-	return array( 'auth' => array( 'Cart-Token' => sign_in_header( $cart, 'cart-token' ), 'Nonce' => sign_in_header( $cart, 'nonce' ) ), 'cookies' => $cart['cookies'], 'cart' => $cart );
+	return array( 'auth' => array( 'Nonce' => sign_in_header( $cart, 'nonce' ) ), 'cookies' => $cart['cookies'], 'cart' => $cart );
 }
 
 run(
