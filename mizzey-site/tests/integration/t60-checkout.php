@@ -125,6 +125,23 @@ run(
 		$picky->refuse = array();
 		$retry   = OrderStock::reserve( wc_get_order( $refused->get_id() ), new StockGateway( $picky, 1, null, 0 ) );
 		$check( ! $no && 5 === $level && $retry && 4 === $picky->levels[ $five->get_id() ] && 1 === $picky->levels[ $two->get_id() ], 'CHK-12, BR-003 a line the source refuses refuses the placement, and the lines already reserved are released; placed again once the source accepts, each line is reserved (' . wp_json_encode( $picky->levels ) . ')' );
+		$no_source = static fn () => new T60Source( array( $five->get_id() => 5 ), array( $five->get_id() ) );
+		add_filter( StockGateway::SOURCE_FILTER, $no_source );
+		$thrown = '';
+		try {
+			OrderStock::placedThroughStoreApi( t60_order( $s, array( $five->get_id() => 1 ) ) );
+		} catch ( \Automattic\WooCommerce\StoreApi\Exceptions\RouteException $e ) {
+			$thrown = $e->getErrorCode() . ' ' . $e->getCode();
+		}
+		$classic = '';
+		try {
+			$classic_order = t60_order( $s, array( $five->get_id() => 1 ) );
+			OrderStock::placedThroughClassic( $classic_order->get_id(), array(), $classic_order );
+		} catch ( \Exception $e ) {
+			$classic = $e->getMessage();
+		}
+		remove_filter( StockGateway::SOURCE_FILTER, $no_source );
+		$check( 'mizzey_stock_not_reserved 409' === $thrown && false !== strpos( $classic, 'reserve the stock' ), 'CHK-12 a placement the source refuses is refused before payment: a 409 on the Store API, a message on the classic checkout (' . $thrown . ')' );
 		$bind = static fn () => $source;
 		add_filter( StockGateway::SOURCE_FILTER, $bind );
 		$cancel = t60_order( $s, array( $five->get_id() => 1 ) );

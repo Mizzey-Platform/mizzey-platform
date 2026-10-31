@@ -1,0 +1,14 @@
+Deliberate defects, each run against t60 and then reverted (31 October 2026):
+
+M2 a refused line leaves the others reserved                          -> t60 fails (1 check)
+M3 a retry after a refusal reuses the spent keys                      -> t60 fails (1 check)
+M5 cancellation releases nothing                                      -> t60 fails (1 check)
+M7 the district is optional                                           -> t60 fails (4 checks)
+M8 the postcode is asked for                                          -> t60 fails (3 checks)
+
+Equivalent, not caught: M1 (a placement reserves again when placed again) and M4 (a release is repeated). The
+operation key of each line and step is the same on a repeat, so the source applies it once (the StockSource contract,
+specs/012); the order's reserved and released marks only save the calls.
+
+M6 (a refused Store API placement goes through) was not caught at first: the cart check refused the order earlier. t60
+now calls the placement hook with a source that refuses: see below.
