@@ -240,10 +240,16 @@ run(
 		$core_approve = new \WP_REST_Request( 'POST', '/wp/v2/comments/' . ( is_int( $first ) ? $first : 0 ) );
 		$core_approve->set_param( 'status', 'approved' );
 		$core_answer = rest_do_request( $core_approve );
+		// The review's id in the body, another in the address: WordPress acts on the body's.
+		$overridden = new \WP_REST_Request( 'PUT', '/wp/v2/comments/999999999' );
+		$overridden->set_body_params( array( 'id' => is_int( $first ) ? $first : 0, 'status' => 'approved' ) );
+		$override_answer = rest_do_request( $overridden );
+		// What the admin's reply with approval, approve and unapprove each check before they change a comment.
+		$may_edit = current_user_can( 'edit_comment', is_int( $first ) ? $first : 0 );
 		wp_set_current_user( 0 );
 		clean_comment_cache( is_int( $first ) ? $first : 0 );
 		$check( in_array( $legacy_answer->get_status(), array( 401, 403 ), true ) && array() === $legacy_made && in_array( $legacy_put_answer->get_status(), array( 401, 403 ), true ), 'D-17 WooCommerce\'s older nested reviews routes (v1, v2) neither take a review nor change one from someone without moderation rights (' . $legacy_answer->get_status() . ', ' . $legacy_put_answer->get_status() . ')' );
-		$check( is_int( $first ) && in_array( $core_answer->get_status(), array( 401, 403 ), true ) && '0' === (string) get_comment( $first )->comment_approved, 'D-17 a held review cannot be approved through WordPress\'s REST comments endpoint by someone who may edit the product but not moderate (' . $core_answer->get_status() . ')' );
+		$check( is_int( $first ) && in_array( $core_answer->get_status(), array( 401, 403 ), true ) && 200 !== $override_answer->get_status() && ! $may_edit && '0' === (string) get_comment( $first )->comment_approved, 'D-17 a held review cannot be approved by someone who may edit the product but not moderate: not through WordPress\'s REST comments endpoint, with its id in the address or in the body, nor through the admin, which needs the right to edit the review (' . $core_answer->get_status() . ', ' . $override_answer->get_status() . ', ' . ( $may_edit ? 'may edit' : 'may not edit' ) . ')' );
 
 		// One customer's lock for one product is the same in either language, so two submissions at once, one per
 		// language, cannot both pass the one-review check.
