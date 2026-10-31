@@ -381,7 +381,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 8,
    "depends_on": [
     {
