@@ -46,7 +46,7 @@ final class FreeShippingProgress
             'data_callback'   => static fn (): array => ['free_shipping' => self::of(WC()->cart), 'wishlist_nonce' => \MizzeySite\Wishlist\WishlistRoutes::nonce()],
             'schema_callback' => static fn (): array => [
                 'free_shipping' => [
-                    'description' => 'What the cart still needs for free shipping.',
+                    'description' => __('What the cart still needs for free shipping.', 'mizzey-site'),
                     'type'        => 'object',
                     'context'     => ['view', 'edit'],
                     'readonly'    => true,
@@ -57,7 +57,7 @@ final class FreeShippingProgress
                     ],
                 ],
                 'wishlist_nonce' => [
-                    'description' => 'The nonce for moving a cart line to the wishlist (X-Mizzey-Nonce).',
+                    'description' => __('The nonce for moving a cart line to the wishlist (X-Mizzey-Nonce).', 'mizzey-site'),
                     'type'        => 'string',
                     'context'     => ['view', 'edit'],
                     'readonly'    => true,
