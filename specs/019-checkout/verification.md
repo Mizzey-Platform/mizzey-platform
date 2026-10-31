@@ -19,11 +19,11 @@ and `t52`: their checkouts had no district, which this branch requires; updated 
 
 | AC | Result in t60 |
 |---|---|
-| AC-1 | Pass. Governorate required, postcode and second line hidden; district and landmark for an Egyptian address only; [HTTP] an order keeps its district; paying an existing Egyptian order without one is refused |
+| AC-1 | Pass. Governorate required, postcode and second line hidden; district and landmark for an Egyptian address only; [HTTP] an order keeps its district; paying an existing Egyptian order without one is refused; [HTTP] paying an existing order through the Store API keeps the district sent with it |
 | AC-3 | Pass over HTTP. Shipping rates with costs, cash on delivery, the totals |
 | AC-4 | Pass over HTTP. The note kept |
 | AC-6 | Pass over HTTP. A missing district refused with a message naming it, in English and Arabic |
-| AC-7 | Pass, against a mock and the development fixture (pending PRE-09). WooCommerce's order stock writers change nothing; each line reserved once; released once; a refusal undoes the others and a retry reserves; Store API and classic placements refused before payment; an edited order released by its record and resized when reserved again; an unanswered reserve re-sent under its key; a paid order reserved late or marked; trashing releases; the visitor's own reservation counts at the cart check; [HTTP] an order reserved with the fixture, WooCommerce's stock untouched; no source, refused |
+| AC-7 | Pass, against a mock and the development fixture (pending PRE-09). WooCommerce's order stock writers change nothing; each line reserved once; released once; a refusal undoes the others and a retry reserves; Store API and classic placements refused before payment; an edited order released by its record and resized when reserved again; an unanswered reserve re-sent under its key; a paid order reserved late or marked; trashing releases; the visitor's own reservation counts at the cart check; a quantity changed back and forth resized under new keys; a crash after a reserve, an undo or a release recovered from the record; an unanswered resize not counted as reserved; a second payment from a stale record keeps the first's reservation; a release settles an unanswered reserve first; [HTTP] an order reserved with the fixture, WooCommerce's stock untouched; no source, refused |
 | AC-8 | Pass. A later price change leaves the item price |
 | AC-2, AC-5 | Native (WooCommerce's saved address and block checkout) |
 
