@@ -302,6 +302,8 @@ run(
 		$twenty_pc->set_code( "{$tag}twentypc" );
 		$twenty_pc->set_props( array( 'discount_type' => 'percent', 'amount' => '20' ) );
 		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		// Not yet valid for a one-unit cart: it competes at the two-unit target, not now.
+		$twenty_pc->update_meta_data( PromotionSettings::MIN_ITEMS, '2' );
 		$twenty_pc->save();
 		$s->on_finish( static function () use ( $twenty_pc ) { wp_delete_post( $twenty_pc->get_id(), true ); AutomaticPromotions::forget(); } );
 		AutomaticPromotions::forget();
@@ -309,7 +311,7 @@ run(
 		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$twenty_pc->save();
 		AutomaticPromotions::forget();
-		$check( null === $competing['items_needed'], 'CART-07, BR-004 with promotions not combining and another automatic promotion standing in the cart, no item target is promised for the free-shipping one (' . wp_json_encode( $competing ) . ')' );
+		$check( null === $competing['items_needed'], 'CART-07, BR-004 with promotions not combining and another automatic promotion that competes at the two-unit target, no item target is promised for the free-shipping one (' . wp_json_encode( $competing ) . ')' );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );

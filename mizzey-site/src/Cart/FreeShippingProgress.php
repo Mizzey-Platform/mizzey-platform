@@ -46,7 +46,7 @@ final class FreeShippingProgress
             'data_callback'   => static fn (): array => ['free_shipping' => self::of(WC()->cart), 'wishlist_nonce' => \MizzeySite\Wishlist\WishlistRoutes::nonce()],
             'schema_callback' => static fn (): array => [
                 'free_shipping' => [
-                    'description' => 'What the cart still needs for free shipping.',
+                    'description' => __('What the cart still needs for free shipping.', 'mizzey-site'),
                     'type'        => 'object',
                     'context'     => ['view', 'edit'],
                     'readonly'    => true,
@@ -57,7 +57,7 @@ final class FreeShippingProgress
                     ],
                 ],
                 'wishlist_nonce' => [
-                    'description' => 'The nonce for moving a cart line to the wishlist (X-Mizzey-Nonce).',
+                    'description' => __('The nonce for moving a cart line to the wishlist (X-Mizzey-Nonce).', 'mizzey-site'),
                     'type'        => 'string',
                     'context'     => ['view', 'edit'],
                     'readonly'    => true,
@@ -149,10 +149,9 @@ final class FreeShippingProgress
         $entered   = array_values(array_diff(array_map('wc_format_coupon_code', $cart->get_applied_coupons()), $automatic));
         $blocked   = $entered !== [] && (! \MizzeySite\Promotions\Combination::allowed()
             || array_filter($entered, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== []);
-        // With promotions not combining, one automatic promotion applies: while another one stands in the cart, the
-        // free-shipping one may not be the one chosen, so no item target is promised.
-        $standing = array_intersect(array_map('wc_format_coupon_code', $cart->get_applied_coupons()), AutomaticPromotions::codes());
-        $others   = array_filter($standing, static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping());
+        // With promotions not combining, one automatic promotion applies, the one worth most: while the store runs
+        // another automatic promotion, it may be the one chosen at the target instead, so no item target is promised.
+        $others = array_filter(AutomaticPromotions::codes(), static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping());
         if ($blocked || (! \MizzeySite\Promotions\Combination::allowed() && $others !== [])) {
             return null;
         }
