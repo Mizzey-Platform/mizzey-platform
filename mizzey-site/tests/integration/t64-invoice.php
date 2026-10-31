@@ -8,7 +8,11 @@
  * AC-3: an Arabic order's invoice is in Arabic, right to left.
  * AC-4: [HTTP] the order's customer downloads it as a PDF from the account; another customer and a request without
  *       the nonce are refused; staff download it from the order.
+ *
+ * @package MizzeySite\Tests\Integration
  */
+
+namespace MizzeySite\Tests\Integration;
 
 
 use MizzeySite\Invoices\InvoiceDocument;
