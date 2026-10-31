@@ -127,8 +127,22 @@ run(
 		delete_post_meta_by_key( '_stock' );
 		update_post_meta( $id, '_STOCK', '93' );
 		update_post_meta( $id, '_stock ', '92' );
+		// WooCommerce Multilingual's clean-up deletes by quoted meta ids; an OR-ed condition reaches a stock row too.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_id IN ('%d') LIMIT %d", $mid_now, 1 ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = '91' WHERE meta_key = '_price' OR meta_id = %d", $mid_now ) );
 		$raw = t67_stored( $id );
-		$check( '5' === $raw['qty'] && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key, by meta id and for every object, a key in another case or with a trailing space, and a raw query naming a key, a meta id or none, change no stored stock (' . wp_json_encode( $raw ) . ')' );
+		$check( '5' === $raw['qty'] && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key, by meta id and for every object, a key in another case or with a trailing space, and a raw query naming a key, quoted or plain meta ids, or an OR-ed condition, change no stored stock (' . wp_json_encode( $raw ) . ')' );
+
+		// Ordinary writes go through: a value that reads like a stock key, and WooCommerce rebuilding its lookup table from the stored stock.
+		$noted = wc_get_product( $id );
+		$noted->set_purchase_note( '_stock' );
+		$noted->save();
+		update_post_meta( $id, '_t67_note', '_stock_status' );
+		$wpdb->update( $wpdb->wc_product_meta_lookup, array( 'stock_quantity' => 1 ), array( 'product_id' => $id ) );
+		wc_update_product_lookup_tables_column( 'stock_quantity' );
+		$rebuilt = (string) $wpdb->get_var( $wpdb->prepare( "SELECT stock_quantity FROM {$wpdb->wc_product_meta_lookup} WHERE product_id = %d", $id ) );
+		$notes   = array( get_post_meta( $id, '_purchase_note', true ), get_post_meta( $id, '_t67_note', true ) );
+		$check( array( '_stock', '_stock_status' ) === $notes && 5 === (int) $rebuilt, 'ERP-07 writes to other keys go through, a value that reads like a stock key among them, and WooCommerce rebuilds its lookup table from the stored stock (' . wp_json_encode( $notes ) . ", {$rebuilt})" );
 
 		// WooCommerce's direct stock update: nothing written, and the object read again.
 		$direct  = wc_get_product( $id );

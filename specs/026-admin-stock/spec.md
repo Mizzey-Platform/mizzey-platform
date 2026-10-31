@@ -73,7 +73,9 @@ staging and the client's approval.
 
 - **FR-001**: Every product and variation save MUST keep its stored stock quantity, stock status, stock management
   and backorders unless the adapter's projection writes them (AC-1).
-- **FR-002**: WooCommerce's direct stock update MUST write nothing outside the projection (AC-1).
+- **FR-002**: Every other local writer MUST be refused a change to a stored stock key outside the projection: WooCommerce's direct stock
+  update, WordPress's metadata API (by key, by meta id, for every object) and a raw query on the post meta table,
+  as WooCommerce Multilingual's synchronisation makes. Writes to other keys MUST go through unchanged (AC-1).
 - **FR-003**: The REST API MUST refuse a stock change with a 403 (AC-1).
 - **FR-004**: The products list, the product editor and the variation editor MUST show the stock source's figure, or
   that it is not known, with the stock fields shown locked (AC-2).

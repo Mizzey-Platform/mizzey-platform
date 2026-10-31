@@ -53,8 +53,13 @@ final class StockWriteGuard
     /** @var array<int,true> Products being deleted, whose stock meta goes with them. */
     private static array $deleting = [];
 
-    /** Set when the metadata API lets WooCommerce's default through: the one insert that follows is let through too. */
-    private static bool $passNext = false;
+    /**
+     * Set when the metadata API lets WooCommerce's default through: the insert of that default, for that post and key,
+     * is let through too.
+     *
+     * @var array{0: int, 1: string, 2: string}|null
+     */
+    private static ?array $passNext = null;
 
     private static bool $inQuery = false;
 
@@ -163,7 +168,7 @@ final class StockWriteGuard
         }
 
         $default = (string) maybe_serialize($value) === self::DEFAULTS[self::normal((string) $key)];
-        self::$passNext = $default;
+        self::$passNext = $default ? [(int) $objectId, self::normal((string) $key), (string) maybe_serialize($value)] : null;
 
         return $default ? null : false;
     }
@@ -223,8 +228,10 @@ final class StockWriteGuard
     }
 
     /**
-     * A raw write to a stock key in the post meta table, as WooCommerce's direct stock update and WooCommerce
-     * Multilingual's synchronisation make, is replaced by a query that writes nothing.
+     * A raw write to a product's stock row in the post meta table, as WooCommerce's direct stock update and
+     * WooCommerce Multilingual's synchronisation and clean-up make, is replaced by a query that writes nothing.
+     * An update or a delete is judged by the rows its own condition selects, counted by MySQL, so the key is compared
+     * as the database compares it; an insert by the key and the post in each row it adds.
      *
      * @param mixed $sql
      * @return mixed
@@ -232,71 +239,248 @@ final class StockWriteGuard
     public static function query($sql)
     {
         global $wpdb;
-        if (! is_string($sql) || self::$inQuery || preg_match('/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i', $sql) !== 1
-            || stripos($sql, $wpdb->postmeta) === false) {
-            return $sql;
-        }
-        if (self::$passNext) {
-            self::$passNext = false;
-
+        if (! is_string($sql) || self::$inQuery || stripos($sql, $wpdb->postmeta) === false
+            || preg_match('/^\s*(INSERT|REPLACE|UPDATE|DELETE)\b/i', $sql, $verb) !== 1) {
             return $sql;
         }
         if (self::permitted()) {
             return $sql;
         }
-        // A delete of a product being deleted goes through.
-        foreach (array_keys(self::$deleting) as $id) {
-            if (preg_match('/\bpost_id`?\s*(=\s*|IN\s*\(\s*)' . $id . '\b/i', $sql) === 1) {
-                return $sql;
+        [$mask, $literals] = self::scan($sql);
+        $refused = in_array(strtoupper($verb[1]), ['INSERT', 'REPLACE'], true)
+            ? self::insertRefused($sql, $mask, $literals)
+            : self::changeRefused($sql, $mask, $literals, strtoupper($verb[1]));
+
+        return $refused ? $wpdb->prepare('SELECT %d', 0) : $sql;
+    }
+
+    /**
+     * The query with the text inside its quotes blanked, so keywords and commas in values are not read as SQL, and each
+     * quoted value with its offset.
+     *
+     * @return array{0: string, 1: array<int, string>}
+     */
+    private static function scan(string $sql): array
+    {
+        $mask     = $sql;
+        $literals = [];
+        $length   = strlen($sql);
+        for ($i = 0; $i < $length; $i++) {
+            $quote = $sql[$i];
+            if ($quote !== "'" && $quote !== '"') {
+                continue;
             }
-        }
-        // A stock key named in the query, as MySQL would compare it.
-        preg_match_all("/'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"/", $sql, $quoted);
-        foreach (array_merge($quoted[1], $quoted[2]) as $literal) {
-            if (self::protectedKey(stripslashes((string) $literal))) {
-                return $wpdb->prepare('SELECT %d', 0);
-            }
-        }
-        // Rows named by meta id or by post id, with no key in the condition: refused when any is a product's stock
-        // key. A condition naming a key names one already shown above not to be a stock key.
-        $where = preg_split('/\bWHERE\b/i', $sql, 2)[1] ?? '';
-        if (preg_match('/^\s*(UPDATE|DELETE)\b/i', $sql) === 1 && preg_match('/\bmeta_key`?\s*(=|IN\b)/i', $where) !== 1
-            && preg_match_all('/\b(meta_id|post_id)`?\s*(?:=\s*(\d+)|IN\s*\(([\d,\s]+)\))/i', $where, $refs, PREG_SET_ORDER) > 0) {
-            // A product being deleted takes its stock rows with it.
-            $skip = self::$deleting === [] ? '' : ' AND m.post_id NOT IN (' . implode(',', array_map('intval', array_keys(self::$deleting))) . ')';
-            self::$inQuery = true;
-            try {
-                foreach ($refs as $ref) {
-                    $ids = implode(',', array_map('intval', preg_split('/[\s,]+/', trim(($ref[2] ?? '') !== '' ? $ref[2] : ($ref[3] ?? '')), -1, PREG_SPLIT_NO_EMPTY)));
-                    if ($ids === '') {
+            $start = $i;
+            $value = '';
+            for ($i++; $i < $length; $i++) {
+                $char = $sql[$i];
+                if ($char === '\\' && $i + 1 < $length) {
+                    $value .= $sql[++$i];
+                    continue;
+                }
+                if ($char === $quote) {
+                    if ($i + 1 < $length && $sql[$i + 1] === $quote) {
+                        $value .= $quote;
+                        $i++;
                         continue;
                     }
-                    $column = strtolower($ref[1]) === 'meta_id' ? 'm.meta_id' : 'm.post_id';
-                    $held   = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} m INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE {$column} IN ({$ids}) AND p.post_type IN ('product', 'product_variation') AND m.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders'){$skip}"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                    if ($held > 0) {
-                        return $wpdb->prepare('SELECT %d', 0);
-                    }
+                    break;
                 }
-            } finally {
-                self::$inQuery = false;
+                $value .= $char;
+            }
+            for ($j = $start + 1; $j < $i && $j < $length; $j++) {
+                $mask[$j] = 'x';
+            }
+            $literals[$start] = $value;
+        }
+
+        return [$mask, $literals];
+    }
+
+    /** Where the post meta table is named among the tables in this text, and the name its columns go by there. */
+    private static function metaTable(string $tables): ?string
+    {
+        global $wpdb;
+        $words = 'JOIN|INNER|LEFT|RIGHT|OUTER|CROSS|STRAIGHT_JOIN|NATURAL|ON|USING|WHERE|SET|ORDER|LIMIT|VALUES|SELECT';
+        if (preg_match('/(?<![\w.])`?' . preg_quote($wpdb->postmeta, '/') . '`?(?![\w.])(?:\s+(?:AS\s+)?(?!(?:' . $words . ')\b)`?(\w+)`?)?/i', $tables, $found) !== 1) {
+            return null;
+        }
+
+        return ($found[1] ?? '') !== '' ? $found[1] : $wpdb->postmeta;
+    }
+
+    /** @param array<int, string> $literals */
+    private static function insertRefused(string $sql, string $mask, array $literals): bool
+    {
+        global $wpdb;
+        $into = '/^\s*(?:INSERT|REPLACE)\s+(?:(?:LOW_PRIORITY|DELAYED|HIGH_PRIORITY|IGNORE)\s+)*(?:INTO\s+)?`?' . preg_quote($wpdb->postmeta, '/') . '`?(?![\w.])\s*/i';
+        if (preg_match($into, $mask, $head) !== 1) {
+            return false;
+        }
+        $rest = substr($mask, strlen($head[0]));
+        if (preg_match('/^\(([^()]*)\)\s*VALUES\s*/i', $rest, $columns) !== 1) {
+            // An insert from a query or by SET: refused when it names a stock key at all.
+            foreach ($literals as $literal) {
+                if (self::protectedKey($literal)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        $names = array_map(static fn (string $name): string => strtolower(trim($name, " \t\n\r`")), explode(',', $columns[1]));
+        $keyAt   = array_search('meta_key', $names, true);
+        $postAt  = array_search('post_id', $names, true);
+        $valueAt = array_search('meta_value', $names, true);
+        if ($keyAt === false) {
+            return false;
+        }
+        $offset = strlen($head[0]) + strlen($columns[0]);
+        preg_match_all('/\(([^()]*)\)/', substr($mask, $offset), $rows, PREG_OFFSET_CAPTURE);
+        foreach ($rows[1] as [$row, $at]) {
+            $values = [];
+            $cursor = $offset + $at;
+            foreach (explode(',', $row) as $cell) {
+                $text     = trim(substr($sql, $cursor, strlen($cell)));
+                $start    = $cursor + strspn($cell, " \t\n\r");
+                $values[] = $literals[$start] ?? $text;
+                $cursor  += strlen($cell) + 1;
+            }
+            $key  = (string) ($values[$keyAt] ?? '');
+            $post = $postAt === false ? 0 : (int) ($values[$postAt] ?? 0);
+            if (! self::protectedKey($key)) {
+                continue;
+            }
+            $value = $valueAt === false ? '' : (string) ($values[$valueAt] ?? '');
+            if (self::$passNext === [$post, self::normal($key), $value]) {
+                self::$passNext = null;
+                continue;
+            }
+            if ($post <= 0 || in_array(get_post_type($post), ['product', 'product_variation'], true)) {
+                return true;
             }
         }
 
-        return $sql;
+        return false;
     }
 
-    /** @param mixed $postId */
-    public static function deleting($postId): void
+    /** @param array<int, string> $literals */
+    private static function changeRefused(string $sql, string $mask, array $literals, string $verb): bool
     {
-        if (in_array(get_post_type((int) $postId), ['product', 'product_variation'], true)) {
-            self::$deleting[(int) $postId] = true;
+        global $wpdb;
+        $where = self::topLevel($mask, 'WHERE');
+        if ($verb === 'UPDATE') {
+            if (preg_match('/^\s*UPDATE\s+(?:(?:LOW_PRIORITY|IGNORE)\s+)*/i', $mask, $head) !== 1) {
+                return false;
+            }
+            $set = self::topLevel($mask, 'SET');
+            if ($set === null) {
+                return false;
+            }
+            $tables = substr($sql, strlen($head[0]), $set - strlen($head[0]));
+            $alias  = self::metaTable(substr($mask, strlen($head[0]), $set - strlen($head[0])));
+            if ($alias === null) {
+                return false;
+            }
+            $setMask = substr($mask, $set + 3, ($where ?? strlen($mask)) - $set - 3);
+            // Columns of another table set: the post meta table is only read.
+            preg_match_all('/(?:^|,)\s*(?:`?(\w+)`?\.)?`?(\w+)`?\s*=/', $setMask, $assigned, PREG_SET_ORDER);
+            $qualifiers = array_filter(array_map(static fn (array $a): string => strtolower($a[1]), $assigned));
+            if ($qualifiers !== [] && ! in_array(strtolower($alias), $qualifiers, true)) {
+                return false;
+            }
+            // A row renamed to a stock key.
+            foreach ($literals as $at => $literal) {
+                if ($at > $set && ($where === null || $at < $where) && self::protectedKey($literal)
+                    && preg_match('/\bmeta_key`?\s*=\s*$/i', substr($mask, $set, $at - $set)) === 1) {
+                    return true;
+                }
+            }
+            $from = $tables;
+        } else {
+            if (preg_match('/^\s*DELETE\s+(?:(?:LOW_PRIORITY|QUICK|IGNORE)\s+)*(.*?)\bFROM\b/is', $mask, $head) !== 1) {
+                return false;
+            }
+            $end   = $where ?? strlen($mask);
+            $alias = self::metaTable(substr($mask, strlen($head[0]), $end - strlen($head[0])));
+            if ($alias === null) {
+                return false;
+            }
+            $targets = array_map(static fn (string $t): string => strtolower(trim($t, " \t\n\r`")), explode(',', $head[1]));
+            if (trim($head[1]) !== '' && ! in_array(strtolower($alias), $targets, true) && ! in_array(strtolower($alias) . '.*', $targets, true)) {
+                return false;
+            }
+            $from = substr($sql, strlen($head[0]), $end - strlen($head[0]));
         }
+        $condition = $where === null ? '' : ' ' . substr($sql, $where);
+        if (self::onlyOtherKey($where === null ? '' : substr($mask, $where), $where ?? 0, $literals)) {
+            return false;
+        }
+        $skip = self::$deleting === [] ? '' : ' AND w.post_id NOT IN (' . implode(',', array_map('intval', array_keys(self::$deleting))) . ')';
+        self::$inQuery = true;
+        try {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $held = $wpdb->get_var("SELECT COUNT(*) FROM (SELECT `{$alias}`.post_id, `{$alias}`.meta_key FROM {$from}{$condition}) w INNER JOIN {$wpdb->posts} p ON p.ID = w.post_id WHERE p.post_type IN ('product', 'product_variation') AND w.meta_key IN ('_stock', '_stock_status', '_manage_stock', '_backorders'){$skip}");
+            $failed = $wpdb->last_error !== '';
+        } finally {
+            self::$inQuery = false;
+        }
+
+        // A condition MySQL cannot count is refused rather than let through.
+        return $failed || (int) $held > 0;
     }
 
-    /** @param mixed $postId */
-    public static function deleted($postId): void
+    /** Where a keyword stands outside quotes and brackets, or null. */
+    private static function topLevel(string $mask, string $word): ?int
     {
-        unset(self::$deleting[(int) $postId]);
+        $depth  = 0;
+        $length = strlen($mask);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $mask[$i];
+            if ($char === '(') {
+                $depth++;
+            } elseif ($char === ')') {
+                $depth--;
+            } elseif ($depth === 0 && preg_match('/\G' . $word . '\b/Ai', $mask, $m, 0, $i) === 1
+                && ($i === 0 || preg_match('/[\w`.]/', $mask[$i - 1]) !== 1)) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * A plain condition (no OR, no subquery) naming one key, not a stock key: the rows it selects hold no stock, and
+     * the count is skipped, as for every ordinary metadata write.
+     *
+     * @param array<int, string> $literals
+     */
+    private static function onlyOtherKey(string $whereMask, int $offset, array $literals): bool
+    {
+        if ($whereMask === '' || preg_match('/\b(OR|SELECT|XOR)\b|\|\|/i', $whereMask) === 1
+            || preg_match_all('/\bmeta_key\b/i', $whereMask) !== 1
+            || preg_match('/\bmeta_key`?\s*(=|IN\s*\()/i', $whereMask, $m, PREG_OFFSET_CAPTURE) !== 1) {
+            return false;
+        }
+        $from = $offset + $m[0][1] + strlen($m[0][0]);
+        $to   = stripos($m[1][0], 'IN') === 0 ? $offset + (int) strpos($whereMask, ')', $m[0][1]) : null;
+        $keys = [];
+        foreach ($literals as $at => $literal) {
+            if ($at >= $from && ($to === null ? $keys === [] : $at < $to)) {
+                $keys[] = $literal;
+            }
+        }
+        if ($keys === []) {
+            return false;
+        }
+        foreach ($keys as $key) {
+            if (self::protectedKey($key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
