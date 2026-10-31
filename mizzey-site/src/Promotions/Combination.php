@@ -31,6 +31,39 @@ final class Combination
     {
         add_filter('woocommerce_general_settings', [self::class, 'setting']);
         add_filter('woocommerce_coupon_get_individual_use', [self::class, 'individualUse'], 10, 2);
+        add_filter('woocommerce_apply_with_individual_use_coupon', [self::class, 'replaces'], 20, 1);
+    }
+
+    /**
+     * With combining off a new code replaces the one held, on the classic cart and the Store API alike (the Store API
+     * otherwise refuses it while an individual-use coupon is held).
+     *
+     * @param mixed $allow
+     */
+    public static function replaces($allow): bool
+    {
+        return self::allowed() ? (bool) $allow : true;
+    }
+
+    /**
+     * Whether, with combining off, the cart or order holds another promotion this one would join: on a cart, a coupon
+     * that is applied but is not the latest applied; on an order, any other coupon. A cart's own winner selection asks
+     * about coupons not yet applied, which this leaves alone.
+     *
+     * @param mixed $object
+     */
+    public static function anotherHeld(\WC_Coupon $coupon, $object): bool
+    {
+        $code = wc_format_coupon_code($coupon->get_code());
+        if ($object instanceof \WC_Order) {
+            return array_diff(array_map('wc_format_coupon_code', $object->get_coupon_codes()), [$code]) !== [];
+        }
+        if (! $object instanceof \WC_Cart) {
+            return false;
+        }
+        $applied = array_values(array_map('wc_format_coupon_code', $object->get_applied_coupons()));
+
+        return in_array($code, $applied, true) && count($applied) > 1 && end($applied) !== $code;
     }
 
     public static function allowed(): bool

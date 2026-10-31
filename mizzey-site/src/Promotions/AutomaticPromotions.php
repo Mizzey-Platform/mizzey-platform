@@ -107,7 +107,13 @@ final class AutomaticPromotions
         }
         $shipping  = array_values(array_filter($automatic, static fn (string $code): bool => self::shippingOnly(new \WC_Coupon($code))));
         $discount  = array_values(array_diff($automatic, $shipping));
-        $options   = array_filter([self::best($cart, $discount), self::best($cart, $shipping)]);
+        // Measured with the entered codes' discount already taken off, as WooCommerce takes it off before a free
+        // shipping minimum is compared.
+        $already = 0.0;
+        foreach ($entered as $code) {
+            $already += (float) wc_add_number_precision($cart->get_coupon_discount_amount($code, ! $cart->display_prices_including_tax()));
+        }
+        $options = array_filter([self::best($cart, $discount, $already), self::best($cart, $shipping, $already)]);
         usort($options, static fn (array $a, array $b): int => self::better($a, $b) ? -1 : 1);
         $chosen = [];
         $solo   = false;
@@ -145,7 +151,7 @@ final class AutomaticPromotions
      * @param list<string> $codes
      * @return array{code:string,value:int,created:int,id:int}|null
      */
-    private static function best(\WC_Cart $cart, array $codes): ?array
+    private static function best(\WC_Cart $cart, array $codes, float $already = 0.0): ?array
     {
         $best = null;
         foreach ($codes as $code) {
@@ -157,7 +163,7 @@ final class AutomaticPromotions
             $created   = $coupon->get_date_created();
             $candidate = [
                 'code'    => $code,
-                'value'   => self::value($cart, $coupon),
+                'value'   => self::value($cart, $coupon, $already),
                 'created' => $created ? $created->getTimestamp() : PHP_INT_MAX,
                 'id'      => $coupon->get_id(),
             ];
@@ -180,8 +186,11 @@ final class AutomaticPromotions
      * comparison: what the customer would pay for shipping without any automatic promotion, less what they would pay
      * with this one (its discount can move the cart below a free shipping minimum; its free shipping can make shipping
      * free).
+     *
+     * `$already` is the shown discount, in cents, of the codes the customer entered (with combining on), which comes off
+     * before a free shipping minimum is compared.
      */
-    public static function value(\WC_Cart $cart, \WC_Coupon $coupon): int
+    public static function value(\WC_Cart $cart, \WC_Coupon $coupon, float $already = 0.0): int
     {
         $discounts = new \WC_Discounts($cart);
         $discounts->set_items(self::items($cart));
@@ -190,7 +199,7 @@ final class AutomaticPromotions
         $paid   = self::paidSaving($cart, $byItem);
         $shown  = self::shownDiscount($cart, $byItem);
 
-        return $paid + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
+        return $paid + self::shippingCost($cart, $already, false) - self::shippingCost($cart, $already + $shown, $coupon->get_free_shipping());
     }
 
     /**

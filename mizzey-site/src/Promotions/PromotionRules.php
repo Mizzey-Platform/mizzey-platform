@@ -42,6 +42,14 @@ final class PromotionRules
             // The template stands for the welcome discount; each customer gets their own copy (BR-001).
             throw new \Exception(esc_html__('This coupon cannot be used.', 'mizzey-site'), 114);
         }
+        $owner = WelcomeDiscount::owner($coupon);
+        if ($owner > 0) {
+            // A welcome discount is its customer's alone, whatever email is given (BR-001).
+            $who = $discounts instanceof \WC_Discounts && $discounts->get_object() instanceof \WC_Order ? (int) $discounts->get_object()->get_customer_id() : get_current_user_id();
+            if ($who !== $owner) {
+                throw new \Exception(esc_html__('This coupon cannot be used.', 'mizzey-site'), 115);
+            }
+        }
         if (PromotionSettings::paused($coupon)) {
             throw new \Exception(esc_html__('This coupon is paused.', 'mizzey-site'), 113);
         }
@@ -64,6 +72,9 @@ final class PromotionRules
         if (PromotionSettings::firstOrder($coupon) && self::hasEarlierOrder($object)) {
             throw new \Exception(esc_html__('This coupon is for a first order only.', 'mizzey-site'), 112);
         }
+        if (! Combination::allowed() && Combination::anotherHeld($coupon, $object)) {
+            throw new \Exception(esc_html__('Only one promotion applies per order.', 'mizzey-site'), 116);
+        }
 
         return true;
     }
@@ -83,7 +94,8 @@ final class PromotionRules
     }
 
     /**
-     * Whether the customer already has an order, by account and by billing email, ignoring the order being placed.
+     * Whether the customer already has an order, by account, by the account's email and by the billing email, ignoring
+     * the order being placed: a guest's earlier order under the account's email counts, whatever billing email is given.
      *
      * @param mixed $object The cart or order the coupon is checked against.
      */
@@ -102,7 +114,8 @@ final class PromotionRules
             }
         }
         $statuses = array_values(array_diff(array_keys(wc_get_order_statuses()), self::NOT_AN_ORDER));
-        foreach (array_filter([$userId ?: null, $email !== '' ? $email : null]) as $customer) {
+        $account  = $userId ? (string) (get_userdata((int) $userId)->user_email ?? '') : '';
+        foreach (array_unique(array_filter([$userId ?: null, $email !== '' ? $email : null, $account !== '' ? $account : null])) as $customer) {
             $found = wc_get_orders([
                 'customer' => $customer,
                 'status'   => $statuses,

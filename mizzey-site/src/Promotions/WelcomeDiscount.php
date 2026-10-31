@@ -32,6 +32,9 @@ final class WelcomeDiscount
     public const OWNER     = '_mizzey_welcome_for';
     public const USER_META = '_mizzey_welcome_coupon';
 
+    /** Hashes of every email a welcome discount was issued to, kept when an account is deleted: one per email, ever. */
+    public const ISSUED = 'mizzey_welcome_issued';
+
     public static function register(): void
     {
         add_action('user_register', [self::class, 'issue'], 20, 1);
@@ -40,6 +43,12 @@ final class WelcomeDiscount
     public static function isTemplate(\WC_Coupon $coupon): bool
     {
         return $coupon->get_meta(self::TEMPLATE, true) === 'yes';
+    }
+
+    /** The customer a welcome discount belongs to, or 0 for any other coupon. */
+    public static function owner(\WC_Coupon $coupon): int
+    {
+        return (int) $coupon->get_meta(self::OWNER, true);
     }
 
     public static function days(\WC_Coupon $coupon): int
@@ -81,6 +90,11 @@ final class WelcomeDiscount
         if ($template === null || ! is_email($user->user_email)) {
             return;
         }
+        $issued = (array) get_option(self::ISSUED, []);
+        $hash   = hash('sha256', wc_strtolower($user->user_email));
+        if (in_array($hash, $issued, true)) {
+            return;
+        }
         $coupon = new \WC_Coupon();
         $coupon->set_code('welcome-' . strtolower(wp_generate_password(10, false, false)));
         $coupon->set_props([
@@ -102,7 +116,8 @@ final class WelcomeDiscount
             'usage_limit_per_user'        => 1,
             'date_expires'                => self::days($template) > 0 ? time() + self::days($template) * DAY_IN_SECONDS : null,
         ]);
-        foreach ([PromotionSettings::MAX_DISCOUNT, PromotionSettings::MIN_ITEMS] as $key) {
+        // WooCommerce keeps a coupon's brand conditions as post meta (`WC_Brands_Coupons`), not as props.
+        foreach ([PromotionSettings::MAX_DISCOUNT, PromotionSettings::MIN_ITEMS, 'product_brands', 'exclude_product_brands'] as $key) {
             $coupon->update_meta_data($key, (string) $template->get_meta($key, true));
         }
         $coupon->update_meta_data(PromotionSettings::AUTOMATIC, 'yes');
@@ -111,6 +126,8 @@ final class WelcomeDiscount
         $coupon->save();
         if ($coupon->get_id()) {
             update_user_meta($user->ID, self::USER_META, $coupon->get_id());
+            $issued[] = $hash;
+            update_option(self::ISSUED, array_values(array_unique($issued)), false);
         }
     }
 

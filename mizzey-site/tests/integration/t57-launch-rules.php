@@ -147,6 +147,41 @@ run(
 		$own->increase_usage_count( (string) $customer );
 		t57_cart( array( $mid->get_id() => 1 ) );
 		$check( array() === t57_applied(), 'BR-001 used once, it no longer applies' );
+		// BR-001: a welcome discount is its customer's alone, for new customers only, once per email ever.
+		$third    = t57_customer( $s, "{$tag}-third" );
+		$third_cp = new \WC_Coupon( (int) get_user_meta( $third, WelcomeDiscount::USER_META, true ) );
+		wp_set_current_user( $other );
+		WC()->customer->set_billing_email( "{$tag}-third@example.invalid" );
+		t57_cart( array( $mid->get_id() => 1 ) );
+		$taken = ( new \WC_Discounts( WC()->cart ) )->is_coupon_valid( new \WC_Coupon( $third_cp->get_code() ) );
+		$check( is_wp_error( $taken ) && 'This coupon cannot be used.' === $taken->get_error_message(), 'BR-001 another customer entering someone\'s welcome code with that person\'s email is refused (' . ( is_wp_error( $taken ) ? $taken->get_error_message() : 'accepted' ) . ')' );
+		wp_set_current_user( 0 );
+		$returning_email = "{$tag}-back@example.invalid";
+		$earlier         = wc_create_order();
+		$earlier->add_product( $cheap, 1 );
+		$earlier->set_billing_email( $returning_email );
+		$earlier->calculate_totals();
+		$earlier->set_status( 'processing' );
+		$earlier->save();
+		$s->track_order( $earlier->get_id() );
+		$returning = t57_customer( $s, "{$tag}-back" );
+		wp_set_current_user( $returning );
+		WC()->customer->set_billing_email( "{$tag}-elsewhere@example.invalid" );
+		t57_cart( array( $mid->get_id() => 1 ) );
+		$check( array() === t57_applied(), 'BR-001 a guest who ordered, then registered, gets no welcome discount, whatever billing email they give' );
+		wp_set_current_user( 0 );
+		WC()->customer->set_billing_email( '' );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $third );
+		$again = (int) wp_insert_user( array( 'user_login' => "{$tag}-third2", 'user_email' => "{$tag}-third@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
+		$s->track_user( $again );
+		$s->on_finish( static function () use ( $third_cp ) { wp_delete_post( $third_cp->get_id(), true ); } );
+		$check( 0 === (int) get_user_meta( $again, WelcomeDiscount::USER_META, true ), 'BR-001 an account deleted and made again with the same email gets no second welcome discount' );
+		update_post_meta( $template->get_id(), 'exclude_product_brands', array( 991 ) );
+		$branded    = t57_customer( $s, "{$tag}-brand" );
+		$branded_cp = (int) get_user_meta( $branded, WelcomeDiscount::USER_META, true );
+		$check( array( 991 ) === get_post_meta( $branded_cp, 'exclude_product_brands', true ), 'BR-001 the template\'s brand exclusions are copied to each customer\'s welcome discount' );
+		delete_post_meta( $template->get_id(), 'exclude_product_brands' );
 		wp_set_current_user( 0 );
 		WC()->customer->set_billing_email( '' );
 
@@ -220,6 +255,59 @@ run(
 		$solo = t57_screen( $s, "{$tag}solo", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '8', 'individual_use' => 'yes' ) );
 		t57_cart( array( $cheap->get_id() => 2 ), array( $solo->get_code() ) );
 		$check( array( t57_code( $solo ) ) === t57_applied(), 'BR-004 on: an individual-use code still stands alone' );
+		// BR-004: entered codes measured in, then switching combining off leaves one, on carts, orders and the Store API.
+		foreach ( array( $auto, $two ) as $quiet ) {
+			$quiet->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$quiet->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$freeauto = t57_screen( $s, "{$tag}freeauto", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0', 'free_shipping' => 'yes', 'mizzey_automatic' => 'yes' ) );
+		$freeauto->set_individual_use( false );
+		$freeauto->save();
+		$big_off = t57_screen( $s, "{$tag}twohundred", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '200' ) );
+		AutomaticPromotions::forget();
+		update_option( Combination::OPTION, 'yes' );
+		t57_cart( array( $mid->get_id() => 1 ), array( $big_off->get_code() ) );
+		$measured = t57_applied();
+		$check( in_array( t57_code( $freeauto ), $measured, true ) && 0.0 === (float) WC()->cart->get_shipping_total(), 'BR-004 on: 200 off a 600 cart takes it under a 500 free shipping minimum, so the automatic free shipping is worth its rate and applies (' . implode( ',', $measured ) . ')' );
+		$freeauto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$freeauto->save();
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		AutomaticPromotions::forget();
+		t57_cart( array( $cheap->get_id() => 2 ), array( $tenoff->get_code(), $five->get_code() ) );
+		$both = t57_applied();
+		delete_option( Combination::OPTION );
+		WC()->cart->calculate_totals();
+		wc_clear_notices();
+		$left = t57_applied();
+		$check( 2 === count( $both ) && array( t57_code( $five ) ) === $left, 'BR-004 two codes held while combining was on: switched off, the cart keeps one (' . implode( ',', $left ) . ')' );
+		$admin_order = $s->order_for( $cheap, 2 );
+		$admin_order->apply_coupon( $tenoff->get_code() );
+		$second = wc_get_order( $admin_order->get_id() )->apply_coupon( $five->get_code() );
+		$codes  = wc_get_order( $admin_order->get_id() )->get_coupon_codes();
+		$check( is_wp_error( $second ) && array( t57_code( $tenoff ) ) === array_map( 'wc_format_coupon_code', $codes ), 'BR-004 off: a second code on an order is refused (' . ( is_wp_error( $second ) ? $second->get_error_message() : 'applied' ) . ')' );
+		wp_set_current_user( 0 );
+		$store   = rest_url( 'wc/store/v1/' );
+		$first_r = wp_remote_get( $store . 'cart', array( 'timeout' => 30 ) ); // storefront-guard: exempt, the Store API answers JSON, not a storefront page.
+		$jar     = array();
+		foreach ( wp_remote_retrieve_cookies( $first_r ) as $cookie ) {
+			$jar[ $cookie->name ] = $cookie;
+		}
+		$auth = array( 'Nonce' => (string) wp_remote_retrieve_header( $first_r, 'nonce' ), 'Cart-Token' => (string) wp_remote_retrieve_header( $first_r, 'cart-token' ), 'Content-Type' => 'application/json' );
+		$post = static function ( string $path, array $body ) use ( $store, &$jar, $auth ) {
+			$r = wp_remote_post( $store . $path, array( 'timeout' => 30, 'cookies' => array_values( $jar ), 'headers' => $auth, 'body' => wp_json_encode( $body ) ) ); // storefront-guard: exempt, the Store API answers JSON, not a storefront page.
+			foreach ( wp_remote_retrieve_cookies( $r ) as $cookie ) {
+				$jar[ $cookie->name ] = $cookie;
+			}
+			return $r;
+		};
+		$post( 'cart/add-item', array( 'id' => $cheap->get_id(), 'quantity' => 2 ) );
+		$post( 'cart/apply-coupon', array( 'code' => $tenoff->get_code() ) );
+		$replaced = $post( 'cart/apply-coupon', array( 'code' => $five->get_code() ) );
+		$after    = array_map( 'wc_format_coupon_code', array_column( (array) ( json_decode( wp_remote_retrieve_body( $replaced ), true )['coupons'] ?? array() ), 'code' ) );
+		$check( 200 === (int) wp_remote_retrieve_response_code( $replaced ) && array( t57_code( $five ) ) === $after, '[HTTP] BR-004 off: through the Store API a second code replaces the first, as on the classic cart (' . wp_remote_retrieve_response_code( $replaced ) . ': ' . implode( ',', $after ) . ')' );
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
@@ -241,6 +329,23 @@ run(
 		$fine = wc_create_refund( array( 'order_id' => $paid->get_id(), 'amount' => '600' ) );
 		$more = wc_create_refund( array( 'order_id' => $paid->get_id(), 'amount' => '1' ) );
 		$check( is_wp_error( $over ) && is_wp_error( $over_line ) && $fine instanceof \WC_Order_Refund && is_wp_error( $more ), 'BR-006 601 back on a 600 order is refused, also for its line; 600 is refunded; then even 1 more is refused' );
+		// BR-006, per item: a discounted two-line order, each line 80 after 20 percent off.
+		$second_item = $s->simple_product( 't57 toner', '100', null );
+		$twenty      = t57_screen( $s, "{$tag}twenty", array( 'discount_type' => 'percent', 'coupon_amount' => '20' ) );
+		$lines_order = wc_create_order();
+		$lines_order->add_product( $cheap, 1 );
+		$lines_order->add_product( $second_item, 1 );
+		$lines_order->apply_coupon( $twenty->get_code() );
+		$lines_order->calculate_totals();
+		$lines_order->set_status( 'processing' );
+		$lines_order->save();
+		$s->track_order( $lines_order->get_id() );
+		$first_line = (int) array_key_first( $lines_order->get_items() );
+		$line_total = (float) $lines_order->get_item( $first_line )->get_total();
+		$above = wc_create_refund( array( 'order_id' => $lines_order->get_id(), 'amount' => '90', 'line_items' => array( $first_line => array( 'qty' => 1, 'refund_total' => 90 ) ) ) );
+		$exact = wc_create_refund( array( 'order_id' => $lines_order->get_id(), 'amount' => '80', 'line_items' => array( $first_line => array( 'qty' => 1, 'refund_total' => 80 ) ) ) );
+		$extra = wc_create_refund( array( 'order_id' => $lines_order->get_id(), 'amount' => '1', 'line_items' => array( $first_line => array( 'qty' => 0, 'refund_total' => 1 ) ) ) );
+		$check( 80.0 === $line_total && is_wp_error( $above ) && $exact instanceof \WC_Order_Refund && is_wp_error( $extra ), "BR-006 a line paid 80 after the discount cannot get 90 back though the order total would allow it; 80 is refunded; then 1 more for that line is refused (" . ( is_wp_error( $above ) ? $above->get_error_message() : 'refunded' ) . ')' );
 
 		// BR-008: a guest orders, then the order-received offer links the order to the new account.
 		sign_in_options(
