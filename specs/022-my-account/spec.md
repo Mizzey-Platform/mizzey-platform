@@ -83,7 +83,7 @@ The designed screens are PRE-03b's.
 | Dashboard, profile, password, order history and detail | WooCommerce's My Account pages | Native, verified (B9) |
 | Address book | One billing and one shipping address | Gap: `AddressBook` |
 | Order tracking | The order's status | Gap: `AccountPages` adds the shipment and the progress |
-| Wishlist page | None | Gap: `AccountPages` adds the page (the wishlist is specs/015's) |
+| Wishlist in the account | None | Gap: `AccountPages` adds a Wishlist item to the account menu, opening the storefront's one Wishlist page (IA-11, G-1 of specs/003); the page's screen is specs/015's, after PRE-03b |
 
 ## Requirements
 

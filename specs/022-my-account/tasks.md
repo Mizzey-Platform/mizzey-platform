@@ -7,7 +7,7 @@ Each task names its test. `t63` is `mizzey-site/tests/integration/t63-my-account
 | Id | Task | Test |
 |---|---|---|
 | T001 | `AddressBook` and its REST routes | t63 AC-2 |
-| T002 | `AccountPages`: order tracking and the wishlist page | t63 AC-4, AC-5 |
+| T002 | `AccountPages`: order tracking and the account menu's Wishlist item | t63 AC-4, AC-5 |
 | T003 | Wire into `mizzey-site.php`; Arabic for every message | t63, t39 |
 | T004 | Full suite; mutation checks; Codex review | suite |
 | T005 | ACCT-12, the invoice download, after #280's invoice | not started |

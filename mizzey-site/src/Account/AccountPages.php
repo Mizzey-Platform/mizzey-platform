@@ -19,7 +19,9 @@ defined('ABSPATH') || exit;
  *
  * - Order tracking (ACCT-07): under an order's details, the shipment (carrier, tracking number and page, specs/021) and
  *   the order's progress, each status it has entered with its date (the status model's history, specs/010).
- * - Saved wishlist (ACCT-08): a Wishlist section in the account menu listing the customer's saved items (specs/015).
+ * - Saved wishlist (ACCT-08): a Wishlist item in the account menu, after Orders, opening the storefront's one Wishlist
+ *   page (IA-11, `/wishlist/` and `/ar/wishlist/`), so the wishlist has one route (G-1 of specs/003). The page's screen
+ *   is specs/015's, after PRE-03b.
  *
  * The dashboard, profile and password, order history and order detail (ACCT-01, ACCT-02, ACCT-03, ACCT-05, ACCT-06) are
  * WooCommerce's own account pages; the address book is AddressBook. The designed screens are PRE-03b's.
@@ -28,26 +30,37 @@ defined('ABSPATH') || exit;
  */
 final class AccountPages
 {
+    /** The account menu item's key. */
     public const WISHLIST = 'wishlist';
 
 
     public static function register(): void
     {
         add_action('woocommerce_order_details_after_order_table', [self::class, 'tracking'], 20, 1);
-        add_filter('woocommerce_get_query_vars', [self::class, 'queryVars']);
         add_filter('woocommerce_account_menu_items', [self::class, 'menu'], 20, 1);
-        add_action('woocommerce_account_' . self::WISHLIST . '_endpoint', [self::class, 'wishlist']);
-        add_action('init', [self::class, 'flushOnce'], 99);
+        add_filter('woocommerce_get_endpoint_url', [self::class, 'wishlistUrl'], 10, 2);
     }
 
-    /** The new account page's address needs WordPress's rewrite rules rebuilt once, after the endpoint is added. */
-    public static function flushOnce(): void
+    /**
+     * The account menu's Wishlist item opens the storefront's Wishlist page, in the visitor's language.
+     *
+     * @param mixed $url
+     * @param mixed $endpoint
+     * @return mixed
+     */
+    public static function wishlistUrl($url, $endpoint)
     {
-        if (get_option('mizzey_account_endpoints') !== self::WISHLIST) {
-            flush_rewrite_rules(false);
-            update_option('mizzey_account_endpoints', self::WISHLIST, true);
+        if ($endpoint !== self::WISHLIST) {
+            return $url;
         }
+        $page = get_page_by_path('wishlist');
+        if (! $page instanceof \WP_Post) {
+            return $url;
+        }
+
+        return get_permalink((int) apply_filters('wpml_object_id', $page->ID, 'page', true)) ?: $url;
     }
+
 
     /**
      * The order's progress: each status it entered, with when.
@@ -99,18 +112,6 @@ final class AccountPages
         echo '</ol></section>';
     }
 
-    /**
-     * @param mixed $vars
-     * @return mixed
-     */
-    public static function queryVars($vars)
-    {
-        if (is_array($vars)) {
-            $vars[self::WISHLIST] = self::WISHLIST;
-        }
-
-        return $vars;
-    }
 
     /**
      * @param mixed $items
@@ -132,21 +133,4 @@ final class AccountPages
         return isset($out[self::WISHLIST]) ? $out : $out + [self::WISHLIST => __('Wishlist', 'mizzey-site')];
     }
 
-    public static function wishlist(): void
-    {
-        $ids = Wishlist::ids();
-        if ($ids === []) {
-            printf('<p class="mizzey-wishlist-empty">%s</p>', esc_html__('Your wishlist is empty.', 'mizzey-site'));
-
-            return;
-        }
-        echo '<ul class="mizzey-wishlist">';
-        foreach ($ids as $id) {
-            $product = Wishlist::shown((int) $id);
-            if ($product instanceof \WC_Product) {
-                printf('<li><a href="%s">%s</a> %s</li>', esc_url($product->get_permalink()), esc_html($product->get_name()), wp_kses_post($product->get_price_html()));
-            }
-        }
-        echo '</ul>';
-    }
 }

@@ -134,17 +134,11 @@ run(
 		remove_filter( 'woocommerce_is_account_page', $on_account );
 		$check( array( 'pending', 'processing', 'preparing', 'shipped' ) === $steps && false !== strpos( $html, 'BST-55210' ) && false !== strpos( $html, 'Bosta' ), 'ACCT-07 the order view shows the carrier and tracking number and each status the order entered, in order (' . implode( ',', $steps ) . ')' );
 
-		// ACCT-08: the wishlist page.
-		wp_set_current_user( $laila );
-		Wishlist::add( $product->get_id() );
-		$menu = array_keys( (array) apply_filters( 'woocommerce_account_menu_items', array( 'dashboard' => 'Dashboard', 'orders' => 'Orders', 'customer-logout' => 'Log out' ) ) );
-		ob_start();
-		AccountPages::wishlist();
-		$page = (string) ob_get_clean();
-		Wishlist::remove( $product->get_id() );
-		wp_set_current_user( 0 );
-		$vars = (array) apply_filters( 'woocommerce_get_query_vars', array() );
-		$check( array( 'dashboard', 'orders', AccountPages::WISHLIST, 'customer-logout' ) === $menu && false !== strpos( $page, 't63 cream' ) && isset( $vars[ AccountPages::WISHLIST ] ), 'ACCT-08 the account menu has a Wishlist page after Orders, listing the saved items' );
+		// ACCT-08: the account menu opens the storefront's one Wishlist page (IA-11), not a second route under the account.
+		$menu     = array_keys( (array) apply_filters( 'woocommerce_account_menu_items', array( 'dashboard' => 'Dashboard', 'orders' => 'Orders', 'customer-logout' => 'Log out' ) ) );
+		$wish_url = wc_get_account_endpoint_url( AccountPages::WISHLIST );
+		$vars     = (array) apply_filters( 'woocommerce_get_query_vars', array() );
+		$check( array( 'dashboard', 'orders', AccountPages::WISHLIST, 'customer-logout' ) === $menu && untrailingslashit( home_url( '/wishlist' ) ) === untrailingslashit( $wish_url ) && ! isset( $vars[ AccountPages::WISHLIST ] ), 'ACCT-08 the account menu has a Wishlist item after Orders, opening the storefront\'s Wishlist page (' . $wish_url . ')' );
 
 		return $ok;
 	}

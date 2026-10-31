@@ -352,10 +352,6 @@ msgstr "تتبّع شحنتك"
 msgid "Wishlist"
 msgstr "قائمة الأمنيات"
 
-#: mizzey-site/src/Account/AccountPages.php
-msgid "Your wishlist is empty."
-msgstr "قائمة أمنياتك فارغة."
-
 #: mizzey-site/src/Account/AddressBook.php
 msgid "Please try again in a moment."
 msgstr "يرجى المحاولة مرة أخرى بعد قليل."

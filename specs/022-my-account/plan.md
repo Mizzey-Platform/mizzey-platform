@@ -14,7 +14,7 @@ and account pages for order tracking and the wishlist. The invoice download wait
 |---|---|
 | Stack | WordPress 7.1.4, WooCommerce 11.1.0 (`stack.lock.json`) |
 | Code | `mizzey-site/src/Account/`: `AddressBook`, `AccountPages` |
-| Extension points | REST `mizzey/v1/account/addresses`; `woocommerce_order_details_after_order_table`; `woocommerce_get_query_vars`, `woocommerce_account_menu_items`, `woocommerce_account_wishlist_endpoint` |
+| Extension points | REST `mizzey/v1/account/addresses`; `woocommerce_order_details_after_order_table`; `woocommerce_account_menu_items`, `woocommerce_get_endpoint_url` |
 | Testing | `t63-my-account`: in-process, the REST routes through `rest_do_request()` |
 
 ## Constitution Check

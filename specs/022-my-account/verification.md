@@ -17,7 +17,7 @@ Stack: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7.
 |---|---|
 | AC-2 | Pass. Add, refuse three bad addresses, default copied with its district; another default, the sign-in number untouched; edit, delete, the default passed on; another customer refused; the capacity; REST 401 for a visitor, 201 for the customer; [HTTP] the customer's cookies without the REST nonce refused |
 | AC-4 | Pass. Every status entered, in order, a failed delivery included, with the carrier and tracking number, through the order details hook |
-| AC-5 | Pass. The Wishlist page after Orders, listing the saved items |
+| AC-5 | Pass for the menu: a Wishlist item after Orders opens the storefront's Wishlist page (IA-11), so the wishlist keeps one route (G-1). The page's list of saved items is specs/015's screen, after PRE-03b |
 | AC-1, AC-3 | Native (WooCommerce's account pages) |
 | AC-6 | Not built: waits for #280 |
 
