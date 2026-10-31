@@ -116,3 +116,11 @@ msgstr "مرحبًا %s،"
 #: mizzey-site/src/Reviews/ReviewInvitationEmail.php
 msgid "Your order has been delivered. We would love to hear what you think of it:"
 msgstr "تم توصيل طلبك. يسعدنا أن نعرف رأيك فيه:"
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Please choose a rating from 1 to 5 stars."
+msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Only staff who moderate reviews can publish one."
+msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."

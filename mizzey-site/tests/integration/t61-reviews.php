@@ -94,14 +94,30 @@ run(
 		$keen    = t61_customer( $s, "{$tag}-keen" );
 		$waiting = t61_customer( $s, "{$tag}-waiting" );
 		$refunded = t61_customer( $s, "{$tag}-refunded" );
+		$eligible_rest = t61_customer( $s, "{$tag}-rest" );
+		$by_amount     = t61_customer( $s, "{$tag}-amount" );
 		t61_order( $s, $keen, $cream, 'completed' );
 		t61_order( $s, $waiting, $cream, 'processing' );
+		t61_order( $s, $eligible_rest, $cream, 'completed' );
+		$pair = wc_create_order( array( 'customer_id' => $by_amount ) );
+		$pair->add_product( $cream, 1 );
+		$pair->add_product( $balm, 1 );
+		$pair->set_billing_email( (string) get_userdata( $by_amount )->user_email );
+		$pair->calculate_totals();
+		$pair->save();
+		$s->track_order( $pair->get_id() );
+		$pair = t61_walk( $pair, 'completed' );
+		foreach ( $pair->get_items() as $pair_id => $pair_item ) {
+			if ( (int) $pair_item->get_product_id() === $balm->get_id() ) {
+				wc_create_refund( array( 'order_id' => $pair->get_id(), 'amount' => (string) $pair_item->get_total(), 'line_items' => array( $pair_id => array( 'qty' => 0, 'refund_total' => (float) $pair_item->get_total() ) ) ) );
+			}
+		}
 		$back = t61_order( $s, $refunded, $balm, 'completed' );
 		$line = (int) array_key_first( $back->get_items() );
 		wc_create_refund( array( 'order_id' => $back->get_id(), 'amount' => (string) $back->get_total(), 'line_items' => array( $line => array( 'qty' => 1, 'refund_total' => (float) $back->get_total() ) ) ) );
 
 		// REV-01, REV-02, D-17: who may review.
-		$check( null === ReviewEligibility::refusal( $keen, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $waiting, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( 0, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $refunded, $balm->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $keen, $balm->get_id() ), 'REV-01, D-17 a delivered order makes its product reviewable; a processing order, a guest, a fully refunded line and another product do not' );
+		$check( null === ReviewEligibility::refusal( $keen, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $waiting, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( 0, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $refunded, $balm->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $keen, $balm->get_id() ) && null === ReviewEligibility::refusal( $by_amount, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $by_amount, $balm->get_id() ), 'REV-01, D-17 a delivered order makes its product reviewable; a processing order, a guest, a line refunded in full (by quantity, or by amount alone) and another product do not' );
 
 		// The form post: refused for the ineligible, held for moderation for the eligible, once.
 		$refused = t61_post( $waiting, $cream->get_id(), 5 );
@@ -126,13 +142,54 @@ run(
 		$direct = ReviewEligibility::checkRest( array( 'comment_post_ID' => $cream->get_id(), 'user_id' => $waiting, 'comment_type' => '' ), $request );
 		$check( 403 === $rest->get_status() && is_wp_error( $direct ) && 'mizzey_review_' . ReviewEligibility::NOT_ELIGIBLE === $direct->get_error_code(), 'D-17 the REST comments endpoint refuses a customer without a delivery (' . $rest->get_status() . ' ' . ( $rest->get_data()['code'] ?? '' ) . '), and its insert check refuses them even where the form is open' );
 
-		// The product page: the form only for someone who may review, an explanation otherwise.
+		// The product page: the Reviews tab and approved reviews for everyone; the form's fields only for someone who
+		// may review, the reason otherwise.
+		$GLOBALS['post'] = get_post( $cream->get_id() );
+		setup_postdata( $GLOBALS['post'] );
+		$base = array( 'title_reply' => 'Add a review', 'comment_field' => '<textarea name="comment"></textarea>', 'fields' => array( 'author' => 'x' ), 'submit_button' => '<input type="submit" />' );
 		wp_set_current_user( $waiting );
 		$open_waiting = comments_open( $cream->get_id() );
+		$args_waiting = apply_filters( 'woocommerce_product_review_comment_form_args', $base );
 		wp_set_current_user( $keen );
-		$open_keen = comments_open( $cream->get_id() );
+		$args_keen = apply_filters( 'woocommerce_product_review_comment_form_args', $base );
+		wp_set_current_user( $eligible_rest );
+		$args_open = apply_filters( 'woocommerce_product_review_comment_form_args', $base );
 		wp_set_current_user( 0 );
-		$check( ! $open_waiting && ! $open_keen && false !== strpos( ReviewEligibility::message( ReviewEligibility::ALREADY_REVIEWED ), 'already' ), 'D-17 the form is not offered to a customer without a delivery, nor to one who has already reviewed; each is told why' );
+		wp_reset_postdata();
+		$check( $open_waiting && '' === $args_waiting['comment_field'] && '' === $args_waiting['submit_button'] && false !== strpos( (string) $args_waiting['comment_notes_before'], 'delivered' ) && false !== strpos( (string) $args_keen['comment_notes_before'], 'already reviewed' ) && $base['comment_field'] === $args_open['comment_field'], 'D-17 the Reviews tab stays open for everyone; a customer without a delivery, and one who has reviewed, see the reason in place of the form\'s fields; an eligible customer gets the form' );
+
+		// Every route needs a rating; the REST comments endpoint keeps it; one review there too.
+		$no_rating = t61_post( $eligible_rest, $cream->get_id(), 0 );
+		wp_set_current_user( $eligible_rest );
+		$rest_review = new \WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$rest_review->set_param( 'post', $cream->get_id() );
+		$rest_review->set_param( 'content', 'Through the API, rated.' );
+		$unrated = rest_do_request( $rest_review );
+		$rest_review->set_param( 'rating', 5 );
+		$rated = rest_do_request( $rest_review );
+		$rated_id = (int) ( $rated->get_data()['id'] ?? 0 );
+		if ( $rated_id > 0 ) {
+			$comments[] = $rated_id;
+		}
+		$rest_review->set_param( 'content', 'And again.' );
+		$twice = rest_do_request( $rest_review );
+		wp_set_current_user( 0 );
+		$check( is_string( $no_rating ) && false !== strpos( $no_rating, 'rating' ) && 400 === $unrated->get_status() && 201 === $rated->get_status() && 5 === (int) get_comment_meta( $rated_id, 'rating', true ) && '0' === (string) get_comment( $rated_id )->comment_approved && 'review' === get_comment( $rated_id )->comment_type && 403 === $twice->get_status(), 'REV-01, D-17 a review with no rating is refused on the form post and on REST; a rated REST review keeps its rating and is held; a second one is refused (' . $unrated->get_status() . ', ' . $rated->get_status() . ', ' . $twice->get_status() . ')' );
+
+		// WooCommerce's REST reviews endpoint: the same rule, and no publishing without moderation rights.
+		$editor = t61_customer( $s, "{$tag}-editor" );
+		get_userdata( $editor )->add_cap( 'edit_products' );
+		wp_set_current_user( $editor );
+		$woo = new \WP_REST_Request( 'POST', '/wc/v3/products/reviews' );
+		$woo->set_param( 'product_id', $cream->get_id() );
+		$woo->set_param( 'review', 'Five stars, honestly.' );
+		$woo->set_param( 'reviewer', 'Someone' );
+		$woo->set_param( 'reviewer_email', "{$tag}-someone@example.invalid" );
+		$woo->set_param( 'rating', 5 );
+		$woo->set_param( 'status', 'approved' );
+		$woo_answer = rest_do_request( $woo );
+		wp_set_current_user( 0 );
+		$check( in_array( $woo_answer->get_status(), array( 401, 403 ), true ), 'D-17 WooCommerce\'s REST reviews endpoint refuses a review from someone without moderation rights or a delivery, and an approved status from them (' . $woo_answer->get_status() . ' ' . ( $woo_answer->get_data()['code'] ?? '' ) . ')' );
 
 		// REV-01, REV-04: the rating required, and the average from approved reviews only.
 		$rating_required = get_option( 'woocommerce_review_rating_required' );

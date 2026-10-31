@@ -48,16 +48,21 @@ final class ReviewInvitationEmail extends \WC_Email
      */
     public function get_subject()
     {
-        $saved = trim((string) ($this->settings['subject'] ?? ''));
+        // A subject staff set goes through WooCommerce's own path, where WooCommerce Multilingual translates it.
+        if (trim((string) ($this->settings['subject'] ?? '')) !== '') {
+            return parent::get_subject();
+        }
 
-        return apply_filters('woocommerce_email_subject_' . $this->id, $this->format_string($saved !== '' ? $saved : $this->get_default_subject()), $this->object, $this);
+        return apply_filters('woocommerce_email_subject_' . $this->id, $this->format_string($this->get_default_subject()), $this->object, $this);
     }
 
     public function get_heading()
     {
-        $saved = trim((string) ($this->settings['heading'] ?? ''));
+        if (trim((string) ($this->settings['heading'] ?? '')) !== '') {
+            return parent::get_heading();
+        }
 
-        return apply_filters('woocommerce_email_heading_' . $this->id, $this->format_string($saved !== '' ? $saved : $this->get_default_heading()), $this->object, $this);
+        return apply_filters('woocommerce_email_heading_' . $this->id, $this->format_string($this->get_default_heading()), $this->object, $this);
     }
 
     /** The language is the order's, set by ReviewInvitation before sending; not the site's, as WC_Email would set. */
@@ -93,7 +98,7 @@ final class ReviewInvitationEmail extends \WC_Email
             $order instanceof \WC_Order ? $order->get_billing_first_name() : ''
         )));
         printf('<p>%s</p><ul>', esc_html__('Your order has been delivered. We would love to hear what you think of it:', 'mizzey-site'));
-        foreach (self::links($order) as $name => $url) {
+        foreach (self::links($order) as [$name, $url]) {
             printf('<li><a href="%1$s">%2$s</a></li>', esc_url($url), esc_html($name));
         }
         echo '</ul>';
@@ -113,7 +118,7 @@ final class ReviewInvitationEmail extends \WC_Email
             ),
             __('Your order has been delivered. We would love to hear what you think of it:', 'mizzey-site'),
         ];
-        foreach (self::links($order) as $name => $url) {
+        foreach (self::links($order) as [$name, $url]) {
             $lines[] = $name . ': ' . $url;
         }
 
@@ -124,7 +129,7 @@ final class ReviewInvitationEmail extends \WC_Email
      * Each product of the order, by its name in the order's language, with the address of its reviews in that language.
      *
      * @param mixed $order
-     * @return array<string,string>
+     * @return list<array{0:string,1:string}> Name and address, one per product.
      */
     public static function links($order): array
     {
@@ -139,12 +144,12 @@ final class ReviewInvitationEmail extends \WC_Email
             }
             $id      = (int) apply_filters('wpml_object_id', (int) $item->get_product_id(), 'product', true, $language !== '' ? $language : null);
             $product = wc_get_product($id);
-            if ($product instanceof \WC_Product && $product->get_status() === 'publish') {
-                $url = (string) apply_filters('wpml_permalink', get_permalink($id), $language !== '' ? $language : null);
-                $links[$product->get_name()] = $url . '#reviews';
+            if ($product instanceof \WC_Product && $product->get_status() === 'publish' && ! isset($links[$id])) {
+                $url        = (string) apply_filters('wpml_permalink', get_permalink($id), $language !== '' ? $language : null);
+                $links[$id] = [$product->get_name(), $url . '#reviews'];
             }
         }
 
-        return $links;
+        return array_values($links);
     }
 }

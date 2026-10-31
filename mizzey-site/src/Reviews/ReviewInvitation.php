@@ -52,7 +52,24 @@ final class ReviewInvitation
      */
     public static function delivered($orderId, $order = null): void
     {
-        $order = $order instanceof \WC_Order ? $order : wc_get_order((int) $orderId);
+        global $wpdb;
+        $id = $order instanceof \WC_Order ? $order->get_id() : (int) $orderId;
+        // One invitation even when two requests deliver the order at once: the check, the sending and the mark under a
+        // MySQL named lock per order, the order read afresh inside it.
+        $lock = substr('mz_' . $wpdb->prefix . 'review_invite_' . $id, 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return;
+        }
+        try {
+            self::send($id);
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
+    private static function send(int $id): void
+    {
+        $order = wc_get_order($id);
         if (! $order instanceof \WC_Order || $order->get_meta(self::SENT) !== '') {
             return;
         }
