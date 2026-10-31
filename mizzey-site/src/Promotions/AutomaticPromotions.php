@@ -195,17 +195,36 @@ final class AutomaticPromotions
     private static function discountWithTax(\WC_Cart $cart, array $byItem, bool $withTax): float
     {
         $entered = wc_prices_include_tax();
+        $perLine = get_option('woocommerce_tax_round_at_subtotal') !== 'yes';
         $total   = 0.0;
         foreach ($byItem as $key => $cents) {
             $line   = $cart->get_cart_item((string) $key);
             $sub    = (float) ($line['line_subtotal'] ?? 0);
             $rate   = $sub > 0 ? self::subtotalTax((array) $line) / $sub : 0.0;
+            if (! $entered && $withTax && $perLine && $rate > 0) {
+                // WooCommerce rounds each line's tax to the cent (`WC_Cart_Totals::calculate_item_totals()`), so the
+                // tax the discount removes is the line's rounded tax before it less its rounded tax after it.
+                $rates  = \WC_Tax::get_rates($line['data']->get_tax_class(), $cart->get_customer());
+                $net    = (float) wc_add_number_precision($sub);
+                $total += (float) $cents + self::lineTax($net, $rates) - self::lineTax($net - (float) $cents, $rates);
+                continue;
+            }
             $factor = (! $entered && $withTax) ? 1 + $rate : (($entered && ! $withTax) ? 1 / (1 + $rate) : 1.0);
             $total += (float) $cents * $factor;
         }
 
         // Unrounded: WooCommerce rounds only the remaining total it compares with a free shipping minimum.
         return $total;
+    }
+
+    /**
+     * A line's tax in cents on a net amount in cents, each rate rounded to the cent as WooCommerce rounds line tax.
+     *
+     * @param array<int|string,array<string,mixed>> $rates
+     */
+    private static function lineTax(float $netCents, array $rates): float
+    {
+        return (float) array_sum(array_map(static fn ($tax) => (float) wc_round_tax_total((float) $tax, 0), \WC_Tax::calc_tax($netCents, $rates, false)));
     }
 
     /**

@@ -413,6 +413,21 @@ run(
 			$done->save();
 		}
 		$zone->delete_shipping_method( $free_edge );
+		// Ninth review round: entered without tax, tax rounded per line, as WooCommerce rounds it. 100.03 off a 1,000.00
+		// line removes 200.00 less 179.99 of tax (saves 120.04); 100.03 off a 1,000.02 line, created earlier, removes
+		// 200.00 less 180.00 (saves 120.03). Rounding 100.03 with 20 percent once would tie them at 120.04.
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		update_option( 'woocommerce_tax_round_at_subtotal', 'no' );
+		$even = t52_product( $s, 't52 taxed 1000.00', '1000.00' );
+		$odd  = t52_product( $s, 't52 taxed 1000.02', '1000.02' );
+		$on_odd  = t52_coupon( $s, "{$tag}autoodd", array( 'discount_type' => 'fixed_product', 'amount' => '100.03', 'individual_use' => true, 'product_ids' => array( $odd->get_id() ), 'date_created' => time() - 8 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$on_even = t52_coupon( $s, "{$tag}autoeven", array( 'discount_type' => 'fixed_product', 'amount' => '100.03', 'individual_use' => true, 'product_ids' => array( $even->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		t52_cart( array( $odd->get_id() => 1, $even->get_id() => 1 ) );
+		$check( array( wc_format_coupon_code( $on_even->get_code() ) ) === t52_applied(), 'Q1 with tax rounded per line, 100.03 off that saves 120.04 beats 100.03 off that saves 120.03, created earlier (' . implode( ',', t52_applied() ) . ')' );
+		foreach ( array( $on_odd, $on_even ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
 		update_option( 'woocommerce_tax_round_at_subtotal', $round_before );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		foreach ( $tax_before as $name => $value ) {
