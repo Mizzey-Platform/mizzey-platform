@@ -489,7 +489,9 @@ final class ReviewPhotos
             && ! str_starts_with(wp_normalize_path($dir), trailingslashit(wp_normalize_path(WP_CONTENT_DIR)))) {
             return true;
         }
-        if (! is_file($dir . '.htaccess') && ! copy(dirname(__DIR__, 2) . '/assets/review-photos.htaccess', $dir . '.htaccess')) {
+        // The refusal as shipped, written again whenever it differs (an older one is replaced).
+        $rule = dirname(__DIR__, 2) . '/assets/review-photos.htaccess';
+        if ((! is_file($dir . '.htaccess') || md5_file($dir . '.htaccess') !== md5_file($rule)) && ! copy($rule, $dir . '.htaccess')) {
             return false;
         }
         $seen = get_option(self::STORAGE);
