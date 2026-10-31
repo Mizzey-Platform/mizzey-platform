@@ -60,11 +60,15 @@ final class CartMerge
         if ($userId <= 0 || ! function_exists('WC') || ! WC()->session || ! get_user_meta($userId, self::FLAG, true)) {
             return;
         }
-        $saved  = get_user_meta($userId, '_woocommerce_persistent_cart_' . get_current_blog_id(), true);
+        $meta   = '_woocommerce_persistent_cart_' . get_current_blog_id();
+        $saved  = get_user_meta($userId, $meta, true);
         $saved  = is_array($saved) && is_array($saved['cart'] ?? null) ? $saved['cart'] : [];
         $guest  = WC()->session->get('cart', null);
         $merged = self::combine($saved, is_array($guest) ? $guest : [], StockGateway::make());
         WC()->session->set('cart', $merged['cart']);
+        // The account's saved cart is the merged one at once, so another device signing in finds it (CART-09):
+        // WooCommerce saves it only when the cart is next recalculated.
+        update_user_meta($userId, $meta, ['cart' => $merged['cart']]);
         // WooCommerce's own merge would now replace lines instead of combining them.
         delete_user_meta($userId, self::FLAG);
         if ($merged['lowered'] !== []) {
