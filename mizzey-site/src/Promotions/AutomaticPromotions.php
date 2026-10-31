@@ -278,7 +278,8 @@ final class AutomaticPromotions
         // WooCommerce accepts a match on the billing email or the account's email.
         $emails = array_values(array_filter(array_map('wc_strtolower', [$email, get_current_user_id() ? (string) get_userdata(get_current_user_id())->user_email : ''])));
         $restrictions = array_map('wc_strtolower', $restrictions);
-        if ($emails !== [] && $restrictions && WC()->cart && ! WC()->cart->is_coupon_emails_allowed($emails, $restrictions)) {
+        // WooCommerce 11.1 deprecates `WC_Cart::is_coupon_emails_allowed()` for this utility, which it now calls itself.
+        if ($emails !== [] && $restrictions && ! \Automattic\WooCommerce\Utilities\DiscountsUtil::is_coupon_emails_allowed($emails, $restrictions)) {
             return false;
         }
         $limit = (int) $coupon->get_usage_limit_per_user();

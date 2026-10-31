@@ -31,9 +31,17 @@ left for its own investigation.
 Recorded limits (in the specification): a paid shipping rate that depends on the discounted value is not modelled; a
 one-piaster tie with subtotal tax rounding and taxed shipping.
 
-## 2. Staging (T009)
+## 2. Staging (T009), 31 October 2026, release v0.1.8
 
-Not done. On the owner's approval: a promotion created on the coupon screen and seen in the cart.
+`evidence/staging-T009.txt`. Backup first; deploy, build and the staging check clean; the security check passes. t52
+passes on staging 63 of 65 checks, on MariaDB with the Redis object cache; the two it cannot pass there are its [HTTP]
+checks, whose requests leave the container for the public address behind Cloudflare Access. A promotion created
+through the coupon screen's save handler was listed by the block cart's Store API, over HTTP to the server's web
+server, with its 10 percent discount and no code entered, then removed.
+
+Found on staging and repaired: a call WooCommerce 11.1 deprecates (`WC_Cart::is_coupon_emails_allowed()`), now its
+replacement, and t52's shipping zone now takes precedence over a site's own zone for Egypt during the run. Not done: the
+coupon screen seen in a browser, which needs a staff sign-in with the owner's authenticator.
 
 ## 3. Client acceptance (T010)
 
