@@ -77,6 +77,7 @@ msgid "This coupon cannot be used."
 msgstr "لا يمكن استخدام هذه القسيمة."
 
 #: mizzey-site/src/Promotions/PromotionRules.php
+
 msgid "This coupon is paused."
 msgstr "هذه القسيمة متوقفة مؤقتًا."
 
@@ -237,3 +238,41 @@ msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخ�
 #, php-format
 msgid "%s is required."
 msgstr "%s مطلوب."
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "You have already reviewed this product. Thank you."
+msgstr "لقد قيّمت هذا المنتج من قبل. شكرًا لك."
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Only customers whose order for this product has been delivered can review it."
+msgstr "يمكن تقييم هذا المنتج فقط من العملاء الذين وصلهم طلبهم منه."
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Review not accepted"
+msgstr "لم يُقبل التقييم"
+
+#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
+msgid "How was your order #{order_number}?"
+msgstr "ما رأيك في طلبك رقم {order_number}؟"
+
+#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
+msgid "Tell us what you think"
+msgstr "شاركنا رأيك"
+
+#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
+#. translators: %s: customer first name.
+#, php-format
+msgid "Hello %s,"
+msgstr "مرحبًا %s،"
+
+#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
+msgid "Your order has been delivered. We would love to hear what you think of it:"
+msgstr "تم توصيل طلبك. يسعدنا أن نعرف رأيك فيه:"
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Please choose a rating from 1 to 5 stars."
+msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
+
+#: mizzey-site/src/Reviews/ReviewEligibility.php
+msgid "Only staff who moderate reviews can publish one."
+msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."
