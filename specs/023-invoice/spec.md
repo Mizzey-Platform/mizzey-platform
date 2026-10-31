@@ -19,15 +19,16 @@ library, on the owner's approval of the same day. Built on `022-my-account`, whi
 | ID | Scope | Stage | Register wording (short, verbatim) |
 |---|---|---|---|
 | ADM-92 | P1-L | S1 | Print / download invoice |
+| ACCT-12 | P1-L | S1 | Download invoice |
 
 Stories: Functional Specification MS-SPC-2026-032 v1.4, US-10-03 (invoice download) and US-18-06 (invoices and
-packing slips), the criteria that trace to the row above.
+packing slips), the criteria that trace to the rows above. ACCT-12 is #308's row (specs/022, AC-6); its download is
+built here, on this invoice.
 
 ## Context rows (no obligation here)
 
 | ID | Scope | Why it matters here |
 |---|---|---|
-| ACCT-12 | P1-L | Download invoice: #308's row (specs/022, AC-6); its account link is built here, on this invoice |
 | ADM-93 | P1-L | The packing slip: #280's, not in this wave (the Stage 3 plan names ADM-92 only) |
 | ADM-85, ADM-88 to ADM-91 | P1, P1-L | #280's order management rows, not in this wave |
 | INT-17 | OUT (EX-32) | The Egyptian Tax Authority's e-invoice: out of scope; tax reporting is the client's accounting or ERP system |
