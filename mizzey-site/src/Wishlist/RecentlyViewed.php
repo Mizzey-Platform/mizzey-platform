@@ -61,7 +61,7 @@ final class RecentlyViewed
                 continue;
             }
             $shown = CanonicalProduct::inCurrentLanguage($id);
-            if ($shown instanceof \WC_Product && $shown->is_visible()) {
+            if ($shown instanceof \WC_Product && $shown->is_visible() && Wishlist::viewable($shown)) {
                 $out[] = $shown;
             }
             if (count($out) >= $limit) {

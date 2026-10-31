@@ -11,9 +11,11 @@ namespace MizzeySite\Wishlist;
 defined('ABSPATH') || exit;
 
 /**
- * A guest's list of product ids, kept in a signed cookie: the ids, their expiry, and an HMAC over both with the site's
- * own salt, so a visitor cannot plant ids or stretch the lifetime. A cookie that is altered, expired or unreadable is
- * an empty list. The cookie is HTTP-only and SameSite=Lax (WooCommerce's own cookie defaults through `wc_setcookie()`).
+ * A guest's list of product ids, kept in a signed cookie: the ids, their expiry, and an HMAC over the cookie's name,
+ * the ids and the expiry with the site's own salt, so a visitor cannot plant ids, stretch the lifetime or pass one
+ * list's cookie off as another's. A cookie that is altered, expired or unreadable is an empty list. A lifetime of 0 is a
+ * browser-session cookie with no timed expiry (written as expiry 0). The cookie is HTTP-only and SameSite=Lax
+ * (WooCommerce's own cookie defaults through `wc_setcookie()`).
  *
  * See specs/015-wishlist.
  */
@@ -28,10 +30,10 @@ final class GuestCookie
     {
         $raw   = isset($_COOKIE[$this->name]) ? (string) wp_unslash($_COOKIE[$this->name]) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
         $parts = explode('|', $raw);
-        if (count($parts) !== 3 || ! ctype_digit($parts[1]) || (int) $parts[1] < time()) {
+        if (count($parts) !== 3 || ! ctype_digit($parts[1]) || ((int) $parts[1] !== 0 && (int) $parts[1] < time())) {
             return [];
         }
-        if (! hash_equals(self::sign($parts[0], $parts[1]), $parts[2])) {
+        if (! hash_equals($this->sign($parts[0], $parts[1]), $parts[2])) {
             return [];
         }
 
@@ -51,16 +53,16 @@ final class GuestCookie
             return;
         }
         $list    = implode(',', $ids);
-        $expires = (string) ($this->lifetime > 0 ? time() + $this->lifetime : time() + DAY_IN_SECONDS);
-        $value   = $list . '|' . $expires . '|' . self::sign($list, $expires);
+        $expires = (string) ($this->lifetime > 0 ? time() + $this->lifetime : 0);
+        $value   = $list . '|' . $expires . '|' . $this->sign($list, $expires);
         $_COOKIE[$this->name] = $value;
         if (function_exists('wc_setcookie')) {
             wc_setcookie($this->name, $value, $this->lifetime > 0 ? (int) $expires : 0, is_ssl(), true);
         }
     }
 
-    private static function sign(string $list, string $expires): string
+    private function sign(string $list, string $expires): string
     {
-        return hash_hmac('sha256', $list . '|' . $expires, wp_salt('auth'));
+        return hash_hmac('sha256', $this->name . '|' . $list . '|' . $expires, wp_salt('auth'));
     }
 }

@@ -117,10 +117,17 @@ run(
 		$check( array() === $planted && array() === $stretched && array( $b, $en ) === Wishlist::ids(), 'WISH-03 a cookie with an id planted, or its lifetime stretched, is ignored' );
 		$expired = new GuestCookie( 't56_probe', 1 );
 		$expired->write( array( $en ) );
-		$probe                = explode( '|', (string) $_COOKIE['t56_probe'] );
-		$_COOKIE['t56_probe'] = $probe[0] . '|' . ( time() - 1 ) . '|' . $probe[2];
-		$check( array() === $expired->read(), 'WISH-03 an expired cookie is an empty list' );
+		$fresh = $expired->read();
+		sleep( 2 );
+		$check( array( $en ) === $fresh && array() === $expired->read(), 'WISH-03 a validly signed cookie reads until its lifetime ends, then is an empty list' );
 		unset( $_COOKIE['t56_probe'] );
+		$_COOKIE[ RecentlyViewed::COOKIE ] = $raw;
+		$check( array() === RecentlyViewed::products(), "WISH-03 a wishlist cookie passed off as the recently viewed one is refused: the signature names its cookie" );
+		unset( $_COOKIE[ RecentlyViewed::COOKIE ] );
+		$draft = $s->simple_product( 't56 draft', '100', null );
+		$draft->set_status( 'draft' );
+		$draft->save();
+		$check( null === Wishlist::add( $draft->get_id() ) && ! in_array( $draft->get_id(), Wishlist::ids(), true ), 'WISH-01 a draft product is not saved, so nothing about it is disclosed' );
 		$cap = static fn () => 2;
 		add_filter( 'mizzey_wishlist_capacity', $cap );
 		Wishlist::add( $c );
@@ -160,11 +167,18 @@ run(
 		do_action( 'wpml_switch_language', 'ar' );
 		$var_moved = Wishlist::moveToCart( $var_ar );
 		do_action( 'wpml_switch_language', 'en' );
-		$in_cart = array();
+		$simple_line = null;
+		$var_line    = null;
 		foreach ( WC()->cart->get_cart() as $line ) {
-			$in_cart[] = (int) ( $line['variation_id'] ?: $line['product_id'] );
+			if ( in_array( (int) $line['product_id'], array( $en, $ar ), true ) && 0 === (int) $line['variation_id'] ) {
+				$simple_line = $line;
+			}
+			if ( in_array( (int) $line['variation_id'], array( $var_en, $var_ar ), true ) ) {
+				$var_line = $line;
+			}
 		}
-		$check( true === $simple_moved && true === $var_moved && 2 === count( $in_cart ) && array( $gone ) === Wishlist::ids(), 'WISH-04 a product and an Arabic variation move to the cart in one action and leave the wishlist (' . implode( ',', $in_cart ) . ')' );
+		$var_size = $var_line ? (string) ( $var_line['variation']['attribute_size'] ?? '' ) : '';
+		$check( true === $simple_moved && true === $var_moved && 2 === count( WC()->cart->get_cart() ) && $simple_line && $var_line && in_array( (int) $var_line['product_id'], array( $variable, $variable_ar ), true ) && '' !== $var_size && array( $gone ) === Wishlist::ids(), "WISH-04 the product and the Arabic variation (its parent and size '{$var_size}') are in the cart after one action each, and off the wishlist" );
 		$refused = Wishlist::moveToCart( $gone );
 		$check( is_wp_error( $refused ) && 'mizzey_wishlist_out_of_stock' === $refused->get_error_code() && 409 === ( $refused->get_error_data()['status'] ?? 0 ) && array( $gone ) === Wishlist::ids(), 'WISH-04 an out-of-stock item is not moved, stays saved, and the reason is given (' . ( is_wp_error( $refused ) ? $refused->get_error_message() : 'moved' ) . ')' );
 		$not_saved = Wishlist::moveToCart( $c );
@@ -205,7 +219,27 @@ run(
 		$arabic = t56_http( 'GET', $ar_url . 'wishlist', $added['cookies'] );
 		$check( 200 === $empty['status'] && array() === $empty['body']['items'] && 201 === $added['status'] && $en === ( $again['body']['items'][0]['canonical'] ?? 0 ), "[HTTP] a guest saves a product and finds it on the next request ({$added['status']})" );
 		$check( $ar === ( $arabic['body']['items'][0]['id'] ?? 0 ), '[HTTP] on the Arabic address the saved product comes back as its Arabic record' );
+		$hidden = t56_http( 'POST', $base . 'wishlist/items', $added['cookies'], array( 'id' => $draft->get_id() ) );
+		$check( 404 === $hidden['status'] && false === strpos( wp_json_encode( $hidden['body'] ), 't56 draft' ), "[HTTP] saving a draft product is refused ({$hidden['status']}) and its name is not disclosed" );
+		$store   = rest_url( 'wc/store/v1/' );
+		$cart_r  = wp_remote_get( $store . 'cart', array( 'cookies' => $added['cookies'], 'timeout' => 30 ) ); // storefront-guard: exempt, the Store API answers JSON, not a storefront page.
+		$nonce   = (string) wp_remote_retrieve_header( $cart_r, 'nonce' );
+		$jar     = array();
+		foreach ( array_merge( $added['cookies'], wp_remote_retrieve_cookies( $cart_r ) ) as $cookie ) {
+			$jar[ $cookie->name ] = $cookie;
+		}
+		$add_r   = wp_remote_post( $store . 'cart/add-item', array( 'cookies' => array_values( $jar ), 'timeout' => 30, 'headers' => array( 'Nonce' => $nonce, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( array( 'id' => $c, 'quantity' => 1 ) ) ) ); // storefront-guard: exempt, the Store API answers JSON, not a storefront page.
+		foreach ( wp_remote_retrieve_cookies( $add_r ) as $cookie ) {
+			$jar[ $cookie->name ] = $cookie;
+		}
+		$added['cookies'] = array_values( $jar );
 		$moved   = t56_http( 'POST', $base . "wishlist/items/{$en}/cart", $added['cookies'] );
+		$after_r = wp_remote_get( $store . 'cart', array( 'cookies' => $moved['cookies'], 'timeout' => 30 ) ); // storefront-guard: exempt, the Store API answers JSON, not a storefront page.
+		$lines   = array_map( static fn ( $i ) => (int) $i['id'], (array) ( json_decode( wp_remote_retrieve_body( $after_r ), true )['items'] ?? array() ) );
+		sort( $lines );
+		$expect  = array( $en, $c );
+		sort( $expect );
+		$check( 201 === (int) wp_remote_retrieve_response_code( $add_r ) && $expect === $lines, '[HTTP] moving an item into a cart that already holds one keeps both (' . implode( ',', $lines ) . ')' );
 		$sold    = t56_http( 'POST', $base . 'wishlist/items', $moved['cookies'], array( 'id' => $gone ) );
 		$refusal = t56_http( 'POST', $base . "wishlist/items/{$gone}/cart", $sold['cookies'] );
 		$removed = t56_http( 'DELETE', $base . "wishlist/items/{$gone}", $refusal['cookies'] );

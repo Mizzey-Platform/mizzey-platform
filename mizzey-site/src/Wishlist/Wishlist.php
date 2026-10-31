@@ -32,17 +32,38 @@ final class Wishlist
         add_action('user_register', [self::class, 'onRegister'], 10, 1);
     }
 
-    /** @return list<int> The visitor's canonical product ids, most recently saved first. */
+    /** @return list<int> The visitor's canonical product ids, most recently saved first; only products they may see. */
     public static function ids(): array
     {
-        return array_values(array_filter(self::stored(get_current_user_id()), static fn (int $id): bool => wc_get_product($id) instanceof \WC_Product));
+        return array_values(array_filter(self::stored(get_current_user_id()), static fn (int $id): bool => self::viewable(wc_get_product($id))));
+    }
+
+    /**
+     * Whether the visitor may see the product: published (a variation, and its parent), or readable by them. A draft,
+     * private or trashed product is neither saved nor shown, so the wishlist discloses nothing that is not on sale.
+     *
+     * @param mixed $product
+     */
+    public static function viewable($product): bool
+    {
+        if (! $product instanceof \WC_Product) {
+            return false;
+        }
+        $parent = $product->is_type('variation') ? wc_get_product($product->get_parent_id()) : null;
+        foreach (array_filter([$product, $parent]) as $record) {
+            if ($record->get_status() !== 'publish' && ! current_user_can('read_post', $record->get_id())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /** Saves a product or variation (any language record); the canonical id, or null for no such product. */
     public static function add(int $productId): ?int
     {
         $canonical = CanonicalProduct::of($productId);
-        if ($canonical === null) {
+        if ($canonical === null || ! self::viewable($canonical) || ! self::viewable(wc_get_product($productId))) {
             return null;
         }
         $id   = $canonical->get_id();
@@ -83,6 +104,9 @@ final class Wishlist
         if (! WC()->cart && function_exists('wc_load_cart')) {
             wc_load_cart();
         }
+        // Load the visitor's cart before adding, or WooCommerce's later lazy load from the session replaces the line just
+        // added (a REST request starts with the cart unloaded).
+        WC()->cart->get_cart();
         $variation = $shown->is_type('variation') ? $shown->get_id() : 0;
         $parent    = $variation ? $shown->get_parent_id() : $shown->get_id();
         $key       = WC()->cart->add_to_cart($parent, 1, $variation, $variation ? $shown->get_variation_attributes() : []);
