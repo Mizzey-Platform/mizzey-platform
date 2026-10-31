@@ -335,6 +335,38 @@ run(
 		}
 		$untaxed_off->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$untaxed_off->save();
+		$taxed_off->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$taxed_off->save();
+		// Sixth review round: shipping counts with its tax. Flat 50 plus 20 percent tax; free shipping saves 60, and 45
+		// off the taxed line, created earlier, saves 54.
+		\WC_Tax::_update_tax_rate( $rate_id, array( 'tax_rate_shipping' => 1 ) );
+		update_option( "woocommerce_flat_rate_{$flat}_settings", array( 'enabled' => 'yes', 'title' => 'Flat', 'cost' => '50', 'tax_status' => 'taxable' ) );
+		$free_coupon = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free_coupon}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$taxed_45 = t52_coupon( $s, "{$tag}autotaxed45", array( 'discount_type' => 'fixed_product', 'amount' => '45', 'individual_use' => true, 'product_ids' => array( $taxed->get_id() ), 'date_created' => time() - 4 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		t52_cart( array( $taxed->get_id() => 1 ) );
+		$check( array( wc_format_coupon_code( $ship_auto->get_code() ) ) === t52_applied(), 'Q1 free shipping of 50 plus 10 tax (saves 60) beats 45 off a 20 percent taxed line (saves 54), created earlier (' . implode( ',', t52_applied() ) . ')' );
+		$taxed_45->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$taxed_45->save();
+		$zone->delete_shipping_method( $free_coupon );
+		update_option( "woocommerce_flat_rate_{$flat}_settings", array( 'enabled' => 'yes', 'title' => 'Flat', 'cost' => '50', 'tax_status' => 'none' ) );
+		\WC_Tax::_update_tax_rate( $rate_id, array( 'tax_rate_shipping' => 0 ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		// Sixth review round: prices entered with tax, a tax-exempt customer. WooCommerce discounts the taxed line at
+		// 100 less its tax (83.33), so 20 percent off it saves 16.67, less than 18 off the zero-rated line, created later.
+		update_option( 'woocommerce_prices_include_tax', 'yes' );
+		WC()->customer->set_is_vat_exempt( true );
+		$s->on_finish( static function () { WC()->customer->set_is_vat_exempt( false ); } );
+		$taxed_pct  = t52_coupon( $s, "{$tag}autotaxpct", array( 'discount_type' => 'percent', 'amount' => '20', 'individual_use' => true, 'product_ids' => array( $taxed->get_id() ), 'date_created' => time() - 5 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$untaxed_18 = t52_coupon( $s, "{$tag}autountaxed18", array( 'discount_type' => 'fixed_product', 'amount' => '18', 'individual_use' => true, 'product_ids' => array( $untaxed->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		t52_cart( array( $taxed->get_id() => 1, $untaxed->get_id() => 1 ) );
+		$check( array( wc_format_coupon_code( $untaxed_18->get_code() ) ) === t52_applied(), 'Q1 prices entered with 20 percent tax, a tax-exempt customer: 20 percent off the taxed line (saves 16.67) loses to 18 off the zero-rated line, created later (' . implode( ',', t52_applied() ) . ')' );
+		WC()->customer->set_is_vat_exempt( false );
+		foreach ( array( $taxed_pct, $untaxed_18 ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
 		foreach ( $tax_before as $name => $value ) {
 			update_option( $name, $value );
 		}

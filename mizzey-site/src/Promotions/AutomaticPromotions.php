@@ -127,6 +127,7 @@ final class AutomaticPromotions
     public static function value(\WC_Cart $cart, \WC_Coupon $coupon): int
     {
         $discounts = new \WC_Discounts($cart);
+        $discounts->set_items(self::items($cart));
         $discounts->apply_coupon($coupon, false);
         $byItem = (array) $discounts->get_discounts_by_item(true);
         $paid   = self::discountWithTax($cart, $byItem, true);
@@ -147,9 +148,34 @@ final class AutomaticPromotions
     }
 
     /**
-     * A discount, in cents, with or without its tax, each line at its own tax rate. WooCommerce discounts prices as they
-     * are entered (`WC_Discounts::set_items_from_cart()`, WooCommerce 11.1.0), so tax is added when prices are entered
-     * without it, and taken out when they are entered with it.
+     * The cart's lines priced as WooCommerce's own totals discount them (`WC_Cart_Totals::calculate_discounts()`,
+     * WooCommerce 11.1.0): after its tax adjustments, so a tax-exempt customer's price entered with tax is discounted
+     * without it, as is a price adjusted for a customer outside the base location. Taken from the lines' subtotals,
+     * which hold those adjusted prices once the totals are calculated.
+     *
+     * @return array<string,\stdClass>
+     */
+    private static function items(\WC_Cart $cart): array
+    {
+        $entered = wc_prices_include_tax();
+        $items   = [];
+        foreach ($cart->get_cart() as $key => $line) {
+            $item           = new \stdClass();
+            $item->key      = $key;
+            $item->object   = $line;
+            $item->product  = $line['data'];
+            $item->quantity = $line['quantity'];
+            $item->price    = wc_add_number_precision_deep((float) ($line['line_subtotal'] ?? 0) + ($entered ? (float) ($line['line_subtotal_tax'] ?? 0) : 0.0));
+            $items[$key]    = $item;
+        }
+
+        return $items;
+    }
+
+    /**
+     * A discount, in cents, with or without its tax, each line at its own tax rate. The discount is on the price as
+     * entered (items()), so tax is added when prices are entered without it, and taken out when they are entered with
+     * it.
      *
      * @param array<string,float|int> $byItem Cents of discount by cart item key.
      */
@@ -264,8 +290,9 @@ final class AutomaticPromotions
                     };
                     continue;
                 }
+                // What the customer pays for the rate: its cost and its tax, as the discount counts its tax (value()).
                 foreach ((array) $method->get_rates_for_package($package) as $rate) {
-                    $costs[] = (float) $rate->get_cost();
+                    $costs[] = (float) $rate->get_cost() + array_sum(array_map('floatval', (array) $rate->get_taxes()));
                 }
             }
             if (! $free && $costs !== []) {
