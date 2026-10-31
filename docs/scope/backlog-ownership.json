@@ -1686,7 +1686,7 @@
     }
    ],
    "data_integrity": "B7 measured working on the WooCommerce side; D7, F1, F3 not yet tested",
-   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order. ADM-92's invoice, with ACCT-12's download, is specs/023-invoice (our own code, D-24).",
+   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order. ADM-92's invoice, with ACCT-12's download, is specs/023-invoice (our own code, D-24). ADM-92's invoice, with ACCT-12's download, merged 31 October 2026 as 39d13b3 (PR #456), the wave-3 part the Stage 3 plan names; the rest of #280's rows stay to build.",
    "not_in_slice": [
     "ADM-86 (P1, owned by #248)",
     "ADM-87 (P1, owned by #248)",
@@ -3261,7 +3261,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 55,
    "depends_on": [
     {
@@ -3310,7 +3310,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "AC-13 and AC-19; a Google sign-in and a manual registration on the same email yielding one account; automated tests on sessions, login rate limiting and the single-use, time-limited reset link. specs/017-accounts verification.md: technically verified; merged 31 October 2026 as 9d0cc13 (PR #449); staging verification and acceptance pending. The second PR (AUTH-10, AUTH-13, Google sign-in as our own code, D-24) is specs/024-google-sign-in.",
+   "acceptance_evidence": "AC-13 and AC-19; a Google sign-in and a manual registration on the same email yielding one account; automated tests on sessions, login rate limiting and the single-use, time-limited reset link. specs/017-accounts verification.md: technically verified; merged 31 October 2026 as 9d0cc13 (PR #449); staging verification and acceptance pending. The second PR (AUTH-10, AUTH-13, Google sign-in as our own code, D-24) is specs/024-google-sign-in. The second PR, specs/024-google-sign-in (AUTH-10, AUTH-13), merged 31 October 2026 as 0452d47 (PR #457); staging verification and acceptance pending.",
    "not_in_slice": [
     "AUTH-10a (P2)",
     "INT-07 (P2)"
@@ -3599,7 +3599,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "In review",
    "delivery_order": 59,
    "depends_on": [
     {
@@ -3643,7 +3643,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery. Eligibility (D-17), on staging through real requests: a delivered order (and ORD-14 once delivered) allows a review; processing, shipped, out for delivery, cancelled, returned to origin and a fully refunded line do not; a guest order is refused until linked by a verified email, and a billing email match alone is refused; a variation qualifies its parent; a purchase in one language qualifies the other; a second review is refused while one is pending or approved, in either language, and allowed after a moderator removes a rejected one; an ineligible account is refused with no comment created on the classic form post, POST /wp/v2/comments with a valid nonce and XML-RPC wp.newComment; the beta review-request route and action are absent; moderation, the required rating and text and the display name are unchanged, and no verified-owner text appears in either language. specs/020-reviews verification.md: technically verified; merged 31 October 2026 as 2f695a6 (PR #450); staging verification and acceptance pending. The second part (D-23's photos, a gift) is specs/025-review-photos.",
+   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery. Eligibility (D-17), on staging through real requests: a delivered order (and ORD-14 once delivered) allows a review; processing, shipped, out for delivery, cancelled, returned to origin and a fully refunded line do not; a guest order is refused until linked by a verified email, and a billing email match alone is refused; a variation qualifies its parent; a purchase in one language qualifies the other; a second review is refused while one is pending or approved, in either language, and allowed after a moderator removes a rejected one; an ineligible account is refused with no comment created on the classic form post, POST /wp/v2/comments with a valid nonce and XML-RPC wp.newComment; the beta review-request route and action are absent; moderation, the required rating and text and the display name are unchanged, and no verified-owner text appears in either language. specs/020-reviews verification.md: technically verified; merged 31 October 2026 as 2f695a6 (PR #450); staging verification and acceptance pending. The second part (D-23's photos, a gift) is specs/025-review-photos. The second part, specs/025-review-photos (D-23's photos, a gift), merged 31 October 2026 as 71bb419 (PR #458); staging verification and acceptance pending.",
    "not_in_slice": [
     "REV-06 (P2)",
     "REV-07 (P2)",
