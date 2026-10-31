@@ -9,3 +9,27 @@ M6  a wrong token spends the link                                     -> t58 fai
 M7  staff are sent sign-in links                                      -> t58 fails
 M8  sign-in links are not rate limited                                -> t58 fails
 M9  an expired link still works                                       -> t58 fails
+
+After the first review (31 October 2026):
+
+M10 a number reaches the lockout as typed                             -> t58 fails (5 checks)
+M11 a redeem signs in whatever its delete found                       -> t58 fails (6 checks)
+M12 the confirmation needs no session nonce                           -> t58 fails (7 checks)
+M13 the link is not bound to the password                             -> t58 fails (6 checks)
+M14 a username spelled like a number wins                             -> t58 fails (5 checks)
+M15 a later writer takes a held number                                -> t58 fails (1 check)
+M16 a generated username can be a number                              -> t58 fails (1 check)
+
+After the second review (31 October 2026):
+
+M17 a release deletes whoever owns the claim                          -> t58 fails (3 checks)
+M18 a number is resolved twice                                        -> t58 fails (1 check)
+M19 numbers saved before are never claimed                            -> t58 fails (1 check)
+M20 registration says a number is taken                               -> t58 fails (2 checks)
+M21 the link is sent before the answer                                -> t58 fails (1 check)
+M23 a stale claim is never taken over                                 -> t58 fails (1 check)
+
+Not a defect: releasing on `deleted_user` instead of `delete_user` is not caught, because deleting the account's billing
+phone meta already releases its claim (`deleted_user_meta`); `delete_user` is kept as a guard.
+
+The counts of M10 to M14 include checks that fail in turn once the first does.
