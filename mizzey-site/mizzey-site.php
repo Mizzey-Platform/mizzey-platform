@@ -88,6 +88,7 @@ require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
 require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/Reviews/ReviewPhotos.php';
 require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
 require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
 require_once __DIR__ . '/src/Cart/CartStock.php';
@@ -203,6 +204,8 @@ if (defined('WP_CLI') && WP_CLI) {
 MizzeySite\Reviews\ReviewEligibility::register();
 MizzeySite\Reviews\ReviewModeration::register();
 MizzeySite\Reviews\ReviewInvitation::register();
+// Photos in reviews, a recorded gift (D-23). See specs/025-review-photos.
+MizzeySite\Reviews\ReviewPhotos::register();
 
 // Customer emails: the welcome discount and the payment retry link added to WooCommerce's own, and the Shipped email.
 // NOTF-01 to NOTF-13, specs/021-emails.
