@@ -1,0 +1,7 @@
+Deliberate defects, each run against t53 and then reverted (31 October 2026):
+
+M1  identity is the record itself, not its source                     -> t53 fails (7 checks)
+M2  a refusal is retried                                              -> t53 fails (2 checks)
+M3  a new operation key on every attempt                              -> t53 fails (2 checks)
+M4  no retry                                                          -> t53 fails (3 checks)
+M5  unknown stock is sellable                                         -> t53 fails (3 checks)
