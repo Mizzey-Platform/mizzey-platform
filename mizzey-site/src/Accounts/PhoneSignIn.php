@@ -114,13 +114,37 @@ final class PhoneSignIn
         return preg_match('/^01[0125][0-9]{8}$/', $digits) === 1 ? $digits : null;
     }
 
-    /** The account that signs in with the number, or null. */
+    /** The account that signs in with the number, or null: the claim's owner, while its saved phone is still the number. */
     public static function holder(string $phone): ?int
     {
         $normal = self::normalise($phone);
         $userId = $normal !== null ? (int) get_option(self::claimName($normal), 0) : 0;
 
-        return $userId > 0 && get_user_meta($userId, self::HELD, true) === $normal ? $userId : null;
+        return $userId > 0 && get_user_meta($userId, self::HELD, true) === $normal
+            && self::normalise((string) get_user_meta($userId, self::FIELD, true)) === $normal ? $userId : null;
+    }
+
+    /**
+     * Runs `$work` holding a MySQL named lock, so two requests changing the same number or account take turns.
+     * Without the lock (a timeout), the work still runs: holder() checks the saved phone, so a binding that loses a race
+     * signs in to nobody rather than the wrong account.
+     *
+     * @template T
+     * @param callable(): T $work
+     * @return T
+     */
+    private static function locked(string $name, callable $work)
+    {
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . $name, 0, 64);
+        $held = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        try {
+            return $work();
+        } finally {
+            if ($held) {
+                $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            }
+        }
     }
 
     /**
@@ -170,7 +194,15 @@ final class PhoneSignIn
             return;
         }
         $userId = (int) $userId;
-        $normal = is_string($value) ? self::normalise($value) : null;
+        self::locked('phone_user_' . $userId, static fn () => self::follow($userId));
+    }
+
+    /** The account's claim follows its phone: the old number released, the new one claimed, under the account's lock. */
+    private static function follow(int $userId): void
+    {
+        // The saved value, read under the lock, not the value this write carried, which a later write may have replaced.
+        wp_cache_delete($userId, 'user_meta');
+        $normal = self::normalise((string) get_user_meta($userId, self::FIELD, true));
         if ($normal !== null && get_user_meta($userId, self::HELD, true) === $normal) {
             return;
         }
@@ -222,6 +254,11 @@ final class PhoneSignIn
      * that owner, which only one account can win too.
      */
     private static function claim(string $normal, int $userId): bool
+    {
+        return self::locked('phone_num_' . $normal, static fn (): bool => self::claimUnlocked($normal, $userId));
+    }
+
+    private static function claimUnlocked(string $normal, int $userId): bool
     {
         global $wpdb;
         $name     = self::claimName($normal);
