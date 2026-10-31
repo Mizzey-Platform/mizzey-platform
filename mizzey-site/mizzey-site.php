@@ -105,6 +105,11 @@ require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
 require_once __DIR__ . '/src/Account/AddressBook.php';
 require_once __DIR__ . '/src/Account/AccountPages.php';
+require_once __DIR__ . '/src/Invoices/InvoiceSettings.php';
+require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
+require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
+require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
+require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -204,3 +209,7 @@ MizzeySite\Emails\Shipped::register();
 // The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
 MizzeySite\Account\AddressBook::register();
 MizzeySite\Account\AccountPages::register();
+// The invoice (ADM-92), downloaded by staff and from the account (ACCT-12). See specs/023-invoice.
+MizzeySite\Invoices\InvoiceSettings::register();
+MizzeySite\Invoices\InvoiceNumber::register();
+MizzeySite\Invoices\InvoiceRoutes::register();

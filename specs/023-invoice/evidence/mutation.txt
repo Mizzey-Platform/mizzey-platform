@@ -1,0 +1,20 @@
+Deliberate defects, each run against t64 and then reverted (31 October 2026):
+
+M1 an unpaid order gets a number                                      -> t64 fails (3 checks)
+M2 a number issued again                                              -> t64 fails (3 checks)
+M3 another customer downloads it                                      -> t64 fails (1 check)
+M4 no nonce needed                                                    -> t64 fails (1 check)
+M5 the discount left off                                              -> t64 fails (1 check)
+M6 not in the order language                                          -> t64 fails (1 check)
+M7 an unpaid order offered in the account                             -> t64 fails (1 check)
+M8 a customer gets the staff action                                   -> t64 fails (1 check)
+M9 the refund left off                                                -> t64 fails (1 check)
+M10 a number another order holds issued again                         -> t64 fails (6 checks)
+M11 decimals from the viewer                                          -> t64 fails (1 check)
+M12 a trashed order's number free                                     -> t64 fails (1 check)
+M13 a failed check counts as free                                     -> t64 fails (1 check)
+
+M5 and M6 were not caught at first: the refund equalled the discount, and the order's emails had left the language
+switched. t64 now keeps the two amounts apart and asks for the Arabic invoice from an English request.
+
+The numbering lock guards two requests at once, which one PHP process cannot create: no mutation check.

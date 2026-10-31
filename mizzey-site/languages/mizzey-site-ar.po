@@ -371,3 +371,107 @@ msgstr "يرجى المحاولة مرة أخرى بعد قليل."
 #, php-format
 msgid "%s is required."
 msgstr "%s مطلوب."
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Invoices"
+msgstr "الفواتير"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "The seller details printed on every invoice. A detail left empty is left off."
+msgstr "بيانات البائع المطبوعة على كل فاتورة. أي بيان يُترك فارغًا لا يظهر."
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Legal name"
+msgstr "الاسم القانوني"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Registered address"
+msgstr "العنوان المسجل"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Tax registration number"
+msgstr "رقم التسجيل الضريبي"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Commercial register number"
+msgstr "رقم السجل التجاري"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Note at the foot of the invoice"
+msgstr "ملاحظة أسفل الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Invoice number prefix"
+msgstr "بادئة رقم الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice"
+msgstr "فاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice number"
+msgstr "رقم الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice date"
+msgstr "تاريخ الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Order number"
+msgstr "رقم الطلب"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Order date"
+msgstr "تاريخ الطلب"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Payment method"
+msgstr "طريقة الدفع"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Billed to"
+msgstr "الفاتورة باسم"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Item"
+msgstr "المنتج"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Quantity"
+msgstr "الكمية"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Unit price"
+msgstr "سعر الوحدة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Total"
+msgstr "الإجمالي"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Discount"
+msgstr "الخصم"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Shipping"
+msgstr "الشحن"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Refunded"
+msgstr "المبلغ المسترد"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Net total"
+msgstr "الصافي"
+
+#: mizzey-site/src/Invoices/InvoiceRoutes.php
+msgid "This invoice is not available."
+msgstr "هذه الفاتورة غير متاحة."
+
+#: mizzey-site/src/Invoices/InvoiceRoutes.php
+msgid "Download invoice"
+msgstr "تنزيل الفاتورة"

@@ -40,4 +40,4 @@ and account pages for order tracking and the wishlist. The invoice download wait
 | AC-4 | The progress in order and the carrier and tracking number on the order view |
 | AC-5 | The Wishlist page after Orders, listing the saved items |
 | AC-1, AC-3 | Native (WooCommerce's account pages) |
-| AC-6 | Not built: waits for #280 |
+| AC-6 | Built in specs/023-invoice: t64 downloads the invoice from the account's orders |
