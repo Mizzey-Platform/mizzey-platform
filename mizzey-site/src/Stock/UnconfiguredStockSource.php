@@ -23,11 +23,11 @@ final class UnconfiguredStockSource implements StockSource
 
     public function level(StockItem $item): int
     {
-        throw new StockSourceRefused('No stock source is configured.');
+        throw new StockSourceRefused('not-configured');
     }
 
     public function adjust(StockItem $item, int $delta, string $operationKey): int
     {
-        throw new StockSourceRefused('No stock source is configured.');
+        throw new StockSourceRefused('not-configured');
     }
 }

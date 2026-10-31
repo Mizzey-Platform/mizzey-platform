@@ -109,7 +109,7 @@ final class StockGateway
             }
         }
 
-        return StockAnswer::unknown($item, 'unavailable after ' . $this->attempts . ' attempts');
+        return StockAnswer::unknown($item, 'exhausted');
     }
 
     /** Diagnostics never change the stock answer: a failing logger, or an adapter whose name() fails, is ignored. */
@@ -121,8 +121,7 @@ final class StockGateway
             } catch (\Throwable) {
                 $name = get_class($this->source);
             }
-            $line = sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $name, $outcome);
-            $this->logger?->log($level, $line, [
+            $this->logger?->log($level, sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $name, $outcome), [
                 'source'    => self::LOG_SOURCE,
                 'operation' => $operation,
                 'item'      => $item?->id,

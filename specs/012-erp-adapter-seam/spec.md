@@ -15,10 +15,10 @@ build plan under D-22. E-ERP-1 (#245). No design dependency; no ERP call (M-3).
 
 | ID | Scope | Stage | Register wording (short, verbatim) |
 |---|---|---|---|
-| ERP-01 | P1 key | S1 | The ERP is the source of truth for stock; the store does not operate an independently maintained stock balance that can disagree with it |
+| ERP-01 | P1 | S1 | The ERP is the source of truth for stock; the store does not operate an independently maintained stock balance that can disagree with it |
 | ERP-02 | P1 | S1 | The stock available to customers reflects your ERP inventory throughout the buying journey |
 | ERP-10 | P1 | S1 | The integration is specified in the ERP Integration Specification (PRE-09), approved by you separately, and then built and tested against a test environment |
-| INT-16 | P1 key | S1 | Every integration behind an adapter with retries, logging and webhook handling |
+| INT-16 | P1 | S1 | Every integration behind an adapter with retries, logging and webhook handling |
 
 Story: Functional Specification MS-SPC-2026-032 v1.4, US-27-06 (Observability) for INT-16; ERP-01 and ERP-02 are
 restated in the product, cart and checkout stories (US-04, US-05, US-07).
@@ -37,7 +37,7 @@ restated in the product, cart and checkout stories (US-04, US-05, US-07).
 
 ## Contractual acceptance criteria [checked]
 
-| AC | Criterion | Register | Status |
+| # | Criterion | Traces | Status |
 |---|---|---|---|
 | AC-1 | Every stock question and every stock change the store makes passes through one boundary, behind an adapter that can be replaced without changing its callers | INT-16, ERP-01 | provisional |
 | AC-2 | A product's English and Arabic records, and a variation's, resolve to one stock identity: the translation group's source-language record | ERP-01 | provisional |
