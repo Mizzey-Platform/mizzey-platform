@@ -63,6 +63,7 @@ require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
@@ -73,6 +74,23 @@ require_once __DIR__ . '/src/Accounts/VerificationOnRegistration.php';
 require_once __DIR__ . '/src/Accounts/MarketingConsent.php';
 require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
+require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
+require_once __DIR__ . '/src/Stock/StockItem.php';
+require_once __DIR__ . '/src/Stock/StockAnswer.php';
+require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
+require_once __DIR__ . '/src/Stock/StockSourceRefused.php';
+require_once __DIR__ . '/src/Stock/StockSource.php';
+require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
+require_once __DIR__ . '/src/Stock/StockIdentity.php';
+require_once __DIR__ . '/src/Stock/StockGateway.php';
+require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
+require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
+require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
+require_once __DIR__ . '/src/Wishlist/Wishlist.php';
+require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
+require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -109,6 +127,13 @@ MizzeySite\Security\Security::register();
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
+
+// Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
+MizzeySite\Roles\RefundCapability::register();
+// The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
+MizzeySite\Wishlist\Wishlist::register();
+MizzeySite\Wishlist\RecentlyViewed::register();
+MizzeySite\Wishlist\WishlistRoutes::register();
 MizzeySite\Orders\CancellationField::register();
 
 // The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,
@@ -139,3 +164,9 @@ if (defined('WP_CLI') && WP_CLI) {
     }
     unset($mizzey_cli_arguments);
 }
+
+// Product reviews: eligibility by delivered purchase (D-17), moderation, the rating, the invitation. REV-01 to REV-05,
+// specs/020-reviews.
+MizzeySite\Reviews\ReviewEligibility::register();
+MizzeySite\Reviews\ReviewModeration::register();
+MizzeySite\Reviews\ReviewInvitation::register();
