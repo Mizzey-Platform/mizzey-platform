@@ -1,0 +1,24 @@
+Deliberate defects in mizzey-site/src/Stock/StockWriteGuard.php, each run against t67 at 0c150b8 and then reverted (31 October 2026). The commit after it only rebuilds three regex and SQL fragments with sprintf.
+
+M1 a save writes derived stock state             -> t67 fails (2 checks)
+M2 the metadata API by key unguarded             -> t67 fails (2 checks)
+M3 raw SQL unguarded                             -> t67 fails (6 checks)
+M4 REST takes stock                              -> t67 fails (1 check)
+M5 the list shows the stored figure              -> t67 fails (1 check)
+M6 the projection is refused too                 -> t67 fails (1 check)
+M7 keys compared case-sensitively                -> t67 fails (7 checks)
+M8 a delete for every object let through         -> t67 fails (1 check)
+M9 nested variations not read                    -> t67 fails (1 check)
+M10 updates and deletes let through              -> t67 fails (6 checks)
+M11 a deleted product keeps its rows             -> t67 fails (1 check)
+M12 a write that only reads the table refused    -> t67 fails (1 check)
+M13 the object keeps a refused figure            -> t67 fails (1 check)
+M14 defaults refused at the SQL layer            -> t67 fails (1 check)
+M15 backorders let through                       -> t67 fails (2 checks)
+M16 the editor shows no figure                   -> t67 fails (1 check)
+M17 the fields are not locked                    -> t67 fails (1 check)
+M18 the metadata API by meta id unguarded        -> t67 fails (1 check)
+M19 WPML duplicates refused whole                -> t67 fails (1 check)
+M20 inserted rows let through                    -> t67 fails (6 checks)
+
+20 of 20 caught.
