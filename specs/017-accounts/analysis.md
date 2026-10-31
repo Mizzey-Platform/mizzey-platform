@@ -13,6 +13,7 @@ check that fails when the fix is removed (`evidence/mutation.txt`).
 | 4 | FIX FIRST | Two Medium. Overlapping changes of one account's phone, and a takeover racing a reclaim, could leave a claim on the wrong number: a number's claim and an account's phone change now take turns under MySQL named locks, the account's saved phone is read under the lock, and holder() also requires the owner's saved phone to be the number, so a binding that loses a race signs in to nobody |
 | 5 | FIX FIRST | One Medium. The backfill published claims outside the account's lock: it now goes through the same locked path |
 | 6 | FIX FIRST | One Medium. Two first requests for a link at once could store two token rows: the link is stored as the account's one row, replaced under a lock per account |
+| 7 | READY | No High or Medium findings beyond the two recorded limits |
 
 Known limits, recorded in the specification: the link request's timing is equal only where PHP-FPM sends the answer
 first; WooCommerce's own registration form says whether an email already has an account (native, AUTH-01); without a
