@@ -155,8 +155,7 @@ final class FreeShippingProgress
         $others      = array_values(array_filter(AutomaticPromotions::codes(), static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping()));
         $combining   = \MizzeySite\Promotions\Combination::allowed();
         $exclusive   = array_filter($others, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== [];
-        // Another automatic promotion may join at the target with a discount of its own.
-        if ($blocked || ! self::couponsShipFree($cart, $others !== [])) {
+        if ($blocked) {
             return null;
         }
         $needed = null;
@@ -164,8 +163,12 @@ final class FreeShippingProgress
             $coupon  = new \WC_Coupon($code);
             $minimum = PromotionSettings::minItems($coupon);
             $competed = $others !== [] && (! $combining || $exclusive || $coupon->get_individual_use());
+            // A discount may join at the target, this promotion's own or another automatic one's (free shipping or not),
+            // and take a minimum that counts discounts out of reach.
+            $discount = (float) $coupon->get_amount() > 0
+                || array_filter(AutomaticPromotions::codes(), static fn (string $other): bool => $other !== $code && (float) (new \WC_Coupon($other))->get_amount() > 0) !== [];
             if (! $coupon->get_free_shipping() || $minimum <= 0 || $competed || ($entered !== [] && $coupon->get_individual_use())
-                || ((float) $coupon->get_amount() > 0 && ! self::couponsShipFree($cart, true))) {
+                || ! self::couponsShipFree($cart, $discount)) {
                 continue;
             }
             // The promotion as it would stand with its item minimum met: valid then, the units are what is missing.

@@ -236,6 +236,44 @@ run(
 		$lost_order->save_meta_data();
 		$lost_again = OrderStock::reserve( wc_get_order( $lost->get_id() ), $lost_gate );
 		$check( '' !== $lost_key && $lost_again && 4 === $lost_source->levels[ $five->get_id() ] && 1 === $lost_source->levels[ $two->get_id() ], 'CHK-12 a crash before an undo reached the source: placing again sends the undo first, so the line holds its stock once (' . wp_json_encode( $lost_source->levels ) . ')' );
+		// A crash after a release reached the source, before the record was saved: paying the order again reserves afresh.
+		$freed_source = new T60Source( array( $five->get_id() => 5 ) );
+		$freed_gate   = new StockGateway( $freed_source, 1, null, 0 );
+		$freed        = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $freed, $freed_gate );
+		$at_release = null;
+		$freed_source->after = static function ( string $key ) use ( &$at_release, $freed ): void {
+			if ( null === $at_release && str_ends_with( $key, '-release' ) ) {
+				wp_cache_flush();
+				$at_release = wc_get_order( $freed->get_id() )->get_meta( OrderStock::RECORD );
+			}
+		};
+		OrderStock::release( wc_get_order( $freed->get_id() ), $freed_gate );
+		$freed_source->after = null;
+		$freed_order = wc_get_order( $freed->get_id() );
+		$freed_order->update_meta_data( OrderStock::RECORD, is_array( $at_release ) ? $at_release : array() );
+		$freed_order->save_meta_data();
+		$freed_again = OrderStock::reserve( wc_get_order( $freed->get_id() ), $freed_gate );
+		$check( null !== $at_release && $freed_again && 4 === $freed_source->levels[ $five->get_id() ] && OrderStock::active( wc_get_order( $freed->get_id() ) ), 'CHK-12 a crash between a release and saving the record leaves the release on the record, so placing the order again reserves its stock afresh (' . $freed_source->levels[ $five->get_id() ] . ' left of 5)' );
+		// A resize the source applied but never answered: the order changed back does not count as reserved, and
+		// reserving again settles it first.
+		$back_source = new T60Source( array( $five->get_id() => 5 ) );
+		$back        = t60_order( $s, array( $five->get_id() => 3 ) );
+		OrderStock::reserve( $back, new StockGateway( $back_source, 1, null, 0 ) );
+		$set_back = static function ( int $qty ) use ( $back ): void {
+			foreach ( wc_get_order( $back->get_id() )->get_items() as $back_item ) {
+				$back_item->set_quantity( $qty );
+				$back_item->save();
+			}
+		};
+		$set_back( 1 );
+		$back_source->silent = array( $five->get_id() );
+		$shrunk = OrderStock::reserve( wc_get_order( $back->get_id() ), new StockGateway( $back_source, 1, null, 0 ) );
+		$back_source->silent = array();
+		$set_back( 3 );
+		$back_active = OrderStock::active( wc_get_order( $back->get_id() ) );
+		$regrown     = OrderStock::reserve( wc_get_order( $back->get_id() ), new StockGateway( $back_source, 1, null, 0 ) );
+		$check( ! $shrunk && ! $back_active && $regrown && 2 === $back_source->levels[ $five->get_id() ] && OrderStock::active( wc_get_order( $back->get_id() ) ), 'CHK-12 an unanswered resize from 3 to 1, then the order back at 3: not taken as reserved; reserving again settles the resize and takes the 2 back (' . $back_source->levels[ $five->get_id() ] . ' left of 5)' );
 		// A reserve that the source applied but never answered: asked again with the same key, taken once.
 		$quiet_source = new T60Source( array( $five->get_id() => 5 ) );
 		$quiet_source->silent = array( $five->get_id() );

@@ -329,13 +329,20 @@ run(
 		$twenty_pc->save();
 		AutomaticPromotions::forget();
 		$both_joined = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		// The same discount promotion giving free shipping too.
+		$twenty_pc->set_free_shipping( true );
+		$twenty_pc->save();
+		AutomaticPromotions::forget();
+		$both_joined_free = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
+		$twenty_pc->set_free_shipping( false );
+		$twenty_pc->save();
 		update_option( \MizzeySite\Promotions\Combination::OPTION, $combine_was );
 		$twenty_pc->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 		$twenty_pc->save();
 		AutomaticPromotions::forget();
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
-		$check( 1 === $both_alone['items_needed'] && null === $both_joined['items_needed'], 'CART-07, BR-004 free shipping that needs the promotion and a minimum after discounts promises one more item alone, and no item target while another automatic discount may join at the target (' . wp_json_encode( array( $both_alone, $both_joined ) ) . ')' );
+		$check( 1 === $both_alone['items_needed'] && null === $both_joined['items_needed'] && null === $both_joined_free['items_needed'], 'CART-07, BR-004 free shipping that needs the promotion and a minimum after discounts promises one more item alone, and no item target while another automatic discount may join at the target, one that gives free shipping too included (' . wp_json_encode( array( $both_alone, $both_joined, $both_joined_free ) ) . ')' );
 		$check( null === $exclusive_competing['items_needed'], 'CART-07, BR-004 with promotions combining, an individual-use automatic promotion that competes at the target also keeps the item target unpromised (' . wp_json_encode( $exclusive_competing ) . ')' );
 		$check( null === $competing['items_needed'], 'CART-07, BR-004 with promotions not combining and another automatic promotion that competes at the two-unit target, no item target is promised for the free-shipping one (' . wp_json_encode( $competing ) . ')' );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );

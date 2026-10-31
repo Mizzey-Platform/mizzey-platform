@@ -44,6 +44,7 @@ final class ReviewEligibility
         add_filter('woocommerce_product_review_comment_form_args', [self::class, 'formArgs'], 20, 1);
         add_filter('rest_pre_dispatch', [self::class, 'wooRestStatus'], 10, 3);
         add_filter('rest_pre_dispatch', [self::class, 'commentsRest'], 10, 3);
+        add_filter('map_meta_cap', [self::class, 'editReview'], 10, 4);
         add_action('wp_insert_comment', [self::class, 'unlock'], 0);
         add_action('shutdown', [self::class, 'unlock']);
     }
@@ -206,7 +207,8 @@ final class ReviewEligibility
             || preg_match('#^/wp/v2/comments/(\d+)#i', $request->get_route(), $match) !== 1) {
             return $result;
         }
-        $comment = get_comment((int) $match[1]);
+        // The comment the controller acts on: an id in the body or query wins over the one in the address.
+        $comment = get_comment((int) ($request->get_param('id') ?? $match[1]));
         $onto    = $request->get_param('post');
         if (($comment instanceof \WP_Comment && get_post_type((int) $comment->comment_post_ID) === 'product')
             || ($onto !== null && get_post_type((int) $onto) === 'product')) {
@@ -214,6 +216,30 @@ final class ReviewEligibility
         }
 
         return $result;
+    }
+
+    /**
+     * Editing a review of a product, approving it included, needs the right to moderate comments: WordPress maps
+     * `edit_comment` to editing the product, which every screen and endpoint that changes a comment checks (the REST
+     * comments endpoint, the admin's reply with approval, approve and unapprove, the comment editor).
+     *
+     * @param mixed $caps
+     * @param mixed $cap
+     * @param mixed $userId
+     * @param mixed $args
+     * @return mixed
+     */
+    public static function editReview($caps, $cap, $userId, $args)
+    {
+        if ($cap !== 'edit_comment' || ! is_array($caps) || ! is_array($args) || ! isset($args[0])) {
+            return $caps;
+        }
+        $comment = get_comment((int) $args[0]);
+        if ($comment instanceof \WP_Comment && get_post_type((int) $comment->comment_post_ID) === 'product') {
+            $caps[] = 'moderate_comments';
+        }
+
+        return $caps;
     }
 
     /** The lock held between a submission's check and its insert, released once the review is stored. */
