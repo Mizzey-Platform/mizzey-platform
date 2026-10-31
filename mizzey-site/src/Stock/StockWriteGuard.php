@@ -81,6 +81,7 @@ final class StockWriteGuard
         add_action('woocommerce_product_options_stock_status', [self::class, 'editor']);
         add_action('woocommerce_variation_options_inventory', [self::class, 'variationEditor'], 10, 3);
         add_action('admin_enqueue_scripts', [self::class, 'lockFields']);
+        add_filter('wpml_duplicate_custom_fields_exceptions', [self::class, 'duplicateExceptions']);
     }
 
     /**
@@ -481,6 +482,20 @@ final class StockWriteGuard
         }
 
         return true;
+    }
+
+    /**
+     * WPML copies a duplicate's meta in one insert; without the stock keys in it, the rest (price, SKU) is not refused
+     * with them, and the duplicate's stock stays as the projection and WooCommerce Multilingual set it.
+     *
+     * @param mixed $exceptions
+     * @return array<int, string>
+     */
+    public static function duplicateExceptions($exceptions): array
+    {
+        $exceptions = is_array($exceptions) ? $exceptions : [];
+
+        return self::permitted() ? $exceptions : array_values(array_unique(array_merge($exceptions, self::KEYS)));
     }
 
     /** @param mixed $postId */
