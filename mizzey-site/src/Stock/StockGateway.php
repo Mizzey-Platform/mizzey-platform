@@ -112,15 +112,25 @@ final class StockGateway
         return StockAnswer::unknown($item, 'unavailable after ' . $this->attempts . ' attempts');
     }
 
+    /** Diagnostics never change the stock answer: a failing logger, or an adapter whose name() fails, is ignored. */
     private function log(string $level, string $operation, ?StockItem $item, int $attempt, string $outcome, string $key = ''): void
     {
-        $line = sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $this->source->name(), $outcome);
-        $this->logger?->log($level, $line, [
-            'source'    => self::LOG_SOURCE,
-            'operation' => $operation,
-            'item'      => $item?->id,
-            'attempt'   => $attempt,
-            'key'       => $key,
-        ]);
+        try {
+            try {
+                $name = $this->source->name();
+            } catch (\Throwable) {
+                $name = get_class($this->source);
+            }
+            $line = sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $name, $outcome);
+            $this->logger?->log($level, $line, [
+                'source'    => self::LOG_SOURCE,
+                'operation' => $operation,
+                'item'      => $item?->id,
+                'attempt'   => $attempt,
+                'key'       => $key,
+            ]);
+        } catch (\Throwable) {
+            // The answer stands without its log line.
+        }
     }
 }

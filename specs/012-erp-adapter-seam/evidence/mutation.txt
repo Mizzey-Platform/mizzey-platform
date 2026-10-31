@@ -5,3 +5,7 @@ M2  a refusal is retried                                              -> t53 fai
 M3  a new operation key on every attempt                              -> t53 fails (2 checks)
 M4  no retry                                                          -> t53 fails (3 checks)
 M5  unknown stock is sellable                                         -> t53 fails (3 checks)
+
+After the first review (31 October 2026):
+
+M6  a logging failure reaches the caller                              -> t53 fails (1 check)

@@ -38,7 +38,12 @@ final class T53MockSource implements StockSource {
 	/** @var list<array{string,int,string}> */
 	public array $calls = array();
 
+	public bool $nameFails = false;
+
 	public function name(): string {
+		if ( $this->nameFails ) {
+			throw new \RuntimeException( 'name failed' );
+		}
 		return 'mock';
 	}
 
@@ -84,7 +89,7 @@ final class T53MockSource implements StockSource {
 }
 
 /** Records what the gateway logs. */
-final class T53Logger implements \WC_Logger_Interface {
+class T53Logger implements \WC_Logger_Interface {
 	/** @var list<array{string,string,array}> */
 	public array $lines = array();
 
@@ -127,6 +132,13 @@ final class T53Logger implements \WC_Logger_Interface {
 
 	public function debug( $message, $context = array() ) {
 		$this->log( 'debug', $message, $context );
+	}
+}
+
+/** A logger that fails on every line. */
+final class T53BrokenLogger extends T53Logger {
+	public function log( $level, $message, $context = array() ) {
+		throw new \RuntimeException( 'logger failed' );
 	}
 }
 
@@ -202,6 +214,23 @@ run(
 		$check( ! $answer->isKnown() && 1 === count( $mock->calls ) && 'error' === ( $log->lines[0][0] ?? '' ), 'AC-3, AC-6 an adapter that breaks its contract fails closed at once, logged as an error' );
 		$mock->failures = array();
 		$check( ! ( new StockGateway( $mock, 3, new T53Logger(), 0 ) )->level( $variable )->isKnown(), 'AC-3 an item the source does not know is refused, so unknown' );
+		$mock->failures  = array( 'unavailable', 'unavailable', 'unavailable' );
+		$mock->nameFails = true;
+		$thrown          = null;
+		try {
+			$quiet = ( new StockGateway( $mock, 3, new T53Logger(), 0 ) )->level( $en );
+		} catch ( \Throwable $e ) {
+			$thrown = $e;
+		}
+		$mock->nameFails = false;
+		$check( null === $thrown && ! $quiet->isKnown(), 'AC-3 a failing source whose name() also fails still answers unknown, with no exception to the caller' );
+		$thrown = null;
+		try {
+			$logged_out = ( new StockGateway( $mock, 3, new T53BrokenLogger(), 0 ) )->level( $en );
+		} catch ( \Throwable $e ) {
+			$thrown = $e;
+		}
+		$check( null === $thrown && $logged_out->isKnown() && 7 === $logged_out->quantity, 'AC-6 a logger that fails changes nothing: the source answered 7, and so does the gateway' );
 
 		// AC-5: a change applied, then its answer lost, is retried with the same key and applied once.
 		$mock->stock[ $en ] = 10;
@@ -222,10 +251,11 @@ run(
 		// FR-007: the gateway leaves WooCommerce's own stock field alone.
 		$product = wc_get_product( $en );
 		$product->set_manage_stock( true );
-		$product->set_stock_quantity( 5 );
+		$product->set_stock_quantity( 50 );
 		$product->save();
-		( new StockGateway( $mock, 3, new T53Logger(), 0 ) )->adjust( $en, -3, "{$tag}-order-2-line-1" );
-		$check( 5 === (int) wc_get_product( $en )->get_stock_quantity(), 'FR-007 a change through the gateway writes nothing to WooCommerce\'s stock field (still 5)' );
+		$changed = ( new StockGateway( $mock, 3, new T53Logger(), 0 ) )->adjust( $en, -3, "{$tag}-order-2-line-1" );
+		$local   = (int) Scenario::fresh_product( $en )->get_stock_quantity();
+		$check( $changed->isKnown() && 5 === $changed->quantity && 50 === $local, "FR-007 the source goes from 8 to 5 and WooCommerce's own stock field stays 50 ({$local})" );
 
 		return $ok;
 	}
