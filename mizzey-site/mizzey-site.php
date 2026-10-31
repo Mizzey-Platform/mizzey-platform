@@ -97,6 +97,7 @@ require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
 require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
 require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 require_once __DIR__ . '/src/Emails/OrderLanguage.php';
 require_once __DIR__ . '/src/Emails/EmailAdditions.php';

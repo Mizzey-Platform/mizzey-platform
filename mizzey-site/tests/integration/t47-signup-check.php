@@ -67,7 +67,8 @@ function t47_cart( int $product_id, array $cookies = array() ): array {
 
 /** A Store API checkout body for an email. */
 function t47_checkout_body( string $email, ?bool $create, ?array $signup ): array {
-	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '01000000000' );
+	// An Egyptian address carries its district (specs/019).
+	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '01000000000', 'mizzey/district' => 'Downtown' );
 	$body    = array( 'billing_address' => $address, 'shipping_address' => $address, 'payment_method' => 'cod' );
 	if ( null !== $create ) {
 		$body['create_account']    = $create;
@@ -125,6 +126,8 @@ run(
 				'woocommerce_enable_signup_and_login_from_checkout'   => 'yes',
 				'woocommerce_enable_guest_checkout'                   => 'yes',
 				'woocommerce_cod_settings'                            => array_merge( is_array( $cod ) ? $cod : array(), array( 'enabled' => 'yes', 'enable_for_virtual' => 'yes' ) ),
+				// The cart asks the stock source and fails closed (specs/018): the development fixture stands in.
+				\MizzeySite\Stock\FixtureStockSource::OPTION          => 'yes',
 			)
 		);
 

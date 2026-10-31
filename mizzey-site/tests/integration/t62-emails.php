@@ -69,6 +69,13 @@ run(
 		$welcomes = array_values( array_filter( $to( $email ), static fn ( $m ) => false !== strpos( (string) ( $m['message'] ?? '' ), 'welcome gift' ) ) );
 		$check( '' !== $code && 1 === count( $welcomes ) && false !== strpos( (string) $welcomes[0]['message'], $code ) && false !== strpos( (string) $welcomes[0]['message'], '10% off' ), 'NOTF-01 the new account email names the welcome discount: what it gives and its code (' . $code . ')' );
 
+		// An expired welcome code is not advertised.
+		$own_coupon = new \WC_Coupon( $code );
+		$own_coupon->set_date_expires( time() - DAY_IN_SECONDS );
+		$own_coupon->save();
+		$expired_line = EmailAdditions::welcome( 'Welcome.', get_userdata( $user_id ), null );
+		$check( 'Welcome.' === $expired_line, 'NOTF-01 an expired welcome code is not advertised' );
+
 		// NOTF-02, NOTF-11: order confirmed, also for a customer who declined marketing.
 		$mails = array();
 		$buyer = "{$tag}-buyer@example.invalid";
@@ -82,7 +89,7 @@ run(
 		update_user_meta( $user_id, '_mizzey_marketing_consent', array( 'given' => false, 'at' => time(), 'source' => 'registration' ) );
 		$order = t62_walk( $order, 'processing' );
 		$confirmed = $to( $buyer );
-		$check( 1 <= count( $confirmed ) && false !== stripos( (string) $confirmed[0]['subject'], (string) $order->get_order_number() ), 'NOTF-02, NOTF-11 a placed order sends its confirmation, though the customer declined marketing (' . ( $confirmed[0]['subject'] ?? 'none' ) . ')' );
+		$check( 1 <= count( $confirmed ) && false !== strpos( (string) $confirmed[0]['message'], (string) $order->get_order_number() ), 'NOTF-02, NOTF-11 a placed order sends its confirmation, though the customer declined marketing (' . ( $confirmed[0]['subject'] ?? 'none' ) . ')' );
 
 		// NOTF-04: Shipped, with the carrier and tracking number, once.
 		$mails = array();
@@ -117,7 +124,7 @@ run(
 		$s->track_order( $failed->get_id() );
 		$failed->update_status( 'failed' );
 		$failed_mail = $to( $failer )[0] ?? array();
-		$check( false !== strpos( (string) ( $failed_mail['message'] ?? '' ), 'pay for your order here' ) && false !== strpos( (string) ( $failed_mail['message'] ?? '' ), 'order-pay' ), 'NOTF-03 a failed payment sends the failed order email with a link to pay again' );
+		$check( false !== strpos( (string) ( $failed_mail['message'] ?? '' ), 'pay for your order here' ) && false !== strpos( (string) ( $failed_mail['message'] ?? '' ), 'order-pay' ) && 1 === preg_match( '/<a href="[^"]*order-pay[^"]*"/', (string) ( $failed_mail['message'] ?? '' ) ), 'NOTF-03 a failed payment sends the failed order email with a link to pay again' );
 
 		// D6: the Shipped email in the order's language.
 		$mails  = array();

@@ -69,6 +69,11 @@ final class ReviewInvitation
 
     private static function send(int $id): void
     {
+        // The mark is read from the database under the lock, not from a cache: another request may have sent the
+        // invitation while this one waited with the order already loaded.
+        if (StoredOrderMeta::get($id, self::SENT) !== '') {
+            return;
+        }
         $order = wc_get_order($id);
         if (! $order instanceof \WC_Order || $order->get_meta(self::SENT) !== '') {
             return;

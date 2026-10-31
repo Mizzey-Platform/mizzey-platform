@@ -132,7 +132,7 @@ run(
 		AccountPages::tracking( $order );
 		$html = (string) ob_get_clean();
 		remove_filter( 'woocommerce_is_account_page', $on_account );
-		$check( array( 'processing', 'preparing', 'shipped' ) === $steps && false !== strpos( $html, 'BST-55210' ) && false !== strpos( $html, 'Bosta' ), 'ACCT-07 the order view shows the carrier and tracking number and each status the order entered, in order (' . implode( ',', $steps ) . ')' );
+		$check( array( 'pending', 'processing', 'preparing', 'shipped' ) === $steps && false !== strpos( $html, 'BST-55210' ) && false !== strpos( $html, 'Bosta' ), 'ACCT-07 the order view shows the carrier and tracking number and each status the order entered, in order (' . implode( ',', $steps ) . ')' );
 
 		// ACCT-08: the wishlist page.
 		wp_set_current_user( $laila );

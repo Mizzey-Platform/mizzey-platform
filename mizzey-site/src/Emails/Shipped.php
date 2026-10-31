@@ -81,6 +81,11 @@ final class Shipped
 
     private static function send(int $id): void
     {
+        // The mark is read from the database under the lock, not from a cache: another request may have sent the email
+        // while this one waited with the order already loaded.
+        if (\MizzeySite\Reviews\StoredOrderMeta::get($id, self::SENT) !== '') {
+            return;
+        }
         $order = wc_get_order($id);
         $email = WC()->mailer()->get_emails()['MizzeySite_Customer_Shipped'] ?? null;
         if (! $order instanceof \WC_Order || $order->get_meta(self::SENT) !== '' || ! $email instanceof ShippedEmail) {

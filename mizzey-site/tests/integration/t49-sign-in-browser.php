@@ -78,6 +78,8 @@ run(
 				'woocommerce_enable_signup_and_login_from_checkout' => 'yes',
 				'woocommerce_enable_guest_checkout'                 => 'yes',
 				'woocommerce_cod_settings'                          => array_merge( is_array( $cod ) ? $cod : array(), array( 'enabled' => 'yes', 'enable_for_virtual' => 'yes' ) ),
+				// The cart asks the stock source and fails closed (specs/018): the development fixture stands in.
+				\MizzeySite\Stock\FixtureStockSource::OPTION        => 'yes',
 			)
 		);
 		$product = $s->simple_product( 't49 virtual item', '50', null );
@@ -107,7 +109,8 @@ run(
 					'url'       => wc_get_checkout_url(),
 					'email'     => $fresh( 'br-checkout' ),
 					'state'     => 'EG-01',
-					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000' ),
+					// The district is an address field of specs/019; its input's id holds a slash, escaped for the selector.
+					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000', 'mizzey\/district' => 'Downtown' ),
 				),
 				'screenshotDir' => get_temp_dir(),
 				'checkoutTrap'  => array( 'email' => $fresh( 'br-checkout-trap' ) ),
