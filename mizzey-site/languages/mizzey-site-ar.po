@@ -86,3 +86,19 @@ msgstr[2] "تتطلب هذه القسيمة منتجين على الأقل في 
 msgstr[3] "تتطلب هذه القسيمة %d منتجات على الأقل في سلتك."
 msgstr[4] "تتطلب هذه القسيمة %d منتجًا على الأقل في سلتك."
 msgstr[5] "تتطلب هذه القسيمة %d منتج على الأقل في سلتك."
+
+#: mizzey-site/src/Wishlist/Wishlist.php
+msgid "This item is not in your wishlist."
+msgstr "هذا المنتج غير موجود في قائمة أمنياتك."
+
+#: mizzey-site/src/Wishlist/Wishlist.php
+msgid "This item is out of stock, so it stays in your wishlist."
+msgstr "هذا المنتج غير متوفر حاليًا، لذلك يبقى في قائمة أمنياتك."
+
+#: mizzey-site/src/Wishlist/Wishlist.php
+msgid "This item could not be added to your cart, so it stays in your wishlist."
+msgstr "تعذّرت إضافة هذا المنتج إلى سلتك، لذلك يبقى في قائمة أمنياتك."
+
+#: mizzey-site/src/Wishlist/WishlistRoutes.php
+msgid "This product could not be found."
+msgstr "تعذّر العثور على هذا المنتج."

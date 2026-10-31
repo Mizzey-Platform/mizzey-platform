@@ -66,6 +66,7 @@ require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
 require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
+require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
 require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
@@ -74,6 +75,10 @@ require_once __DIR__ . '/src/Stock/StockSource.php';
 require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
 require_once __DIR__ . '/src/Stock/StockIdentity.php';
 require_once __DIR__ . '/src/Stock/StockGateway.php';
+require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
+require_once __DIR__ . '/src/Wishlist/Wishlist.php';
+require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
+require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -110,6 +115,11 @@ MizzeySite\Security\Security::register();
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
+
+// The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
+MizzeySite\Wishlist\Wishlist::register();
+MizzeySite\Wishlist\RecentlyViewed::register();
+MizzeySite\Wishlist\WishlistRoutes::register();
 MizzeySite\Orders\CancellationField::register();
 
 // The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,
