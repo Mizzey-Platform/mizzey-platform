@@ -1,0 +1,8 @@
+Deliberate defects, each run against t56 and then reverted (31 October 2026):
+
+M1  the wishlist keys the record, not the canonical product           -> t56 fails (9 checks)
+M2  the cookie signature is not checked                               -> t56 fails (2 checks)
+M3  merging duplicates an item                                        -> t56 fails (4 checks)
+M4  an out-of-stock item is moved anyway                              -> t56 fails (3 checks)
+M5  recently viewed keys the record                                   -> t56 fails (2 checks)
+M6  a customer list is kept in the cookie                             -> t56 fails (5 checks)
