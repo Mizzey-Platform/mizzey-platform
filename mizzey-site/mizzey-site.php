@@ -63,6 +63,7 @@ require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
@@ -82,6 +83,10 @@ require_once __DIR__ . '/src/Stock/StockSource.php';
 require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
 require_once __DIR__ . '/src/Stock/StockIdentity.php';
 require_once __DIR__ . '/src/Stock/StockGateway.php';
+require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
+require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
+require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
 require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
 require_once __DIR__ . '/src/Cart/CartStock.php';
@@ -95,10 +100,6 @@ require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
 require_once __DIR__ . '/src/Wishlist/Wishlist.php';
 require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
 require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
-require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
-require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
-require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
-require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
 require_once __DIR__ . '/src/Emails/OrderLanguage.php';
 require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
@@ -146,7 +147,9 @@ MizzeySite\Security\Security::register();
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
 
-// The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
+// Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
+MizzeySite\Roles\RefundCapability::register();
+// The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
 MizzeySite\Stock\FixtureStockSource::register();
 MizzeySite\Stock\LocalStockWriters::register();
 MizzeySite\Cart\CartStock::register();
@@ -154,8 +157,10 @@ MizzeySite\Cart\CartMerge::register();
 MizzeySite\Cart\GuestCartRetention::register();
 MizzeySite\Cart\FreeShippingProgress::register();
 MizzeySite\Cart\CartSuggestions::register();
+// The checkout: the Egyptian address and stock reserved at placement (#255). See specs/019-checkout.
 MizzeySite\Checkout\EgyptianAddress::register();
 MizzeySite\Checkout\OrderStock::register();
+// The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
 MizzeySite\Wishlist\Wishlist::register();
 MizzeySite\Wishlist\RecentlyViewed::register();
 MizzeySite\Wishlist\WishlistRoutes::register();

@@ -317,6 +317,60 @@ run(
 		$gone_source->silent = array();
 		$gone_released = OrderStock::release( wc_get_order( $gone->get_id() ), new StockGateway( $gone_source, 1, null, 0 ) );
 		$check( $gone_released && 5 === $gone_source->levels[ $five->get_id() ], 'CHK-12 an order released with its reserve unanswered settles the reserve, then gives the stock back (' . $gone_source->levels[ $five->get_id() ] . ' of 5)' );
+		// A placement from a copy of the order loaded at 1, after another request changed it to 3 and reserved 3: the
+		// stock work reads the order as stored, so the 3 stay held.
+		$copy_source = new T60Source( array( $five->get_id() => 5 ) );
+		$copy_gate   = new StockGateway( $copy_source, 1, null, 0 );
+		$copied      = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $copied, $copy_gate );
+		$old_copy = wc_get_order( $copied->get_id() );
+		$old_copy->get_items();
+		foreach ( wc_get_order( $copied->get_id() )->get_items() as $copied_item ) {
+			$copied_item->set_quantity( 3 );
+			$copied_item->save();
+		}
+		OrderStock::reserve( wc_get_order( $copied->get_id() ), $copy_gate );
+		OrderStock::reserve( $old_copy, $copy_gate );
+		$check( 2 === $copy_source->levels[ $five->get_id() ] && OrderStock::active( wc_get_order( $copied->get_id() ) ), 'CHK-12 a placement from a copy of the order loaded before another request changed it to 3 keeps the 3 held (' . $copy_source->levels[ $five->get_id() ] . ' left of 5)' );
+		// Another request changes the stored quantity to 3 while this one still holds the order, at 1, in its caches: the
+		// stock work under the lock reads the stored 3 and takes the 2 more.
+		$cached_source = new T60Source( array( $five->get_id() => 5 ) );
+		$cached_gate   = new StockGateway( $cached_source, 1, null, 0 );
+		$cached        = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $cached, $cached_gate );
+		$warm = wc_get_order( $cached->get_id() );
+		foreach ( $warm->get_items() as $warm_item ) {
+			$warm_item->get_quantity();
+			// As another request writes it: straight to the database, past this request's caches.
+			$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'woocommerce_order_itemmeta', array( 'meta_value' => '3' ), array( 'order_item_id' => $warm_item->get_id(), 'meta_key' => '_qty' ) );
+		}
+		OrderStock::reserve( wc_get_order( $cached->get_id() ), $cached_gate );
+		$check( 2 === $cached_source->levels[ $five->get_id() ], 'CHK-12 a quantity another request stored as 3, while this request still holds the order at 1 in its caches, is reserved as 3 (' . $cached_source->levels[ $five->get_id() ] . ' left of 5)' );
+		// A payment's failure and success arriving together: the failure releases, then the success, from a copy loaded
+		// while the order was still reserved, reserves again instead of trusting its copy.
+		$race_source = new T60Source( array( $five->get_id() => 5 ) );
+		$bind_race   = static fn () => $race_source;
+		add_filter( StockGateway::SOURCE_FILTER, $bind_race );
+		$race = t60_order( $s, array( $five->get_id() => 1 ) );
+		$race->set_status( 'pending' );
+		$race->save();
+		OrderStock::reserve( wc_get_order( $race->get_id() ), StockGateway::make() );
+		$success = wc_get_order( $race->get_id() );
+		$success->get_meta( OrderStock::RECORD );
+		wc_get_order( $race->get_id() )->update_status( 'failed' );
+		$after_failure = $race_source->levels[ $five->get_id() ];
+		// The success callback works from its own copy: the stored order moves to processing, then the handler runs with
+		// the copy, which still shows the reservation the failure gave back.
+		remove_action( 'woocommerce_order_status_changed', array( OrderStock::class, 'statusChanged' ), 20 );
+		wc_get_order( $race->get_id() )->update_status( 'processing' );
+		add_action( 'woocommerce_order_status_changed', array( OrderStock::class, 'statusChanged' ), 20, 4 );
+		OrderStock::statusChanged( $race->get_id(), 'failed', 'processing', $success );
+		// A failure's release that reaches the order only after it was paid: the stored status is paid, so nothing goes back.
+		$late_failure = wc_get_order( $race->get_id() );
+		OrderStock::statusChanged( $race->get_id(), 'pending', 'failed', $late_failure );
+		$after_late_failure = $race_source->levels[ $five->get_id() ];
+		remove_filter( StockGateway::SOURCE_FILTER, $bind_race );
+		$check( 5 === $after_failure && 4 === $race_source->levels[ $five->get_id() ] && 4 === $after_late_failure && OrderStock::active( wc_get_order( $race->get_id() ) ), 'CHK-12 a payment that fails and then succeeds from a copy loaded before the failure: the failure gives the stock back, the success reserves it again, and a failure release arriving after the payment gives nothing back (' . $after_failure . ' then ' . $race_source->levels[ $five->get_id() ] . ' left of 5, status ' . wc_get_order( $race->get_id() )->get_status() . ')' );
 		// A reserve that the source applied but never answered: asked again with the same key, taken once.
 		$quiet_source = new T60Source( array( $five->get_id() => 5 ) );
 		$quiet_source->silent = array( $five->get_id() );

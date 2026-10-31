@@ -2143,3 +2143,29 @@ protection (D-21) applies; each image has alternative text. The values are set i
 
 **4. Where it is built.** Inside #309 (E-SF-11), under D-22: upload, checks, storage and moderation now; the designed
 form and display after PRE-03b.
+
+
+## 2026-10-31 - D-24: our own code over ready-made plugins
+
+**Status: the owner's decision of 31 October 2026, in his words: "i don't want to use plugins ! if we can create
+something custom and will be better and more compatible with our flows and business we should do that ... don't use
+ready made plugin, create ours".** Internal record. It changes no register row, no fee and no stage, and is not a
+Change Request. It amends constitution M-4 (version 2.0.0).
+
+**1. The rule.** Where WooCommerce or WPML/WCML do not cover a requirement, it is built as our own code on CoreX and
+`mizzey-site`, not with a ready-made third-party plugin. A named plugin is used only when the owner approves it over
+our own code, with the reason recorded here or in the spec: for example a carrier's own integration, or security code
+that gains from a maintained, audited plugin.
+
+**2. What it settles now.**
+- #280's invoice and packing slip (ADM-92, ADM-93, and the download of ACCT-12) are our own code, with a PDF library
+  that shapes Arabic correctly, not an invoice plugin.
+- Google sign-in (#305) is our own code, not Nextend Social Login, which was proposed and never installed.
+- Redirection, approved on 21 October 2026 and never installed, is weighed again under this rule before any install.
+
+**3. What stays.** WooCommerce and the WPML stack (WPML, String Translation, WooCommerce Multilingual) are the
+contracted base. Bosta for WooCommerce is the carrier's own integration. WP 2FA, the staff two-factor sign-in of
+specs/008, stays until the owner decides otherwise: it is security code, where a maintained, audited plugin is the
+safer choice.
+
+**4. Constitution.** M-4 is redefined, so the constitution moves from 1.2.0 to 2.0.0 (MAJOR: a principle redefined).
