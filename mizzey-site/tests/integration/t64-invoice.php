@@ -135,6 +135,9 @@ run(
 		$wcml = is_array( $wcml ) ? $wcml : array();
 		$wcml['currency_options']['KWD']['num_decimals'] = 3;
 		update_option( '_wcml_settings', $wcml );
+		// Made as WooCommerce Multilingual makes a dinar order: three decimals while it is created.
+		$three = static fn (): int => 3;
+		add_filter( 'wc_get_price_decimals', $three );
 		$dinar = t64_order( $s, $buyer, $product, 'processing' );
 		$dinar->set_currency( 'KWD' );
 		foreach ( $dinar->get_items() as $dinar_item ) {
@@ -144,6 +147,7 @@ run(
 		}
 		$dinar->calculate_totals( false );
 		$dinar->save();
+		remove_filter( 'wc_get_price_decimals', $three );
 		$dinar_text = wp_strip_all_tags( str_replace( '<', ' <', InvoiceDocument::html( wc_get_order( $dinar->get_id() ) ) ) );
 		$check( false !== strpos( $dinar_text, '123.456' ) && false !== strpos( $dinar_text, '173.456' ), 'ADM-92 an order in a three-decimal currency keeps its three decimals on the invoice (123.456, and 173.456 with shipping)' );
 
