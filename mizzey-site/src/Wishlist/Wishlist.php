@@ -135,6 +135,28 @@ final class Wishlist
         return true;
     }
 
+    /**
+     * Moves a cart line to the wishlist in one action (CART-04): saved, then taken out of the cart. A line that is not
+     * in the cart, or a product that cannot be saved, changes nothing.
+     */
+    public static function fromCart(string $cartKey): true|\WP_Error
+    {
+        if (! WC()->cart && function_exists('wc_load_cart')) {
+            wc_load_cart();
+        }
+        WC()->cart->get_cart();
+        $line = WC()->cart->get_cart_item($cartKey);
+        if ($line === []) {
+            return new \WP_Error('mizzey_cart_no_line', __('This item is not in your cart.', 'mizzey-site'), ['status' => 404]);
+        }
+        if (self::add((int) ($line['variation_id'] ?: $line['product_id'])) === null) {
+            return new \WP_Error('mizzey_wishlist_no_product', __('This product could not be found.', 'mizzey-site'), ['status' => 404]);
+        }
+        WC()->cart->remove_cart_item($cartKey);
+
+        return true;
+    }
+
     /** Adds a guest's list to the account's, without duplicates, and clears the guest's. Idempotent. */
     public static function mergeGuestInto(int $userId): void
     {
