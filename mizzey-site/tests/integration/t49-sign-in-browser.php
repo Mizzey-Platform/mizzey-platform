@@ -109,7 +109,8 @@ run(
 					'url'       => wc_get_checkout_url(),
 					'email'     => $fresh( 'br-checkout' ),
 					'state'     => 'EG-01',
-					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000' ),
+					// The district is an address field of specs/019; its input's id holds a slash, escaped for the selector.
+					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000', 'mizzey\/district' => 'Downtown' ),
 				),
 				'screenshotDir' => get_temp_dir(),
 				'checkoutTrap'  => array( 'email' => $fresh( 'br-checkout-trap' ) ),

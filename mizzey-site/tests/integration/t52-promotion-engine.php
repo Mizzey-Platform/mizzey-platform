@@ -544,7 +544,7 @@ run(
 		$guest   = t52_store( 'GET', 'cart', array(), array() );
 		t52_store( 'POST', 'cart/add-item', array( 'id' => $cream->get_id(), 'quantity' => 1 ), $guest['headers'] );
 		$coupon  = t52_store( 'POST', 'cart/apply-coupon', array( 'code' => $first->get_code() ), $guest['headers'] );
-		$address = array( 'first_name' => 'T', 'last_name' => 'Fiftytwo', 'address_1' => '1 Tahrir Street', 'city' => 'Cairo', 'state' => 'EG-01', 'postcode' => '11511', 'country' => 'EG', 'email' => 'returning-' . $tag . '@example.invalid', 'phone' => '01000000000' );
+		$address = array( 'first_name' => 'T', 'last_name' => 'Fiftytwo', 'address_1' => '1 Tahrir Street', 'city' => 'Cairo', 'state' => 'EG-01', 'postcode' => '11511', 'country' => 'EG', 'email' => 'returning-' . $tag . '@example.invalid', 'phone' => '01000000000', 'mizzey/district' => 'Downtown' );
 		$placed  = t52_store( 'POST', 'checkout', array( 'billing_address' => $address, 'shipping_address' => $address, 'payment_method' => 'cod' ), $guest['headers'] );
 		if ( ! empty( $placed['body']['order_id'] ) ) {
 			$s->track_order( (int) $placed['body']['order_id'] );
