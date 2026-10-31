@@ -1,0 +1,19 @@
+Deliberate defects, each run against t52 and then reverted (31 October 2026, after the second review):
+
+M1  the percentage cap is never applied                               -> t52 fails (7 checks)
+M2  the smaller automatic discount wins                               -> t52 fails (5 checks)
+M3  automatic promotions skip the checkout's usage and email checks   -> t52 fails (3 checks)
+M4  the promotions applied here are not remembered                    -> t52 fails (1 check)
+M5  the first-order condition is never checked                       -> t52 fails (5 checks)
+
+Review rounds 5 to 10 (31 October 2026). Each fix was removed in turn and t52 run against the commit named, then the
+fix restored:
+
+M6   the winner compares the discount before tax (a9c6c5d)              -> t52 fails (2 checks)
+M7   the discount measured on the original prices (90f2c41)             -> t52 fails (1 check)
+M8   shipping compared without its tax (90f2c41)                        -> t52 fails (1 check)
+M9   prices rebuilt from the rounded tax (4a8ee94)                      -> t52 fails (1 check)
+M10  the discount rounded before the free shipping minimum (f35cc0b)    -> t52 fails (1 check)
+M11  the removed tax not rounded per line (9f0b753)                     -> t52 fails (1 check)
+M12  the rounded saving used for the free shipping minimum (c0ee3a6)    -> t52 fails (1 check)
+M13  subtotal tax rounding ignored for the saving (c0ee3a6)             -> t52 fails (1 check)

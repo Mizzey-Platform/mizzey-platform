@@ -62,6 +62,10 @@ require_once __DIR__ . '/src/Orders/StatusModel.php';
 require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
+require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
+require_once __DIR__ . '/src/Promotions/PromotionRules.php';
+require_once __DIR__ . '/src/Promotions/DiscountCap.php';
+require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -99,6 +103,13 @@ MizzeySite\Security\Security::register();
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
 MizzeySite\Orders\CancellationField::register();
+
+// The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,
+// minimum items, first order only). PROMO-01 to PROMO-23, specs/011-promotion-engine.
+MizzeySite\Promotions\PromotionSettings::register();
+MizzeySite\Promotions\PromotionRules::register();
+MizzeySite\Promotions\DiscountCap::register();
+MizzeySite\Promotions\AutomaticPromotions::register();
 
 // The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.

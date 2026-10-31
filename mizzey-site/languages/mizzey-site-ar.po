@@ -67,3 +67,22 @@ msgstr "بانتظار الدفع"
 #: mizzey-site/src/Orders/StatusModel.php
 msgid "Payment Failed"
 msgstr "فشل الدفع"
+
+#: mizzey-site/src/Promotions/PromotionRules.php
+msgid "This coupon is not active yet."
+msgstr "هذه القسيمة غير مفعّلة بعد."
+
+#: mizzey-site/src/Promotions/PromotionRules.php
+msgid "This coupon is for a first order only."
+msgstr "هذه القسيمة للطلب الأول فقط."
+
+#: mizzey-site/src/Promotions/PromotionRules.php
+#, php-format
+msgid "This coupon needs at least %d item in your cart."
+msgid_plural "This coupon needs at least %d items in your cart."
+msgstr[0] "تتطلب هذه القسيمة %d منتج على الأقل في سلتك."
+msgstr[1] "تتطلب هذه القسيمة منتجًا واحدًا على الأقل في سلتك."
+msgstr[2] "تتطلب هذه القسيمة منتجين على الأقل في سلتك."
+msgstr[3] "تتطلب هذه القسيمة %d منتجات على الأقل في سلتك."
+msgstr[4] "تتطلب هذه القسيمة %d منتجًا على الأقل في سلتك."
+msgstr[5] "تتطلب هذه القسيمة %d منتج على الأقل في سلتك."
