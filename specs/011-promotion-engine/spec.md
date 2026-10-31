@@ -130,7 +130,9 @@ more", saves it, and it applies by itself on those dates.
   they sort as WooCommerce sorts them. As WooCommerce does, the discount keeps its fractions of a cent until the
   remaining total is rounded for a free shipping minimum. The saving itself is rounded as WooCommerce rounds tax: the
   tax a discount removes is the rounded tax before it less the rounded tax after it, per line or for the cart as the
-  store's tax rounding setting says. Shipping counts with its tax. Paid shipping rates are taken as the zone calculates them for the
+  store's tax rounding setting says. Shipping counts with its tax. Known limit: where tax is rounded at subtotal and
+  shipping is taxed, the merchandise saving and the shipping are rounded apart, so two promotions within one piaster of
+  each other can rank as equal and the one created first applies; the customer's difference is at most one piaster. Paid shipping rates are taken as the zone calculates them for the
   cart: the store's rates are fixed per governorate (the carrier's rate card), so a promotion does not change them. A
   paid rate that depends on the cart's discounted value is not modelled; the store does not use one.
 - An automatic promotion stops qualifying when the cart changes: it is removed; a code the customer entered is kept
