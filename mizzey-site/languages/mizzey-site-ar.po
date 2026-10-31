@@ -69,6 +69,15 @@ msgid "Payment Failed"
 msgstr "فشل الدفع"
 
 #: mizzey-site/src/Promotions/PromotionRules.php
+msgid "Only one promotion applies per order."
+msgstr "يُطبَّق عرض واحد فقط لكل طلب."
+
+#: mizzey-site/src/Promotions/PromotionRules.php
+msgid "This coupon cannot be used."
+msgstr "لا يمكن استخدام هذه القسيمة."
+
+#: mizzey-site/src/Promotions/PromotionRules.php
+
 msgid "This coupon is paused."
 msgstr "هذه القسيمة متوقفة مؤقتًا."
 
