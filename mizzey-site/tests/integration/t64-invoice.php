@@ -10,7 +10,6 @@
  *       the nonce are refused; staff download it from the order.
  */
 
-declare(strict_types=1);
 
 use MizzeySite\Invoices\InvoiceDocument;
 use MizzeySite\Invoices\InvoiceNumber;
