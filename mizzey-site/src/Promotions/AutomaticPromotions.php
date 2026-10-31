@@ -130,7 +130,7 @@ final class AutomaticPromotions
         $discounts->set_items(self::items($cart));
         $discounts->apply_coupon($coupon, false);
         $byItem = (array) $discounts->get_discounts_by_item(true);
-        $paid   = (int) round(self::discountWithTax($cart, $byItem, true));
+        $paid   = self::paidSaving($cart, $byItem);
         $shown  = self::shownDiscount($cart, $byItem);
 
         return $paid + self::shippingCost($cart, 0, false) - self::shippingCost($cart, $shown, $coupon->get_free_shipping());
@@ -195,26 +195,60 @@ final class AutomaticPromotions
     private static function discountWithTax(\WC_Cart $cart, array $byItem, bool $withTax): float
     {
         $entered = wc_prices_include_tax();
-        $perLine = get_option('woocommerce_tax_round_at_subtotal') !== 'yes';
         $total   = 0.0;
         foreach ($byItem as $key => $cents) {
             $line   = $cart->get_cart_item((string) $key);
             $sub    = (float) ($line['line_subtotal'] ?? 0);
             $rate   = $sub > 0 ? self::subtotalTax((array) $line) / $sub : 0.0;
-            if (! $entered && $withTax && $perLine && $rate > 0) {
-                // WooCommerce rounds each line's tax to the cent (`WC_Cart_Totals::calculate_item_totals()`), so the
-                // tax the discount removes is the line's rounded tax before it less its rounded tax after it.
-                $rates  = \WC_Tax::get_rates($line['data']->get_tax_class(), $cart->get_customer());
-                $net    = (float) wc_add_number_precision($sub);
-                $total += (float) $cents + self::lineTax($net, $rates) - self::lineTax($net - (float) $cents, $rates);
-                continue;
-            }
             $factor = (! $entered && $withTax) ? 1 + $rate : (($entered && ! $withTax) ? 1 / (1 + $rate) : 1.0);
             $total += (float) $cents * $factor;
         }
 
         // Unrounded: WooCommerce rounds only the remaining total it compares with a free shipping minimum.
         return $total;
+    }
+
+    /**
+     * The cut in what the customer pays for the items, in cents. When prices are entered without tax, the tax the
+     * discount removes is rounded as WooCommerce rounds tax (`WC_Cart_Totals`, WooCommerce 11.1.0): per line, the
+     * line's rounded tax before the discount less its rounded tax after it; at subtotal, the cart's rounded tax before
+     * less its rounded tax after. Otherwise the discount already is the cut (prices entered with tax).
+     *
+     * @param array<string,float|int> $byItem Cents of discount by cart item key.
+     */
+    private static function paidSaving(\WC_Cart $cart, array $byItem): int
+    {
+        if (wc_prices_include_tax() || ! wc_tax_enabled()) {
+            return (int) round(self::discountWithTax($cart, $byItem, true));
+        }
+        $perLine  = get_option('woocommerce_tax_round_at_subtotal') !== 'yes';
+        $discount = 0.0;
+        $removed  = 0.0;
+        foreach ($byItem as $key => $cents) {
+            $line      = (array) $cart->get_cart_item((string) $key);
+            $sub       = (float) ($line['line_subtotal'] ?? 0);
+            $tax       = self::subtotalTax($line);
+            $discount += (float) $cents;
+            if ($sub <= 0 || $tax <= 0) {
+                continue;
+            }
+            if ($perLine) {
+                $rates    = \WC_Tax::get_rates($line['data']->get_tax_class(), $cart->get_customer());
+                $net      = (float) wc_add_number_precision($sub);
+                $removed += self::lineTax($net, $rates) - self::lineTax($net - (float) $cents, $rates);
+            } else {
+                $removed += (float) $cents * $tax / $sub;
+            }
+        }
+        if (! $perLine) {
+            $before = 0.0;
+            foreach ($cart->get_cart() as $line) {
+                $before += (float) wc_add_number_precision(self::subtotalTax((array) $line));
+            }
+            $removed = (float) wc_round_tax_total($before, 0) - (float) wc_round_tax_total($before - $removed, 0);
+        }
+
+        return (int) round($discount + $removed);
     }
 
     /**

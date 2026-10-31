@@ -428,6 +428,64 @@ run(
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
 		}
+		$free_rate_now = static function (): bool {
+			foreach ( WC()->shipping()->get_packages() as $package ) {
+				foreach ( (array) $package['rates'] as $rate ) {
+					if ( 'free_shipping' === $rate->get_method_id() ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		};
+		// Tenth review round, 1: the free shipping minimum sees the discount with its unrounded tax, as WooCommerce
+		// does; only the saving is rounded per line. Shown with tax, the 1,000.02 line shows 1,200.02. 100.03 off leaves
+		// 1,079.984, under a 1,079.99 minimum; 100.02 off, created later, leaves 1,079.996 and keeps free shipping.
+		update_option( 'woocommerce_tax_display_cart', 'incl' );
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		$free_line = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free_line}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '1079.99', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$off_03  = t52_coupon( $s, "{$tag}auto10003", array( 'discount_type' => 'fixed_product', 'amount' => '100.03', 'individual_use' => true, 'product_ids' => array( $odd->get_id() ), 'date_created' => time() - 9 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$off_02  = t52_coupon( $s, "{$tag}auto10002", array( 'discount_type' => 'fixed_product', 'amount' => '100.02', 'individual_use' => true, 'product_ids' => array( $odd->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$code_03 = t52_coupon( $s, "{$tag}code10003", array( 'discount_type' => 'fixed_product', 'amount' => '100.03', 'individual_use' => true, 'product_ids' => array( $odd->get_id() ) ) );
+		t52_cart( array( $odd->get_id() => 1 ) );
+		$chosen      = t52_applied();
+		$chosen_free = $free_rate_now();
+		WC()->cart->apply_coupon( $code_03->get_code() );
+		WC()->cart->calculate_totals();
+		$code_free = $free_rate_now();
+		$check( array( wc_format_coupon_code( $off_02->get_code() ) ) === $chosen && $chosen_free && ! $code_free, 'Q1 at a per-line-rounded free shipping minimum: 100.02 off, which WooCommerce ships free, beats 100.03 off, which WooCommerce does not (' . implode( ',', $chosen ) . ', free with it ' . ( $chosen_free ? 'yes' : 'no' ) . ', free with 100.03 ' . ( $code_free ? 'yes' : 'no' ) . ')' );
+		foreach ( array( $off_03, $off_02 ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		$zone->delete_shipping_method( $free_line );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		// Tenth review round, 2: tax rounded at subtotal. 100.02 off a 1,000.03 taxed line takes the cart's tax from
+		// 200.006 (200.01) to 180.002 (180.00), saving 120.03; 120.02 off a zero-rated line, created earlier, saves
+		// 120.02. Checked against WooCommerce's own totals with each applied as a code.
+		update_option( 'woocommerce_tax_round_at_subtotal', 'yes' );
+		$taxed_03 = t52_product( $s, 't52 taxed 1000.03', '1000.03' );
+		$zero_k   = t52_product( $s, 't52 zero-rated 1000', '1000' );
+		$zero_k->set_tax_class( 'zero-rate' );
+		$zero_k->save();
+		$off_taxed = t52_coupon( $s, "{$tag}autosubtaxed", array( 'discount_type' => 'fixed_product', 'amount' => '100.02', 'individual_use' => true, 'product_ids' => array( $taxed_03->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$off_zero  = t52_coupon( $s, "{$tag}autosubzero", array( 'discount_type' => 'fixed_product', 'amount' => '120.02', 'individual_use' => true, 'product_ids' => array( $zero_k->get_id() ), 'date_created' => time() - 10 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$totals = array();
+		foreach ( array( 'taxed' => $off_taxed, 'zero' => $off_zero ) as $label => $coupon ) {
+			$copy = t52_coupon( $s, "{$tag}codesub{$label}", array( 'discount_type' => 'fixed_product', 'amount' => $coupon->get_amount(), 'individual_use' => true, 'product_ids' => $coupon->get_product_ids() ) );
+			t52_cart( array( $taxed_03->get_id() => 1, $zero_k->get_id() => 1 ) );
+			WC()->cart->apply_coupon( $copy->get_code() );
+			WC()->cart->calculate_totals();
+			$totals[ $label ] = (float) WC()->cart->get_total( 'edit' );
+		}
+		t52_cart( array( $taxed_03->get_id() => 1, $zero_k->get_id() => 1 ) );
+		$check( array( wc_format_coupon_code( $off_taxed->get_code() ) ) === t52_applied() && $totals['taxed'] < $totals['zero'], 'Q1 with tax rounded at subtotal, 100.02 off the taxed line (WooCommerce total ' . $totals['taxed'] . ') beats 120.02 off the zero-rated line, created earlier (total ' . $totals['zero'] . ') (' . implode( ',', t52_applied() ) . ')' );
+		foreach ( array( $off_taxed, $off_zero ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
 		update_option( 'woocommerce_tax_round_at_subtotal', $round_before );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		foreach ( $tax_before as $name => $value ) {
