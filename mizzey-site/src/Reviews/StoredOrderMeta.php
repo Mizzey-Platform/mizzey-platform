@@ -23,11 +23,10 @@ final class StoredOrderMeta
     public static function get(int $orderId, string $key): string
     {
         global $wpdb;
-        $hpos = class_exists(OrderUtil::class) && OrderUtil::custom_orders_table_usage_is_enabled();
-        $sql  = $hpos
-            ? "SELECT meta_value FROM {$wpdb->prefix}wc_orders_meta WHERE order_id = %d AND meta_key = %s ORDER BY id DESC LIMIT 1"
-            : "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1";
+        if (class_exists(OrderUtil::class) && OrderUtil::custom_orders_table_usage_is_enabled()) {
+            return (string) $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->prefix}wc_orders_meta WHERE order_id = %d AND meta_key = %s ORDER BY id DESC LIMIT 1", $orderId, $key)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
 
-        return (string) $wpdb->get_var($wpdb->prepare($sql, $orderId, $key)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+        return (string) $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1", $orderId, $key)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
     }
 }
