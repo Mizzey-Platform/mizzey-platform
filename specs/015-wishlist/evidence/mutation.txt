@@ -6,3 +6,9 @@ M3  merging duplicates an item                                        -> t56 fai
 M4  an out-of-stock item is moved anyway                              -> t56 fails (3 checks)
 M5  recently viewed keys the record                                   -> t56 fails (2 checks)
 M6  a customer list is kept in the cookie                             -> t56 fails (5 checks)
+
+After the first review (31 October 2026):
+
+M7  any product is viewable                                           -> t56 fails (6 checks)
+M8  the cart is not loaded before a move                              -> t56 fails (1 check)
+M9  the signature does not name its cookie                            -> t56 fails (1 check)
