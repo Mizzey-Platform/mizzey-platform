@@ -286,6 +286,8 @@ run(
 		$pickup = $zone->add_shipping_method( 'flat_rate' );
 		update_option( "woocommerce_flat_rate_{$pickup}_settings", array( 'enabled' => 'yes', 'title' => 'Pickup', 'cost' => '0', 'tax_status' => 'none' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		wp_cache_flush();
+		WC()->session->set( 'shipping_for_package_0', null );
 		t59_cart( array( $open->get_id() => 1 ) );
 		WC()->session->set( 'chosen_shipping_methods', array( "flat_rate:{$flat}" ) );
 		WC()->cart->calculate_totals();
@@ -293,10 +295,11 @@ run(
 		WC()->session->set( 'chosen_shipping_methods', array( "flat_rate:{$pickup}" ) );
 		WC()->cart->calculate_totals();
 		$free_chosen = FreeShippingProgress::of( WC()->cart );
+		$chosen_seen = array( WC()->session->get( 'chosen_shipping_methods' ), array_keys( (array) ( WC()->shipping()->get_packages()[0]['rates'] ?? array() ) ) );
 		$zone->delete_shipping_method( $pickup );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		WC()->session->set( 'chosen_shipping_methods', array() );
-		$check( false === $paid_chosen['free'] && true === $free_chosen['free'], 'CART-07 a free pickup on offer does not make shipping free while the paid delivery is the one chosen' );
+		$check( false === $paid_chosen['free'] && true === $free_chosen['free'], 'CART-07 a free pickup on offer does not make shipping free while the paid delivery is the one chosen (' . wp_json_encode( array( $paid_chosen['free'], $free_chosen['free'], $chosen_seen ) ) . ')' );
 		$by_value = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 1 ) ) );
 		$over     = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 2 ) ) );
 		$check( false === $single['free'] && 1 === $single['items_needed'] && '400.00' === $single['amount_needed'] && true === $pair['free'], 'CART-07 one unit needs one more item for the two-unit promotion (or 400 more for the 500 minimum); two units ship free (' . wp_json_encode( $single ) . ')' );
