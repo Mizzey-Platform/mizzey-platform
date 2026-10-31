@@ -238,3 +238,35 @@ msgstr "يرجى اختيار تقييم من نجمة إلى 5 نجوم."
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "Only staff who moderate reviews can publish one."
 msgstr "لا ينشر التقييمات إلا الموظفون المخوّلون بمراجعتها."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Continue with Google"
+msgstr "المتابعة باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Staff accounts sign in with their password."
+msgstr "تسجيل دخول حسابات الموظفين يكون بكلمة المرور."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in did not complete. Please try again."
+msgstr "لم يكتمل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in"
+msgstr "تسجيل الدخول باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "The OAuth client of the store's Google Cloud project. Sign-in with Google is offered once both are set."
+msgstr "عميل OAuth الخاص بمشروع Google Cloud للمتجر. يُتاح تسجيل الدخول باستخدام Google بعد ضبط القيمتين."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client ID"
+msgstr "معرّف العميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client secret"
+msgstr "الرمز السري للعميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Left empty when it is set in the configuration file."
+msgstr "يُترك فارغًا إذا كان مضبوطًا في ملف الإعدادات."
