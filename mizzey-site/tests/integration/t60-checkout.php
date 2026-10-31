@@ -168,7 +168,10 @@ run(
 		$missing = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( "{$tag}-m@example.invalid", null ), $auth, $cart['cookies'] );
 		$ar_url  = add_query_arg( 'lang', 'ar', rest_url( 'wc/store/v1/checkout' ) );
 		$missing_ar = sign_in_json( 'POST', $ar_url, t60_body( "{$tag}-m@example.invalid", null ), $auth, $cart['cookies'] );
-		$check( 400 === $missing['status'] && false !== strpos( (string) ( $missing['data']['message'] ?? '' ), 'District' ) && 400 === $missing_ar['status'] && false !== strpos( (string) ( $missing_ar['data']['message'] ?? '' ), 'الحي' ), '[HTTP] CHK-01, CHK-11 a missing district is refused with a message naming it, in English and in Arabic (' . ( $missing['data']['message'] ?? '' ) . ' | ' . ( $missing_ar['data']['message'] ?? '' ) . ')' );
+		// The Store API names the field in the error's details.
+		$said    = (string) wp_json_encode( $missing['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
+		$said_ar = (string) wp_json_encode( $missing_ar['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
+		$check( 400 === $missing['status'] && false !== strpos( $said, 'District' ) && 400 === $missing_ar['status'] && false !== strpos( $said_ar, 'الحي' ), '[HTTP] CHK-01, CHK-11 a missing district is refused with a message naming it, in English and in Arabic (' . substr( $said, 0, 160 ) . ' | ' . substr( $said_ar, 0, 160 ) . ')' );
 		$placed   = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( "{$tag}-p@example.invalid", 'Garden City' ), $auth, $cart['cookies'] );
 		$order_id = (int) ( $placed['data']['order_id'] ?? 0 );
 		if ( $order_id > 0 ) {
