@@ -321,3 +321,37 @@ msgstr "تتبّع شحنتك من هنا: %s"
 #: mizzey-site/src/Emails/ShippedEmail.php
 msgid "We will send you the tracking details as soon as the carrier gives them to us."
 msgstr "سنرسل إليك تفاصيل التتبع فور وصولها من شركة الشحن."
+
+#: mizzey-site/src/Account/AddressBook.php
+#. translators: %d: the most addresses a book holds.
+#, php-format
+msgid "Your address book holds up to %d addresses."
+msgstr "يتسع دفتر العناوين لـ %d عناوين كحد أقصى."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "Please fill in every part of the address; only the landmark is optional."
+msgstr "يرجى ملء جميع أجزاء العنوان؛ العلامة المميزة وحدها اختيارية."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "Please choose a governorate."
+msgstr "يرجى اختيار المحافظة."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "This address is not in your address book."
+msgstr "هذا العنوان غير موجود في دفتر عناوينك."
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Tracking"
+msgstr "تتبع الشحنة"
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Track your shipment"
+msgstr "تتبّع شحنتك"
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Wishlist"
+msgstr "قائمة الأمنيات"
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Your wishlist is empty."
+msgstr "قائمة أمنياتك فارغة."
