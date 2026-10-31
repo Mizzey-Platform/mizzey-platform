@@ -138,12 +138,15 @@ run(
 		// WooCommerce Multilingual's clean-up deletes by quoted meta ids; an OR-ed condition reaches a stock row too.
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_id IN ('%d') LIMIT %d", $mid_now, 1 ) );
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_value = '91' WHERE meta_key = '_price' OR meta_id = %d", $mid_now ) );
+		// WooCommerce Multilingual inserts several rows in one statement.
+		$wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->postmeta} (`post_id`,`meta_key`,`meta_value`) VALUES (%d,%s,%s),(%d,%s,%s)", $id, '_t67_other', 'x', $id, '_stock', '90' ) );
+		$stock_rows = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s", $id, '_stock' ) );
 		$raw = t67_stored( $id );
 		foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) as $announce ) {
 			remove_action( $announce, $listen, 10 );
 		}
 		$check( array() === $announced, 'ERP-07 a refused metadata write announces nothing (' . wp_json_encode( $announced ) . ')' );
-		$check( '5' === $raw['qty'] && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key, by meta id and for every object, a key in another case or with a trailing space, and a raw query naming a key, quoted or plain meta ids, or an OR-ed condition, change no stored stock (' . wp_json_encode( $raw ) . ')' );
+		$check( '5' === $raw['qty'] && 1 === $stock_rows && 'yes' === $raw['manage'] && 'no' === $raw['backorder'], 'ERP-07, D-19 the metadata API by key, by meta id and for every object, a key in another case or with a trailing space, and a raw query naming a key, quoted or plain meta ids, or an OR-ed condition, or inserting rows, change no stored stock (' . wp_json_encode( $raw ) . ')' );
 
 		// Ordinary writes go through: a value that reads like a stock key, and WooCommerce rebuilding its lookup table from the stored stock.
 		$noted = wc_get_product( $id );
@@ -166,9 +169,10 @@ run(
 		// Bulk edit sets a price, then the stock, then saves: the price is kept.
 		$bulk = wc_get_product( $id );
 		$bulk->set_regular_price( '150' );
-		wc_update_product_stock( $bulk, 1, 'set', true );
+		$bulk_answer = wc_update_product_stock( $bulk, 1, 'set', true );
+		$bulk_held   = (int) $bulk->get_stock_quantity();
 		$bulk->save();
-		$check( '150' === (string) wc_get_product( $id )->get_regular_price() && '5' === t67_stored( $id )['qty'], 'ERP-07 a bulk edit keeps the price it sets while its stock change is refused' );
+		$check( '150' === (string) wc_get_product( $id )->get_regular_price() && '5' === t67_stored( $id )['qty'] && 5 === (int) $bulk_answer && 5 === $bulk_held, "ERP-07 a bulk edit keeps the price it sets while its stock change is refused, the object and the answer holding the stored figure before the save ({$bulk_answer}, {$bulk_held})" );
 
 		// WPML duplicating the product copies the rest of its meta; only the stock rows stay out.
 		$duplicate = (int) $GLOBALS['sitepress']->make_duplicate( $id, 'ar' );
