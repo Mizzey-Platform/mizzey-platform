@@ -42,6 +42,24 @@ final class ReviewInvitationEmail extends \WC_Email
         return __('Tell us what you think', 'mizzey-site');
     }
 
+    /**
+     * The subject staff set, or the default in the language of the moment: WC_Email fixes its defaults when it builds
+     * its settings form, before the order's language is switched to.
+     */
+    public function get_subject()
+    {
+        $saved = trim((string) ($this->settings['subject'] ?? ''));
+
+        return apply_filters('woocommerce_email_subject_' . $this->id, $this->format_string($saved !== '' ? $saved : $this->get_default_subject()), $this->object, $this);
+    }
+
+    public function get_heading()
+    {
+        $saved = trim((string) ($this->settings['heading'] ?? ''));
+
+        return apply_filters('woocommerce_email_heading_' . $this->id, $this->format_string($saved !== '' ? $saved : $this->get_default_heading()), $this->object, $this);
+    }
+
     /** The language is the order's, set by ReviewInvitation before sending; not the site's, as WC_Email would set. */
     public function setup_locale()
     {
