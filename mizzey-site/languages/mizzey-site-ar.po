@@ -100,6 +100,53 @@ msgstr[3] "تتطلب هذه القسيمة %d منتجات على الأقل ف
 msgstr[4] "تتطلب هذه القسيمة %d منتجًا على الأقل في سلتك."
 msgstr[5] "تتطلب هذه القسيمة %d منتج على الأقل في سلتك."
 
+#: mizzey-site/src/Accounts/MarketingConsent.php
+msgid "Send me offers and news by email. You can stop at any time."
+msgstr "أرسلوا لي العروض والأخبار عبر البريد الإلكتروني. يمكنني الإيقاف في أي وقت."
+
+#: mizzey-site/src/Accounts/PhoneSignIn.php
+msgid "Mobile number"
+msgstr "رقم الجوال"
+
+#: mizzey-site/src/Accounts/PhoneSignIn.php
+msgid "(optional)"
+msgstr "(اختياري)"
+
+#: mizzey-site/src/Accounts/PhoneSignIn.php
+msgid "Please enter a mobile number such as 01012345678."
+msgstr "يرجى إدخال رقم جوال مثل 01012345678."
+
+#: mizzey-site/src/Accounts/PhoneSignIn.php
+msgid "This mobile number is already used by another account."
+msgstr "رقم الجوال هذا مستخدم في حساب آخر."
+
+#: mizzey-site/src/Accounts/SignInLink.php
+msgid "If an account exists for that email, a sign-in link is on its way."
+msgstr "إذا كان هناك حساب بهذا البريد الإلكتروني، فرابط تسجيل الدخول في طريقه إليك."
+
+#: mizzey-site/src/Accounts/SignInLink.php
+msgid "Your sign-in link"
+msgstr "رابط تسجيل الدخول"
+
+#: mizzey-site/src/Accounts/SignInLink.php
+msgid "This sign-in link has expired or was already used. Ask for a new one."
+msgstr "انتهت صلاحية رابط تسجيل الدخول هذا أو استُخدم من قبل. اطلب رابطًا جديدًا."
+
+#: mizzey-site/src/Accounts/SignInLink.php
+#. translators: 1: the sign-in link, 2: minutes it stays valid.
+#, php-format
+msgid "Use this link to sign in to your account:\n\n%1$s\n\nIt works once and expires in %2$d minutes. If you did not ask for it, you can ignore this email."
+msgstr "استخدم هذا الرابط لتسجيل الدخول إلى حسابك:\n\n%1$s\n\nيعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
+
+msgid "You are already signed in to another account. Sign out first to use this sign-in link."
+msgstr "أنت مسجّل الدخول بالفعل إلى حساب آخر. سجّل الخروج أولاً لاستخدام رابط تسجيل الدخول هذا."
+
+msgid "Sign in with the link from your email?"
+msgstr "هل تريد تسجيل الدخول بالرابط الموجود في بريدك الإلكتروني؟"
+
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
 #: mizzey-site/src/Wishlist/Wishlist.php
 msgid "This item is not in your wishlist."
 msgstr "هذا المنتج غير موجود في قائمة أمنياتك."
