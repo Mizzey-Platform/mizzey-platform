@@ -42,7 +42,7 @@ the rows above.
 
 ## Contractual acceptance criteria [checked]
 
-| AC | Criterion | Register | Status |
+| # | Criterion | Traces | Status |
 |---|---|---|---|
 | AC-1 | The Owner / Super Admin role holds every capability, including roles and users, sensitive settings, the logs, and refunds | ROLE-08 | provisional |
 | AC-2 | The Admin role manages products, orders, customers, offers (promotions) and the store's settings and integrations, and may refund | ROLE-07 | provisional |
