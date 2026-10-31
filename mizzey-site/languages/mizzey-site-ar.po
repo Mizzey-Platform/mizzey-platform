@@ -77,6 +77,7 @@ msgid "This coupon cannot be used."
 msgstr "لا يمكن استخدام هذه القسيمة."
 
 #: mizzey-site/src/Promotions/PromotionRules.php
+
 msgid "This coupon is paused."
 msgstr "هذه القسيمة متوقفة مؤقتًا."
 
@@ -232,6 +233,12 @@ msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أ
 msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
 msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
 
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#. translators: %s: the field's name.
+#, php-format
+msgid "%s is required."
+msgstr "%s مطلوب."
+
 #: mizzey-site/src/Reviews/ReviewEligibility.php
 msgid "You have already reviewed this product. Thank you."
 msgstr "لقد قيّمت هذا المنتج من قبل. شكرًا لك."
@@ -321,9 +328,3 @@ msgstr "تتبّع شحنتك من هنا: %s"
 #: mizzey-site/src/Emails/ShippedEmail.php
 msgid "We will send you the tracking details as soon as the carrier gives them to us."
 msgstr "سنرسل إليك تفاصيل التتبع فور وصولها من شركة الشحن."
-
-#: mizzey-site/src/Checkout/EgyptianAddress.php
-#. translators: %s: the field's name.
-#, php-format
-msgid "%s is required."
-msgstr "%s مطلوب."
