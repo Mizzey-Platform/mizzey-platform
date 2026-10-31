@@ -15,12 +15,17 @@ defined('ABSPATH') || exit;
  *
  * - The reviewer attaches them to their own review while it is held for moderation (every review is, specs/020):
  *   `POST mizzey/v1/reviews/{id}/photos`, files `photos[]` and optional `alt[]`, signed in, with WordPress's REST nonce.
- * - Each file is checked by its content, not its name: JPEG, PNG or WebP only, at most 5 MB and 6000 pixels a side;
- *   then decoded and encoded again, at most 2000 pixels a side, which drops its location and camera data and anything
- *   that is not the picture. Stored under a random name in `uploads/mizzey-review-photos/`, which the web server is
- *   told to refuse (`.htaccess`; on other servers, a hosting rule), and served only through the site.
- * - A photo is shown, and served, only while its review is approved; staff who moderate see it while it is held. A
- *   review deleted takes its files with it.
+ *   Uploads to one review are taken one at a time, under a lock, and only while the review is still held.
+ * - Each file is checked by its content, not its name: JPEG, PNG or WebP only, at most 5 MB, 6000 pixels a side and
+ *   16 million pixels, and only when the memory to decode it is there; then decoded and encoded again, at most 2000
+ *   pixels a side, which drops its location, camera and colour profile data and anything that is not the picture.
+ * - Stored under a random name, served only through the site and never cached. The folder is
+ *   `MIZZEY_REVIEW_PHOTOS_DIR` from the configuration when set (outside the site's public folder), else
+ *   `uploads/mizzey-review-photos/` with an `.htaccess` refusal, used only once a request to a file in it is seen
+ *   refused (checked again daily); until then no photo is accepted.
+ * - A photo is shown, and served, only while its review is approved and only if it was attached before that approval,
+ *   so a photo that arrives as a moderator approves waits for the next approval; staff who moderate see every photo,
+ *   in the admin's list of comments too. A review deleted takes its files with it.
  * - Each photo has alternative text: the reviewer's, or a description naming the product.
  *
  * The designed upload form and gallery are PRE-03b's; the approved review's photos are listed under its text.
@@ -29,19 +34,24 @@ defined('ABSPATH') || exit;
  */
 final class ReviewPhotos
 {
-    public const META      = '_mizzey_review_photos';
-    public const QUERY     = 'mizzey-review-photo';
-    public const MAX       = 5;
-    public const MAX_BYTES = 5 * 1024 * 1024;
-    public const MAX_SIDE  = 6000;
-    public const KEEP_SIDE = 2000;
-    private const TYPES    = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
+    public const META       = '_mizzey_review_photos';
+    public const APPROVED   = '_mizzey_review_approved_at';
+    public const STORAGE    = 'mizzey_review_photos_storage';
+    public const QUERY      = 'mizzey-review-photo';
+    public const MAX        = 5;
+    public const MAX_BYTES  = 5 * 1024 * 1024;
+    public const MAX_SIDE   = 6000;
+    public const MAX_PIXELS = 16000000;
+    public const KEEP_SIDE  = 2000;
+    private const TYPES     = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
 
     public static function register(): void
     {
         add_action('rest_api_init', [self::class, 'routes']);
         add_action('template_redirect', [self::class, 'serve'], 1);
         add_action('woocommerce_review_after_comment_text', [self::class, 'show'], 20, 1);
+        add_filter('comment_text', [self::class, 'adminList'], 20, 2);
+        add_action('transition_comment_status', [self::class, 'approved'], 10, 3);
         add_action('delete_comment', [self::class, 'forget'], 10, 1);
     }
 
@@ -67,39 +77,64 @@ final class ReviewPhotos
     /** @param mixed $request */
     public static function upload($request)
     {
-        $comment = get_comment((int) $request['id']);
-        $files   = self::files((array) ($request->get_file_params()['photos'] ?? []));
-        $alts    = array_values((array) ($request->get_param('alt') ?? []));
-        $photos  = self::photos((int) $comment->comment_ID);
+        global $wpdb;
+        $id    = (int) $request['id'];
+        $files = self::files((array) ($request->get_file_params()['photos'] ?? []));
+        $alts  = array_values((array) ($request->get_param('alt') ?? []));
         if ($files === []) {
             return new \WP_Error('mizzey_photo_none', __('Please choose a photo.', 'mizzey-site'), ['status' => 400]);
         }
-        if (count($photos) + count($files) > self::MAX) {
-            /* translators: %d: the most photos a review may have. */
-            return new \WP_Error('mizzey_photo_many', sprintf(__('A review can have up to %d photos.', 'mizzey-site'), self::MAX), ['status' => 400]);
+        if (! self::storageReady()) {
+            return new \WP_Error('mizzey_photo_storage', __('Photos cannot be added right now. Please try again later.', 'mizzey-site'), ['status' => 503]);
+        }
+        $lock = substr('mz_' . $wpdb->prefix . 'review_photos_' . $id, 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return new \WP_Error('mizzey_photo_busy', __('Please try again in a moment.', 'mizzey-site'), ['status' => 409]);
         }
         $made = [];
-        foreach ($files as $index => $file) {
-            $photo = self::store($file, self::alt($alts[$index] ?? '', (int) $comment->comment_post_ID));
-            if (is_wp_error($photo)) {
-                foreach ($made as $done) {
-                    wp_delete_file(self::dir() . $done['file']);
-                }
-
-                return $photo;
+        try {
+            wp_cache_delete($id, 'comment');
+            clean_comment_cache($id);
+            $photos = self::photos($id);
+            if (count($photos) + count($files) > self::MAX) {
+                /* translators: %d: the most photos a review may have. */
+                return new \WP_Error('mizzey_photo_many', sprintf(__('A review can have up to %d photos.', 'mizzey-site'), self::MAX), ['status' => 400]);
             }
-            $made[] = $photo;
-        }
-        update_comment_meta((int) $comment->comment_ID, self::META, array_merge($photos, $made));
+            $productId = (int) get_comment($id)->comment_post_ID;
+            foreach ($files as $index => $file) {
+                $photo = self::store($file, self::alt($alts[$index] ?? '', $productId));
+                if (is_wp_error($photo)) {
+                    self::remove($made);
 
-        return new \WP_REST_Response(['photos' => count($photos) + count($made)], 201);
+                    return $photo;
+                }
+                $made[] = $photo;
+            }
+            // Still held, as read from the database now: a review approved meanwhile takes none of them.
+            $status = (string) $wpdb->get_var($wpdb->prepare("SELECT comment_approved FROM {$wpdb->comments} WHERE comment_ID = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            if ($status !== '0') {
+                self::remove($made);
+
+                return new \WP_Error('rest_forbidden', __('Photos can be added only while the review waits for moderation.', 'mizzey-site'), ['status' => 403]);
+            }
+            $all = array_merge($photos, $made);
+            if (! update_comment_meta($id, self::META, $all) && self::photos($id) !== $all) {
+                self::remove($made);
+
+                return new \WP_Error('mizzey_photo_refused', __('This photo could not be used. Please send a JPEG, PNG or WebP image under 5 MB.', 'mizzey-site'), ['status' => 500]);
+            }
+
+            return new \WP_REST_Response(['photos' => count($all)], 201);
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
     }
 
     /**
      * The photo checked, cleaned and stored, or why not.
      *
      * @param array{tmp_name:string,size:int,error:int} $file
-     * @return array{file:string,alt:string,width:int,height:int}|\WP_Error
+     * @return array{file:string,alt:string,width:int,height:int,at:float}|\WP_Error
      */
     private static function store(array $file, string $alt)
     {
@@ -110,7 +145,8 @@ final class ReviewPhotos
         }
         $bytes = (string) file_get_contents($path); // phpcs:ignore WordPress.WP.AlternativeFunctions
         $info  = $bytes !== '' ? getimagesizefromstring($bytes) : false;
-        if (! is_array($info) || ! isset(self::TYPES[$info[2]]) || $info[0] < 1 || $info[1] < 1 || $info[0] > self::MAX_SIDE || $info[1] > self::MAX_SIDE) {
+        if (! is_array($info) || ! isset(self::TYPES[$info[2]]) || $info[0] < 1 || $info[1] < 1 || $info[0] > self::MAX_SIDE || $info[1] > self::MAX_SIDE
+            || $info[0] * $info[1] > self::MAX_PIXELS || ! self::memoryFor($info[0], $info[1])) {
             return $refused;
         }
         $image = imagecreatefromstring($bytes);
@@ -136,15 +172,33 @@ final class ReviewPhotos
         $width   = imagesx($image);
         $height  = imagesy($image);
         imagedestroy($image);
-        if (! $encoded || $clean === '' || ! self::ready()) {
-            return $refused;
-        }
         $name = bin2hex(random_bytes(16)) . '.' . $ext;
-        if (file_put_contents(self::dir() . $name, $clean) === false) { // phpcs:ignore WordPress.WP.AlternativeFunctions
+        if (! $encoded || $clean === '' || file_put_contents(self::dir() . $name, $clean) === false) { // phpcs:ignore WordPress.WP.AlternativeFunctions
             return $refused;
         }
 
-        return ['file' => $name, 'alt' => $alt, 'width' => $width, 'height' => $height];
+        return ['file' => $name, 'alt' => $alt, 'width' => $width, 'height' => $height, 'at' => microtime(true)];
+    }
+
+    /** Whether there is the memory to decode an image of this size, and a scaled copy of it. */
+    private static function memoryFor(int $width, int $height): bool
+    {
+        wp_raise_memory_limit('image');
+        $limit = wp_convert_hr_to_bytes((string) ini_get('memory_limit'));
+        if ($limit <= 0) {
+            return true;
+        }
+        $needed = (int) ($width * $height * 5 + self::KEEP_SIDE * self::KEEP_SIDE * 4 + 16 * 1024 * 1024);
+
+        return $limit - memory_get_usage(true) > $needed;
+    }
+
+    /** @param list<array{file:string}> $photos */
+    private static function remove(array $photos): void
+    {
+        foreach ($photos as $photo) {
+            wp_delete_file(self::dir() . basename((string) $photo['file']));
+        }
     }
 
     /** An uploaded file's path, only inside the server's temporary directory, where PHP puts uploads. */
@@ -191,7 +245,7 @@ final class ReviewPhotos
         return sprintf(__('A customer\'s photo of %s', 'mizzey-site'), get_the_title($productId));
     }
 
-    /** @return list<array{file:string,alt:string,width:int,height:int}> */
+    /** @return list<array{file:string,alt:string,width:int,height:int,at?:float}> */
     public static function photos(int $commentId): array
     {
         $photos = get_comment_meta($commentId, self::META, true);
@@ -199,15 +253,39 @@ final class ReviewPhotos
         return is_array($photos) ? array_values($photos) : [];
     }
 
+    /**
+     * When a review is approved, the moment is kept: only photos attached before it are shown.
+     *
+     * @param mixed $new
+     * @param mixed $old
+     * @param mixed $comment
+     */
+    public static function approved($new, $old, $comment): void
+    {
+        if ($new === 'approved' && $comment instanceof \WP_Comment && get_post_type((int) $comment->comment_post_ID) === 'product') {
+            update_comment_meta((int) $comment->comment_ID, self::APPROVED, (string) microtime(true));
+        }
+    }
+
     public static function url(int $commentId, int $index): string
     {
         return add_query_arg(self::QUERY, $commentId . '-' . $index, home_url('/'));
     }
 
-    /** Whether the photos of the review may be seen by this visitor: approved, or the visitor moderates. */
-    public static function visible(\WP_Comment $comment): bool
+    /**
+     * Whether a photo may be seen by this visitor: staff who moderate see every photo; anyone else, only one attached
+     * before its review was approved, while it is approved.
+     *
+     * @param array{at?:float} $photo
+     */
+    public static function visible(\WP_Comment $comment, array $photo): bool
     {
-        return (string) $comment->comment_approved === '1' || current_user_can('moderate_comments');
+        if (current_user_can('moderate_comments')) {
+            return true;
+        }
+        $approvedAt = (float) get_comment_meta((int) $comment->comment_ID, self::APPROVED, true);
+
+        return (string) $comment->comment_approved === '1' && $approvedAt > 0 && (float) ($photo['at'] ?? PHP_FLOAT_MAX) < $approvedAt;
     }
 
     public static function serve(): void
@@ -221,15 +299,15 @@ final class ReviewPhotos
         $comment = $id > 0 ? get_comment($id) : null;
         $photo   = $comment instanceof \WP_Comment ? (self::photos($id)[$index] ?? null) : null;
         $path    = is_array($photo) ? self::dir() . basename((string) $photo['file']) : '';
-        if (! $comment instanceof \WP_Comment || ! is_array($photo) || ! self::visible($comment) || ! is_file($path)) {
+        nocache_headers();
+        if (! $comment instanceof \WP_Comment || ! is_array($photo) || ! self::visible($comment, $photo) || ! is_file($path)) {
             status_header(404);
-            nocache_headers();
             exit;
         }
         $types = ['jpg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp'];
         header(sprintf('Content-Type:%s', $types[pathinfo($path, PATHINFO_EXTENSION)] ?? 'application/octet-stream'));
         header('X-Content-Type-Options:nosniff');
-        header((string) $comment->comment_approved === '1' ? 'Cache-Control:public,max-age=86400' : 'Cache-Control:private,no-store');
+        header('Cache-Control:private,no-store,max-age=0');
         header(sprintf('Content-Length:%d', (int) filesize($path)));
         readfile($path); // phpcs:ignore WordPress.WP.AlternativeFunctions
         exit;
@@ -238,47 +316,87 @@ final class ReviewPhotos
     /** @param mixed $comment */
     public static function show($comment): void
     {
-        if (! $comment instanceof \WP_Comment || ! self::visible($comment)) {
-            return;
+        if ($comment instanceof \WP_Comment) {
+            echo self::markup($comment); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in markup().
         }
-        $photos = self::photos((int) $comment->comment_ID);
-        if ($photos === []) {
-            return;
+    }
+
+    /**
+     * The admin's list of comments: staff who moderate see a held review's photos beside it.
+     *
+     * @param mixed $text
+     * @param mixed $comment
+     * @return mixed
+     */
+    public static function adminList($text, $comment)
+    {
+        if (! is_admin() || ! is_string($text) || ! $comment instanceof \WP_Comment || ! current_user_can('moderate_comments')) {
+            return $text;
         }
-        echo '<ul class="mizzey-review-photos">';
-        foreach ($photos as $index => $photo) {
-            printf('<li><img src="%s" alt="%s" width="%d" height="%d" loading="lazy"></li>', esc_url(self::url((int) $comment->comment_ID, (int) $index)), esc_attr((string) $photo['alt']), (int) $photo['width'], (int) $photo['height']);
+
+        return $text . self::markup($comment);
+    }
+
+    private static function markup(\WP_Comment $comment): string
+    {
+        $out = '';
+        foreach (self::photos((int) $comment->comment_ID) as $index => $photo) {
+            if (self::visible($comment, $photo)) {
+                $out .= sprintf('<li><img src="%s" alt="%s" width="%d" height="%d" loading="lazy"></li>', esc_url(self::url((int) $comment->comment_ID, (int) $index)), esc_attr((string) $photo['alt']), (int) $photo['width'], (int) $photo['height']);
+            }
         }
-        echo '</ul>';
+
+        return $out !== '' ? '<ul class="mizzey-review-photos">' . $out . '</ul>' : '';
     }
 
     /** @param mixed $commentId */
     public static function forget($commentId): void
     {
-        foreach (self::photos((int) $commentId) as $photo) {
-            wp_delete_file(self::dir() . basename((string) $photo['file']));
-        }
+        self::remove(self::photos((int) $commentId));
     }
 
     public static function dir(): string
     {
+        if (defined('MIZZEY_REVIEW_PHOTOS_DIR') && is_string(constant('MIZZEY_REVIEW_PHOTOS_DIR')) && constant('MIZZEY_REVIEW_PHOTOS_DIR') !== '') {
+            return trailingslashit((string) constant('MIZZEY_REVIEW_PHOTOS_DIR'));
+        }
+
         return trailingslashit((string) wp_upload_dir(null, false)['basedir']) . 'mizzey-review-photos/';
     }
 
-    /** The folder exists, with the web server told to refuse it and no listing. */
-    private static function ready(): bool
+    /**
+     * The folder exists, is writable, and cannot be read from the web: outside the site's public folder when set in
+     * the configuration, or refused by the web server, as a request to a file in it shows (checked again daily).
+     */
+    public static function storageReady(): bool
     {
         $dir = self::dir();
-        if (! wp_mkdir_p($dir)) {
+        if (! wp_mkdir_p($dir) || ! is_writable($dir)) {
             return false;
-        }
-        if (! is_file($dir . '.htaccess')) {
-            copy(dirname(__DIR__, 2) . '/assets/review-photos.htaccess', $dir . '.htaccess');
         }
         if (! is_file($dir . 'index.php')) {
             file_put_contents($dir . 'index.php', "<?php\n"); // phpcs:ignore WordPress.WP.AlternativeFunctions
         }
+        if (! str_starts_with(wp_normalize_path($dir), trailingslashit(wp_normalize_path(ABSPATH)))
+            && ! str_starts_with(wp_normalize_path($dir), trailingslashit(wp_normalize_path(WP_CONTENT_DIR)))) {
+            return true;
+        }
+        if (! is_file($dir . '.htaccess') && ! copy(dirname(__DIR__, 2) . '/assets/review-photos.htaccess', $dir . '.htaccess')) {
+            return false;
+        }
+        $seen = get_option(self::STORAGE);
+        if (is_array($seen) && ($seen['at'] ?? 0) > time() - DAY_IN_SECONDS) {
+            return ! empty($seen['refused']);
+        }
+        $probe = 'probe-' . bin2hex(random_bytes(8)) . '.txt';
+        $mark  = bin2hex(random_bytes(16));
+        file_put_contents($dir . $probe, $mark); // phpcs:ignore WordPress.WP.AlternativeFunctions
+        $answer  = wp_remote_get(trailingslashit((string) wp_upload_dir(null, false)['baseurl']) . 'mizzey-review-photos/' . $probe, ['timeout' => 10, 'redirection' => 0, 'sslverify' => false]);
+        wp_delete_file($dir . $probe);
+        // Refused only when the server answered and did not hand the file over; no answer is no proof.
+        $refused = ! is_wp_error($answer) && (int) wp_remote_retrieve_response_code($answer) !== 200 && ! str_contains((string) wp_remote_retrieve_body($answer), $mark);
+        update_option(self::STORAGE, ['refused' => $refused, 'at' => time()], false);
 
-        return is_dir($dir) && is_writable($dir);
+        return $refused;
     }
 }

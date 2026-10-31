@@ -296,3 +296,11 @@ msgstr "تعذّر استخدام هذه الصورة. يرجى إرسال صو�
 #, php-format
 msgid "A customer's photo of %s"
 msgstr "صورة من أحد العملاء لمنتج %s"
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+msgid "Photos cannot be added right now. Please try again later."
+msgstr "لا يمكن إضافة الصور الآن. يرجى المحاولة لاحقًا."
+
+#: mizzey-site/src/Reviews/ReviewPhotos.php
+msgid "Photos can be added only while the review waits for moderation."
+msgstr "يمكن إضافة الصور فقط أثناء انتظار التقييم للمراجعة."
