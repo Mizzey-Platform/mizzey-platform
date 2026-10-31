@@ -38,6 +38,10 @@ final class PromotionRules
         if (! $valid) {
             return false;
         }
+        if (WelcomeDiscount::isTemplate($coupon)) {
+            // The template stands for the welcome discount; each customer gets their own copy (BR-001).
+            throw new \Exception(esc_html__('This coupon cannot be used.', 'mizzey-site'), 114);
+        }
         if (PromotionSettings::paused($coupon)) {
             throw new \Exception(esc_html__('This coupon is paused.', 'mizzey-site'), 113);
         }

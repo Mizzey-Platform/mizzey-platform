@@ -96,6 +96,21 @@ final class PromotionSettings
     public static function generalFields($couponId, \WC_Coupon $coupon): void
     {
         woocommerce_wp_checkbox([
+            'id'          => 'mizzey_welcome_template',
+            'label'       => __('Welcome discount template', 'mizzey-site'),
+            'description' => __('Each new customer account gets its own copy of this promotion: for their email, one use, first order only, applied automatically. This coupon itself is never accepted as a code.', 'mizzey-site'),
+            'value'       => WelcomeDiscount::isTemplate($coupon) ? 'yes' : 'no',
+        ]);
+        woocommerce_wp_text_input([
+            'id'                => 'mizzey_welcome_days',
+            'label'             => __('Welcome discount valid for (days)', 'mizzey-site'),
+            'description'       => __('How long each new customer has to use it, from the day the account is created. Leave empty for no expiry.', 'mizzey-site'),
+            'desc_tip'          => true,
+            'type'              => 'number',
+            'value'             => WelcomeDiscount::days($coupon) > 0 ? (string) WelcomeDiscount::days($coupon) : '',
+            'custom_attributes' => ['min' => '0', 'step' => '1'],
+        ]);
+        woocommerce_wp_checkbox([
             'id'          => 'mizzey_paused',
             'label'       => __('Paused', 'mizzey-site'),
             'description' => __('A paused promotion applies to no new cart or order. Its usage history is kept, and orders that already have it keep it. Untick to reactivate.', 'mizzey-site'),
@@ -168,6 +183,8 @@ final class PromotionSettings
         $minItems     = absint(wp_unslash((string) ($_POST['mizzey_min_items'] ?? '0')));
         $firstOrder   = isset($_POST['mizzey_first_order']) ? 'yes' : 'no';
         $paused       = isset($_POST['mizzey_paused']) ? 'yes' : 'no';
+        $welcome      = isset($_POST['mizzey_welcome_template']) ? 'yes' : 'no';
+        $welcomeDays  = absint(wp_unslash((string) ($_POST['mizzey_welcome_days'] ?? '0')));
         // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         $coupon->update_meta_data(self::AUTOMATIC, $automatic);
@@ -194,6 +211,8 @@ final class PromotionSettings
         $coupon->update_meta_data(self::MIN_ITEMS, $minItems > 0 ? (string) $minItems : '');
         $coupon->update_meta_data(self::FIRST_ORDER, $firstOrder);
         $coupon->update_meta_data(self::PAUSED, $paused);
+        $coupon->update_meta_data(WelcomeDiscount::TEMPLATE, $welcome);
+        $coupon->update_meta_data(WelcomeDiscount::DAYS, $welcomeDays > 0 ? (string) $welcomeDays : '');
         $coupon->save();
         AutomaticPromotions::forget();
     }
