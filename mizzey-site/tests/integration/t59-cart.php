@@ -281,8 +281,10 @@ run(
 		$single   = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 1 ) ) );
 		$entered  = new \WC_Coupon();
 		$entered->set_code( "{$tag}entered" );
-		$entered->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '5' ) );
+		$entered->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '5', 'individual_use' => true ) );
 		$entered->save();
+		$combine_before = get_option( \MizzeySite\Promotions\Combination::OPTION );
+		update_option( \MizzeySite\Promotions\Combination::OPTION, 'yes' );
 		$s->on_finish( static function () use ( $entered ) { wp_delete_post( $entered->get_id(), true ); } );
 		$with_code = t59_cart( array( $open->get_id() => 1 ) );
 		$with_code->apply_coupon( $entered->get_code() );
@@ -290,6 +292,7 @@ run(
 		wc_clear_notices();
 		$beside = FreeShippingProgress::of( $with_code );
 		$with_code->remove_coupons();
+		update_option( \MizzeySite\Promotions\Combination::OPTION, $combine_before );
 		$pair     = FreeShippingProgress::of( t59_cart( array( $open->get_id() => 2 ) ) );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
@@ -319,7 +322,7 @@ run(
 		$check( false === $paid_chosen['free'] && true === $free_chosen['free'], 'CART-07 a free pickup on offer does not make shipping free while the paid delivery is the one chosen (' . wp_json_encode( array( $paid_chosen['free'], $free_chosen['free'], $chosen_seen ) ) . ')' );
 		$by_value = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 1 ) ) );
 		$over     = FreeShippingProgress::of( t59_cart( array( $five->get_id() => 2 ) ) );
-		$check( null === $beside['items_needed'], 'CART-07, BR-004 with promotions not combining, a code the customer entered keeps the automatic free shipping out, so no item target is promised (' . wp_json_encode( $beside ) . ')' );
+		$check( null === $beside['items_needed'], 'CART-07, BR-004 an individual-use code the customer entered keeps the automatic free shipping out, even with promotions combining, so no item target is promised (' . wp_json_encode( $beside ) . ')' );
 		$check( false === $single['free'] && 1 === $single['items_needed'] && '400.00' === $single['amount_needed'] && true === $pair['free'], 'CART-07 one unit needs one more item for the two-unit promotion (or 400 more for the 500 minimum); two units ship free (' . wp_json_encode( $single ) . ')' );
 		$check( null === $by_value['items_needed'] && '200.00' === $by_value['amount_needed'] && true === $over['free'], 'CART-07 with no item promotion, a 300 cart needs 200 more for the minimum; a 600 cart ships free (' . wp_json_encode( $by_value ) . ')' );
 		$api = t59_store();
