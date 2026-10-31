@@ -166,7 +166,13 @@ run(
 		t61_walk( $arabic, 'completed' );
 		$invites = array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === "{$tag}-ar@example.invalid" && false !== strpos( (string) ( $m['message'] ?? '' ), '#reviews' ) ) );
 		$subject = (string) ( $invites[0]['subject'] ?? '' );
-		$check( false !== strpos( $subject, 'ما رأيك' ) && get_locale() !== 'ar', 'REV-05 an Arabic order\'s invitation is in Arabic, and the site\'s language is restored after (' . $subject . ')' );
+		$again_order = wc_get_order( $arabic->get_id() );
+		$again_order->delete_meta_data( ReviewInvitation::SENT );
+		$again_order->save_meta_data();
+		$locale_before = get_locale();
+		ReviewInvitation::delivered( $arabic->get_id() );
+		$locale_after = get_locale();
+		$check( false !== strpos( $subject, 'ما رأيك' ) && $locale_before === $locale_after, 'REV-05 the invitation of an Arabic order is in Arabic, and sending it leaves the language as it found it (' . $subject . ', ' . $locale_before . ' then ' . $locale_after . ')' );
 
 		return $ok;
 	}
