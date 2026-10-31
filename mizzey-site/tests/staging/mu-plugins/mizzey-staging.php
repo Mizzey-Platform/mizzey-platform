@@ -113,6 +113,32 @@ add_filter(
 	2
 );
 
+// ---- Bosta's governorates and districts ------------------------------------------------------------------
+//
+// The carrier plugin builds Egypt's governorate list from Bosta's public district list, fetched over the web.
+// Staging refuses outside requests, so without this the list is empty and every Egyptian address is refused. When
+// the server's build carried development's copy (`staging.py parity-export`), that request is answered from it.
+
+add_filter(
+	'pre_http_request',
+	static function ( $answer, $args, $url ) {
+		$carried = dirname( __DIR__, 2 ) . '/parity/bosta-districts.json';
+		if ( false !== $answer || false === strpos( (string) $url, '/cities/getAllDistricts' ) || ! is_readable( $carried ) ) {
+			return $answer;
+		}
+		return array(
+			'headers'  => array( 'content-type' => 'application/json' ),
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local staging file
+			'body'     => (string) file_get_contents( $carried ),
+			'response' => array( 'code' => 200, 'message' => 'OK' ),
+			'cookies'  => array(),
+			'filename' => null,
+		);
+	},
+	10,
+	3
+);
+
 // ---- A test payment method that moves no money -------------------------------------------------------------
 
 add_action(
