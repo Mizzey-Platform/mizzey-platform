@@ -1,0 +1,10 @@
+Deliberate defects, each run against t62 and then reverted (31 October 2026, after the first review):
+
+M1 no welcome details                                                 -> t62 fails (1 check)
+M2 an expired code is advertised                                      -> t62 fails (1 check)
+M3 no retry link                                                      -> t62 fails (1 check)
+
+M5 (the Shipped email in the site language) was not caught at first: WooCommerce Multilingual's own emails earlier in
+the order's walk had left the request in Arabic. t62 now ships the Arabic order from an English request, and M5 fails it (1 check).
+
+Equivalent in one process: M4 (the Shipped mark not read from the database), as M7 of specs/020.

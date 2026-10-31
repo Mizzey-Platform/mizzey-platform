@@ -77,7 +77,6 @@ msgid "This coupon cannot be used."
 msgstr "لا يمكن استخدام هذه القسيمة."
 
 #: mizzey-site/src/Promotions/PromotionRules.php
-
 msgid "This coupon is paused."
 msgstr "هذه القسيمة متوقفة مؤقتًا."
 
@@ -132,11 +131,21 @@ msgstr "رابط تسجيل الدخول"
 msgid "This sign-in link has expired or was already used. Ask for a new one."
 msgstr "انتهت صلاحية رابط تسجيل الدخول هذا أو استُخدم من قبل. اطلب رابطًا جديدًا."
 
-#: mizzey-site/src/Accounts/SignInLink.php
 #. translators: 1: the sign-in link, 2: minutes it stays valid.
+#: mizzey-site/src/Accounts/SignInLink.php
 #, php-format
-msgid "Use this link to sign in to your account:\n\n%1$s\n\nIt works once and expires in %2$d minutes. If you did not ask for it, you can ignore this email."
-msgstr "استخدم هذا الرابط لتسجيل الدخول إلى حسابك:\n\n%1$s\n\nيعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
+msgid ""
+"Use this link to sign in to your account:\n"
+"\n"
+"%1$s\n"
+"\n"
+"It works once and expires in %2$d minutes. If you did not ask for it, you can ignore this email."
+msgstr ""
+"استخدم هذا الرابط لتسجيل الدخول إلى حسابك:\n"
+"\n"
+"%1$s\n"
+"\n"
+"يعمل مرة واحدة وتنتهي صلاحيته خلال %2$d دقيقة. إذا لم تطلبه، يمكنك تجاهل هذه الرسالة."
 
 msgid "You are already signed in to another account. Sign out first to use this sign-in link."
 msgstr "أنت مسجّل الدخول بالفعل إلى حساب آخر. سجّل الخروج أولاً لاستخدام رابط تسجيل الدخول هذا."
@@ -163,14 +172,14 @@ msgstr "تعذّرت إضافة هذا المنتج إلى سلتك، لذلك �
 msgid "This product could not be found."
 msgstr "تعذّر العثور على هذا المنتج."
 
-#: mizzey-site/src/Cart/CartStock.php
 #. translators: %s: product name.
+#: mizzey-site/src/Cart/CartStock.php
 #, php-format
 msgid "We could not confirm that %s is in stock. Please try again in a few minutes."
 msgstr "لم نتمكن من التأكد من توفر %s في المخزون. يرجى المحاولة مرة أخرى بعد بضع دقائق."
 
-#: mizzey-site/src/Cart/CartStock.php
 #. translators: 1: units available, 2: product name.
+#: mizzey-site/src/Cart/CartStock.php
 #, php-format
 msgid "Only %1$d of %2$s is available. Please change the quantity in your cart."
 msgid_plural "Only %1$d of %2$s are available. Please change the quantity in your cart."
@@ -181,14 +190,14 @@ msgstr[3] "تتوفر %1$d قطع فقط من %2$s. يرجى تعديل الكم
 msgstr[4] "تتوفر %1$d قطعة فقط من %2$s. يرجى تعديل الكمية في سلتك."
 msgstr[5] "تتوفر %1$d قطعة فقط من %2$s. يرجى تعديل الكمية في سلتك."
 
-#: mizzey-site/src/Cart/CartStock.php
 #. translators: %s: product name.
+#: mizzey-site/src/Cart/CartStock.php
 #, php-format
 msgid "%s is out of stock. Please remove it from your cart."
 msgstr "%s غير متوفر في المخزون. يرجى إزالته من سلتك."
 
-#: mizzey-site/src/Cart/CartMerge.php
 #. translators: %s: product names.
+#: mizzey-site/src/Cart/CartMerge.php
 #, php-format
 msgid "We lowered the quantity of %s to what is available."
 msgstr "خفّضنا كمية %s إلى المتوفر."
@@ -233,8 +242,8 @@ msgstr "يرجى إعادة تحميل الصفحة والمحاولة مرة أ
 msgid "The stock for this order could not be reserved with the stock source. Check it before fulfilling the order."
 msgstr "تعذّر حجز مخزون هذا الطلب لدى مصدر المخزون. تحقّق منه قبل تجهيز الطلب."
 
-#: mizzey-site/src/Checkout/EgyptianAddress.php
 #. translators: %s: the field's name.
+#: mizzey-site/src/Checkout/EgyptianAddress.php
 #, php-format
 msgid "%s is required."
 msgstr "%s مطلوب."
@@ -259,8 +268,8 @@ msgstr "ما رأيك في طلبك رقم {order_number}؟"
 msgid "Tell us what you think"
 msgstr "شاركنا رأيك"
 
-#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
 #. translators: %s: customer first name.
+#: mizzey-site/src/Reviews/ReviewInvitationEmail.php
 #, php-format
 msgid "Hello %s,"
 msgstr "مرحبًا %s،"
@@ -281,8 +290,8 @@ msgstr "لا ينشر التقييمات إلا الموظفون المخوّل�
 msgid "Please choose a photo."
 msgstr "يرجى اختيار صورة."
 
-#: mizzey-site/src/Reviews/ReviewPhotos.php
 #. translators: %d: the most photos a review may have.
+#: mizzey-site/src/Reviews/ReviewPhotos.php
 #, php-format
 msgid "A review can have up to %d photos."
 msgstr "يمكن أن يحتوي التقييم على %d صور كحد أقصى."
@@ -291,8 +300,8 @@ msgstr "يمكن أن يحتوي التقييم على %d صور كحد أقصى
 msgid "This photo could not be used. Please send a JPEG, PNG or WebP image under 5 MB."
 msgstr "تعذّر استخدام هذه الصورة. يرجى إرسال صورة بصيغة JPEG أو PNG أو WebP بحجم أقل من 5 ميجابايت."
 
-#: mizzey-site/src/Reviews/ReviewPhotos.php
 #. translators: %s: the product's name.
+#: mizzey-site/src/Reviews/ReviewPhotos.php
 #, php-format
 msgid "A customer's photo of %s"
 msgstr "صورة من أحد العملاء لمنتج %s"
@@ -308,3 +317,229 @@ msgstr "يمكن إضافة الصور فقط أثناء انتظار التقي
 #: mizzey-site/src/Reviews/ReviewPhotos.php
 msgid "Please try again in a moment."
 msgstr "يرجى المحاولة مرة أخرى بعد قليل."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Continue with Google"
+msgstr "المتابعة باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Staff accounts sign in with their password."
+msgstr "تسجيل دخول حسابات الموظفين يكون بكلمة المرور."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in did not complete. Please try again."
+msgstr "لم يكتمل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Google sign-in"
+msgstr "تسجيل الدخول باستخدام Google"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "The OAuth client of the store's Google Cloud project. Sign-in with Google is offered once both are set."
+msgstr "عميل OAuth الخاص بمشروع Google Cloud للمتجر. يُتاح تسجيل الدخول باستخدام Google بعد ضبط القيمتين."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client ID"
+msgstr "معرّف العميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Client secret"
+msgstr "الرمز السري للعميل"
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Left empty when it is set in the configuration file."
+msgstr "يُترك فارغًا إذا كان مضبوطًا في ملف الإعدادات."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "An account is already registered with your email address. Please log in."
+msgstr "يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول."
+
+#: mizzey-site/src/Accounts/GoogleSignIn.php
+msgid "Please sign in or register with your email and password."
+msgstr "يرجى تسجيل الدخول أو إنشاء حساب بالبريد الإلكتروني وكلمة المرور."
+
+#. translators: %s: a percentage, such as 10.
+#: mizzey-site/src/Emails/EmailAdditions.php
+#, php-format
+msgid "%s%% off"
+msgstr "خصم %s%%"
+
+#. translators: 1: what the discount gives, 2: the code, 3: the last day it can be used.
+#: mizzey-site/src/Emails/EmailAdditions.php
+#, php-format
+msgid "Your welcome gift: %1$s your first order with the code %2$s, until %3$s."
+msgstr "هدية الترحيب: %1$s على طلبك الأول بالكود %2$s، حتى %3$s."
+
+#. translators: 1: what the discount gives, 2: the code.
+#: mizzey-site/src/Emails/EmailAdditions.php
+#, php-format
+msgid "Your welcome gift: %1$s your first order with the code %2$s."
+msgstr "هدية الترحيب: %1$s على طلبك الأول بالكود %2$s."
+
+#. translators: %s: the address to pay for the order again.
+#: mizzey-site/src/Emails/EmailAdditions.php
+#, php-format
+msgid "To try again, pay for your order here: %s"
+msgstr "للمحاولة مرة أخرى، ادفع قيمة طلبك من هنا: %s"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order #{order_number} is on its way"
+msgstr "طلبك رقم {order_number} في الطريق إليك"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order has shipped"
+msgstr "تم شحن طلبك"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your order has been handed to the carrier."
+msgstr "تم تسليم طلبك إلى شركة الشحن."
+
+#. translators: 1: carrier name, 2: tracking number.
+#: mizzey-site/src/Emails/ShippedEmail.php
+#, php-format
+msgid "Carrier: %1$s. Tracking number: %2$s."
+msgstr "شركة الشحن: %1$s. رقم التتبع: %2$s."
+
+#. translators: %s: the tracking page's address.
+#: mizzey-site/src/Emails/ShippedEmail.php
+#, php-format
+msgid "Track it here: %s"
+msgstr "تتبّع شحنتك من هنا: %s"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "We will send you the tracking details as soon as the carrier gives them to us."
+msgstr "سنرسل إليك تفاصيل التتبع فور وصولها من شركة الشحن."
+
+#. translators: %d: the most addresses a book holds.
+#: mizzey-site/src/Account/AddressBook.php
+#, php-format
+msgid "Your address book holds up to %d addresses."
+msgstr "يتسع دفتر العناوين لـ %d عناوين كحد أقصى."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "Please fill in every part of the address; only the landmark is optional."
+msgstr "يرجى ملء جميع أجزاء العنوان؛ العلامة المميزة وحدها اختيارية."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "Please choose a governorate."
+msgstr "يرجى اختيار المحافظة."
+
+#: mizzey-site/src/Account/AddressBook.php
+msgid "This address is not in your address book."
+msgstr "هذا العنوان غير موجود في دفتر عناوينك."
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Tracking"
+msgstr "تتبع الشحنة"
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Track your shipment"
+msgstr "تتبّع شحنتك"
+
+#: mizzey-site/src/Account/AccountPages.php
+msgid "Wishlist"
+msgstr "قائمة الأمنيات"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Invoices"
+msgstr "الفواتير"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "The seller details printed on every invoice. A detail left empty is left off."
+msgstr "بيانات البائع المطبوعة على كل فاتورة. أي بيان يُترك فارغًا لا يظهر."
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Legal name"
+msgstr "الاسم القانوني"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Registered address"
+msgstr "العنوان المسجل"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Tax registration number"
+msgstr "رقم التسجيل الضريبي"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Commercial register number"
+msgstr "رقم السجل التجاري"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Note at the foot of the invoice"
+msgstr "ملاحظة أسفل الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceSettings.php
+msgid "Invoice number prefix"
+msgstr "بادئة رقم الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice"
+msgstr "فاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice number"
+msgstr "رقم الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Invoice date"
+msgstr "تاريخ الفاتورة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Order number"
+msgstr "رقم الطلب"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Order date"
+msgstr "تاريخ الطلب"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Payment method"
+msgstr "طريقة الدفع"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Billed to"
+msgstr "الفاتورة باسم"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Item"
+msgstr "المنتج"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Quantity"
+msgstr "الكمية"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Unit price"
+msgstr "سعر الوحدة"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Total"
+msgstr "الإجمالي"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Discount"
+msgstr "الخصم"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Shipping"
+msgstr "الشحن"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Refunded"
+msgstr "المبلغ المسترد"
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php
+msgid "Net total"
+msgstr "الصافي"
+
+#: mizzey-site/src/Invoices/InvoiceRoutes.php
+msgid "This invoice is not available."
+msgstr "هذه الفاتورة غير متاحة."
+
+#: mizzey-site/src/Invoices/InvoiceRoutes.php
+msgid "Download invoice"
+msgstr "تنزيل الفاتورة"

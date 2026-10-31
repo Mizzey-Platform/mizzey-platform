@@ -74,6 +74,7 @@ require_once __DIR__ . '/src/Accounts/VerificationOnRegistration.php';
 require_once __DIR__ . '/src/Accounts/MarketingConsent.php';
 require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
+require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
@@ -101,6 +102,16 @@ require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
 require_once __DIR__ . '/src/Wishlist/Wishlist.php';
 require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
 require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
+require_once __DIR__ . '/src/Emails/OrderLanguage.php';
+require_once __DIR__ . '/src/Emails/EmailAdditions.php';
+require_once __DIR__ . '/src/Emails/Shipped.php';
+require_once __DIR__ . '/src/Account/AddressBook.php';
+require_once __DIR__ . '/src/Account/AccountPages.php';
+require_once __DIR__ . '/src/Invoices/InvoiceSettings.php';
+require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
+require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
+require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
+require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -172,6 +183,8 @@ MizzeySite\Accounts\VerificationOnRegistration::register();
 MizzeySite\Accounts\MarketingConsent::register();
 MizzeySite\Accounts\PhoneSignIn::register();
 MizzeySite\Accounts\SignInLink::register();
+// Google sign-in, one account per email (AUTH-10, AUTH-13; D-24). See specs/024-google-sign-in.
+MizzeySite\Accounts\GoogleSignIn::register();
 
 // The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
@@ -193,3 +206,16 @@ MizzeySite\Reviews\ReviewModeration::register();
 MizzeySite\Reviews\ReviewInvitation::register();
 // Photos in reviews, a recorded gift (D-23). See specs/025-review-photos.
 MizzeySite\Reviews\ReviewPhotos::register();
+
+// Customer emails: the welcome discount and the payment retry link added to WooCommerce's own, and the Shipped email.
+// NOTF-01 to NOTF-13, specs/021-emails.
+MizzeySite\Emails\EmailAdditions::register();
+MizzeySite\Emails\Shipped::register();
+
+// The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
+MizzeySite\Account\AddressBook::register();
+MizzeySite\Account\AccountPages::register();
+// The invoice (ADM-92), downloaded by staff and from the account (ACCT-12). See specs/023-invoice.
+MizzeySite\Invoices\InvoiceSettings::register();
+MizzeySite\Invoices\InvoiceNumber::register();
+MizzeySite\Invoices\InvoiceRoutes::register();

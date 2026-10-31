@@ -381,7 +381,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In review",
    "delivery_order": 8,
    "depends_on": [
     {
@@ -405,7 +405,7 @@
     }
    ],
    "data_integrity": "B1 measured (closed); M17 open; C3, C4",
-   "acceptance_evidence": "Contract tests on the adapter against a mock; both language records of an item resolve to one stock identity.",
+   "acceptance_evidence": "Contract tests on the adapter against a mock; both language records of an item resolve to one stock identity. specs/012-erp-adapter-seam verification.md: technically verified; merged 31 October 2026 as d3f0e76 (PR #444); staging verification and acceptance pending.",
    "not_in_slice": [
     "ERP-09 (OUT)",
     "INT-14 (P3)"
@@ -437,7 +437,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "Verified",
    "delivery_order": 9,
    "depends_on": [
     {
@@ -456,7 +456,7 @@
     }
    ],
    "data_integrity": "D6 order language context; D7 shipment status history",
-   "acceptance_evidence": "Status transitions validated; a query returns when an order entered each status.",
+   "acceptance_evidence": "Status transitions validated; a query returns when an order entered each status. specs/010-order-status-model verification.md: technically verified 30 October 2026 (merged as e77f827, PR #436) and on staging (T012, release v0.1.7, PR #438); not accepted.",
    "not_in_slice": [
     "ORD-09 (DEF)",
     "ORD-10 (DEF)",
@@ -520,7 +520,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In review",
    "delivery_order": 11,
    "depends_on": [
     {
@@ -539,7 +539,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Permission tests per role (DOD-06); AC-11.",
+   "acceptance_evidence": "Permission tests per role (DOD-06); AC-11. specs/013-launch-roles verification.md: technically verified; merged 31 October 2026 as 2d0b4a6 (PR #445); staging verification and acceptance pending.",
    "not_in_slice": [
     "ROLE-03 (DEF)",
     "ROLE-04 (DEF)",
@@ -813,7 +813,7 @@
     }
    ],
    "data_integrity": "B6 concurrency (needs staging); D6 order language context",
-   "acceptance_evidence": "Checkout completed on staging in both languages; BR-005 and ENT-08 snapshots verified (P-002, P-017).",
+   "acceptance_evidence": "Checkout completed on staging in both languages; BR-005 and ENT-08 snapshots verified (P-002, P-017). specs/019-checkout verification.md: technically verified; merged 31 October 2026 as 46e2c95 (PR #453); staging verification and acceptance pending.",
    "not_in_slice": [
     "CHK-13 (P2)",
     "PAY-10 (P2)",
@@ -1106,7 +1106,7 @@
     },
     {
      "ref": "#281",
-     "reason": "Delivers the behaviour behind FIX-08",
+     "reason": "Delivers the behaviour behind FIX-08. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1232,7 +1232,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ENT-10, the shipment state record of ADR-0002",
+     "reason": "ENT-10, the shipment state record of ADR-0002. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1647,12 +1647,12 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 30,
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "Owns ADM-86 and ADM-87 and the status model the filters use. Not a predecessor for starting",
+     "reason": "Owns ADM-86 and ADM-87 and the status model the filters use. Not a predecessor for starting. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1686,7 +1686,7 @@
     }
    ],
    "data_integrity": "B7 measured working on the WooCommerce side; D7, F1, F3 not yet tested",
-   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order.",
+   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order. ADM-92's invoice, with ACCT-12's download, is specs/023-invoice (our own code, D-24).",
    "not_in_slice": [
     "ADM-86 (P1, owned by #248)",
     "ADM-87 (P1, owned by #248)",
@@ -1726,7 +1726,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "Verified",
    "delivery_order": 31,
    "depends_on": [],
    "erp_blocked": "no",
@@ -1739,7 +1739,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Each reward, condition, limit and exclusion configured from admin and exercised by automated tests on pricing and promotions (DOD-04 critical logic); the AC-04 invalid-coupon scenario.",
+   "acceptance_evidence": "Each reward, condition, limit and exclusion configured from admin and exercised by automated tests on pricing and promotions (DOD-04 critical logic); the AC-04 invalid-coupon scenario. specs/011-promotion-engine verification.md: technically verified 31 October 2026 (merged as 7691fdb, PR #440) and on staging (T009, release v0.1.8, PR #441); not accepted.",
    "not_in_slice": [
     "PROMO-10 (DEF)",
     "PROMO-16 (DEF)",
@@ -1837,7 +1837,7 @@
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The Pending Payment, Payment Failed and Confirmed states the callbacks move an order through, and ORD-14 for cash on delivery. Not a predecessor for starting",
+     "reason": "The Pending Payment, Payment Failed and Confirmed states the callbacks move an order through, and ORD-14 for cash on delivery. Not a predecessor for starting. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1983,12 +1983,12 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In review",
    "delivery_order": 35,
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The Shipped and Delivered states that trigger NOTF-04 and NOTF-06. The account, order, payment and refund emails do not wait for it",
+     "reason": "The Shipped and Delivered states that trigger NOTF-04 and NOTF-06. The account, order, payment and refund emails do not wait for it. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -2017,7 +2017,7 @@
     }
    ],
    "data_integrity": "D6 not yet tested (the language an order was placed in decides the language of its emails)",
-   "acceptance_evidence": "Each event triggered on staging and the email received in English and in Arabic; a marketing opt-out does not stop a transactional email.",
+   "acceptance_evidence": "Each event triggered on staging and the email received in English and in Arabic; a marketing opt-out does not stop a transactional email. specs/021-emails verification.md: technically verified; merged 31 October 2026 as d763d83 (PR #454); staging verification and acceptance pending.",
    "not_in_slice": [
     "NOTF-05 (P2)",
     "NOTF-07 (DEF)",
@@ -2208,12 +2208,12 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "In review",
    "delivery_order": 39,
    "depends_on": [
     {
      "ref": "#281",
-     "reason": "The promotion engine these screens configure",
+     "reason": "The promotion engine these screens configure. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     }
    ],
@@ -2221,18 +2221,13 @@
    "design_dependency": "none",
    "inputs": [
     {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #281"
-    },
-    {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
      "note": "Manual testing on staging and client approval, as on every PBI (D-10)"
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A promotion and a coupon created, scheduled, paused and reactivated from admin, with the usage count intact after the pause.",
+   "acceptance_evidence": "A promotion and a coupon created, scheduled, paused and reactivated from admin, with the usage count intact after the pause. specs/014-promotions-admin verification.md: technically verified; merged 31 October 2026 as 7750794 (PR #446); staging verification and acceptance pending.",
    "not_in_slice": [
     "ADM-112 (P2)",
     "ADM-114 (P2)",
@@ -2262,12 +2257,12 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "In review",
    "delivery_order": 40,
    "depends_on": [
     {
      "ref": "#281",
-     "reason": "BR-001, BR-002, BR-004, BR-009 and BR-010 are rules of the promotion engine",
+     "reason": "BR-001, BR-002, BR-004, BR-009 and BR-010 are rules of the promotion engine. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -2279,11 +2274,6 @@
    "erp_blocked": "partial",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #281"
-    },
     {
      "id": "OD-03",
      "class": "Configurable working default",
@@ -2306,7 +2296,7 @@
     }
    ],
    "data_integrity": "B6 not yet tested (BR-003, needs staging); B7 measured working on the WooCommerce side; B8 not yet tested",
-   "acceptance_evidence": "AC-01, AC-02, AC-03 and AC-10; automated tests on welcome-discount eligibility, item-count free shipping, the combination setting, the refund ceiling and the non-negative total. The ERP criteria of BR-003 and BR-007 are pending PRE-09.",
+   "acceptance_evidence": "AC-01, AC-02, AC-03 and AC-10; automated tests on welcome-discount eligibility, item-count free shipping, the combination setting, the refund ceiling and the non-negative total. The ERP criteria of BR-003 and BR-007 are pending PRE-09. specs/016-launch-rules verification.md: technically verified; merged 31 October 2026 as fa7d594 (PR #448); staging verification and acceptance pending.",
    "not_in_slice": [
     "BR-005 (P1, owned by #255)",
     "PROMO-16 (DEF)",
@@ -2339,23 +2329,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 41,
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The mapping targets the statuses #248 defines, including ORD-13 and ORD-14, and the shipment state record of ADR-0002",
+     "reason": "The mapping targets the statuses #248 defines, including ORD-13 and ORD-14, and the shipment state record of ADR-0002. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #248"
-    },
     {
      "id": "CR-03",
      "class": "Vendor or account input",
@@ -2536,7 +2521,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ADM-12, orders requiring action, reads the status model",
+     "reason": "ADM-12, orders requiring action, reads the status model. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     }
    ],
@@ -3325,7 +3310,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "AC-13 and AC-19; a Google sign-in and a manual registration on the same email yielding one account; automated tests on sessions, login rate limiting and the single-use, time-limited reset link.",
+   "acceptance_evidence": "AC-13 and AC-19; a Google sign-in and a manual registration on the same email yielding one account; automated tests on sessions, login rate limiting and the single-use, time-limited reset link. specs/017-accounts verification.md: technically verified; merged 31 October 2026 as 9d0cc13 (PR #449); staging verification and acceptance pending. The second PR (AUTH-10, AUTH-13, Google sign-in as our own code, D-24) is specs/024-google-sign-in.",
    "not_in_slice": [
     "AUTH-10a (P2)",
     "INT-07 (P2)"
@@ -3382,7 +3367,7 @@
     },
     {
      "ref": "#281",
-     "reason": "CART-06 coupon entry uses the engine",
+     "reason": "CART-06 coupon entry uses the engine. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -3436,7 +3421,7 @@
     }
    ],
    "data_integrity": "B1 measured (stock limits read one effective balance while the translation group is intact)",
-   "acceptance_evidence": "AC-01 and AC-18 on staging in both languages; each merge case (guest then register, guest then sign in with a saved cart, guest then Google) leaving no lost item and no duplicate line. The ERP criteria of CART-10 are pending PRE-09.",
+   "acceptance_evidence": "AC-01 and AC-18 on staging in both languages; each merge case (guest then register, guest then sign in with a saved cart, guest then Google) leaving no lost item and no duplicate line. The ERP criteria of CART-10 are pending PRE-09. specs/018-cart verification.md: technically verified; merged 31 October 2026 as e749059 (PR #452); staging verification and acceptance pending.",
    "not_in_slice": [
     "ERP-03 (P1-E, owned by E-ERP-4)",
     "NOTF-10 (P2)",
@@ -3463,7 +3448,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In review",
    "delivery_order": 57,
    "depends_on": [
     {
@@ -3492,7 +3477,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Add, remove and move to cart as a guest and as a customer in both languages; the wishlist present after signing in on another device; recently viewed products listed.",
+   "acceptance_evidence": "Add, remove and move to cart as a guest and as a customer in both languages; the wishlist present after signing in on another device; recently viewed products listed. specs/015-wishlist verification.md: technically verified; merged 31 October 2026 as bb6a578 (PR #447); staging verification and acceptance pending.",
    "not_in_slice": [
     "WISH-05 (P2)",
     "WISH-06 (P2)",
@@ -3542,7 +3527,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ACCT-07 reads the status and shipment state #248 records",
+     "reason": "ACCT-07 reads the status and shipment state #248 records. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -3586,7 +3571,7 @@
     }
    ],
    "data_integrity": "D1 verified working (observed); D5 not yet tested generally",
-   "acceptance_evidence": "Each account page on staging in both languages; an address added, edited, deleted and set as default; an order tracked; an invoice downloaded.",
+   "acceptance_evidence": "Each account page on staging in both languages; an address added, edited, deleted and set as default; an order tracked; an invoice downloaded. specs/022-my-account verification.md: technically verified; merged 31 October 2026 as 187ac29 (PR #455); staging verification and acceptance pending.",
    "not_in_slice": [
     "ACCT-09 (P1-L, stage S2, owned by E-SF-9b)",
     "ACCT-11 (P1-L, stage S2, owned by E-SF-9b)",
@@ -3614,7 +3599,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "In progress",
    "delivery_order": 59,
    "depends_on": [
     {
@@ -3629,7 +3614,7 @@
     },
     {
      "ref": "#248",
-     "reason": "The Delivered state that triggers REV-05, and the set of statuses that make a review eligible (D-17): Delivered, and ORD-14 only once delivery is established",
+     "reason": "The Delivered state that triggers REV-05, and the set of statuses that make a review eligible (D-17): Delivered, and ORD-14 only once delivery is established. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -3658,7 +3643,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery. Eligibility (D-17), on staging through real requests: a delivered order (and ORD-14 once delivered) allows a review; processing, shipped, out for delivery, cancelled, returned to origin and a fully refunded line do not; a guest order is refused until linked by a verified email, and a billing email match alone is refused; a variation qualifies its parent; a purchase in one language qualifies the other; a second review is refused while one is pending or approved, in either language, and allowed after a moderator removes a rejected one; an ineligible account is refused with no comment created on the classic form post, POST /wp/v2/comments with a valid nonce and XML-RPC wp.newComment; the beta review-request route and action are absent; moderation, the required rating and text and the display name are unchanged, and no verified-owner text appears in either language.",
+   "acceptance_evidence": "A rating and a review submitted in each language, invisible until approved; the average on the product page and the listing; the invitation email sent on delivery. Eligibility (D-17), on staging through real requests: a delivered order (and ORD-14 once delivered) allows a review; processing, shipped, out for delivery, cancelled, returned to origin and a fully refunded line do not; a guest order is refused until linked by a verified email, and a billing email match alone is refused; a variation qualifies its parent; a purchase in one language qualifies the other; a second review is refused while one is pending or approved, in either language, and allowed after a moderator removes a rejected one; an ineligible account is refused with no comment created on the classic form post, POST /wp/v2/comments with a valid nonce and XML-RPC wp.newComment; the beta review-request route and action are absent; moderation, the required rating and text and the display name are unchanged, and no verified-owner text appears in either language. specs/020-reviews verification.md: technically verified; merged 31 October 2026 as 2f695a6 (PR #450); staging verification and acceptance pending. The second part (D-23's photos, a gift) is specs/025-review-photos.",
    "not_in_slice": [
     "REV-06 (P2)",
     "REV-07 (P2)",
@@ -4586,7 +4571,7 @@
     },
     {
      "ref": "#248",
-     "reason": "JRN-09",
+     "reason": "JRN-09. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -4601,7 +4586,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #302, #304, #254, #306, #305, #255, #248, #292"
+     "note": "Not yet delivered: #302, #304, #254, #306, #305, #255, #292"
     }
    ],
    "data_integrity": "",
@@ -4658,7 +4643,7 @@
     },
     {
      "ref": "#281",
-     "reason": "AC-04",
+     "reason": "AC-04. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -4718,7 +4703,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #306, #290, #281, #255, #283, #251, #305, #292, #291, #247, #311, #301"
+     "note": "Not yet delivered: #306, #290, #255, #283, #251, #305, #292, #291, #247, #311, #301"
     },
     {
      "id": "PRE-09",
