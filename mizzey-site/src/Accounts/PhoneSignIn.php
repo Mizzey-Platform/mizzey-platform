@@ -18,7 +18,12 @@ defined('ABSPATH') || exit;
  * Egyptian mobile form (`01` and nine digits; `+20` and `0020` prefixes accepted). One number signs in to one account:
  * the first account to hold it claims it, in one insert that a second account cannot also win, whatever wrote the
  * billing phone (registration, the account's address form, the admin, the REST API). An account whose number another
- * account already holds keeps the number for delivery and cannot sign in with it.
+ * account already holds keeps the number for delivery and cannot sign in with it; registration does not say so, so the
+ * form cannot be used to learn whether a number belongs to a customer. Numbers saved before this existed are claimed
+ * once (`backfill()`), each by the one account holding it; a number several accounts hold is claimed by none.
+ *
+ * A number no account holds costs the same password work at sign-in as one that does, so the time taken does not say
+ * which it is.
  *
  * At sign-in, a mobile number in any accepted spelling is replaced by its account's username before the password is
  * checked (`wp_authenticate`), so CoreX's lockout counts every spelling, and the username, as one identity. A number
@@ -33,6 +38,10 @@ final class PhoneSignIn
     /** The number this account holds for sign-in, when it holds the claim. */
     public const HELD = '_mizzey_phone';
     public const CLAIM = 'mizzey_phone';
+    public const BACKFILLED = 'mizzey_phone_claims_backfilled';
+
+    /** The username identity() resolved a number to in this request, which is not read as a number again. */
+    private static ?string $resolved = null;
 
     public static function register(): void
     {
@@ -46,6 +55,30 @@ final class PhoneSignIn
         add_action('wp_authenticate', [self::class, 'identity'], 0, 1);
         add_filter('authenticate', [self::class, 'authenticate'], 19, 3);
         add_filter('woocommerce_new_customer_username', [self::class, 'username'], 10, 1);
+        add_action('init', [self::class, 'backfill'], 20);
+    }
+
+    /** Claims the numbers saved before claims existed, once: each by its one holder, none held by several. */
+    public static function backfill(): void
+    {
+        if (get_option(self::BACKFILLED) === 'yes') {
+            return;
+        }
+        global $wpdb;
+        $rows    = $wpdb->get_results($wpdb->prepare("SELECT user_id, meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s ORDER BY user_id", self::FIELD)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $holders = [];
+        foreach ((array) $rows as $row) {
+            $normal = self::normalise((string) $row->meta_value);
+            if ($normal !== null) {
+                $holders[$normal][] = (int) $row->user_id;
+            }
+        }
+        foreach ($holders as $normal => $users) {
+            if (count(array_unique($users)) === 1 && get_option(self::claimName($normal)) === false && self::claim($normal, $users[0])) {
+                update_user_meta($users[0], self::HELD, $normal);
+            }
+        }
+        update_option(self::BACKFILLED, 'yes', false);
     }
 
     public static function field(): void
@@ -93,11 +126,10 @@ final class PhoneSignIn
         if ($given === '' || ! $errors instanceof \WP_Error) {
             return $errors;
         }
-        // As WooCommerce's own form says when an email has an account, this says when a number has one.
+        // A number another account holds is not refused here, which would say it belongs to a customer: the new
+        // account keeps it for delivery and does not sign in with it (changed()).
         if (self::normalise($given) === null) {
             $errors->add('mizzey_phone_invalid', __('Please enter a mobile number such as 01012345678.', 'mizzey-site'));
-        } elseif (self::holder($given) !== null) {
-            $errors->add('mizzey_phone_taken', __('This mobile number is already used by another account.', 'mizzey-site'));
         }
 
         return $errors;
@@ -153,10 +185,15 @@ final class PhoneSignIn
     /** @param mixed $userId */
     public static function release($userId): void
     {
+        global $wpdb;
         $userId = (int) $userId;
         $held   = (string) get_user_meta($userId, self::HELD, true);
-        if ($held !== '' && (int) get_option(self::claimName($held), 0) === $userId) {
-            delete_option(self::claimName($held));
+        if ($held !== '') {
+            // Only while this account still owns the claim: one delete naming both, so a release that overlaps another
+            // account's new claim cannot remove it.
+            $wpdb->delete($wpdb->options, ['option_name' => self::claimName($held), 'option_value' => (string) $userId]); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            wp_cache_delete(self::claimName($held), 'options');
+            wp_cache_delete('alloptions', 'options');
         }
         delete_user_meta($userId, self::HELD);
     }
@@ -186,7 +223,8 @@ final class PhoneSignIn
     public static function identity(&$login): void
     {
         if (is_string($login)) {
-            $login = self::canonical($login);
+            $login           = self::canonical($login);
+            self::$resolved  = $login;
         }
     }
 
@@ -215,10 +253,32 @@ final class PhoneSignIn
         if ($user instanceof \WP_User || ! is_string($username) || ! is_string($password) || $password === '' || self::normalise($username) === null) {
             return $user;
         }
+        // Resolved once: the username identity() gave is an account's, not a number to resolve again.
+        if (self::$resolved !== null && $username === self::$resolved && get_user_by('login', $username)) {
+            return $user;
+        }
         $holder  = self::holder($username);
         $account = $holder !== null ? get_userdata($holder) : false;
+        if (! $account instanceof \WP_User) {
+            // The password work a held number costs, so the time does not say the number is unknown.
+            wp_check_password($password, self::decoy());
 
-        return $account instanceof \WP_User ? wp_authenticate_username_password(null, $account->user_login, $password) : $user;
+            return $user;
+        }
+
+        return wp_authenticate_username_password(null, $account->user_login, $password);
+    }
+
+    /** A password hash no password matches, made once, for the work an unknown number costs. */
+    private static function decoy(): string
+    {
+        $decoy = (string) get_option('mizzey_phone_decoy_hash', '');
+        if ($decoy === '') {
+            $decoy = wp_hash_password(wp_generate_password(32, true, true));
+            update_option('mizzey_phone_decoy_hash', $decoy, true);
+        }
+
+        return $decoy;
     }
 
     /**

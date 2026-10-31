@@ -93,8 +93,9 @@ Provisional: verified by automated tests; acceptance follows manual testing on s
 
 ### Edge Cases
 
-- A mobile number is one account's: registering it again is refused; a number held by no account, or ambiguously,
-  signs in to nothing.
+- A mobile number signs in to one account, the first to hold it, whatever wrote it; another account registering or
+  saving it keeps it for delivery without being told, and cannot sign in with it. Numbers saved before this existed
+  are claimed once; a number several accounts hold signs in to none. An unknown number costs the same password work.
 - A sign-in link: a wrong token does not spend it; asking again replaces it; requests share the password-reset limits
   (per account and per address), so neither route multiplies the other; the answer is the same whether or not an
   account exists.

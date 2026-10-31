@@ -18,7 +18,9 @@ defined('ABSPATH') || exit;
  * protection, and responses that disclose nothing.
  *
  * A customer asks with their email (`POST mizzey/v1/sign-in-link`); the answer is the same whether or not an account
- * exists. For a customer account, a link valid for 15 minutes (`mizzey_sign_in_link_lifetime`) is emailed; asking again
+ * exists, and the work is done after the answer is sent (`fastcgi_finish_request()`, under PHP-FPM as on the servers),
+ * so the time it takes does not say whether the email has an account, or a staff one. For a customer account, a link
+ * valid for 15 minutes (`mizzey_sign_in_link_lifetime`) is emailed; asking again
  * replaces it. Requests count against the password-reset limits (`RecoveryLimiter`: per account and per address), so
  * neither route multiplies the other. Staff accounts are never sent one: their sign-in needs two-factor (ADM-131).
  *
@@ -63,11 +65,36 @@ final class SignInLink
         ]);
     }
 
+    /** @var list<string> Emails asked for in this request, handled after the answer is sent. */
+    private static array $queued = [];
+
     public static function requestRoute(\WP_REST_Request $request): \WP_REST_Response
     {
-        self::request((string) $request['email']);
+        if (self::$queued === []) {
+            add_action('shutdown', [self::class, 'afterAnswer'], 0);
+        }
+        self::$queued[] = (string) $request['email'];
 
         return new \WP_REST_Response(['message' => __('If an account exists for that email, a sign-in link is on its way.', 'mizzey-site')], 202);
+    }
+
+    /** At shutdown: the answer goes out first, then the queued requests are handled. */
+    public static function afterAnswer(): void
+    {
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        self::flush();
+    }
+
+    /** Handles the queued requests. */
+    public static function flush(): void
+    {
+        $queued       = self::$queued;
+        self::$queued = [];
+        foreach ($queued as $email) {
+            self::request($email);
+        }
     }
 
     /** Sends a link to a customer account for the email, if there is one and the limits allow; says nothing either way. */
