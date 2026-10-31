@@ -12,3 +12,5 @@ specs/012); the order's reserved and released marks only save the calls.
 
 M6 (a refused Store API placement goes through) was not caught at first: the cart check refused the order earlier. t60
 now calls the placement hook with a source that refuses: see below.
+
+M6 a refused Store API placement goes through                         -> t60 fails (1 check)
