@@ -214,6 +214,15 @@ run(
 		}
 
 		// ---- AC-242-05: term archives, per language -----------------------------------------------------
+		// IA-04 in the admin: the products list gives the Collections column a width, so it is not squeezed.
+		set_current_screen( 'edit-product' );
+		ob_start();
+		do_action( 'admin_head' );
+		$admin_head = (string) ob_get_clean();
+		set_current_screen( 'front' );
+		$width_ok = false !== strpos( $admin_head, '.column-taxonomy-product_collection{width:9%}' );
+		$s->note( ( $width_ok ? 'ok   ' : 'FAIL ' ) . 'IA-04 the products list gives the Collections column a width' );
+		$ok = $ok && $width_ok;
 		foreach ( array( 'IA-03' => 'product_cat', 'IA-05' => 'product_brand', 'IA-04' => 'product_collection' ) as $row => $tax ) {
 			if ( ! taxonomy_exists( $tax ) ) {
 				$s->note( "FAIL {$row}: taxonomy {$tax} does not exist" );
