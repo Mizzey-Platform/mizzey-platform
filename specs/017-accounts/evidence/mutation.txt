@@ -33,3 +33,7 @@ Not a defect: releasing on `deleted_user` instead of `delete_user` is not caught
 phone meta already releases its claim (`deleted_user_meta`); `delete_user` is kept as a guard.
 
 The counts of M10 to M14 include checks that fail in turn once the first does.
+
+After the third review (31 October 2026): the ambiguous-number reservation is checked by t58 ("stays reserved"). The
+in-progress claim and the re-read after claiming guard races between two requests, which one PHP process cannot
+create, so they have no mutation check here.
