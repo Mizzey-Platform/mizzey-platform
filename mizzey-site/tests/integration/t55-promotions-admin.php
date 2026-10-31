@@ -4,8 +4,8 @@
  *
  * In-process, through the coupon screen's own save handler (`WC_Meta_Box_Coupon_Data::save()`) and WooCommerce's real
  * cart and discount calculation: a promotion created automatic and one by code, its conditions, limits and exclusions,
- * its start and end, and a pause (Draft) and reactivation (Publish) that keep its use count and its record of who used
- * it. Every coupon, product and user it makes is removed when it finishes.
+ * its start and end, and a pause and reactivation on the same screen that keep its use count and its record of who
+ * used it, with use recorded and reversed by a real order. Every coupon, product and user it makes is removed when it finishes.
  *
  * @package MizzeySite\Tests\Integration
  */
@@ -56,11 +56,16 @@ function t55_valid( string $code ) {
 	return true === $result ? true : $result->get_error_message();
 }
 
-/** Pause (Draft) or reactivate (Publish) a promotion, as the coupon list does. */
-function t55_status( \WC_Coupon $coupon, string $status ): void {
-	wp_update_post( array( 'ID' => $coupon->get_id(), 'post_status' => $status ) );
-	wp_cache_flush();
-	AutomaticPromotions::forget();
+/** Save an existing promotion again through the coupon screen, with the given fields (an unticked box is absent). */
+function t55_resave( \WC_Coupon $coupon, array $fields ): \WC_Coupon {
+	$_POST = $fields + array(
+		'discount_type' => $coupon->get_discount_type(), 'coupon_amount' => (string) $coupon->get_amount(), 'expiry_date' => '', 'usage_limit' => '',
+		'usage_limit_per_user' => (string) ( $coupon->get_usage_limit_per_user() ?: '' ), 'limit_usage_to_x_items' => '',
+		'minimum_amount' => (string) ( $coupon->get_minimum_amount() ?: '' ), 'maximum_amount' => '', 'customer_email' => '',
+	);
+	\WC_Meta_Box_Coupon_Data::save( $coupon->get_id(), get_post( $coupon->get_id() ) );
+	$_POST = array();
+	return new \WC_Coupon( $coupon->get_id() );
 }
 
 run(
@@ -104,45 +109,61 @@ run(
 		$ended = t55_screen( $s, "{$tag}ended", array( 'expiry_date' => wp_date( 'Y-m-d', time() - DAY_IN_SECONDS ) ) );
 		$check( true !== t55_valid( $later->get_code() ) && true !== t55_valid( $ended->get_code() ), 'AC-3 a promotion whose start is in three days, and one that ended yesterday, are both refused' );
 
-		// AC-4: a code used once, paused, and reactivated.
-		$customer_id = wp_insert_user( array( 'user_login' => "{$tag}-c", 'user_email' => "{$tag}-c@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
-		$s->track_user( (int) $customer_id );
-		$code->increase_usage_count( (string) $customer_id );
-		$code     = new \WC_Coupon( $code->get_id() );
-		$count    = $code->get_usage_count();
-		$used_by  = $code->get_used_by();
-		t55_status( $code, 'draft' );
-		$paused   = t55_valid( $code->get_code() );
-		$kept     = new \WC_Coupon( $code->get_id() );
-		$check( true !== $paused && $count === $kept->get_usage_count() && $used_by === $kept->get_used_by() && 1 === $count, "AC-4 paused, the code is refused ({$paused}) and its use count ({$kept->get_usage_count()}) and record of who used it are kept" );
-		t55_status( $code, 'publish' );
+		// AC-4: a code used on a real order, paused on the coupon screen, and reactivated there.
+		$customer_id = (int) wp_insert_user( array( 'user_login' => "{$tag}-c", 'user_email' => "{$tag}-c@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
+		$s->track_user( $customer_id );
+		$placed = wc_create_order( array( 'customer_id' => $customer_id ) );
+		$placed->add_product( $product, 1 );
+		$placed->set_billing_email( "{$tag}-c@example.invalid" );
+		$placed->apply_coupon( $code->get_code() );
+		$placed->calculate_totals();
+		$placed->set_status( 'processing' );
+		$placed->save();
+		$s->track_order( $placed->get_id() );
+		$used     = new \WC_Coupon( $code->get_id() );
+		$discount = (float) wc_get_order( $placed->get_id() )->get_discount_total();
+		$check( 1 === $used->get_usage_count() && in_array( (string) $customer_id, array_map( 'strval', $used->get_used_by() ), true ) && 20.0 === $discount, "AC-4 an order that uses the code records one use by its customer ({$used->get_usage_count()}) and takes 20 off ({$discount})" );
+		$paused = t55_resave( $code, array( 'mizzey_paused' => 'yes' ) );
 		t55_cart( array( $product->get_id() => 1 ) );
-		$again = t55_valid( $code->get_code() );
-		$back  = new \WC_Coupon( $code->get_id() );
-		WC()->customer->set_billing_email( "{$tag}-c@example.invalid" );
-		wp_set_current_user( (int) $customer_id );
-		$used_up = t55_valid( $code->get_code() );
-		wp_set_current_user( 0 );
-		WC()->customer->set_billing_email( '' );
-		$check( true === $again && 1 === $back->get_usage_count() && true !== $used_up, 'AC-4 reactivated, the code is valid again with its use count still 1, and the customer who used it up still cannot use it' );
+		$refusal = t55_valid( $code->get_code() );
+		$check( PromotionSettings::paused( $paused ) && 'publish' === get_post_status( $code->get_id() ) && 'This coupon is paused.' === $refusal, "AC-4 ticked Paused on the coupon screen, the promotion stays published and a new cart is refused it ({$refusal})" );
+		$kept = new \WC_Coupon( $code->get_id() );
+		$check( 1 === $kept->get_usage_count() && $used->get_used_by() === $kept->get_used_by(), 'AC-4 pausing keeps the use count and the record of who used it' );
+		$order_again = wc_get_order( $placed->get_id() );
+		$order_again->recalculate_coupons();
+		$check( 20.0 === (float) wc_get_order( $placed->get_id() )->get_discount_total(), 'AC-4 an order that already has the paused promotion keeps its discount when its coupons are recalculated' );
+		wc_get_order( $placed->get_id() )->update_status( 'cancelled', 't55 cancelled while paused' );
+		$reversed = new \WC_Coupon( $code->get_id() );
+		$check( 0 === $reversed->get_usage_count(), "AC-4 cancelling that order while the promotion is paused reverses its use, as WooCommerce does for a live one ({$reversed->get_usage_count()})" );
+		$back = t55_resave( $code, array() );
+		t55_cart( array( $product->get_id() => 1 ) );
+		$check( ! PromotionSettings::paused( $back ) && true === t55_valid( $code->get_code() ), 'AC-4 unticked Paused, the promotion applies again' );
+
+		// AC-4: a code that is its own number is paused like any other.
+		$numeric = new \WC_Coupon();
+		$numeric->set_code( "{$tag}tmp" );
+		$numeric->save();
+		$s->on_finish( static function () use ( $numeric ) { wp_delete_post( $numeric->get_id(), true ); } );
+		$numeric->set_code( (string) $numeric->get_id() );
+		$numeric->save();
+		t55_resave( $numeric, array( 'mizzey_paused' => 'yes' ) );
+		t55_cart( array( $product->get_id() => 1 ) );
+		$number_refusal = t55_valid( (string) $numeric->get_id() );
+		$check( 'This coupon is paused.' === $number_refusal, "AC-4 a paused code that is the coupon's own number is refused too ({$number_refusal})" );
 
 		// AC-4: an automatic promotion paused while a cart holds it.
-		$auto->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
-		$auto->save();
-		AutomaticPromotions::forget();
+		$auto = t55_resave( $auto, array( 'discount_type' => 'percent', 'coupon_amount' => '10', 'mizzey_automatic' => 'yes', 'mizzey_min_items' => '2', 'mizzey_max_discount' => '15' ) );
 		t55_cart( array( $product->get_id() => 2 ) );
 		$held = t55_applied();
-		t55_status( $auto, 'draft' );
+		t55_resave( $auto, array( 'discount_type' => 'percent', 'coupon_amount' => '10', 'mizzey_automatic' => 'yes', 'mizzey_min_items' => '2', 'mizzey_max_discount' => '15', 'mizzey_paused' => 'yes' ) );
 		WC()->cart->calculate_totals();
 		$after_pause = t55_applied();
-		t55_status( $auto, 'publish' );
+		t55_resave( $auto, array( 'discount_type' => 'percent', 'coupon_amount' => '10', 'mizzey_automatic' => 'yes', 'mizzey_min_items' => '2', 'mizzey_max_discount' => '15' ) );
 		WC()->cart->calculate_totals();
 		$after_back = t55_applied();
-		$name = wc_format_coupon_code( $auto->get_code() );
+		$name       = wc_format_coupon_code( $auto->get_code() );
 		$check( array( $name ) === $held && array() === $after_pause && array( $name ) === $after_back, 'AC-4 an automatic promotion paused while a cart holds it is taken off on the next calculation, and comes back when reactivated' );
-		$auto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
-		$auto->save();
-
+		t55_resave( $auto, array( 'discount_type' => 'percent', 'coupon_amount' => '10' ) );
 		return $ok;
 	}
 );
