@@ -195,3 +195,31 @@ msgstr "خفّضنا كمية %s إلى المتوفر."
 #: mizzey-site/src/Wishlist/Wishlist.php
 msgid "This item is not in your cart."
 msgstr "هذا المنتج ليس في سلتك."
+
+#: mizzey-site/src/Checkout/OrderStock.php
+msgid "We could not reserve the stock for your order. Please try again in a few minutes."
+msgstr "لم نتمكن من حجز المخزون لطلبك. يرجى المحاولة مرة أخرى بعد بضع دقائق."
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Governorate"
+msgstr "المحافظة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "City"
+msgstr "المدينة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Street and building"
+msgstr "الشارع ورقم المبنى"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "District"
+msgstr "الحي"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Nearest landmark"
+msgstr "أقرب علامة مميزة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Nearest landmark (optional)"
+msgstr "أقرب علامة مميزة (اختياري)"
