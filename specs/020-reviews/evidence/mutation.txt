@@ -8,7 +8,7 @@ M6 a line refunded by amount still counts                             -> t61 fai
 M8 the form shows to the ineligible                                   -> t61 fails (1 check)
 
 M3 (reviews published unmoderated) was not caught at first: WordPress's own setting held a first-time commenter's
-review. t61 now posts as a returning commenter with WordPress's moderation off.
+review. t61 now posts as a returning commenter with WordPress's moderation off, and M3 fails it (2 checks).
 
 Equivalent in one process: M7 (the invitation mark not read from the database). The mark read from the loaded order
 afterwards still stops a second send in sequence; the database read matters only for two requests at once, which one
