@@ -63,9 +63,11 @@ final class AutomaticPromotions
         $automatic = self::automaticCodes();
         $applied   = array_map('wc_format_coupon_code', $cart->get_applied_coupons());
         $entered   = array_values(array_diff($applied, $automatic));
-        // With combining off the cart holds one code: the latest entered (BR-004), also when combining was switched
-        // off while the cart held more. WooCommerce re-validates applied coupons only on the cart and checkout pages.
-        $extra = ! Combination::allowed() && count($entered) > 1 ? array_slice($entered, 0, -1) : [];
+        // With combining off, or when one of the entered codes is individual-use, the cart holds one code: the latest
+        // entered (BR-004), also when the setting or a coupon's box changed while the cart held more. WooCommerce
+        // re-validates applied coupons only on the cart and checkout pages.
+        $solo  = array_filter($entered, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use());
+        $extra = count($entered) > 1 && (! Combination::allowed() || $solo !== []) ? array_slice($entered, 0, -1) : [];
         if ($extra !== []) {
             $entered = array_values(array_diff($entered, $extra));
             $applied = array_values(array_diff($applied, $extra));
@@ -112,28 +114,70 @@ final class AutomaticPromotions
                 return [];
             }
         }
-        $shipping = array_values(array_filter($automatic, static fn (string $code): bool => self::shippingOnly(new \WC_Coupon($code))));
-        $discount = array_values(array_diff($automatic, $shipping));
-        // Measured after the entered codes: their discount comes off first, line by line, and off a free shipping
-        // minimum, as WooCommerce takes it.
-        $already = 0.0;
-        foreach ($entered as $code) {
-            $already += (float) wc_add_number_precision($cart->get_coupon_discount_amount($code, ! $cart->display_prices_including_tax()));
+        $individual = static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use();
+        // An individual-use promotion never stands beside an entered code, so it is not a candidate then; left in, it
+        // could outrank a compatible one and leave neither applied.
+        $candidates = $entered !== [] ? array_values(array_filter($automatic, static fn (string $code): bool => ! $individual($code))) : $automatic;
+        $shipping   = array_values(array_filter($candidates, static fn (string $code): bool => self::shippingOnly(new \WC_Coupon($code))));
+        $discount   = array_values(array_diff($candidates, $shipping));
+        $solo       = static fn (?array $option): bool => $option !== null && $individual($option['code']);
+        $joinable   = array_values(array_filter($shipping, static fn (string $code): bool => ! $individual($code)));
+        // Measured after the entered codes, simulated with each candidate (measure()).
+        $best = self::best($cart, $discount, $entered);
+        // Each promotion alone, valued after the entered codes only.
+        $options = [];
+        foreach ([$best, self::best($cart, $shipping, $entered)] as $alone) {
+            if ($alone !== null) {
+                $options[] = ['codes' => [$alone['code']], 'value' => $alone['value'], 'created' => $alone['created'], 'id' => $alone['id']];
+            }
         }
-        $solo = static fn (?array $option): bool => $option !== null && (new \WC_Coupon($option['code']))->get_individual_use();
-        $best = self::best($cart, $discount, $already, $entered);
-        // Free shipping is valued after the chosen discount, which can take the cart under a free shipping minimum.
-        $ship = $best !== null && ! $solo($best)
-            ? self::best($cart, $shipping, $already + $best['shown'], [...$entered, $best['code']])
-            : self::best($cart, $shipping, $already, $entered);
-        if ($best !== null && $ship !== null && ! $solo($best) && ! $solo($ship)) {
-            return [$best['code'], $ship['code']];
+        // The discount with free shipping that can join it, valued after that discount, which can take the cart
+        // under a free shipping minimum.
+        if ($best !== null && ! $solo($best)) {
+            $ship = self::best($cart, $joinable, [...$entered, $best['code']]);
+            if ($ship !== null) {
+                $options[] = ['codes' => [$best['code'], $ship['code']], 'value' => $best['value'] + $ship['value'], 'created' => $best['created'], 'id' => $best['id']];
+            }
         }
-        // Otherwise one at most: an individual-use promotion stands alone, and never beside an entered code.
-        $single = array_values(array_filter([$best, $ship], static fn (?array $option): bool => $option !== null && ! ($solo($option) && $entered !== [])));
-        usort($single, static fn (array $a, array $b): int => self::better($a, $b) ? -1 : 1);
+        usort($options, static fn (array $a, array $b): int => self::better($a, $b) ? -1 : 1);
 
-        return $single !== [] ? [$single[0]['code']] : [];
+        return $options !== [] ? $options[0]['codes'] : [];
+    }
+
+    /**
+     * The discount, in cents by cart item, of the coupons applied together in WooCommerce's order.
+     *
+     * @param list<\WC_Coupon> $coupons
+     * @return array<string,float|int>
+     */
+    private static function discountByItem(\WC_Cart $cart, array $coupons): array
+    {
+        $discounts = new \WC_Discounts($cart);
+        $discounts->set_items(self::items($cart));
+        foreach (self::inWooCommerceOrder($coupons) as $each) {
+            $discounts->apply_coupon($each, false);
+        }
+
+        return (array) $discounts->get_discounts_by_item(true);
+    }
+
+    /**
+     * Coupons in the order WooCommerce's totals apply them, which matters with sequential discounts: fixed per product,
+     * then percentage, then fixed cart (`woocommerce_coupon_sort` may change it), then a smaller item limit, then a
+     * smaller amount, then the newer (`WC_Cart_Totals::get_coupons_from_cart()`, `sort_coupons_callback()`, 11.1.0).
+     *
+     * @param list<\WC_Coupon> $coupons
+     * @return list<\WC_Coupon>
+     */
+    private static function inWooCommerceOrder(array $coupons): array
+    {
+        $rank = static fn (\WC_Coupon $c): int => (int) apply_filters('woocommerce_coupon_sort', ['fixed_product' => 1, 'percent' => 2, 'fixed_cart' => 3][$c->get_discount_type()] ?? 0, $c);
+        usort($coupons, static function (\WC_Coupon $a, \WC_Coupon $b) use ($rank): int {
+            return [$rank($a), $a->get_limit_usage_to_x_items(), (float) $a->get_amount(), -$a->get_id()]
+                <=> [$rank($b), $b->get_limit_usage_to_x_items(), (float) $b->get_amount(), -$b->get_id()];
+        });
+
+        return $coupons;
     }
 
     /** A promotion whose only reward is free shipping. */
@@ -158,7 +202,7 @@ final class AutomaticPromotions
      * @param list<string> $codes
      * @return array{code:string,value:int,created:int,id:int}|null
      */
-    private static function best(\WC_Cart $cart, array $codes, float $already = 0.0, array $before = []): ?array
+    private static function best(\WC_Cart $cart, array $codes, array $before = []): ?array
     {
         $best = null;
         foreach ($codes as $code) {
@@ -168,11 +212,9 @@ final class AutomaticPromotions
                 continue;
             }
             $created   = $coupon->get_date_created();
-            $measured  = self::measure($cart, $coupon, $already, $before);
             $candidate = [
                 'code'    => $code,
-                'value'   => $measured['value'],
-                'shown'   => $measured['shown'],
+                'value'   => self::measure($cart, $coupon, $before),
                 'created' => $created ? $created->getTimestamp() : PHP_INT_MAX,
                 'id'      => $coupon->get_id(),
             ];
@@ -196,37 +238,42 @@ final class AutomaticPromotions
      * with this one (its discount can move the cart below a free shipping minimum; its free shipping can make shipping
      * free).
      *
-     * `$already` is the shown discount, in cents, of the codes the customer entered (with combining on), which comes off
-     * before a free shipping minimum is compared.
+     * `$before` are the codes the customer entered (with combining on): their discount comes off first, and off a free
+     * shipping minimum.
+     *
+     * @param list<string> $before
      */
-    public static function value(\WC_Cart $cart, \WC_Coupon $coupon, float $already = 0.0): int
+    public static function value(\WC_Cart $cart, \WC_Coupon $coupon, array $before = []): int
     {
-        return self::measure($cart, $coupon, $already, [])['value'];
+        return self::measure($cart, $coupon, $before);
     }
 
     /**
-     * The saving and the shown discount of the coupon, applied after the codes in `$before` in one discount
+     * The saving of the coupon, in cents, applied after the codes in `$before` in one discount
      * calculation, so what they already take off a line is not counted again.
      *
      * @param list<string> $before
-     * @return array{value:int,shown:float}
      */
-    private static function measure(\WC_Cart $cart, \WC_Coupon $coupon, float $already, array $before): array
+    private static function measure(\WC_Cart $cart, \WC_Coupon $coupon, array $before): int
     {
-        $discounts = new \WC_Discounts($cart);
-        $discounts->set_items(self::items($cart));
-        foreach ($before as $code) {
-            $discounts->apply_coupon(new \WC_Coupon($code), false);
+        // What the promotion adds: the discount with it, less the discount without it, line by line, both applied in
+        // WooCommerce's order, so a line the entered codes already take to nothing gains nothing from it.
+        $held    = array_map(static fn (string $code): \WC_Coupon => new \WC_Coupon($code), $before);
+        $with    = self::discountByItem($cart, [...$held, $coupon]);
+        $without = $held !== [] ? self::discountByItem($cart, $held) : [];
+        $byItem  = [];
+        foreach ($with as $key => $cents) {
+            $byItem[$key] = (float) $cents - (float) ($without[$key] ?? 0);
         }
-        $discounts->apply_coupon($coupon, false);
-        $byItem = (array) ($discounts->get_discounts(true)[$coupon->get_code()] ?? []);
-        $paid   = self::paidSaving($cart, $byItem);
-        $shown  = self::shownDiscount($cart, $byItem);
+        $paid    = self::paidSaving($cart, $byItem);
+        // The free shipping minimum is compared with the simulated discounts, not the cart's current ones, which an
+        // applied automatic promotion changes under sequential discounts; an entered code's free shipping counts on
+        // both sides.
+        $heldFree    = array_filter($held, static fn (\WC_Coupon $c): bool => $c->get_free_shipping()) !== [];
+        $costWithout = self::shippingCost($cart, self::shownDiscount($cart, $without), $heldFree);
+        $costWith    = self::shippingCost($cart, self::shownDiscount($cart, $with), $heldFree || $coupon->get_free_shipping());
 
-        return [
-            'value' => $paid + self::shippingCost($cart, $already, false) - self::shippingCost($cart, $already + $shown, $coupon->get_free_shipping()),
-            'shown' => $shown,
-        ];
+        return $paid + $costWithout - $costWith;
     }
 
     /**

@@ -327,6 +327,11 @@ run(
 		t57_cart( array( $cheap->get_id() => 1, $mask->get_id() => 1 ), array( $entered_a->get_code() ) );
 		$after_entered = t57_applied();
 		$check( in_array( t57_code( $auto_b ), $after_entered, true ) && ! in_array( t57_code( $auto_a ), $after_entered, true ) && 150.0 === (float) WC()->cart->get_discount_total(), 'BR-004 on: with a code already taking the lip balm to nothing, 50 off the mask applies rather than a second 100 off the lip balm (' . implode( ',', $after_entered ) . ')' );
+		$auto_b->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$auto_b->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $cheap->get_id() => 1, $mask->get_id() => 1 ), array( $entered_a->get_code() ) );
+		$check( ! in_array( t57_code( $auto_a ), t57_applied(), true ), 'BR-004 on: an automatic promotion that would add nothing to what the entered code already takes off is not applied (' . implode( ',', t57_applied() ) . ')' );
 		foreach ( array( $auto_a, $auto_b ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
@@ -350,6 +355,121 @@ run(
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		delete_option( Combination::OPTION );
 		AutomaticPromotions::forget();
+		// BR-004, on: WooCommerce's coupon order with sequential discounts; individual-use free shipping valued alone;
+		// a cart whose code becomes individual-use keeps one; one claim per email.
+		update_option( Combination::OPTION, 'yes' );
+		$sequential = get_option( 'woocommerce_calc_discounts_sequentially', 'no' );
+		$s->on_finish( static function () use ( $sequential ) { update_option( 'woocommerce_calc_discounts_sequentially', $sequential ); } );
+		update_option( 'woocommerce_calc_discounts_sequentially', 'yes' );
+		$two_hundred = $s->simple_product( 't57 duo', '200', null );
+		$cart_off    = t57_screen( $s, "{$tag}cartoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '100' ) );
+		$half        = t57_screen( $s, "{$tag}half", array( 'discount_type' => 'percent', 'coupon_amount' => '50', 'mizzey_automatic' => 'yes' ) );
+		$sixty       = t57_screen( $s, "{$tag}sixty", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '60', 'mizzey_automatic' => 'yes', 'product_ids' => array( $two_hundred->get_id() ) ) );
+		foreach ( array( $half, $sixty ) as $loose ) {
+			$loose->set_individual_use( false );
+			$loose->save();
+		}
+		AutomaticPromotions::forget();
+		t57_cart( array( $two_hundred->get_id() => 1 ), array( $cart_off->get_code() ) );
+		$ordered = t57_applied();
+		$check( in_array( t57_code( $half ), $ordered, true ) && ! in_array( t57_code( $sixty ), $ordered, true ), 'BR-004 on, sequential: WooCommerce takes 50 percent before a fixed cart 100, so the 50 percent (100 more off) beats a fixed 60 (' . implode( ',', $ordered ) . ')' );
+		foreach ( array( $half, $sixty ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( 'woocommerce_calc_discounts_sequentially', $sequential );
+		$five_fifty = $s->simple_product( 't57 set', '550', null );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$sixty_off = t57_screen( $s, "{$tag}sixtyoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '60', 'mizzey_automatic' => 'yes' ) );
+		$sixty_off->set_individual_use( false );
+		$sixty_off->save();
+		$lone_ship = t57_screen( $s, "{$tag}loneship", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0', 'free_shipping' => 'yes', 'mizzey_automatic' => 'yes', 'individual_use' => 'yes' ) );
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_fifty->get_id() => 1 ) );
+		$alone = t57_applied();
+		$check( array( t57_code( $sixty_off ) ) === $alone, 'BR-004 on: an individual-use free shipping is valued alone (worth nothing on a cart that already ships free), so the 60 off applies rather than it (' . implode( ',', $alone ) . ')' );
+		foreach ( array( $sixty_off, $lone_ship ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		AutomaticPromotions::forget();
+		$tenoff->set_individual_use( false );
+		$tenoff->save();
+		$five->set_individual_use( false );
+		$five->save();
+		t57_cart( array( $cheap->get_id() => 2 ), array( $tenoff->get_code(), $five->get_code() ) );
+		$pair = t57_applied();
+		$tenoff->set_individual_use( true );
+		$tenoff->save();
+		WC()->cart->calculate_totals();
+		wc_clear_notices();
+		$check( 2 === count( $pair ) && array( t57_code( $five ) ) === t57_applied(), 'BR-004 on: two codes held, then one is made individual-use: the cart keeps one (' . implode( ',', t57_applied() ) . ')' );
+		$tenoff->set_individual_use( false );
+		$tenoff->save();
+		// BR-004, on, round four: an individual-use automatic is no candidate beside an entered code; an entered free
+		// shipping code keeps shipping free in both estimates; the minimum is read from the simulation, so the choice
+		// holds from one calculation to the next.
+		$five_ten = $s->simple_product( 't57 kit', '510', null );
+		$entered  = t57_screen( $s, "{$tag}entered", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '5' ) );
+		$entered->set_individual_use( false );
+		$entered->save();
+		$big   = t57_screen( $s, "{$tag}big", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '100', 'mizzey_automatic' => 'yes', 'individual_use' => 'yes' ) );
+		$joins = t57_screen( $s, "{$tag}joins", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '80', 'mizzey_automatic' => 'yes' ) );
+		$joins->set_individual_use( false );
+		$joins->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_ten->get_id() => 1 ), array( $entered->get_code() ) );
+		$compatible = t57_applied();
+		$check( in_array( t57_code( $joins ), $compatible, true ) && ! in_array( t57_code( $big ), $compatible, true ), 'BR-004 on: beside an entered code, an individual-use 100 off is no candidate, so the joinable 80 off applies (' . implode( ',', $compatible ) . ')' );
+		foreach ( array( $big, $joins ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$ship_code = t57_screen( $s, "{$tag}shipcode", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '0', 'free_shipping' => 'yes' ) );
+		$ship_code->set_individual_use( false );
+		$ship_code->save();
+		$twenty_off = t57_screen( $s, "{$tag}twentyoff", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '20', 'mizzey_automatic' => 'yes' ) );
+		$twenty_off->set_individual_use( false );
+		$twenty_off->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $five_ten->get_id() => 1 ), array( $ship_code->get_code() ) );
+		$kept = t57_applied();
+		$check( in_array( t57_code( $twenty_off ), $kept, true ) && 0.0 === (float) WC()->cart->get_shipping_total(), 'BR-004 on: an entered free shipping code keeps shipping free, so 20 off taking 510 under the 500 minimum still saves 20 and applies (' . implode( ',', $kept ) . ')' );
+		$twenty_off->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$twenty_off->save();
+		update_option( 'woocommerce_calc_discounts_sequentially', 'yes' );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '325', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$six_hundred = $s->simple_product( 't57 hamper', '600', null );
+		$halfcode    = t57_screen( $s, "{$tag}halfcode", array( 'discount_type' => 'percent', 'coupon_amount' => '50' ) );
+		$halfcode->set_individual_use( false );
+		$halfcode->save();
+		$hundred = t57_screen( $s, "{$tag}hundred", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '100', 'mizzey_automatic' => 'yes', 'product_ids' => array( $six_hundred->get_id() ) ) );
+		$hundred->set_individual_use( false );
+		$hundred->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $six_hundred->get_id() => 1 ), array( $halfcode->get_code() ) );
+		$steady = array();
+		for ( $i = 0; $i < 3; $i++ ) {
+			$steady[] = in_array( t57_code( $hundred ), t57_applied(), true ) ? 'on' : 'off';
+			WC()->cart->calculate_totals();
+		}
+		$check( array( 'on', 'on', 'on' ) === $steady, 'BR-004 on, sequential: the 100 off beside an entered 50 percent stays applied from one calculation to the next (' . implode( ',', $steady ) . ')' );
+		$hundred->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$hundred->save();
+		update_option( 'woocommerce_calc_discounts_sequentially', $sequential );
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		AutomaticPromotions::forget();
+		delete_option( Combination::OPTION );
+		$claim_email = "{$tag}-claim@example.invalid";
+		$s->on_finish( static function () use ( $claim_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', wc_strtolower( $claim_email ) ) ); } );
+		$check( WelcomeDiscount::claim( $claim_email ) && ! WelcomeDiscount::claim( strtoupper( $claim_email ) ), 'BR-001 an email is claimed once, whatever its case: the second claim fails' );
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
