@@ -437,7 +437,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "Verified",
    "delivery_order": 9,
    "depends_on": [
     {
@@ -456,7 +456,7 @@
     }
    ],
    "data_integrity": "D6 order language context; D7 shipment status history",
-   "acceptance_evidence": "Status transitions validated; a query returns when an order entered each status.",
+   "acceptance_evidence": "Status transitions validated; a query returns when an order entered each status. specs/010-order-status-model verification.md: technically verified 30 October 2026 (merged as e77f827, PR #436) and on staging (T012, release v0.1.7, PR #438); not accepted.",
    "not_in_slice": [
     "ORD-09 (DEF)",
     "ORD-10 (DEF)",
@@ -1106,7 +1106,7 @@
     },
     {
      "ref": "#281",
-     "reason": "Delivers the behaviour behind FIX-08",
+     "reason": "Delivers the behaviour behind FIX-08. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1232,7 +1232,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ENT-10, the shipment state record of ADR-0002",
+     "reason": "ENT-10, the shipment state record of ADR-0002. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1652,7 +1652,7 @@
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "Owns ADM-86 and ADM-87 and the status model the filters use. Not a predecessor for starting",
+     "reason": "Owns ADM-86 and ADM-87 and the status model the filters use. Not a predecessor for starting. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1726,7 +1726,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In progress",
+   "status": "Verified",
    "delivery_order": 31,
    "depends_on": [],
    "erp_blocked": "no",
@@ -1739,7 +1739,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Each reward, condition, limit and exclusion configured from admin and exercised by automated tests on pricing and promotions (DOD-04 critical logic); the AC-04 invalid-coupon scenario.",
+   "acceptance_evidence": "Each reward, condition, limit and exclusion configured from admin and exercised by automated tests on pricing and promotions (DOD-04 critical logic); the AC-04 invalid-coupon scenario. specs/011-promotion-engine verification.md: technically verified 31 October 2026 (merged as 7691fdb, PR #440) and on staging (T009, release v0.1.8, PR #441); not accepted.",
    "not_in_slice": [
     "PROMO-10 (DEF)",
     "PROMO-16 (DEF)",
@@ -1837,7 +1837,7 @@
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The Pending Payment, Payment Failed and Confirmed states the callbacks move an order through, and ORD-14 for cash on delivery. Not a predecessor for starting",
+     "reason": "The Pending Payment, Payment Failed and Confirmed states the callbacks move an order through, and ORD-14 for cash on delivery. Not a predecessor for starting. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -1988,7 +1988,7 @@
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The Shipped and Delivered states that trigger NOTF-04 and NOTF-06. The account, order, payment and refund emails do not wait for it",
+     "reason": "The Shipped and Delivered states that trigger NOTF-04 and NOTF-06. The account, order, payment and refund emails do not wait for it. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -2208,23 +2208,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "In progress",
    "delivery_order": 39,
    "depends_on": [
     {
      "ref": "#281",
-     "reason": "The promotion engine these screens configure",
+     "reason": "The promotion engine these screens configure. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #281"
-    },
     {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
@@ -2262,12 +2257,12 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 40,
    "depends_on": [
     {
      "ref": "#281",
-     "reason": "BR-001, BR-002, BR-004, BR-009 and BR-010 are rules of the promotion engine",
+     "reason": "BR-001, BR-002, BR-004, BR-009 and BR-010 are rules of the promotion engine. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -2279,11 +2274,6 @@
    "erp_blocked": "partial",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #281"
-    },
     {
      "id": "OD-03",
      "class": "Configurable working default",
@@ -2339,23 +2329,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 41,
    "depends_on": [
     {
      "ref": "#248",
-     "reason": "The mapping targets the statuses #248 defines, including ORD-13 and ORD-14, and the shipment state record of ADR-0002",
+     "reason": "The mapping targets the statuses #248 defines, including ORD-13 and ORD-14, and the shipment state record of ADR-0002. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #248"
-    },
     {
      "id": "CR-03",
      "class": "Vendor or account input",
@@ -2536,7 +2521,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ADM-12, orders requiring action, reads the status model",
+     "reason": "ADM-12, orders requiring action, reads the status model. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     }
    ],
@@ -3382,7 +3367,7 @@
     },
     {
      "ref": "#281",
-     "reason": "CART-06 coupon entry uses the engine",
+     "reason": "CART-06 coupon entry uses the engine. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -3463,7 +3448,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 57,
    "depends_on": [
     {
@@ -3542,7 +3527,7 @@
     },
     {
      "ref": "#248",
-     "reason": "ACCT-07 reads the status and shipment state #248 records",
+     "reason": "ACCT-07 reads the status and shipment state #248 records. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": false
     },
     {
@@ -3614,7 +3599,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 59,
    "depends_on": [
     {
@@ -3629,7 +3614,7 @@
     },
     {
      "ref": "#248",
-     "reason": "The Delivered state that triggers REV-05, and the set of statuses that make a review eligible (D-17): Delivered, and ORD-14 only once delivery is established",
+     "reason": "The Delivered state that triggers REV-05, and the set of statuses that make a review eligible (D-17): Delivered, and ORD-14 only once delivery is established. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -4586,7 +4571,7 @@
     },
     {
      "ref": "#248",
-     "reason": "JRN-09",
+     "reason": "JRN-09. Satisfied: merged 30 October 2026 as e77f827 (PR #436), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -4601,7 +4586,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #302, #304, #254, #306, #305, #255, #248, #292"
+     "note": "Not yet delivered: #302, #304, #254, #306, #305, #255, #292"
     }
    ],
    "data_integrity": "",
@@ -4658,7 +4643,7 @@
     },
     {
      "ref": "#281",
-     "reason": "AC-04",
+     "reason": "AC-04. Satisfied: merged 31 October 2026 as 7691fdb (PR #440), Verified 31 October 2026",
      "blocking": true
     },
     {
@@ -4718,7 +4703,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #306, #290, #281, #255, #283, #251, #305, #292, #291, #247, #311, #301"
+     "note": "Not yet delivered: #306, #290, #255, #283, #251, #305, #292, #291, #247, #311, #301"
     },
     {
      "id": "PRE-09",
