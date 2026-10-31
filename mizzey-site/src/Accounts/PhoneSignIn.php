@@ -84,8 +84,10 @@ final class PhoneSignIn
                 $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", self::claimName($normal), self::RESERVED)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 wp_cache_delete(self::claimName($normal), 'options');
                 wp_cache_delete('notoptions', 'options');
-            } elseif (self::claim($normal, $users[0])) {
-                update_user_meta($users[0], self::HELD, $normal);
+            } else {
+                // The same locked path as any phone change, reading the account's phone as it is now.
+                $userId = $users[0];
+                self::locked('phone_user_' . $userId, static fn () => self::follow($userId));
             }
         }
         update_option(self::BACKFILLED, 'yes', false);
