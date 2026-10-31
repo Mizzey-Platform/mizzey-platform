@@ -19,12 +19,13 @@ defined('ABSPATH') || exit;
  * WooCommerce's own order stock writers are switched off by LocalStockWriters (specs/018).
  *
  * The order keeps a reservation record, one entry per line: the stock record and quantity reserved, the generation of
- * its operation keys, and its state (reserved, undoing while an undo is being sent, undone, released, refused, unsure
- * when a reserve went unanswered, or unsettled when an undo or a release went unanswered). A resize is numbered per
+ * its operation keys, and its state (reserved, undoing or releasing while an undo or a release is being sent, undone,
+ * released, refused, unsure when a reserve went unanswered, or unsettled when an undo or a release went unanswered). A resize is numbered per
  * line and written to the record before it is sent, with key `...-g{generation}-resize{n}`, so a quantity changed
  * back and forth asks under a new key each time.
- * An undo or a resize is written to the record before it is sent, so one a crash cut short is sent again under its own
- * key, which the source applies once, before anything else is asked for the order.
+ * An undo, a release or a resize is written to the record before it is sent, so one a crash cut short is sent again
+ * under its own key, which the source applies once, before anything else is asked for the order. A line whose resize
+ * is still unanswered does not count as reserved.
  * Releases use the record, not the order's current lines, so an order edited after placement releases what was taken.
  *
  * - Placement, on the block checkout, the classic checkout and pay-for-order: each line not already reserved is
@@ -158,7 +159,7 @@ final class OrderStock
             return false;
         }
         foreach ($record as $itemId => $line) {
-            if ($line['state'] !== 'reserved' || $line['record'] !== $lines[$itemId][0] || $line['qty'] !== $lines[$itemId][1]) {
+            if ($line['state'] !== 'reserved' || isset($line['resize']) || $line['record'] !== $lines[$itemId][0] || $line['qty'] !== $lines[$itemId][1]) {
                 return false;
             }
         }
@@ -195,8 +196,9 @@ final class OrderStock
             $old = $before[$itemId];
             $now = $lines[$itemId] ?? null;
             if ($old['state'] === 'reserved' && ($now === null || $now[0] !== $old['record'])) {
-                $released = $gateway->adjust($old['record'], $old['qty'], self::key($order, $itemId, $old['gen'], 'release'))->isKnown();
-                $before[$itemId]['state'] = $released ? 'released' : 'unsettled';
+                $before[$itemId]['state'] = 'releasing';
+                self::save($order, $before);
+                self::settle($order, $gateway, $itemId, $before[$itemId]);
             } elseif ($old['state'] === 'reserved' && $now[1] !== $old['qty']) {
                 $op                        = (int) ($old['op'] ?? 0) + 1;
                 $before[$itemId]['op']     = $op;
@@ -245,10 +247,14 @@ final class OrderStock
     /** Releases the reserved lines of the record once; answers whether nothing reserved remains. */
     public static function release(\WC_Order $order, StockGateway $gateway): bool
     {
-        $record = self::record($order);
-        $all    = true;
+        $record  = self::record($order);
+        $all     = true;
+        $sending = [];
         foreach (array_keys($record) as $itemId) {
+            // An undo or a release a crash cut short is finished first; left unanswered, something may still be held.
+            $was = $record[$itemId]['state'];
             self::settle($order, $gateway, $itemId, $record[$itemId]);
+            $all  = $all && ! (in_array($was, ['undoing', 'releasing'], true) && $record[$itemId]['state'] === 'unsettled');
             $line = $record[$itemId];
             if ($line['state'] !== 'reserved') {
                 continue;
@@ -259,9 +265,12 @@ final class OrderStock
                 $all                      = false;
                 continue;
             }
-            $released = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], 'release'))->isKnown();
-            $record[$itemId]['state'] = $released ? 'released' : 'unsettled';
-            $all                      = $all && $released;
+            $record[$itemId]['state'] = 'releasing';
+            $sending[]                = $itemId;
+        }
+        self::save($order, $record);
+        foreach ($sending as $itemId) {
+            $all = self::settle($order, $gateway, $itemId, $record[$itemId]) && $all;
         }
         self::save($order, $record);
 
@@ -329,19 +338,20 @@ final class OrderStock
     }
 
     /**
-     * Sends again what the record says was being sent, under its own key, which the source applies once: an undo (the
-     * line is then undone, or unsettled when unanswered) or a resize (the line then holds the new quantity; a refused
+     * Sends again what the record says was being sent, under its own key, which the source applies once: an undo or a
+     * release (the line is then undone or released, or unsettled when unanswered) or a resize (the line then holds the new quantity; a refused
      * resize is dropped, an unanswered one kept to send again). Answers whether nothing is left unanswered or refused.
      *
      * @param array{record:int,qty:int,gen:int,state:string,op?:int,resize?:array{op:int,to:int}} $line
      */
     private static function settle(\WC_Order $order, StockGateway $gateway, int $itemId, array &$line): bool
     {
-        if ($line['state'] === 'undoing') {
-            $undone        = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], 'undo'))->isKnown();
-            $line['state'] = $undone ? 'undone' : 'unsettled';
+        if ($line['state'] === 'undoing' || $line['state'] === 'releasing') {
+            $step          = $line['state'] === 'undoing' ? 'undo' : 'release';
+            $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step))->isKnown();
+            $line['state'] = $done ? ($step === 'undo' ? 'undone' : 'released') : 'unsettled';
 
-            return $undone;
+            return $done;
         }
         if ($line['state'] !== 'reserved' || ! isset($line['resize'])) {
             return true;
