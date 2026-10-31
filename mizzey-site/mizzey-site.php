@@ -66,6 +66,14 @@ require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
 require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
+require_once __DIR__ . '/src/Stock/StockItem.php';
+require_once __DIR__ . '/src/Stock/StockAnswer.php';
+require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
+require_once __DIR__ . '/src/Stock/StockSourceRefused.php';
+require_once __DIR__ . '/src/Stock/StockSource.php';
+require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
+require_once __DIR__ . '/src/Stock/StockIdentity.php';
+require_once __DIR__ . '/src/Stock/StockGateway.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
