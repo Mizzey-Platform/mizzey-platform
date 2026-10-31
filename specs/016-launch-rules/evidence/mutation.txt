@@ -18,3 +18,10 @@ M12  the Store API refuses instead of replacing                       -> t57 fai
 M13  entered codes are not measured in                                -> t57 fails (1 check)
 M14  brand conditions are not copied                                  -> t57 fails (1 check)
 M15  no refund ceiling per line                                       -> t57 fails (1 check)
+
+After the second review (31 October 2026; M9 re-run against the atomic claim):
+
+M9   an email can get a second welcome (the claim)                    -> t57 fails (1 check)
+M16  an order takes two individual-use codes with combining on        -> t57 fails (1 check)
+M17  entered codes are not simulated before a candidate               -> t57 fails (1 check)
+M18  free shipping is valued without the chosen discount              -> t57 fails (1 check)

@@ -32,7 +32,7 @@ final class WelcomeDiscount
     public const OWNER     = '_mizzey_welcome_for';
     public const USER_META = '_mizzey_welcome_coupon';
 
-    /** Hashes of every email a welcome discount was issued to, kept when an account is deleted: one per email, ever. */
+    /** The prefix of each email's claim to its welcome discount, kept when the account is deleted: one per email, ever. */
     public const ISSUED = 'mizzey_welcome_issued';
 
     public static function register(): void
@@ -90,9 +90,10 @@ final class WelcomeDiscount
         if ($template === null || ! is_email($user->user_email)) {
             return;
         }
-        $issued = (array) get_option(self::ISSUED, []);
-        $hash   = hash('sha256', wc_strtolower($user->user_email));
-        if (in_array($hash, $issued, true)) {
+        // One claim per email, made atomically: add_option() inserts a unique row, or fails when the email already has
+        // one, so two registrations at once cannot both pass.
+        $claim = self::ISSUED . '_' . hash('sha256', wc_strtolower($user->user_email));
+        if (! add_option($claim, (string) time(), '', false)) {
             return;
         }
         $coupon = new \WC_Coupon();
@@ -133,8 +134,6 @@ final class WelcomeDiscount
                 }
             }
             update_user_meta($user->ID, self::USER_META, $coupon->get_id());
-            $issued[] = $hash;
-            update_option(self::ISSUED, array_values(array_unique($issued)), false);
         }
     }
 

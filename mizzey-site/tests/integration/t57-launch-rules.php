@@ -308,6 +308,48 @@ run(
 		$replaced = $post( 'cart/apply-coupon', array( 'code' => $five->get_code() ) );
 		$after    = array_map( 'wc_format_coupon_code', array_column( (array) ( json_decode( wp_remote_retrieve_body( $replaced ), true )['coupons'] ?? array() ), 'code' ) );
 		$check( 200 === (int) wp_remote_retrieve_response_code( $replaced ) && array( t57_code( $five ) ) === $after, '[HTTP] BR-004 off: through the Store API a second code replaces the first, as on the classic cart (' . wp_remote_retrieve_response_code( $replaced ) . ': ' . implode( ',', $after ) . ')' );
+		// BR-004, on: an order checks individual use both ways; candidates are measured after entered codes and after
+		// the chosen discount.
+		update_option( Combination::OPTION, 'yes' );
+		$solo_order = $s->order_for( $cheap, 2 );
+		$solo_order->apply_coupon( $tenoff->get_code() );
+		$solo_added = wc_get_order( $solo_order->get_id() )->apply_coupon( $solo->get_code() );
+		$check( is_wp_error( $solo_added ) && array( t57_code( $tenoff ) ) === array_map( 'wc_format_coupon_code', wc_get_order( $solo_order->get_id() )->get_coupon_codes() ), 'BR-004 on: an individual-use code cannot join a code already on an order (' . ( is_wp_error( $solo_added ) ? $solo_added->get_error_message() : 'applied' ) . ')' );
+		$mask      = $s->simple_product( 't57 mask', '100', null );
+		$entered_a = t57_screen( $s, "{$tag}enteredA", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '100', 'product_ids' => array( $cheap->get_id() ) ) );
+		$auto_a    = t57_screen( $s, "{$tag}autoA", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '100', 'mizzey_automatic' => 'yes', 'product_ids' => array( $cheap->get_id() ) ) );
+		$auto_b    = t57_screen( $s, "{$tag}autoB", array( 'discount_type' => 'fixed_product', 'coupon_amount' => '50', 'mizzey_automatic' => 'yes', 'product_ids' => array( $mask->get_id() ) ) );
+		foreach ( array( $auto_a, $auto_b ) as $loose ) {
+			$loose->set_individual_use( false );
+			$loose->save();
+		}
+		AutomaticPromotions::forget();
+		t57_cart( array( $cheap->get_id() => 1, $mask->get_id() => 1 ), array( $entered_a->get_code() ) );
+		$after_entered = t57_applied();
+		$check( in_array( t57_code( $auto_b ), $after_entered, true ) && ! in_array( t57_code( $auto_a ), $after_entered, true ) && 150.0 === (float) WC()->cart->get_discount_total(), 'BR-004 on: with a code already taking the lip balm to nothing, 50 off the mask applies rather than a second 100 off the lip balm (' . implode( ',', $after_entered ) . ')' );
+		foreach ( array( $auto_a, $auto_b ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'either', 'min_amount' => '500', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$auto200 = t57_screen( $s, "{$tag}auto200", array( 'discount_type' => 'fixed_cart', 'coupon_amount' => '200', 'mizzey_automatic' => 'yes' ) );
+		$auto200->set_individual_use( false );
+		$auto200->save();
+		$freeauto->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		$freeauto->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $mid->get_id() => 1 ) );
+		$paired = t57_applied();
+		$check( in_array( t57_code( $auto200 ), $paired, true ) && in_array( t57_code( $freeauto ), $paired, true ) && 0.0 === (float) WC()->cart->get_shipping_total(), 'BR-004 on: the automatic 200 off takes 600 under the 500 free shipping minimum, so the automatic free shipping joins it and the cart ships free (' . implode( ',', $paired ) . ')' );
+		foreach ( array( $auto200, $freeauto ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		delete_option( Combination::OPTION );
+		AutomaticPromotions::forget();
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();

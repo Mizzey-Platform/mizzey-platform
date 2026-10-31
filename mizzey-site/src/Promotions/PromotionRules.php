@@ -72,7 +72,7 @@ final class PromotionRules
         if (PromotionSettings::firstOrder($coupon) && self::hasEarlierOrder($object)) {
             throw new \Exception(esc_html__('This coupon is for a first order only.', 'mizzey-site'), 112);
         }
-        if (! Combination::allowed() && Combination::anotherHeld($coupon, $object)) {
+        if (Combination::conflicts($coupon, $object)) {
             throw new \Exception(esc_html__('Only one promotion applies per order.', 'mizzey-site'), 116);
         }
 
