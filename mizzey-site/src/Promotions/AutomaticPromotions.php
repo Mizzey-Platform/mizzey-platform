@@ -165,11 +165,24 @@ final class AutomaticPromotions
             $item->object   = $line;
             $item->product  = $line['data'];
             $item->quantity = $line['quantity'];
-            $item->price    = wc_add_number_precision_deep((float) ($line['line_subtotal'] ?? 0) + ($entered ? (float) ($line['line_subtotal_tax'] ?? 0) : 0.0));
+            $item->price    = wc_add_number_precision_deep((float) ($line['line_subtotal'] ?? 0) + ($entered ? self::subtotalTax($line) : 0.0));
             $items[$key]    = $item;
         }
 
         return $items;
+    }
+
+    /**
+     * A line's subtotal tax as WooCommerce calculated it, before rounding (`line_tax_data`), so a rebuilt price equals
+     * the one WooCommerce discounts and sorts by; the rounded `line_subtotal_tax` when the data is missing.
+     *
+     * @param array<string,mixed> $line
+     */
+    private static function subtotalTax(array $line): float
+    {
+        $taxes = $line['line_tax_data']['subtotal'] ?? null;
+
+        return is_array($taxes) ? (float) array_sum(array_map('floatval', $taxes)) : (float) ($line['line_subtotal_tax'] ?? 0);
     }
 
     /**
@@ -186,7 +199,7 @@ final class AutomaticPromotions
         foreach ($byItem as $key => $cents) {
             $line   = $cart->get_cart_item((string) $key);
             $sub    = (float) ($line['line_subtotal'] ?? 0);
-            $rate   = $sub > 0 ? (float) ($line['line_subtotal_tax'] ?? 0) / $sub : 0.0;
+            $rate   = $sub > 0 ? self::subtotalTax((array) $line) / $sub : 0.0;
             $factor = (! $entered && $withTax) ? 1 + $rate : (($entered && ! $withTax) ? 1 / (1 + $rate) : 1.0);
             $total += (float) $cents * $factor;
         }

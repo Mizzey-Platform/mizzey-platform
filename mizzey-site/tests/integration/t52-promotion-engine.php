@@ -367,6 +367,31 @@ run(
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
 		}
+		// Seventh review round: prices are rebuilt from the unrounded tax, so they sort as WooCommerce sorts them.
+		// Entered with tax, shown without it, tax rounded per line: a zero-rated 100 added before a taxed 100. 50
+		// percent off one item falls on the zero-rated one, taking the shown 183.33 to 133.33, under a 135 free
+		// shipping minimum, so it saves nothing; 20 off the zero-rated line keeps free shipping and applies.
+		$round_before = get_option( 'woocommerce_tax_round_at_subtotal' );
+		$s->on_finish( static function () use ( $round_before ) { update_option( 'woocommerce_tax_round_at_subtotal', $round_before ); } );
+		update_option( 'woocommerce_tax_round_at_subtotal', 'no' );
+		update_option( 'woocommerce_tax_display_cart', 'excl' );
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+		$free_min = $zone->add_shipping_method( 'free_shipping' );
+		update_option( "woocommerce_free_shipping_{$free_min}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'min_amount', 'min_amount' => '135', 'ignore_discounts' => 'no' ) );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+		$half_one = t52_coupon( $s, "{$tag}autohalfone", array( 'discount_type' => 'percent', 'amount' => '50', 'individual_use' => true, 'limit_usage_to_x_items' => 1, 'date_created' => time() - 6 * HOUR_IN_SECONDS ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		$twenty   = t52_coupon( $s, "{$tag}autotwenty", array( 'discount_type' => 'fixed_product', 'amount' => '20', 'individual_use' => true, 'product_ids' => array( $untaxed->get_id() ) ), array( PromotionSettings::AUTOMATIC => 'yes' ) );
+		WC()->customer->set_shipping_country( 'EG' );
+		WC()->customer->set_billing_country( 'EG' );
+		t52_cart( array( $untaxed->get_id() => 1, $taxed->get_id() => 1 ) );
+		$check( array( wc_format_coupon_code( $twenty->get_code() ) ) === t52_applied(), 'Q1 50 percent off one item, which WooCommerce puts on the zero-rated line and so loses free shipping, does not beat 20 off that keeps it (' . implode( ',', t52_applied() ) . ')' );
+		foreach ( array( $half_one, $twenty ) as $done ) {
+			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+			$done->save();
+		}
+		$zone->delete_shipping_method( $free_min );
+		update_option( 'woocommerce_tax_round_at_subtotal', $round_before );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 		foreach ( $tax_before as $name => $value ) {
 			update_option( $name, $value );
 		}
