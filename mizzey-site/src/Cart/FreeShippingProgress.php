@@ -149,17 +149,21 @@ final class FreeShippingProgress
         $entered   = array_values(array_diff(array_map('wc_format_coupon_code', $cart->get_applied_coupons()), $automatic));
         $blocked   = $entered !== [] && (! \MizzeySite\Promotions\Combination::allowed()
             || array_filter($entered, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== []);
-        // With promotions not combining, one automatic promotion applies, the one worth most: while the store runs
-        // another automatic promotion, it may be the one chosen at the target instead, so no item target is promised.
-        $others = array_filter(AutomaticPromotions::codes(), static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping());
-        if ($blocked || (! \MizzeySite\Promotions\Combination::allowed() && $others !== [])) {
+        // One automatic promotion applies, the one worth most, when promotions do not combine or when either of two is
+        // individual-use: while the store runs another automatic promotion it cannot stand beside, that one may be
+        // chosen at the target instead, so no item target is promised for this one.
+        $others      = array_values(array_filter(AutomaticPromotions::codes(), static fn (string $code): bool => ! (new \WC_Coupon($code))->get_free_shipping()));
+        $combining   = \MizzeySite\Promotions\Combination::allowed();
+        $exclusive   = array_filter($others, static fn (string $code): bool => (new \WC_Coupon($code))->get_individual_use()) !== [];
+        if ($blocked) {
             return null;
         }
         $needed = null;
         foreach (AutomaticPromotions::codes() as $code) {
             $coupon  = new \WC_Coupon($code);
             $minimum = PromotionSettings::minItems($coupon);
-            if (! $coupon->get_free_shipping() || $minimum <= 0 || ($entered !== [] && $coupon->get_individual_use())) {
+            $competed = $others !== [] && (! $combining || $exclusive || $coupon->get_individual_use());
+            if (! $coupon->get_free_shipping() || $minimum <= 0 || $competed || ($entered !== [] && $coupon->get_individual_use())) {
                 continue;
             }
             // The promotion as it would stand with its item minimum met: valid then, the units are what is missing.

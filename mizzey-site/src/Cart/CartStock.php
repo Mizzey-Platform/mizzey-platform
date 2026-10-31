@@ -77,6 +77,10 @@ final class CartStock
             [$record, $name] = $names[$key];
             $answer = $gateway->level($record);
             $quantity = max(0, $quantity - ($held[$key] ?? 0));
+            // All of it already reserved by the visitor's own order: nothing more to confirm.
+            if ($quantity === 0 && $answer->isKnown()) {
+                continue;
+            }
             if (! $answer->isKnown()) {
                 /* translators: %s: product name. */
                 $problems[] = sprintf(__('We could not confirm that %s is in stock. Please try again in a few minutes.', 'mizzey-site'), $name);

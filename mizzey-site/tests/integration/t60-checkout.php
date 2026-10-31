@@ -157,6 +157,17 @@ run(
 			$edited_item->set_quantity( 4 );
 			$edited_item->save();
 		}
+		$grown = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $grown, $edit_gate );
+		foreach ( wc_get_order( $grown->get_id() )->get_items() as $grown_item ) {
+			$grown_item->set_quantity( 3 );
+			$grown_item->save();
+		}
+		$stale     = OrderStock::active( wc_get_order( $grown->get_id() ) );
+		$resized   = OrderStock::reserve( wc_get_order( $grown->get_id() ), $edit_gate );
+		$after_grow = $edit_source->levels[ $five->get_id() ];
+		OrderStock::release( wc_get_order( $grown->get_id() ), $edit_gate );
+		$check( ! $stale && $resized && 1 === $after_grow && OrderStock::active( wc_get_order( $grown->get_id() ) ) === false, 'CHK-12 an order edited from 1 to 3 is not taken as reserved; reserving again takes the 2 more, and its release gives back 3 (' . $after_grow . ' left while it held 3 and the other order 1)' );
 		OrderStock::release( wc_get_order( $edited->get_id() ), $edit_gate );
 		$check( 5 === $edit_source->levels[ $five->get_id() ], 'CHK-12 an order edited from 1 to 4 after placement releases the 1 it reserved, not 4 (' . $edit_source->levels[ $five->get_id() ] . ' left)' );
 		// A reserve that the source applied but never answered: asked again with the same key, taken once.
@@ -190,9 +201,15 @@ run(
 		OrderStock::reserve( $mine, StockGateway::make() );
 		WC()->session->set( 'order_awaiting_payment', $mine->get_id() );
 		$held_back = apply_filters( 'mizzey_cart_stock_held', array() );
+		$late_source->levels[ $five->get_id() ] = 0;
+		WC()->cart->empty_cart( false );
+		WC()->cart->add_to_cart( $five->get_id(), 1 );
+		$retry_problems = \MizzeySite\Cart\CartStock::problems( WC()->cart, StockGateway::make() );
+		WC()->cart->empty_cart( false );
+		$late_source->levels[ $five->get_id() ] = 5;
 		WC()->session->set( 'order_awaiting_payment', null );
 		remove_filter( StockGateway::SOURCE_FILTER, $bind_late );
-		$check( $late_ok && 'marked' === $stuck_status && $after_trash === $before_trash + 1 && 1 === ( $held_back[ $five->get_id() ] ?? 0 ), 'CHK-12 an order paid without a reservation is reserved then, or marked for staff when refused; an unpaid order trashed releases its stock; the visitor\'s own unpaid order counts as theirs at the cart check (' . $stuck_status . ')' );
+		$check( $late_ok && 'marked' === $stuck_status && $after_trash === $before_trash + 1 && 1 === ( $held_back[ $five->get_id() ] ?? 0 ) && array() === $retry_problems, 'CHK-12 an order paid without a reservation is reserved then, or marked for staff when refused; an unpaid order trashed releases its stock; the visitor\'s own unpaid order counts as theirs at the cart check (' . $stuck_status . ')' );
 		$bind = static fn () => $source;
 		add_filter( StockGateway::SOURCE_FILTER, $bind );
 		$cancel = t60_order( $s, array( $five->get_id() => 1 ) );
@@ -201,6 +218,18 @@ run(
 		$cancel->update_status( 'cancelled' );
 		remove_filter( StockGateway::SOURCE_FILTER, $bind );
 		$check( ! OrderStock::active( wc_get_order( $cancel->get_id() ) ) && 'released' === ( current( OrderStock::record( wc_get_order( $cancel->get_id() ) ) )['state'] ?? '' ) && 5 === $source->levels[ $five->get_id() ], 'CHK-12, BR-007 an order moved to Cancelled releases its reservation' );
+
+		// Paying an existing order checks its district too.
+		$pay_order = t60_order( $s, array( $five->get_id() => 1 ) );
+		$pay_order->set_billing_country( 'EG' );
+		$pay_order->save();
+		$pay_errors = new \WP_Error();
+		do_action( 'woocommerce_checkout_validate_order_before_payment', wc_get_order( $pay_order->get_id() ), $pay_errors );
+		$pay_order->update_meta_data( '_wc_billing/' . EgyptianAddress::DISTRICT, 'Maadi' );
+		$pay_order->save();
+		$pay_ok = new \WP_Error();
+		do_action( 'woocommerce_checkout_validate_order_before_payment', wc_get_order( $pay_order->get_id() ), $pay_ok );
+		$check( in_array( 'mizzey_district_missing', $pay_errors->get_error_codes(), true ) && ! in_array( 'mizzey_district_missing', $pay_ok->get_error_codes(), true ), 'CHK-01 paying an existing Egyptian order without a district is refused before payment; with it, not' );
 
 		// CHK-01: the Egyptian address structure.
 		$locale = WC()->countries->get_country_locale()['EG'] ?? array();
