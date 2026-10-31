@@ -12,6 +12,7 @@ fix is removed (`evidence/mutation.txt`).
 | 4 | FIX FIRST | Three Medium. The free shipping minimum read the cart's live discounts, which an applied automatic promotion changes under sequential discounts, so the choice could alternate between calculations: it reads the simulated discounts. An entered free-shipping code was ignored in the shipping estimates: counted. An individual-use automatic promotion could outrank a compatible one beside an entered code and leave neither applied: it is not a candidate then |
 | 5 | FIX FIRST | Two Medium. Free shipping was paired only with the best discount alone, so a larger discount that wins with free shipping was missed: every joinable discount is paired. The paid saving applied tax rounding to the difference of two discounts, crediting a candidate with the entered codes' rounding: it is what the customer pays without the candidate less what they pay with it |
 | 6 | FIX FIRST | One Medium. A discount that loses money alone (it takes the cart under a free shipping minimum) was dropped before it was paired with free shipping, though the pair saves money: discounts are kept for pairing, and a positive saving is required of the whole option |
+| 7 | READY | No High or Medium findings |
 
 Recorded in the specification: a one-piaster tie can remain when tax is rounded at subtotal and shipping is taxed
 (specs/011, known limit).
