@@ -139,6 +139,53 @@ add_filter(
 	3
 );
 
+// ---- The site's requests to itself -----------------------------------------------------------------------
+//
+// On the server, staging's public address is behind Cloudflare Access, so a request the site makes to its own
+// address leaves the machine and is answered with Access's sign-in redirect. Code that checks its own address
+// (the review photos' folder check, for one) then sees the wrong answer. Such requests are sent to the hosting
+// stack's web server inside Docker instead, as plain HTTP marked as having arrived over HTTPS, which is what
+// Cloudflare's tunnel delivers. Where that web server's name does not resolve (the Windows copy) nothing changes.
+
+const MIZZEY_STAGING_WEB_SERVER = 'caddy';
+
+/** Whether the request goes to this site's own address and the hosting stack's web server can be reached. */
+function mizzey_staging_to_self( string $url ): bool {
+	static $reachable = null;
+	$host = wp_parse_url( $url, PHP_URL_HOST );
+	if ( ! $host || wp_parse_url( home_url(), PHP_URL_HOST ) !== $host ) {
+		return false;
+	}
+	$reachable ??= gethostbyname( MIZZEY_STAGING_WEB_SERVER ) !== MIZZEY_STAGING_WEB_SERVER;
+	return $reachable;
+}
+
+add_filter(
+	'http_request_args',
+	static function ( $args, $url ) {
+		if ( mizzey_staging_to_self( (string) $url ) && is_array( $args['headers'] ?? array() ) ) {
+			$args['headers']['X-Forwarded-Proto'] = 'https';
+		}
+		return $args;
+	},
+	10,
+	2
+);
+
+add_action(
+	'http_api_curl',
+	static function ( $handle, $args, $url ) {
+		if ( ! mizzey_staging_to_self( (string) $url ) ) {
+			return;
+		}
+		$host = (string) wp_parse_url( $url, PHP_URL_HOST );
+		curl_setopt( $handle, CURLOPT_URL, preg_replace( '#^https://#', 'http://', (string) $url ) );
+		curl_setopt( $handle, CURLOPT_CONNECT_TO, array( $host . ':80:' . MIZZEY_STAGING_WEB_SERVER . ':80' ) );
+	},
+	10,
+	3
+);
+
 // ---- A test payment method that moves no money -------------------------------------------------------------
 
 add_action(
