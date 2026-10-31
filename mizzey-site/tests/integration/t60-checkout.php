@@ -345,7 +345,12 @@ run(
 		$success->get_meta( OrderStock::RECORD );
 		wc_get_order( $race->get_id() )->update_status( 'failed' );
 		$after_failure = $race_source->levels[ $five->get_id() ];
-		$success->update_status( 'processing' );
+		// The success callback works from its own copy: the stored order moves to processing, then the handler runs with
+		// the copy, which still shows the reservation the failure gave back.
+		remove_action( 'woocommerce_order_status_changed', array( OrderStock::class, 'statusChanged' ), 20 );
+		wc_get_order( $race->get_id() )->update_status( 'processing' );
+		add_action( 'woocommerce_order_status_changed', array( OrderStock::class, 'statusChanged' ), 20, 4 );
+		OrderStock::statusChanged( $race->get_id(), 'failed', 'processing', $success );
 		// A failure's release that reaches the order only after it was paid: the stored status is paid, so nothing goes back.
 		$late_failure = wc_get_order( $race->get_id() );
 		OrderStock::statusChanged( $race->get_id(), 'pending', 'failed', $late_failure );
