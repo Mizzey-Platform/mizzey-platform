@@ -327,6 +327,11 @@ run(
 		t57_cart( array( $cheap->get_id() => 1, $mask->get_id() => 1 ), array( $entered_a->get_code() ) );
 		$after_entered = t57_applied();
 		$check( in_array( t57_code( $auto_b ), $after_entered, true ) && ! in_array( t57_code( $auto_a ), $after_entered, true ) && 150.0 === (float) WC()->cart->get_discount_total(), 'BR-004 on: with a code already taking the lip balm to nothing, 50 off the mask applies rather than a second 100 off the lip balm (' . implode( ',', $after_entered ) . ')' );
+		$auto_b->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$auto_b->save();
+		AutomaticPromotions::forget();
+		t57_cart( array( $cheap->get_id() => 1, $mask->get_id() => 1 ), array( $entered_a->get_code() ) );
+		$check( ! in_array( t57_code( $auto_a ), t57_applied(), true ), 'BR-004 on: an automatic promotion that would add nothing to what the entered code already takes off is not applied (' . implode( ',', t57_applied() ) . ')' );
 		foreach ( array( $auto_a, $auto_b ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();
