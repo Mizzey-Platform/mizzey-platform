@@ -23,18 +23,21 @@ Paymob test mode, as D-10 allows when a sandbox can stand in for the approved ac
 | PAY-02 | P1 | S1 | No card data stored on Mizzey servers |
 | PAY-03 | P1 | S1 | Secure hosted and tokenised payment flow |
 | PAY-04 | P1 | S1 | Webhook handling with signature verification |
-| PAY-05 | P1 [key] | S1 | Duplicate protection: a repeated callback or double-click on Place Order never creates a duplicate charge or order |
+| PAY-05 | P1 | S1 | Duplicate protection: a repeated callback or double-click on Place Order never creates a duplicate charge or order |
 | PAY-06 | P1 | S1 | Transaction reference, status, amount, currency and timestamps stored against the order |
 | PAY-07 | P1 | S1 | Full refund from the order screen |
 | PAY-08 | P1 | S1 | Partial refund |
-| PAY-09 | P1, conditional on OD-05 | S1 if selected | Cash on Delivery capability. Built and tested. Enabled at launch only if you select it |
+| PAY-09 | P1 | S1 | Cash on Delivery capability. Built and tested. Enabled at launch only if you select it |
 | PAY-13 | P1 | S1 | Paymob via its official WooCommerce integration, wrapped in an abstraction layer |
 | PAY-14 | P1 | S1 | Card payments with embedded 3-D Secure authentication |
-| PAY-15 | P1, conditional on OD-19 | S1 if selected and approved | Mobile-wallet payment capability |
-| PAY-16 | P1 [key] | S1 | Cryptographic verification of every payment callback |
+| PAY-15 | P1 | S1 | Mobile-wallet payment capability |
+| PAY-16 | P1 | S1 | Cryptographic verification of every payment callback |
 | PAY-17 | P1-L | S1 | Refunds initiated from the order screen through the payment provider where the selected Paymob integration supports it; otherwise made through Paymob's own process and recorded on the order |
 | PAY-19 | P1 | S1 | Settlement timing documented: paid status is distinct from funds received |
 | INT-01 | P1 | S1 | Payment gateway, Paymob |
+
+PAY-05 and PAY-16 are marked [key] in the register. PAY-09 is enabled at launch only if selected under OD-05, and
+PAY-15 only if selected under OD-19 and approved by the provider.
 
 ## Context rows (no obligation here)
 
@@ -64,18 +67,18 @@ Paymob test mode, as D-10 allows when a sandbox can stand in for the approved ac
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Exactly one order and at most one charge when Place Order is pressed twice or the payment page is opened twice | PAY-05 (UAT AC-06) | pending sandbox |
-| AC-2 | A repeated or late payment confirmation has no second effect on the order, its stock or its emails | PAY-05 (UAT AC-07) | pending sandbox |
-| AC-3 | A failed, declined or abandoned payment never makes the order Paid or Confirmed | PAY-14 (UAT AC-08) | pending sandbox |
-| AC-4 | A callback that is unsigned, wrongly signed, for another amount or currency, or for an unknown order is refused and recorded, and changes nothing | PAY-04, PAY-16 | pending sandbox |
-| AC-5 | A card payment runs on Paymob's hosted page with 3-D Secure; no card number, expiry or security code reaches Mizzey's database, logs or emails | PAY-02, PAY-03, PAY-14 | pending sandbox |
-| AC-6 | The order stores the provider's transaction reference, status, amount, currency and the time of each payment event | PAY-06 | pending sandbox |
-| AC-7 | Staff with the permission refund in full or in part from the order screen; a partial refund cannot exceed what was paid after discount | PAY-07, PAY-08, PAY-17 (UAT AC-10, AC-11) | pending sandbox |
+| AC-1 | Exactly one order and at most one charge when Place Order is pressed twice or the payment page is opened twice | PAY-05 | provisional |
+| AC-2 | A repeated or late payment confirmation has no second effect on the order, its stock or its emails | PAY-05 | provisional |
+| AC-3 | A failed, declined or abandoned payment never makes the order Paid or Confirmed | PAY-14 | provisional |
+| AC-4 | A callback that is unsigned, wrongly signed, for another amount or currency, or for an unknown order is refused and recorded, and changes nothing | PAY-04, PAY-16 | provisional |
+| AC-5 | A card payment runs on Paymob's hosted page with 3-D Secure; no card number, expiry or security code reaches Mizzey's database, logs or emails | PAY-02, PAY-03, PAY-14 | provisional |
+| AC-6 | The order stores the provider's transaction reference, status, amount, currency and the time of each payment event | PAY-06 | provisional |
+| AC-7 | Staff with the permission refund in full or in part from the order screen; a partial refund cannot exceed what was paid after discount | PAY-07, PAY-08, PAY-17 | provisional |
 | AC-8 | The checkout talks to a payment provider only through Mizzey's provider layer; a second provider can be added without changing the checkout | PAY-01, PAY-13, INT-01 | provisional |
-| AC-9 | Cash on delivery and wallet payment each work end to end when switched on, and are not offered when switched off | PAY-09, PAY-15 | pending OD-05, OD-19 |
+| AC-9 | Cash on delivery and wallet payment each work end to end when switched on, and are not offered when switched off | PAY-09, PAY-15 | pending OD-05 |
 | AC-10 | A settlement note says when a paid order's funds reach the client's account, and the admin never shows Paid as funds received | PAY-19 | provisional |
 
-All are tested automatically against a stand-in provider and run by hand against the Paymob test mode on staging;
+AC-1, AC-2, AC-3 and AC-7 carry the Acceptance and UAT Plan rows AC-06, AC-07, AC-08, AC-10 and AC-11. AC-9's wallet half also waits for OD-19 and Paymob's approval. All are tested automatically against a stand-in provider and run by hand against the Paymob test mode on staging;
 acceptance waits for the approved account (CR-01), staging and the client's approval (DOD-04, DOD-09).
 
 ## User Scenarios & Testing *(mandatory)*
