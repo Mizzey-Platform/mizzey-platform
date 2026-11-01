@@ -130,6 +130,9 @@ acceptance waits for the approved account (CR-01), staging and the client's appr
 - A verified payment arrives for an order already cancelled (stock released): the money is recorded, the order is not
   silently reopened, and staff are shown that it needs a refund or a manual decision.
 - A refund made in Paymob's own dashboard: recorded on the order when Paymob reports it, as PAY-17's fallback asks.
+  Paymob reports a refund by sending the payment again, marked refunded, with the total refunded so far (staging
+  sandbox, 1 November 2026); the order's refunds are reconciled with that total, never counted from a refund's own
+  notice.
 - A partial refund the provider refuses: WooCommerce's refund is not kept, and staff see the provider's reason.
 - Arabic and English: every customer and staff message has both (FIX-04), including the payment-failed state.
 

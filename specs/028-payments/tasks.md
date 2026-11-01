@@ -13,4 +13,5 @@
 - [x] T008b The same callbacks through the plugin itself, over HTTP to the local runtime (plugin installed on the owner's approval, 1 November 2026): forged return, signed success, repeat, unsigned repeat, other amount, a refund from the order screen with Paymob's reply stood in for, its notice, a refused refund, a refund above what is left, a dashboard refund and its repeat
 - [x] T009 `stack.lock.json` paymob entry (installed-untested); `docs/payments-settlement.md` (PAY-19)
 - [x] T011 A second payment of a paid order refunded automatically through the provider (D-25): `PaymentProvider::refundTransaction`, `PaymobProvider` through Paymob's API, `RefundLedger::record`; t68 AC-1
+- [x] T012 Refunds reconciled with Paymob's refunded total (the shape the staging sandbox showed): equal adds nothing, more is a dashboard refund recorded for the difference, less is flagged; a refund's own notice never reaches the plugin
 - [ ] T010 Staging: release with the plugin (after the tooling PR), test keys, sandbox run of AC-1 to AC-7 by hand

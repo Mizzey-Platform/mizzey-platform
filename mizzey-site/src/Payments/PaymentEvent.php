@@ -21,6 +21,10 @@ final class PaymentEvent
     public const PAYMENT = 'payment';
     public const REFUND  = 'refund';
     public const VOID    = 'void';
+    /** A payment the provider now reports refunded: the amount is the total refunded so far. */
+    public const REFUNDED = 'refunded';
+    /** A payment the provider now reports voided. */
+    public const VOIDED   = 'voided';
 
     public const SUCCESS = 'success';
     public const FAILED  = 'failed';
