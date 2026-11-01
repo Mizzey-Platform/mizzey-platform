@@ -182,6 +182,9 @@ acceptance waits for the approved account (CR-01), staging and the client's appr
 - **FR-011**: Provider keys MUST live outside the repository and the database export, and test keys MUST never reach
   production.
 - **FR-012**: Every message MUST be translated (FIX-04).
+- **FR-013**: Only the parts of the provider's plugin the store uses MUST be reachable: entry points of features the
+  store does not run MUST be refused to everyone, and the plugin's settings MUST need staff who manage the store
+  (PAY-02, PAY-03; D-21).
 
 ## Optional safeguards (not owed)
 

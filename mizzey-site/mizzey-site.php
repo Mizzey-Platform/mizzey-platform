@@ -118,6 +118,7 @@ require_once __DIR__ . '/src/Payments/CallbackResult.php';
 require_once __DIR__ . '/src/Payments/PaymentProvider.php';
 require_once __DIR__ . '/src/Payments/Paymob/PaymobProvider.php';
 require_once __DIR__ . '/src/Payments/Paymob/CallbackAddress.php';
+require_once __DIR__ . '/src/Payments/Paymob/PluginSurface.php';
 require_once __DIR__ . '/src/Payments/PaymentRecord.php';
 require_once __DIR__ . '/src/Payments/RefundLedger.php';
 require_once __DIR__ . '/src/Payments/PaymentGate.php';
@@ -236,3 +237,4 @@ add_action('plugins_loaded', [MizzeySite\Payments\PaymentGate::class, 'register'
 MizzeySite\Payments\PaymentRecord::register();
 MizzeySite\Payments\RefundLedger::register();
 MizzeySite\Payments\Paymob\CallbackAddress::register();
+MizzeySite\Payments\Paymob\PluginSurface::register();

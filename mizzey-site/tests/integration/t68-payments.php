@@ -27,6 +27,7 @@ namespace MizzeySite\Tests\Integration;
 use MizzeySite\Payments\CallbackResult;
 use MizzeySite\Payments\Paymob\CallbackAddress;
 use MizzeySite\Payments\Paymob\PaymobProvider;
+use MizzeySite\Payments\Paymob\PluginSurface;
 use MizzeySite\Payments\PaymentEvent;
 use MizzeySite\Payments\PaymentGate;
 use MizzeySite\Payments\PaymentProvider;
@@ -404,6 +405,48 @@ run(
 		} else {
 			$s->note( 'SKIP  the plugin is not active in this runtime: the checks through the plugin did not run' );
 		}
+
+		// ---- The plugin's unused entry points are closed; its settings are staff only ------------------------------
+		$refused                     = array();
+		PluginSurface::$refuse       = function ( string $action ) use ( &$refused ): void {
+			$refused[] = $action;
+		};
+		$s->on_finish( static function (): void { PluginSurface::$refuse = null; } );
+		$ask = function ( string $action, bool $ajax = true ) use ( &$refused ): bool {
+			$refused = array();
+			$was     = $_REQUEST['action'] ?? null;
+			$_REQUEST['action'] = $action;
+			$doing   = fn () => $ajax;
+			add_filter( 'wp_doing_ajax', $doing, 99 );
+			PluginSurface::guard();
+			remove_filter( 'wp_doing_ajax', $doing, 99 );
+			null === $was ? ( function () { unset( $_REQUEST['action'] ); } )() : $_REQUEST['action'] = $was;
+			return array( $action ) === $refused;
+		};
+		$who      = get_current_user_id();
+		$customer = wp_insert_user( array( 'user_login' => 't68c' . wp_rand( 10000, 99999 ), 'user_pass' => wp_generate_password(), 'user_email' => 't68c' . wp_rand( 10000, 99999 ) . '@example.invalid', 'role' => 'customer' ) );
+		$admins   = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
+		if ( ! is_wp_error( $customer ) ) {
+			$s->track_user( (int) $customer );
+		}
+		$s->on_finish( static function () use ( $who ): void { wp_set_current_user( $who ); } );
+
+		wp_set_current_user( 0 );
+		$closed_anon = array_filter( PluginSurface::CLOSED, fn ( $a ) => ! $ask( $a ) );
+		$check( array() === $closed_anon, 'Security: every unused plugin entry point (' . count( PluginSurface::CLOSED ) . ') is refused to a visitor' . ( $closed_anon ? ' (open: ' . implode( ',', $closed_anon ) . ')' : '' ) );
+		$check( ! $ask( 'heartbeat' ) && ! $ask( 'create_order', false ), 'Security: other actions, and the same name outside an ajax request, are left alone' );
+		if ( ! is_wp_error( $customer ) ) {
+			wp_set_current_user( (int) $customer );
+			$staff_customer = array_filter( PluginSurface::STAFF, fn ( $a ) => ! $ask( $a ) );
+			$check( array() === $staff_customer && $ask( 'create_order' ), 'Security: a signed-in customer is refused the plugin\'s settings actions (' . count( PluginSurface::STAFF ) . ') and its unused entry points' );
+		}
+		if ( $admins ) {
+			wp_set_current_user( (int) $admins[0] );
+			$check( ! $ask( 'disconnect_save_keys' ) && ! $ask( 'toggle_gateway' ) && $ask( 'create_order' ), 'Security: staff reach the plugin\'s settings; the unused entry points stay closed to staff too' );
+		}
+		wp_set_current_user( $who );
+		$res = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'body' => array( 'action' => 'paymob_aw_cart_amount' ), 'timeout' => 20 ) ); // storefront-guard: exempt, an ajax endpoint answering JSON, not a page
+		$check( 403 === (int) wp_remote_retrieve_response_code( $res ) && str_contains( (string) wp_remote_retrieve_body( $res ), 'not_available' ), 'Security: over the real request, an unused plugin entry point answers 403 not_available (' . wp_remote_retrieve_response_code( $res ) . ')' );
 
 		// ---- AC-5: no card number kept ---------------------------------------------------------------------------
 		$like = '%' . $wpdb->esc_like( T68_PAN ) . '%';
