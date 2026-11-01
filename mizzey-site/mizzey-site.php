@@ -113,6 +113,14 @@ require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
 require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
 require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
 require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
+require_once __DIR__ . '/src/Payments/PaymentEvent.php';
+require_once __DIR__ . '/src/Payments/CallbackResult.php';
+require_once __DIR__ . '/src/Payments/PaymentProvider.php';
+require_once __DIR__ . '/src/Payments/Paymob/PaymobProvider.php';
+require_once __DIR__ . '/src/Payments/Paymob/CallbackAddress.php';
+require_once __DIR__ . '/src/Payments/PaymentRecord.php';
+require_once __DIR__ . '/src/Payments/RefundLedger.php';
+require_once __DIR__ . '/src/Payments/PaymentGate.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -221,3 +229,10 @@ MizzeySite\Account\AccountPages::register();
 MizzeySite\Invoices\InvoiceSettings::register();
 MizzeySite\Invoices\InvoiceNumber::register();
 MizzeySite\Invoices\InvoiceRoutes::register();
+
+// The payment layer around the provider's gateway: every callback verified, matched to its order and applied once;
+// the payment record on the order; refunds counted once. PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, specs/028-payments.
+add_action('plugins_loaded', [MizzeySite\Payments\PaymentGate::class, 'register'], 20);
+MizzeySite\Payments\PaymentRecord::register();
+MizzeySite\Payments\RefundLedger::register();
+MizzeySite\Payments\Paymob\CallbackAddress::register();

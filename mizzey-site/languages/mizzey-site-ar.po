@@ -557,3 +557,7 @@ msgstr "المخزون من مصدر المخزون: غير معروف"
 #, php-format
 msgid "Stock from the stock source: %d"
 msgstr "المخزون من مصدر المخزون: %d"
+
+#: mizzey-site/src/Payments/PaymentGate.php
+msgid "Your payment was not confirmed. If you paid, your order will be updated shortly; otherwise you can try again."
+msgstr "لم يتم تأكيد الدفع. إذا كنت قد دفعت، فسيتم تحديث طلبك قريبًا؛ وإلا يمكنك المحاولة مرة أخرى."
