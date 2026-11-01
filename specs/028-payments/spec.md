@@ -57,9 +57,11 @@ PAY-15 only if selected under OD-19 and approved by the provider.
   as no register row asks for one.
 - **OD-19 and the wallet approval.** Wallet payment is built behind its own switch, off until the client selects it
   and Paymob approves it for the account.
-- **PAY-17.** The official plugin declares refund support (version 4.1.15, `process_refund`). Whether a refund made
-  from the order screen completes in Paymob's test mode is confirmed on the sandbox; if it does not, the fallback the
-  row names (refund in Paymob's dashboard, recorded on the order) is what is built.
+- **PAY-17.** The official plugin declares refund support (version 4.1.15, `process_refund`). Paymob's test mode
+  refunds through its API: on 1 November 2026 a 50 EGP test card payment (3-D Secure) was partly refunded by 20 EGP,
+  and a further refund above the 30 EGP left was refused by Paymob. That the plugin's refund from the order screen
+  does the same is confirmed at build; if it does not, the fallback the row names (refund in Paymob's dashboard,
+  recorded on the order) is what is built.
 - **Design.** The payment-failed and pay-again states on the order-received page follow the low-fidelity checkout
   wireframes (Batch 05); the high-fidelity design is not a predecessor for the function layer.
 
@@ -208,5 +210,5 @@ Contractual stage: S1. Engineering timing: November 2026, the function layer on 
 
 - The official plugin's HMAC check is relied on only after the forged-callback tests pass against it; Mizzey's own
   amount, currency and order check runs in any case.
-- Paymob's test mode works on an account still under review, as its documentation describes for new accounts; if it
-  does not, the stand-in provider carries the automated tests and the sandbox run waits.
+- Paymob's test mode works on the account still under review: confirmed on 1 November 2026 with its test keys, a test
+  card integration and Paymob's published test card.
