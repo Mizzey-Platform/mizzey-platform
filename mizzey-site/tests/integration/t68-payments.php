@@ -266,6 +266,95 @@ run(
 		$note = dirname( __DIR__, 3 ) . '/docs/payments-settlement.md';
 		$check( is_readable( $note ) && str_contains( (string) file_get_contents( $note ), 'PAY-19' ), 'AC-10 the settlement note exists (docs/payments-settlement.md)' );
 
+		// ---- Through the plugin itself, over the real request (when the plugin is in the runtime) -----------------
+		if ( in_array( 'paymob-for-woocommerce/init-paymob.php', (array) get_option( 'active_plugins', array() ), true ) ) {
+			// The plugin loads its card gateway once it is set up with real keys and has created its payment methods, as
+			// staging will be. Here the same gateway is loaded by a temporary file for the requests this scenario makes.
+			$mu = WPMU_PLUGIN_DIR . '/t68-paymob-card-gateway.php';
+			wp_mkdir_p( WPMU_PLUGIN_DIR );
+			file_put_contents( $mu, "<?php\n// Temporary, written and removed by t68-payments.\nadd_action( 'plugins_loaded', function () {\n\t\$d = WP_PLUGIN_DIR . '/paymob-for-woocommerce/includes/gateways/';\n\tif ( class_exists( 'WC_Payment_Gateway' ) && is_readable( \$d . 'class-gateway-paymob.php' ) ) {\n\t\trequire_once \$d . 'class-paymob-payment.php';\n\t\trequire_once \$d . 'class-gateway-paymob.php';\n\t}\n}, 30 );\n" );
+			$s->on_finish( fn () => @unlink( $mu ) );
+			$main = get_option( 'woocommerce_paymob-main_settings', null );
+			update_option( 'woocommerce_paymob-main_settings', array_merge( is_array( $main ) ? $main : array(), array( 'sec_key' => 'egy_sk_test_t68_local_only', 'pub_key' => 'egy_pk_test_t68_local_only', 'mode' => 'test' ) ) );
+			$s->on_finish( fn () => null === $main ? delete_option( 'woocommerce_paymob-main_settings' ) : update_option( 'woocommerce_paymob-main_settings', $main ) );
+			$fresh = function ( int $id ): \WC_Order {
+				wp_cache_flush();
+				return wc_get_order( $id );
+			};
+			$plugin_order = function () use ( $order ): \WC_Order {
+				$o = $order();
+				$o->update_meta_data( 'PaymobPaymentId', 'paymob' );
+				$o->save();
+				return $o;
+			};
+			$post = function ( array $obj, bool $signed = true ) use ( $url, $secret ): array {
+				PaymentGate::releaseAll();
+				$target = $signed ? add_query_arg( 'hmac', PaymobProvider::sign( PaymobProvider::fromNotice( $obj ), $secret ), $url ) : $url;
+				$res    = wp_remote_post( $target, array( 'body' => (string) wp_json_encode( array( 'type' => 'TRANSACTION', 'obj' => $obj ) ), 'timeout' => 30, 'headers' => array( 'Content-Type' => 'application/json' ) ) ); // storefront-guard: exempt, a callback endpoint answering a word, not a page
+				return is_wp_error( $res ) ? array( 0, $res->get_error_message() ) : array( (int) wp_remote_retrieve_response_code( $res ), trim( wp_remote_retrieve_body( $res ) ) );
+			};
+
+			$e      = $plugin_order();
+			$forged = PaymobProvider::fromNotice( t68_obj( $e->get_id(), array( 'amount_cents' => 100 ) ) ) + array( 'merchant_order_id' => $e->get_id() . '_1793530999' );
+			PaymentGate::releaseAll();
+			$res = wp_remote_get( add_query_arg( $forged, $url ), array( 'redirection' => 0, 'timeout' => 30 ) ); // storefront-guard: exempt, a callback endpoint that redirects, the page itself is not read
+			$check( 302 === (int) wp_remote_retrieve_response_code( $res ) && str_contains( (string) wp_remote_retrieve_header( $res, 'location' ), 'checkout' ) && 'pending' === $fresh( $e->get_id() )->get_status() && $total === $fresh( $e->get_id() )->get_total(), 'AC-4 through the plugin: an unsigned return claiming success at 1.00 is sent to the checkout; the order stays pending at ' . $total . ' [' . ( is_wp_error( $res ) ? $res->get_error_message() : wp_remote_retrieve_response_code( $res ) . ' ' . wp_remote_retrieve_header( $res, 'location' ) . ' ' . $fresh( $e->get_id() )->get_status() . ' ' . $fresh( $e->get_id() )->get_total() ) . ']' );
+
+			$ok_obj        = t68_obj( $e->get_id() );
+			[ $code, $body ] = $post( $ok_obj );
+			$paid_e        = $fresh( $e->get_id() );
+			$check( 200 === $code && str_contains( $body, 'Order updated' ) && ! $paid_e->has_status( PaymentGate::AWAITING ) && $total === $paid_e->get_total(), 'AC-6 through the plugin: a signed success marks the order paid (' . $paid_e->get_status() . '), total still ' . $total . ' [' . $code . ' ' . $body . ']' );
+			$check( 1 === count( PaymentRecord::events( $paid_e ) ) && (string) $ok_obj['id'] === (string) $paid_e->get_meta( 'PaymobTransactionId' ), 'AC-6 through the plugin: one event recorded, and the plugin stored the same transaction' );
+			[ $code, $body ] = $post( $ok_obj );
+			$check( 200 === $code && 'already handled' === $body && 1 === count( PaymentRecord::events( $fresh( $e->get_id() ) ) ), 'AC-2 through the plugin: the same notice again is acknowledged by the gate, still one event [' . $body . ']' );
+			[ $code, $body ] = $post( $ok_obj, false );
+			$check( 403 === $code && 'refused' === $body, 'AC-4 through the plugin: the same notice without its signature is refused' );
+
+			$f               = $plugin_order();
+			[ $code, $body ] = $post( t68_obj( $f->get_id(), array( 'amount_cents' => 4000 ) ) );
+			$check( 200 === $code && 'pending' === $fresh( $f->get_id() )->get_status() && $total === $fresh( $f->get_id() )->get_total(), 'AC-4 through the plugin: a signed success of 40.00 leaves the 50.00 order pending and its total unchanged [' . $body . ']' );
+
+			// A refund from the order screen: the plugin's own gateway, with Paymob's reply stood in for.
+			require_once WP_PLUGIN_DIR . '/paymob-for-woocommerce/includes/gateways/class-paymob-payment.php';
+			require_once WP_PLUGIN_DIR . '/paymob-for-woocommerce/includes/gateways/class-gateway-paymob.php';
+			add_filter( 'woocommerce_payment_gateways', fn ( $g ) => array_merge( (array) $g, array( new \Paymob_Gateway() ) ), 99 );
+			WC()->payment_gateways()->init();
+			$reply = array( 'id' => 555001, 'success' => true, 'amount_cents' => 1000 );
+			$calls = 0;
+			add_filter(
+				'pre_http_request',
+				function ( $pre, $args, $req_url ) use ( &$reply, &$calls ) {
+					if ( ! str_contains( (string) $req_url, 'void_refund/refund' ) ) {
+						return $pre;
+					}
+					$calls++;
+					return array( 'headers' => array(), 'body' => (string) wp_json_encode( $reply ), 'response' => array( 'code' => 201, 'message' => 'Created' ), 'cookies' => array(), 'filename' => null );
+				},
+				10,
+				3
+			);
+			PaymentGate::releaseAll();
+			$refund = wc_create_refund( array( 'order_id' => $e->get_id(), 'amount' => 10, 'reason' => 't68', 'refund_payment' => true ) );
+			$check( ! is_wp_error( $refund ) && 1 === $calls && RefundLedger::madeHere( $fresh( $e->get_id() ), '555001' ), 'AC-7 through the plugin: a 10.00 refund from the order screen goes to Paymob once and its reference is kept' . ( is_wp_error( $refund ) ? ' (' . $refund->get_error_message() . ')' : '' ) );
+			PaymentGate::releaseAll();
+			[ $code, $body ] = $post( t68_obj( $e->get_id(), array( 'id' => 555001, 'amount_cents' => 1000, 'is_refund' => true, 'has_parent_transaction' => true ) ) );
+			$check( 'refund already recorded' === $body && 1 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-2 through the plugin: Paymob\'s notice of that refund does not add a second refund [' . $body . ', ' . count( $fresh( $e->get_id() )->get_refunds() ) . ' refund]' );
+
+			$reply   = array( 'message' => 'Requested Refund Amount is greater than the maximum refund amount permissible.' );
+			$refused = wc_create_refund( array( 'order_id' => $e->get_id(), 'amount' => 30, 'reason' => 't68', 'refund_payment' => true ) );
+			$check( is_wp_error( $refused ) && 1 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-7 through the plugin: a refund Paymob refuses leaves no refund on the order' );
+			$over = wc_create_refund( array( 'order_id' => $e->get_id(), 'amount' => 45, 'reason' => 't68', 'refund_payment' => true ) );
+			$check( is_wp_error( $over ) && 2 === $calls, 'AC-7 a refund above what is left is refused before Paymob is asked (' . ( is_wp_error( $over ) ? $over->get_error_message() : 'made' ) . ')' );
+
+			$dash_obj        = t68_obj( $e->get_id(), array( 'id' => 555002, 'amount_cents' => 500, 'is_refund' => true, 'has_parent_transaction' => true ) );
+			[ $code, $body ] = $post( $dash_obj );
+			$check( 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'PAY-17 through the plugin: a 5.00 refund made in Paymob\'s dashboard is recorded on the order [' . $body . ']' );
+			[ $code, $body ] = $post( $dash_obj );
+			$check( 'already handled' === $body && 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-2 through the plugin: that dashboard refund\'s notice again adds nothing' );
+		} else {
+			$s->note( 'SKIP  the plugin is not active in this runtime: the checks through the plugin did not run' );
+		}
+
 		// ---- AC-5: no card number kept ---------------------------------------------------------------------------
 		$like = '%' . $wpdb->esc_like( T68_PAN ) . '%';
 		$hits = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders_meta WHERE meta_value LIKE %s", $like ) )

@@ -10,6 +10,6 @@
 - [x] T006 `CallbackAddress`: Paymob told the path form of the callback address
 - [x] T007 Register in `mizzey-site.php`; the customer message in Arabic (FIX-04; staff text is English, ADM-159)
 - [x] T008 `t68-payments` in process and over the real request; mutation evidence (`evidence/mutation.txt`, 7 of 7 caught)
-- [ ] T008b The same callbacks through the plugin itself, with the plugin in the local runtime (needs the owner's approval to install it there)
+- [x] T008b The same callbacks through the plugin itself, over HTTP to the local runtime (plugin installed on the owner's approval, 1 November 2026): forged return, signed success, repeat, unsigned repeat, other amount, a refund from the order screen with Paymob's reply stood in for, its notice, a refused refund, a refund above what is left, a dashboard refund and its repeat
 - [x] T009 `stack.lock.json` paymob entry (installed-untested); `docs/payments-settlement.md` (PAY-19)
 - [ ] T010 Staging: release with the plugin (after the tooling PR), test keys, sandbox run of AC-1 to AC-7 by hand
