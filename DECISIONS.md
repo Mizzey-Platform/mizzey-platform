@@ -2193,3 +2193,30 @@ not refunded automatically: staff may restore the order, so it stays a flag.
 
 **3. The plugin's weaknesses are reported to Paymob privately.** The details stay out of this public repository until
 Paymob has fixed them or a date is agreed with them.
+
+## 2026-11-01 - D-26: Quick Look on product cards, a recorded gift
+
+**Status: the owner's decision of 1 November 2026, in his words: "Add it as a gift".** Internal record. It adds no
+register row, changes no fee and is not a Change Request.
+
+**1. What is given.** On a product card in a listing, search result or product rail, a Quick Look control opens a
+preview of the product without leaving the page: its images, name and brand, price and saving, stock status, key
+features, the option picker where the product has options, Add to cart, Add to wishlist, and a link to the full product
+page. The preview uses only behaviour the register already contracts (PDP-01, PDP-03 to PDP-11, PLP-04, PLP-05); the
+preview window itself is the gift.
+
+**2. Why it is a gift and not owed.** No register row names a quick view or preview, and neither did the Option C
+register, so giving it does not blur the difference between the two offers. It is given on the owner's choice and
+recorded so it is never read as owed: comparison (IA-12, WISH-08), frequently bought together (PDP-20) or any other P2
+row are not owed because this was given. The client is told in writing, when the storefront is presented, that Quick
+Look is included at no charge beyond the contracted scope. Defects in it are fixed like any delivered code; extensions
+to it are not owed.
+
+**3. Working design default.** Desktop and larger screens. On phones the contracted quick add and its in-place option
+picker (the frozen product card wireframe) stay the fast path, and a card opens the product page. The low-fidelity
+addition and the high-fidelity design settle the details; nothing in the frozen wireframes changes until that pass.
+It meets D-21: keyboard and screen reader complete (focus moved in, kept in and returned), no layout shift, and the
+preview's data loaded only when it is opened. It must absorb the real catalogue data: long names, images of any shape
+shown whole.
+
+**4. Where it is built.** With the storefront, after PRE-03b, beside the product card (PLP-04, PLP-05).
