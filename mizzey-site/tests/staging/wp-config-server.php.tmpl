@@ -61,6 +61,8 @@ define( 'WP_AUTO_UPDATE_CORE', false );
 
 // No request leaves the server for a real provider. A provider sandbox is allowed by name when one is wired.
 define( 'WP_HTTP_BLOCK_EXTERNAL', true );
+// The Paymob sandbox (specs/028-payments): its API host alone, used with test keys only.
+define( 'WP_ACCESSIBLE_HOSTS', 'accept.paymob.com' );
 
 // WordPress starts its scheduled tasks by calling its own address, which here is behind Cloudflare Access and
 // would not answer. The server runs them instead: `wp cron event run --due-now` in the PHP container, on a timer.
