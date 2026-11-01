@@ -155,7 +155,9 @@ acceptance waits for the approved account (CR-01), staging and the client's appr
   provider's methods, starts a payment, reads a verified result and asks for a refund. Paymob, through its official
   plugin, MUST be the first provider (AC-8).
 - **FR-002**: Placing an order MUST create at most one order per checkout and at most one chargeable payment attempt
-  per order, whatever the number of presses, reloads or returns to the payment page (AC-1).
+  per order, whatever the number of presses, reloads or returns to the payment page. A second verified payment of an
+  order already paid MUST be refunded in full through the provider at once, and only once; when the provider does not
+  make the refund, staff MUST be flagged to make it (AC-1; D-25).
 - **FR-003**: Every payment callback and redirect MUST be accepted only when its signature verifies, and its amount,
   currency and order match the order as placed; anything else MUST be refused, recorded without card data, and change
   nothing (AC-4).

@@ -2169,3 +2169,27 @@ specs/008, stays until the owner decides otherwise: it is security code, where a
 safer choice.
 
 **4. Constitution.** M-4 is redefined, so the constitution moves from 1.2.0 to 2.0.0 (MAJOR: a principle redefined).
+
+
+## 2026-11-01 - D-25: Paymob through its official plugin, and a second payment refunded automatically
+
+**Status: the owner's decisions of 1 November 2026.** Internal record. It changes no register row, no fee and no
+stage, and is not a Change Request.
+
+**1. Paymob's official plugin is used, under D-24's exception.** PAY-13 contracts "Paymob via its official
+WooCommerce integration, wrapped in an abstraction layer", so the plugin (Paymob for WooCommerce, from wordpress.org,
+version in `stack.lock.json`) takes the payment and makes refunds, and Mizzey's own code is the layer around it
+(`mizzey-site/src/Payments/`, specs/028-payments). The contract decides this, not a preference. The layer verifies
+every callback itself before the plugin acts, and does not rely on the plugin's own checks.
+
+**2. A second payment of a paid order is refunded at once.** Asked whether a duplicate payment should be refunded
+automatically or only flagged, the owner said: "do the right decision and secured". Decided: the layer refunds it in
+full through the provider, at once. PAY-05 says a double click must never create a duplicate charge, and leaving the
+money with the store until staff notice breaks that. The refund runs only for a second signed and verified successful
+payment of an order already paid by a different recorded payment; it runs once (the payment is recorded first, so a
+repeat of its notice stops), and the provider's notice of the refund is acknowledged without a second record. When
+the provider does not make the refund, staff are flagged to make it. A payment that arrives for a cancelled order is
+not refunded automatically: staff may restore the order, so it stays a flag.
+
+**3. The plugin's weaknesses are reported to Paymob privately.** The details stay out of this public repository until
+Paymob has fixed them or a date is agreed with them.

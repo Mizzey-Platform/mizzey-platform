@@ -65,6 +65,15 @@ final class RefundLedger
         return $data;
     }
 
+    /** Keep a refund the layer made itself, so the provider's notice of it is acknowledged and not recorded again. */
+    public static function record(\WC_Order $order, string $reference): void
+    {
+        if (! self::madeHere($order, $reference)) {
+            $order->add_meta_data(self::MADE_HERE, $reference, false);
+            $order->save_meta_data();
+        }
+    }
+
     public static function madeHere(\WC_Order $order, string $reference): bool
     {
         foreach ($order->get_meta(self::MADE_HERE, false) as $meta) {

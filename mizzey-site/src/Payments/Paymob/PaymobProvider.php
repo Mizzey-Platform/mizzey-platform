@@ -124,6 +124,30 @@ final class PaymobProvider implements PaymentProvider
     }
 
     /**
+     * A refund through Paymob's API, with the secret key the plugin was given. Egypt's API only: a key of another
+     * country is not used.
+     */
+    public function refundTransaction(string $reference, int $amountCents): ?string
+    {
+        $settings = get_option('woocommerce_paymob-main_settings');
+        $key      = is_array($settings) && is_scalar($settings['sec_key'] ?? null) ? trim((string) $settings['sec_key']) : '';
+        if (! str_starts_with($key, 'egy_') || ! ctype_digit($reference) || $amountCents <= 0) {
+            return null;
+        }
+        $response = wp_remote_post('https://accept.paymob.com/api/acceptance/void_refund/refund', [
+            'timeout' => 30,
+            'headers' => ['Content-Type' => 'application/json', 'Authorization' => 'Token ' . $key],
+            'body'    => (string) wp_json_encode(['transaction_id' => $reference, 'amount_cents' => $amountCents]),
+        ]);
+        if (is_wp_error($response)) {
+            return null;
+        }
+        $reply = json_decode((string) wp_remote_retrieve_body($response), true);
+
+        return is_array($reply) && ($reply['success'] ?? null) === true && is_scalar($reply['id'] ?? null) ? (string) $reply['id'] : null;
+    }
+
+    /**
      * Paymob's signature over the twenty fields, as lowercase hex.
      *
      * @param array<string,string> $fields

@@ -7,7 +7,8 @@
  * change by hand (payment completed, or failed), so the next request meets the order as it would be. The run through
  * the plugin itself is a separate HTTP check once the plugin is in the runtime.
  *
- * AC-1: a second payment of a paid order is recorded and flagged and does not move the order.
+ * AC-1: a second payment of a paid order is refunded in full through Paymob, once, and does not move the order; when
+ *       Paymob does not refund it, staff are flagged.
  * AC-2: the same success twice, the return after the notice, and the notice of a refund made from the order screen
  *       each change the order once; a transaction held by one order cannot pay another.
  * AC-3: a pending notice changes nothing; a success for a cancelled order is flagged and not applied.
@@ -50,6 +51,7 @@ final class T68Provider implements PaymentProvider {
 		return CallbackResult::verified( new PaymentEvent( 't68', (int) $j['order'], (string) $j['ref'], PaymentEvent::PAYMENT, PaymentEvent::SUCCESS, (int) $j['amount'], 'EGP', 'now', 'notice' ) );
 	}
 	public function refundReferenceInNote( string $note ): ?string { return null; }
+	public function refundTransaction( string $reference, int $amountCents ): ?string { return null; }
 }
 
 /** A Paymob transaction object as Paymob sends it, for an order. */
@@ -98,9 +100,14 @@ run(
 		$secret   = 't68-' . wp_generate_password( 24, false );
 		$settings = get_option( PaymobProvider::SETTINGS, null );
 		update_option( PaymobProvider::SETTINGS, array_merge( is_array( $settings ) ? $settings : array(), array( 'hmac_hidden' => $secret ) ) );
+		// The plugin's own settings: a test key of Egypt's API (never sent anywhere: Paymob's API is stood in for), and
+		// test mode, without which the plugin resets its gateways on the next request.
+		$main = get_option( 'woocommerce_paymob-main_settings', null );
+		update_option( 'woocommerce_paymob-main_settings', array_merge( is_array( $main ) ? $main : array(), array( 'sec_key' => 'egy_sk_test_t68_local_only', 'pub_key' => 'egy_pk_test_t68_local_only', 'mode' => 'test' ) ) );
 		$s->on_finish(
-			function () use ( $settings ): void {
+			function () use ( $settings, $main ): void {
 				null === $settings ? delete_option( PaymobProvider::SETTINGS ) : update_option( PaymobProvider::SETTINGS, $settings );
+				null === $main ? delete_option( 'woocommerce_paymob-main_settings' ) : update_option( 'woocommerce_paymob-main_settings', $main );
 				PaymentGate::$finish = null;
 				PaymentGate::releaseAll();
 			}
@@ -196,12 +203,34 @@ run(
 		$r     = $notice( $moved );
 		$check( 403 === ( $r['status'] ?? 0 ) && 'pending' === $fresh( $a->get_id() )->get_status(), 'AC-2 order B\'s transaction cannot pay order A (refused, A still pending)' );
 
-		// ---- AC-1: a second payment of a paid order ---------------------------------------------------------------
+		// ---- AC-1: a second payment of a paid order is refunded at once, through Paymob, once --------------------
+		// Paymob's refund API is stood in for: the request is recorded and answered, nothing leaves this machine.
+		$dup_reply = array( 'id' => 556001, 'success' => true );
+		$dup_asked = array();
+		$dup_stub  = function ( $pre, $args, $req_url ) use ( &$dup_reply, &$dup_asked ) {
+			if ( ! str_contains( (string) $req_url, 'void_refund/refund' ) ) {
+				return $pre;
+			}
+			$dup_asked[] = array( 'url' => (string) $req_url, 'auth' => (string) ( $args['headers']['Authorization'] ?? '' ), 'body' => json_decode( (string) $args['body'], true ) );
+			return array( 'headers' => array(), 'body' => (string) wp_json_encode( $dup_reply ), 'response' => array( 'code' => 201, 'message' => 'Created' ), 'cookies' => array(), 'filename' => null );
+		};
+		add_filter( 'pre_http_request', $dup_stub, 10, 3 );
 		$status = $fresh( $b->get_id() )->get_status();
-		$r      = $notice( t68_obj( $b->get_id() ) );
+		$second = t68_obj( $b->get_id() );
+		$r      = $notice( $second );
 		$check( 200 === ( $r['status'] ?? 0 ) && $status === $fresh( $b->get_id() )->get_status(), 'AC-1 a second success for the paid order is stopped, status unchanged' );
-		$flags = PaymentRecord::attention( $fresh( $b->get_id() ) );
-		$check( 1 === count( $flags ) && str_contains( $flags[0]['message'], 'second payment' ), 'AC-1 the second payment is flagged for refund' );
+		$asked = $dup_asked[0] ?? array();
+		$check( 1 === count( $dup_asked ) && str_starts_with( $asked['url'] ?? '', 'https://accept.paymob.com/' ) && 'Token egy_sk_test_t68_local_only' === $asked['auth'] && (string) $second['id'] === (string) ( $asked['body']['transaction_id'] ?? '' ) && 5000 === ( $asked['body']['amount_cents'] ?? 0 ), 'AC-1 the second payment is refunded in full through Paymob, once, by its own reference' );
+		$check( RefundLedger::madeHere( $fresh( $b->get_id() ), '556001' ) && array() === PaymentRecord::attention( $fresh( $b->get_id() ) ) && 0 === count( $fresh( $b->get_id() )->get_refunds() ), 'AC-1 the refund is kept by reference, nothing is left for staff, and the order\'s own refunds are untouched' );
+		$r = $notice( $second );
+		$check( 'already handled' === ( $r['word'] ?? '' ) && 1 === count( $dup_asked ), 'AC-1 the same second payment again is not refunded twice' );
+		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 556001, 'amount_cents' => 5000, 'is_refund' => true, 'has_parent_transaction' => true ) ) );
+		$check( 'refund already recorded' === ( $r['word'] ?? '' ), 'AC-1 Paymob\'s notice of that refund is acknowledged without a record on the order' );
+		$dup_reply = array( 'message' => 'Transaction is not refundable.' );
+		$r         = $notice( t68_obj( $b->get_id() ) );
+		$flags     = PaymentRecord::attention( $fresh( $b->get_id() ) );
+		$check( 2 === count( $dup_asked ) && 1 === count( $flags ) && str_contains( $flags[0]['message'], 'did not go through' ), 'AC-1 when Paymob does not refund a further payment, staff are flagged to refund it' );
+		remove_filter( 'pre_http_request', $dup_stub, 10 );
 
 		// ---- AC-3: pending, failure, cancelled -------------------------------------------------------------------
 		$c = $order();
@@ -274,9 +303,6 @@ run(
 			wp_mkdir_p( WPMU_PLUGIN_DIR );
 			file_put_contents( $mu, "<?php\n// Temporary, written and removed by t68-payments.\nadd_action( 'plugins_loaded', function () {\n\t\$d = WP_PLUGIN_DIR . '/paymob-for-woocommerce/includes/gateways/';\n\tif ( class_exists( 'WC_Payment_Gateway' ) && is_readable( \$d . 'class-gateway-paymob.php' ) ) {\n\t\trequire_once \$d . 'class-paymob-payment.php';\n\t\trequire_once \$d . 'class-gateway-paymob.php';\n\t}\n}, 30 );\n" );
 			$s->on_finish( fn () => @unlink( $mu ) );
-			$main = get_option( 'woocommerce_paymob-main_settings', null );
-			update_option( 'woocommerce_paymob-main_settings', array_merge( is_array( $main ) ? $main : array(), array( 'sec_key' => 'egy_sk_test_t68_local_only', 'pub_key' => 'egy_pk_test_t68_local_only', 'mode' => 'test' ) ) );
-			$s->on_finish( fn () => null === $main ? delete_option( 'woocommerce_paymob-main_settings' ) : update_option( 'woocommerce_paymob-main_settings', $main ) );
 			$fresh = function ( int $id ): \WC_Order {
 				wp_cache_flush();
 				return wc_get_order( $id );
