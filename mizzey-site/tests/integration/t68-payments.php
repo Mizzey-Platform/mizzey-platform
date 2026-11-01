@@ -1,0 +1,283 @@
+<?php
+/**
+ * t68: payments through the payment layer (PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, INT-01). See specs/028-payments.
+ *
+ * The gate is driven in process with Paymob's real signature, computed here with a test secret, and with a stand-in
+ * provider. Where the gate lets a request through, the provider's gateway would act; this scenario applies the same
+ * change by hand (payment completed, or failed), so the next request meets the order as it would be. The run through
+ * the plugin itself is a separate HTTP check once the plugin is in the runtime.
+ *
+ * AC-1: a second payment of a paid order is recorded and flagged and does not move the order.
+ * AC-2: the same success twice, the return after the notice, and the notice of a refund made from the order screen
+ *       each change the order once; a transaction held by one order cannot pay another.
+ * AC-3: a pending notice changes nothing; a success for a cancelled order is flagged and not applied.
+ * AC-4: unsigned, wrongly signed, other-amount, other-currency, unknown-order, other-gateway and other-shape requests
+ *       are refused or stopped with no change, by notice and by return; the gate answers the real request.
+ * AC-5: no card number from the payloads reaches the database or the payment log.
+ * AC-6: each verified event is stored once with reference, kind, outcome, amount, currency and time.
+ * AC-8: a stand-in provider is gated the same way.
+ * AC-10: the settlement note exists and the order screen says paid is not received.
+ *
+ * @package MizzeySite\Tests\Integration
+ */
+
+namespace MizzeySite\Tests\Integration;
+
+use MizzeySite\Payments\CallbackResult;
+use MizzeySite\Payments\Paymob\CallbackAddress;
+use MizzeySite\Payments\Paymob\PaymobProvider;
+use MizzeySite\Payments\PaymentEvent;
+use MizzeySite\Payments\PaymentGate;
+use MizzeySite\Payments\PaymentProvider;
+use MizzeySite\Payments\PaymentRecord;
+use MizzeySite\Payments\RefundLedger;
+
+require_once __DIR__ . '/_bootstrap.php';
+
+/** A full card number that must never be stored, sent inside a payload where a careless handler could keep it. */
+const T68_PAN = '5123456789012346';
+
+/** A provider that trusts a body saying `"sig":"ok"`: enough to show the gate is the provider's, not Paymob's. */
+final class T68Provider implements PaymentProvider {
+	public function id(): string { return 't68'; }
+	public function callbackAction(): string { return 't68_callback'; }
+	public function ownsOrder( \WC_Order $order ): bool { return 't68pay' === $order->get_payment_method(); }
+	public function read( string $method, array $query, string $body ): CallbackResult {
+		$j = json_decode( $body, true );
+		if ( ! is_array( $j ) || ( $j['sig'] ?? '' ) !== 'ok' ) {
+			return CallbackResult::refused( 'bad stand-in signature', 'notice', (int) ( $j['order'] ?? 0 ) );
+		}
+		return CallbackResult::verified( new PaymentEvent( 't68', (int) $j['order'], (string) $j['ref'], PaymentEvent::PAYMENT, PaymentEvent::SUCCESS, (int) $j['amount'], 'EGP', 'now', 'notice' ) );
+	}
+	public function refundReferenceInNote( string $note ): ?string { return null; }
+}
+
+/** A Paymob transaction object as Paymob sends it, for an order. */
+function t68_obj( int $order_id, array $over = array() ): array {
+	static $n = 0;
+	$n++;
+	return array_replace(
+		array(
+			'id'                     => 990000000 + $n * 7 + wp_rand( 0, 6 ),
+			'amount_cents'           => 5000,
+			'created_at'             => '2026-11-01T14:10:00.000000',
+			'currency'               => 'EGP',
+			'error_occured'          => false,
+			'has_parent_transaction' => false,
+			'integration_id'         => 6030296,
+			'is_3d_secure'           => true,
+			'is_auth'                => false,
+			'is_capture'             => false,
+			'is_refunded'            => false,
+			'is_standalone_payment'  => true,
+			'is_voided'              => false,
+			'is_refund'              => false,
+			'is_void'                => false,
+			'order'                  => array( 'id' => 640000000 + $n, 'merchant_order_id' => $order_id . '_' . ( 1793530000 + $n ) ),
+			'owner'                  => 1,
+			'pending'                => false,
+			'source_data'            => array( 'pan' => '2346', 'sub_type' => 'MasterCard', 'type' => 'card' ),
+			'success'                => true,
+			// Not a Paymob field: a full card number where a handler that stores the body would keep it.
+			'card_number'            => T68_PAN,
+		),
+		$over
+	);
+}
+
+run(
+	new Scenario( 't68-payments', 'PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, INT-01: the payment layer' ),
+	function ( Scenario $s ): bool {
+		global $wpdb;
+		$ok    = true;
+		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {
+			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );
+			$ok = $ok && $condition;
+		};
+
+		$secret   = 't68-' . wp_generate_password( 24, false );
+		$settings = get_option( PaymobProvider::SETTINGS, null );
+		update_option( PaymobProvider::SETTINGS, array_merge( is_array( $settings ) ? $settings : array(), array( 'hmac_hidden' => $secret ) ) );
+		$s->on_finish(
+			function () use ( $settings ): void {
+				null === $settings ? delete_option( PaymobProvider::SETTINGS ) : update_option( PaymobProvider::SETTINGS, $settings );
+				PaymentGate::$finish = null;
+				PaymentGate::releaseAll();
+			}
+		);
+
+		$last                = null;
+		PaymentGate::$finish = function ( int $status, string $word, string $location ) use ( &$last ): void {
+			$last = array( 'status' => $status, 'word' => $word, 'location' => $location );
+		};
+		$paymob = new PaymobProvider();
+		$notice = function ( array $obj, ?string $hmac = null ) use ( &$last, $paymob, $secret ): ?array {
+			$last = null;
+			PaymentGate::releaseAll();
+			$query = array( 'hmac' => $hmac ?? PaymobProvider::sign( PaymobProvider::fromNotice( $obj ), $secret ) );
+			PaymentGate::handle( $paymob, 'POST', $query, (string) wp_json_encode( array( 'type' => 'TRANSACTION', 'obj' => $obj ) ) );
+			return $last;
+		};
+		$return = function ( array $obj, bool $signed = true ) use ( &$last, $paymob, $secret ): ?array {
+			$last   = null;
+			PaymentGate::releaseAll();
+			$fields = PaymobProvider::fromNotice( $obj );
+			$query  = $fields + array( 'merchant_order_id' => $obj['order']['merchant_order_id'] );
+			if ( $signed ) {
+				$query['hmac'] = PaymobProvider::sign( $fields, $secret );
+			}
+			PaymentGate::handle( $paymob, 'GET', $query, '' );
+			return $last;
+		};
+
+		$product = $s->simple_product( 'T68 payment product', '50.00', null );
+		// A placed order awaiting payment, as the checkout leaves it (WooCommerce stores a new order as Pending Payment).
+		$order   = function ( string $method = 'paymob' ) use ( $s, $product ): \WC_Order {
+			$o = wc_create_order();
+			$o->add_product( $product, 1 );
+			$o->set_payment_method( $method );
+			$o->calculate_totals();
+			$o->save();
+			$s->track_order( $o->get_id() );
+			return wc_get_order( $o->get_id() );
+		};
+		$fresh = fn ( int $id ): \WC_Order => wc_get_order( $id );
+
+		// ---- AC-4: nothing unverified reaches the gateway ---------------------------------------------------------
+		$a     = $order();
+		$total = $a->get_total();
+		$check( 5000 === (int) round( (float) $total * 100 ), 'fixture order totals 50.00 EGP (' . $total . ' ' . $a->get_currency() . ')' );
+
+		$r = $notice( t68_obj( $a->get_id() ), '' );
+		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 unsigned notice refused 403' );
+		$bad = t68_obj( $a->get_id() );
+		$sig = PaymobProvider::sign( PaymobProvider::fromNotice( $bad ), $secret );
+		$bad['amount_cents'] = 100;
+		$r = $notice( $bad, $sig );
+		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 notice altered after signing (amount) refused 403' );
+		$r = $notice( t68_obj( 999999999 ) );
+		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 signed notice for an unknown order refused 403' );
+		$cod = $order( 'cod' );
+		$r   = $notice( t68_obj( $cod->get_id() ) );
+		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 signed notice for an order of another gateway refused 403' );
+		$last = null;
+		PaymentGate::handle( $paymob, 'POST', array( 'hmac' => 'x' ), (string) wp_json_encode( array( 'intention' => array( 'id' => 'pi_test' ) ) ) );
+		$check( 403 === ( $last['status'] ?? 0 ), 'AC-4 a notice of another shape refused 403' );
+		$unsigned = t68_obj( $a->get_id(), array( 'amount_cents' => 100 ) );
+		$r        = $return( $unsigned, false );
+		$check( 403 === ( $r['status'] ?? 0 ) && str_contains( (string) ( $r['location'] ?? '' ), wc_get_checkout_url() ), 'AC-4 unsigned return refused and sent to the checkout' );
+		$check( 'pending' === $fresh( $a->get_id() )->get_status() && $total === $fresh( $a->get_id() )->get_total(), 'AC-4 after every refusal the order is still pending at ' . $total );
+		$check( array() === PaymentRecord::events( $fresh( $a->get_id() ) ), 'AC-4 refusals record no event' );
+
+		$r = $notice( t68_obj( $a->get_id(), array( 'amount_cents' => 4000 ) ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'pending' === $fresh( $a->get_id() )->get_status(), 'AC-4 signed success of 40.00 for a 50.00 order stopped, order still pending' );
+		$check( 1 === count( PaymentRecord::attention( $fresh( $a->get_id() ) ) ), 'AC-4 the other amount is flagged for staff' );
+		$r = $notice( t68_obj( $a->get_id(), array( 'currency' => 'USD' ) ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'pending' === $fresh( $a->get_id() )->get_status() && 2 === count( PaymentRecord::attention( $fresh( $a->get_id() ) ) ), 'AC-4 signed success in another currency stopped and flagged' );
+
+		// ---- AC-6 and AC-2: the first success goes through once ------------------------------------------------
+		$b    = $order();
+		$paid = t68_obj( $b->get_id() );
+		$r    = $notice( $paid );
+		$check( null === $r, 'AC-6 a verified first success for a pending order goes on to the gateway' );
+		$events = PaymentRecord::events( $fresh( $b->get_id() ) );
+		$e      = $events[0] ?? array();
+		$check( 1 === count( $events ) && (string) $paid['id'] === $e['reference'] && 'payment' === $e['kind'] && 'success' === $e['outcome'] && 5000 === $e['amount'] && 'EGP' === $e['currency'] && '' !== $e['occurred_at'] && $e['received_at'] > 0, 'AC-6 one event: reference, kind, outcome, amount, currency, times' );
+		$fresh( $b->get_id() )->payment_complete( (string) $paid['id'] ); // what the gateway does
+		$check( ! $fresh( $b->get_id() )->has_status( PaymentGate::AWAITING ), 'gateway step applied: order is ' . $fresh( $b->get_id() )->get_status() );
+
+		$r = $notice( $paid );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'already handled' === $r['word'], 'AC-2 the same notice again is acknowledged and stops' );
+		$r = $return( $paid );
+		$check( 200 === ( $r['status'] ?? 0 ) && str_contains( (string) $r['location'], 'order-received' ), 'AC-2 the return after the notice stops and shows the order' );
+		$check( 1 === count( PaymentRecord::events( $fresh( $b->get_id() ) ) ), 'AC-2 still one event after the repeats' );
+
+		$moved = t68_obj( $a->get_id(), array( 'id' => $paid['id'] ) );
+		$r     = $notice( $moved );
+		$check( 403 === ( $r['status'] ?? 0 ) && 'pending' === $fresh( $a->get_id() )->get_status(), 'AC-2 order B\'s transaction cannot pay order A (refused, A still pending)' );
+
+		// ---- AC-1: a second payment of a paid order ---------------------------------------------------------------
+		$status = $fresh( $b->get_id() )->get_status();
+		$r      = $notice( t68_obj( $b->get_id() ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && $status === $fresh( $b->get_id() )->get_status(), 'AC-1 a second success for the paid order is stopped, status unchanged' );
+		$flags = PaymentRecord::attention( $fresh( $b->get_id() ) );
+		$check( 1 === count( $flags ) && str_contains( $flags[0]['message'], 'second payment' ), 'AC-1 the second payment is flagged for refund' );
+
+		// ---- AC-3: pending, failure, cancelled -------------------------------------------------------------------
+		$c = $order();
+		$r = $notice( t68_obj( $c->get_id(), array( 'pending' => true, 'success' => false ) ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'pending' === $fresh( $c->get_id() )->get_status(), 'AC-3 a pending notice is recorded and changes nothing' );
+		$r = $notice( t68_obj( $c->get_id(), array( 'success' => false ) ) );
+		$check( null === $r, 'AC-3 a verified failure for an awaiting order goes on to the gateway' );
+		$fresh( $c->get_id() )->update_status( 'failed' ); // what the gateway does
+		$check( ! $fresh( $c->get_id() )->is_paid(), 'AC-3 the failed order is not paid' );
+		$r = $notice( t68_obj( $c->get_id() ) );
+		$check( null === $r, 'AC-3 a later success for the failed order (a retry) goes on to the gateway' );
+
+		$d = $order();
+		$d->set_status( 'cancelled' );
+		$d->save();
+		$r = $notice( t68_obj( $d->get_id() ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'cancelled' === $fresh( $d->get_id() )->get_status(), 'AC-3 a success for a cancelled order is not applied' );
+		$check( 1 === count( PaymentRecord::attention( $fresh( $d->get_id() ) ) ), 'AC-3 the payment of a cancelled order is flagged' );
+
+		// ---- AC-2 and AC-7: refunds counted once ------------------------------------------------------------------
+		$fresh( $b->get_id() )->add_order_note( 'Paymob : Partial refund of 20<br/>Woo Order Refund ID: 1<br/>Transaction Refund ID : 777001' );
+		$check( RefundLedger::madeHere( $fresh( $b->get_id() ), '777001' ), 'AC-7 the refund made from the order screen is captured from the gateway note' );
+		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 777001, 'amount_cents' => 2000, 'is_refund' => true, 'has_parent_transaction' => true ) ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'refund already recorded' === $r['word'], 'AC-2 the notice of that refund stops without a second record' );
+		$dash = t68_obj( $b->get_id(), array( 'id' => 777002, 'amount_cents' => 1000, 'is_refund' => true, 'has_parent_transaction' => true ) );
+		$r    = $notice( $dash );
+		$check( null === $r, 'AC-7 a refund made in Paymob\'s dashboard goes on to the gateway to be recorded' );
+		$r = $notice( $dash );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'already handled' === $r['word'], 'AC-2 that dashboard refund\'s notice again stops' );
+		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 777003, 'is_void' => true, 'has_parent_transaction' => true ) ) );
+		$check( 200 === ( $r['status'] ?? 0 ) && 2 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a void is recorded and flagged, not applied' );
+
+		// ---- AC-8: the gate is the provider's ---------------------------------------------------------------------
+		$stand = new T68Provider();
+		add_filter( 'mizzey_payment_providers', fn ( $list ) => array_merge( $list, array( $stand ) ) );
+		$check( in_array( $stand, PaymentGate::providers(), true ), 'AC-8 a stand-in provider joins through mizzey_payment_providers' );
+		$t = $order( 't68pay' );
+		$last = null;
+		PaymentGate::releaseAll();
+		PaymentGate::handle( $stand, 'POST', array(), (string) wp_json_encode( array( 'sig' => 'no', 'order' => $t->get_id() ) ) );
+		$check( 403 === ( $last['status'] ?? 0 ), 'AC-8 the stand-in\'s unverified notice is refused by the same gate' );
+		$last = null;
+		PaymentGate::releaseAll();
+		PaymentGate::handle( $stand, 'POST', array(), (string) wp_json_encode( array( 'sig' => 'ok', 'order' => $t->get_id(), 'ref' => 't68-1', 'amount' => 5000 ) ) );
+		$check( null === $last && 1 === count( PaymentRecord::events( $fresh( $t->get_id() ) ) ), 'AC-8 the stand-in\'s verified first payment goes through and is recorded' );
+		$check( null === PaymentGate::providerFor( $cod ) && $paymob->ownsOrder( $fresh( $b->get_id() ) ), 'AC-8 orders are matched to their provider by gateway' );
+
+		// ---- the callback address Paymob is given ---------------------------------------------------------------
+		$data = apply_filters( 'paymob_intention_data', array( 'amount' => 5000 ), array( 'order_id' => $b->get_id() ) );
+		$url  = untrailingslashit( (string) get_option( 'home' ) ) . '/wc-api/paymob_callback/';
+		$check( ( $data['notification_url'] ?? '' ) === $url && ( $data['redirection_url'] ?? '' ) === $url && CallbackAddress::url() === $url, 'Paymob is given the path form of the callback address: ' . $url );
+
+		// ---- AC-4 over the real request --------------------------------------------------------------------------
+		$http = wp_remote_post( $url, array( 'body' => (string) wp_json_encode( array( 'type' => 'TRANSACTION', 'obj' => t68_obj( $a->get_id() ) ) ), 'timeout' => 20, 'headers' => array( 'Content-Type' => 'application/json' ) ) ); // storefront-guard: exempt, a callback endpoint answering a word, not a page
+		$check( ! is_wp_error( $http ) && 403 === wp_remote_retrieve_response_code( $http ) && 'refused' === trim( wp_remote_retrieve_body( $http ) ), 'AC-4 the real request to the callback address, unsigned, is refused 403 by the gate (' . ( is_wp_error( $http ) ? $http->get_error_message() : wp_remote_retrieve_response_code( $http ) ) . ')' );
+
+		// ---- AC-10: paid is not received -------------------------------------------------------------------------
+		ob_start();
+		PaymentRecord::panel( $fresh( $b->get_id() ) );
+		$panel = (string) ob_get_clean();
+		$check( str_contains( $panel, 'Payment record' ) && str_contains( $panel, 'not at this time' ) && str_contains( $panel, (string) $paid['id'] ), 'AC-10 the order screen shows the record and says paid is not received' );
+		$note = dirname( __DIR__, 3 ) . '/docs/payments-settlement.md';
+		$check( is_readable( $note ) && str_contains( (string) file_get_contents( $note ), 'PAY-19' ), 'AC-10 the settlement note exists (docs/payments-settlement.md)' );
+
+		// ---- AC-5: no card number kept ---------------------------------------------------------------------------
+		$like = '%' . $wpdb->esc_like( T68_PAN ) . '%';
+		$hits = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders_meta WHERE meta_value LIKE %s", $like ) )
+			+ (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_value LIKE %s", $like ) )
+			+ (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_content LIKE %s", $like ) )
+			+ (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_value LIKE %s", $like ) );
+		$logs = defined( 'WC_LOG_DIR' ) ? ( glob( trailingslashit( WC_LOG_DIR ) . PaymentGate::LOG_SOURCE . '*' ) ?: array() ) : array();
+		foreach ( $logs as $file ) {
+			$hits += substr_count( (string) file_get_contents( $file ), T68_PAN );
+		}
+		$check( 0 === $hits, 'AC-5 the full card number in the payloads is in no order meta, note, option or payment log (' . count( $logs ) . ' log files read)' );
+
+		return $ok;
+	}
+);

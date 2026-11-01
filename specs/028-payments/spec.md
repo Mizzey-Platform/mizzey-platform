@@ -208,7 +208,7 @@ Contractual stage: S1. Engineering timing: November 2026, the function layer on 
 
 ## Assumptions
 
-- The official plugin's HMAC check is relied on only after the forged-callback tests pass against it; Mizzey's own
-  amount, currency and order check runs in any case.
+- Mizzey's layer verifies every callback's signature itself, and checks its amount, currency and order, before the
+  official plugin acts on it; the plugin's own checks are not relied on.
 - Paymob's test mode works on the account still under review: confirmed on 1 November 2026 with its test keys, a test
   card integration and Paymob's published test card.
