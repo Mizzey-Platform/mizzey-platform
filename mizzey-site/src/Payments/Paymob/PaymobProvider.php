@@ -99,19 +99,27 @@ final class PaymobProvider implements PaymentProvider
             return CallbackResult::refused('incomplete_transaction', $channel, $orderId);
         }
 
-        // A payment Paymob later reports as refunded or voided is the payment's own record changing; the refund or
-        // void itself arrives as a transaction of its own.
-        if ($kind === PaymentEvent::PAYMENT && ($fields['is_refunded'] === 'true' || $fields['is_voided'] === 'true')) {
-            $kind = 'payment-update';
+        // Paymob reports a refund by sending the payment again, marked refunded, with the total refunded so far
+        // (seen on the sandbox, 1 November 2026); a void, marked voided. Each state is an event of its own.
+        $reference = $fields['id'];
+        $cents     = (int) $fields['amount_cents'];
+        if ($kind === PaymentEvent::PAYMENT && $fields['is_voided'] === 'true') {
+            $kind      = PaymentEvent::VOIDED;
+            $reference = $fields['id'] . '-voided';
+        } elseif ($kind === PaymentEvent::PAYMENT && $fields['is_refunded'] === 'true') {
+            $source    = $channel === 'notice' ? ($obj['refunded_amount_cents'] ?? null) : ($query['refunded_amount_cents'] ?? null);
+            $kind      = PaymentEvent::REFUNDED;
+            $cents     = is_scalar($source) && ctype_digit((string) $source) ? (int) $source : 0;
+            $reference = $fields['id'] . '-refunded-' . $cents;
         }
 
         return CallbackResult::verified(new PaymentEvent(
             self::ID,
             $orderId,
-            $fields['id'],
+            $reference,
             $kind,
             $this->outcome($fields),
-            (int) $fields['amount_cents'],
+            $cents,
             strtoupper($fields['currency']),
             $fields['created_at'],
             $channel,

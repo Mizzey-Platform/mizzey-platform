@@ -257,9 +257,27 @@ run(
 		$check( 200 === ( $r['status'] ?? 0 ) && 'refund already recorded' === $r['word'], 'AC-2 the notice of that refund stops without a second record' );
 		$dash = t68_obj( $b->get_id(), array( 'id' => 777002, 'amount_cents' => 1000, 'is_refund' => true, 'has_parent_transaction' => true ) );
 		$r    = $notice( $dash );
-		$check( null === $r, 'AC-7 a refund made in Paymob\'s dashboard goes on to the gateway to be recorded' );
+		$check( 'recorded' === ( $r['word'] ?? '' ) && 0 === count( $fresh( $b->get_id() )->get_refunds() ), 'AC-2 a refund\'s own notice not made here is recorded and never reaches the gateway' );
 		$r = $notice( $dash );
-		$check( 200 === ( $r['status'] ?? 0 ) && 'already handled' === $r['word'], 'AC-2 that dashboard refund\'s notice again stops' );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'already handled' === $r['word'], 'AC-2 that refund notice again stops' );
+
+		// ---- PAY-17: Paymob reports a refund as the payment marked refunded, with the total refunded so far ---------
+		$g      = $order();
+		$g_paid = t68_obj( $g->get_id() );
+		$notice( $g_paid );
+		$fresh( $g->get_id() )->payment_complete( (string) $g_paid['id'] );
+		$update = fn ( int $refunded ) => t68_obj( $g->get_id(), array( 'id' => $g_paid['id'], 'is_refunded' => true, 'refunded_amount_cents' => $refunded ) );
+		PaymentGate::releaseAll();
+		wc_create_refund( array( 'order_id' => $g->get_id(), 'amount' => 20, 'reason' => 't68 order screen', 'refund_payment' => false ) );
+		$r = $notice( $update( 2000 ) );
+		$check( 'refunds match' === ( $r['word'] ?? '' ) && 1 === count( $fresh( $g->get_id() )->get_refunds() ) && array() === PaymentRecord::attention( $fresh( $g->get_id() ) ), 'PAY-17 Paymob\'s refunded total equal to the order\'s refunds: nothing added, nothing flagged' );
+		$r = $notice( $update( 2000 ) );
+		$check( 'already handled' === ( $r['word'] ?? '' ), 'AC-2 the same refunded total again stops' );
+		$r = $notice( $update( 3000 ) );
+		$g_now = $fresh( $g->get_id() );
+		$check( 'refunds reconciled' === ( $r['word'] ?? '' ) && 2 === count( $g_now->get_refunds() ) && 3000 === (int) round( (float) $g_now->get_total_refunded() * 100 ), 'PAY-17 a further 10.00 refunded in Paymob\'s dashboard is recorded on the order for the difference (refunded ' . $g_now->get_total_refunded() . ')' );
+		$r = $notice( $update( 2500 ) );
+		$check( 2 === count( $fresh( $g->get_id() )->get_refunds() ) && 1 === count( PaymentRecord::attention( $fresh( $g->get_id() ) ) ), 'PAY-17 a refunded total below the order\'s refunds adds nothing and is flagged' );
 		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 777003, 'is_void' => true, 'has_parent_transaction' => true ) ) );
 		$check( 200 === ( $r['status'] ?? 0 ) && 2 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a void is recorded and flagged, not applied' );
 
@@ -372,11 +390,17 @@ run(
 			$over = wc_create_refund( array( 'order_id' => $e->get_id(), 'amount' => 45, 'reason' => 't68', 'refund_payment' => true ) );
 			$check( is_wp_error( $over ) && 2 === $calls, 'AC-7 a refund above what is left is refused before Paymob is asked (' . ( is_wp_error( $over ) ? $over->get_error_message() : 'made' ) . ')' );
 
+			// Paymob's own shape for a refund: the payment again, marked refunded, with the total refunded so far.
+			$refunded        = fn ( int $total ) => array_replace( $ok_obj, array( 'is_refunded' => true, 'refunded_amount_cents' => $total ) );
+			[ $code, $body ] = $post( $refunded( 1000 ) );
+			$check( 'refunds match' === $body && 1 === count( $fresh( $e->get_id() )->get_refunds() ) && array() === PaymentRecord::attention( $fresh( $e->get_id() ) ), 'AC-2 through the plugin: the payment marked refunded by 10.00 after the order-screen refund adds nothing [' . $body . ']' );
 			$dash_obj        = t68_obj( $e->get_id(), array( 'id' => 555002, 'amount_cents' => 500, 'is_refund' => true, 'has_parent_transaction' => true ) );
 			[ $code, $body ] = $post( $dash_obj );
-			$check( 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'PAY-17 through the plugin: a 5.00 refund made in Paymob\'s dashboard is recorded on the order [' . $body . ']' );
-			[ $code, $body ] = $post( $dash_obj );
-			$check( 'already handled' === $body && 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-2 through the plugin: that dashboard refund\'s notice again adds nothing' );
+			$check( 'recorded' === $body && 1 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-2 through the plugin: a refund\'s own notice does not reach the plugin [' . $body . ']' );
+			[ $code, $body ] = $post( $refunded( 1500 ) );
+			$check( 'refunds reconciled' === $body && 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'PAY-17 through the plugin: a 5.00 refund made in Paymob\'s dashboard is recorded on the order once [' . $body . ']' );
+			[ $code, $body ] = $post( $refunded( 1500 ) );
+			$check( 'already handled' === $body && 2 === count( $fresh( $e->get_id() )->get_refunds() ), 'AC-2 through the plugin: the same refunded total again adds nothing' );
 		} else {
 			$s->note( 'SKIP  the plugin is not active in this runtime: the checks through the plugin did not run' );
 		}

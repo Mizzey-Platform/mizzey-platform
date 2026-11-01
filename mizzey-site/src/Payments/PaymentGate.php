@@ -122,20 +122,19 @@ final class PaymentGate
         $amount = self::money($event->amountCents, $event->currency);
         switch ($event->kind) {
             case PaymentEvent::REFUND:
-                if (RefundLedger::madeHere($order, $event->reference)) {
-                    self::stop($channel, 200, 'refund already recorded', $order->get_id(), '', $order);
-                    return;
-                }
-                return; // A refund made in the provider's dashboard: the gateway records it (PAY-17).
-            case PaymentEvent::VOID:
-                PaymentRecord::flag($order, sprintf(__('%1$s reported a void of %2$s (reference %3$s). Check the order and its refunds.', 'mizzey-site'), $event->provider, $amount, $event->reference));
-                self::stop($channel, 200, 'recorded', $order->get_id(), '', $order);
+                // A refund's own notice never reaches the gateway, which would count it again: a refund made here is
+                // already on the order, and one made in the provider's dashboard is recorded from the payment's
+                // refunded total.
+                self::stop($channel, 200, RefundLedger::madeHere($order, $event->reference) ? 'refund already recorded' : 'recorded', $order->get_id(), '', $order);
+                return;
+            case PaymentEvent::REFUNDED:
+                self::reconcileRefunds($order, $event, $channel);
                 return;
             case PaymentEvent::PAYMENT:
                 break;
-            default:
+            default: // a void, or a payment reported voided
                 if (! $order->has_status('refunded')) {
-                    PaymentRecord::flag($order, sprintf(__('%1$s now reports payment %2$s as refunded or voided. Check that the order\'s refunds match.', 'mizzey-site'), $event->provider, $event->reference));
+                    PaymentRecord::flag($order, sprintf(__('%1$s reported a void (reference %2$s). Check the order and its refunds.', 'mizzey-site'), $event->provider, $event->reference));
                 }
                 self::stop($channel, 200, 'recorded', $order->get_id(), '', $order);
                 return;
@@ -187,6 +186,34 @@ final class PaymentGate
             return;
         }
         PaymentRecord::flag($order, sprintf(__('A second payment of %1$s (reference %2$s) arrived for an order already paid by reference %3$s. The automatic refund did not go through: refund the second payment.', 'mizzey-site'), $amount, $event->reference, $other['reference']));
+    }
+
+    /**
+     * The provider reports the total refunded on the payment so far. The order's own refunds are compared with it: equal
+     * is the usual case (a refund made from the order screen); more at the provider is a refund made in its dashboard,
+     * recorded on the order for the difference without asking the provider again (PAY-17); less at the provider is
+     * flagged for staff. The order is locked, so a refund being made from the order screen is saved before this runs.
+     */
+    private static function reconcileRefunds(\WC_Order $order, PaymentEvent $event, string $channel): void
+    {
+        $atProvider = $event->amountCents;
+        $onOrder    = (int) round((float) $order->get_total_refunded() * 100);
+        if ($atProvider > $onOrder) {
+            $refund = wc_create_refund([
+                'order_id'       => $order->get_id(),
+                'amount'         => ($atProvider - $onOrder) / 100,
+                /* translators: 1: payment provider, 2: provider's payment reference. */
+                'reason'         => sprintf(__('Refund made in the %1$s dashboard (payment %2$s)', 'mizzey-site'), $event->provider, $event->reference),
+                'refund_payment' => false,
+                'restock_items'  => false,
+            ]);
+            if (is_wp_error($refund)) {
+                PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s, and the difference could not be recorded. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));
+            }
+        } elseif ($atProvider < $onOrder) {
+            PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));
+        }
+        self::stop($channel, 200, $atProvider === $onOrder ? 'refunds match' : 'refunds reconciled', $order->get_id(), '', $order);
     }
 
     /** Take a named lock for the rest of the request. */
