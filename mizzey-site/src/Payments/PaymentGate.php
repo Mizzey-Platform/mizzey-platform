@@ -148,9 +148,11 @@ final class PaymentGate
         if (! $awaiting) {
             if ($event->outcome === PaymentEvent::SUCCESS) {
                 $other = PaymentRecord::otherPayment($order, $event->key());
-                PaymentRecord::flag($order, $other !== null
-                    ? sprintf(__('A second payment of %1$s (reference %2$s) arrived for an order already paid by reference %3$s. Refund the second payment.', 'mizzey-site'), $amount, $event->reference, $other['reference'])
-                    : sprintf(__('A payment of %1$s (reference %2$s) arrived while the order is %3$s. It was not applied: refund it, or restore the order.', 'mizzey-site'), $amount, $event->reference, wc_get_order_status_name($order->get_status())));
+                if ($other !== null) {
+                    self::refundSecondPayment($provider, $order, $event, $other, $amount);
+                } else {
+                    PaymentRecord::flag($order, sprintf(__('A payment of %1$s (reference %2$s) arrived while the order is %3$s. It was not applied: refund it, or restore the order.', 'mizzey-site'), $amount, $event->reference, wc_get_order_status_name($order->get_status())));
+                }
             }
             self::stop($channel, 200, 'recorded', $order->get_id(), '', $order);
             return;
@@ -164,6 +166,27 @@ final class PaymentGate
             }
         }
         // A first success or failure for an order awaiting payment: the gateway applies it, inside the lock.
+    }
+
+    /**
+     * A second verified payment of an order already paid by another: a duplicate charge (PAY-05). It is refunded in
+     * full at once, through the provider, outside the order's own refunds, since the order never counted it. It runs
+     * once: the payment was recorded before this call, so a repeat of its notice stops as already handled, and the
+     * refund's own notice is acknowledged through the ledger. When the provider does not make the refund, staff are
+     * flagged to make it.
+     *
+     * @param array<string,int|string> $other The payment that paid the order.
+     */
+    private static function refundSecondPayment(PaymentProvider $provider, \WC_Order $order, PaymentEvent $event, array $other, string $amount): void
+    {
+        $refund = $provider->refundTransaction($event->reference, $event->amountCents);
+        if ($refund !== null) {
+            RefundLedger::record($order, $refund);
+            $order->add_order_note(sprintf(__('A second payment of %1$s (reference %2$s) arrived for an order already paid by reference %3$s. It was refunded in full automatically (refund reference %4$s).', 'mizzey-site'), $amount, $event->reference, $other['reference'], $refund));
+            wc_get_logger()->info(sprintf('second payment refunded (order %d)', $order->get_id()), ['source' => self::LOG_SOURCE]);
+            return;
+        }
+        PaymentRecord::flag($order, sprintf(__('A second payment of %1$s (reference %2$s) arrived for an order already paid by reference %3$s. The automatic refund did not go through: refund the second payment.', 'mizzey-site'), $amount, $event->reference, $other['reference']));
     }
 
     /** Take a named lock for the rest of the request. */

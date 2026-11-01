@@ -44,7 +44,7 @@ Reading the plugin (4.1.15) settled what the layer must do, not only what the re
 
 | AC | `t68-payments` asserts |
 |---|---|
-| AC-1 | A second successful payment of an already paid order is recorded and flagged for refund and does not move the order |
+| AC-1 | A second successful payment of an already paid order is refunded in full through Paymob once (API stood in for), does not move the order and leaves the order's own refunds alone; its repeat is not refunded again; its refund notice is acknowledged; a refund Paymob does not make is flagged for staff |
 | AC-2 | The same success notice twice, the notice after the return, and a refund notice for a refund made from the order screen each change the order once |
 | AC-3 | A failed notice leaves the order unpaid; a pending notice changes nothing; an unsigned return changes nothing |
 | AC-4 | Unsigned, wrongly signed, other-amount, other-currency and unknown-order callbacks are refused with no change, by POST and by GET, through the real plugin |
@@ -57,5 +57,4 @@ Reading the plugin (4.1.15) settled what the layer must do, not only what the re
 
 ## Not built here
 
-- Automatic refund of a second payment: flagged for staff (AC-1). The owner decides whether the layer refunds it.
 - The release packer's line for the plugin (internal:tooling PR).
