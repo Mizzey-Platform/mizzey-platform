@@ -10,5 +10,6 @@ caught    refunded total not reconciled: PAY-17 Paymob's refunded total equal to
 caught    paid order not protected: AC-1 a second success for the paid order is stopped, status unchanged; AC-1 the second payment is refunded in full through Paymob, once, by its own reference
 caught    pending not stopped: AC-3 a pending notice is recorded and changes nothing
 caught    second payment not refunded: AC-1 the second payment is refunded in full through Paymob, once, by its own reference; AC-1 the refund is kept by reference, nothing is left for staff, and the order's own refunds are untouched
+caught    plugin entry points left open: Security: over the real request, an unused plugin entry point answers 403 not_available (403)
 caught    gate switched off (the plugin alone): the unsigned request is no longer refused by the gate, and checks through the plugin fail
 unmutated rerun: pass
