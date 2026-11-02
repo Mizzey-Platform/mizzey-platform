@@ -1,0 +1,18 @@
+Mutation check for specs/030-order-management, t70-order-management, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, HPOS).
+Each deliberate defect was applied alone, t70 run, the file restored. M3 and M8 survived the first run: the date range now
+ends on an order's own day, and the customer view is reached through WooCommerce's hook; both are caught since.
+
+CAUGHT    M1 the payment filter is ignored  <- AC-1 filter by payment method: cash on delivery finds its three orders
+CAUGHT    M2 the carrier filter is ignored  <- AC-1 filter by carrier
+CAUGHT    M4 an invalid date is accepted
+CAUGHT    M5 the shipment saves without its nonce  <- AC-3 without the form's nonce, or by someone who cannot edit orders, the shipment does not change
+CAUGHT    M6 a shipment change is not noted  <- AC-3 staff attach a shipment from the order screen; the note names who did it
+CAUGHT    M7 a javascript address is kept  <- AC-3 a wrong code is corrected and the correction noted; a non-web address is not kept
+CAUGHT    M9 the slip shows prices  <- AC-6 the slip lists the item, SKU and quantity, where it goes, the phone, the note and the carrier, and no price
+CAUGHT    M10 refunded items stay on the slip  <- AC-6 an item refunded before packing is taken off the slip (2 ordered, 1 refunded, 1 to pack)
+CAUGHT    M11 a customer may open the slip
+CAUGHT    M12 the slip is in English for an Arabic order  <- AC-6 an Arabic order's slip is in Arabic, right to left
+CAUGHT    M3 the end date is not included  <- AC-1 filter by a date range, both ends included
+CAUGHT    M8 the customer does not see the shipment  <- AC-3 the customer sees the carrier and the tracking number
+
+12 of 12 caught.

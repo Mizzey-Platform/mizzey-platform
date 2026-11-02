@@ -552,8 +552,8 @@ msgstr "المخزون يأتي من مصدر المخزون ولا يمكن ت�
 msgid "Stock from the stock source: not known"
 msgstr "المخزون من مصدر المخزون: غير معروف"
 
-#: mizzey-site/src/Stock/StockWriteGuard.php
 #. translators: %d: the quantity the stock source reports.
+#: mizzey-site/src/Stock/StockWriteGuard.php
 #, php-format
 msgid "Stock from the stock source: %d"
 msgstr "المخزون من مصدر المخزون: %d"
@@ -561,3 +561,43 @@ msgstr "المخزون من مصدر المخزون: %d"
 #: mizzey-site/src/Payments/PaymentGate.php
 msgid "Your payment was not confirmed. If you paid, your order will be updated shortly; otherwise you can try again."
 msgstr "لم يتم تأكيد الدفع. إذا كنت قد دفعت، فسيتم تحديث طلبك قريبًا؛ وإلا يمكنك المحاولة مرة أخرى."
+
+#: mizzey-site/src/Orders/ShipmentBox.php
+msgid "Shipment"
+msgstr "الشحنة"
+
+#: mizzey-site/src/Orders/ShipmentBox.php
+msgid "Carrier"
+msgstr "شركة الشحن"
+
+#: mizzey-site/src/Orders/ShipmentBox.php
+msgid "Tracking number"
+msgstr "رقم التتبع"
+
+#: mizzey-site/src/Orders/PackingSlip.php
+msgid "Packing slip"
+msgstr "قائمة التعبئة"
+
+#: mizzey-site/src/Orders/PackingSlip.php
+msgid "Packing slip %s"
+msgstr "قائمة التعبئة %s"
+
+#: mizzey-site/src/Orders/PackingSlip.php
+msgid "Ship to"
+msgstr "الشحن إلى"
+
+#: mizzey-site/src/Orders/PackingSlip.php
+msgid "SKU"
+msgstr "رمز المنتج"
+
+#: mizzey-site/src/Orders/PackingSlip.php
+msgid "Customer note"
+msgstr "ملاحظة العميل"
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Refund reference: %s"
+msgstr "مرجع الاسترداد: %s"
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Payment reference: %s"
+msgstr "مرجع الدفع: %s"

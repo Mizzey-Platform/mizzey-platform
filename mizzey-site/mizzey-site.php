@@ -63,6 +63,7 @@ require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Orders/RefundReference.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
@@ -113,6 +114,9 @@ require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
 require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
 require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
 require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
+require_once __DIR__ . '/src/Orders/PackingSlip.php';
+require_once __DIR__ . '/src/Orders/ShipmentBox.php';
+require_once __DIR__ . '/src/Orders/OrderFilters.php';
 require_once __DIR__ . '/src/Payments/PaymentEvent.php';
 require_once __DIR__ . '/src/Payments/CallbackResult.php';
 require_once __DIR__ . '/src/Payments/PaymentProvider.php';
@@ -188,6 +192,7 @@ MizzeySite\Promotions\AutomaticPromotions::register();
 MizzeySite\Promotions\Combination::register();
 MizzeySite\Promotions\WelcomeDiscount::register();
 MizzeySite\Orders\RefundIntegrity::register();
+MizzeySite\Orders\RefundReference::register();
 
 // Accounts: verification sent at registration, marketing consent, phone sign-in, sign-in links (#305). See specs/017-accounts.
 MizzeySite\Accounts\VerificationOnRegistration::register();
@@ -230,6 +235,9 @@ MizzeySite\Account\AccountPages::register();
 MizzeySite\Invoices\InvoiceSettings::register();
 MizzeySite\Invoices\InvoiceNumber::register();
 MizzeySite\Invoices\InvoiceRoutes::register();
+MizzeySite\Orders\PackingSlip::register();
+MizzeySite\Orders\ShipmentBox::register();
+MizzeySite\Orders\OrderFilters::register();
 
 // The payment layer around the provider's gateway: every callback verified, matched to its order and applied once;
 // the payment record on the order; refunds counted once. PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, specs/028-payments.
