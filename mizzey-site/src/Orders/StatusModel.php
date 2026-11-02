@@ -112,6 +112,9 @@ final class StatusModel
         if ($to === self::COD_COLLECTED && ! self::isCash($order)) {
             return __('Order status not changed: COD Collected is only for cash on delivery orders.', 'mizzey-site');
         }
+        if (in_array($to, self::DELIVERED, true) && (string) $order->get_meta('_mizzey_carrier_needs_review') !== '') {
+            return __('Order status not changed: the carrier reported a status that needs review. Mark it reviewed on the order first.', 'mizzey-site');
+        }
 
         return null;
     }
