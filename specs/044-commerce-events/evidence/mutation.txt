@@ -1,0 +1,26 @@
+Mutation check for specs/044-commerce-events, t84-commerce-events, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7), on the code after the Codex review. Each defect is applied alone, the scenario run over the real request, the file restored.
+
+CAUGHT    M1 no home event  <- FAIL  AC-1 EVT-01 the home page pushes view_home, in English
+CAUGHT    M2 no zero-result search  <- FAIL  AC-1 EVT-18 a search with no results pushes zero_result_search
+CAUGHT    M3 items named by record id  <- FAIL  AC-1 EVT-02 a category page pushes view_item_list, items named by SKU with their position
+CAUGHT    M4 the queue is not emptied  <- FAIL  AC-1 EVT-03 a search pushes search with its term and result count ([{"event":"search","params":{"search_term":"t848628","r
+CAUGHT    M5 a refused coupon is pushed  <- FAIL  AC-2 EVT-10 a refused coupon pushes nothing
+CAUGHT    M6 quantity changes are not pushed  <- FAIL  AC-2 EVT-07, EVT-08 adding two and going down to one: add_to_cart (2, 300) and remove_from_cart (1)
+CAUGHT    M7 staff sign-ins are pushed  <- FAIL  AC-2 a staff sign-in is not a customer event
+CAUGHT    M8 purchase fires again  <- FAIL  AC-3 EVT-14 reloading the confirmation page pushes no second purchase
+CAUGHT    M9 purchase fires before confirmation  <- FAIL  AC-3 EVT-14 an order on hold, awaiting payment, pushes no purchase
+SURVIVED  M10 purchase without the order key
+CAUGHT    M11 refund sent without configuration  <- FAIL  AC-4 EVT-15 with no measurement id and secret, nothing is sent
+CAUGHT    M12 no Store API delivery  <- FAIL  AC-1 EVT-03 a search pushes search with its term and result count ([{"event":"search","params":{"search_term":"t849991","res
+CAUGHT    M13 the link sign-in is not pushed  <- FAIL  AC-2 EVT-16 a sign-in pushes login, with its method (password)
+CAUGHT    M14 the wishlist is not heard  <- FAIL  AC-2 EVT-06 saving to the wishlist pushes add_to_wishlist
+CAUGHT    M15 an add of a line in the cart counts twice  <- FAIL  AC-2 EVT-07 adding a product already in the cart is one add_to_cart
+CAUGHT    M16 a search term keeps an email address  <- FAIL  AC-5 an email address or a phone number typed in the search box is masked
+SURVIVED  M17 the coupon discount is read before totals
+
+M10 survived because the wrong-key check ran on an order already tracked; the check now runs first, on a confirmed order not yet tracked:
+CAUGHT    M10 purchase without the order key  <- FAIL  AC-3 a confirmation page with the wrong order key pushes nothing
+
+M17 showed that recalculating the cart in the coupon handler was redundant: the handler runs at priority 999, after WooCommerce's own recalculation, and the discount is right without it (t84 checks it). The code was removed.
+
+16 of 16 caught.

@@ -85,6 +85,7 @@ final class Wishlist
         $list = array_values(array_diff(self::stored(get_current_user_id()), [$id]));
         array_unshift($list, $id);
         self::store(get_current_user_id(), array_slice($list, 0, self::capacity()));
+        do_action('mizzey_wishlist_added', $productId);
 
         return $id;
     }
