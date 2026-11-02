@@ -30,7 +30,7 @@ run(
 			$ok = $ok && $condition;
 		};
 		$check( class_exists( '\Corex\Boot' ) && \Corex\Boot::booted(), 'fixture: CoreX is booted' );
-		$activity = \Corex\Boot::app()->make( \Corex\Activity\ActivityService::class );
+		$activity = \Corex\Boot::app()->container()->make( \Corex\Activity\ActivityService::class );
 		$table    = $wpdb->prefix . 'corex_activity_events';
 		$started  = gmdate( 'Y-m-d H:i:s', time() - 2 );
 		$tag      = 't71' . wp_rand( 1000, 9999 );
@@ -63,7 +63,7 @@ run(
 		do_action( 'wp_login_failed', "{$tag}mgr", new \WP_Error( 'incorrect_password', 'x' ) );
 		do_action( 'wp_login_failed', "{$tag}mgr", new \WP_Error( 'authentication_failed', 'Invalid verification code.' ) );
 		do_action( 'wp_login_failed', "{$tag}ghost", new \WP_Error( 'invalid_username', 'x' ) );
-		\Corex\Boot::app()->make( \Corex\Events\EventDispatcher::class )->dispatch( new \Corex\Security\LoginLockoutEvent( "{$tag}mgr", '203.0.113.71', new \DateTimeImmutable( '+15 minutes' ) ) );
+		\Corex\Boot::app()->container()->make( \Corex\Events\EventDispatcher::class )->dispatch( new \Corex\Security\LoginLockoutEvent( "{$tag}mgr", '203.0.113.71', new \DateTimeImmutable( '+15 minutes' ) ) );
 		do_action( 'retrieve_password', "{$tag}mgr" );
 		do_action( 'after_password_reset', $mgr_user, 'unused' );
 		do_action( 'wp_logout', $manager );
@@ -83,7 +83,7 @@ run(
 		// Over the real request: a failed sign-in on wp-login.php.
 		$answer = sign_in_wp_login( "{$tag}mgr", 'wrong-' . $pass );
 		$http   = array_values( array_filter( $mine( array( 'actor_id' => $manager, 'kind' => StaffActivityLog::SIGNIN_FAILED ) ), static fn ( $e ) => $e->occurredAt->format( 'Y-m-d H:i:s' ) >= $started ) );
-		$check( count( $http ) >= 2 && '' !== (string) ( $http[0]->context['address'] ?? '' ), 'AC-2 over the real request a wrong password on the sign-in page is recorded, with the address (' . (int) $answer['status'] . ', ' . ( $http[0]->context['address'] ?? 'none' ) . ')' );
+		$check( count( $http ) >= 2 && '' !== (string) ( $http[0]->context['address'] ?? '' ), 'AC-2 over the real request a wrong password on the sign-in page is recorded, with the address (' . count( $http ) . ' since the start, ' . (int) $answer['status'] . ', ' . ( $http[0]->context['address'] ?? 'none' ) . ')' );
 
 		// ---- AC-3: searchable in the administration ----------------------------------------------------------
 		$q = static fn ( array $over ) => StaffActivityScreen::entries( array_merge( array( 'account' => '', 'kind' => '', 'outcome' => '', 'from' => '', 'to' => '', 'page' => 1 ), $over ) );
@@ -92,7 +92,7 @@ run(
 		$fails = $q( array( 'account' => "{$tag}mgr", 'outcome' => 'failure' ) );
 		$check( is_array( $fails ) && array() === array_filter( $fails, static fn ( $e ) => 'failure' !== $e->outcome ) && count( $fails ) >= 3, 'AC-3 filter by outcome combines with the account' );
 		$second = $q( array( 'account' => "{$tag}mgr", 'kind' => StaffActivityLog::SECOND_FACTOR ) );
-		$check( is_array( $second ) && 1 === count( $second ), 'AC-3 filter by event' );
+		$check( is_array( $second ) && 1 === count( $second ), 'AC-3 filter by event (' . ( is_array( $second ) ? count( $second ) . ': ' . implode( ',', array_map( static fn ( $e ) => $e->kind, $second ) ) : 'none' ) . ')' );
 		$today  = wp_date( 'Y-m-d' );
 		$check( is_array( $q( array( 'account' => "{$tag}mgr", 'from' => $today, 'to' => $today ) ) ) && array() === $q( array( 'account' => "{$tag}mgr", 'to' => '2020-01-01' ) ), 'AC-3 filter by dates: today finds them, a range in the past finds none' );
 		$check( null === $q( array( 'account' => "{$tag}nobody" ) ), 'AC-3 an account that does not exist is said so' );
@@ -127,7 +127,13 @@ run(
 		wp_set_current_user( $manager );
 		$check( ! current_user_can( StaffActivityScreen::CAP ), 'AC-4 a shop manager cannot open the log' );
 		$denied = null;
-		add_filter( 'wp_die_handler', static fn () => static function ( $m, $t = '', $a = array() ) use ( &$denied ) { $denied = (int) ( $a['response'] ?? 0 ); throw new \RuntimeException( 'die' ); } );
+		$handler = static function () use ( &$denied ) {
+			return static function ( $m, $t = '', $a = array() ) use ( &$denied ) {
+				$denied = (int) ( is_array( $a ) ? ( $a['response'] ?? 0 ) : 0 );
+				throw new \RuntimeException( 'die' );
+			};
+		};
+		add_filter( 'wp_die_handler', $handler );
 		try {
 			StaffActivityScreen::render();
 		} catch ( \RuntimeException $e ) {

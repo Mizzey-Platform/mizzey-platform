@@ -63,11 +63,11 @@ final class StaffActivityLog
     public static function listen($app = null): void
     {
         static $listening = false;
-        if ($listening || ! is_object($app) || ! method_exists($app, 'make') || ! class_exists('\Corex\Events\ListenerProvider') || ! class_exists('\Corex\Security\LoginLockoutEvent')) {
+        if ($listening || ! is_object($app) || ! method_exists($app, 'container') || ! class_exists('\Corex\Events\ListenerProvider') || ! class_exists('\Corex\Security\LoginLockoutEvent')) {
             return;
         }
         try {
-            $app->make(\Corex\Events\ListenerProvider::class)->listen(\Corex\Security\LoginLockoutEvent::class, [self::class, 'lockedOut']);
+            $app->container()->make(\Corex\Events\ListenerProvider::class)->listen(\Corex\Security\LoginLockoutEvent::class, [self::class, 'lockedOut']);
             $listening = true;
         } catch (\Throwable $e) {
             wc_get_logger()->warning('staff log: cannot listen for lockouts: ' . $e->getMessage(), ['source' => 'mizzey-staff-log']);
@@ -106,9 +106,29 @@ final class StaffActivityLog
         $typed = mb_substr(sanitize_text_field((string) $login), 0, 100);
         $user  = $typed === '' ? false : (get_user_by('login', $typed) ?: get_user_by('email', $typed));
         $code  = $error instanceof \WP_Error ? (string) $error->get_error_code() : '';
-        $kind  = $code === 'authentication_failed' ? self::SECOND_FACTOR : self::SIGNIN_FAILED;
+        $kind  = self::secondFactor($error) ? self::SECOND_FACTOR : self::SIGNIN_FAILED;
         $id    = $user instanceof \WP_User ? $user->ID : 0;
         self::write($id, $user instanceof \WP_User ? $user->user_login : '', $kind, 'failure', (string) $id, $typed, ['reason' => sanitize_key($code)]);
+    }
+
+    /**
+     * Whether a failure is a wrong second factor. WP 2FA reports it with WordPress's generic `authentication_failed`
+     * code, which WordPress also uses for other failures, so the request is read too: WP 2FA's second step carries
+     * its own fields (`wp-auth-nonce`, `authcode`), or its REST step says "Invalid verification code."
+     *
+     * @param mixed $error
+     */
+    private static function secondFactor($error): bool
+    {
+        if (! $error instanceof \WP_Error || $error->get_error_code() !== 'authentication_failed') {
+            return false;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- only whether the fields are present.
+        if (isset($_REQUEST['wp-auth-nonce']) || isset($_REQUEST['authcode'])) {
+            return true;
+        }
+
+        return $error->get_error_message() === __('Invalid verification code.', 'wp-2fa');
     }
 
     /** @param mixed $userId */
@@ -155,7 +175,7 @@ final class StaffActivityLog
     {
         try {
             if (class_exists('\Corex\Boot') && \Corex\Boot::booted()) {
-                return (string) \Corex\Boot::app()->make(\Corex\Config\Security\LoginProtection\ClientIpResolver::class)->resolve($_SERVER);
+                return (string) \Corex\Boot::app()->container()->make(\Corex\Config\Security\LoginProtection\ClientIpResolver::class)->resolve($_SERVER);
             }
         } catch (\Throwable $e) {
             unset($e);
@@ -188,7 +208,7 @@ final class StaffActivityLog
                 return;
             }
             $now = new \DateTimeImmutable('now');
-            \Corex\Boot::app()->make(\Corex\Activity\ActivityService::class)->record(
+            \Corex\Boot::app()->container()->make(\Corex\Activity\ActivityService::class)->record(
                 $actorId,
                 \Corex\Activity\ActivityEvent::ACTOR_USER,
                 $actorLabel,

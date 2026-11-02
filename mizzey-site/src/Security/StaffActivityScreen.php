@@ -108,7 +108,7 @@ final class StaffActivityScreen
         if ($f['to'] !== '') {
             $filters['date_to'] = (new \DateTimeImmutable($f['to'] . ' 23:59:59', $tz))->setTimezone(new \DateTimeZone('UTC'));
         }
-        $events = \Corex\Boot::app()->make(\Corex\Activity\ActivityService::class)->query($filters, $f['page'], self::PER_PAGE);
+        $events = \Corex\Boot::app()->container()->make(\Corex\Activity\ActivityService::class)->query($filters, $f['page'], self::PER_PAGE);
 
         return array_values(array_filter($events, static fn ($e): bool => str_starts_with((string) $e->kind, StaffActivityLog::PREFIX)));
     }
