@@ -50,9 +50,11 @@ run(
 		[ $code, $list ] = $get( admin_url( 'edit.php?post_type=product' ) );
 		preg_match( '/name="_wpnonce" value="([^"]+)"/', $list, $m );
 		$nonce = $m[1] ?? '';
+		preg_match( '/name="woocommerce_quick_edit_nonce" value="([^"]+)"/', $list, $qm );
+		$quick = $qm[1] ?? '';
 		$check( 200 === $code && '' !== $nonce, 'fixture: the products list opens and gives its bulk-edit nonce' );
-		$bulk = static function ( array $ids, array $fields ) use ( $get, $nonce ): array {
-			$query = array_merge( array( 'post_type' => 'product', 'action' => 'edit', 'action2' => '-1', '_wpnonce' => $nonce, 'bulk_edit' => 'Update', '_status' => '-1' ), $fields );
+		$bulk = static function ( array $ids, array $fields ) use ( $get, $nonce, $quick ): array {
+			$query = array_merge( array( 'post_type' => 'product', 'action' => 'edit', 'action2' => '-1', '_wpnonce' => $nonce, 'woocommerce_quick_edit_nonce' => $quick, 'bulk_edit' => 'Update', '_status' => '-1' ), $fields );
 			$url   = add_query_arg( $query, admin_url( 'edit.php' ) );
 			foreach ( $ids as $id ) {
 				$url .= '&post%5B%5D=' . (int) $id;
@@ -136,7 +138,9 @@ run(
 		update_user_meta( $admin, 'locale', 'ar' );
 		[ , $screen ] = $get( admin_url( 'edit.php?post_type=product' ) );
 		delete_user_meta( $admin, 'locale' );
-		$check( str_contains( $screen, 'lang="en' ) && str_contains( $screen, 'Products' ) && ! str_contains( $screen, 'dir="rtl"' ), 'AC-5 the administration stays in English for a staff member who chose Arabic' );
+		preg_match( '/<html[^>]*>/s', $screen, $html_tag );
+		$tag = (string) ( $html_tag[0] ?? '' );
+		$check( 1 === preg_match( '/lang="en/', $tag ) && ! str_contains( $tag, 'dir="rtl"' ) && str_contains( $screen, 'Products' ), 'AC-5 the administration stays in English for a staff member who chose Arabic (' . esc_html( preg_replace( '/\\s+/', ' ', $tag ) ) . ')' );
 
 		return $ok;
 	}
