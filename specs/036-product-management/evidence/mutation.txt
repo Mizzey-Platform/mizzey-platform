@@ -11,4 +11,10 @@ CAUGHT    M6 a price change is not recorded  <- AC-6 a change by staff and one f
 CAUGHT    M7 the Arabic record keeps a second history  <- AC-6 saving the Arabic record keeps no second history on it
 CAUGHT    M8 the site's WPML rules are not applied  <- fixture: the site's wpml-config.xml is applied when it changes
 
-8 of 8 caught.
+After Codex's review (escaping, translations, duplicates, robots, addresses, zero prices):
+CAUGHT    M10 a duplicate copies the history  <- AC-6 a duplicate starts with no history of its own
+CAUGHT    M11 a change on the Arabic record is lost  <- AC-6 a change saved on the Arabic record is kept in the item's one history
+EQUIVALENT M9 the SEO title is printed unescaped: WordPress 7.1 strips markup from the document title itself, so the
+          page carries no script either way; the escaping stays as defence in depth for another title path.
+
+10 of 10 caught; 1 equivalent.

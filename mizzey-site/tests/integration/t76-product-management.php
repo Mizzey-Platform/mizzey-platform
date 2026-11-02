@@ -121,6 +121,8 @@ run(
 		$evil->set_param( 'meta_data', array( array( 'key' => ProductFields::SEO_TITLE, 'value' => '</title><script>t76xss()</script>' ) ) );
 		rest_get_server()->dispatch( $evil );
 		wp_set_current_user( 0 );
+		// Whatever route stored it (an import, the REST API, a database copy), the page must escape it.
+		update_post_meta( $bulk_target, ProductFields::SEO_TITLE, '</title><script>t76xss()</script>' );
 		$xss_url  = get_permalink( $bulk_target );
 		$xss_page = (string) wp_remote_retrieve_body( wp_remote_get( $xss_url, array( 'timeout' => 30 ) ) );
 		$check( ! str_contains( $xss_page, '<script>t76xss()' ), 'AC-2 an SEO title stored by another route is printed escaped' );
