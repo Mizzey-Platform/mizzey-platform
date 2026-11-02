@@ -612,7 +612,7 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered: the only development blocker. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
      "blocking": false
     },
     {
