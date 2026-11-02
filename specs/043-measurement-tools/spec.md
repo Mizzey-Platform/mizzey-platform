@@ -49,10 +49,10 @@ MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register. INT-09, INT-
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Google Tag Manager loads on every storefront page, in both languages, after Google's consent defaults, from a container named in admin; the Google Analytics, Meta and TikTok tags run inside it | MKT-01, MKT-02, MKT-03, INT-09, INT-10 | pending I-09 |
+| AC-1 | Google Tag Manager loads on every storefront page, in both languages, after Google's consent defaults, from a container named in admin; the Google Analytics, Meta and TikTok tags run inside it | MKT-01, MKT-02, MKT-03, INT-09, INT-10 | provisional |
 | AC-2 | A consent banner, in the visitor's language, records the visitor's choice, which governs every tracking tag and the campaign capture | MKT-10 | provisional |
 | AC-3 | The campaign that brought the visitor is kept on the order | MKT-09 | provisional |
-| AC-4 | A product feed per language serves Google Merchant Center and the Meta catalogue | MKT-05, MKT-06, INT-12 | pending I-09 |
+| AC-4 | A product feed per language serves Google Merchant Center and the Meta catalogue | MKT-05, MKT-06, INT-12 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
