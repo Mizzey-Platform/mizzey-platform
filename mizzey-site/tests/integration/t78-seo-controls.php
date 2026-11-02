@@ -79,18 +79,26 @@ run(
 		$check( str_contains( $body, "<title>{$tag} category title" ) && str_contains( $body, "{$tag} category description" ) && str_contains( $body, 'https://example.com/cat-' . $tag ), 'AC-1 a category carries its edited title, description and canonical' );
 
 		// ---- AC-2: redirects -----------------------------------------------------------------------------
+		// The requests ran in other processes: read the stored lists afresh.
+		$afresh = static function (): void {
+			wp_cache_delete( Redirects::OPTION, 'options' );
+			wp_cache_delete( Redirects::MISSING, 'options' );
+		};
 		$check( null === Redirects::save( "/{$tag}-old-page/", '/' . get_page_uri( $pid ) . '/' ) && null !== Redirects::save( '/' . get_page_uri( $pid ), get_permalink( $pid ) ), 'AC-2 a redirect is saved; one from a page to itself is refused' );
 		[ $c, , $loc ] = $page( home_url( "/{$tag}-old-page/" ) );
 		$check( 301 === $c && str_contains( $loc, get_page_uri( $pid ) ), 'AC-2 the old path answers 301 to the new address (' . $c . ' ' . $loc . ')' );
+		$afresh();
 		Redirects::save( "/ar/{$tag}-qadim/", home_url( '/ar/' ) );
 		[ $c, , $loc ] = $page( home_url( "/ar/{$tag}-qadim/" ) );
 		$check( 301 === $c && str_contains( $loc, '/ar/' ), 'AC-2 an Arabic path is redirected too (' . $c . ')' );
+		$afresh();
 		$check( 1 <= (int) ( Redirects::all()[ "/{$tag}-old-page" ]['hits'] ?? 0 ), 'AC-2 each redirect counts its use' );
 
 		// ---- AC-3: missing pages ---------------------------------------------------------------------------
-		$r = wp_remote_get( home_url( "/{$tag}-nowhere/" ), array( 'timeout' => 30, 'headers' => array( 'Referer' => 'https://referrer.example/x' ) ) );
+		$r = wp_remote_get( home_url( "/{$tag}-nowhere/" ), array( 'timeout' => 30, 'headers' => array( 'Referer' => 'https://referrer.example/x' ) ) ); // storefront-guard: exempt, a missing page whose 404 status is what is checked.
+		$afresh();
 		$missing = Redirects::missing();
-		$check( 404 === (int) wp_remote_retrieve_response_code( $r ) && isset( $missing[ "/{$tag}-nowhere" ] ) && 'https://referrer.example/x' === $missing[ "/{$tag}-nowhere" ]['referrer'] && ! str_contains( wp_json_encode( $missing[ "/{$tag}-nowhere" ] ), '127.0.0.1' ), 'AC-3 a missing page is logged by path with where it came from, and no visitor address' );
+		$check( 404 === (int) wp_remote_retrieve_response_code( $r ) && isset( $missing[ "/{$tag}-nowhere" ] ) && 'https://referrer.example/x' === $missing[ "/{$tag}-nowhere" ]['referrer'] && array( 'hits', 'last', 'referrer' ) === array_keys( $missing[ "/{$tag}-nowhere" ] ), 'AC-3 a missing page is logged by path with where it came from, and no visitor address' );
 		Redirects::save( "/{$tag}-nowhere/", home_url( '/' ) );
 		$check( ! isset( Redirects::missing()[ "/{$tag}-nowhere" ] ), 'AC-3 redirecting a missing path takes it off the list' );
 
@@ -108,11 +116,13 @@ run(
 			$all_products .= $xml;
 		}
 		$check( str_contains( $all_products, (string) get_permalink( $listed->get_id() ) ) && ! str_contains( $all_products, (string) get_permalink( $hidden->get_id() ) ), 'AC-4 the sitemap lists a product and leaves out one marked "do not index"' );
-		update_option( SearchSettings::EXCLUDED, array( 'product_brand' ), false );
+		update_option( SearchSettings::EXCLUDED, array(), false );
+		[ , $index_before ] = $page( home_url( '/wp-sitemap.xml' ) );
+		update_option( SearchSettings::EXCLUDED, array( 'product_cat' ), false );
 		update_option( SearchSettings::ROBOTS, SearchSettings::robotsLines( "Disallow: /{$tag}-private/\n<script>bad</script>" ), false );
 		[ , $index ] = $page( home_url( '/wp-sitemap.xml' ) );
 		[ , $robots ] = $page( home_url( '/robots.txt' ) );
-		$check( ! str_contains( $index, 'taxonomies-product_brand' ) && str_contains( $index, 'posts-product' ), 'AC-4 a kind of content switched off is not in the sitemap index' );
+		$check( str_contains( $index_before, 'taxonomies-product_cat' ) && ! str_contains( $index, 'taxonomies-product_cat' ) && str_contains( $index, 'posts-product' ), 'AC-4 a kind of content switched off is not in the sitemap index' );
 		$check( str_contains( $robots, "Disallow: /{$tag}-private/" ) && ! str_contains( $robots, 'script' ) && str_contains( $robots, 'Sitemap:' ), 'AC-4 robots.txt carries the extra line, refuses what is not a directive, and keeps the sitemap line' );
 
 		// ---- AC-5: structured data, hreflang, verification ----------------------------------------------------
@@ -125,7 +135,7 @@ run(
 		[ $c, $pdp ] = $page( (string) get_permalink( $listed->get_id() ) );
 		storefront_refuse_shell( (string) get_permalink( $listed->get_id() ), $c, $pdp );
 		$check( str_contains( $pdp, '"@type":"Product"' ) && str_contains( $pdp, '"@type":"BreadcrumbList"' ), 'AC-5 a product page carries product and breadcrumb structured data' );
-		$check( str_contains( $home, '"@type":"Organization"' ) || str_contains( $home, '"@type":"WebSite"' ), 'AC-5 the home page carries the organisation\'s structured data' );
+		$check( str_contains( $home, '"@type":"Organization"' ) && str_contains( $home, '"url":"' . home_url( '/' ) . '"' ), 'AC-5 the home page carries the organisation\'s structured data' );
 
 		// ---- AC-6: a landing page from blocks ------------------------------------------------------------------
 		$landing = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => "{$tag} Ramadan offers", 'post_content' => '<!-- wp:heading --><h2 class="wp-block-heading">Ramadan offers</h2><!-- /wp:heading --><!-- wp:woocommerce/product-collection {"queryId":1} /-->' ) );

@@ -56,7 +56,7 @@ final class SeoFields
         $set = $kind === 'term' ? static fn (string $k, string $v) => update_term_meta($id, $k, $v) : static fn (string $k, string $v) => update_post_meta($id, $k, $v);
         $set(ProductFields::SEO_TITLE, mb_substr(sanitize_text_field($values['title'] ?? ''), 0, 120));
         $set(ProductFields::SEO_DESC, mb_substr(sanitize_textarea_field($values['description'] ?? ''), 0, 320));
-        $set(ProductFields::CANONICAL, esc_url_raw(trim($values['canonical'] ?? ''), ['http', 'https']));
+        $set(ProductFields::CANONICAL, ProductFields::webAddress($values['canonical'] ?? ''));
         $robots = (string) ($values['robots'] ?? '');
         $set(ProductFields::ROBOTS, in_array($robots, ProductFields::ROBOT_CHOICES, true) ? $robots : '');
     }
@@ -157,9 +157,10 @@ final class SeoFields
      */
     public static function title($title)
     {
-        $own = self::field('title');
+        $own = sanitize_text_field(self::field('title'));
 
-        return $own !== '' ? $own : $title;
+        // WordPress prints this filter's value as it is: escaped here, whatever route stored the field.
+        return $own !== '' ? esc_html($own) : $title;
     }
 
     /**
@@ -180,7 +181,7 @@ final class SeoFields
      */
     public static function pageCanonical($url, $post = null)
     {
-        $own = $post instanceof \WP_Post && $post->post_type === 'page' ? self::of('post', $post->ID)['canonical'] : '';
+        $own = $post instanceof \WP_Post && $post->post_type === 'page' ? ProductFields::webAddress(self::of('post', $post->ID)['canonical']) : '';
 
         return $own !== '' ? $own : $url;
     }
@@ -191,7 +192,7 @@ final class SeoFields
      */
     public static function termCanonical($url)
     {
-        $own = is_page() ? '' : self::field('canonical');
+        $own = is_page() ? '' : ProductFields::webAddress(self::field('canonical'));
 
         return $own !== '' ? $own : $url;
     }
@@ -203,7 +204,7 @@ final class SeoFields
     public static function robots($robots)
     {
         $own = self::field('robots');
-        if (! is_array($robots) || $own === '') {
+        if (! is_array($robots) || $own === '' || ! in_array($own, ProductFields::ROBOT_CHOICES, true)) {
             return $robots;
         }
         foreach (explode(',', $own) as $directive) {

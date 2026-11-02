@@ -82,7 +82,7 @@ MKT-13 is marked [key] in the register.
 | robots.txt | WordPress's virtual robots.txt | Native; extra lines added |
 | hreflang | WPML | Native, verified |
 | Product and breadcrumb structured data | WooCommerce | Native, verified |
-| Organisation structured data | specs/003 | Exists, verified |
+| Organisation structured data | None (specs/003 left it to MKT-16) | Gap: printed on the home page of each language |
 | Landing pages | The block editor with WooCommerce's blocks | Native, verified (the section library is #311) |
 | Page and category SEO fields | None (no SEO plugin, D-24) | Gap: the same four fields as products |
 | Redirects, missing-page log | None (Redirection not installed, D-24) | Gap: our own |
@@ -102,6 +102,10 @@ MKT-13 is marked [key] in the register.
   extra robots lines MUST be directives only (AC-4).
 - **FR-005**: The Google and Bing verification codes MUST be printed on the home page (AC-5).
 - **FR-006**: The screen MUST need `manage_woocommerce` and its nonce for every change.
+- **FR-007**: The home page of each language MUST carry the store's organisation structured data: name, address
+  and, once the brand identity gives one, the logo (AC-5).
+- **FR-008**: The title, canonical and robots values MUST be checked when printed, whatever route stored them: the
+  title escaped, the canonical a full web address, the robots value one of the four choices (AC-1, AC-4).
 
 ## Optional safeguards (not owed)
 

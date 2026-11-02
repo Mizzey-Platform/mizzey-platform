@@ -4,7 +4,7 @@
 
 ## Summary
 
-Three classes: `SeoFields` (the product SEO store of specs/036, extended to pages and the three product taxonomies, and the sitemap's do-not-index exclusion), `Redirects` (301 redirects and the missing-page log), `SearchSettings` (the Settings screen: redirects, missing pages, sitemap kinds, robots lines, verification codes). WordPress, WooCommerce and WPML already give the sitemap, robots file, hreflang and structured data.
+Three classes: `SeoFields` (the product SEO store of specs/036, extended to pages and the three product taxonomies, and the sitemap's do-not-index exclusion), `Redirects` (301 redirects and the missing-page log), `SearchSettings` (the Settings screen: redirects, missing pages, sitemap kinds, robots lines, verification codes). `SearchSettings` also prints the organisation structured data on each language's home page, which specs/003 left to MKT-16. WordPress, WooCommerce and WPML already give the sitemap, robots file, hreflang and the product and breadcrumb structured data.
 
 ## Technical Context
 

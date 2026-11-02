@@ -44,6 +44,7 @@ final class SearchSettings
         add_filter('wp_sitemaps_taxonomies', [self::class, 'taxonomies']);
         add_filter('robots_txt', [self::class, 'robotsTxt'], 20, 2);
         add_action('wp_head', [self::class, 'verification'], 2);
+        add_action('wp_head', [self::class, 'organisation'], 3);
     }
 
     public static function menu(): void
@@ -100,6 +101,27 @@ final class SearchSettings
                 printf('<meta name="%s" content="%s" />' . "\n", esc_attr($name), esc_attr($code));
             }
         }
+    }
+
+    /** The store as an organisation (MKT-16), on the home page of each language. */
+    public static function organisation(): void
+    {
+        if (! is_front_page()) {
+            return;
+        }
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type'    => 'Organization',
+            'name'     => wp_strip_all_tags((string) get_bloginfo('name')),
+            'url'      => home_url('/'),
+        ];
+        $logo = (int) get_theme_mod('custom_logo') ?: (int) get_option('site_icon');
+        $src  = $logo > 0 ? wp_get_attachment_image_url($logo, 'full') : false;
+        if (is_string($src) && $src !== '') {
+            $data['logo'] = $src;
+        }
+        echo '<script type="application/ld+json">' . wp_json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . "</script>
+";
     }
 
     /** Only letters, digits, underscores and hyphens: what both services issue. */
