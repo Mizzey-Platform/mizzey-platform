@@ -300,9 +300,10 @@ run(
 		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
 		$check( 0 === $reads_waiting && str_contains( $deferred, 'being read' ) && $queued_fill && str_contains( $filled, 'Stock from the stock source: 9' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
 
-		// The budget counts the time the list has spent: with reads of 0.1 s and a 0.15 s budget, two rows are read and
-		// the third waits for the background. A single read longer than the budget makes lists read only in the
-		// background for five minutes, whatever their budget.
+		// The budget counts the time the list has spent (the budget itself, kept from its first version): with reads of
+		// 0.1 s and a 0.15 s budget, two rows are read and the third waits for the background. Then the slow mark (the
+		// later fix, which the second check guards): a single read longer than the budget makes lists read only in the
+		// background for five minutes, whatever their budget. How long one read may take is the adapter's timeout.
 		$rows = array( $id, $variation->get_id() );
 		for ( $i = 0; $i < 3; $i++ ) {
 			$rows[] = $s->simple_product( "t67 row {$i}", '10.00', null )->get_id();

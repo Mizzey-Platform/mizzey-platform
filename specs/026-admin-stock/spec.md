@@ -81,9 +81,11 @@ staging and the client's approval.
   that it is not known, with the stock fields shown locked (AC-2). The figure is kept five minutes per stock identity
   (one answer for both languages); a products list asks the source only while the time it has spent asking stays
   within a two-second budget, and a row past it says the figure is being read, which a background job then reads
-  for the next load. After one read longer than the budget, lists read only in the background for five minutes. One
-  read is one attempt; how long a single call may take is the adapter's own timeout, and a batch read for a page,
-  like that timeout, waits for the adapter's contract (PRE-09).
+  for the next load. The budget is checked before each read, so the read that crosses it still runs to its end:
+  after one read longer than the budget, lists read only in the background for five minutes, so a slow source holds
+  at most one list load in five minutes, for one read. One read is one attempt; how long a single call may take is
+  the adapter's own timeout, and a batch read for a page, like that timeout, waits for the adapter's contract
+  (PRE-09).
 - **FR-005**: Test fixtures and staging seeds MAY write stock as the ERP's stand-in, through a filter the site's own
   code never sets.
 - **FR-006**: Every message MUST be translated (FIX-04).
