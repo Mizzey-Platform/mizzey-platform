@@ -642,3 +642,18 @@ msgstr "اطلبوا مني تقييم المنتج بعد وصوله"
 
 msgid "Offers and news"
 msgstr "العروض والأخبار"
+
+msgid "Cookie choices"
+msgstr "خيارات ملفات تعريف الارتباط"
+
+msgid "We use cookies to measure visits and to show you relevant offers on other sites. Essential cookies keep the store working and are always on."
+msgstr "نستخدم ملفات تعريف الارتباط لقياس الزيارات ولعرض عروض تناسبك على مواقع أخرى. ملفات تعريف الارتباط الأساسية تُبقي المتجر يعمل وتظل مفعّلة دائمًا."
+
+msgid "Accept all"
+msgstr "قبول الكل"
+
+msgid "Essential only"
+msgstr "الأساسية فقط"
+
+msgid "Cookie settings"
+msgstr "إعدادات ملفات تعريف الارتباط"
