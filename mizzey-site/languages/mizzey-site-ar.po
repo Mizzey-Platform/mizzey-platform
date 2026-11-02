@@ -552,8 +552,8 @@ msgstr "المخزون يأتي من مصدر المخزون ولا يمكن ت�
 msgid "Stock from the stock source: not known"
 msgstr "المخزون من مصدر المخزون: غير معروف"
 
-#: mizzey-site/src/Stock/StockWriteGuard.php
 #. translators: %d: the quantity the stock source reports.
+#: mizzey-site/src/Stock/StockWriteGuard.php
 #, php-format
 msgid "Stock from the stock source: %d"
 msgstr "المخزون من مصدر المخزون: %d"
@@ -593,3 +593,11 @@ msgstr "رمز المنتج"
 #: mizzey-site/src/Orders/PackingSlip.php
 msgid "Customer note"
 msgstr "ملاحظة العميل"
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Refund reference: %s"
+msgstr "مرجع الاسترداد: %s"
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Payment reference: %s"
+msgstr "مرجع الدفع: %s"
