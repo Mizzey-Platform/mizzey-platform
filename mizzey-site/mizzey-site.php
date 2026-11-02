@@ -21,6 +21,7 @@ defined('ABSPATH') || exit;
 // Corex framework. Register the service provider with Corex's container on boot.
 
 require_once __DIR__ . '/src/I18n/Localisation.php';
+require_once __DIR__ . '/src/I18n/AdminEnglish.php';
 require_once __DIR__ . '/src/I18n/WpmlConfigSync.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -139,6 +140,8 @@ require_once __DIR__ . '/src/Payments/PaymentGate.php';
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
 MizzeySite\I18n\Localisation::register();
+// The administration in English for every staff member: ADM-159, specs/037-everyday-admin.
+MizzeySite\I18n\AdminEnglish::register();
 // The site's wpml-config.xml applied as soon as it changes: specs/036-product-management.
 MizzeySite\I18n\WpmlConfigSync::register();
 // .htaccess names the site's root, never a language's: specs/034-sales-report.
