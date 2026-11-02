@@ -617,7 +617,8 @@ run(
 		wp_cache_flush();
 		$made     = wc_get_order( $order_id );
 		$district = $made ? (string) $made->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) : '';
-		$ledger   = (array) get_option( FixtureStockSource::LEDGER, array() );
+		// This order's entries only: another scenario's cleanup may have left entries of its own.
+		$ledger   = array_filter( (array) get_option( FixtureStockSource::LEDGER, array() ), static fn ( $key ) => str_starts_with( (string) $key, 'order-' . $order_id . '-' ), ARRAY_FILTER_USE_KEY );
 		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ' ' . wp_strip_all_tags( (string) ( $placed['data']['message'] ?? '' ) ) . '; before it ' . ( $missing['data']['code'] ?? '' ) . ', ' . ( $missing_ar['data']['code'] ?? '' ) . '; ' . wp_json_encode( array( 'made' => (bool) $made, 'district' => $district, 'note' => $made ? $made->get_customer_note() : null, 'active' => $made ? OrderStock::active( $made ) : null, 'ledger' => count( $ledger ), 'wc' => (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'level' => StockGateway::make()->level( $five->get_id() )->quantity ) ) . ')' );
 		// [HTTP] PAY-05: Place Order pressed twice. Two checkouts of one cart sent at the same moment make one order, with
 		// one reservation per line; and pressing again after it was placed makes none.
