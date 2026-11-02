@@ -545,7 +545,7 @@ final class StockWriteGuard
     public static function rest($result, $server, $request)
     {
         if ($result !== null || ! $request instanceof \WP_REST_Request || self::permitted() || $request->get_method() === 'GET'
-            || preg_match('#^/wc/v\d+/products(/|$)#', $request->get_route()) !== 1) {
+            || preg_match('#^/wc/v\d+/products(/|$)#i', $request->get_route()) !== 1) {
             return $result;
         }
         // What the request sent, not the schema's defaults.

@@ -136,12 +136,16 @@ run(
 		t54_as( $manager->ID );
 		$kept_refund = t54_rest( 'DELETE', $route . '/' . $refund, array( 'force' => true ) );
 		$check( 403 === $kept_refund->get_status() && null !== wc_get_order( $refund ), "AC-4 [REST] deleting a refund without the capability is refused ({$kept_refund->get_status()})" );
+		// WordPress matches a route whatever its letter case: the same route in capitals is refused too.
+		$upper      = t54_rest( 'POST', '/WC/V3/ORDERS/' . $order->get_id() . '/REFUNDS', array( 'amount' => '10', 'api_refund' => false ) );
+		$upper_made = count( wc_get_order( $order->get_id() )->get_refunds() );
+		$check( 403 === $upper->get_status() && 1 === $upper_made, "AC-4 [REST] the refunds route written in capitals is refused too ({$upper->get_status()}), and no refund is made" );
 		$read    = t54_rest( 'GET', $route )->get_status();
 		$preview = t54_rest( 'POST', $route . '/preview', array( 'amount' => '5' ) )->get_status();
 		$check( 200 === $read && 403 !== $preview, "AC-4 [REST] reading refunds ({$read}) and the refund preview ({$preview}), which make no refund, are not refused by the capability" );
 		// WooCommerce's v4 refunds routes (behind its rest-api-v4 flag): the guard's answer before any route runs.
 		$v4 = static fn ( string $method, string $route ) => RefundCapability::guardRest( null, null, new \WP_REST_Request( $method, $route ) );
-		$check( is_wp_error( $v4( 'POST', '/wc/v4/refunds' ) ) && is_wp_error( $v4( 'DELETE', '/wc/v4/refunds/' . $refund ) ) && null === $v4( 'GET', '/wc/v4/refunds' ) && null === $v4( 'POST', '/wc/v4/refunds/preview' ), 'AC-4 [REST] the v4 refunds routes are guarded too: making or deleting a refund is refused without the capability; reading and the preview are not' );
+		$check( is_wp_error( $v4( 'POST', '/wc/v4/refunds' ) ) && is_wp_error( $v4( 'POST', '/WC/V4/Refunds' ) ) && is_wp_error( $v4( 'DELETE', '/wc/v4/refunds/' . $refund ) ) && null === $v4( 'GET', '/wc/v4/refunds' ) && null === $v4( 'POST', '/wc/v4/refunds/preview' ), 'AC-4 [REST] the v4 refunds routes are guarded too: making or deleting a refund is refused without the capability; reading and the preview are not' );
 
 		// AC-4: the order screen's refund and delete-refund actions.
 		$check( 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ) && 0 === has_action( 'wp_ajax_woocommerce_delete_refund', array( RefundCapability::class, 'guardAjax' ) ), 'AC-4 the guard runs before WooCommerce on the order screen\'s refund and delete-refund actions (priority 0)' );

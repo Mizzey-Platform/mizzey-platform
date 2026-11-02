@@ -31,9 +31,10 @@ final class RefundCapability
 
     /**
      * WooCommerce's REST routes that make or delete a refund: under an order (v1 to v3), and v4's own refunds routes
-     * (behind WooCommerce's `rest-api-v4` flag in 11.1); the preview makes none.
+     * (behind WooCommerce's `rest-api-v4` flag in 11.1); the preview makes none. Case-insensitive, as WordPress matches
+     * a route.
      */
-    private const REST_ROUTES = ['#^/wc/v[0-9]+/orders/[0-9]+/refunds(/[0-9]+)?$#', '#^/wc/v[0-9]+/refunds(/[0-9]+)?$#'];
+    private const REST_ROUTES = ['#^/wc/v[0-9]+/orders/[0-9]+/refunds(/[0-9]+)?$#i', '#^/wc/v[0-9]+/refunds(/[0-9]+)?$#i'];
 
     public static function register(): void
     {

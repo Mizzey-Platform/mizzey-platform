@@ -214,6 +214,8 @@ run(
 			'batch'     => t67_rest( 'POST', '/wc/v3/products/batch', array( 'update' => array( array( 'id' => $id, 'stock_quantity' => 50 ) ) ) ),
 			'delta'     => t67_rest( 'PUT', "/wc/v3/products/{$id}", array( 'inventory_delta' => 3 ) ),
 			'v1 nested' => t67_rest( 'PUT', '/wc/v1/products/' . $parent->get_id(), array( 'variations' => array( array( 'id' => $variation->get_id(), 'stock_quantity' => 99 ) ) ) ),
+			// WordPress matches a route whatever its letter case.
+			'capitals'  => t67_rest( 'PUT', "/WC/V3/PRODUCTS/{$id}", array( 'stock_quantity' => 50 ) ),
 		);
 		$create  = new \WP_REST_Request( 'POST', '/wc/v3/products' );
 		$create->set_header( 'content-type', 'application/json' );
