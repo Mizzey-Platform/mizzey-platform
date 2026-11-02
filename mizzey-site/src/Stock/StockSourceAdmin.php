@@ -176,7 +176,7 @@ final class StockSourceAdmin
                 esc_html(sprintf(
                     /* translators: 1: date and time, 2: the change, 3: the figure after it, 4: where it came from, 5: who, 6: the reason. */
                     __('%1$s: %2$+d to %3$d (%4$s, %5$s) %6$s', 'mizzey-site'),
-                    get_date_from_gmt((string) $row->created_at, 'Y-m-d H:i'),
+                    get_date_from_gmt((string) $row->created_at, get_option('date_format') . ' ' . get_option('time_format')),
                     (int) $row->delta,
                     (int) $row->level_after,
                     (string) $row->origin,

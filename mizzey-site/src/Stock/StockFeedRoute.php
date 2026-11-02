@@ -32,7 +32,7 @@ final class StockFeedRoute
     public const ROLE      = 'mizzey_stock_feed';
     public const GRANTED   = 'mizzey_feed_stock_granted';
     public const MAX_ITEMS = 100;
-    public const KEY_PREFIX = 'feed:';
+    public const KEY_PREFIX = 'feed' . ':';
     /** The largest figure or change the route accepts. */
     public const MAX_QUANTITY = 999999;
 
