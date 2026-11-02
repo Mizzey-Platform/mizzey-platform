@@ -48,7 +48,34 @@ run(
 		};
 		$tag = 't75' . wp_rand( 1000, 9999 );
 		$w   = new Workflows( $s );
-		$s->on_finish( static function (): void { delete_transient( StoreDashboard::STOCK_KEY ); wp_set_current_user( 0 ); } );
+		$threshold_before = get_option( 'woocommerce_notify_low_stock_amount', null );
+		$s->on_finish(
+			static function () use ( $threshold_before ): void {
+				delete_transient( StoreDashboard::STOCK_KEY );
+				delete_option( StoreDashboard::RUN_KEY );
+				as_unschedule_all_actions( StoreDashboard::COUNT_HOOK, null, 'mizzey' );
+				null === $threshold_before ? delete_option( 'woocommerce_notify_low_stock_amount' ) : update_option( 'woocommerce_notify_low_stock_amount', $threshold_before );
+				wp_set_current_user( 0 );
+			}
+		);
+		// The background count, run to the end in this process: each batch queues the next.
+		$count = static function (): array {
+			delete_transient( StoreDashboard::STOCK_KEY );
+			delete_option( StoreDashboard::RUN_KEY );
+			as_unschedule_all_actions( StoreDashboard::COUNT_HOOK, null, 'mizzey' );
+			$after = 0;
+			for ( $i = 0; $i < 1000; $i++ ) {
+				StoreDashboard::countBatch( $after );
+				$next = as_get_scheduled_actions( array( 'hook' => StoreDashboard::COUNT_HOOK, 'group' => 'mizzey', 'status' => \ActionScheduler_Store::STATUS_PENDING, 'per_page' => 1 ) );
+				if ( array() === $next ) {
+					break;
+				}
+				$action = reset( $next );
+				$after  = (int) ( $action->get_args()[0] ?? 0 );
+				as_unschedule_all_actions( StoreDashboard::COUNT_HOOK, null, 'mizzey' );
+			}
+			return (array) get_transient( StoreDashboard::STOCK_KEY );
+		};
 		$admin = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}adm@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $admin );
 		wp_set_current_user( $admin );
@@ -77,7 +104,7 @@ run(
 		$req   = new \WP_REST_Request( 'GET', '/wc-analytics/reports/revenue/stats' );
 		$req->set_query_params( array( 'after' => $after, 'before' => $before, 'interval' => 'day', 'force_cache_refresh' => true ) );
 		$report = (array) ( rest_do_request( $req )->get_data()['totals'] ?? array() );
-		$check( abs( $sales['revenue'] - (float) $report['total_sales'] ) < 0.01 && $sales['orders'] === (int) $report['orders_count'] && $sales['units'] === (int) $report['num_items_sold'] && abs( $sales['aov'] - (float) $report['avg_order_value'] ) < 0.01 && $sales['units'] >= 12, 'AC-1 the dashboard\'s revenue, orders, units and average order value are the sales report\'s for the same week (' . wp_json_encode( $sales ) . ')' );
+		$check( abs( $sales['revenue'] - (float) $report['total_sales'] ) < 0.01 && $sales['orders'] === (int) $report['orders_count'] && $sales['units'] === (int) $report['num_items_sold'] && abs( $sales['aov'] - (float) $report['avg_order_value'] ) < 0.01 && abs( $sales['refunds'] - (float) $report['refunds'] ) < 0.01 && $sales['units'] >= 12, 'AC-1 the dashboard\'s revenue, orders, units and average order value are the sales report\'s for the same week (' . wp_json_encode( $sales ) . ')' );
 		ob_start();
 		StoreDashboard::render();
 		$html = (string) ob_get_clean();
@@ -87,6 +114,20 @@ run(
 		$top  = StoreDashboard::topProducts( $after, $before, 50 );
 		$mine = array_values( array_filter( $top, static fn ( $l ) => in_array( $l['id'], array( $en, $ar ), true ) ) );
 		$check( 1 === count( $mine ) && $en === $mine[0]['id'] && $mine[0]['units'] >= 12, 'AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units (' . wp_json_encode( $mine ) . ')' );
+
+		[ $parent, $variations ] = $w->variable( "{$tag}-VAR", array( 'S' => null, 'L' => null ) );
+		$order( $variations[0], 3, 'en' );
+		$order( $variations[1], 2, 'en' );
+		$refunded = $order( $en, 4, 'en' );
+		$line     = array_key_first( $refunded->get_items() );
+		$refund   = wc_create_refund( array( 'order_id' => $refunded->get_id(), 'amount' => (string) $refunded->get_total(), 'line_items' => array( $line => array( 'qty' => 4, 'refund_total' => (float) $refunded->get_total() ) ) ) );
+		if ( $refund instanceof \WC_Order_Refund ) {
+			OrdersScheduler::import( $refund->get_id() );
+		}
+		OrdersScheduler::import( $refunded->get_id() );
+		$top2   = StoreDashboard::topProducts( $after, $before, 50 );
+		$by_id  = array_column( $top2, 'units', 'id' );
+		$check( 3 === ( $by_id[ $variations[0] ] ?? 0 ) && 2 === ( $by_id[ $variations[1] ] ?? 0 ) && 12 === ( $by_id[ $en ] ?? 0 ), 'AC-3 two variations are two lines, and 4 units sold and refunded leave the product at 12 (' . wp_json_encode( array_intersect_key( $by_id, array_flip( array( $variations[0], $variations[1], $en ) ) ) ) . ')' );
 
 		// ---- AC-4: orders requiring action, refunds to make ---------------------------------------------------
 		$before_counts = StoreDashboard::needingAction();
@@ -105,6 +146,17 @@ run(
 		wc_create_refund( array( 'order_id' => $o1->get_id(), 'amount' => (string) $o1->get_total() ) );
 		remove_filter( 'woocommerce_order_fully_refunded_status', '__return_false' );
 		$check( 'cancelled' === wc_get_order( $o1->get_id() )->get_status() && ! in_array( $o1->get_id(), StoreDashboard::pendingRefunds()['cancelled_paid'], true ), 'AC-4 once refunded it is no longer counted, even while it stays Cancelled' );
+		$_GET = array( 'mizzey_refunds' => 'cancelled_paid' );
+		$listed = StoreDashboard::listOnly( array( 'type' => 'shop_order', 'status' => array( 'wc-cancelled' ) ) );
+		$_GET = array();
+		$check( array_values( StoreDashboard::pendingRefunds()['cancelled_paid'] ?: array( 0 ) ) === array_values( (array) ( $listed['id'] ?? array() ) ) && ! isset( $listed['status'] ), 'AC-4 the link from a refund count opens exactly the orders counted' );
+		$flag = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $flag, 't75 a payment arrived for a cancelled order' );
+		$flagged_now = in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true );
+		$delivered   = wc_get_order( $flag->get_id() );
+		$delivered->set_status( 'completed' );
+		$delivered->save();
+		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded' );
 		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'status=wc-cancelled' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------
@@ -115,13 +167,17 @@ run(
 		$filter  = static fn () => $fixture;
 		add_filter( StockGateway::SOURCE_FILTER, $filter );
 		update_option( 'woocommerce_notify_low_stock_amount', 2 );
-		$stock = StoreDashboard::stock( true );
+		$stock = $count();
 		remove_filter( StockGateway::SOURCE_FILTER, $filter );
 		$check( 1 <= $stock['low'] && 1 <= $stock['out'] && 0 < $stock['unknown'], 'AC-5 the source\'s figures give the low and out-of-stock counts; items it does not know are unknown, not in stock (' . wp_json_encode( $stock ) . ')' );
 		add_filter( StockGateway::SOURCE_FILTER, static fn () => new T75Source( array( "{$tag}-OUT" => 0 ) ), 20 );
-		$only = StoreDashboard::stock( true );
+		$only = $count();
 		$check( $only['out'] === 1 && $out_ar > 0, 'AC-5 the out-of-stock product in two languages is counted once (out ' . $only['out'] . ')' );
-		$check( is_array( get_transient( StoreDashboard::STOCK_KEY ) ), 'AC-5 the answer is kept for ten minutes, so the dashboard does not ask the source on every visit' );
+		$check( is_array( get_transient( StoreDashboard::STOCK_KEY ) ), 'AC-5 the count is kept, so the dashboard does not ask the source on every visit' );
+		delete_transient( StoreDashboard::STOCK_KEY );
+		as_unschedule_all_actions( StoreDashboard::COUNT_HOOK, null, 'mizzey' );
+		$first = StoreDashboard::stock();
+		$check( null === $first && false !== as_next_scheduled_action( StoreDashboard::COUNT_HOOK, null, 'mizzey' ), 'AC-5 with no count yet the dashboard answers at once and queues the count in the background' );
 
 		// ---- AC-6: quick actions, and who sees the widget ------------------------------------------------------
 		$check( str_contains( $html, 'post-new.php?post_type=product' ) && str_contains( $html, 'post-new.php?post_type=shop_coupon' ) && str_contains( $html, 'status=wc-processing' ), 'AC-6 add a product, create a coupon and view pending orders are on the dashboard' );
