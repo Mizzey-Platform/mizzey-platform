@@ -54,6 +54,7 @@ require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';
 require_once __DIR__ . '/src/Security/StaffActivityLog.php';
 require_once __DIR__ . '/src/Security/StaffActivityScreen.php';
+require_once __DIR__ . '/src/Security/Monitoring.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
@@ -193,6 +194,9 @@ MizzeySite\Catalogue\ImageHandling::register();
 // Product fields WooCommerce lacks, and the price history: #276. See specs/036-product-management.
 MizzeySite\Catalogue\ProductFields::register();
 MizzeySite\Catalogue\PriceHistory::register();
+
+// Errors and failed scheduled actions logged and raised: NFR-10. See specs/039-observability.
+MizzeySite\Security\Monitoring::register();
 
 // The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
