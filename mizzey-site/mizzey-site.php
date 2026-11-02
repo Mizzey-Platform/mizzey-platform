@@ -29,6 +29,7 @@ require_once __DIR__ . '/src/Seo/MetaDescription.php';
 require_once __DIR__ . '/src/Seo/SitemapLanguages.php';
 require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
 require_once __DIR__ . '/src/Reporting/StockReport.php';
+require_once __DIR__ . '/src/Reporting/StoreDashboard.php';
 require_once __DIR__ . '/src/Security/Disclosure.php';
 require_once __DIR__ . '/src/Security/XmlRpc.php';
 require_once __DIR__ . '/src/Security/AccountDiscovery.php';
@@ -150,6 +151,9 @@ MizzeySite\Seo\SitemapLanguages::register();
 // whichever language the operator's session is in. Confined to that report's own query.
 // See specs/004-inventory-report-one-item-once.
 MizzeySite\Reporting\StockReport::register();
+
+// The store at a glance on the dashboard: ADM-01 to ADM-15. See specs/035-admin-dashboard.
+MizzeySite\Reporting\StoreDashboard::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
