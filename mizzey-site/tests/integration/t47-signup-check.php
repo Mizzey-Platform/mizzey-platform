@@ -442,6 +442,30 @@ run(
 		SignupRoutes::restAfter( null, array(), $parent );
 		$check( null !== $checkout_handler && is_wp_error( $from_child ) && ! is_wp_error( $from_parent ), 'FR-003 a nested request cannot use its parent\'s permit; the parent still can after the child ends' );
 
+		// A checkout's token is spent only when the account is made: a check after the guard on the same filter that
+		// refuses the account (Google sign-in's e-mail lock busy) leaves it for the next try.
+		$late_token = t47_token( 'checkout', 10 );
+		$late_email = $fresh( 'guard-late' );
+		$late       = new \WP_REST_Request( 'POST', '/wc/store/v1/checkout' );
+		$late->set_param( 'create_account', true );
+		$late->set_param( 'billing_address', array( 'email' => $late_email ) );
+		$late->set_param( 'extensions', array( 'mizzey-signup' => array( 'token' => $late_token, 'trap' => '' ) ) );
+		$busy = static function ( $errors ) {
+			$errors->add( 'mizzey_registration_busy', 'Please try again in a moment.' );
+			return $errors;
+		};
+		SignupRoutes::restBefore( null, (array) $checkout_handler, $late );
+		add_filter( 'woocommerce_registration_errors', $busy, 999, 1 );
+		$late_refused = wc_create_new_customer( $late_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		remove_filter( 'woocommerce_registration_errors', $busy, 999 );
+		SignupRoutes::restAfter( null, array(), $late );
+		$late_valid = SignupCheck::inspect( 'checkout', $late_token, '' );
+		$late_kept  = null !== $late_valid && ! SignupCheck::spent( $late_valid );
+		SignupRoutes::restBefore( null, (array) $checkout_handler, $late );
+		$late_made = wc_create_new_customer( $late_email, '', 'Pw-' . wp_generate_password( 18, false ) );
+		SignupRoutes::restAfter( null, array(), $late );
+		$check( is_wp_error( $late_refused ) && $late_kept && ! is_wp_error( $late_made ) && null !== $late_valid && SignupCheck::spent( $late_valid ), 'AC-2 [checkout] an account refused by a later check keeps the checkout\'s token, and the next try creates it and spends the token' );
+
 		list( $plain_customer ) = two_factor_user( $s, 'customer' );
 		wp_set_current_user( $plain_customer->ID );
 		$by_customer = wc_create_new_customer( $fresh( 'guard-customer' ), '', 'Pw-' . wp_generate_password( 18, false ) );
