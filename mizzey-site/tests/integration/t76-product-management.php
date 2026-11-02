@@ -63,10 +63,14 @@ run(
 		// ---- AC-2: video and SEO over the real product screen ---------------------------------------------
 		// The site's field rules applied (as WpmlConfigSync does when the file changes), then a translation as staff
 		// make one in the translation editor: not a WPML duplicate, which mirrors every field of its original.
+		// WPML's loader runs once a request and marks it: unmark it, so only this sync can run it now.
+		$ran = new \ReflectionProperty( \WPML_Config::class, 'has_run' );
+		$ran->setAccessible( true );
+		$ran->setValue( null, false );
 		delete_option( \MizzeySite\I18n\WpmlConfigSync::OPTION );
 		$applied = \MizzeySite\I18n\WpmlConfigSync::sync();
 		$fields  = get_option( 'icl_sitepress_settings' )['translation-management']['custom_fields_translation'] ?? array();
-		$check( $applied && 1 === (int) ( $fields[ ProductFields::BADGES ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::SEO_TITLE ] ?? -1 ), 'fixture: the site\'s wpml-config.xml is applied when it changes (badges copied, SEO title translated): ' . wp_json_encode( array( $fields[ ProductFields::BADGES ] ?? null, $fields[ ProductFields::SEO_TITLE ] ?? null ) ) );
+		$check( $applied && true === $ran->getValue() && 1 === (int) ( $fields[ ProductFields::BADGES ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::SEO_TITLE ] ?? -1 ), 'fixture: the site\'s wpml-config.xml is applied when it changes (badges copied, SEO title translated): ' . wp_json_encode( array( $fields[ ProductFields::BADGES ] ?? null, $fields[ ProductFields::SEO_TITLE ] ?? null ) ) );
 		// The product screen's save, as WooCommerce runs it (WC_Meta_Box_Product_Data::save): the posted fields, the
 		// woocommerce_admin_process_product_object action, then the save. The same request over HTTP crashes this
 		// machine's Apache (Xdebug in develop mode, exit 0xC0000005, t11 shows it on main too); it is checked on staging.
@@ -163,6 +167,16 @@ run(
 		PriceHistory::render( get_post( $en ) );
 		$box = (string) ob_get_clean();
 		$check( str_contains( $box, '210' ) && str_contains( $box, '180' ) && str_contains( $box, "{$tag}mgr" ), 'AC-6 the product screen shows the history with who changed what' );
+
+		// A save of the Arabic record (staff editing it, or WooCommerce Multilingual) is the same item: no history of its own.
+		$bulk_check_en = $w->simple( "{$tag}-ARSAVE", null );
+		$bulk_check_ar = $w->translate( 'duplicate', $bulk_check_en );
+		wp_set_current_user( $staff );
+		$ar_product = $fresh( $bulk_check_ar );
+		$ar_product->set_regular_price( '77' );
+		$ar_product->save();
+		wp_set_current_user( 0 );
+		$check( $bulk_check_ar > 0 && array() === PriceHistory::of( $bulk_check_ar ), 'AC-6 saving the Arabic record keeps no second history on it' );
 
 		// ---- AC-7: bulk -------------------------------------------------------------------------------------------
 		$check( class_exists( '\WC_Product_CSV_Exporter' ) || is_readable( WC_ABSPATH . 'includes/export/class-wc-product-csv-exporter.php' ), 'AC-7 bulk export is WooCommerce\'s CSV exporter' );
