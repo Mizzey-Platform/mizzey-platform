@@ -147,6 +147,13 @@ run(
 		$bad      = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-z@example.invalid" );
 		$_POST    = array();
 		$check( '01012345678' === get_user_meta( $mobile, PhoneSignIn::FIELD, true ) && ! $errors->has_errors() && ! $taken->has_errors() && in_array( 'mizzey_phone_invalid', $bad->get_error_codes(), true ), 'AUTH-02 a mobile number given at registration is kept in its local form; a number another account holds is not refused, so the form does not say whose it is; a malformed one is refused' );
+		// D-305-3, D-305-6: Arabic-Indic digits are a mobile number like any other; an array value is refused quietly.
+		$_POST        = array( PhoneSignIn::FIELD => '٠١٠١٢٣٤٥٦٧٨' );
+		$arabic_typed = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-a@example.invalid" );
+		$_POST        = array( PhoneSignIn::FIELD => array( '01012345678' ) );
+		$array_typed  = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-b@example.invalid" );
+		$_POST        = array();
+		$check( ! $arabic_typed->has_errors() && ! $array_typed->has_errors() && '01012345678' === PhoneSignIn::normalise( '۰۱۰ ۱۲۳۴ ۵۶۷۸' ) && $mobile === PhoneSignIn::holder( '٠١٠١٢٣٤٥٦٧٨' ) && get_userdata( $mobile )->user_login === PhoneSignIn::canonical( '٠١٠١٢٣٤٥٦٧٨' ), 'AUTH-02 a mobile number typed with Arabic-Indic or Eastern Arabic-Indic digits registers and reaches sign-in as the same number; an array value raises nothing' );
 		$by_phone = wp_authenticate( '0020 10 1234 5678', $password );
 		$wrong    = wp_authenticate( '01012345678', 'not-the-password' );
 		$nobody   = wp_authenticate( '01099999999', $password );
@@ -180,6 +187,8 @@ run(
 		wp_cache_flush();
 		delete_option( PhoneSignIn::BACKFILLED );
 		PhoneSignIn::backfill();
+		$autoload = (string) $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", PhoneSignIn::BACKFILLED ) );
+		$check( in_array( $autoload, array( 'yes', 'on', 'auto-on' ), true ), 'AUTH-02 the backfill flag is autoloaded, so it costs no query on each request (' . $autoload . ')' );
 		$check( $late === PhoneSignIn::holder( $n1 ) && null === PhoneSignIn::holder( $n2 ) && $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 numbers saved before claims existed are claimed once by their one holder; a number two accounts saved is claimed by neither; a claimed number is left as it is (' . wp_json_encode( array( PhoneSignIn::holder( $n1 ), $late, PhoneSignIn::holder( $n2 ), PhoneSignIn::holder( '01012345678' ), $mobile, get_option( PhoneSignIn::CLAIM . '_' . $n1 ), get_user_meta( $late, PhoneSignIn::HELD, true ) ) ) . ')' );
 		$s->on_finish( static function () use ( $n1, $n2 ) { delete_option( PhoneSignIn::CLAIM . '_' . $n1 ); delete_option( PhoneSignIn::CLAIM . '_' . $n2 ); } );
 		$third = t58_register( $s, "{$tag}-third@example.invalid", $password, array( PhoneSignIn::FIELD => $n2 ) );

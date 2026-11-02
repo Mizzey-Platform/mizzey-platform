@@ -15,10 +15,11 @@ defined('ABSPATH') || exit;
  * the phone number is captured at registration and can be used to sign in, with no SMS code (SMS is P2, INT-07).
  *
  * The registration form offers an optional mobile number; it is kept as the account's WooCommerce billing phone in the
- * Egyptian mobile form (`01` and nine digits; `+20` and `0020` prefixes accepted). One number signs in to one account:
- * the first account to hold it claims it, in one insert that a second account cannot also win, whatever wrote the
- * billing phone (registration, the account's address form, the admin, the REST API). An account whose number another
- * account already holds keeps the number for delivery and cannot sign in with it; registration does not say so, so the
+ * Egyptian mobile form (`01` and nine digits; `+20` and `0020` prefixes and Arabic digits accepted, CustomerKey). One
+ * number signs in to one account: the first account to hold it claims it, in one insert that a second account cannot
+ * also win, whatever wrote the billing phone (registration, the account's address form, the admin, the REST API). An
+ * account whose number another account already holds keeps the number for delivery and cannot sign in with it;
+ * registration does not say so, so the
  * form cannot be used to learn whether a number belongs to a customer. Numbers saved before this existed are claimed
  * once (`backfill()`), each by the one account holding it; a number several accounts hold is claimed by none.
  *
@@ -64,7 +65,14 @@ final class PhoneSignIn
     /** Claims the numbers saved before claims existed, once: each by its one holder, none held by several. */
     public static function backfill(): void
     {
+        // Read from the autoloaded options, so a site that has run it pays no query on each request.
+        if ((wp_load_alloptions()[self::BACKFILLED] ?? '') === 'yes') {
+            return;
+        }
         if (get_option(self::BACKFILLED) === 'yes') {
+            // Saved before the flag was autoloaded: autoloaded from now on.
+            wp_set_option_autoload(self::BACKFILLED, true);
+
             return;
         }
         global $wpdb;
@@ -90,7 +98,7 @@ final class PhoneSignIn
                 self::locked('phone_user_' . $userId, static fn () => self::follow($userId));
             }
         }
-        update_option(self::BACKFILLED, 'yes', false);
+        update_option(self::BACKFILLED, 'yes', true);
     }
 
     public static function field(): void
@@ -103,17 +111,10 @@ final class PhoneSignIn
         );
     }
 
-    /** The Egyptian mobile form of a number, or null when it is not one. */
+    /** The Egyptian mobile form of a number, or null when it is not one (Arabic digits included, CustomerKey). */
     public static function normalise(string $phone): ?string
     {
-        $digits = preg_replace('/[\s\-().]/', '', $phone) ?? '';
-        if (str_starts_with($digits, '+20')) {
-            $digits = '0' . substr($digits, 3);
-        } elseif (str_starts_with($digits, '0020')) {
-            $digits = '0' . substr($digits, 4);
-        }
-
-        return preg_match('/^01[0125][0-9]{8}$/', $digits) === 1 ? $digits : null;
+        return CustomerKey::phone($phone);
     }
 
     /** The account that signs in with the number, or null: the claim's owner, while its saved phone is still the number. */
@@ -158,7 +159,7 @@ final class PhoneSignIn
     public static function validate($errors, $username, $email)
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verified the registration form's nonce.
-        $given = isset($_POST[self::FIELD]) ? trim(sanitize_text_field(wp_unslash((string) $_POST[self::FIELD]))) : '';
+        $given = isset($_POST[self::FIELD]) && is_string($_POST[self::FIELD]) ? trim(sanitize_text_field(wp_unslash($_POST[self::FIELD]))) : '';
         if ($given === '' || ! $errors instanceof \WP_Error) {
             return $errors;
         }
@@ -175,7 +176,7 @@ final class PhoneSignIn
     public static function save($customerId): void
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verified the registration form's nonce.
-        $given  = isset($_POST[self::FIELD]) ? sanitize_text_field(wp_unslash((string) $_POST[self::FIELD])) : '';
+        $given  = isset($_POST[self::FIELD]) && is_string($_POST[self::FIELD]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD])) : '';
         $normal = $given !== '' ? self::normalise($given) : null;
         if ((int) $customerId > 0 && $normal !== null) {
             update_user_meta((int) $customerId, self::FIELD, $normal);
