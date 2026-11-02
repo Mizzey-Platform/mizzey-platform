@@ -290,6 +290,48 @@ run(
 		$s->note( 'AC-242-06 order-received endpoint query var: '
 			. ( WC()->query->get_query_vars()['order-received'] ?? 'MISSING' ) );
 
+		// ---- The production path (audit of 2 November 2026): `wp mizzey languages provision` ---------------
+		// The baseline is made by LanguageSetup, the code the release command runs. Run again it changes nothing,
+		// keeps every endpoint wording, and makes a missing Arabic record again, served at its Arabic address.
+		$before_pages = (int) $GLOBALS['wpdb']->get_var( "SELECT COUNT(*) FROM {$GLOBALS['wpdb']->posts} WHERE post_type = 'page'" );
+		$front_before = array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ), (int) get_option( 'woocommerce_terms_page_id' ) );
+		$again        = \MizzeySite\I18n\LanguageSetup::provision( false );
+		$after_pages  = (int) $GLOBALS['wpdb']->get_var( "SELECT COUNT(*) FROM {$GLOBALS['wpdb']->posts} WHERE post_type = 'page'" );
+		$front_after  = array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ), (int) get_option( 'woocommerce_terms_page_id' ) );
+		$good = ! isset( $again['error'] ) && $before_pages === $after_pages && $front_before === $front_after
+			&& array() === $again['endpoints']['made'] && array() === $again['endpoints']['missing']
+			&& count( \MizzeySite\I18n\LanguageSetup::ENDPOINTS ) === count( $again['endpoints']['kept'] )
+			&& 'orders-ar' === ( $again['endpoints']['kept']['orders'] ?? '' )
+			&& array( 'product_brand' => true, 'product_collection' => true ) === $again['taxonomies']
+			&& count( \MizzeySite\I18n\LanguageSetup::PAGES ) === count( $again['pages']['ar'] ) && array() === $again['pages']['drafts'];
+		$s->note( sprintf( '%s provision run again changes nothing: pages %d -> %d, endpoints kept %d, made %d, missing %s, taxonomies %s, drafts %s',
+			$good ? 'ok  ' : 'FAIL', $before_pages, $after_pages, count( $again['endpoints']['kept'] ?? array() ), count( $again['endpoints']['made'] ?? array() ),
+			implode( ',', $again['endpoints']['missing'] ?? array( 'error' ) ), wp_json_encode( $again['taxonomies'] ?? null ), implode( ',', $again['pages']['drafts'] ?? array() ) ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
+		// A missing Arabic record is made again, in the English record's group, with the same slug, and served.
+		$offers_en = (int) ( $again['pages']['en']['offers'] ?? 0 );
+		$offers_ar = (int) ( $again['pages']['ar']['offers'] ?? 0 );
+		$healed    = false;
+		$served    = 0;
+		if ( $offers_en > 0 && $offers_ar > 0 ) {
+			wp_delete_post( $offers_ar, true );
+			$made      = \MizzeySite\I18n\LanguageSetup::provision( false );
+			$new_ar    = (int) ( $made['pages']['ar']['offers'] ?? 0 );
+			$trid      = $sitepress->get_element_trid( $offers_en, 'post_page' );
+			$group     = $trid ? $sitepress->get_element_translations( $trid, 'post_page' ) : array();
+			$healed    = $new_ar > 0 && $new_ar !== $offers_ar && isset( $group['ar'] ) && (int) $group['ar']->element_id === $new_ar
+				&& 'offers' === get_post_field( 'post_name', $new_ar ) && 'publish' === get_post_status( $new_ar );
+			$served    = t22_get( (string) apply_filters( 'wpml_permalink', get_permalink( $offers_en ), 'ar' ) )['status'];
+		}
+		$good = $healed && 200 === $served;
+		$s->note( sprintf( '%s provision makes a missing Arabic record again (offers): same group, slug and status; /ar/ answers %d', $good ? 'ok  ' : 'FAIL', $served ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
 		// Recorded, not asserted: WooCommerce redirects an empty cart away from checkout, in both languages
 		// identically, so a checkout request says nothing about language resolution. Measured under #241.
 		return $ok;

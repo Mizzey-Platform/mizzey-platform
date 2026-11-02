@@ -452,6 +452,19 @@ parallel metadata store**:
 - **FR-015**: no broad SEO plugin is added to satisfy #242. One would deliver the admin surfaces four other
   slices own, which M-1 forbids.
 
+### The configuration is the site's, not the test harness's
+
+Added by the audit of 2 November 2026: what made `/ar/` work existed only in the test baseline, which staging
+replays, so a clean production install would have served untranslated brand and collection archives and English
+endpoint slugs in Arabic.
+
+- **FR-016**: The Arabic records of the system and contracted pages, the static front page, the terms page, the brand
+  and collection taxonomies as translatable and the Arabic endpoint slugs MUST be made by the plugin
+  (`MizzeySite\I18n\LanguageSetup`), run at release as `wp mizzey languages provision` and by the test baseline
+  alike. Run again it MUST change nothing: an existing record, a chosen front or terms page and an endpoint wording
+  already translated are kept. Without `--publish` a new page is a draft, so no empty page goes live before its copy.
+  The two taxonomies are also declared in `wpml-config.xml`. (AC-242-02, AC-242-04, AC-242-05; t22)
+
 ### Key Entities
 
 - **Contracted page**: one of the twenty-nine named pages. Has an English record or route, an Arabic counterpart,

@@ -34,5 +34,15 @@ class CostFieldDeclaration(unittest.TestCase):
         self.assertNotIn("_cogs_value", fields)
 
 
+class TaxonomyDeclaration(unittest.TestCase):
+    """Brand and collection archives are served per language on any install, not only where the test baseline ran
+    (audit of 2 November 2026, IA-04, IA-05, IA-35)."""
+
+    def test_brand_and_collection_are_declared_translatable(self):
+        taxonomies = {el.text.strip(): el.get("translate") for el in ET.parse(DECLARATION).getroot().iter("taxonomy")}
+        self.assertEqual("1", taxonomies.get("product_brand"))
+        self.assertEqual("1", taxonomies.get("product_collection"))
+
+
 if __name__ == "__main__":
     unittest.main()
