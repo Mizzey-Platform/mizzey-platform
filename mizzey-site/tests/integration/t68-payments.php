@@ -485,6 +485,19 @@ run(
 		$return( $low );
 		$return( $low );
 		$check( 1 === count( PaymentRecord::attention( $fresh( $short->get_id() ) ) ) && 'pending' === $fresh( $short->get_id() )->get_status(), 'L-2 a mismatched success returned three times is flagged once and does not pay the order' );
+		// NFR-10: a signature that does not verify (as after the secret is changed at Paymob) is an error, which the monitor
+		// raises; an unsigned request stays a warning.
+		$count = static function ( string $needle ): int {
+			$n = 0;
+			foreach ( defined( 'WC_LOG_DIR' ) ? ( glob( trailingslashit( WC_LOG_DIR ) . PaymentGate::LOG_SOURCE . '*' ) ?: array() ) : array() as $file ) {
+				$n += substr_count( (string) file_get_contents( $file ), $needle );
+			}
+			return $n;
+		};
+		$errors_before = $count( 'ERROR notice refused: bad_signature' );
+		$notice( t68_obj( $order()->get_id() ), str_repeat( 'ab', 64 ) );
+		$check( $count( 'ERROR notice refused: bad_signature' ) === $errors_before + 1, 'NFR-10 a notice whose signature does not verify is logged as an error, for the monitor to raise' );
+
 		// FR-011: keys that do not match the environment are pointed out to staff.
 		$keys = get_option( 'woocommerce_paymob-main_settings' );
 		$test_mode = PaymobProvider::keyMode();

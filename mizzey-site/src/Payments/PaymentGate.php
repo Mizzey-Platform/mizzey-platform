@@ -34,6 +34,9 @@ final class PaymentGate
     /** Statuses in which an order still waits for its payment. */
     public const AWAITING = ['pending', 'failed', 'on-hold'];
 
+    /** Refusals that stop every payment until someone acts: logged as errors. */
+    private const URGENT = ['no_hmac_secret', 'bad_signature', 'amount_mismatch'];
+
     /** Whether the event being handled belongs to another provider order than the one that paid the order. */
     private static bool $foreign = false;
 
@@ -343,7 +346,11 @@ final class PaymentGate
     private static function stop(string $channel, int $status, string $word, int $orderId, string $reason, ?\WC_Order $order = null): void
     {
         if ($reason !== '') {
-            wc_get_logger()->warning(sprintf('%s %s: %s (order %d)', $channel, $word, $reason, $orderId), ['source' => self::LOG_SOURCE]);
+            // A refusal that means every payment will be refused (no secret stored, or a signature that does not verify,
+            // as after a secret is changed at Paymob) is an error, raised to operations by the monitor (NFR-10); the
+            // others (an unsigned or altered request, a repeat) are warnings.
+            $level = in_array($reason, self::URGENT, true) ? 'error' : 'warning';
+            wc_get_logger()->log($level, sprintf('%s %s: %s (order %d)', $channel, $word, $reason, $orderId), ['source' => self::LOG_SOURCE]);
         }
         $location = '';
         if ($channel === 'return') {

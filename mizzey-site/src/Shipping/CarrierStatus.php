@@ -36,6 +36,7 @@ final class CarrierStatus
     public const SEEN     = 'mizzey_carrier_codes_seen';
     public const APPLIED  = '_mizzey_carrier_code_applied';
     public const REVIEW   = '_mizzey_carrier_needs_review';
+    public const LOG_SOURCE = 'mizzey-shipping';
     public const NONCE    = 'mizzey_carrier_map';
 
     /** The Mizzey states a code can map to, and the order status each one moves the order to (null: none). */
@@ -181,6 +182,11 @@ final class CarrierStatus
         $order->update_meta_data(self::REVIEW, $why);
         $order->save();
         $order->add_order_note($why, 0, false);
+        // A carrier status the store could not apply is logged for operations. A warning, not an error: until the
+        // carrier's status legend is mapped (I-08) every new code lands here by design, and staff see each in review.
+        if (function_exists('wc_get_logger')) {
+            wc_get_logger()->warning(sprintf('carrier status not applied (order %d): %s', $order->get_id(), $why), ['source' => self::LOG_SOURCE]);
+        }
     }
 
     /**

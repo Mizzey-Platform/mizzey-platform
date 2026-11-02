@@ -82,6 +82,7 @@ ADM-92 (invoice) is specs/023. ADM-93 is per order: bulk packing-slip printing (
 - A tracking address that is not a web address: not kept.
 - A filter with an invalid date or method: ignored.
 - A customer or visitor opening a slip link: refused.
+- AC-5 covers the status route: staff without the refund permission cannot move an order to Refunded by any route (t70).
 
 ## Native coverage
 

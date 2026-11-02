@@ -70,6 +70,7 @@ details (CR-12, OD-18).
   had, showing the refund and the net.
 - Another customer, or a link without its nonce, is refused.
 - Two orders paid at once never get the same number.
+- An order that is cancelled, failed or undelivered after its number was issued keeps the number (no gap in the sequence) and offers no invoice and no Invoice action (audit, 2 November 2026).
 
 ## Native coverage
 

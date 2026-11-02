@@ -83,6 +83,7 @@ support channels (AC-14, OD-30), with no customer returns area and no approval w
 - A reference typed but the refund made through the gateway: the provider's reference is kept, the typed one is not.
 - A refund the provider refuses: no refund is kept (specs/028), so nothing is shown or emailed.
 - Text typed into the reference: kept as plain text, at most 100 characters, never markup.
+- Moving an order to Refunded makes WooCommerce record a full refund and email the customer, so staff need the refund permission for it too, on the order screen, the list, bulk actions and the REST API (audit, 2 November 2026).
 
 ## Native coverage
 
