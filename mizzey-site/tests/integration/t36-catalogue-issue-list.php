@@ -12,6 +12,8 @@
 
 namespace MizzeySite\Tests\Integration;
 
+use MizzeySite\Catalogue\Import\ReportWriter;
+
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_catalogue.php';
 
@@ -66,6 +68,31 @@ run(
 		$check( 'R5' === ( $child['rule'] ?? '' ) && array() === $listed, 'AC-7: a variation of a parent rejected for a store-identity defect is rejected, and neither is on the Client list' );
 
 		$s->note( 'fact: the Developer reviews this list before it is sent (quickstart step 6); the scenario proves the list, not the review' );
+
+		// A cell from the source file that Excel would run as a formula is written as text (B-17).
+		$formula = catalogue_out_dir( $s, 'formula' );
+		ReportWriter::write( $formula, array(), array( array( 'row' => '2', 'sku' => '=HYPERLINK("https://example.invalid","x")', 'field' => '@field', 'problem' => '-1 problem', 'correction' => '+fix', 'issue_code' => 'R1' ) ) );
+		$cells = catalogue_csv( $formula . '/' . ReportWriter::ISSUES );
+		$check( 1 === count( $cells ) && '\'=HYPERLINK("https://example.invalid","x")' === $cells[0]['sku'] && "'@field" === $cells[0]['field'] && "'-1 problem" === $cells[0]['problem'] && "'+fix" === $cells[0]['correction'] && '2' === $cells[0]['row'], 'B-17 a cell starting with =, @, - or + is written as text, so the client\'s Excel does not run it (' . wp_json_encode( $cells[0] ?? null ) . ')' );
+
+		// The values the load writes besides the price are checked before the load, for the client to correct (B-15, B-16).
+		$warn = catalogue_out_dir( $s, 'warnings' );
+		$head = (array) file( CATALOGUE_FIXTURES . '/export.tsv', FILE_IGNORE_NEW_LINES );
+		$cols = explode( "\t", (string) preg_replace( '/^\xEF\xBB\xBF/', '', (string) $head[0] ) );
+		$row  = static function ( array $values ) use ( $cols ): string {
+			return implode( "\t", array_map( static fn ( $c ) => (string) ( $values[ $c ] ?? '' ), $cols ) );
+		};
+		$file = $warn . '/variations.tsv';
+		file_put_contents( // phpcs:ignore WordPress.WP.AlternativeFunctions
+			$file,
+			implode( "\t", $cols ) . "\n"
+			. $row( array( 'seller-sku' => 'MZ-T36-P', 'item-name' => 'Parent', 'item-name-ar' => 'منتج', 'parent-child' => 'parent' ) ) . "\n"
+			. $row( array( 'seller-sku' => 'MZ-T36-1', 'price' => '10.00', 'parent-child' => 'child', 'parent-sku' => 'MZ-T36-P', 'size-name' => 'S' ) ) . "\n"
+			. $row( array( 'seller-sku' => 'MZ-T36-2', 'price' => '10.00', 'parent-child' => 'child', 'parent-sku' => 'MZ-T36-P', 'size-name' => 'S' ) ) . "\n"
+		);
+		catalogue_command( 'validate ' . escapeshellarg( $file ) . ' --out=' . escapeshellarg( $warn ) );
+		$w8 = array_filter( catalogue_csv( $warn . '/client-issues.csv' ), fn ( $i ) => 'W8' === $i['issue_code'] );
+		$check( 2 === count( $w8 ) && array( 'MZ-T36-1', 'MZ-T36-2' ) === array_values( array_column( $w8, 'sku' ) ), 'B-16 two variations of one product with the same size are on the Client list (' . count( $w8 ) . ' W8)' );
 
 		return $ok;
 	}

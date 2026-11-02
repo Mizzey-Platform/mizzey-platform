@@ -60,7 +60,7 @@ final class ReportWriter
         try {
             $complete = fwrite($handle, "\xEF\xBB\xBF") === 3 && self::writeRow($handle, $columns);
             foreach ($rows as $row) {
-                $complete = $complete && self::writeRow($handle, array_map(static fn (string $column): string => $row[$column] ?? '', $columns));
+                $complete = $complete && self::writeRow($handle, array_map(static fn (string $column): string => self::cell((string) ($row[$column] ?? '')), $columns));
             }
             if (! $complete || ! fflush($handle)) {
                 throw new RuntimeException(sprintf(
@@ -74,6 +74,15 @@ final class ReportWriter
         }
 
         return $path;
+    }
+
+    /**
+     * A cell Excel would run as a formula (it starts with =, +, -, @, a tab or a carriage return) is written as text,
+     * with a leading apostrophe: the cells come from the source file, and the list is opened by the client.
+     */
+    public static function cell(string $value): string
+    {
+        return $value !== '' && str_contains("=+-@\t\r", $value[0]) ? "'" . $value : $value;
     }
 
     /**

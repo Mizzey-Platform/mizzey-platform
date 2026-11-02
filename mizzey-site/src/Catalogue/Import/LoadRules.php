@@ -32,7 +32,8 @@ final class LoadRules
     private const OWNER = [
         'R1' => 'client', 'R2' => 'client', 'R3' => 'developer', 'R4' => 'developer', 'R5' => 'client',
         'R6' => 'client', 'R7' => 'client', 'R8' => 'client', 'R9' => 'developer',
-        'W1' => 'developer', 'W3' => 'client', 'W4' => 'developer',
+        'W1' => 'developer', 'W3' => 'client', 'W4' => 'developer', 'W5' => 'client', 'W6' => 'client', 'W7' => 'client',
+        'W8' => 'client', 'W9' => 'client', 'W10' => 'developer',
     ];
 
     /** @var array<string, list<string>> */
@@ -143,6 +144,9 @@ final class LoadRules
                         $resolution['kind'],
                         $type,
                     ), __('Correct the row type or the SKU.', 'mizzey-site'));
+                }
+                if ($type === 'simple' && ($resolution['product_type'] ?? '') === 'variable') {
+                    $issues[] = self::issue('W9', '', __('The SKU belongs to a store product with variations; a simple row\'s price has no effect on it.', 'mizzey-site'), __('Give the prices on the variation rows, or correct the row type.', 'mizzey-site'));
                 }
                 if (! $resolution['original_matched']) {
                     $issues[] = self::issue('W4', '', sprintf(

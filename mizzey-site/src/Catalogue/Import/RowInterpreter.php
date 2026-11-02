@@ -89,12 +89,57 @@ final class RowInterpreter
         }
 
         $price = trim($fields['regular_price'] ?? '');
-        if ($price !== '' && preg_match('/^\d+(\.\d{1,2})?$/', $price) !== 1) {
+        if ($price !== '' && ! self::money($price)) {
             $issues[] = LoadRules::issue('R6', (string) $mapping->columnFor('regular_price'), sprintf(
                 /* translators: %s: the value found. */
                 __('The price "%s" is not a number.', 'mizzey-site'),
                 $price,
             ), __('Write the price as digits with a dot for decimals, for example 249.50, with no currency or thousands separator.', 'mizzey-site'));
+        }
+
+        // The values the load writes besides the price are checked here too, so the client is asked before the load
+        // (MIG-06, MIG-19). Each is a warning: the row still loads, without the value that cannot be used.
+        $sale = trim($fields['sale_price'] ?? '');
+        if ($sale !== '' && ! self::money($sale)) {
+            $issues[] = LoadRules::issue('W5', (string) $mapping->columnFor('sale_price'), sprintf(
+                /* translators: %s: the value found. */
+                __('The sale price "%s" is not a number; it will not be written.', 'mizzey-site'),
+                $sale,
+            ), __('Write the sale price as digits with a dot for decimals, for example 199.50.', 'mizzey-site'));
+        } elseif ($sale !== '' && self::money($price) && (float) $sale >= (float) $price) {
+            $issues[] = LoadRules::issue('W5', (string) $mapping->columnFor('sale_price'), sprintf(
+                /* translators: 1: the sale price, 2: the price. */
+                __('The sale price %1$s is not below the price %2$s, so it is not shown as a saving.', 'mizzey-site'),
+                $sale,
+                $price,
+            ), __('Give a sale price below the price, or leave it empty.', 'mizzey-site'));
+        }
+        $cost = trim($fields['cost'] ?? '');
+        if ($cost !== '' && ! self::money($cost)) {
+            $issues[] = LoadRules::issue('W6', (string) $mapping->columnFor('cost'), sprintf(
+                /* translators: %s: the value found. */
+                __('The cost "%s" is not a number; it will not be written.', 'mizzey-site'),
+                $cost,
+            ), __('Write the cost as digits with a dot for decimals, with no currency.', 'mizzey-site'));
+        }
+        $images = array_values(array_unique(array_filter(array_map('trim', explode('|', (string) ($fields['images'] ?? ''))), 'strlen')));
+        foreach ($images as $address) {
+            $parts = wp_parse_url($address);
+            if (! is_array($parts) || ! in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true) || (string) ($parts['host'] ?? '') === '') {
+                $issues[] = LoadRules::issue('W7', (string) $mapping->columnFor('images'), sprintf(
+                    /* translators: %s: the value found. */
+                    __('The image address "%s" is not a web address; the image will not be downloaded.', 'mizzey-site'),
+                    $address,
+                ), __('Give the full http or https address of the image.', 'mizzey-site'));
+            }
+        }
+        if (count($images) > CatalogueLoad::IMAGES_MAX) {
+            $issues[] = LoadRules::issue('W7', (string) $mapping->columnFor('images'), sprintf(
+                /* translators: 1: images given, 2: images kept. */
+                __('The row gives %1$d images; only the first %2$d are kept.', 'mizzey-site'),
+                count($images),
+                CatalogueLoad::IMAGES_MAX,
+            ), __('Keep the images that matter most first, or remove the extra ones.', 'mizzey-site'));
         }
 
         $skuSource       = $fields['sku'] ?? '';
@@ -114,5 +159,11 @@ final class RowInterpreter
             'price'             => $price === '' ? null : $price,
             'issues'            => $issues,
         ];
+    }
+
+    /** A plain decimal with a dot and at most two places, as the load writes a price. */
+    private static function money(string $value): bool
+    {
+        return preg_match('/^\d+(\.\d{1,2})?$/', $value) === 1;
     }
 }
