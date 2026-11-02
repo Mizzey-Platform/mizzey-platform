@@ -88,6 +88,43 @@ run(
 			}
 		}
 
+		// ---- AC-242-09 a paginated archive is its own canonical form (audit of 2 November 2026) ----------
+		// Page 2 lists products page 1 does not; a canonical at page 1 would drop them from the crawl path. Enough
+		// published products are made sure of first, so page 2 exists and the check cannot pass by being skipped.
+		$shop_url = (string) get_permalink( (int) get_option( 'woocommerce_shop_page_id' ) );
+		if ( 200 !== t23_get( trailingslashit( $shop_url ) . 'page/2/' )['status'] ) {
+			$per_page = (int) apply_filters( 'loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page() );
+			for ( $i = 0; $i <= $per_page; $i++ ) {
+				$s->simple_product( 't23 pagination ' . $i, '10', null );
+			}
+		}
+		$paged_cases = array(
+			'shop page 2'        => array( trailingslashit( $shop_url ) . 'page/2/', true ),
+			'Arabic shop page 2' => array( trailingslashit( (string) apply_filters( 'wpml_permalink', $shop_url, 'ar' ) ) . 'page/2/', false ),
+		);
+		foreach ( $paged_cases as $label => list( $url, $required ) ) {
+			$res = t23_get( $url );
+			if ( 200 !== $res['status'] && ! $required ) {
+				// The Arabic listing holds only Arabic records; the English case above runs the same code path.
+				$s->note( sprintf( 'note AC-242-09 %s answers %d: too few Arabic products for a second page', $label, $res['status'] ) );
+				continue;
+			}
+			$tag   = t23_tag( $res['body'], '/<link rel="canonical"[^>]*>/i' );
+			$count = preg_match_all( '/<link rel="canonical"/i', $res['body'] );
+			$good  = 200 === $res['status'] && 1 === $count && false !== strpos( $tag, rtrim( $url, '/' ) );
+			$s->note( sprintf( '%s AC-242-09 %-18s %s (status=%d, count=%d)', $good ? 'ok  ' : 'FAIL', $label, $tag ?: 'NO CANONICAL', $res['status'], $count ) );
+			if ( ! $good ) {
+				$ok = false;
+			}
+		}
+		$sorted = t23_get( add_query_arg( 'orderby', 'price', trailingslashit( $shop_url ) . 'page/2/' ) );
+		$sorted_tag = t23_tag( $sorted['body'], '/<link rel="canonical"[^>]*>/i' );
+		$sorted_ok  = '' !== $sorted_tag && false === strpos( $sorted_tag, 'orderby' ) && false !== strpos( $sorted_tag, 'page/2' );
+		$s->note( sprintf( '%s AC-242-09 sorted page 2 keeps the page and drops the sort: %s', $sorted_ok ? 'ok  ' : 'FAIL', $sorted_tag ?: 'NO CANONICAL' ) );
+		if ( ! $sorted_ok ) {
+			$ok = false;
+		}
+
 		// ---- AC-242-10 sitemap in both languages --------------------------------------------------------
 		$sitemap = t23_get( (string) home_url( '/wp-sitemap-posts-page-1.xml' ) );
 		preg_match_all( '#<loc>([^<]*)</loc>#', $sitemap['body'], $locs );

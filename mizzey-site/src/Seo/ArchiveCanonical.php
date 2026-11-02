@@ -47,7 +47,7 @@ final class ArchiveCanonical
             return;
         }
 
-        $url = self::resolve();
+        $url = self::paged(self::resolve());
 
         /**
          * Filters the canonical URL this site emits for a non-singular route.
@@ -97,5 +97,29 @@ final class ArchiveCanonical
         }
 
         return '';
+    }
+
+    /**
+     * Page N of a listing is its own document: page 2 lists products page 1 does not, so pointing it at page 1 would
+     * tell a search engine to drop them (AC-242-09, "that URL's own canonical form"). The page number comes from the
+     * resolved query, and the base from resolve(), so sorting or filter parameters never reach the canonical.
+     */
+    private static function paged(string $url): string
+    {
+        $paged = (int) get_query_var('paged');
+        if ($paged < 2 || '' === $url) {
+            return $url;
+        }
+
+        global $wp_rewrite;
+        if (! $wp_rewrite instanceof \WP_Rewrite || ! $wp_rewrite->using_permalinks()) {
+            return (string) add_query_arg('paged', $paged, $url);
+        }
+
+        // A base with a query string (a language parameter, say) keeps it after the page segment.
+        $parts = explode('?', $url, 2);
+        $path  = trailingslashit($parts[0]) . user_trailingslashit($wp_rewrite->pagination_base . '/' . $paged, 'paged');
+
+        return isset($parts[1]) ? $path . '?' . $parts[1] : $path;
     }
 }

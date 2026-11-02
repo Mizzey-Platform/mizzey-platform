@@ -366,6 +366,8 @@ page, structured data parsing as valid JSON with the expected types.
 
 - **A trailing-slash variant of a contracted URL is requested.** It must resolve to one canonical form rather
   than serving the same content at two addresses (G-1).
+- **A paginated archive page is requested.** `/shop/page/2/` lists products page 1 does not, so its canonical is
+  itself; a canonical pointing at page 1 would tell a search engine to drop them (audit of 2 November 2026, t23).
 - **An Arabic URL is requested for a page that has no Arabic record yet.** It must not silently serve the English
   record under the Arabic prefix, which would be a bilingual URL serving the wrong language record.
 - **Two pages are given the same slug in different languages.** WPML permits this when the language is known at
@@ -419,6 +421,8 @@ specific and small, and only three of them are code.
 - **FR-003**: The account and confirmation URLs MUST remain WooCommerce endpoints, with their Arabic slugs supplied through string translation, and no page record may duplicate an endpoint. (AC-242-04, G-1)
 - **FR-004**: The storefront's product, category, collection and brand URL patterns MUST be documented per language, and a URL naming a term MUST serve that term's archive. (AC-242-05)
 - **FR-005**: A canonical link MUST be emitted on every contracted URL, including archive URLs where core emits none. (AC-242-09)
+  Page N of a paginated archive is its own canonical form (`/shop/page/2/`), never page 1, and sorting or filter
+  parameters never reach it. Added by the audit of 2 November 2026.
 - **FR-005a**: Every address a contracted page points at as its canonical form or as a language counterpart MUST
   resolve to that page, in every language, and the address word of a taxonomy MUST NOT depend on the language of
   the request that builds the link or the routing rules. Added by the repair of 5 October 2026. (AC-242-09,
