@@ -214,11 +214,7 @@ run(
 		$anon   = sign_in_json( 'POST', $url, array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 1, 'key' => "{$tag}-h0" ) ) ) );
 		$authed = sign_in_json( 'POST', $url, array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 9, 'key' => "{$tag}-h1" ) ) ), array( 'Authorization' => 'Basic ' . base64_encode( "{$tag}feed:{$password}" ) ) );
 		// The change was made by another process: this one forgets its own copy of the item first.
-		foreach ( array( $a, $a_ar ) as $record ) {
-			wp_cache_delete( $record, 'post_meta' );
-			wp_cache_delete( $record, 'posts' );
-			wp_cache_delete( 'product-' . $record, 'products' );
-		}
+		wp_cache_flush();
 		$h_status = (string) ( $authed['data']['items'][0]['status'] ?? wp_json_encode( $authed['data'] ) );
 		$check( 401 === $anon['status'] && 200 === $authed['status'] && 'applied' === $h_status && 9 === $level( $a ), 'S-4 over HTTP the route refuses an unauthenticated call (401) and takes one from the feeding account\'s application password (' . $anon['status'] . ', ' . $authed['status'] . ', ' . $h_status . ', ' . $level( $a ) . ')' );
 
