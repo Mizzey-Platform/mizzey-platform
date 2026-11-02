@@ -32,6 +32,7 @@ run(
 		$s->on_finish(
 			static function () use ( $wpdb ): void {
 				Monitoring::$sink = null;
+				$wpdb->query( "DELETE FROM {$wpdb->prefix}corex_notifications WHERE dedup_key LIKE 'mizzey.monitor|%' AND created_at >= NOW() - INTERVAL 1 HOUR" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_%mizzey\\_monitor\\_%' OR option_name LIKE '\\_transient\\_timeout\\_mizzey\\_monitor\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			}
 		);
@@ -52,7 +53,17 @@ run(
 		$fatal = array_values( array_filter( $raised, static fn ( $r ) => 'fatal' === $r['kind'] ) );
 		$check( 1 === count( $fatal ) && 'wp-content/plugins/mizzey-site/src/Example.php:42' === $fatal[0]['where'] && ! str_contains( $fatal[0]['line'], '4111111111111111' ), 'AC-1 a fatal error is raised with its place inside the site, and a card-like number is masked (' . ( $fatal[0]['line'] ?? 'none' ) . ')' );
 		$check( $logged( "{$tag} call to undefined function" ) && ! $logged( '4111111111111111' ), 'AC-1 it is in the application log (source ' . Monitoring::SOURCE . ')' );
-		$check( 10 === has_action( 'shutdown', array( Monitoring::class, 'shutdown' ) ) || in_array( array( Monitoring::class, 'shutdown' ), array( array( Monitoring::class, 'shutdown' ) ), true ), 'AC-1 the request\'s end is watched for a fatal error' );
+		// A real fatal error in another process: WP-CLI loads the site and calls a function that does not exist.
+		$bin = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "{$tag}_no_such_function();" ) . ' 2>&1', $out, $code );
+		$check( 0 !== $code && $logged( "{$tag}_no_such_function" ), 'AC-1 a fatal error that ends a real request is in the application log (exit ' . $code . ')' );
+		// WordPress's own handler shows its error page and ends the request: the error is taken from its message.
+		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();
+		$before = count( $raised );
+		apply_filters( 'wp_php_error_message', 'page', array( 'type' => E_ERROR, 'message' => "{$tag} shown by WordPress", 'file' => ABSPATH . 'wp-content/plugins/x/y.php', 'line' => 7 ) );
+		$check( count( $raised ) === $before + 1 && str_contains( $raised[ $before ]['line'] ?? '', "{$tag} shown by WordPress" ), 'AC-1 a fatal error WordPress shows its error page for is raised too' );
+		$stored = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}corex_notifications WHERE dedup_key = %s", 'mizzey.monitor|' . md5( 'fatal|wp-content/plugins/x/y.php:7' ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$check( 1 === $stored, 'AC-1 it reaches the operations staff as a CoreX notification' );
 
 		// ---- AC-2: a failed scheduled action --------------------------------------------------------------------
 		$hook = "{$tag}_failing_task";
@@ -82,6 +93,7 @@ run(
 		@trigger_error( "{$tag} a notice", E_USER_WARNING ); // phpcs:ignore
 		Monitoring::shutdown();
 		$check( count( $raised ) === $before, 'AC-4 a warning that does not end the request is not raised as a fatal error' );
+		$check( false !== has_action( 'wp_login', array( \MizzeySite\Security\StaffActivityLog::class, 'signedIn' ) ) , 'AC-4 sign-ins reach the staff log (specs/031), beside WooCommerce's order notes' );
 
 		return $ok;
 	}
