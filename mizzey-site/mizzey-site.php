@@ -21,6 +21,7 @@ defined('ABSPATH') || exit;
 // Corex framework. Register the service provider with Corex's container on boot.
 
 require_once __DIR__ . '/src/I18n/Localisation.php';
+require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
@@ -135,6 +136,8 @@ require_once __DIR__ . '/src/Payments/PaymentGate.php';
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
 MizzeySite\I18n\Localisation::register();
+// .htaccess names the site's root, never a language's: specs/034-sales-report.
+MizzeySite\I18n\RewriteRoot::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
