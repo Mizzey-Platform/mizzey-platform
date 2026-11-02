@@ -45,6 +45,8 @@ require_once __DIR__ . '/src/Security/SignupRoutes.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';
+require_once __DIR__ . '/src/Security/StaffActivityLog.php';
+require_once __DIR__ . '/src/Security/StaffActivityScreen.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
@@ -157,6 +159,8 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+MizzeySite\Security\StaffActivityLog::register();
+MizzeySite\Security\StaffActivityScreen::register();
 
 // The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
