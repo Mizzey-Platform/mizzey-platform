@@ -1,0 +1,13 @@
+Mutation check for specs/035-admin-dashboard, t75-admin-dashboard, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7).
+Each deliberate defect was applied alone, t75 run, the file restored. M5 survived the first run (a full refund moved
+the order out of Cancelled); the test now keeps a fully refunded order Cancelled, and M5 is caught.
+
+CAUGHT    M1 top products are counted per language record  <- AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units ([{"id":186785,"name":"t11 t754019-DUO","units":7},{"
+CAUGHT    M2 an unanswered item counts as in stock  <- AC-5 the source's figures give the low and out-of-stock counts; items it does not know are unknown, not in stock ({"low":1,"out":24,"u
+CAUGHT    M3 a physical item in two languages is counted twice  <- AC-5 the out-of-stock product in two languages is counted once (out 2)
+CAUGHT    M4 on-hold orders are not counted  <- AC-4 an order put on hold is counted among the orders requiring action, beside the confirmed ones
+CAUGHT    M6 customers see the widget  <- AC-6 a customer gets nothing from it
+CAUGHT    M7 the stock answer is not kept  <- AC-5 the answer is kept for ten minutes, so the dashboard does not ask the source on every visit
+CAUGHT    M5 a refunded cancelled order is still a refund to make  <- AC-4 once refunded it is no longer counted, even while it stays Cancelled
+
+7 of 7 caught.

@@ -100,8 +100,11 @@ run(
 		$o1->update_status( 'cancelled' );
 		$pending = StoreDashboard::pendingRefunds();
 		$check( in_array( $o1->get_id(), $pending['cancelled_paid'], true ) && ! in_array( $o1->get_id(), $pending_before['cancelled_paid'], true ), 'AC-4 a paid order cancelled and not refunded is a refund to make' );
+		// A store may keep a fully refunded order Cancelled rather than Refunded: it is still not a refund to make.
+		add_filter( 'woocommerce_order_fully_refunded_status', '__return_false' );
 		wc_create_refund( array( 'order_id' => $o1->get_id(), 'amount' => (string) $o1->get_total() ) );
-		$check( ! in_array( $o1->get_id(), StoreDashboard::pendingRefunds()['cancelled_paid'], true ), 'AC-4 once refunded it is no longer counted' );
+		remove_filter( 'woocommerce_order_fully_refunded_status', '__return_false' );
+		$check( 'cancelled' === wc_get_order( $o1->get_id() )->get_status() && ! in_array( $o1->get_id(), StoreDashboard::pendingRefunds()['cancelled_paid'], true ), 'AC-4 once refunded it is no longer counted, even while it stays Cancelled' );
 		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'status=wc-cancelled' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------
