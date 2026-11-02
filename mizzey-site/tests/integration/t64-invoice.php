@@ -124,6 +124,14 @@ run(
 		$lock_free = 1 === (int) $GLOBALS['wpdb']->get_var( $GLOBALS['wpdb']->prepare( 'SELECT IS_FREE_LOCK(%s)', substr( 'mz_' . $GLOBALS['wpdb']->prefix . 'invoice_number', 0, 64 ) ) );
 		$check( '' === InvoiceNumber::of( $stalled->get_id() ) && $took < 10 && $lock_free, sprintf( 'ADM-92 when the database fails the check for a number already held, no number is issued, at once, and the numbering lock is free again (%.1f s)', $took ) );
 		$check( 1 === preg_match( '/^T64-(\d{6})$/', $number1, $a ) && 1 === preg_match( '/^T64-(\d{6})$/', $number2, $b ) && (int) $b[1] === (int) $a[1] + 1 && $again === $number1 && '' === InvoiceNumber::of( $unpaid->get_id() ) && '' === InvoiceNumber::issue( $unpaid->get_id() ) && ! InvoiceNumber::issuable( $unpaid ), "ADM-92 a paid order gets its invoice number once, the next in sequence; an unpaid one gets none ({$number1}, {$number2}, again {$again})" );
+		// A sale that did not happen has no invoice (specs/023 edge case): its number stays issued, the invoice is not offered.
+		$void_order  = t64_order( $s, $buyer, $product, 'processing' );
+		$void_number = InvoiceNumber::issue( $void_order->get_id() );
+		$void_order  = wc_get_order( $void_order->get_id() );
+		$void_order->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't64 customer cancelled' );
+		$void_order->update_status( 'cancelled', 't64' );
+		$void_order  = wc_get_order( $void_order->get_id() );
+		$check( '' !== $void_number && 'cancelled' === $void_order->get_status() && ! InvoiceNumber::issuable( $void_order ) && $void_number === InvoiceNumber::of( $void_order->get_id() ), 'ADM-92 a cancelled order keeps its issued number but offers no invoice (' . $void_order->get_status() . ')' );
 
 		// AC-2: what it carries. A gift-wrap fee of 15 on the first order: 180 + 50 + 15 = 245.
 		$fee = new \WC_Order_Item_Fee();

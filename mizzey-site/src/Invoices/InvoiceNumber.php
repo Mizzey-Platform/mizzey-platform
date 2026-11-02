@@ -46,9 +46,20 @@ final class InvoiceNumber
         }
     }
 
-    /** Whether the order may have an invoice: it is paid, or it had one issued before (a refunded order keeps it). */
+    /** Statuses of a sale that did not happen: no invoice is offered, even when a number was issued earlier. */
+    public const VOID_STATUSES = ['cancelled', 'failed', 'delivery-failed'];
+
+    /**
+     * Whether the order may have an invoice: it is paid, or it had one issued before (a refunded order keeps it), and it
+     * is not cancelled, failed or undelivered (specs/023: such an order has no invoice and no Invoice action). Its number
+     * stays issued, so the sequence has no gap; the invoice is simply not offered.
+     */
     public static function issuable(\WC_Order $order): bool
     {
+        if (in_array($order->get_status(), self::VOID_STATUSES, true)) {
+            return false;
+        }
+
         return in_array($order->get_status(), self::paidStatuses(), true) || self::of((int) $order->get_id()) !== '';
     }
 

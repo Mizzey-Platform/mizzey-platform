@@ -485,6 +485,34 @@ run(
 		$district = $made ? (string) $made->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) : '';
 		$ledger   = (array) get_option( FixtureStockSource::LEDGER, array() );
 		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ' ' . wp_strip_all_tags( (string) ( $placed['data']['message'] ?? '' ) ) . '; before it ' . ( $missing['data']['code'] ?? '' ) . ', ' . ( $missing_ar['data']['code'] ?? '' ) . ')' );
+		// [HTTP] PAY-05: Place Order pressed twice. Two checkouts of one cart sent at the same moment make one order, with
+		// one reservation per line; and pressing again after it was placed makes none.
+		$store4 = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
+		$auth4  = array( 'Cart-Token' => sign_in_header( $store4, 'cart-token' ), 'Nonce' => sign_in_header( $store4, 'nonce' ) );
+		$cart4  = sign_in_json( 'POST', rest_url( 'wc/store/v1/cart/add-item' ), array( 'id' => $five->get_id(), 'quantity' => 1 ), $auth4, $store4['cookies'] );
+		$jar    = array();
+		foreach ( (array) $cart4['cookies'] as $cookie ) {
+			if ( $cookie instanceof \WP_Http_Cookie ) {
+				$jar[ $cookie->name ] = $cookie->value;
+			}
+		}
+		$twice_email = "{$tag}-twice@example.invalid";
+		$one_press   = array(
+			'url'     => rest_url( 'wc/store/v1/checkout' ),
+			'type'    => 'POST',
+			'headers' => $auth4 + array( 'Content-Type' => 'application/json' ),
+			'data'    => (string) wp_json_encode( t60_body( $twice_email, 'Dokki' ) ),
+			'cookies' => $jar,
+		);
+		$presses = \WpOrg\Requests\Requests::request_multiple( array( $one_press, $one_press ), array( 'timeout' => 60 ) );
+		$again   = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( $twice_email, 'Dokki' ), $auth4, $cart4['cookies'] );
+		wp_cache_flush();
+		$twice_orders = wc_get_orders( array( 'billing_email' => $twice_email, 'status' => array_diff( array_keys( wc_get_order_statuses() ), array( 'wc-checkout-draft' ) ), 'limit' => 10, 'return' => 'ids' ) );
+		foreach ( $twice_orders as $twice_id ) {
+			$s->track_order( (int) $twice_id );
+		}
+		$codes = array_map( static fn ( $r ) => $r instanceof \WpOrg\Requests\Response ? (int) $r->status_code : 0, $presses );
+		$check( 1 === count( $twice_orders ) && in_array( 200, $codes, true ) && 200 !== $again['status'] && 1 === count( (array) ( OrderStock::record( wc_get_order( (int) $twice_orders[0] ) ) ) ), '[HTTP] PAY-05 Place Order pressed twice at once makes one order with one reservation, and pressing again after it makes none (' . implode( ', ', $codes ) . ', then ' . $again['status'] . '; ' . count( $twice_orders ) . ' order)' );
 		$five->set_regular_price( '150' );
 		$five->save();
 		$item = $made ? current( $made->get_items() ) : null;

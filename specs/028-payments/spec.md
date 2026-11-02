@@ -135,6 +135,14 @@ acceptance waits for the approved account (CR-01), staging and the client's appr
   notice.
 - A partial refund the provider refuses: WooCommerce's refund is not kept, and staff see the provider's reason.
 - Arabic and English: every customer and staff message has both (FIX-04), including the payment-failed state.
+- A signed transaction is tied to its order by what Paymob signs: a transaction of an integration the store does not use is refused; a failure of another amount cannot fail an order awaiting payment; once an order is paid, a transaction of another Paymob order is handled as a second payment (refunded, D-25) and never shows that order's confirmation page (audit, 2 November 2026).
+- A verified card payment for an order that now pays another way (the customer went back and chose cash on delivery, then paid in the old tab) is recorded on the order once and flagged for staff to refund or take; the gateway does not act on it.
+- A success of the wrong amount returned again and again is flagged once.
+- A payment marked refunded is reconciled with the order's refunds only when it is the payment that paid the order, only from Paymob's server notice, and only up to the payment's signed amount (Paymob does not sign the refunded total); otherwise it is recorded, and flagged when above the payment.
+- Known limit: before an order is paid, a signed success of the store's own integration and the same amount could be presented for another order awaiting payment. It pays that order with the presenter's own money (nothing is lost to the store or the customer), and binding it fully needs the Paymob order id of each payment request, which the official plugin does not keep.
+- FR-011: staff who manage the store see a notice while the stored Paymob keys are test keys on the live store, or live keys on any other site.
+- NFR-10: a callback refused because no secret is stored, its signature does not verify, or its amount does not match is logged as an error, which the monitor raises; other refusals are warnings.
+- PAY-05: Place Order pressed twice at the same moment makes one order with one reservation per line (t60, over HTTP).
 
 ## Native coverage
 

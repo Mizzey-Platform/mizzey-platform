@@ -10,6 +10,7 @@ namespace MizzeySite\Payments\Paymob;
 
 use MizzeySite\Payments\CallbackResult;
 use MizzeySite\Payments\PaymentEvent;
+use MizzeySite\Payments\PaymentGate;
 use MizzeySite\Payments\PaymentProvider;
 
 defined('ABSPATH') || exit;
@@ -123,7 +124,53 @@ final class PaymobProvider implements PaymentProvider
             strtoupper($fields['currency']),
             $fields['created_at'],
             $channel,
+            ['provider_order' => $fields['order'], 'integration' => $fields['integration_id'], 'payment' => $fields['id'], 'payment_cents' => (int) $fields['amount_cents']],
         ));
+    }
+
+    /**
+     * Paymob signs its own order id and the integration, not the store's reference, so a signed transaction could be
+     * presented with another order's reference. It is refused when its integration is not one of the store's, or when
+     * it is a failure that would fail an order awaiting payment with an amount other than the order's own payment
+     * request. (The gate refuses a transaction of another Paymob order once the order is paid.)
+     */
+    public function bindingProblem(\WC_Order $order, PaymentEvent $event): ?string
+    {
+        $integrations = self::integrations();
+        $integration  = (string) ($event->signed['integration'] ?? '');
+        if ($integrations !== [] && ! in_array($integration, $integrations, true)) {
+            return 'foreign_integration';
+        }
+        if ((string) ($event->signed['provider_order'] ?? '') === '') {
+            return 'no_provider_order';
+        }
+        if ($event->kind === PaymentEvent::PAYMENT && $event->outcome !== PaymentEvent::PENDING && $order->has_status(PaymentGate::AWAITING)) {
+            $requested = (string) $order->get_meta('PaymobCentsAmount', true);
+            $expected  = ctype_digit($requested) ? (int) $requested : (int) round((float) $order->get_total('edit') * 100);
+            if ($event->outcome === PaymentEvent::FAILED && $event->amountCents !== $expected) {
+                return 'failure_for_other_amount';
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The integration ids the store's Paymob settings name (the plugin keeps them as "id : name (currency)" entries).
+     *
+     * @return list<string>
+     */
+    public static function integrations(): array
+    {
+        $settings = get_option(self::SETTINGS);
+        $text     = is_array($settings) && is_scalar($settings['integration_id_hidden'] ?? null) ? (string) $settings['integration_id_hidden'] : '';
+        $ids      = [];
+        foreach (explode(',', $text) as $entry) {
+            if (preg_match('/^\s*(\d+)/', $entry, $m) === 1) {
+                $ids[] = $m[1];
+            }
+        }
+
+        return array_values(array_unique($ids));
     }
 
     public function refundReferenceInNote(string $note): ?string
@@ -153,6 +200,22 @@ final class PaymobProvider implements PaymentProvider
         $reply = json_decode((string) wp_remote_retrieve_body($response), true);
 
         return is_array($reply) && ($reply['success'] ?? null) === true && is_scalar($reply['id'] ?? null) ? (string) $reply['id'] : null;
+    }
+
+    /** `test` or `live` from the stored keys' prefixes, '' when no key is stored or the two disagree. */
+    public static function keyMode(): string
+    {
+        $settings = get_option('woocommerce_paymob-main_settings');
+        $modes    = [];
+        foreach (['sec_key', 'pub_key'] as $field) {
+            $key = is_array($settings) && is_scalar($settings[$field] ?? null) ? (string) $settings[$field] : '';
+            if (preg_match('/^egy_[sp]k_(test|live)_/', $key, $m) === 1) {
+                $modes[] = $m[1];
+            }
+        }
+        $modes = array_values(array_unique($modes));
+
+        return count($modes) === 1 ? $modes[0] : '';
     }
 
     /**

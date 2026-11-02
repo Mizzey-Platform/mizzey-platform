@@ -40,6 +40,8 @@ final class PaymentEvent
         public readonly string $currency,
         public readonly string $occurredAt,
         public readonly string $channel,
+        /** Facts the provider signed that tie the event to one payment request: its own order id, the integration. */
+        public readonly array $signed = [],
     ) {
     }
 

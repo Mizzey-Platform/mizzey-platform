@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace MizzeySite\Orders;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
+use MizzeySite\Roles\RefundCapability;
 
 defined('ABSPATH') || exit;
 
@@ -227,6 +228,14 @@ final class TransitionGuard
             return;
         }
         $transition = self::transition($order);
+        // A person's own change to Refunded, by any route, needs the refund permission; the store's own full refund
+        // (made after a permitted refund, or by a payment provider's callback) is not a manual change.
+        $refund = is_array($transition) && ! empty($transition['manual']) ? self::refundProblem($to, true) : null;
+        if ($refund !== null) {
+            self::refuse($order, $from, $to, $data, $refund);
+
+            return;
+        }
         if ($to === 'cancelled' && ! self::recordCancellation($order, $from, $to, $data, $transition)) {
             return;
         }
@@ -263,9 +272,23 @@ final class TransitionGuard
     /** Why the move is refused for this order, or null when it is allowed. */
     public static function check(\WC_Order $order, string $from, string $to, string $reason, bool $staff): ?string
     {
-        $problem = self::problem($from, $to, $reason, $staff);
+        $problem = self::problem($from, $to, $reason, $staff) ?? self::refundProblem($to, $staff);
 
         return $problem ?? StatusModel::routeProblem($order, $from, $to);
+    }
+
+    /**
+     * Moving an order to Refunded makes WooCommerce record a full refund and email the customer
+     * (`wc_order_fully_refunded()`), so for staff it is a refund like any other: it needs the refund permission
+     * (specs/029 AC-5, specs/030 AC-5).
+     */
+    public static function refundProblem(string $to, bool $staff): ?string
+    {
+        if ($to === 'refunded' && $staff && ! current_user_can(RefundCapability::CAP)) {
+            return __('Order status not changed: recording a refund needs the refund permission.', 'mizzey-site');
+        }
+
+        return null;
     }
 
     /** Why the move is refused by the table or for a missing reason, or null when it is allowed. */
