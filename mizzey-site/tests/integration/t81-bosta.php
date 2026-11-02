@@ -219,10 +219,12 @@ run(
 		$check( 'in-transit' === ( CarrierStatus::map()['20'] ?? '' ), 'AC-4 a change without the form\'s nonce is refused' );
 
 		// ---- AC-1: a governorate zone, its rate, and free shipping by coupon --------------------------------------
+		// A governorate as this store lists them: WooCommerce's codes, or Bosta's where its plugin replaces them.
+		$gov  = (string) array_key_first( (array) WC()->countries->get_states( 'EG' ) );
 		$zone = new \WC_Shipping_Zone();
 		$zone->set_zone_name( "{$tag} Cairo" );
 		$zone->set_zone_order( -1000 );
-		$zone->add_location( 'EG:EGC', 'state' );
+		$zone->add_location( 'EG:' . $gov, 'state' );
 		$zone->save();
 		$s->on_finish( static function () use ( $zone ) { $zone->delete(); } );
 		$flat = $zone->add_shipping_method( 'flat_rate' );
@@ -230,7 +232,7 @@ run(
 		$free = $zone->add_shipping_method( 'free_shipping' );
 		update_option( "woocommerce_free_shipping_{$free}_settings", array( 'enabled' => 'yes', 'title' => 'Free', 'requires' => 'coupon' ) );
 		\WC_Cache_Helper::get_transient_version( 'shipping', true );
-		$package = array( 'destination' => array( 'country' => 'EG', 'state' => 'EGC', 'postcode' => '', 'city' => 'Cairo', 'address' => '', 'address_2' => '' ), 'contents' => array(), 'contents_cost' => 240, 'applied_coupons' => array() );
+		$package = array( 'destination' => array( 'country' => 'EG', 'state' => $gov, 'postcode' => '', 'city' => 'Cairo', 'address' => '', 'address_2' => '' ), 'contents' => array(), 'contents_cost' => 240, 'applied_coupons' => array() );
 		$matched = \WC_Shipping_Zones::get_zone_matching_package( $package );
 		$check( $matched->get_id() === $zone->get_id(), 'AC-1 an address in Cairo governorate falls in the Cairo zone staff made in admin' );
 		$coupon = new \WC_Coupon();
@@ -240,7 +242,7 @@ run(
 		$s->track_post( $coupon->get_id() );
 		WC()->cart->empty_cart( false );
 		WC()->customer->set_shipping_country( 'EG' );
-		WC()->customer->set_shipping_state( 'EGC' );
+		WC()->customer->set_shipping_state( $gov );
 		WC()->cart->add_to_cart( $product->get_id(), 2 );
 		WC()->cart->calculate_totals();
 		$rates_of = static function (): array {
