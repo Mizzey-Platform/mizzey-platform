@@ -65,7 +65,7 @@ run(
 			return $m;
 		} )();
 		$check( 'bounces@relay.example' === $preset->Sender, 'AC-1 a bounce address set by someone else is kept; the password is used exactly as given' );
-		$check( "orders-{$tag}@example.com" === apply_filters( 'wp_mail_from', 'wordpress@example.com' ) && 'Mizzey' === apply_filters( 'wp_mail_from_name', 'WordPress' ) && 'shop@x.example' === apply_filters( 'wp_mail_from', 'shop@x.example' ) && 'wordpress@vendor.example' === apply_filters( 'wp_mail_from', 'wordpress@vendor.example' ), 'AC-1 WordPress\'s own messages take WooCommerce\'s sender; a sender set on purpose is kept' );
+		$check( "orders-{$tag}@example.com" === apply_filters( 'wp_mail_from', Transport::wordpressDefault() ) && 'Mizzey' === apply_filters( 'wp_mail_from_name', 'WordPress' ) && 'shop@x.example' === apply_filters( 'wp_mail_from', 'shop@x.example' ) && 'wordpress@vendor.example' === apply_filters( 'wp_mail_from', 'wordpress@vendor.example' ), 'AC-1 WordPress\'s own messages take WooCommerce\'s sender; a sender set on purpose is kept' );
 		$admin = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}adm@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $admin );
 		wp_set_current_user( $admin );
@@ -112,13 +112,13 @@ run(
 		wp_set_current_user( $editor );
 		$refused = false;
 		$die     = static function () use ( &$refused ) { return static function () use ( &$refused ) { $refused = true; throw new \RuntimeException( 'refused' ); }; };
-		add_filter( 'wp_die_handler', $die, 1 );
+		add_filter( 'wp_die_handler', $die, PHP_INT_MAX );
 		try {
 			Transport::test();
 		} catch ( \RuntimeException $e ) {
 			unset( $e );
 		}
-		remove_filter( 'wp_die_handler', $die, 1 );
+		remove_filter( 'wp_die_handler', $die, PHP_INT_MAX );
 		$check( $refused && 1 === count( $sent ), 'AC-3 a staff member who may not manage the site cannot send it' );
 
 		return $ok;
