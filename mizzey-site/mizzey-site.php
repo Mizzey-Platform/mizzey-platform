@@ -76,6 +76,8 @@ require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
 require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
+require_once __DIR__ . '/src/Catalogue/ProductFields.php';
+require_once __DIR__ . '/src/Catalogue/PriceHistory.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
 require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
@@ -153,6 +155,10 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+
+// Product fields WooCommerce lacks, and the price history: #276. See specs/036-product-management.
+MizzeySite\Catalogue\ProductFields::register();
+MizzeySite\Catalogue\PriceHistory::register();
 
 // The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
