@@ -98,7 +98,7 @@ final class Transport
     {
         $host = strtolower((string) wp_parse_url(network_home_url(), PHP_URL_HOST));
 
-        return 'wordpress@' . (str_starts_with($host, 'www.') ? substr($host, 4) : $host);
+        return 'wordpress@' . ((string) preg_replace('/^www\./', '', $host));
     }
 
     /**
