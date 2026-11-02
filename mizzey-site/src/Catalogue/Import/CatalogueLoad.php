@@ -147,9 +147,16 @@ final class CatalogueLoad
             throw new \RuntimeException(__('The run directory cannot be written.', 'mizzey-site'));
         }
         $real = wp_normalize_path((string) realpath($directory));
-        $root = wp_normalize_path((string) realpath(ABSPATH));
-        if ($real === '' || ($root !== '' && str_starts_with($real . '/', rtrim($root, '/') . '/'))) {
-            throw new \RuntimeException(__('Keep the run directory outside the website folder: the plan holds costs.', 'mizzey-site'));
+        // Every folder the web server can serve: WordPress's own and the uploads folder, which a server may keep
+        // elsewhere (staging links it in from outside the release), each by its real path.
+        $served = array_filter([
+            wp_normalize_path((string) realpath(ABSPATH)),
+            wp_normalize_path((string) realpath((string) (wp_upload_dir(null, false)['basedir'] ?? ''))),
+        ]);
+        foreach ($served as $root) {
+            if ($real === '' || str_starts_with($real . '/', rtrim($root, '/') . '/')) {
+                throw new \RuntimeException(__('Keep the run directory outside the website folder: the plan holds costs.', 'mizzey-site'));
+            }
         }
 
         return rtrim($real, '/');

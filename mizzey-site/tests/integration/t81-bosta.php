@@ -223,10 +223,20 @@ run(
 		$gov  = (string) array_key_first( (array) WC()->countries->get_states( 'EG' ) );
 		$zone = new \WC_Shipping_Zone();
 		$zone->set_zone_name( "{$tag} Cairo" );
-		$zone->set_zone_order( -1000 );
+		$zone->set_zone_order( 0 );
 		$zone->add_location( 'EG:' . $gov, 'state' );
 		$zone->save();
 		$s->on_finish( static function () use ( $zone ) { $zone->delete(); } );
+		// The zone order is stored unsigned: the store's other zones are moved after this one for the run, and back.
+		foreach ( \WC_Shipping_Zones::get_zones() as $existing ) {
+			if ( (int) $existing['id'] !== $zone->get_id() ) {
+				$moved = new \WC_Shipping_Zone( (int) $existing['id'] );
+				$order = $moved->get_zone_order();
+				$moved->set_zone_order( $order + 1000 );
+				$moved->save();
+				$s->on_finish( static function () use ( $moved, $order ) { $moved->set_zone_order( $order ); $moved->save(); } );
+			}
+		}
 		$flat = $zone->add_shipping_method( 'flat_rate' );
 		update_option( "woocommerce_flat_rate_{$flat}_settings", array( 'enabled' => 'yes', 'title' => 'Cairo', 'cost' => '45', 'tax_status' => 'none', 'mizzey_estimate_en' => '1 to 2 working days', 'mizzey_estimate_ar' => 'من يوم إلى يومين عمل' ) );
 		$free = $zone->add_shipping_method( 'free_shipping' );
