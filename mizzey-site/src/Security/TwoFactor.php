@@ -125,7 +125,11 @@ final class TwoFactor
 
         if (wp_doing_ajax()) {
             $action = isset($_REQUEST['action']) && is_string($_REQUEST['action']) ? sanitize_key(wp_unslash($_REQUEST['action'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-            if (in_array($action, self::AJAX_ALLOWED, true)) {
+            // An enrolment action is let through only on its own: not carrying a screen (`page`, `import`) whose code
+            // runs on admin-ajax.php too, such as WooCommerce's settings save on wp_loaded.
+            $screen = isset($_REQUEST['page']) || isset($_REQUEST['import']) // phpcs:ignore WordPress.Security.NonceVerification
+                || (function_exists('is_wc_admin_settings_page') && is_wc_admin_settings_page());
+            if (in_array($action, self::AJAX_ALLOWED, true) && ! $screen) {
                 return;
             }
             wp_send_json_error(['message' => self::message()], 403);
