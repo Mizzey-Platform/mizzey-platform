@@ -120,6 +120,7 @@ require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
 require_once __DIR__ . '/src/Emails/OrderLanguage.php';
 require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
+require_once __DIR__ . '/src/Emails/Transport.php';
 require_once __DIR__ . '/src/Account/AddressBook.php';
 require_once __DIR__ . '/src/Account/AccountPages.php';
 require_once __DIR__ . '/src/Account/CustomerRecords.php';
@@ -267,6 +268,7 @@ MizzeySite\Reviews\ReviewPhotos::register();
 // NOTF-01 to NOTF-13, specs/021-emails.
 MizzeySite\Emails\EmailAdditions::register();
 MizzeySite\Emails\Shipped::register();
+MizzeySite\Emails\Transport::register();
 
 // The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
 MizzeySite\Account\AddressBook::register();
