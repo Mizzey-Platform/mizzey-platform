@@ -147,6 +147,50 @@ run(
 		$kept = $r5 instanceof \WC_Order_Refund ? RefundReference::of( wc_get_order( $r5->get_id() ) )['reference'] : '';
 		$check( RefundReference::MAX === mb_strlen( $kept ) && ! str_contains( $kept, '<' ), 'FR-004 a typed reference is kept as plain text of at most 100 characters (' . mb_strlen( $kept ) . ')' );
 
+		// The refund itself is refused to staff without the permission, on the REST API and the order screen (the guard
+		// is specs/013's; checked here so this slice's AC-5 stands on its own).
+		wp_set_current_user( $no_cap );
+		$rest = new \WP_REST_Request( 'POST', '/wc/v3/orders/' . $cod->get_id() . '/refunds' );
+		$rest->set_param( 'amount', '1' );
+		$rest->set_param( 'api_refund', false );
+		$before_refunds = count( $fresh( $cod->get_id() )->get_refunds() );
+		$denied         = rest_get_server()->dispatch( $rest );
+		$died           = null;
+		$die            = static function () use ( &$died ) {
+			return static function () use ( &$died ) {
+				$died = http_response_code() ?: 403;
+				throw new \RuntimeException( 'died' );
+			};
+		};
+		add_filter( 'wp_die_ajax_handler', $die );
+		add_filter( 'wp_die_handler', $die );
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		ob_start();
+		try {
+			RefundCapability::guardAjax();
+		} catch ( \RuntimeException $e ) {
+			unset( $e );
+		}
+		ob_end_clean();
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+		remove_filter( 'wp_die_ajax_handler', $die );
+		remove_filter( 'wp_die_handler', $die );
+		wp_set_current_user( 0 );
+		$check( 403 === $denied->get_status() && count( $fresh( $cod->get_id() )->get_refunds() ) === $before_refunds && null !== $died && 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ), 'AC-5 staff without the refund permission are refused the refund by the REST API (' . $denied->get_status() . ') and on the order screen before WooCommerce acts (' . var_export( $died, true ) . ')' );
+
+		// A reference with an apostrophe reaches a plain-text email as typed.
+		$plain     = new \WC_Email_Customer_Refunded_Order();
+		$plain->id = 'customer_partially_refunded_order';
+		$apos      = $fresh( $cod->get_id() )->get_refunds()[0];
+		$apos->update_meta_data( RefundReference::REFERENCE, "O'BRIEN-0042" );
+		$apos->update_meta_data( RefundReference::SOURCE, RefundReference::BY_STAFF );
+		$apos->save_meta_data();
+		$plain->refund = $apos;
+		ob_start();
+		RefundReference::email( $fresh( $cod->get_id() ), false, true, $plain );
+		$text = (string) ob_get_clean();
+		$check( str_contains( $text, "Refund reference: O'BRIEN-0042" ) && ! str_contains( $text, '&#' ), 'AC-4 a plain-text refund email carries the reference exactly as typed (' . trim( $text ) . ')' );
+
 		// ---- AC-1, AC-2, AC-4: a refund through the gateway keeps the provider's reference, in Arabic ---------------
 		$card = $paid( 'paymob-t69', '991234567', 'ar' );
 		$panel( $manager, 'TRF-IGNORED' );

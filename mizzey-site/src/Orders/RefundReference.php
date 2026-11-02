@@ -199,7 +199,9 @@ final class RefundReference
             return;
         }
         if ($plainText) {
-            echo "\n" . esc_html($line) . "\n\n";
+            // Plain text is not HTML: the reference is already plain text (sanitize_text_field), and an entity here
+            // would reach the customer as written, or be stripped with the character it stands for.
+            echo "\n" . wp_strip_all_tags($line) . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a plain-text email.
             return;
         }
         printf('<p class="mizzey-refund-reference">%s</p>', esc_html($line));
