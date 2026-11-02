@@ -91,7 +91,13 @@ final class CarrierStatus
                 continue;
             }
             $status = $carrier->status($order);
-            if ($status === null || (string) $order->get_meta(self::APPLIED) === $carrier->id() . ':' . $status['code']) {
+            if ($status === null) {
+                return;
+            }
+            // Applied once; a code left in review is looked at again only when its mapping has changed.
+            $applied = (string) $order->get_meta(self::APPLIED);
+            $key     = $carrier->id() . ':' . $status['code'];
+            if ($applied === $key || $applied === self::reviewMark($key, $status['code'])) {
                 return;
             }
             self::$applying = true;
@@ -115,12 +121,19 @@ final class CarrierStatus
     }
 
     /** @param array{code:string,label:string,at:int} $status */
+    private static function reviewMark(string $key, string $code): string
+    {
+        return $key . '|review|' . (self::map()[$code] ?? '');
+    }
+
     private static function move(\WC_Order $order, Carrier $carrier, array $status): void
     {
-        $order->update_meta_data(self::APPLIED, $carrier->id() . ':' . $status['code']);
+        $key = $carrier->id() . ':' . $status['code'];
+        $order->update_meta_data(self::APPLIED, $key);
         $state = self::map()[$status['code']] ?? null;
         $label = $status['label'] !== '' ? $status['label'] : '-';
         if ($state === null) {
+            $order->update_meta_data(self::APPLIED, self::reviewMark($key, $status['code']));
             self::review($order, sprintf(__('%1$s sent status code %2$s (%3$s), which has no mapping yet. The order was not moved: map the code in Settings, Shipping, Carrier statuses.', 'mizzey-site'), $carrier->name(), $status['code'], $label));
             return;
         }
@@ -131,14 +144,18 @@ final class CarrierStatus
             $order->add_order_note(sprintf(__('%1$s status %2$s (%3$s): %4$s.', 'mizzey-site'), $carrier->name(), $status['code'], $label, $state), 0, false);
             return;
         }
+        $cash = $state === 'delivered' && StatusModel::isCash($order);
+        if ($cash) {
+            $target = StatusModel::COD_COLLECTED; // Delivered cash is collected, not yet in hand (SHIP-16).
+        }
         $from = (string) $order->get_status();
         if (! StatusModel::allowed($from, $target)) {
+            $order->update_meta_data(self::APPLIED, self::reviewMark($key, $status['code']));
             self::review($order, sprintf(__('%1$s sent status code %2$s (%3$s), mapped to %4$s, but an order in %5$s cannot move there. The order was not moved.', 'mizzey-site'), $carrier->name(), $status['code'], $label, $state, wc_get_order_status_name($from)));
             return;
         }
-        if ($state === 'delivered' && StatusModel::isCash($order)) {
+        if ($cash) {
             CodReconciliation::collected($order, $status['at']);
-            $target = StatusModel::COD_COLLECTED;
         }
         $order->delete_meta_data(self::REVIEW);
         $order->save();
@@ -263,6 +280,16 @@ final class CarrierStatus
             update_option(self::SEEN, $seen, false);
         }
         update_option(self::MAP, $map, false);
+        self::recheck();
+    }
+
+    /** Orders waiting in review are looked at again once the table changes. */
+    public static function recheck(): void
+    {
+        $orders = wc_get_orders(['limit' => 200, 'type' => 'shop_order', 'meta_query' => [['key' => self::REVIEW, 'compare' => 'EXISTS']]]); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+        foreach ((array) $orders as $order) {
+            self::apply($order);
+        }
     }
 
     /** @param mixed $order */
