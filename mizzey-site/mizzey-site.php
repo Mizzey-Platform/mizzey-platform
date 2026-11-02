@@ -63,6 +63,7 @@ require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Orders/RefundReference.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
@@ -188,6 +189,7 @@ MizzeySite\Promotions\AutomaticPromotions::register();
 MizzeySite\Promotions\Combination::register();
 MizzeySite\Promotions\WelcomeDiscount::register();
 MizzeySite\Orders\RefundIntegrity::register();
+MizzeySite\Orders\RefundReference::register();
 
 // Accounts: verification sent at registration, marketing consent, phone sign-in, sign-in links (#305). See specs/017-accounts.
 MizzeySite\Accounts\VerificationOnRegistration::register();

@@ -561,3 +561,11 @@ msgstr "المخزون من مصدر المخزون: %d"
 #: mizzey-site/src/Payments/PaymentGate.php
 msgid "Your payment was not confirmed. If you paid, your order will be updated shortly; otherwise you can try again."
 msgstr "لم يتم تأكيد الدفع. إذا كنت قد دفعت، فسيتم تحديث طلبك قريبًا؛ وإلا يمكنك المحاولة مرة أخرى."
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Refund reference: %s"
+msgstr "مرجع الاسترداد: %s"
+
+#: mizzey-site/src/Orders/RefundReference.php
+msgid "Payment reference: %s"
+msgstr "مرجع الدفع: %s"
