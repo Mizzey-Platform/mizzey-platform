@@ -112,5 +112,7 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
 - **FR-004**: The setting, the master switch and each product's choice MUST be changed only by staff holding
   `manage_woocommerce` (product choice: `edit_products`), with a nonce, and each change MUST be logged (S-1, S-2).
 - **FR-005**: `POST /mizzey/v1/stock` and `GET /mizzey/v1/stock` MUST require the `mizzey_feed_stock` capability, take at
-  most 100 items, and answer per item (S-4).
+  most 100 items, and answer per item (S-4). The integration signs its calls with an application password on its own
+  account, given the "Stock feed" role (read, and the feed permission only), so a leaked password can change stock and
+  nothing else. That account is the one exception to specs/007 AC-4 (application passwords for administrators only).
 - **FR-006**: An ERP that does not answer MUST never switch an item to the store's own stock (S-5, OD-41).

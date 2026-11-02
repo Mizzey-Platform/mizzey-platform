@@ -106,7 +106,9 @@ recovery request for one account within the window is refused.
 - A product created by a staff member in wp-admin carries that account as author: the oEmbed answer and the product
   feed name the site instead, as core does for a post with no author.
 - WooCommerce integrations authenticate with WooCommerce API keys, which AC-4 does not touch. An integration that needs
-  an application password uses an administrator service account; the test harness does the same.
+  an application password uses an administrator service account; the test harness does the same. One exception, set by
+  specs/049 (D-28): an account holding the stock feed permission (the "Stock feed" role, which holds nothing else) may
+  use one for the stock feed route, so the outside system that feeds stock never needs an administrator's password.
 - CoreX's lockout message is not the generic message: AC-5 replaces only the unknown-account and wrong-password
   errors, so a locked-out visitor is still told to wait.
 - Behind the proxy, the client address comes from CoreX's `ClientAddress` service, the same one its lockout uses.
@@ -122,7 +124,7 @@ recovery request for one account within the window is refused.
 | Generator marks | WordPress `wp_generator`, WooCommerce `wc_generator_tag`, CoreX `GeneratorTag` (filter `corex_generator_tag`) | Switch each off through its own hook |
 | XML-RPC | `xmlrpc_enabled` leaves unauthenticated methods on; an empty `xmlrpc_methods` still leaves the server's `system.*` methods and `?rsd` | Refuse `XMLRPC_REQUEST` at `init` before dispatch; keep both native switches; remove the pingback header and discovery links |
 | User discovery | REST users controller, `?author=` canonical redirect and archive, users sitemap provider, oEmbed author fields, feed author | Restrict for visitors through the native filters (`rest_pre_dispatch`, `request`, `wp_sitemaps_add_provider`, `oembed_response_data`, `the_author` in feeds) |
-| Application passwords | `wp_is_application_passwords_available_for_user`, judged on the target user | Administrators only |
+| Application passwords | `wp_is_application_passwords_available_for_user`, judged on the target user | Administrators only, and the stock feed account (specs/049) |
 | Sign-in failure message | Distinct WordPress errors; WooCommerce applies `login_errors` | Replace the two account-revealing codes in `authenticate`, after CoreX |
 | Recovery rate limit | None in WordPress, WooCommerce or CoreX (CoreX's limiter wraps its own controllers only) | Mizzey limiter on `lostpassword_post`, which both pages fire |
 | Comment surface | Per-post `comments_open`, `pings_open` | Closed except products |
