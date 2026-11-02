@@ -207,7 +207,7 @@ final class PaymentGate
         if ($event->outcome === PaymentEvent::SUCCESS) {
             $expected = (int) round((float) $order->get_total('edit') * 100);
             if ($event->amountCents !== $expected || $event->currency !== strtoupper((string) $order->get_currency())) {
-                PaymentRecord::flag($order, sprintf(__('%1$s approved %2$s (reference %3$s) but the order total is %4$s. The order was not marked paid: check the payment and refund or correct it.', 'mizzey-site'), $event->provider, $amount, $event->reference, self::money($expected, (string) $order->get_currency())), 'mismatch:' . $event->key());
+                PaymentRecord::flag($order, sprintf(__('%1$s approved %2$s (reference %3$s) but the order total is %4$s. The order was not marked paid: check the payment and refund or correct it.', 'mizzey-site'), $event->provider, $amount, $event->reference, self::money($expected, (string) $order->get_currency())), 'mismatch' . '-' . $event->key());
                 self::stop($channel, 200, 'amount mismatch recorded', $order->get_id(), 'amount_mismatch', $order);
                 return;
             }

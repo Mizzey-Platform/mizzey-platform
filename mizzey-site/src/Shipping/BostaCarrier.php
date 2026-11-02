@@ -25,6 +25,8 @@ final class BostaCarrier implements Carrier
     public const LABEL    = 'bosta_status';
     /** Bosta's plugin's delivery time for a delivered parcel. */
     public const DELIVERED = 'bosta_delivery_date';
+    /** How Bosta's plugin writes it (bosta_format_date()). */
+    private const DELIVERED_FORMAT = 'l,' . ' ' . 'd/m/Y' . ' ' . 'h:ia'; // "Monday, 02/11/2026 03:45pm"
 
     public function id(): string
     {
@@ -66,7 +68,7 @@ final class BostaCarrier implements Carrier
         if ($text === '') {
             return null;
         }
-        $at = \DateTimeImmutable::createFromFormat('l, d/m/Y h:ia', $text, new \DateTimeZone('Africa/Cairo'));
+        $at = \DateTimeImmutable::createFromFormat(self::DELIVERED_FORMAT, $text, new \DateTimeZone('Africa/Cairo'));
 
         return $at instanceof \DateTimeImmutable && $at->getTimestamp() <= time() + HOUR_IN_SECONDS ? $at->getTimestamp() : null;
     }
