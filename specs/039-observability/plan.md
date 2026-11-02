@@ -11,7 +11,7 @@ One class, `Security/Monitoring`, watches the end of each request for a fatal er
 | Item | Value |
 |---|---|
 | Code | `mizzey-site/src/Security/Monitoring.php` |
-| Extension points | `register_shutdown_function`, `action_scheduler_failed_execution`, `action_scheduler_failed_action`, `woocommerce_logger_log_message`; CoreX `NotificationService::publish` |
+| Extension points | `register_shutdown_function`, `wp_php_error_message` (WordPress's fatal error handler ends the request before later shutdown functions run), `action_scheduler_failed_execution`, `action_scheduler_failed_action`, `woocommerce_logger_log_message`; CoreX `NotificationService::publish` |
 | Testing | `t79-observability`; on staging a forced error in the PHP container and a stock source left unbound |
 
 ## Constitution Check

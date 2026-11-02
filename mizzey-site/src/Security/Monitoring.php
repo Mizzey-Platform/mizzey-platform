@@ -31,8 +31,8 @@ final class Monitoring
     public const SOURCE = 'mizzey-errors';
     public const QUIET  = HOUR_IN_SECONDS;
 
-    /** The integration log sources whose errors are raised. */
-    public const WATCHED = ['mizzey-payments', 'mizzey-stock', 'mizzey-shipping', 'mizzey-email', 'mizzey-staff-log', 'mizzey-catalogue'];
+    /** Every Mizzey log source (payments, stock, shipping, email and the others) is watched, but this monitor's own. */
+    public const WATCHED_PREFIX = 'mizzey-';
 
     /** The prefix of this monitor's notification types and keys. */
     private const TYPE = 'mizzey' . '.monitor';
@@ -122,7 +122,7 @@ final class Monitoring
     public static function watch($message, $level = '', $context = [], $handler = null)
     {
         $source = is_array($context) ? (string) ($context['source'] ?? '') : '';
-        if (! self::$raising && in_array($source, self::WATCHED, true) && in_array((string) $level, ['error', 'critical', 'alert', 'emergency'], true)) {
+        if (! self::$raising && str_starts_with($source, self::WATCHED_PREFIX) && $source !== self::SOURCE && in_array((string) $level, ['error', 'critical', 'alert', 'emergency'], true)) {
             self::error('integration', $source, sprintf('%s logged an error: %s', $source, self::clean((string) $message)), 'error', false);
         }
 

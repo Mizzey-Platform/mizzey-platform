@@ -1,0 +1,17 @@
+Mutation check for specs/039-observability, t79-observability, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). Each defect is applied alone, the scenario run (two real fatal errors in WP-CLI child processes), the file restored.
+
+CAUGHT    M1 the end of a request is not watched  <- FAIL  AC-1 a fatal error after the page has started is in the application log too (exit 255)
+CAUGHT    M2 WordPress's error page route is not watched  <- FAIL  AC-1 a fatal error that ends a real request is in the application log (exit 1)
+CAUGHT    M3 a card-like number is kept  <- FAIL  AC-1 a fatal error is raised with its place inside the site, and a card-like number is masked (Fatal error at wp-content
+CAUGHT    M4 the server's absolute path is reported  <- FAIL  AC-1 a fatal error is raised with its place inside the site, and a card-like number is masked (Fatal error a
+CAUGHT    M5 a fatal error is not written to the log  <- FAIL  AC-1 it is in the application log (source mizzey-errors)
+CAUGHT    M6 failed scheduled actions are not watched  <- FAIL  AC-2 a failed scheduled action is logged and raised (none)
+CAUGHT    M7 integration errors are not watched  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info
+CAUGHT    M8 repeats within the hour are raised again  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, a
+CAUGHT    M9 any plugin's error is raised  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info line 
+CAUGHT    M10 info lines are raised  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info line and an
+CAUGHT    M11 a warning is raised as a fatal error  <- FAIL  AC-4 a warning that does not end the request is not raised as a fatal error
+CAUGHT    M12 operations staff are not notified  <- FAIL  AC-1 it reaches the operations staff as a CoreX notification
+CAUGHT    M13 the monitor's own line is raised again  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an
+
+13 of 13 caught.

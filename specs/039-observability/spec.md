@@ -71,9 +71,11 @@ hosting logs, no custom operational audit trail.
 
 ### Functional Requirements
 
-- **FR-001**: A fatal error MUST be logged with its place inside the site and raised (AC-1).
+- **FR-001**: A fatal error MUST be logged with its place inside the site and raised (AC-1), both when WordPress
+  shows its error page (which ends the request inside its own handler) and when output had already started.
 - **FR-002**: A failed or timed-out scheduled action MUST be logged and raised (AC-2).
-- **FR-003**: An error logged by a Mizzey integration source MUST be raised (AC-3).
+- **FR-003**: An error logged under any Mizzey log source (`mizzey-` followed by the area) MUST be raised, except
+  the monitor's own source (AC-3).
 - **FR-004**: One kind of failure at one place MUST be raised at most once an hour.
 - **FR-005**: No card-like number and no absolute server path MUST be logged or raised by the monitor.
 - **FR-006**: A failure of the monitor itself MUST NOT affect the request.

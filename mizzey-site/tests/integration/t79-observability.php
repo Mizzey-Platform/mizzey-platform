@@ -29,11 +29,17 @@ run(
 		$tag    = 't79' . wp_rand( 1000, 9999 );
 		$raised = array();
 		Monitoring::$sink = static function ( array $entry ) use ( &$raised ) { $raised[] = $entry; };
+		// Only what this run raised is cleared: the scenario also runs on staging, beside real notifications.
+		$ours = array();
 		$s->on_finish(
-			static function () use ( $wpdb ): void {
+			static function () use ( $wpdb, &$ours ): void {
 				Monitoring::$sink = null;
-				$wpdb->query( "DELETE FROM {$wpdb->prefix}corex_notifications WHERE dedup_key LIKE 'mizzey.monitor|%' AND created_at >= NOW() - INTERVAL 1 HOUR" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-				$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_%mizzey\\_monitor\\_%' OR option_name LIKE '\\_transient\\_timeout\\_mizzey\\_monitor\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				foreach ( $ours as $kind_where ) {
+					delete_transient( 'mizzey_monitor_' . md5( $kind_where ) );
+					$wpdb->delete( $wpdb->prefix . 'corex_notifications', array( 'dedup_key' => 'mizzey.monitor|' . md5( $kind_where ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				}
+				// The two WP-CLI runs below fail inside evaluated code, which no real request runs.
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}corex_notifications WHERE source_type = %s AND source_id LIKE %s", 'mizzey_monitor', '%' . $wpdb->esc_like( "eval()'d code" ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			}
 		);
 		$logged = static function ( string $needle ): bool {
@@ -49,20 +55,24 @@ run(
 		};
 
 		// ---- AC-1: a fatal error -----------------------------------------------------------------------------
-		Monitoring::fatal( "{$tag} call to undefined function with card 4111111111111111", ABSPATH . 'wp-content/plugins/mizzey-site/src/Example.php', 42 );
+		$card = '4111' . wp_rand( 100000000000, 999999999999 );
+		Monitoring::fatal( "{$tag} call to undefined function with card {$card}", ABSPATH . "wp-content/plugins/mizzey-site/src/{$tag}.php", 42 );
 		$fatal = array_values( array_filter( $raised, static fn ( $r ) => 'fatal' === $r['kind'] ) );
-		$check( 1 === count( $fatal ) && 'wp-content/plugins/mizzey-site/src/Example.php:42' === $fatal[0]['where'] && ! str_contains( $fatal[0]['line'], '4111111111111111' ), 'AC-1 a fatal error is raised with its place inside the site, and a card-like number is masked (' . ( $fatal[0]['line'] ?? 'none' ) . ')' );
-		$check( $logged( "{$tag} call to undefined function" ) && ! $logged( '4111111111111111' ), 'AC-1 it is in the application log (source ' . Monitoring::SOURCE . ')' );
+		$check( 1 === count( $fatal ) && "wp-content/plugins/mizzey-site/src/{$tag}.php:42" === $fatal[0]['where'] && ! str_contains( $fatal[0]['line'], $card ), 'AC-1 a fatal error is raised with its place inside the site, and a card-like number is masked (' . ( $fatal[0]['line'] ?? 'none' ) . ')' );
+		$check( $logged( "{$tag} call to undefined function" ) && ! $logged( $card ), 'AC-1 it is in the application log (source ' . Monitoring::SOURCE . ')' );
 		// A real fatal error in another process: WP-CLI loads the site and calls a function that does not exist.
 		$bin = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
 		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "{$tag}_no_such_function();" ) . ' 2>&1', $out, $code );
 		$check( 0 !== $code && $logged( "{$tag}_no_such_function" ), 'AC-1 a fatal error that ends a real request is in the application log (exit ' . $code . ')' );
+		// Once output has started WordPress shows no error page: the end of the request is watched for that case.
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "echo 'started'; {$tag}_after_output();" ) . ' 2>&1', $out2, $code2 );
+		$check( 0 !== $code2 && $logged( "{$tag}_after_output" ), 'AC-1 a fatal error after the page has started is in the application log too (exit ' . $code2 . ')' );
 		// WordPress's own handler shows its error page and ends the request: the error is taken from its message.
 		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();
 		$before = count( $raised );
-		apply_filters( 'wp_php_error_message', 'page', array( 'type' => E_ERROR, 'message' => "{$tag} shown by WordPress", 'file' => ABSPATH . 'wp-content/plugins/x/y.php', 'line' => 7 ) );
+		apply_filters( 'wp_php_error_message', 'page', array( 'type' => E_ERROR, 'message' => "{$tag} shown by WordPress", 'file' => ABSPATH . "wp-content/plugins/{$tag}/y.php", 'line' => 7 ) );
 		$check( count( $raised ) === $before + 1 && str_contains( $raised[ $before ]['line'] ?? '', "{$tag} shown by WordPress" ), 'AC-1 a fatal error WordPress shows its error page for is raised too' );
-		$stored = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}corex_notifications WHERE dedup_key = %s", 'mizzey.monitor|' . md5( 'fatal|wp-content/plugins/x/y.php:7' ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$stored = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}corex_notifications WHERE dedup_key = %s", 'mizzey.monitor|' . md5( "fatal|wp-content/plugins/{$tag}/y.php:7" ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$check( 1 === $stored, 'AC-1 it reaches the operations staff as a CoreX notification' );
 
 		// ---- AC-2: a failed scheduled action --------------------------------------------------------------------
@@ -80,20 +90,29 @@ run(
 
 		// ---- AC-3: integration errors, once an hour -----------------------------------------------------------
 		$before = count( $raised );
-		wc_get_logger()->error( "{$tag} stock source unavailable after 3 attempts", array( 'source' => 'mizzey-stock' ) );
-		wc_get_logger()->error( "{$tag} stock source unavailable after 3 attempts", array( 'source' => 'mizzey-stock' ) );
-		wc_get_logger()->error( "{$tag} callback refused", array( 'source' => 'mizzey-payments' ) );
-		wc_get_logger()->info( "{$tag} routine", array( 'source' => 'mizzey-payments' ) );
-		wc_get_logger()->error( "{$tag} someone else's plugin", array( 'source' => 'other-plugin' ) );
+		wc_get_logger()->error( "{$tag} stock source unavailable after 3 attempts", array( 'source' => "mizzey-{$tag}-stock" ) );
+		wc_get_logger()->error( "{$tag} stock source unavailable after 3 attempts", array( 'source' => "mizzey-{$tag}-stock" ) );
+		wc_get_logger()->error( "{$tag} callback refused", array( 'source' => "mizzey-{$tag}-payments" ) );
+		wc_get_logger()->info( "{$tag} routine", array( 'source' => "mizzey-{$tag}-info" ) );
+		wc_get_logger()->critical( "{$tag} the monitor's own line", array( 'source' => Monitoring::SOURCE ) );
+		wc_get_logger()->error( "{$tag} someone else's plugin", array( 'source' => "{$tag}-other-plugin" ) );
 		$new = array_slice( $raised, $before );
-		$check( 2 === count( $new ) && 'mizzey-stock' === $new[0]['where'] && 'mizzey-payments' === $new[1]['where'], 'AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info line and another plugin\'s error are not (' . count( $new ) . ')' );
+		$check( 2 === count( $new ) && "mizzey-{$tag}-stock" === $new[0]['where'] && "mizzey-{$tag}-payments" === $new[1]['where'], 'AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info line and another plugin\'s error are not (' . count( $new ) . ')' );
 
 		// ---- AC-4: not fatal --------------------------------------------------------------------------------------
+		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();
 		$before = count( $raised );
 		@trigger_error( "{$tag} a notice", E_USER_WARNING ); // phpcs:ignore
 		Monitoring::shutdown();
 		$check( count( $raised ) === $before, 'AC-4 a warning that does not end the request is not raised as a fatal error' );
-		$check( false !== has_action( 'wp_login', array( \MizzeySite\Security\StaffActivityLog::class, 'signedIn' ) ) , 'AC-4 sign-ins reach the staff log (specs/031), beside WooCommerce's order notes' );
+		$check( false !== has_action( 'wp_login', array( \MizzeySite\Security\StaffActivityLog::class, 'signedIn' ) ), 'AC-4 sign-ins reach the staff log (specs/031), beside the order notes' );
+
+		foreach ( $raised as $entry ) {
+			$ours[] = $entry['kind'] . '|' . $entry['where'];
+		}
+		foreach ( array( "mizzey-{$tag}-info", Monitoring::SOURCE, "{$tag}-other-plugin" ) as $source ) {
+			$ours[] = 'integration|' . $source;
+		}
 
 		return $ok;
 	}
