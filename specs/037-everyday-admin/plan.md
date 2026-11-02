@@ -10,7 +10,7 @@ G10 is met by the standard administration (M-4). The work is to measure each tas
 
 | Item | Value |
 |---|---|
-| Code | Only where a check fails |
+| Code | `mizzey-site/src/I18n/AdminEnglish.php`: the one gap t77 found, the administration in a staff member's own language and direction |
 | Testing | `t77-everyday-admin`, over the real requests of the products list, the orders list and the bulk-edit form, as a signed-in administrator |
 
 ## Constitution Check

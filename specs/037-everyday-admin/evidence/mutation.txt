@@ -1,0 +1,5 @@
+Mutation check for specs/037-everyday-admin, t77-everyday-admin, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). The slice's one piece of code is AdminEnglish.
+
+CAUGHT    M1 the admin language follows the staff member  <- AC-5 the administration stays in English for a staff member who chose Arabic (&lt;h
+CAUGHT    M2 the admin direction follows the staff member  <- AC-5 the administration stays in English for a staff member who chose Arabic (&lt;
+2 of 2 caught
