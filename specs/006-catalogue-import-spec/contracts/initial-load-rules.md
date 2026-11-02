@@ -67,6 +67,14 @@ A file with a header and no rows completes with no outcomes.
 | `W2` | The file has a column the mapping does not list (file level); the mapping is not complete until it is mapped or recorded as not imported | developer |
 | `W3` | On a create, an Arabic column the mapping fills is empty | client |
 | `W4` | The SKU matched a translation; its original carries a different SKU | developer |
+| `W5` | A sale price that is not a plain number, or not below the row's price (on an update with the price blank, the price the store holds); the row loads without it | client |
+| `W6` | A cost that is not a plain number; the row loads without it | client |
+| `W7` | An image address the load would refuse (not a public http or https address, by WordPress's own check), or more than ten images on a row; those are not downloaded | client |
+| `W8` | Variation rows of one parent with the same attribute values, or filling different attributes | client |
+| `W9` | A simple row whose SKU belongs to a store product with variations; its price has no effect | client |
+| `W10` | The mapping fills the cost while WooCommerce's cost of goods is off; the load refuses to start until it is on | developer |
+
+W5 to W10 were added on 2 November 2026 (audit B-15, B-16). They change no outcome, so the rules version stays 1.
 
 The `client` issues go to `client-issues.csv` for the Developer's review. The `developer` issues are corrected in the
 mapping where the mapping is wrong, or routed to their owning work where the store data is wrong; rules are never changed

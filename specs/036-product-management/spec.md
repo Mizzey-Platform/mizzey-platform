@@ -93,7 +93,9 @@ The owner's instruction of 2 November 2026 puts it in the admin set that needs n
 
 - A sale price above the regular price: not shown as a saving.
 - A video or canonical address that is not a web address: not kept.
-- The Arabic record's SEO fields: its own, never copied from the English.
+- The Arabic record's SEO fields: its own, never copied from the English, and shown on the Arabic page only.
+- A price, a badge or another copied field changed by code (the REST API, WP-CLI, an integration) rather than on a
+  screen: the Arabic record follows, as it does after the product screen, and an Arabic order is charged the new price.
 
 ## Native coverage
 
@@ -109,6 +111,7 @@ The owner's instruction of 2 November 2026 puts it in the admin set that needs n
 | Related products | Upsells (staff) and an automatic rail | Upsells relabelled; the automatic rail emptied (D-19 item 3, D-20 C3) |
 | Compare-at | Sale and regular price, WooCommerce's validation | Native, verified (D-20 C6) |
 | Price history | None | Gap: a narrow history per item (CX-03) |
+| The Arabic record following a change made by code | WPML's copy runs from save_post, which a CRUD save after a field-only change skips (t20: REST and CRUD left a stale Arabic price) | Partial: `TranslationSync` runs WPML's own copy after such a save |
 
 ## Requirements
 
@@ -125,6 +128,8 @@ The owner's instruction of 2 November 2026 puts it in the admin set that needs n
   empty (AC-4).
 - **FR-006**: Every regular or sale price change of a product or variation MUST be recorded once per item with user
   and time, by any channel (AC-6).
+- **FR-007**: A copied field (price, sale price and its dates, badges, video, cost, SKU, weight, dimensions) changed on
+  the English record by any channel MUST reach the Arabic record (AC-6, AC-7).
 
 ## Optional safeguards (not owed)
 

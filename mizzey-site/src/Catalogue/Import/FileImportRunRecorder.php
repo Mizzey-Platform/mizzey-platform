@@ -13,9 +13,10 @@ defined('ABSPATH') || exit;
 use RuntimeException;
 
 /**
- * Writes the run payload as `run.json` beside the reports. A fixture record: it proves no database persistence.
+ * Writes the run payload as `run.json` beside the reports: a copy for the migration evidence. The persisted Import Run
+ * (ENT-19) is ImportRunLog's, and the copy names it under `record`.
  *
- * Register ids: MIG-06 (CX-04, pending). See specs/006-catalogue-import-spec, FR-010.
+ * Register ids: MIG-06 (CX-04). See specs/006-catalogue-import-spec, FR-010.
  */
 final class FileImportRunRecorder implements ImportRunRecorder
 {
@@ -28,7 +29,7 @@ final class FileImportRunRecorder implements ImportRunRecorder
     public function record(array $payload): string
     {
         $path    = $this->directory . '/' . self::FILE;
-        $payload = $payload + ['recorder' => 'fixture-adapter', 'persisted' => false];
+        $payload = ['recorder' => 'file-copy', 'persisted' => false] + $payload;
         $json    = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $bytes   = $json === false ? false : file_put_contents($path, $json . "\n");
         if ($json === false || $bytes !== strlen($json . "\n")) {

@@ -71,8 +71,8 @@ MIG-04 part only), US-23-05 (preview), US-23-06 (dry run, the MIG-06 part only) 
 
 **CX-04 integration dependency (pending CX-04):** #249 supplies the source file or reference, the mapping used and its
 version, the row counts, the run outcome, the actor, the timestamp, and the validation or error-summary reference
-where applicable. ENT-19 persistence and its acceptance belong to #273. Development uses a contract and fixture
-adapter until that implementation is available; a fixture record is not evidence of persisted ENT-19 integration.
+where applicable. ENT-19 persistence and its acceptance belong to #273. Since 2 November 2026 each run is stored as
+an Import Run record (`ImportRunLog`, specs/040); `run.json` beside the reports is its copy and names it.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -232,8 +232,7 @@ additional parsing work. The eventual load belongs to the neighbouring migration
   problem and requested correction. Issues resolved by the Developer in the mapping are excluded from the Client's
   correction list (AC-7)
 - **FR-010**: Each validation run MUST supply the payload specified by the CX-04 integration dependency. Verification
-  MUST distinguish fixture-adapter output from a persisted ENT-19 record. #249 does not implement or accept the ENT-19
-  storage model
+  MUST distinguish the file copy from the persisted ENT-19 record. #249 does not accept the ENT-19 storage model
 - **FR-011**: The tool MUST be operated by the Developer only; it offers no storefront surface and no client-facing
   administration screen (AC-2, AC-7)
 - **FR-012**: The pass MUST validate the whole agreed export. OD-15's 5,000-product fixture is a provisional

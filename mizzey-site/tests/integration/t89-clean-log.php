@@ -90,6 +90,17 @@ run(
 		$trid2 = (int) apply_filters( 'wpml_element_trid', null, $second, 'post_product' );
 		$check( $open > 0 && $ar2 > 0 && $open === (int) wpml_tm_load_job_factory()->job_id_by_trid_and_lang( $trid2, 'ar' ) && $jobs( $second ) === $before_jobs, 'FR-002 a translation job already open for the product is reused, not replaced, and no new one is sent (' . $open . ', ' . $before_jobs . ' to ' . $jobs( $second ) . ')' );
 
+		// A product made after a translation, in the same request, is its own: it never takes over the translation's
+		// language row (WooCommerce Multilingual's editor leaves save filters behind, A11).
+		$after = $w->simple( "{$tag}-AFTER", null );
+		$lang_row = static function ( int $id ) {
+			global $wpdb;
+			return $wpdb->get_row( $wpdb->prepare( "SELECT language_code, trid FROM {$wpdb->prefix}icl_translations WHERE element_id = %d AND element_type = %s", $id, 'post_product' ) );
+		};
+		$ar2_row   = $lang_row( $ar2 );
+		$after_row = $lang_row( $after );
+		$check( $ar2_row && 'ar' === $ar2_row->language_code && (int) $ar2_row->trid === $trid2 && $after_row && 'en' === $after_row->language_code && (int) $after_row->trid !== $trid2, 'FR-002 a product made after a translation in the same request keeps its own language row, and the translation keeps its own (' . wp_json_encode( array( $ar2_row, $after_row ) ) . ')' );
+
 		// ---- The WPML handlers ----------------------------------------------------------------------------------
 		$left = array();
 		foreach ( $GLOBALS['wp_filter']['woocommerce_after_product_object_save']->callbacks ?? array() as $callbacks ) {

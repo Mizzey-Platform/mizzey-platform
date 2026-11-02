@@ -1,22 +1,24 @@
 <?php
 /**
- * t37, CX-04 integration dependency (FR-010): each validation run supplies the Import Run payload.
+ * t37, CX-04 (FR-010, ENT-19): each validation run is kept as a persisted Import Run record.
  *
- * `run.json` carries the file, the mapping used and its version, the rules version, the counts, the outcome, the
- * actor, the times and the reports, and says it is a fixture-adapter record, not a persisted ENT-19 row (#273). A
+ * The record (ImportRunLog, in the database) and its copy `run.json` carry the file, the mapping used and its version,
+ * the rules version, the counts, the outcome, the actor, the times and the reports; the copy names the record. A
  * file-level failure is recorded with its reason and no invented row outcomes. A run that cannot write its output is
- * never marked completed. The guard case (exit 3, `guard-refused`) is t34's.
+ * never marked completed. The guard case (exit 3, `guard-refused`) is t34's. The load's record is t86's.
  *
  * @package MizzeySite\Tests\Integration
  */
 
 namespace MizzeySite\Tests\Integration;
 
+use MizzeySite\Catalogue\Import\ImportRunLog;
+
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_catalogue.php';
 
 run(
-	new Scenario( 't37-catalogue-run-record', 'CX-04: each run supplies the Import Run payload, as a fixture-adapter record' ),
+	new Scenario( 't37-catalogue-run-record', 'CX-04: each run is kept as a persisted Import Run record' ),
 	function ( Scenario $s ): bool {
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {
@@ -42,7 +44,13 @@ run(
 		$check( 'wp-cli' === ( $record['actor'] ?? '' ), 'CX-04: the actor (' . ( $record['actor'] ?? '' ) . ')' );
 		$check( false !== strtotime( (string) ( $record['started_at'] ?? '' ) ) && strtotime( (string) $record['finished_at'] ) >= strtotime( (string) $record['started_at'] ), 'CX-04: started and finished times' );
 		$check( 2 === count( $record['reports'] ?? array() ) && array() === array_filter( $record['reports'], fn ( $p ) => ! file_exists( $p ) ), 'CX-04: the reports it names exist' );
-		$check( 'fixture-adapter' === ( $record['recorder'] ?? '' ) && false === ( $record['persisted'] ?? true ), 'FR-010: it says fixture-adapter, not persisted (ENT-19 is #273\'s)' );
+		$check( 'file-copy' === ( $record['recorder'] ?? '' ) && false === ( $record['persisted'] ?? true ), 'FR-010: run.json says it is the copy, not the persisted record' );
+		$reference = (string) ( $record['record'] ?? '' );
+		wp_cache_delete( 'alloptions', 'options' );
+		wp_cache_delete( $reference, 'options' );
+		$stored = '' === $reference ? null : ImportRunLog::get( $reference );
+		$s->on_finish( static fn () => '' === $reference ? null : delete_option( $reference ) );
+		$check( is_array( $stored ) && true === $stored['persisted'] && 'validation' === $stored['kind'] && $stored['file'] === $record['file'] && $stored['counts'] === $record['counts'] && 'completed' === $stored['outcome'] && 'wp-cli' === $stored['actor'] && $stored['started_at'] === $record['started_at'], 'A-273-1 ENT-19: the run is kept in the database with the same file, counts, outcome, actor and times (' . ( '' === $reference ? 'no record' : $reference ) . ')' );
 
 		$out2    = catalogue_out_dir( $s, 'failure' );
 		$failure = catalogue_command( 'validate ' . escapeshellarg( CATALOGUE_FIXTURES . '/header-mismatch.tsv' ) . ' --out=' . escapeshellarg( $out2 ) );

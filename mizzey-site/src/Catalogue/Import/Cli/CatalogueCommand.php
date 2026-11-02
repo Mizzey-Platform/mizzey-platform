@@ -16,6 +16,7 @@ use MizzeySite\Catalogue\Import\CatalogueWriteRefused;
 use MizzeySite\Catalogue\Import\ExportReader;
 use MizzeySite\Catalogue\Import\FileImportRunRecorder;
 use MizzeySite\Catalogue\Import\HeaderCheck;
+use MizzeySite\Catalogue\Import\ImportRunLog;
 use MizzeySite\Catalogue\Import\Mapping;
 use MizzeySite\Catalogue\Import\ReportWriter;
 use MizzeySite\Catalogue\Import\RowInterpreter;
@@ -191,6 +192,8 @@ final class CatalogueCommand
         $payload['finished_at'] = gmdate('c');
         try {
             $payload['error_reference'] = $exit === 0 ? null : $payload['outcome'];
+            // The persisted Import Run (ENT-19); run.json beside the reports is its copy and names it.
+            $payload['record'] = (new ImportRunLog())->record($payload + ['kind' => 'validation']);
             WP_CLI::log(sprintf(
                 /* translators: %s: a file path. */
                 __('Run recorded: %s', 'mizzey-site'),
@@ -199,6 +202,10 @@ final class CatalogueCommand
         } catch (RuntimeException $failure) {
             $payload = array_replace($payload, ['outcome' => 'output-failure', 'reason' => $failure->getMessage(), 'error_reference' => 'output-failure']);
             $exit    = $exit === 0 ? self::EXIT_USAGE : $exit;
+            // The stored record must not say completed when its copy could not be written.
+            if (isset($payload['record'])) {
+                ImportRunLog::update((string) $payload['record'], ['outcome' => 'output-failure', 'reason' => $payload['reason'], 'error_reference' => 'output-failure']);
+            }
         }
         if ($exit !== 0) {
             WP_CLI::warning((string) $payload['reason']);
@@ -216,7 +223,8 @@ final class CatalogueCommand
      * : The agreed export.
      *
      * --out=<directory>
-     * : Where the run's plan is kept.
+     * : Where the run's plan, validation report and client issue list are kept. Outside the website folder, and new
+     * for each run: a directory holding an earlier plan is refused.
      *
      * [--mapping=<file>]
      * : The mapping. Defaults to the plugin's.
@@ -245,6 +253,11 @@ final class CatalogueCommand
         foreach ($state['counts'] as $name => $count) {
             WP_CLI::log(sprintf('%-18s %d', $name, $count));
         }
+        WP_CLI::log(sprintf(
+            /* translators: %s: a run id. */
+            __('Import run recorded: %s. The rows the validation rejected are in validation-report.csv in the run directory.', 'mizzey-site'),
+            (string) $state['id'],
+        ));
         WP_CLI::success(sprintf(
             /* translators: %d: rows planned. */
             __('%d rows planned. The load runs in the background; follow it with: wp mizzey catalogue status', 'mizzey-site'),
@@ -271,6 +284,10 @@ final class CatalogueCommand
         }
         foreach ((array) $state['problems'] as $problem) {
             WP_CLI::log(sprintf(__('row %1$d %2$s: %3$s', 'mizzey-site'), (int) $problem['row'], (string) $problem['sku'], (string) $problem['problem']));
+        }
+        foreach ((array) ($state['warnings'] ?? []) as $warning) {
+            /* translators: 1: a row number, 2: a SKU, 3: the warning. */
+            WP_CLI::log(sprintf(__('warning, row %1$d %2$s: %3$s', 'mizzey-site'), (int) $warning['row'], (string) $warning['sku'], (string) $warning['warning']));
         }
     }
 

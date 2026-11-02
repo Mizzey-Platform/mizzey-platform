@@ -46,6 +46,14 @@ final class ValidationPass
             }
         }
         ksort($decided);
+        $decided = self::checkVariationSets($rows, $decided, $index, $mapping);
+        if ($mapping->columnFor('cost') !== null && ! CatalogueLoad::costsOn()) {
+            foreach ($rows as $position => $row) {
+                if (($row['fields']['cost'] ?? '') !== '') {
+                    $decided[$position]['issues'][] = LoadRules::issue('W10', (string) $mapping->columnFor('cost'), __('Cost of goods is switched off in WooCommerce, so no cost can be written; the load refuses to start until it is on.', 'mizzey-site'), __('Switch on cost of goods in WooCommerce before the load.', 'mizzey-site'));
+                }
+            }
+        }
 
         $lines        = [];
         $clientIssues = [];
@@ -84,6 +92,54 @@ final class ValidationPass
         $decision   = LoadRules::decide($row, $resolution, $parent, $mapping);
 
         return $decision + ['resolution' => $resolution];
+    }
+
+    /**
+     * Variation rows of one parent that name the same attribute values (the customer's choice would reach only one of
+     * them), or that fill different attributes, are flagged for the client (W8). Rows with no attribute value, an
+     * update that changes no attribute, are left out.
+     *
+     * @param list<array<string, mixed>>       $rows
+     * @param array<int, array<string, mixed>> $decided
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function checkVariationSets(array $rows, array $decided, SkuIndex $index, Mapping $mapping): array
+    {
+        $byParent = [];
+        foreach ($rows as $position => $row) {
+            if ($row['type'] === 'variation' && $row['parent_sku'] !== '' && $row['attributes'] !== []) {
+                $byParent[$index->key($row['parent_sku_source'])][] = $position;
+            }
+        }
+        $column = implode(', ', $mapping->attributeColumns());
+        foreach ($byParent as $positions) {
+            $combinations = [];
+            $sets         = [];
+            foreach ($positions as $position) {
+                $attributes = $rows[$position]['attributes'];
+                ksort($attributes);
+                $combinations[(string) wp_json_encode($attributes)][] = $rows[$position]['row'];
+                $sets[implode(',', array_keys($attributes))] = true;
+            }
+            foreach ($positions as $position) {
+                $attributes = $rows[$position]['attributes'];
+                ksort($attributes);
+                $same = $combinations[(string) wp_json_encode($attributes)];
+                if (count($same) > 1) {
+                    $decided[$position]['issues'][] = LoadRules::issue('W8', $column, sprintf(
+                        /* translators: %s: row numbers. */
+                        __('Rows %s are variations of one product with the same attribute values, so a customer can choose only one of them.', 'mizzey-site'),
+                        implode(', ', $same),
+                    ), __('Give each variation its own attribute values.', 'mizzey-site'));
+                }
+                if (count($sets) > 1) {
+                    $decided[$position]['issues'][] = LoadRules::issue('W8', $column, __('The variations of this product fill different attributes.', 'mizzey-site'), __('Fill the same attributes on every variation of the product.', 'mizzey-site'));
+                }
+            }
+        }
+
+        return $decided;
     }
 
     /**

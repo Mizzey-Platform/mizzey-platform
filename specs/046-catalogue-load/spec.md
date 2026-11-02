@@ -48,6 +48,11 @@ SSC-21 is marked [key] in the register.
 - **CR-06.** The client's real, unmodified Amazon export. The mapping's headers follow it when it arrives; the
   acceptance evidence is a run over that file.
 - **CR-08.** The rights to the product images. Images are downloaded only when the run says the rights are confirmed.
+- **CX-04** (D-12): each run is kept as an Import Run record (ENT-19, owned by #273, specs/040). The record is written;
+  its acceptance stays with specs/040's AC-3.
+- **CR-06, SEO fields in Arabic.** The mapping has no Arabic SEO fields: the SEO title and description are written to
+  the English record only, and the Arabic record keeps its own (empty until staff fill them). Whether the agreed source
+  carries Arabic SEO text is known only from the real export; if it does, the mapping gains the fields then.
 
 ## Contractual acceptance criteria [checked]
 
@@ -56,7 +61,7 @@ SSC-21 is marked [key] in the register.
 | AC-1 | The load writes what the validation pass decided, in the background, without interrupting the store; rejected rows are not written | MIG-20 | provisional |
 | AC-2 | Each product carries its name, description, price, sale price and cost, its category path and brand, and its SEO fields where the source has them | MIG-11, MIG-12, MIG-13, MIG-15 | provisional |
 | AC-3 | Variations in the source become variable products with their attributes | MIG-09, MIG-10 | provisional |
-| AC-4 | Each Arabic record is written as its own content, valid and normalised, in the product's translation group, and the Arabic variations keep their attributes | MIG-02, SSC-21 | provisional |
+| AC-4 | Each Arabic record is written as its own content, valid and normalised, in the product's translation group, and the Arabic variations keep their attributes; on every run, the first and an update, the Arabic record carries the item's price, sale price and other copied fields, and a variation added to a translated product gets its Arabic variation | MIG-02, MIG-09, MIG-13, SSC-21 | provisional |
 | AC-5 | Images are downloaded and stored on the store's server once rights are confirmed, with the title as alt text where the source gives none | MIG-16, MIG-17 | provisional |
 | AC-6 | The loaded catalogue exports in WooCommerce's standard CSV format | MIG-25 | provisional |
 
@@ -76,6 +81,30 @@ SSC-21 is marked [key] in the register.
 - A byte order mark at the start of a cell: dropped.
 - The same image address on two products: stored once.
 - A row with no Arabic text: no Arabic record.
+- An update file that changes only a price (blank cells elsewhere): the English and the Arabic record both carry the
+  new price, and an Arabic order is charged it.
+- An update file that adds a size to a product already in both languages: the Arabic product gets the Arabic
+  variation, at its price, and the new value in its attribute list, in the English wording until it is translated.
+- A category or brand that has no Arabic name: the Arabic record shows none; the run lists a warning for it, for the
+  translation to be added.
+- An Arabic name with `&`: it is stored as WordPress stores titles and reads back as written.
+- An image address that is not a public web address, and every address after the tenth: not downloaded, reported.
+  The validation pass reports them first, as client issues.
+- Cost in the mapping while WooCommerce's cost of goods is off: the load refuses to start, so no cost is lost.
+- A run directory under WordPress, the uploads folder, the site's folder when WordPress sits in a subfolder of it (the
+  site address ends in that subfolder, as `/wp` does), or the request's document root, or one that holds an earlier
+  run's plan, run record copy or reports (a validation's included): refused, and nothing is created or overwritten
+  there. Under WP-CLI the document root is WordPress's own folder, so a web root
+  set higher than the site address shows is not known to the load: the runbook keeps run directories outside the web
+  server's folders (a home or temporary folder).
+- A web runner rather than WP-CLI: an images action takes at most five products and hands over once half the PHP time
+  limit is spent; it queues a watchdog first, which resumes from the saved progress if the action dies at the limit,
+  and a product tried twice without finishing is given up and reported. One worker per run works at a time, under a
+  lock its database connection holds, so a watchdog that fires while a slow worker is alive does nothing but wait
+  again. The load is run with `wp action-scheduler run` where the host allows it.
+- A run that stopped moving for half an hour and is replaced by a new one: its Import Run record is finalised as
+  superseded, with its finish time and what it had written.
+- An update that renames a product and moves it to a translated category: the Arabic record gets the Arabic category.
 
 ## Native coverage
 
@@ -83,6 +112,7 @@ SSC-21 is marked [key] in the register.
 |---|---|---|
 | Products, variations, attributes, categories, brands, cost | WooCommerce's product classes and taxonomies, its cost of goods | Native, used |
 | The Arabic record | WooCommerce Multilingual's translation editor | Native, used in its own phase |
+| The Arabic record following an update | WPML's copy of the copied fields and WooCommerce Multilingual's product synchronisation, which run only from save_post | Partial: a CRUD save skips save_post (t20, t18); `TranslationSync` runs WPML's and WCML's own synchronisation after it |
 | Background work | Action Scheduler | Native, used |
 | Media | WordPress's `media_sideload_image` | Native, used |
 | Export | WooCommerce's CSV exporter | Native, verified |
@@ -102,7 +132,18 @@ SSC-21 is marked [key] in the register.
   attributes MUST be the variable product's, with every value its variations use (AC-2, AC-3).
 - **FR-005**: Images MUST be downloaded only with the rights confirmed, each address once, the first as the product
   image and the rest its gallery, alt text the title where none is given (AC-5).
-- **FR-006**: The run MUST work in batches of 20 in Action Scheduler and record its state and every failed row (AC-1).
+- **FR-006**: The run MUST work in batches of 20 in Action Scheduler (images five products an action) and record its
+  state and every failed row (AC-1).
+- **FR-007**: After an English record is written, its translations MUST carry its copied fields (price, sale price and
+  its dates, cost, SKU, weight and dimensions), and the Arabic phase MUST run WooCommerce Multilingual's
+  synchronisation for every product the run touched, the parent of a new variation included, so the Arabic
+  variation exists and its value is in the Arabic attribute list (AC-4).
+- **FR-008**: A category or brand assigned to a product with an Arabic record, and with no Arabic translation, MUST be
+  listed as a warning in the run (AC-2).
+- **FR-009**: An image address that is refused, or beyond the tenth, MUST be reported for its row (AC-5).
+- **FR-010**: The run MUST write the validation report and the client issue list into its own run directory, and keep
+  an Import Run record (file and its hash, mapping and rules version, actor, times, counts, outcome, problems and
+  warnings) that a later run does not overwrite (AC-1, CX-04).
 
 ## Optional safeguards (not owed)
 
@@ -124,3 +165,7 @@ Contractual stage: S1. Engineering timing: November 2026 (D-22).
 ## Assumptions
 
 - Arabic attribute values are those of the source: WooCommerce Multilingual carries them to the Arabic variations.
+- Attributes are product-level (local) attributes. Whether the migrated sizes and shades become global attributes, so
+  the listing filters of PLP-09 (#303) can use them, is decided with #303; until then the filter cannot use them.
+- The image alt text is the English title, on one attachment shared by both language records (MIG-17 does not say
+  per language).

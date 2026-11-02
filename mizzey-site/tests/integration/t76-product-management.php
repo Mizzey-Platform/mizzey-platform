@@ -108,6 +108,17 @@ run(
 		$ar_body = (string) wp_remote_retrieve_body( $ar_page );
 		storefront_refuse_shell( $ar_url, (int) wp_remote_retrieve_response_code( $ar_page ), $ar_body );
 		$check( ! str_contains( $ar_body, "{$tag} serum SEO title" ) && ! str_contains( $ar_body, 'canonical-' . $tag ), 'AC-2 the Arabic record keeps its own SEO words and address: the English ones are not carried to it' );
+		// The Arabic record's own SEO words, as the translation editor stores them on it (B-19), on its page only.
+		update_post_meta( $ar, ProductFields::SEO_TITLE, "{$tag} عنوان السيروم" );
+		update_post_meta( $ar, ProductFields::SEO_DESC, "{$tag} وصف محركات البحث" );
+		update_post_meta( $ar, ProductFields::CANONICAL, 'https://example.com/ar-canonical-' . $tag );
+		$ar_res  = wp_remote_get( $ar_url, array( 'timeout' => 30 ) );
+		$ar_own  = (string) wp_remote_retrieve_body( $ar_res );
+		storefront_refuse_shell( $ar_url, is_wp_error( $ar_res ) ? 0 : (int) wp_remote_retrieve_response_code( $ar_res ), $ar_own );
+		$en_res  = wp_remote_get( $url, array( 'timeout' => 30 ) );
+		$en_back = (string) wp_remote_retrieve_body( $en_res );
+		storefront_refuse_shell( $url, is_wp_error( $en_res ) ? 0 : (int) wp_remote_retrieve_response_code( $en_res ), $en_back );
+		$check( 1 === preg_match( '#<title>[^<]*' . preg_quote( "{$tag} عنوان السيروم", '#' ) . '#u', $ar_own ) && str_contains( $ar_own, "{$tag} وصف محركات البحث" ) && str_contains( $ar_own, 'rel="canonical" href="https://example.com/ar-canonical-' . $tag ) && ! str_contains( $en_back, 'ar-canonical-' . $tag ) && str_contains( $en_back, "{$tag} serum SEO title" ), 'AC-2 B-19 the Arabic record\'s own SEO title, description and canonical are on the Arabic page, and only there' );
 		wp_set_current_user( $staff );
 		$_POST = array( ProductFields::NONCE . '_nonce' => 'bad', 'mizzey_video' => 'https://evil.example/x' );
 		$forged = $fresh( $en );
@@ -144,7 +155,8 @@ run(
 		$ext = (array) ( $api->get_data()['extensions']->mizzey ?? ( $api->get_data()['extensions']['mizzey'] ?? array() ) );
 		$check( 200 === $api->get_status() && array( 'limited', 'new', 'trending' ) === ( $ext['badges'] ?? null ) && str_contains( (string) ( $ext['video'] ?? '' ), 't76video' ), 'AC-3 the Store API gives the badges and the video for the designed screens (' . wp_json_encode( $ext ) . ')' );
 		wp_cache_flush();
-		$check( array( 'trending' ) === get_post_meta( $ar, ProductFields::BADGES, true ) && str_contains( (string) get_post_meta( $ar, ProductFields::VIDEO, true ), 't76video' ), 'AC-3 the Arabic record carries the badges and the video it was made with (WPML copy): ' . wp_json_encode( get_post_meta( $ar, ProductFields::BADGES, true ) ) );
+		// The badges are the item's (copied): the change saved above in code reaches the Arabic record too.
+		$check( array( 'trending', 'new', 'limited' ) === get_post_meta( $ar, ProductFields::BADGES, true ) && str_contains( (string) get_post_meta( $ar, ProductFields::VIDEO, true ), 't76video' ), 'AC-3 the Arabic record carries the item\'s badges and video, also after a change saved in code (WPML copy): ' . wp_json_encode( get_post_meta( $ar, ProductFields::BADGES, true ) ) );
 
 		// ---- AC-4: related products ---------------------------------------------------------------------------
 		$other = $w->simple( "{$tag}-REL", null );
@@ -183,6 +195,28 @@ run(
 		$history   = PriceHistory::of( $en );
 		$last      = end( $history );
 		$check( 'ok' === $admin_set && 'ok' === $rest_set && count( $history ) >= $before + 2 && '180' === ( $last['sale'][1] ?? '' ) && '' !== ( $last['login'] ?? '' ) && $last['at'] >= time() - 120, 'AC-6 a change by staff and one from the REST API are each recorded with the user and the time (' . count( $history ) . ' entries, last by ' . ( $last['login'] ?? '?' ) . ')' );
+		// B-18: a price changed over the REST API reaches the Arabic record, and an Arabic order is charged it.
+		$ar_after = $fresh( $ar );
+		do_action( 'wpml_switch_language', 'ar' );
+		$ar_charged = (float) $s->order_for( $ar_after, 1 )->get_subtotal();
+		do_action( 'wpml_switch_language', 'en' );
+		$check( '210' === $ar_after->get_regular_price( 'edit' ) && '180' === $ar_after->get_sale_price( 'edit' ) && 180.0 === $ar_charged, 'AC-6 B-18 the price changed by staff in code and over the REST API reaches the Arabic record, and an Arabic order is charged it (' . wp_json_encode( array( $ar_after->get_regular_price( 'edit' ), $ar_after->get_sale_price( 'edit' ), $ar_charged ) ) . ')' );
+		// A lower regular price clears a sale price no longer below it, while WooCommerce saves: the Arabic record follows
+		// that too, so it is not left charging the old sale once the price goes back up (Codex).
+		$clear = $fresh( $en );
+		$clear->set_regular_price( '150' );
+		$clear->save();
+		$clear = $fresh( $en );
+		$clear->set_regular_price( '210' );
+		$clear->save();
+		$ar_cleared = $fresh( $ar );
+		$check( '' === $fresh( $en )->get_sale_price( 'edit' ) && '' === $ar_cleared->get_sale_price( 'edit' ) && '210' === $ar_cleared->get_price( 'edit' ), 'AC-6 B-18 a sale price WooCommerce clears while saving a lower price is cleared on the Arabic record too (' . wp_json_encode( array( $fresh( $en )->get_sale_price( 'edit' ), $ar_cleared->get_sale_price( 'edit' ), $ar_cleared->get_price( 'edit' ) ) ) . ')' );
+		// A copied field deleted in code is deleted on the Arabic record too.
+		$no_video = $fresh( $en );
+		$no_video->delete_meta_data( ProductFields::VIDEO );
+		$no_video->save();
+		wp_cache_flush();
+		$check( '' === (string) get_post_meta( $en, ProductFields::VIDEO, true ) && '' === (string) get_post_meta( $ar, ProductFields::VIDEO, true ), 'AC-3 a copied field deleted in code (the video) is gone from the Arabic record too (' . (string) get_post_meta( $ar, ProductFields::VIDEO, true ) . ')' );
 		$by_staff = array_values( array_filter( $history, static fn ( $h ) => "{$tag}mgr" === $h['login'] ) );
 		$check( 1 === count( $by_staff ) && array( '200', '210' ) === $by_staff[0]['regular'], 'AC-6 the staff member\'s change is kept with their name and the old and new price' );
 		$check( array() === PriceHistory::of( $ar ), 'AC-6 the Arabic record, which follows the same price, keeps no second history' );
