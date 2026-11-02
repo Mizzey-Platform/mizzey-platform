@@ -44,9 +44,14 @@ final class Monitoring
 
     private static bool $raising = false;
 
+    private static bool $fatalSeen = false;
+
     public static function register(): void
     {
         register_shutdown_function([self::class, 'shutdown']);
+        // WordPress's own handler runs first at shutdown and ends the request with its error page, so the error is
+        // taken from its message filter too; the shutdown function covers the cases where WordPress shows no page.
+        add_filter('wp_php_error_message', [self::class, 'fromWordPress'], 10, 2);
         add_action('action_scheduler_failed_execution', [self::class, 'actionFailed'], 10, 2);
         add_action('action_scheduler_failed_action', [self::class, 'actionTimedOut'], 10, 1);
         add_filter('woocommerce_logger_log_message', [self::class, 'watch'], 10, 4);
@@ -62,8 +67,28 @@ final class Monitoring
         self::fatal((string) $error['message'], (string) $error['file'], (int) $error['line']);
     }
 
+    /**
+     * The fatal error WordPress is about to show its error page for.
+     *
+     * @param mixed $message
+     * @param mixed $error
+     * @return mixed
+     */
+    public static function fromWordPress($message, $error = null)
+    {
+        if (is_array($error) && isset($error['message'], $error['file'], $error['line'])) {
+            self::fatal((string) $error['message'], (string) $error['file'], (int) $error['line']);
+        }
+
+        return $message;
+    }
+
     public static function fatal(string $message, string $file, int $line): void
     {
+        if (self::$fatalSeen) {
+            return; // One fatal error per request, whichever of the two routes saw it first.
+        }
+        self::$fatalSeen = true;
         $where = self::relative($file) . ':' . $line;
         self::error('fatal', $where, sprintf('Fatal error at %s: %s', $where, self::clean($message)), 'error');
     }
@@ -172,7 +197,7 @@ final class Monitoring
             'scheduled'   => __('A scheduled task failed', 'mizzey-site'),
             'integration' => __('An integration reported an error', 'mizzey-site'),
         ];
-        \Corex\Boot::app()->make(\Corex\Notifications\NotificationService::class)->publish(\Corex\Notifications\Notification::create(
+        \Corex\Boot::app()->container()->make(\Corex\Notifications\NotificationService::class)->publish(\Corex\Notifications\Notification::create(
             type: self::TYPE . '.' . $entry['kind'],
             category: $entry['kind'] === 'scheduled' ? \Corex\Notifications\NotificationCategory::JOBS : \Corex\Notifications\NotificationCategory::OPERATIONS,
             severity: \Corex\Notifications\NotificationSeverity::ERROR,
