@@ -53,11 +53,11 @@ SSC-21 is marked [key] in the register.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | The load writes what the validation pass decided, in the background, without interrupting the store; rejected rows are not written | MIG-20 | pending CR-06 |
-| AC-2 | Each product carries its name, description, price, sale price and cost, its category path and brand, and its SEO fields where the source has them | MIG-11, MIG-12, MIG-13, MIG-15 | pending CR-06 |
-| AC-3 | Variations in the source become variable products with their attributes | MIG-09, MIG-10 | pending CR-06 |
-| AC-4 | Each Arabic record is written as its own content, valid and normalised, in the product's translation group, and the Arabic variations keep their attributes | MIG-02, SSC-21 | pending CR-06 |
-| AC-5 | Images are downloaded and stored on the store's server once rights are confirmed, with the title as alt text where the source gives none | MIG-16, MIG-17 | pending CR-08 |
+| AC-1 | The load writes what the validation pass decided, in the background, without interrupting the store; rejected rows are not written | MIG-20 | provisional |
+| AC-2 | Each product carries its name, description, price, sale price and cost, its category path and brand, and its SEO fields where the source has them | MIG-11, MIG-12, MIG-13, MIG-15 | provisional |
+| AC-3 | Variations in the source become variable products with their attributes | MIG-09, MIG-10 | provisional |
+| AC-4 | Each Arabic record is written as its own content, valid and normalised, in the product's translation group, and the Arabic variations keep their attributes | MIG-02, SSC-21 | provisional |
+| AC-5 | Images are downloaded and stored on the store's server once rights are confirmed, with the title as alt text where the source gives none | MIG-16, MIG-17 | provisional |
 | AC-6 | The loaded catalogue exports in WooCommerce's standard CSV format | MIG-25 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
