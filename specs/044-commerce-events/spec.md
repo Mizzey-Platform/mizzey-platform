@@ -72,6 +72,10 @@ container is named.
 - A refreshed confirmation page: no second purchase.
 - A payment not yet confirmed: no purchase.
 - A refused coupon: no apply_coupon.
+- An automatic promotion the store applies itself: no apply_coupon (the customer did nothing).
+- A customer's own welcome discount: named `welcome` in every coupon parameter, never by its code, which is unique to
+  one person.
+- Analytics slow or unreachable when a refund is made: the refund does not wait; the send is tried once more later.
 - A staff member signing in: no login event.
 - No personal data in any event.
 
@@ -89,14 +93,17 @@ container is named.
 ### Functional Requirements
 
 - **FR-001**: Page events MUST be worked out when the page is built and pushed as it loads (AC-1).
-- **FR-002**: Cart changes, an accepted coupon, a wishlist save, a sign-up and a customer's sign-in MUST be queued in
-  the visitor's session and delivered once, in the Store API's cart answer or on the next page (AC-2).
+- **FR-002**: Cart changes, a coupon the customer applied, a wishlist save, a sign-up and a customer's sign-in MUST be
+  queued in the visitor's session and delivered once, in the Store API's cart answer or on the next page; an automatic
+  promotion the store applies MUST NOT push `apply_coupon` (AC-2).
 - **FR-003**: Card clicks and shipping and payment choices MUST be pushed from WooCommerce Blocks' actions (AC-2).
 - **FR-004**: Purchase MUST fire once per order, only on its confirmation page with the order's key, and only once the
   order is confirmed (AC-3).
 - **FR-005**: A refund MUST be sent to Analytics' Measurement Protocol with the order number and value when a
-  measurement id and API secret are set, and nothing MUST be sent otherwise (AC-4).
-- **FR-006**: Every item MUST be named by its SKU; no event MUST carry personal data.
+  measurement id and API secret are set, and nothing MUST be sent otherwise (AC-4). It MUST be queued (Action
+  Scheduler) rather than sent inside the refund request, and a failed send MUST be tried once more.
+- **FR-006**: Every item MUST be named by its SKU; no event MUST carry personal data. A customer's own welcome
+  discount MUST be reported as `welcome` in `apply_coupon`, `begin_checkout` and `purchase`.
 
 ## Optional safeguards (not owed)
 

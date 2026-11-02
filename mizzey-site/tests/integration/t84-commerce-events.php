@@ -16,6 +16,9 @@
 namespace MizzeySite\Tests\Integration;
 
 use MizzeySite\Marketing\Events;
+use MizzeySite\Promotions\AutomaticPromotions;
+use MizzeySite\Promotions\PromotionSettings;
+use MizzeySite\Promotions\WelcomeDiscount;
 use MizzeySite\Wishlist\Wishlist;
 
 require_once __DIR__ . '/_bootstrap.php';
@@ -135,6 +138,37 @@ run(
 		WC()->cart->apply_coupon( "{$tag}nosuch" );
 		wc_clear_notices();
 		$check( array() === $named( Events::drain(), 'apply_coupon' ), 'AC-2 EVT-10 a refused coupon pushes nothing' );
+		// E-312-1: an automatic promotion the store applies itself is not the customer's act: no apply_coupon.
+		WC()->cart->remove_coupons();
+		$auto = new \WC_Coupon();
+		$auto->set_code( "{$tag}auto" );
+		$auto->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '5' ) );
+		$auto->update_meta_data( PromotionSettings::AUTOMATIC, 'yes' );
+		$auto->save();
+		$s->on_finish( static function () use ( $auto ) { wp_delete_post( $auto->get_id(), true ); AutomaticPromotions::forget(); } );
+		AutomaticPromotions::forget();
+		Events::drain();
+		WC()->cart->calculate_totals();
+		$auto_held = in_array( wc_format_coupon_code( "{$tag}auto" ), array_map( 'wc_format_coupon_code', WC()->cart->get_applied_coupons() ), true );
+		$check( $auto_held && array() === $named( Events::drain(), 'apply_coupon' ), 'AC-2 EVT-10 an automatic promotion applied by the store pushes no apply_coupon' );
+		$auto->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
+		$auto->save();
+		AutomaticPromotions::forget();
+		WC()->cart->remove_coupons();
+		WC()->cart->calculate_totals();
+		// A customer's own welcome discount is named "welcome", never by its code, which is unique to one person.
+		$welcome_code = 'welcome-' . substr( md5( $tag ), 0, 10 );
+		$welcome      = new \WC_Coupon();
+		$welcome->set_code( $welcome_code );
+		$welcome->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '1' ) );
+		$welcome->update_meta_data( WelcomeDiscount::OWNER, '1' );
+		$welcome->save();
+		$s->track_post( $welcome->get_id() );
+		WC()->cart->apply_coupon( $welcome_code );
+		wc_clear_notices();
+		$welcomed = $named( Events::drain(), 'apply_coupon' );
+		$check( 'welcome' === ( $welcomed[0]['params']['coupon'] ?? '' ) && ! str_contains( (string) wp_json_encode( $welcomed ), $welcome_code ) && "{$tag}ten" === Events::couponName( "{$tag}ten" ), 'AC-5 a welcome code is pushed as "welcome", never by its own code; other codes keep theirs' );
+		WC()->cart->remove_coupons();
 		$check( array() === Events::drain() && '' !== (string) ( $added[0]['id'] ?? '' ), 'AC-2 each queued event has an id and is delivered once' );
 		WC()->cart->remove_cart_item( $key );
 		$check( 1 === count( $named( Events::drain(), 'remove_from_cart' ) ), 'AC-2 EVT-08 removing a line pushes remove_from_cart' );
@@ -187,6 +221,7 @@ run(
 		$ship->set_total( '45' );
 		$order->add_item( $ship );
 		$order->calculate_totals();
+		$order->apply_coupon( $welcome_code );
 		$order->save();
 		$s->track_order( $order->get_id() );
 		$as_page = static function ( int $page_id ): void {
@@ -218,7 +253,7 @@ run(
 		$check( 'purchase' === ( $bought['event'] ?? '' ) && (string) $order->get_order_number() === ( $data['transaction_id'] ?? '' ) && abs( (float) $order->get_total() - (float) ( $data['value'] ?? 0 ) ) < 0.001 && 45.0 === (float) ( $data['shipping'] ?? 0 ) && 2 === (int) ( $data['items'][0]['quantity'] ?? 0 ), 'AC-3 EVT-14 a confirmed order pushes purchase with its number, total, shipping and items' );
 		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 reloading the confirmation page pushes no second purchase' );
 		$flat = wp_json_encode( $bought );
-		$check( ! str_contains( (string) $flat, "{$tag}buyer@example.invalid" ) && ! str_contains( (string) $flat, '01000000000' ), 'AC-5 the purchase carries no email address or phone number' );
+		$check( ! str_contains( (string) $flat, "{$tag}buyer@example.invalid" ) && ! str_contains( (string) $flat, '01000000000' ) && 'welcome' === ( $data['coupon'] ?? '' ) && ! str_contains( (string) $flat, $welcome_code ), 'AC-5 the purchase carries no email address, phone number or personal welcome code (coupon: ' . ( $data['coupon'] ?? 'none' ) . ')' );
 
 		// ---- AC-4: refund, sent by the store --------------------------------------------------------------------
 		$sent = array();
@@ -237,9 +272,27 @@ run(
 		$check( array() === $sent, 'AC-4 EVT-15 with no measurement id and secret, nothing is sent' );
 		update_option( Events::GA4_ID, 'G-T84TEST' );
 		update_option( Events::GA4_KEY, 't84secret' );
-		wc_create_refund( array( 'order_id' => $order->get_id(), 'amount' => '30', 'reason' => 't84' ) );
+		$refund = wc_create_refund( array( 'order_id' => $order->get_id(), 'amount' => '30', 'reason' => 't84' ) );
+		$rid    = $refund instanceof \WC_Order_Refund ? $refund->get_id() : 0;
+		// E-312-2: the refund only queues the send, so it never waits on Google; the queued action sends it.
+		$queued = as_get_scheduled_actions( array( 'hook' => Events::REFUND_HOOK, 'args' => array( $order->get_id(), $rid, 1 ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		$check( array() === $sent && 1 === count( $queued ), 'AC-4 EVT-15 the refund itself sends nothing: the send is queued (' . count( $queued ) . ' action)' );
+		as_unschedule_all_actions( Events::REFUND_HOOK, array( $order->get_id(), $rid, 1 ), 'mizzey' );
+		do_action( Events::REFUND_HOOK, $order->get_id(), $rid, 1 );
 		$event = $sent[0]['body']['events'][0] ?? array();
 		$check( 1 === count( $sent ) && str_contains( $sent[0]['url'], 'measurement_id=G-T84TEST' ) && 'refund' === ( $event['name'] ?? '' ) && 30.0 === (float) ( $event['params']['value'] ?? 0 ) && (string) $order->get_order_number() === ( $event['params']['transaction_id'] ?? '' ) && '' !== (string) ( $sent[0]['body']['client_id'] ?? '' ), 'AC-4 EVT-15 a refund is sent to Analytics with its order number and value' );
+		// A failed first try is tried once more, later; a failed second try is not tried again.
+		$fail = static function ( $pre, $args, $url ) {
+			return str_contains( (string) $url, 'google-analytics.com/mp/collect' ) ? new \WP_Error( 'http_request_failed', 't84 unreachable' ) : $pre;
+		};
+		add_filter( 'pre_http_request', $fail, 5, 3 );
+		Events::sendRefund( $order->get_id(), $rid, 1 );
+		Events::sendRefund( $order->get_id(), $rid, 2 );
+		remove_filter( 'pre_http_request', $fail, 5 );
+		$retry = as_get_scheduled_actions( array( 'hook' => Events::REFUND_HOOK, 'args' => array( $order->get_id(), $rid, 2 ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		$third = as_get_scheduled_actions( array( 'hook' => Events::REFUND_HOOK, 'args' => array( $order->get_id(), $rid, 3 ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		as_unschedule_all_actions( Events::REFUND_HOOK, array( $order->get_id(), $rid, 2 ), 'mizzey' );
+		$check( 1 === count( $retry ) && array() === $third, 'AC-4 EVT-15 an unreachable Analytics is tried once more, then left (logged)' );
 
 		// ---- The browser half is loaded -----------------------------------------------------------------------
 		$body = $page( (string) get_permalink( $en_id ) );
