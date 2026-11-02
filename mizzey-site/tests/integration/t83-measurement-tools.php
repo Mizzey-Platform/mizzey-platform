@@ -157,14 +157,26 @@ run(
 		$check( ! isset( $en_items[ "{$tag}-HID" ] ) && ! isset( $en_items[ "{$tag}-DRF" ] ) && ! isset( $en_items[ "{$tag}-PWD" ] ), 'AC-3 a hidden, draft or password-protected product is not in the feed' );
 		$check( false !== simplexml_load_string( $feed_en ) && "Serumplus {$tag}" === ( $en_items[ "{$tag}-CTL" ]['title'] ?? '' ) && 'Serum' === ProductFeed::text( "Ser\x00u\x1Fm\x7F" ), 'AC-3 a control character pasted into a product is removed, so the feed stays valid XML (' . ( $en_items[ "{$tag}-CTL" ]['title'] ?? 'missing' ) . ')' );
 		// E-288-4: after a product is saved, while another request builds the feed, the last good copy is served at once.
+		// The last good copy is marked, so only a request that did not rebuild can return the mark.
+		$transient = '_transient_' . ProductFeed::CACHE . 'en';
+		$marker    = '<!-- t83 last good copy ' . $tag . ' -->';
+		update_option( ProductFeed::LAST . 'en', $feed_en . $marker, false );
 		$lock = substr( 'mz_' . $wpdb->prefix . 'feed_en', 0, 64 );
 		$held = 1 === (int) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		ProductFeed::forget();
-		$started = microtime( true );
 		[ $busy_code, $busy_feed ] = $page( ProductFeed::url( 'en' ) );
-		$took = microtime( true ) - $started;
 		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$check( $held && 200 === $busy_code && isset( $items( $busy_feed )[ $sku ] ) && $took < 20 && false === get_transient( ProductFeed::CACHE . 'en' ), 'AC-3 while one request rebuilds the feed, another is served the last good copy without building it (' . round( $took, 1 ) . ' s)' );
+		$stored = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $transient ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$check( $held && 200 === $busy_code && str_contains( $busy_feed, $marker ) && isset( $items( $busy_feed )[ $sku ] ) && null === $stored, 'AC-3 while another request holds the build, the feed is served from the last good copy and is not rebuilt (read from the database)' );
+		// A request that waited for the lock reads the feed the other request stored meanwhile, not its own earlier miss.
+		ProductFeed::forget();
+		get_transient( ProductFeed::CACHE . 'en' );
+		$meanwhile = $feed_en . '<!-- t83 built meanwhile ' . $tag . ' -->';
+		$wpdb->insert( $wpdb->options, array( 'option_name' => '_transient_timeout_' . ProductFeed::CACHE . 'en', 'option_value' => (string) ( time() + 600 ), 'autoload' => 'off' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$wpdb->insert( $wpdb->options, array( 'option_name' => $transient, 'option_value' => $meanwhile, 'autoload' => 'off' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$waited = ( new \ReflectionMethod( ProductFeed::class, 'fresh' ) )->invoke( null, 'en' );
+		$check( $waited === $meanwhile, 'AC-3 a request that waited for the build serves the feed stored meanwhile, and does not build it again' );
+		ProductFeed::forget();
 		[ , $feed_ar ] = $page( ProductFeed::url( 'ar' ) );
 		$ar_items = $items( $feed_ar );
 		$check( $ar_id > 0 && isset( $ar_items[ $sku ] ) && str_contains( $ar_items[ $sku ]['link'], '/ar/' ), 'AC-3 the Arabic feed lists the same item, by the same SKU, at its Arabic address' );

@@ -101,7 +101,7 @@ final class ProductFeed
             return $last;
         }
         try {
-            wp_cache_delete(self::CACHE . $lang, 'transient');
+            self::uncache($lang);
             $xml = get_transient(self::CACHE . $lang); // Built by the request that held the lock before.
             if (is_string($xml) && $xml !== '') {
                 return $xml;
@@ -114,6 +114,21 @@ final class ProductFeed
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
+    }
+
+    /**
+     * Forgets what this request remembers of the feed's transient, so the next read goes to the database: a request
+     * that waited for the lock may hold a "not there" from before the other request stored it. Transients live in the
+     * options table here (no persistent object cache), so the options caches are cleared too.
+     */
+    private static function uncache(string $lang): void
+    {
+        foreach (['_transient_', '_transient_timeout_'] as $prefix) {
+            wp_cache_delete($prefix . self::CACHE . $lang, 'options');
+        }
+        wp_cache_delete('notoptions', 'options');
+        wp_cache_delete('alloptions', 'options');
+        wp_cache_delete(self::CACHE . $lang, 'transient');
     }
 
     /** A value as XML 1.0 allows it: valid UTF-8, with no control character but tab and line breaks. */
