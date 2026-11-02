@@ -70,7 +70,7 @@ run(
 		// ENT-17: the audit records.
 		$activity = $columns( 'corex_activity_events' );
 		$check( array() === array_diff( array( 'actor_id', 'kind', 'target_id', 'occurred_at', 'context_json' ), $activity ), 'ENT-17 CoreX Activity keeps actor, action, entity, details and time' );
-		$check( ! class_exists( '\MizzeySite\Catalogue\PriceHistory' ) || '_mizzey_price_history' === \MizzeySite\Catalogue\PriceHistory::META, 'ENT-17 price changes with before and after values (specs/036, when merged)' );
+		$check( class_exists( '\MizzeySite\Catalogue\PriceHistory' ) && '_mizzey_price_history' === \MizzeySite\Catalogue\PriceHistory::META, 'ENT-17 price changes with before and after values (specs/036)' );
 
 		// ENT-19: import runs.
 		$check( class_exists( '\MizzeySite\Catalogue\Import\FileImportRunRecorder' ) && interface_exists( '\MizzeySite\Catalogue\Import\ImportRunRecorder' ), 'ENT-19 each import run is recorded (run.json; CX-04 pending)' );

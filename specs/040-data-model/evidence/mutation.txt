@@ -1,0 +1,9 @@
+Mutation check for specs/040-data-model, t80-data-model, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). Each defect moves one stored entity away from what the record says, or drops a line from the record; the scenario run, the file restored.
+
+CAUGHT    M1 the record loses the audit log line
+CAUGHT    M2 the wishlist moves to another key  <- FAIL  ENT-07 the wishlist (_mizzey_wishlist)
+CAUGHT    M3 the refund's payment reference moves  <- FAIL  ENT-13 refunds with their payment and refund references
+CAUGHT    M4 the price history moves  <- FAIL  ENT-17 price changes with before and after values (specs/036)
+CAUGHT    M5 the shipment carrier moves  <- FAIL  ENT-10 the shipment fields
+
+5 of 5 caught.
