@@ -124,7 +124,9 @@ run(
 		// Whatever route stored it (an import, the REST API, a database copy), the page must escape it.
 		update_post_meta( $bulk_target, ProductFields::SEO_TITLE, '</title><script>t76xss()</script>' );
 		$xss_url  = get_permalink( $bulk_target );
-		$xss_page = (string) wp_remote_retrieve_body( wp_remote_get( $xss_url, array( 'timeout' => 30 ) ) );
+		$xss_res  = wp_remote_get( $xss_url, array( 'timeout' => 30 ) );
+		$xss_page = (string) wp_remote_retrieve_body( $xss_res );
+		storefront_refuse_shell( $xss_url, is_wp_error( $xss_res ) ? 0 : (int) wp_remote_retrieve_response_code( $xss_res ), $xss_page );
 		$check( ! str_contains( $xss_page, '<script>t76xss()' ), 'AC-2 an SEO title stored by another route is printed escaped' );
 		$check( '' === ProductFields::webAddress( 'https://' ) && '' === ProductFields::webAddress( 'http:///bad' ) && '' === ProductFields::webAddress( '#fragment' ) && '' !== ProductFields::webAddress( 'https://www.youtube.com/watch?v=x' ), 'AC-2 only a full web address is kept for the video and the canonical' );
 
