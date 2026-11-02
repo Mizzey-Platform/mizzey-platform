@@ -38,6 +38,8 @@ final class AddressBook
     public const CAPACITY = 10;
     public const FIELDS   = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'address_1', 'landmark'];
     private const REQUIRED = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'address_1'];
+    /** The longest each part is kept. */
+    public const LENGTHS = ['first_name' => 60, 'last_name' => 60, 'phone' => 32, 'state' => 10, 'city' => 80, 'district' => 80, 'address_1' => 200, 'landmark' => 120];
 
     public static function register(): void
     {
@@ -239,7 +241,9 @@ final class AddressBook
     {
         $address = [];
         foreach (self::FIELDS as $field) {
-            $address[$field] = sanitize_text_field((string) ($input[$field] ?? ''));
+            // Text only, each part cut to its length (a list or an object is an empty part).
+            $value           = isset($input[$field]) && is_scalar($input[$field]) ? sanitize_text_field((string) $input[$field]) : '';
+            $address[$field] = mb_substr($value, 0, self::LENGTHS[$field] ?? 80);
         }
         foreach (self::REQUIRED as $field) {
             if ($address[$field] === '') {

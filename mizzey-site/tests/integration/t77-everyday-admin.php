@@ -120,6 +120,19 @@ run(
 		$s->track_order( $order->get_id() );
 		[ , $orders ] = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => '01112223334', 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
 		$check( str_contains( $orders, 'id="order-' . $order->get_id() . '"' ) || str_contains( $orders, 'post=' . $order->get_id() . '&' ) || str_contains( $orders, 'id=' . $order->get_id() . '&' ), 'AC-3 an order found by the customer\'s phone in the orders list' );
+		// B-20: the number as the customer typed it and as staff type it need not match. Encoded as the search box's form
+		// sends it (spaces as +); another encoding is redirected to this one by WordPress first.
+		$typed = wc_create_order();
+		$typed->set_billing_phone( '+20 111 222 3335' );
+		$typed->add_product( $fresh( $a ), 1 );
+		$typed->calculate_totals();
+		$typed->save();
+		$s->track_order( $typed->get_id() );
+		$in_list = static fn ( string $html, int $id ): bool => str_contains( $html, 'id="order-' . $id . '"' ) || str_contains( $html, 'post=' . $id . '&' ) || str_contains( $html, 'id=' . $id . '&' );
+		[ , $by_local ]  = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => '01112223335', 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
+		[ , $by_spaced ] = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => urlencode( '+20 111 222 3334' ), 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
+		[ , $by_arabic ] = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => urlencode( '٠١١١٢٢٢٣٣٣٥' ), 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
+		$check( $in_list( $by_local, $typed->get_id() ) && $in_list( $by_spaced, $order->get_id() ) && $in_list( $by_arabic, $typed->get_id() ), 'AC-3 an order is found by the phone however the customer and staff typed it: +20 and spaces, the local form, Arabic digits' . ' (' . wp_json_encode( array( $in_list( $by_local, $typed->get_id() ), $in_list( $by_spaced, $order->get_id() ), $in_list( $by_arabic, $typed->get_id() ) ) ) . ')');
 
 		// ---- AC-4: bulk order status, export --------------------------------------------------------------------
 		$o2 = wc_create_order();

@@ -26,7 +26,7 @@ require_once __DIR__ . '/_two_factor.php';
 
 /** Create a customer the way the account page's registration does, with the posted extras. */
 function t58_register( Scenario $s, string $email, string $password, array $post = array() ): int {
-	$_POST = $post;
+	$_POST = $post + array( 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ) );
 	$id    = wc_create_new_customer( $email, '', $password );
 	$_POST = array();
 	if ( is_wp_error( $id ) ) {
@@ -114,6 +114,16 @@ run(
 		$q_meta = get_user_meta( $quiet, MarketingConsent::META, true );
 		$k_meta = get_user_meta( $keen, MarketingConsent::META, true );
 		$check( $quiet && $keen && ! MarketingConsent::given( $quiet ) && is_array( $q_meta ) && MarketingConsent::given( $keen ) && 'registration' === ( $k_meta['source'] ?? '' ) && abs( (int) ( $k_meta['at'] ?? 0 ) - time() ) < 60, 'AUTH-09 registering records no consent unless the box is ticked; ticked, the consent is kept with when and where it was given' );
+		$_POST    = array();
+		$unasked  = wc_create_new_customer( "{$tag}-unasked@example.invalid", '', 'Pw-' . wp_generate_password( 18, false ) );
+		if ( ! is_wp_error( $unasked ) ) {
+			$s->track_user( (int) $unasked );
+			$own_welcome = (int) get_user_meta( (int) $unasked, WelcomeDiscount::USER_META, true );
+			if ( $own_welcome > 0 ) {
+				$s->on_finish( static function () use ( $own_welcome ) { wp_delete_post( $own_welcome, true ); } );
+			}
+		}
+		$check( ! is_wp_error( $unasked ) && '' === get_user_meta( (int) $unasked, MarketingConsent::META, true ), 'AUTH-09 an account made where the box was not offered (Google, the checkout, the order confirmation) records no consent decision' );
 		$check( isset( $sent[ $quiet ] ) && false !== strpos( $sent[ $quiet ], 'wc_verify_email_key' ) && ! VerificationOnRegistration::verified( $quiet ), 'AUTH-05 the verification email is sent when the account is created, and the account is not verified yet' );
 
 		// AUTH-08, B14: a guest's order is linked only once the email is verified.
@@ -147,6 +157,13 @@ run(
 		$bad      = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-z@example.invalid" );
 		$_POST    = array();
 		$check( '01012345678' === get_user_meta( $mobile, PhoneSignIn::FIELD, true ) && ! $errors->has_errors() && ! $taken->has_errors() && in_array( 'mizzey_phone_invalid', $bad->get_error_codes(), true ), 'AUTH-02 a mobile number given at registration is kept in its local form; a number another account holds is not refused, so the form does not say whose it is; a malformed one is refused' );
+		// D-305-3, D-305-6: Arabic-Indic digits are a mobile number like any other; an array value is refused quietly.
+		$_POST        = array( PhoneSignIn::FIELD => '٠١٠١٢٣٤٥٦٧٨' );
+		$arabic_typed = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-a@example.invalid" );
+		$_POST        = array( PhoneSignIn::FIELD => array( '01012345678' ) );
+		$array_typed  = apply_filters( 'woocommerce_registration_errors', new \WP_Error(), '', "{$tag}-b@example.invalid" );
+		$_POST        = array();
+		$check( ! $arabic_typed->has_errors() && ! $array_typed->has_errors() && '01012345678' === PhoneSignIn::normalise( '۰۱۰ ۱۲۳۴ ۵۶۷۸' ) && $mobile === PhoneSignIn::holder( '٠١٠١٢٣٤٥٦٧٨' ) && get_userdata( $mobile )->user_login === PhoneSignIn::canonical( '٠١٠١٢٣٤٥٦٧٨' ), 'AUTH-02 a mobile number typed with Arabic-Indic or Eastern Arabic-Indic digits registers and reaches sign-in as the same number; an array value raises nothing' );
 		$by_phone = wp_authenticate( '0020 10 1234 5678', $password );
 		$wrong    = wp_authenticate( '01012345678', 'not-the-password' );
 		$nobody   = wp_authenticate( '01099999999', $password );
@@ -180,6 +197,8 @@ run(
 		wp_cache_flush();
 		delete_option( PhoneSignIn::BACKFILLED );
 		PhoneSignIn::backfill();
+		$autoload = (string) $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", PhoneSignIn::BACKFILLED ) );
+		$check( in_array( $autoload, array( 'yes', 'on', 'auto-on' ), true ), 'AUTH-02 the backfill flag is autoloaded, so it costs no query on each request (' . $autoload . ')' );
 		$check( $late === PhoneSignIn::holder( $n1 ) && null === PhoneSignIn::holder( $n2 ) && $mobile === PhoneSignIn::holder( '01012345678' ), 'AUTH-02 numbers saved before claims existed are claimed once by their one holder; a number two accounts saved is claimed by neither; a claimed number is left as it is (' . wp_json_encode( array( PhoneSignIn::holder( $n1 ), $late, PhoneSignIn::holder( $n2 ), PhoneSignIn::holder( '01012345678' ), $mobile, get_option( PhoneSignIn::CLAIM . '_' . $n1 ), get_user_meta( $late, PhoneSignIn::HELD, true ) ) ) . ')' );
 		$s->on_finish( static function () use ( $n1, $n2 ) { delete_option( PhoneSignIn::CLAIM . '_' . $n1 ); delete_option( PhoneSignIn::CLAIM . '_' . $n2 ); } );
 		$third = t58_register( $s, "{$tag}-third@example.invalid", $password, array( PhoneSignIn::FIELD => $n2 ) );
@@ -327,12 +346,15 @@ run(
 		SignInLink::request( "{$tag}-keen@example.invalid" );
 		$http_token = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $ht ) ? $ht[1] : '';
 		$opened     = two_factor_http( 'GET', add_query_arg( array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen ), wc_get_page_permalink( 'myaccount' ) ) );
-		$nonce      = two_factor_field( $opened['body'], '_wpnonce' );
-		$fields     = array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen, '_wpnonce' => $nonce );
-		$foreign    = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields );
-		$followed   = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
-		$again      = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
-		$check( '' !== $http_token && ! sign_in_has_session( $opened ) && '' !== $nonce && ! sign_in_has_session( $foreign ), '[HTTP] AUTH-12 opening the link signs no one in and asks to confirm; the confirmation from another browser session is refused' );
+		$held       = array_values( array_filter( sign_in_jar( $opened['cookies'] ), static fn ( $c ) => SignInLink::COOKIE === $c->name ) );
+		$page       = two_factor_http( 'GET', wc_get_page_permalink( 'myaccount' ), array(), $opened['cookies'] );
+		$nonce      = two_factor_field( $page['body'], '_wpnonce' );
+		$check( '' !== $http_token && in_array( $opened['status'], array( 301, 302, 303 ), true ) && wc_get_page_permalink( 'myaccount' ) === $opened['location'] && isset( $held[0] ) && false === strpos( $opened['location'] . $page['body'], $http_token ), '[HTTP] AUTH-12 opening the link redirects at once to the plain account page, the token kept in a cookie: it is in no address and no page the tags or a referrer could carry (' . $opened['status'] . ')' );
+		$fields     = array( SignInLink::CONFIRM => '1', '_wpnonce' => $nonce );
+		$foreign    = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $held );
+		$followed   = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $page['cookies'] );
+		$again      = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $page['cookies'] );
+		$check( ! sign_in_has_session( $opened ) && ! sign_in_has_session( $page ) && '' !== $nonce && ! sign_in_has_session( $foreign ), '[HTTP] AUTH-12 opening the link signs no one in and asks to confirm; the confirmation from another browser session (the link cookie without the session) is refused' );
 		$check( sign_in_has_session( $followed ) && ! sign_in_has_session( $again ), '[HTTP] AUTH-12 confirming in the browser that opened the link signs the customer in; confirming again does not' );
 
 		return $ok;

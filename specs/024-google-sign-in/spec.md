@@ -87,6 +87,9 @@ staging with a real OAuth client and the client's approval.
 - **FR-006**: The feature MUST stay off until the client ID and secret are set; the secret MAY come from
   `MIZZEY_GOOGLE_CLIENT_SECRET` in the configuration.
 - **FR-007**: Every message MUST be translated (FIX-04).
+- **FR-008**: For a Gmail address with no account under its exact spelling, an account registered under another
+  spelling of the same mailbox (dots, a `+tag`, googlemail.com) MUST be the account signed in to, with FR-004's
+  protection; when several accounts share the mailbox, Google sign-in MUST be refused rather than pick one (AC-2).
 
 ### Key Entities
 

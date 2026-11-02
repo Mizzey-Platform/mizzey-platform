@@ -68,7 +68,7 @@ function t47_cart( int $product_id, array $cookies = array() ): array {
 /** A Store API checkout body for an email. */
 function t47_checkout_body( string $email, ?bool $create, ?array $signup ): array {
 	// An Egyptian address carries its district (specs/019).
-	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '01000000000', 'mizzey/district' => 'Downtown' );
+	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '010' . sprintf( '%08d', abs( crc32( $email ) ) % 100000000 ), 'mizzey/district' => 'Downtown' ); // a phone of its own: orders sharing a phone are one customer (first-order rules)
 	$body    = array( 'billing_address' => $address, 'shipping_address' => $address, 'payment_method' => 'cod' );
 	if ( null !== $create ) {
 		$body['create_account']    = $create;
@@ -289,7 +289,7 @@ run(
 		foreach ( sign_in_orders_for( $customer->user_email ) as $order_id ) {
 			$s->track_order( $order_id );
 		}
-		$check( 200 === $r['status'], "AC-2 [checkout] a signed-in customer's checkout needs no check (status {$r['status']})" );
+		$check( 200 === $r['status'], "AC-2 [checkout] a signed-in customer's checkout needs no check (status {$r['status']} " . ( $r['data']['code'] ?? '' ) . ' ' . wp_strip_all_tags( (string) ( $r['data']['message'] ?? '' ) ) . ')' );
 
 		// The predicate follows WooCommerce's filtered checkout settings, not the raw options.
 		add_filter( 'woocommerce_checkout_registration_enabled', '__return_false' );

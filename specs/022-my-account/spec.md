@@ -95,6 +95,8 @@ The designed screens are PRE-03b's.
 - **FR-003**: An order's view MUST show its progress and, once shipped, its carrier and tracking number (AC-4).
 - **FR-004**: The account menu MUST offer the wishlist (AC-5).
 - **FR-005**: Every customer-facing message MUST be translated (FIX-04).
+- **FR-006**: Each part of a saved address MUST be text, kept up to its length (names 60, city and district 80, street
+  200, landmark 120); the mobile number MAY be typed in Arabic digits (AC-2).
 
 ### Key Entities
 

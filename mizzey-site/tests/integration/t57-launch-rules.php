@@ -169,6 +169,58 @@ run(
 		WC()->customer->set_billing_email( "{$tag}-elsewhere@example.invalid" );
 		t57_cart( array( $mid->get_id() => 1 ) );
 		$check( array() === t57_applied(), 'BR-001 a guest who ordered, then registered, gets no welcome discount, whatever billing email they give' );
+		$returning_mail = \MizzeySite\Emails\EmailAdditions::welcome( '', get_userdata( $returning ), null );
+		$check( 0 === (int) get_user_meta( $returning, WelcomeDiscount::USER_META, true ) && '' === $returning_mail && WelcomeDiscount::claim( $returning_email ), 'BR-001 a customer who ordered before registering is issued no welcome discount, is not told of one, and the email\'s one claim is left unspent' );
+		$s->on_finish( static function () use ( $returning_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', \MizzeySite\Accounts\CustomerKey::email( $returning_email ) ) ); } );
+		// A guest who ordered with a mobile number registers with a new email and that number: the number is posted with
+		// the form and saved only after the account exists, and still counts.
+		$guest_phone = '0101' . wp_rand( 1000000, 9999999 );
+		$by_number   = wc_create_order();
+		$by_number->add_product( $cheap, 1 );
+		$by_number->set_billing_email( "{$tag}-numbered@example.invalid" );
+		$by_number->set_billing_phone( $guest_phone );
+		$by_number->calculate_totals();
+		$by_number->set_status( 'processing' );
+		$by_number->save();
+		$s->track_order( $by_number->get_id() );
+		$_POST    = array( 'billing_phone' => '+20 ' . substr( $guest_phone, 1 ), 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ) );
+		$numbered = wc_create_new_customer( "{$tag}-renumbered@example.invalid", '', wp_generate_password( 24 ) );
+		$_POST    = array();
+		if ( ! is_wp_error( $numbered ) ) {
+			$s->track_user( (int) $numbered );
+			$numbered_cp = (int) get_user_meta( (int) $numbered, WelcomeDiscount::USER_META, true );
+			if ( $numbered_cp > 0 ) {
+				$s->on_finish( static function () use ( $numbered_cp ) { wp_delete_post( $numbered_cp, true ); } );
+			}
+		}
+		$s->on_finish( static function () use ( $tag ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', "{$tag}-renumbered@example.invalid" ) ); } );
+		$check( ! is_wp_error( $numbered ) && 0 === (int) get_user_meta( (int) $numbered, WelcomeDiscount::USER_META, true ) && $guest_phone === get_user_meta( (int) $numbered, 'billing_phone', true ), 'BR-001 a guest who ordered, then registers with a new email and the same mobile number, is issued no welcome discount' );
+		// A shared browser still holding that guest's checkout details: someone new registering on the account page with
+		// their own number, or with none, is judged by what they give, not by the session's number.
+		WC()->customer->set_billing_phone( $guest_phone );
+		$newcomers = array();
+		foreach ( array( 'own' => '0102' . wp_rand( 1000000, 9999999 ), 'none' => '' ) as $kind => $own_phone ) {
+			$_POST = array( 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ) ) + ( '' !== $own_phone ? array( 'billing_phone' => $own_phone ) : array() );
+			$made  = wc_create_new_customer( "{$tag}-shared-{$kind}@example.invalid", '', wp_generate_password( 24 ) );
+			$_POST = array();
+			if ( is_wp_error( $made ) ) {
+				$newcomers[ $kind ] = 0;
+				continue;
+			}
+			$s->track_user( (int) $made );
+			$made_cp = (int) get_user_meta( (int) $made, WelcomeDiscount::USER_META, true );
+			if ( $made_cp > 0 ) {
+				$s->on_finish( static function () use ( $made_cp ) { wp_delete_post( $made_cp, true ); } );
+			}
+			$newcomers[ $kind ] = $made_cp;
+		}
+		WC()->customer->set_billing_phone( '' );
+		$check( 0 < $newcomers['own'] && 0 < $newcomers['none'], 'BR-001 on a shared browser holding a returning guest\'s checkout number, a new customer registering on the account page with their own number, or none, is still issued their welcome discount (' . wp_json_encode( $newcomers ) . ')' );
+		// A customer who was issued one, and whose saved number is that of an earlier order, is not told of it.
+		$told = t57_customer( $s, "{$tag}-told" );
+		update_user_meta( $told, 'billing_phone', $guest_phone );
+		$check( 0 < (int) get_user_meta( $told, WelcomeDiscount::USER_META, true ) && '' === \MizzeySite\Emails\EmailAdditions::welcome( '', get_userdata( $told ), null ), 'BR-001 the new-account email does not advertise a welcome discount to a customer whose mobile number has an earlier order' );
+		delete_user_meta( $told, 'billing_phone' );
 		wp_set_current_user( 0 );
 		WC()->customer->set_billing_email( '' );
 		require_once ABSPATH . 'wp-admin/includes/user.php';
@@ -532,6 +584,9 @@ run(
 		$claim_email = "{$tag}-claim@example.invalid";
 		$s->on_finish( static function () use ( $claim_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', wc_strtolower( $claim_email ) ) ); } );
 		$check( WelcomeDiscount::claim( $claim_email ) && ! WelcomeDiscount::claim( strtoupper( $claim_email ) ), 'BR-001 an email is claimed once, whatever its case: the second claim fails' );
+		$gmail = "{$tag}.claim@gmail.com";
+		$s->on_finish( static function () use ( $gmail ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', \MizzeySite\Accounts\CustomerKey::email( $gmail ) ) ); } );
+		$check( ! WelcomeDiscount::claim( "{$tag}-claim+2@example.invalid" ) && WelcomeDiscount::claim( $gmail ) && ! WelcomeDiscount::claim( "{$tag}claim+1@googlemail.com" ) && ! WelcomeDiscount::claim( strtoupper( "{$tag}.c.l.a.i.m@gmail.com" ) ), 'BR-001, SC-001 one mailbox claims one welcome discount: a plus-tag alias, Gmail\'s dots and googlemail.com are the same mailbox' );
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();

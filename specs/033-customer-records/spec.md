@@ -37,16 +37,18 @@ ADM-103 and ADM-104 are P1-L with no reduction written in Part One 1.2; they are
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Staff open a customer's profile with their contacts, addresses and order history | ADM-100 | provisional |
-| AC-2 | Staff keep internal notes on a customer that the customer never sees | ADM-103 | provisional |
+| AC-1 | Staff open a customer's profile with their contacts, addresses (the saved address book included) and order history, with refunds against the customer visible on it | ADM-100 | provisional |
+| AC-2 | Staff add internal notes to a customer record, each recording its author and timestamp, that the customer never sees | ADM-103 | provisional |
 | AC-3 | Staff suspend a customer account with a recorded reason; a suspended account cannot sign in by any route until reinstated | ADM-104 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The customer on the phone (Priority: High)
 
-1. **Given** a customer, **When** staff open their profile, **Then** their phone, email, addresses and orders are on
-   one screen, with staff's internal notes.
+1. **Given** a customer, **When** staff open their profile, **Then** their phone, email, addresses (the address book
+   included) and orders are on one screen, a refund showing on its order's total, with staff's internal notes.
+2. **Given** a note one agent wrote, **When** another agent adds a note, **Then** both are kept, each with who wrote it
+   and when, newest first.
 
 ### User Story 2 - Suspend an abusive account (Priority: Medium)
 
@@ -57,6 +59,11 @@ ADM-103 and ADM-104 are P1-L with no reduction written in Part One 1.2; they are
 ### Edge Cases
 
 - A suspension without a reason: refused with a message.
+- A note saved before notes were entries (one text box): kept as the first entry, its author and time unknown.
+- A saved note is not edited or removed from the screen; a note is kept up to 2,000 characters, and the newest 200 notes
+  are kept.
+- Two staff adding a note to one customer at once take turns; a note whose turn does not come within five seconds is
+  not written, and the screen says to add it again, so no note replaces another.
 - A staff account or one's own: cannot be suspended here.
 - Google sign-in or a sign-in link for a suspended account: the cookie gives no session.
 
@@ -66,7 +73,8 @@ ADM-103 and ADM-104 are P1-L with no reduction written in Part One 1.2; they are
 |---|---|---|
 | Contacts and addresses | WordPress's user screen with WooCommerce's customer fields | Native |
 | Order history on the profile | Only the orders list filtered by customer | Gap: the list on the profile |
-| Notes on a customer | None | Gap: a private field on the profile |
+| Notes on a customer | None | Gap: dated notes with their author, in a private field on the profile |
+| The address book on the profile | None (WooCommerce shows its billing and shipping address only) | Gap: the book listed read only |
 | Suspension | None in WordPress or WooCommerce | Gap: a suspension with reason and history, enforced on sign-in |
 
 ## Requirements
@@ -74,18 +82,21 @@ ADM-103 and ADM-104 are P1-L with no reduction written in Part One 1.2; they are
 ### Functional Requirements
 
 - **FR-001**: The customer's user screen MUST list their orders, newest first, linked to each order (AC-1).
-- **FR-002**: Internal notes MUST be stored in a private field and shown only on the staff screen (AC-2).
+- **FR-002**: Internal notes MUST be added as entries, each with its text, its author and its time, stored in a private
+  field and shown only on the staff screen, newest first; adding a note MUST keep every earlier note (AC-2).
 - **FR-003**: Suspending MUST need a reason, end the account's sessions and keep who, when and why; reinstating MUST be
   kept too (AC-3).
 - **FR-004**: A suspended account MUST be refused at password sign-in with a message in the visitor's language, and
   MUST never be the signed-in user whatever cookie it holds (AC-3).
 - **FR-005**: Only customer accounts other than one's own MUST be suspendable, by staff who may edit them (AC-3).
 - **FR-006**: Changes MUST need the form's nonce.
+- **FR-007**: The profile MUST list the customer's saved address book, and an order's total MUST show a refund against
+  it (AC-1).
 
 ### Key Entities
 
-- **Customer record**: the WordPress user with WooCommerce's fields, plus internal notes, suspension state, reason and
-  history.
+- **Customer record**: the WordPress user with WooCommerce's fields, plus internal notes (text, author, time),
+  suspension state, reason and history.
 
 ## Optional safeguards (not owed)
 

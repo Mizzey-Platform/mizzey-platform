@@ -51,6 +51,11 @@ final class EmailAdditions
         if (! $coupon instanceof \WC_Coupon || ! $coupon->get_id() || $expired || $usedUp) {
             return $content;
         }
+        // A first-order gift is not advertised to someone who has already ordered.
+        $account = get_userdata($userId);
+        if (! $account instanceof \WP_User || WelcomeDiscount::hasOrdered($account)) {
+            return $content;
+        }
         $value   = $coupon->is_type('percent')
             /* translators: %s: a percentage, such as 10. */
             ? sprintf(__('%s%% off', 'mizzey-site'), wc_format_localized_decimal($coupon->get_amount()))

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace MizzeySite\Wishlist;
 
 use MizzeySite\Catalogue\CanonicalProduct;
+use MizzeySite\Stock\StockGateway;
 
 defined('ABSPATH') || exit;
 
@@ -17,7 +18,8 @@ defined('ABSPATH') || exit;
  * product saved in English and in Arabic is one entry. A customer's list is kept on their account (WISH-02), a guest's
  * in a signed cookie for the shopping session, WooCommerce's guest session lifetime (`wc_session_expiration`, two days
  * by default) (WISH-03). On sign-in or registration a guest's list is added to the account's, without duplicates, and
- * the guest's is cleared (US-11-06); doing it again changes nothing. No sharing, multiple lists or price alerts (P2).
+ * the guest's is cleared (US-11-06), by every sign-in route, an email link included; doing it again changes nothing.
+ * No sharing, multiple lists or price alerts (P2).
  *
  * WooCommerce has no wishlist (P-015). Register ids: WISH-01 to WISH-04. See specs/015-wishlist.
  */
@@ -30,6 +32,38 @@ final class Wishlist
     {
         add_action('wp_login', [self::class, 'onLogin'], 10, 2);
         add_action('user_register', [self::class, 'onRegister'], 10, 1);
+        // A sign-in by email link fires no `wp_login` (which would count a second sign-in event).
+        add_action('mizzey_signed_in_by', [self::class, 'onSignedInBy'], 10, 2);
+        add_filter('woocommerce_set_cookie_options', [self::class, 'cookieOptions'], 10, 2);
+    }
+
+    /**
+     * @param mixed $method
+     * @param mixed $userId
+     */
+    public static function onSignedInBy($method, $userId): void
+    {
+        if ($method === 'link' && (int) $userId > 0) {
+            self::mergeGuestInto((int) $userId);
+            RecentlyViewed::mergeGuestInto((int) $userId);
+        }
+    }
+
+    /**
+     * The guest lists' cookies are sent on the store's own requests only (SameSite=Lax), so another site's request
+     * cannot read or change a guest's lists with them.
+     *
+     * @param mixed $options
+     * @param mixed $name
+     * @return mixed
+     */
+    public static function cookieOptions($options, $name)
+    {
+        if (is_array($options) && in_array($name, [self::COOKIE, RecentlyViewed::COOKIE], true)) {
+            $options['samesite'] = 'Lax';
+        }
+
+        return $options;
     }
 
     /** @return list<int> The visitor's canonical product ids, most recently saved first; only products they may see. */
@@ -104,8 +138,8 @@ final class Wishlist
     }
 
     /**
-     * Moves a saved item into the cart in one action (WISH-04): added, then taken off the wishlist. An item out of
-     * stock, or one the cart refuses, stays saved and the reason is given.
+     * Moves a saved item into the cart in one action (WISH-04): added, then taken off the wishlist. An item the stock
+     * source says is sold out, or one the cart refuses, stays saved and the reason is given.
      */
     public static function moveToCart(int $productId): true|\WP_Error
     {
@@ -114,7 +148,10 @@ final class Wishlist
             return new \WP_Error('mizzey_wishlist_not_saved', __('This item is not in your wishlist.', 'mizzey-site'), ['status' => 404]);
         }
         $shown = self::shown($canonical->get_id()) ?? $canonical;
-        if (! $shown->is_in_stock()) {
+        // The stock source is the authority (D-19); WooCommerce's own field only when the source does not answer, as the
+        // cart's check then fails closed at checkout (CartStock).
+        $answer = StockGateway::make()->level($shown->get_id());
+        if (! ($answer->isKnown() ? $answer->sellable(1) : $shown->is_in_stock())) {
             return new \WP_Error('mizzey_wishlist_out_of_stock', __('This item is out of stock, so it stays in your wishlist.', 'mizzey-site'), ['status' => 409]);
         }
         if (! WC()->cart && function_exists('wc_load_cart')) {
@@ -127,9 +164,22 @@ final class Wishlist
         $parent    = $variation ? $shown->get_parent_id() : $shown->get_id();
         $key       = WC()->cart->add_to_cart($parent, 1, $variation, $variation ? $shown->get_variation_attributes() : []);
         if (! $key) {
+            // The cart's own reason, such as WooCommerce's stock field saying out of stock while the stock source holds
+            // units (that field follows the source only once PRE-09's projection exists; specs/015 FR-009).
+            $said = '';
+            foreach ((array) wc_get_notices('error') as $notice) {
+                $said = trim(html_entity_decode(wp_strip_all_tags((string) (is_array($notice) ? ($notice['notice'] ?? '') : $notice)), ENT_QUOTES, 'UTF-8'));
+                if ($said !== '') {
+                    break;
+                }
+            }
             wc_clear_notices();
+            $message = $said !== ''
+                /* translators: %s: the cart's reason for refusing the item. */
+                ? sprintf(__('%s It stays in your wishlist.', 'mizzey-site'), $said)
+                : __('This item could not be added to your cart, so it stays in your wishlist.', 'mizzey-site');
 
-            return new \WP_Error('mizzey_wishlist_not_added', __('This item could not be added to your cart, so it stays in your wishlist.', 'mizzey-site'), ['status' => 409]);
+            return new \WP_Error('mizzey_wishlist_not_added', $message, ['status' => 409]);
         }
         self::remove($canonical->get_id());
 

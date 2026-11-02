@@ -433,6 +433,22 @@ run(
 		do_action( 'woocommerce_checkout_validate_order_before_payment', wc_get_order( $pay_order->get_id() ), $pay_ok );
 		$check( in_array( 'mizzey_district_missing', $pay_errors->get_error_codes(), true ) && ! in_array( 'mizzey_district_missing', $pay_ok->get_error_codes(), true ), 'CHK-01 paying an existing Egyptian order without a district is refused before payment; with it, not' );
 
+		// CHK-11, M-6: a phone given with an Egyptian address is an Egyptian mobile number, typed in any spelling.
+		$phone_checks = array(
+			\WC_Validation::is_phone( '12345', 'EG' ),
+			\WC_Validation::is_phone( '0223456789', 'EG' ),
+			\WC_Validation::is_phone( '+20 100 555 1234', 'EG' ),
+			\WC_Validation::is_phone( '٠١٠٠٥٥٥١٢٣٤', 'EG' ),
+			\WC_Validation::is_phone( '12345', 'FR' ),
+		);
+		$pay_order->set_billing_phone( '12345' );
+		$bad_phone = new \WP_Error();
+		do_action( 'woocommerce_checkout_validate_order_before_payment', $pay_order, $bad_phone );
+		$check( array( false, false, true, true, true ) === $phone_checks && in_array( 'mizzey_phone_invalid', $bad_phone->get_error_codes(), true ), 'CHK-11 for an Egyptian address a phone must be a mobile number (a short number and a landline refused; +20 spacing and Arabic digits accepted), on every form WooCommerce checks and again before payment; another country keeps WooCommerce\'s own check (' . wp_json_encode( $phone_checks ) . ')' );
+		$pay_order->set_billing_phone( '٠١٠٠٥٥٥١٢٣٤' );
+		$pay_order->save();
+		$check( '01005551234' === wc_get_order( $pay_order->get_id() )->get_billing_phone(), 'ADM-157 an order keeps a phone typed in Arabic digits in its local 01 form, so staff find it by the number' );
+
 		// CHK-01: the Egyptian address structure.
 		$locale = WC()->countries->get_country_locale()['EG'] ?? array();
 		$fields = \Automattic\WooCommerce\Blocks\Package::container()->get( \Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class )->get_fields_for_location( 'address' );
@@ -475,6 +491,11 @@ run(
 		$said    = (string) wp_json_encode( $missing['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
 		$said_ar = (string) wp_json_encode( $missing_ar['data']['data'] ?? array(), JSON_UNESCAPED_UNICODE );
 		$check( 400 === $missing['status'] && false !== strpos( $said, 'District' ) && 400 === $missing_ar['status'] && false !== strpos( $said_ar, 'الحي' ), '[HTTP] CHK-01, CHK-11 a missing district is refused with a message naming it, in English and in Arabic (' . substr( $said, 0, 160 ) . ' | ' . substr( $said_ar, 0, 160 ) . ')' );
+		$short_body = t60_body( "{$tag}-p@example.invalid", 'Garden City' );
+		$short_body['billing_address']['phone']  = '12345';
+		$short_body['shipping_address']['phone'] = '12345';
+		$short = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), $short_body, $auth, $cart['cookies'] );
+		$check( 400 === $short['status'], '[HTTP] CHK-11 a checkout with an Egyptian address and a phone that is not a mobile number is refused (' . $short['status'] . ' ' . wp_strip_all_tags( (string) ( $short['data']['message'] ?? '' ) ) . ')' );
 		$placed   = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( "{$tag}-p@example.invalid", 'Garden City' ), $auth, $cart['cookies'] );
 		$order_id = (int) ( $placed['data']['order_id'] ?? 0 );
 		if ( $order_id > 0 ) {

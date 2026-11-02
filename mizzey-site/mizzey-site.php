@@ -96,6 +96,7 @@ require_once __DIR__ . '/src/Promotions/Combination.php';
 require_once __DIR__ . '/src/Promotions/WelcomeDiscount.php';
 require_once __DIR__ . '/src/Accounts/VerificationOnRegistration.php';
 require_once __DIR__ . '/src/Accounts/MarketingConsent.php';
+require_once __DIR__ . '/src/Accounts/CustomerKey.php';
 require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
 require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
@@ -274,6 +275,8 @@ MizzeySite\Orders\RefundReference::register();
 MizzeySite\Accounts\VerificationOnRegistration::register();
 MizzeySite\Accounts\MarketingConsent::register();
 MizzeySite\Accounts\PhoneSignIn::register();
+// Contact details compared as one however typed: orders keep the mobile form and the email's key (ADM-157, BR-001).
+MizzeySite\Accounts\CustomerKey::register();
 MizzeySite\Accounts\SignInLink::register();
 // Google sign-in, one account per email (AUTH-10, AUTH-13; D-24). See specs/024-google-sign-in.
 MizzeySite\Accounts\GoogleSignIn::register();

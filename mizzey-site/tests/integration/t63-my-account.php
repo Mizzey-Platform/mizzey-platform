@@ -68,6 +68,15 @@ run(
 		$deleted = AddressBook::delete( $laila, (string) $first );
 		$check( true === $edited && is_wp_error( $foreign ) && true === $deleted && 1 === count( AddressBook::all( $laila ) ) && (string) $second === AddressBook::all( $laila )[0]['id'], 'ACCT-04 an address is edited and deleted; another customer cannot touch it' );
 
+		// D-308-1, D-305-3: parts are cut to their length, a list is no part, and a mobile number may be typed in Arabic digits.
+		$long    = AddressBook::add( $laila, t63_address( array( 'address_1' => str_repeat( 'Nile Street ', 500 ), 'phone' => '٠١٠٠٥٥٥١٢٣٤' ) ) );
+		$stored  = is_string( $long ) ? array_values( array_filter( AddressBook::all( $laila ), static fn ( $a ) => $a['id'] === $long ) )[0] ?? array() : array();
+		$listed  = AddressBook::add( $laila, t63_address( array( 'district' => array( 'Zamalek' ) ) ) );
+		$check( is_string( $long ) && AddressBook::LENGTHS['address_1'] === mb_strlen( (string) ( $stored['address_1'] ?? '' ) ) && '01005551234' === ( $stored['phone'] ?? '' ) && is_wp_error( $listed ) && 'mizzey_address_incomplete' === $listed->get_error_code(), 'ACCT-04 a street of 6,000 characters is kept at 200, a number in Arabic digits in its 01 form; a district sent as a list is refused as missing' );
+		if ( is_string( $long ) ) {
+			AddressBook::delete( $laila, $long );
+		}
+
 		$third = AddressBook::add( $laila, t63_address( array( 'city' => 'Tanta', 'state' => 'EG-03', 'address_1' => '8 Station Road' ) ) );
 		AddressBook::delete( $laila, (string) $second );
 		$after_delete = AddressBook::all( $laila );

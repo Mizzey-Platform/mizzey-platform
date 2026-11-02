@@ -372,15 +372,32 @@ final class ReviewEligibility
         return array_values(array_unique(array_filter($ids)));
     }
 
-    /** @param list<int> $group */
+    /**
+     * Whether the customer has a delivered line of the product. Only the delivered orders holding the product are loaded,
+     * found by their ids and one lookup of their lines, not every delivered order with its lines.
+     *
+     * @param list<int> $group
+     */
     private static function delivered(int $userId, array $group): bool
     {
-        $orders = wc_get_orders([
+        global $wpdb;
+        $ids = wc_get_orders([
             'customer_id' => $userId,
             'status'      => array_map(static fn (string $status): string => 'wc-' . $status, StatusModel::DELIVERED),
             'limit'       => -1,
+            'return'      => 'ids',
+            'type'        => 'shop_order',
         ]);
-        foreach ($orders as $order) {
+        $ids = array_values(array_filter(array_map('intval', (array) $ids)));
+        if ($ids === [] || $group === []) {
+            return false;
+        }
+        $orderList   = implode(',', $ids);
+        $productList = implode(',', array_map('intval', $group));
+        // The orders among them with a line of the product, by WooCommerce's order item tables (both order storages).
+        $holding = $wpdb->get_col("SELECT DISTINCT i.order_id FROM {$wpdb->prefix}woocommerce_order_items i INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta m ON m.order_item_id = i.order_item_id AND m.meta_key = '_product_id' WHERE i.order_item_type = 'line_item' AND i.order_id IN ({$orderList}) AND m.meta_value IN ({$productList})"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- integer lists only.
+        foreach ((array) $holding as $orderId) {
+            $order = wc_get_order((int) $orderId);
             if (! $order instanceof \WC_Order || ! StatusModel::isDelivered($order)) {
                 continue;
             }

@@ -2,8 +2,9 @@
 /**
  * t73: the customer's record in admin (ADM-100, ADM-103, ADM-104). See specs/033-customer-records.
  *
- * AC-1: the customer's profile shows contacts, addresses and order history.
- * AC-2: internal notes are kept and never shown to the customer.
+ * AC-1: the customer's profile shows contacts, addresses (the address book included) and order history, refunds
+ *       visible on it.
+ * AC-2: internal notes are added, each with its author and time, kept, and never shown to the customer.
  * AC-3: an account is suspended with a reason: sessions end, every sign-in is refused, the reason and who did it are
  *       kept; reinstating restores sign-in. Staff accounts and one's own cannot be suspended.
  *
@@ -12,6 +13,7 @@
 
 namespace MizzeySite\Tests\Integration;
 
+use MizzeySite\Account\AddressBook;
 use MizzeySite\Account\CustomerRecords;
 
 require_once __DIR__ . '/_bootstrap.php';
@@ -67,12 +69,39 @@ run(
 		$html = $panel( $customer );
 		$check( str_contains( $html, 'All 2 orders of this customer' ) && str_contains( $html, '_customer_user=' . $customer ), 'AC-1 the profile links to all of the customer\'s orders in the orders list' );
 		$check( str_contains( $html, '#' . $orders[0] ) && str_contains( $html, '#' . $orders[1] ) && strpos( $html, '#' . $orders[1] ) < strpos( $html, '#' . $orders[0] ), 'AC-1 the profile lists the customer\'s orders, newest first, linked to each order' );
+		$saved = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-01', 'city' => 'Cairo', 'district' => "{$tag} Heliopolis", 'address_1' => '9 Baghdad Street', 'landmark' => '' ) );
+		$extra = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-02', 'city' => 'Alexandria', 'district' => "{$tag} Smouha", 'address_1' => '3 Victor Emmanuel Street', 'landmark' => '' ) );
+		wc_get_order( $orders[1] )->update_status( 'processing' );
+		$refund = wc_create_refund( array( 'order_id' => $orders[1], 'amount' => '10.00', 'reason' => 't73' ) );
+		$html   = $panel( $customer );
+		$check( is_string( $saved ) && is_string( $extra ) && str_contains( $html, "{$tag} Heliopolis" ) && str_contains( $html, "{$tag} Smouha" ) && str_contains( $html, '3 Victor Emmanuel Street' ), 'AC-1 the profile lists the customer\'s address book, a saved address that is not the default included' );
+		$check( ! is_wp_error( $refund ) && str_contains( $html, '<del' ), 'AC-1, US-19-01 a refund against the customer shows on the profile (the order\'s total struck through with what is left)' );
 
 		// ---- AC-2: internal notes ------------------------------------------------------------------------
-		$post( array( 'mizzey_customer_notes' => "{$tag} prefers delivery after 6 pm" ) );
+		update_user_meta( $customer, CustomerRecords::NOTES, "{$tag} an older single note" );
+		$post( array( 'mizzey_customer_note' => "{$tag} prefers delivery after 6 pm" ) );
 		CustomerRecords::save( $customer );
 		$_POST = array();
-		$check( "{$tag} prefers delivery after 6 pm" === get_user_meta( $customer, CustomerRecords::NOTES, true ) && str_contains( $panel( $customer ), 'prefers delivery after 6 pm' ), 'AC-2 staff keep an internal note on the customer' );
+		wp_set_current_user( $other );
+		$post( array( 'mizzey_customer_note' => "{$tag} refused delivery twice" ) );
+		CustomerRecords::save( $customer );
+		$_POST = array();
+		wp_set_current_user( $manager );
+		$notes      = CustomerRecords::notes( $customer );
+		$notes_html = $panel( $customer );
+		$check( 3 === count( $notes ) && "{$tag} an older single note" === $notes[0]['text'] && "{$tag} prefers delivery after 6 pm" === $notes[1]['text'] && "{$tag}mgr" === $notes[1]['by'] && "{$tag} refused delivery twice" === $notes[2]['text'] && "{$tag}mgr2" === $notes[2]['by'] && abs( $notes[2]['at'] - time() ) < 60, 'AC-2, US-19-02 notes are added, each with its author and time; a later note keeps the earlier ones, and a note saved before notes were entries is kept as the first' );
+		$check( str_contains( $notes_html, 'prefers delivery after 6 pm' ) && str_contains( $notes_html, "by {$tag}mgr2" ) && strpos( $notes_html, 'refused delivery twice' ) < strpos( $notes_html, 'prefers delivery after 6 pm' ), 'AC-2 the profile shows each note with its author, newest first' );
+		// Another request holding the customer's note lock (a second database connection) past the wait: nothing written.
+		$rival = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$taken = 1 === (int) $rival->get_var( $rival->prepare( 'SELECT GET_LOCK(%s, 0)', CustomerRecords::notesLock( $customer ) ) );
+		$post( array( 'mizzey_customer_note' => "{$tag} written while locked" ) );
+		CustomerRecords::save( $customer );
+		$_POST       = array();
+		$busy_errors = new \WP_Error();
+		do_action_ref_array( 'user_profile_update_errors', array( &$busy_errors, true, get_user_by( 'id', $customer ) ) );
+		$rival->get_var( $rival->prepare( 'SELECT RELEASE_LOCK(%s)', CustomerRecords::notesLock( $customer ) ) );
+		$rival->close();
+		$check( $taken && 3 === count( CustomerRecords::notes( $customer ) ) && in_array( 'mizzey_customer_note_busy', $busy_errors->get_error_codes(), true ), 'AC-2 a note whose turn does not come (another save holds the customer\'s notes) is not written, and staff are told to add it again' );
 		wp_set_current_user( $customer );
 		$me = rest_do_request( new \WP_REST_Request( 'GET', '/wp/v2/users/me' ) );
 		$me->set_status( $me->get_status() );
@@ -83,11 +112,11 @@ run(
 		$account = (string) ob_get_clean();
 		$check( ! str_contains( wp_json_encode( $me->get_data() ) . wp_json_encode( $store->get_data() ) . $account, 'prefers delivery' ) && '' === $panel( $customer ), 'AC-2 the note is in none of what the customer can read: their user data, the store API, their account pages' );
 		wp_set_current_user( $manager );
-		$post( array( 'mizzey_customer_notes' => 'forged' ) );
+		$post( array( 'mizzey_customer_note' => 'forged' ) );
 		$_POST[ CustomerRecords::NONCE . '_nonce' ] = 'bad';
 		CustomerRecords::save( $customer );
 		$_POST = array();
-		$check( "{$tag} prefers delivery after 6 pm" === get_user_meta( $customer, CustomerRecords::NOTES, true ), 'AC-2 without the form\'s nonce nothing changes' );
+		$check( 3 === count( CustomerRecords::notes( $customer ) ), 'AC-2 without the form\'s nonce nothing changes' );
 
 		// Who WordPress takes the visitor to be when the browser holds a valid signed-in cookie for the account, as a
 		// Google or sign-in-link session would leave it.

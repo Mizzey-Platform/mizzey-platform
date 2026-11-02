@@ -63,6 +63,13 @@ run(
 		// [HTTP] A callback without the state's cookie is refused, and the state cannot be used again.
 		$forged = two_factor_http( 'GET', add_query_arg( array( 'state' => $asked['state'] ?? '', 'code' => 'x' ), GoogleSignIn::redirectUri() ) );
 		$check( 302 === $forged['status'] && false !== strpos( (string) $forged['location'], 'mizzey-google=refused' ) && false === get_transient( 'mizzey_google_' . hash( 'sha256', (string) ( $asked['state'] ?? '' ) ) ), '[HTTP] AUTH-10 a callback without the browser\'s state cookie is refused, and its state is spent (' . $forged['status'] . ')' );
+		$warned  = array();
+		set_error_handler( static function ( $no, $text ) use ( &$warned ) { if ( str_contains( (string) $text, 'Array to string' ) ) { $warned[] = $text; } return false; } ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+		$listed  = new \WP_REST_Request( 'GET', '/mizzey/v1/google/callback' );
+		$listed->set_query_params( array( 'state' => array( '1' ), 'code' => array( 'x' ) ) );
+		$as_list = GoogleSignIn::callback( $listed );
+		restore_error_handler();
+		$check( 302 === $as_list->get_status() && false !== strpos( (string) ( $as_list->get_headers()['Location'] ?? '' ), 'mizzey-google=refused' ) && array() === $warned, 'AUTH-10 a callback whose state is a list is refused without a PHP warning (' . implode( '; ', $warned ) . ')' );
 
 		// The ID token's checks.
 		$good    = array( 'iss' => 'https://accounts.google.com', 'aud' => $client, 'exp' => time() + 300, 'nonce' => 'n-1', 'sub' => "{$tag}-sub-1", 'email' => "{$tag}-new@example.invalid", 'email_verified' => true, 'hd' => 'example.invalid', 'given_name' => 'Hana', 'family_name' => 'Adel' );
@@ -118,6 +125,15 @@ run(
 		clean_user_cache( $squat_id );
 		$replaced  = $squatted instanceof \WP_User && $squatted->ID === $squat_id && ! wp_check_password( $password, get_userdata( $squat_id )->user_pass, $squat_id ) && VerificationOnRegistration::verified( $squat_id ) && ! \WP_Session_Tokens::get_instance( $squat_id )->verify( $squat_token );
 		$check( $known instanceof \WP_User && $known->ID === $known_id && $kept && $replaced, 'AUTH-13 a Google sign-in with the email of an existing customer signs in to that account; one whose email was never verified here has its password replaced and its sessions ended first, so whoever registered it cannot keep it' );
+
+		// AUTH-13: a Gmail mailbox registered here under another spelling (dots, a plus tag, googlemail.com) is that account.
+		$mailbox_id = t65_user( $s, "{$tag}jdoe+shop@googlemail.com", 'customer', $password );
+		wc_get_container()->get( $class )->mark_verified( $mailbox_id );
+		$mailbox    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-mailbox", 'email' => "{$tag}j.doe@gmail.com", 'hd' => '' ) + $good );
+		if ( $mailbox instanceof \WP_User && $mailbox->ID !== $mailbox_id ) {
+			$s->track_user( $mailbox->ID );
+		}
+		$check( $mailbox_id > 0 && $mailbox instanceof \WP_User && $mailbox->ID === $mailbox_id && "{$tag}-sub-mailbox" === get_user_meta( $mailbox_id, GoogleSignIn::SUBJECT, true ) && false === get_user_by( 'email', "{$tag}j.doe@gmail.com" ), 'AUTH-13 a Google sign-in as j.doe@gmail.com reaches the account registered as jdoe+shop@googlemail.com, the same mailbox, and makes no second account' );
 
 		// An address Google is not the authority for: never linked to an existing account, and a new account from it is
 		// not taken as verified.
@@ -178,7 +194,7 @@ run(
 		}
 		unset( $_COOKIE[ GoogleSignIn::COOKIE ] );
 		wp_set_current_user( 0 );
-		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $made instanceof \WP_User && $signed === $made->ID && $issued === $made->ID, 'AUTH-10 the callback with the state, its cookie and a good code, for someone new, makes their account through the sign-up check, signs them in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
+		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $made instanceof \WP_User && $signed === $made->ID && $issued === $made->ID, 'AUTH-10 the callback with the state, its cookie and a good code, for someone new, makes their account through the sign-up check, signs them in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ', made ' . ( $made instanceof \WP_User ? $made->ID : 'none' ) . ', cookie for ' . $issued . ', to ' . ( $landed->get_headers()['Location'] ?? '' ) . ')' );
 
 		sign_in_forget( array( "{$tag}-known", "{$tag}-squat", "{$tag}-staff", "{$tag}-outside" ) );
 		return $ok;

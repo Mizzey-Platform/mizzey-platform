@@ -121,6 +121,9 @@ performance gates.
   per line; any failure MUST release the lines reserved and refuse the order before payment, with a message (AC-7).
 - **FR-004**: A cancelled or failed order MUST release its reservation once (AC-7).
 - **FR-005**: Every customer-facing message MUST be translated (FIX-04).
+- **FR-006**: For an Egyptian address, a phone given MUST be an Egyptian mobile number, accepted in any spelling (`+20`,
+  spaces, Arabic-Indic digits) on both checkouts and before payment, refused otherwise with a message in the
+  customer's language (CHK-11); orders keep it in the `01` form.
 
 ### Key Entities
 
