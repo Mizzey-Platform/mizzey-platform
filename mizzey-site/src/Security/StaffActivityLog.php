@@ -42,9 +42,19 @@ final class StaffActivityLog
     /** @var callable|null A stand-in for CoreX's service, for the tests. */
     public static $sink = null;
 
+    /** Whether this request failed at the password stage (before the sign-in messages make every failure alike). */
+    private static bool $passwordStageFailed = false;
+
+    /** @var array<int,bool> Accounts whose sign-in this request has recorded. */
+    private static array $recorded = [];
+
     public static function register(): void
     {
-        add_action('wp_login', [self::class, 'signedIn'], 20, 2);
+        // After WP 2FA's own wp_login handler (priority 20), which challenges a staff member for the second factor and
+        // ends the request: a sign-in is recorded only once it is complete, here or when WP 2FA finishes it.
+        add_action('wp_login', [self::class, 'signedIn'], 99, 2);
+        add_action('wp_2fa_user_authenticated', [self::class, 'secondFactorPassed'], 10, 1);
+        add_filter('authenticate', [self::class, 'notePasswordStage'], 99, 1);
         add_action('wp_login_failed', [self::class, 'failed'], 20, 2);
         add_action('wp_logout', [self::class, 'signedOut'], 20, 1);
         add_action('retrieve_password', [self::class, 'resetRequested'], 20, 1);
@@ -88,10 +98,35 @@ final class StaffActivityLog
      */
     public static function signedIn($login, $user = null): void
     {
-        if (! $user instanceof \WP_User || ! self::isStaff($user)) {
+        if (! $user instanceof \WP_User || ! self::isStaff($user) || isset(self::$recorded[$user->ID])) {
             return;
         }
+        self::$recorded[$user->ID] = true;
         self::write($user->ID, $user->user_login, self::SIGNIN, 'success', (string) $user->ID, $user->user_login, ['roles' => array_values($user->roles)]);
+    }
+
+    /** @param mixed $user */
+    public static function secondFactorPassed($user): void
+    {
+        if ($user instanceof \WP_User) {
+            self::signedIn($user->user_login, $user);
+        }
+    }
+
+    /**
+     * The password check's own verdict, read before Mizzey's sign-in messages (priority 100) make every failure the
+     * same generic error.
+     *
+     * @param mixed $user
+     * @return mixed
+     */
+    public static function notePasswordStage($user)
+    {
+        if ($user instanceof \WP_Error) {
+            self::$passwordStageFailed = true;
+        }
+
+        return $user;
     }
 
     /**
@@ -113,8 +148,9 @@ final class StaffActivityLog
 
     /**
      * Whether a failure is a wrong second factor. WP 2FA reports it with WordPress's generic `authentication_failed`
-     * code, which WordPress also uses for other failures, so the request is read too: WP 2FA's second step carries
-     * its own fields (`wp-auth-nonce`, `authcode`), or its REST step says "Invalid verification code."
+     * code, which Mizzey's sign-in messages also give a wrong password, so the password stage is watched: WP 2FA's
+     * second step does not run the password check, so a failure with no password-stage failure before it in the
+     * request is WP 2FA's, whatever fields the request carries.
      *
      * @param mixed $error
      */
@@ -123,12 +159,8 @@ final class StaffActivityLog
         if (! $error instanceof \WP_Error || $error->get_error_code() !== 'authentication_failed') {
             return false;
         }
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- only whether the fields are present.
-        if (isset($_REQUEST['wp-auth-nonce']) || isset($_REQUEST['authcode'])) {
-            return true;
-        }
 
-        return $error->get_error_message() === __('Invalid verification code.', 'wp-2fa');
+        return ! self::$passwordStageFailed;
     }
 
     /** @param mixed $userId */

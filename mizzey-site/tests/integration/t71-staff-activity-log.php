@@ -85,6 +85,19 @@ run(
 		$http   = array_values( array_filter( $mine( array( 'actor_id' => $manager, 'kind' => StaffActivityLog::SIGNIN_FAILED ) ), static fn ( $e ) => $e->occurredAt->format( 'Y-m-d H:i:s' ) >= $started ) );
 		$check( count( $http ) >= 2 && '' !== (string) ( $http[0]->context['address'] ?? '' ), 'AC-2 over the real request a wrong password on the sign-in page is recorded, with the address (' . count( $http ) . ' since the start, ' . (int) $answer['status'] . ', ' . ( $http[0]->context['address'] ?? 'none' ) . ')' );
 
+		// A staff sign-in is recorded only once it is complete: after WP 2FA's challenge, or when WP 2FA finishes it.
+		$check( 99 === has_action( 'wp_login', array( StaffActivityLog::class, 'signedIn' ) ), 'AC-2 the sign-in is recorded after WP 2FA has had its say (priority 99 against its 20)' );
+		$second = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr2", 'user_pass' => $pass, 'user_email' => "{$tag}mgr2@example.invalid", 'role' => 'shop_manager' ) );
+		$s->track_user( $second );
+		do_action( 'wp_2fa_user_authenticated', get_user_by( 'id', $second ) );
+		do_action( 'wp_login', "{$tag}mgr2", get_user_by( 'id', $second ) );
+		$check( 1 === count( $mine( array( 'actor_id' => $second, 'kind' => StaffActivityLog::SIGNIN ) ) ), 'AC-2 a sign-in WP 2FA completes is recorded once, even when wp_login follows it' );
+
+		// A wrong password sent with a second-factor field is still a wrong password.
+		$spoof = two_factor_http( 'POST', site_url( 'wp-login.php', 'login_post' ), array( 'log' => "{$tag}mgr2", 'pwd' => 'wrong-' . $pass, 'authcode' => '123456', 'wp-auth-nonce' => 'x', 'testcookie' => 1 ), array( new \WP_Http_Cookie( array( 'name' => 'wordpress_test_cookie', 'value' => 'WP Cookie check' ) ) ) );
+		$kinds2 = $kinds( $mine( array( 'actor_id' => $second ) ) );
+		$check( in_array( StaffActivityLog::SIGNIN_FAILED, $kinds2, true ) && ! in_array( StaffActivityLog::SECOND_FACTOR, $kinds2, true ), 'AC-2 a wrong password sent with second-factor fields is filed as a wrong password (' . (int) $spoof['status'] . ')' );
+
 		// ---- AC-3: searchable in the administration ----------------------------------------------------------
 		$q = static fn ( array $over ) => StaffActivityScreen::entries( array_merge( array( 'account' => '', 'kind' => '', 'outcome' => '', 'from' => '', 'to' => '', 'page' => 1 ), $over ) );
 		$by_account = $q( array( 'account' => "{$tag}mgr@example.invalid" ) );
@@ -111,6 +124,11 @@ run(
 		$page = (string) ob_get_clean();
 		$_GET = array();
 		$check( str_contains( $page, 'Failed second factor' ) && str_contains( $page, '203.0.113.71' ) && str_contains( $page, 'parcel left with the neighbour' ), 'AC-3 the screen shows the account\'s entries and the matching order note' );
+
+		$_GET = array( 'from' => '2026-13-01', 'to' => '2026-02-30' );
+		$bad  = StaffActivityScreen::request();
+		$_GET = array();
+		$check( '' === $bad['from'] && '' === $bad['to'], 'AC-3 an impossible date in the filter is ignored, not a crash' );
 
 		// ---- AC-4: not deletable from the interface; administrators only ---------------------------------------
 		$check( 1 !== preg_match( '/<(a|button|input|form)[^>]*(delete|remove|trash|clear|method="post")/i', $page ), 'AC-4 the screen offers no control that changes or deletes an entry' );

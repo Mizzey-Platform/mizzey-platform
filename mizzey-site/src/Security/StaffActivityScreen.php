@@ -59,7 +59,7 @@ final class StaffActivityScreen
     {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended -- a read-only screen.
         $get  = static fn (string $key): string => isset($_GET[$key]) && is_string($_GET[$key]) ? sanitize_text_field(wp_unslash($_GET[$key])) : '';
-        $date = static fn (string $v): string => preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) === 1 ? $v : '';
+        $date = static fn (string $v): string => preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) === 1 && checkdate((int) substr($v, 5, 2), (int) substr($v, 8, 2), (int) substr($v, 0, 4)) ? $v : '';
         $kind = $get('kind');
         $out  = $get('outcome');
         $values = [
