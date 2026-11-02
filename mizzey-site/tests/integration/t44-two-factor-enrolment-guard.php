@@ -58,7 +58,7 @@ run(
 			$check( 200 === $setup['status'] && false !== strpos( $setup['body'], 'totpKey' ), "AC-3 [{$label}] the set-up screen opens (status {$setup['status']})" );
 			// WooCommerce saves its settings on wp_loaded, before admin_init: refused there too, before any save.
 			$early = two_factor_http( 'POST', admin_url( 'admin.php?page=wc-settings&tab=general' ), array( 'save' => 'Save changes', 'woocommerce_store_city' => 't44-early' ), $cookies );
-			$check( 403 === $early['status'] && false !== strpos( $early['body'], 'Set up two-factor sign-in before using this.' ) && 't44-early' !== get_option( 'woocommerce_store_city' ), "AC-3 [{$label}] a form sent to an administration screen that saves before admin_init is refused by the guard, not only by the form's nonce (status {$early['status']})" );
+			$check( 403 === $early['status'] && false !== strpos( $early['body'], 'Set up two-factor sign-in before using this.' ) && 't44-early' !== get_option( 'woocommerce_store_city' ), "AC-3 [{$label}] a form sent to an administration screen that saves before admin_init is refused by the guard, not only by the form's nonce (status {$early['status']}, to " . ( $early['location'] ?? '' ) . ', city ' . get_option( 'woocommerce_store_city' ) . ')' );
 			// The same save sent through admin-ajax.php, which also loads WooCommerce's settings saver on wp_loaded.
 			$early_ajax = two_factor_http( 'POST', admin_url( 'admin-ajax.php?page=wc-settings&tab=general' ), array( 'save' => 'Save changes', 'woocommerce_store_city' => 't44-ajax' ), $cookies );
 			wp_cache_delete( 'alloptions', 'options' );
