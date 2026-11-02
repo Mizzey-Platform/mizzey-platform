@@ -49,7 +49,7 @@ support channels (AC-14, OD-30), with no customer returns area and no approval w
 |---|---|---|---|
 | AC-1 | Staff with the refund permission record a full or a partial refund from the standard order screen, through the gateway where it supports refunds, otherwise recorded by hand | RET-08, ADM-124 | provisional |
 | AC-2 | Every refund carries its payment reference: the reference of the payment it returns, and, where there is one, the refund's own reference from the provider or typed by staff; both are shown on the refund in the order screen | ADM-124 | provisional |
-| AC-3 | A refund made in Paymob's own dashboard is recorded on the order with the payment reference (PAY-17's fallback) | RET-08, ADM-124 | provisional |
+| AC-3 | A refund made through the provider's own process is recorded on the order with the payment reference | RET-08, ADM-124 | provisional |
 | AC-4 | The customer receives the standard refunded-order email, full or partial, in the order's language, naming the refund's reference | RET-08 | provisional |
 | AC-5 | Staff without the refund permission cannot record a refund, by the order screen or the REST API | ADM-124 | provisional |
 | AC-6 | No customer returns area, return request form or approval workflow exists | RET-08 | provisional |
