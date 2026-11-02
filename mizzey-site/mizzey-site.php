@@ -22,6 +22,7 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/src/I18n/Localisation.php';
 require_once __DIR__ . '/src/I18n/WpmlConfigSync.php';
+require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
@@ -139,6 +140,8 @@ require_once __DIR__ . '/src/Payments/PaymentGate.php';
 MizzeySite\I18n\Localisation::register();
 // The site's wpml-config.xml applied as soon as it changes: specs/036-product-management.
 MizzeySite\I18n\WpmlConfigSync::register();
+// .htaccess names the site's root, never a language's: specs/034-sales-report.
+MizzeySite\I18n\RewriteRoot::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
