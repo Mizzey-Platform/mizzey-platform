@@ -153,11 +153,11 @@ run(
 		$flag = $order( $en, 1, 'en' );
 		\MizzeySite\Payments\PaymentRecord::flag( $flag, 't75 a payment arrived for a cancelled order' );
 		$flagged_now = in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true );
-		$delivered   = wc_get_order( $flag->get_id() );
-		$delivered->set_status( 'completed' );
-		$delivered->save();
-		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded' );
-		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'status=wc-cancelled' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
+		foreach ( array( 'preparing', 'shipped', 'completed' ) as $step ) {
+			wc_get_order( $flag->get_id() )->update_status( $step );
+		}
+		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded (' . wp_json_encode( array( $flagged_now, wc_get_order( $flag->get_id() )->get_status() ) ) . ')' );
+		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'mizzey_refunds=cancelled_paid' ) && str_contains( $html, 'mizzey_refunds=flagged' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------
 		$low  = $w->simple( "{$tag}-LOW", null );
