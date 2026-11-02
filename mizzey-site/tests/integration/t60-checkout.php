@@ -397,6 +397,25 @@ run(
 		$before_trash = $late_source->levels[ $five->get_id() ];
 		wc_get_order( $trashed->get_id() )->delete( false );
 		$after_trash = $late_source->levels[ $five->get_id() ];
+		// A Confirmed order trashed (a duplicate) gives its stock back; restored, it is reserved again. A Shipped order
+		// trashed keeps it: the stock has left.
+		$duplicate = t60_order( $s, array( $five->get_id() => 2 ) );
+		OrderStock::reserve( $duplicate, StockGateway::make() );
+		wc_get_order( $duplicate->get_id() )->update_status( 'processing' );
+		$dup_held = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $duplicate->get_id() )->delete( false );
+		$dup_trashed = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $duplicate->get_id() )->untrash();
+		$dup_restored = $late_source->levels[ $five->get_id() ];
+		$restored_ok  = 'processing' === wc_get_order( $duplicate->get_id() )->get_status() && OrderStock::active( wc_get_order( $duplicate->get_id() ) );
+		$gone = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $gone, StockGateway::make() );
+		foreach ( array( 'processing', 'preparing', 'shipped' ) as $step ) {
+			wc_get_order( $gone->get_id() )->update_status( $step );
+		}
+		$gone_held = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $gone->get_id() )->delete( false );
+		$check( $dup_trashed === $dup_held + 2 && $dup_restored === $dup_held && $restored_ok && $late_source->levels[ $five->get_id() ] === $gone_held, 'CHK-12 a Confirmed order trashed gives its stock back and, restored, holds it again; a Shipped order trashed gives nothing back (' . wp_json_encode( array( $dup_held, $dup_trashed, $dup_restored, $gone_held, $late_source->levels[ $five->get_id() ] ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );

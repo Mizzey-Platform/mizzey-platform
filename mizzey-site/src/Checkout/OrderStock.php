@@ -43,7 +43,8 @@ defined('ABSPATH') || exit;
  * - An order that reaches a paid status without a reservation (a payment callback, staff) is reserved then; if the
  *   source refuses, the order is marked (`UNRESERVED`) with a note for staff, as a payment already taken cannot be
  *   refused here, and the status model (specs/010) decides where it may move next.
- * - A cancelled or failed order, and an unpaid order trashed or deleted, releases what it reserved, once.
+ * - A cancelled or failed order, and an order trashed or deleted before it is Shipped, releases what it reserved,
+ *   once; restored from the trash to a paid status, it is reserved again or marked for staff.
  * - A line whose undo or release went unanswered stays marked unsettled for reconciliation with the source (PRE-09);
  *   a later placement asks for it with new keys.
  *
@@ -57,8 +58,11 @@ final class OrderStock
 
     /** Paid or fulfilled statuses: an order there should hold a reservation. */
     private const HOLDING = ['processing', 'on-hold', 'preparing', 'shipped', 'out-for-delivery', 'cod-collected', 'completed'];
-    /** Unpaid statuses an order may be trashed or deleted from, releasing what it reserved. */
-    private const UNPAID = ['pending', 'failed', 'checkout-draft', 'cancelled'];
+    /**
+     * Statuses an order trashed or deleted from releases what it reserved: unpaid, and paid but not yet handed to the
+     * carrier (a duplicate or a test order). From Shipped on, the stock has left and nothing is given back.
+     */
+    private const RELEASED_ON_REMOVAL = ['pending', 'failed', 'checkout-draft', 'cancelled', 'on-hold', 'processing', 'preparing'];
 
     public static function register(): void
     {
@@ -68,6 +72,7 @@ final class OrderStock
         add_action('woocommerce_order_status_changed', [self::class, 'statusChanged'], 20, 4);
         add_action('woocommerce_before_trash_order', [self::class, 'beforeRemoval'], 10, 1);
         add_action('woocommerce_before_delete_order', [self::class, 'beforeRemoval'], 10, 1);
+        add_action('untrashed_post', [self::class, 'restored'], 20, 1);
         add_filter('mizzey_cart_stock_held', [self::class, 'heldByVisitor'], 10, 1);
     }
 
@@ -135,9 +140,14 @@ final class OrderStock
 
             return;
         }
-        if (! in_array($to, self::HOLDING, true)) {
-            return;
+        if (in_array($to, self::HOLDING, true)) {
+            self::hold($order);
         }
+    }
+
+    /** A paid order without a reservation is reserved now; if the source refuses, it is marked for staff. */
+    private static function hold(\WC_Order $order): void
+    {
         $held = self::locked($order, static function (\WC_Order $fresh): bool {
             if (! in_array($fresh->get_status(), self::HOLDING, true) || self::active($fresh)) {
                 return true;
@@ -171,7 +181,22 @@ final class OrderStock
     {
         $order = wc_get_order((int) $orderId);
         if ($order instanceof \WC_Order) {
-            self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), self::UNPAID, true) || self::releaseLocked($fresh, StockGateway::make()));
+            self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), self::RELEASED_ON_REMOVAL, true) || self::releaseLocked($fresh, StockGateway::make()));
+        }
+    }
+
+    /**
+     * An order restored from the trash to a paid status holds a reservation again, or is marked for staff. With the
+     * order tables WooCommerce's restore is a status change, handled there; with posts storage it is not, so here.
+     *
+     * @param mixed $postId
+     */
+    public static function restored($postId): void
+    {
+        $order = wc_get_order((int) $postId);
+        // The status is read again inside the lock, from storage.
+        if ($order instanceof \WC_Order) {
+            self::hold($order);
         }
     }
 
