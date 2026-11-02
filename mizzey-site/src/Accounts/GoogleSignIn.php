@@ -28,7 +28,9 @@ defined('ABSPATH') || exit;
  *   customer account, its email verified, with marketing consent left unset (AUTH-09). A new account is let through
  *   the sign-up check (AUTH-15, specs/009) by a permit for its email in the callback's own request.
  * - One account per email: the account is found or made under a lock per email, which WooCommerce's own registration
- *   takes too (`woocommerce_registration_errors`), so the two cannot both create one at once.
+ *   takes too (`woocommerce_registration_errors`), so the two cannot both create one at once. For a Gmail address with
+ *   no account under its exact spelling, an account under another spelling of the same mailbox (dots, a `+tag`,
+ *   googlemail.com) is the one, with the same protection for an unverified account; several such accounts are refused.
  * - Staff accounts (any role beyond a customer) cannot sign in this way: they sign in with their password and two
  *   factors (specs/008).
  * - Off until the client ID and secret are set: the secret from `MIZZEY_GOOGLE_CLIENT_SECRET` in the configuration, or
@@ -87,7 +89,8 @@ final class GoogleSignIn
     private static function lockEmail(string $email): bool
     {
         global $wpdb;
-        $name = substr('mz_' . $wpdb->prefix . 'email_' . hash('sha256', strtolower(trim($email))), 0, 64);
+        // Every spelling of one mailbox takes the one lock.
+        $name = substr('mz_' . $wpdb->prefix . 'email_' . hash('sha256', CustomerKey::email($email)), 0, 64);
         if (self::$emailLock === $name) {
             return true;
         }
@@ -131,7 +134,7 @@ final class GoogleSignIn
         if (! self::enabled()) {
             return self::back(self::accountUrl(), 'unavailable');
         }
-        $to       = $request instanceof \WP_REST_Request ? (string) $request->get_param('redirect_to') : '';
+        $to       = self::param($request, 'redirect_to');
         $state    = self::token();
         $verifier = self::token();
         $nonce    = self::token();
@@ -155,9 +158,9 @@ final class GoogleSignIn
     /** @param mixed $request */
     public static function callback($request): \WP_REST_Response
     {
-        $state  = $request instanceof \WP_REST_Request ? (string) $request->get_param('state') : '';
-        $code   = $request instanceof \WP_REST_Request ? (string) $request->get_param('code') : '';
-        $cookie = isset($_COOKIE[self::COOKIE]) ? sanitize_text_field(wp_unslash($_COOKIE[self::COOKIE])) : '';
+        $state  = self::param($request, 'state');
+        $code   = self::param($request, 'code');
+        $cookie = isset($_COOKIE[self::COOKIE]) && is_string($_COOKIE[self::COOKIE]) ? sanitize_text_field(wp_unslash($_COOKIE[self::COOKIE])) : '';
         $bound  = $state !== '' && $cookie !== '' && hash_equals($state, $cookie);
         $saved  = $state !== '' ? get_transient(self::key($state)) : false;
         // Spent by any request that presents it; claimed once: only the request whose delete removes it goes on.
@@ -182,6 +185,18 @@ final class GoogleSignIn
         do_action('wp_login', $user->user_login, $user);
 
         return self::redirect((string) $saved['to']);
+    }
+
+    /**
+     * A query value, or an empty string when it is missing or not a string (`state[]=1`).
+     *
+     * @param mixed $request
+     */
+    private static function param($request, string $name): string
+    {
+        $value = $request instanceof \WP_REST_Request ? $request->get_param($name) : null;
+
+        return is_string($value) ? $value : '';
     }
 
     /**
@@ -254,7 +269,12 @@ final class GoogleSignIn
             if (! self::lockEmail($email)) {
                 return new \WP_Error('mizzey_google_busy', 'busy');
             }
-            $user = get_user_by('email', $email) ?: null;
+            $user = get_user_by('email', $email) ?: self::sameMailbox($email);
+            if ($user instanceof \WP_Error) {
+                self::unlockEmail();
+
+                return $user;
+            }
             if ($user instanceof \WP_User && ! self::customer($user)) {
                 self::unlockEmail();
 
@@ -296,6 +316,35 @@ final class GoogleSignIn
         }
 
         return $user;
+    }
+
+    /**
+     * For a Gmail address with no account under its exact spelling: the one account registered under another spelling
+     * of the same mailbox (dots, a `+tag`, googlemail.com), so one mailbox never gets a second account (AUTH-13). Null
+     * when there is none; a refusal when several accounts share the mailbox, as which one is meant cannot be told.
+     */
+    private static function sameMailbox(string $email): \WP_User|\WP_Error|null
+    {
+        if (! CustomerKey::isGmail($email)) {
+            return null;
+        }
+        global $wpdb;
+        $key   = CustomerKey::email($email);
+        $local = substr($key, 0, (int) strrpos($key, '@'));
+        // Read only on a first Google sign-in with no exact match: the Gmail accounts whose folded local part matches.
+        $ids   = $wpdb->get_col($wpdb->prepare("SELECT ID FROM {$wpdb->users} WHERE (user_email LIKE %s OR user_email LIKE %s) AND REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(LOWER(user_email), '@', 1), '+', 1), '.', '') = %s ORDER BY ID LIMIT 5", '%@gmail.com', '%@googlemail.com', $local)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $found = [];
+        foreach ((array) $ids as $id) {
+            $user = get_userdata((int) $id);
+            if ($user instanceof \WP_User && CustomerKey::email($user->user_email) === $key) {
+                $found[] = $user;
+            }
+        }
+        if (count($found) > 1) {
+            return new \WP_Error('mizzey_google_link', 'several_accounts');
+        }
+
+        return $found[0] ?? null;
     }
 
     /**

@@ -26,7 +26,7 @@ require_once __DIR__ . '/_two_factor.php';
 
 /** Create a customer the way the account page's registration does, with the posted extras. */
 function t58_register( Scenario $s, string $email, string $password, array $post = array() ): int {
-	$_POST = $post;
+	$_POST = $post + array( 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ) );
 	$id    = wc_create_new_customer( $email, '', $password );
 	$_POST = array();
 	if ( is_wp_error( $id ) ) {
@@ -114,6 +114,16 @@ run(
 		$q_meta = get_user_meta( $quiet, MarketingConsent::META, true );
 		$k_meta = get_user_meta( $keen, MarketingConsent::META, true );
 		$check( $quiet && $keen && ! MarketingConsent::given( $quiet ) && is_array( $q_meta ) && MarketingConsent::given( $keen ) && 'registration' === ( $k_meta['source'] ?? '' ) && abs( (int) ( $k_meta['at'] ?? 0 ) - time() ) < 60, 'AUTH-09 registering records no consent unless the box is ticked; ticked, the consent is kept with when and where it was given' );
+		$_POST    = array();
+		$unasked  = wc_create_new_customer( "{$tag}-unasked@example.invalid", '', 'Pw-' . wp_generate_password( 18, false ) );
+		if ( ! is_wp_error( $unasked ) ) {
+			$s->track_user( (int) $unasked );
+			$own_welcome = (int) get_user_meta( (int) $unasked, WelcomeDiscount::USER_META, true );
+			if ( $own_welcome > 0 ) {
+				$s->on_finish( static function () use ( $own_welcome ) { wp_delete_post( $own_welcome, true ); } );
+			}
+		}
+		$check( ! is_wp_error( $unasked ) && '' === get_user_meta( (int) $unasked, MarketingConsent::META, true ), 'AUTH-09 an account made where the box was not offered (Google, the checkout, the order confirmation) records no consent decision' );
 		$check( isset( $sent[ $quiet ] ) && false !== strpos( $sent[ $quiet ], 'wc_verify_email_key' ) && ! VerificationOnRegistration::verified( $quiet ), 'AUTH-05 the verification email is sent when the account is created, and the account is not verified yet' );
 
 		// AUTH-08, B14: a guest's order is linked only once the email is verified.

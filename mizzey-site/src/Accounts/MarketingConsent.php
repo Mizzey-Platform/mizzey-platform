@@ -14,7 +14,8 @@ defined('ABSPATH') || exit;
  * Marketing consent is captured separately from account creation and is not implied by registering (AUTH-09).
  *
  * The registration form carries one unticked box. Ticking it records the consent on the account with when it was given
- * and where (`_mizzey_marketing_consent`); not ticking it records that consent was not given. Registering never needs
+ * and where (`_mizzey_marketing_consent`); not ticking it records that consent was not given. An account made anywhere
+ * the box was not offered (Google, the checkout, the order confirmation) records nothing. Registering never needs
  * it (AUTH-14). Withdrawing and the consent screens are the account pages' (#308) and the presentation layer's.
  *
  * Register ids: AUTH-09, AUTH-14. See specs/017-accounts.
@@ -43,11 +44,14 @@ final class MarketingConsent
     public static function save($customerId): void
     {
         $id = (int) $customerId;
-        if ($id <= 0 || get_user_meta($id, self::META, true) !== '') {
+        // Only an account made from the registration form, where the box was offered: an account made by Google, the
+        // checkout or the order confirmation was never asked, so nothing is recorded for it.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verified the registration form's nonce.
+        if ($id <= 0 || ! isset($_POST['woocommerce-register-nonce']) || get_user_meta($id, self::META, true) !== '') {
             return;
         }
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verified the registration form's nonce.
-        $given = isset($_POST[self::FIELD]) && 'yes' === sanitize_text_field(wp_unslash((string) $_POST[self::FIELD]));
+        $given = isset($_POST[self::FIELD]) && is_string($_POST[self::FIELD]) && 'yes' === sanitize_text_field(wp_unslash($_POST[self::FIELD]));
         self::record($id, $given, 'registration');
     }
 
