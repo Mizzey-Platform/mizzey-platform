@@ -79,6 +79,7 @@ require_once __DIR__ . '/src/Catalogue/Import/ValidationPass.php';
 require_once __DIR__ . '/src/Catalogue/Import/ReportWriter.php';
 require_once __DIR__ . '/src/Catalogue/Import/ImportRunRecorder.php';
 require_once __DIR__ . '/src/Catalogue/Import/FileImportRunRecorder.php';
+require_once __DIR__ . '/src/Catalogue/Import/ImportRunLog.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueLoad.php';
 require_once __DIR__ . '/src/Catalogue/Import/Cli/CatalogueCommand.php';
 require_once __DIR__ . '/src/Orders/StatusModel.php';

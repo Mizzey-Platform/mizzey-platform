@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace MizzeySite\Catalogue\Import;
 
 use MizzeySite\Catalogue\ProductFields;
+use MizzeySite\Catalogue\TranslationSync;
 
 defined('ABSPATH') || exit;
 
@@ -23,6 +24,11 @@ defined('ABSPATH') || exit;
  *   product in a process that has already written such a translation corrupts the Arabic variations, so phase two
  *   starts only when every source batch is done, and a source batch that finds itself in such a process puts itself
  *   back in the queue instead of running. Phase three, the images, saves no product: it writes the image fields.
+ * - **The Arabic record follows the English one.** A CRUD save does not run WPML's copy, so the price of an update run
+ *   would stay old in Arabic. TranslationSync copies the copied fields after every save of an English record, and
+ *   phase two runs WooCommerce Multilingual's whole synchronisation for every product the run touched, the parent of
+ *   a new variation included: the Arabic variation is created and its value added to the Arabic attribute list.
+ *   A category or brand with no Arabic name is reported as a warning: the Arabic record shows it only once translated.
  * - **Blank means no change**, as the load rules say: on an update a blank cell leaves the field, an attribute or an
  *   Arabic text as it was. A value that is present but not usable (a sale price `199,00`) is reported, not guessed.
  * - **Arabic integrity (MIG-02, SSC-21).** Text must be valid UTF-8; a byte order mark is dropped and the text is
@@ -36,6 +42,9 @@ defined('ABSPATH') || exit;
  * - **In the background (MIG-20):** batches of 20 through Action Scheduler. One run at a time, under a lock; every
  *   action carries its run's id. Progress is saved after each product, and a product already written under its SKU is
  *   updated, never created twice, so a batch can be run again after a crash. `wp mizzey catalogue status` shows it.
+ * - **The run is recorded (ENT-19, CX-04).** The validation report and the client issue list are written into the run
+ *   directory before anything is written to the store, and each run is kept as an Import Run record (ImportRunLog):
+ *   file and its hash, mapping and rules version, actor, times, counts, outcome, problems and warnings.
  *
  * Register ids: MIG-02, MIG-09, MIG-10, MIG-11, MIG-12, MIG-13, MIG-15, MIG-16, MIG-17, MIG-20, SSC-21.
  * See specs/046-catalogue-load.
@@ -48,6 +57,8 @@ final class CatalogueLoad
     public const IMAGES       = 'mizzey_catalogue_images';
     public const RUN          = 'mizzey_catalogue_run';
     public const BATCH        = 20;
+    public const IMAGE_BATCH  = 5;
+    public const IMAGES_MAX   = 10;
     public const STALE        = 1800;
     public const IMAGE_BYTES  = 20971520;
     public const SOURCE_META  = '_mizzey_source_image';
@@ -82,6 +93,12 @@ final class CatalogueLoad
                 throw new \RuntimeException(__('Another catalogue load is still running.', 'mizzey-site'));
             }
             $directory = self::directory($directory);
+            if (file_exists($directory . '/plan.json')) {
+                throw new \RuntimeException(__('Use a run directory with no earlier plan in it: each run keeps its own.', 'mizzey-site'));
+            }
+            if ($mapping->columnFor('cost') !== null && ! self::costsOn()) {
+                throw new \RuntimeException(__('Cost of goods is switched off in WooCommerce and the mapping fills the cost: switch it on before the load, or no cost is written.', 'mizzey-site'));
+            }
             $read      = ExportReader::read($file, $mapping->source());
             $header    = HeaderCheck::check($read['header'], $mapping);
             if ($header['failures'] !== []) {
@@ -108,12 +125,29 @@ final class CatalogueLoad
                 ];
             }
             usort($plan, static fn (array $a, array $b): int => [(int) ($a['type'] === 'variation'), $a['row']] <=> [(int) ($b['type'] === 'variation'), $b['row']]);
+            $reports  = ReportWriter::write($directory, $result['lines'], $result['client_issues']);
             $planFile = $directory . '/plan.json';
             if (file_put_contents($planFile, (string) wp_json_encode($plan, JSON_UNESCAPED_UNICODE)) === false) {
                 throw new \RuntimeException(__('The plan cannot be written.', 'mizzey-site'));
             }
+            $runId = wp_generate_uuid4();
+            (new ImportRunLog())->record([
+                'id'              => $runId,
+                'kind'            => 'load',
+                'file'            => ['name' => basename($file), 'reference' => (string) realpath($file), 'sha256' => (string) hash_file('sha256', $file)],
+                'mapping_used'    => wp_normalize_path((string) realpath($mapping->path)),
+                'mapping_version' => $mapping->version(),
+                'rules_version'   => $mapping->rulesVersion(),
+                'actor'           => self::actor(),
+                'images'          => $images,
+                'started_at'      => gmdate('c'),
+                'finished_at'     => null,
+                'counts'          => $result['counts'],
+                'reports'         => $reports,
+                'outcome'         => 'running',
+            ]);
             $state = [
-                'id'       => wp_generate_uuid4(),
+                'id'       => $runId,
                 'plan'     => $planFile,
                 'total'    => count($plan),
                 'counts'   => $result['counts'],
@@ -122,6 +156,7 @@ final class CatalogueLoad
                 'ids'      => [],
                 'done'     => ['sources' => 0, 'translations' => 0, 'images' => 0],
                 'problems' => [],
+                'warnings' => [],
                 'started'  => gmdate('c'),
                 'updated'  => time(),
             ];
@@ -149,10 +184,12 @@ final class CatalogueLoad
         $real = wp_normalize_path((string) realpath($directory));
         // Every folder the web server can serve: WordPress's own and the uploads folder, which a server may keep
         // elsewhere (staging links it in from outside the release), each by its real path.
-        $served = array_filter([
-            wp_normalize_path((string) realpath(ABSPATH)),
-            wp_normalize_path((string) realpath((string) (wp_upload_dir(null, false)['basedir'] ?? ''))),
-        ]);
+        // The server's document root too, when it sits above WordPress (a subdirectory install, a local web server).
+        $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? sanitize_text_field(wp_unslash((string) $_SERVER['DOCUMENT_ROOT'])) : '';
+        $served       = array_filter(array_map(
+            static fn (string $path): string => $path === '' ? '' : wp_normalize_path((string) realpath($path)),
+            [ABSPATH, (string) (wp_upload_dir(null, false)['basedir'] ?? ''), $documentRoot],
+        ));
         foreach ($served as $root) {
             if ($real === '' || str_starts_with($real . '/', rtrim($root, '/') . '/')) {
                 throw new \RuntimeException(__('Keep the run directory outside the website folder: the plan holds costs.', 'mizzey-site'));
@@ -199,9 +236,35 @@ final class CatalogueLoad
     /** A plan that cannot be read stops the run, said, never a quiet empty success. */
     private static function failed(array $state): void
     {
-        $state['status']     = 'failed';
         $state['problems'][] = ['row' => 0, 'sku' => '', 'problem' => __('The plan file cannot be read.', 'mizzey-site')];
+        self::finish($state, 'failed');
+    }
+
+    /** The run ends: its state, and its Import Run record with what was written and what was not. */
+    private static function finish(array $state, string $status): void
+    {
+        $state['status'] = $status;
         self::save($state);
+        ImportRunLog::update((string) $state['id'], [
+            'finished_at' => gmdate('c'),
+            'outcome'     => $status === 'done' ? 'completed' : 'failed',
+            'written'     => $state['done'],
+            'problems'    => $state['problems'],
+            'warnings'    => array_values((array) ($state['warnings'] ?? [])),
+        ]);
+    }
+
+    private static function actor(): string
+    {
+        $user = wp_get_current_user();
+
+        return $user->exists() ? $user->user_login : (defined('WP_CLI') && WP_CLI ? 'wp-cli' : 'system');
+    }
+
+    /** @param array<string,mixed> $state @param array<string,mixed> $entry */
+    private static function warning(array &$state, string $key, array $entry, string $why): void
+    {
+        $state['warnings'][$key] = ['row' => $entry['row'], 'sku' => $entry['sku'], 'warning' => $why];
     }
 
     private static function problem(array &$state, array $entry, string $why): void
@@ -344,7 +407,7 @@ final class CatalogueLoad
     }
 
     /** WooCommerce's cost of goods (MIG-13 writes the cost there) must be switched on to hold a cost. */
-    private static function costsOn(): bool
+    public static function costsOn(): bool
     {
         return wc_get_container()->get(\Automattic\WooCommerce\Internal\Features\FeaturesController::class)->feature_is_enabled('cost_of_goods_sold');
     }
@@ -454,15 +517,22 @@ final class CatalogueLoad
             self::failed($state);
             return;
         }
-        $plan   = array_values(array_filter($all, static fn (array $e): bool => $e['type'] !== 'variation'));
+        $plan   = self::translationEntries($all);
         $offset = max(0, (int) $offset);
+        do_action('wpml_switch_language', self::sourceLanguage());
         foreach (array_slice($plan, $offset, self::BATCH) as $entry) {
             $id = (int) ($state['ids'][$entry['sku']] ?? 0);
-            $f  = $entry['fields'];
-            if ($id > 0 && (trim((string) ($f['name_ar'] ?? '')) !== '' || trim((string) ($f['description_ar'] ?? '')) !== '')) {
+            if ($id <= 0 && ! empty($entry['parent_only'])) {
+                $id = self::source((int) wc_get_product_id_by_sku($entry['sku']), 'product');
+            }
+            $f = $entry['fields'];
+            if ($id > 0) {
                 try {
                     self::$translated = true;
-                    self::writeTranslation($id, $f);
+                    if (trim((string) ($f['name_ar'] ?? '')) !== '' || trim((string) ($f['description_ar'] ?? '')) !== '') {
+                        self::writeTranslation($id, $f);
+                    }
+                    self::follow($id, ! empty($entry['has_variations']), $state, $entry);
                 } catch (\Throwable $e) {
                     self::problem($state, $entry, $e->getMessage());
                 }
@@ -475,10 +545,121 @@ final class CatalogueLoad
             as_enqueue_async_action(self::TRANSLATIONS, [$state['id'], $next], self::GROUP);
             return;
         }
-        $state['status'] = $state['images'] ? 'images' : 'done';
+        if (! $state['images']) {
+            self::finish($state, 'done');
+            return;
+        }
+        $state['status'] = 'images';
         self::save($state);
-        if ($state['images']) {
-            as_enqueue_async_action(self::IMAGES, [$state['id'], 0], self::GROUP);
+        as_enqueue_async_action(self::IMAGES, [$state['id'], 0], self::GROUP);
+    }
+
+    /**
+     * Phase two's list: every product row, then the parent of each variation row whose parent has no row of its own
+     * (a size added to an existing product), each parent once, marked when variations of it were written.
+     *
+     * @param list<array<string,mixed>> $all
+     * @return list<array<string,mixed>>
+     */
+    private static function translationEntries(array $all): array
+    {
+        $parents = [];
+        foreach ($all as $e) {
+            if ($e['type'] === 'variation' && (string) $e['parent_sku'] !== '') {
+                $parents[(string) $e['parent_sku']] ??= $e['row'];
+            }
+        }
+        $entries = [];
+        foreach ($all as $e) {
+            if ($e['type'] !== 'variation') {
+                $entries[] = $e + ['has_variations' => isset($parents[(string) $e['sku']])];
+                unset($parents[(string) $e['sku']]);
+            }
+        }
+        foreach ($parents as $sku => $row) {
+            $entries[] = ['row' => $row, 'sku' => (string) $sku, 'type' => 'variable', 'fields' => [], 'parent_only' => true, 'has_variations' => true];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * The Arabic record follows the English one: WooCommerce Multilingual's whole synchronisation (price, attributes,
+     * terms, a new variation's Arabic variation), the new values of a variable product added to its Arabic attribute
+     * list, and a warning for each category or brand that has no Arabic name.
+     *
+     * @param array<string,mixed> $state @param array<string,mixed> $entry
+     */
+    private static function follow(int $id, bool $variations, array &$state, array $entry): void
+    {
+        if (TranslationSync::product($id) === []) {
+            return; // No Arabic record: nothing follows.
+        }
+        if ($variations) {
+            self::extendTranslatedOptions($id);
+            TranslationSync::product($id); // Each new Arabic variation's value read against the extended list.
+        }
+        foreach (TranslationSync::translationsOf($id) as $language) {
+            foreach (['product_cat', 'product_brand'] as $taxonomy) {
+                if ($language === '' || ! taxonomy_exists($taxonomy) || ! apply_filters('wpml_is_translated_taxonomy', false, $taxonomy)) {
+                    continue;
+                }
+                $terms = wp_get_object_terms($id, $taxonomy);
+                foreach (is_array($terms) ? $terms : [] as $term) {
+                    $translated = (int) apply_filters('wpml_object_id', $term->term_id, $taxonomy, false, $language);
+                    if ($translated <= 0 || $translated === (int) $term->term_id) {
+                        self::warning($state, $taxonomy . ':' . $term->term_id . ':' . $language, $entry, sprintf(
+                            /* translators: 1: a category or brand name, 2: a language code. */
+                            __('"%1$s" has no %2$s name, so the %2$s record shows no such category or brand until it is translated.', 'mizzey-site'),
+                            $term->name,
+                            $language,
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * A value added to an English attribute (a new size) is added to each translation's own list, at the same position,
+     * in the English wording until it is translated: without it the Arabic product page cannot offer the new variation.
+     */
+    private static function extendTranslatedOptions(int $id): void
+    {
+        $source = wc_get_product($id);
+        if (! $source instanceof \WC_Product_Variable) {
+            return;
+        }
+        foreach (array_keys(TranslationSync::translationsOf($id)) as $translationId) {
+            $translation = wc_get_product($translationId);
+            if (! $translation instanceof \WC_Product_Variable) {
+                continue;
+            }
+            $theirs  = $translation->get_attributes();
+            $changed = false;
+            foreach ($source->get_attributes() as $key => $attribute) {
+                if (! $attribute instanceof \WC_Product_Attribute || $attribute->is_taxonomy()) {
+                    continue;
+                }
+                $ours = $attribute->get_options();
+                if (! isset($theirs[$key]) || ! $theirs[$key] instanceof \WC_Product_Attribute) {
+                    $theirs[$key] = clone $attribute;
+                    $changed      = true;
+                    continue;
+                }
+                $have = $theirs[$key]->get_options();
+                if (count($have) < count($ours)) {
+                    $copy = clone $theirs[$key];
+                    $copy->set_options(array_merge($have, array_slice($ours, count($have))));
+                    $copy->set_variation(true);
+                    $theirs[$key] = $copy;
+                    $changed      = true;
+                }
+            }
+            if ($changed) {
+                $translation->set_attributes($theirs);
+                $translation->save();
+            }
         }
     }
 
@@ -503,7 +684,8 @@ final class CatalogueLoad
             throw new \RuntimeException(__('The Arabic record was not created.', 'mizzey-site'));
         }
         wp_cache_delete($ar, 'posts');
-        if (get_post_field('post_title', $ar) !== $title) {
+        // Compared as text: a run with no user stores "&" as "&amp;" (core's title filter), which is the same title.
+        if (html_entity_decode((string) get_post_field('post_title', $ar), ENT_QUOTES | ENT_HTML5, 'UTF-8') !== html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8')) {
             throw new \RuntimeException(__('The Arabic title did not read back as written.', 'mizzey-site'));
         }
     }
@@ -533,11 +715,11 @@ final class CatalogueLoad
         $limit  = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
         add_filter('http_request_args', $limit, 99);
         try {
-            foreach (array_slice($plan, $offset, self::BATCH) as $entry) {
+            foreach (array_slice($plan, $offset, self::IMAGE_BATCH) as $entry) {
                 $id = (int) ($state['ids'][$entry['sku']] ?? 0);
                 try {
                     if ($id > 0) {
-                        self::attach($id, $entry['fields']);
+                        self::attach($id, $entry, $state);
                     }
                 } catch (\Throwable $e) {
                     self::problem($state, $entry, $e->getMessage());
@@ -548,24 +730,42 @@ final class CatalogueLoad
         } finally {
             remove_filter('http_request_args', $limit, 99);
         }
-        $next = $offset + self::BATCH;
+        // Five products an action: up to ten downloads each must finish inside a web runner's time limit too.
+        $next = $offset + self::IMAGE_BATCH;
         if ($next < count($plan)) {
             as_enqueue_async_action(self::IMAGES, [$state['id'], $next], self::GROUP);
             return;
         }
-        $state['status'] = 'done';
-        self::save($state);
+        self::finish($state, 'done');
     }
 
-    /** The image fields are written directly: no product is saved in this phase. @param array<string,string> $f */
-    private static function attach(int $id, array $f): void
+    /**
+     * The image fields are written directly: no product is saved in this phase. An address that is refused, and every
+     * address after the tenth, is reported, never dropped quietly.
+     *
+     * @param array<string,mixed> $entry @param array<string,mixed> $state
+     */
+    private static function attach(int $id, array $entry, array &$state): void
     {
+        $f     = $entry['fields'];
         $title = wp_strip_all_tags((string) get_the_title($id));
-        $urls  = array_values(array_unique(array_filter(array_map('trim', explode('|', (string) $f['images'])), static fn (string $u): bool => wp_http_validate_url($u) !== false)));
+        $urls  = [];
+        foreach (array_unique(array_filter(array_map('trim', explode('|', (string) $f['images'])), 'strlen')) as $url) {
+            if (wp_http_validate_url($url) === false) {
+                /* translators: %s: an image address from the file. */
+                self::problem($state, $entry, sprintf(__('The image address "%s" is not a public web address; it was not downloaded.', 'mizzey-site'), $url));
+                continue;
+            }
+            $urls[] = $url;
+        }
+        foreach (array_slice($urls, self::IMAGES_MAX) as $url) {
+            /* translators: %s: an image address from the file. */
+            self::problem($state, $entry, sprintf(__('Only ten images are kept per product; "%s" was not downloaded.', 'mizzey-site'), $url));
+        }
         $alt   = trim((string) ($f['image_alt'] ?? '')) !== '' ? sanitize_text_field((string) $f['image_alt']) : $title;
         $ids   = [];
-        foreach (array_slice($urls, 0, 10) as $url) {
-            $known = get_posts(['post_type' => 'attachment', 'post_status' => 'inherit', 'fields' => 'ids', 'numberposts' => 1, 'meta_key' => self::SOURCE_META, 'meta_value' => $url]); // phpcs:ignore WordPress.DB.SlowDBQuery
+        foreach (array_slice($urls, 0, self::IMAGES_MAX) as $url) {
+            $known = get_posts(['post_type' => 'attachment', 'post_status' => 'inherit', 'fields' => 'ids', 'numberposts' => 1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => self::SOURCE_META, 'meta_value' => $url]); // phpcs:ignore WordPress.DB.SlowDBQuery
             $media = $known !== [] ? (int) $known[0] : media_sideload_image($url, $id, $alt, 'id');
             if (is_wp_error($media)) {
                 throw new \RuntimeException($media->get_error_message());
@@ -579,8 +779,11 @@ final class CatalogueLoad
         if ($ids === []) {
             return;
         }
-        update_post_meta($id, '_thumbnail_id', $ids[0]);
-        update_post_meta($id, '_product_image_gallery', implode(',', array_slice($ids, 1)));
-        wc_delete_product_transients($id);
+        // The same images on each language record: one shared attachment, as WooCommerce Multilingual shows them.
+        foreach (array_merge([$id], array_keys(TranslationSync::translationsOf($id))) as $record) {
+            update_post_meta($record, '_thumbnail_id', $ids[0]);
+            update_post_meta($record, '_product_image_gallery', implode(',', array_slice($ids, 1)));
+            wc_delete_product_transients($record);
+        }
     }
 }
