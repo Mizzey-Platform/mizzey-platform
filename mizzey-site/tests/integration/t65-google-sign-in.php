@@ -129,11 +129,11 @@ run(
 		// AUTH-13: a Gmail mailbox registered here under another spelling (dots, a plus tag, googlemail.com) is that account.
 		$mailbox_id = t65_user( $s, "{$tag}jdoe+shop@googlemail.com", 'customer', $password );
 		wc_get_container()->get( $class )->mark_verified( $mailbox_id );
-		$mailbox    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-8", 'email' => "{$tag}j.doe@gmail.com", 'hd' => '' ) + $good );
+		$mailbox    = GoogleSignIn::account( array( 'sub' => "{$tag}-sub-mailbox", 'email' => "{$tag}j.doe@gmail.com", 'hd' => '' ) + $good );
 		if ( $mailbox instanceof \WP_User && $mailbox->ID !== $mailbox_id ) {
 			$s->track_user( $mailbox->ID );
 		}
-		$check( $mailbox_id > 0 && $mailbox instanceof \WP_User && $mailbox->ID === $mailbox_id && "{$tag}-sub-8" === get_user_meta( $mailbox_id, GoogleSignIn::SUBJECT, true ) && false === get_user_by( 'email', "{$tag}j.doe@gmail.com" ), 'AUTH-13 a Google sign-in as j.doe@gmail.com reaches the account registered as jdoe+shop@googlemail.com, the same mailbox, and makes no second account' );
+		$check( $mailbox_id > 0 && $mailbox instanceof \WP_User && $mailbox->ID === $mailbox_id && "{$tag}-sub-mailbox" === get_user_meta( $mailbox_id, GoogleSignIn::SUBJECT, true ) && false === get_user_by( 'email', "{$tag}j.doe@gmail.com" ), 'AUTH-13 a Google sign-in as j.doe@gmail.com reaches the account registered as jdoe+shop@googlemail.com, the same mailbox, and makes no second account' );
 
 		// An address Google is not the authority for: never linked to an existing account, and a new account from it is
 		// not taken as verified.
