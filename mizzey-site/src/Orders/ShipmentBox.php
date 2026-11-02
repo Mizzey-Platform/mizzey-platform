@@ -121,9 +121,11 @@ final class ShipmentBox
     /** Only an http or https address is kept. */
     private static function url(string $url): string
     {
-        $url = esc_url_raw(trim($url), ['http', 'https']);
+        $url  = trim($url);
+        $host = (string) wp_parse_url($url, PHP_URL_HOST);
+        $ok   = filter_var($url, FILTER_VALIDATE_URL) !== false && in_array(strtolower((string) wp_parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true) && $host !== '' && str_contains($host, '.');
 
-        return mb_strlen($url) <= 500 ? $url : '';
+        return $ok && mb_strlen($url) <= 500 ? esc_url_raw($url, ['http', 'https']) : '';
     }
 
     /**

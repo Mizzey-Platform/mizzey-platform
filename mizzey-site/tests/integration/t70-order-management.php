@@ -99,6 +99,9 @@ run(
 		$check( $same( $list( array( 'mizzey_payment' => 'cod', 'mizzey_carrier' => "{$tag}Bosta" ) ), $ids( $a ) ), 'AC-1 filters combine: payment and carrier' );
 		$check( $same( $list( array( 'mizzey_payment' => 'cod', 'mizzey_from' => '2026-10-21' ), array( 'status' => array( 'wc-pending' ) ) ), $ids( $c, $d ) ), 'AC-1 filters combine with WooCommerce\'s status filter and an open-ended date' );
 		$check( $same( $list( array( 'mizzey_from' => '2026-13-40', 'mizzey_payment' => '<script>' ) ), $ids( $a, $b, $c, $d ) ), 'AC-1 an invalid date or method is ignored, not applied' );
+		$check( $same( $list( array( 'mizzey_payment' => 'does-not-exist' ) ), $ids( $a, $b, $c, $d ) ), 'AC-1 a payment method the store does not have is ignored' );
+		$check( $same( $list( array( 'mizzey_to' => '2026-10-20' ) ), $ids( $a, $b ) ), 'AC-1 an end date alone finds everything up to that day' );
+		$check( $same( $list( array( 'mizzey_from' => '2026-10-21', 'mizzey_to' => '2026-11-30' ), array( 'date_created' => '2026-10-01...2026-10-31' ) ), $ids( $c ) ), 'AC-1 a date range combines with the month filter WooCommerce offers: both apply' );
 		$search = static fn ( string $term ): array => array_values( array_intersect( array_map( 'intval', wc_get_orders( array( 'type' => 'shop_order', 'limit' => -1, 'return' => 'ids', 's' => $term, 'search_filter' => 'all' ) ) ), $mine ) );
 		$check( $same( $search( '01001110003' ), $ids( $c ) ), 'AC-1 WooCommerce\'s search finds an order by the customer\'s phone' );
 		$check( $same( $search( "{$tag}-01001110002@example.invalid" ), $ids( $b ) ), 'AC-1 by email' );
@@ -119,7 +122,7 @@ run(
 
 		// ---- AC-3: shipment attached, corrected, noted, shown --------------------------------------------------
 		$_POST = array( ShipmentBox::NONCE . '_nonce' => wp_create_nonce( ShipmentBox::NONCE ), 'mizzey_shipment' => array( 'carrier' => 'Bosta', 'tracking' => "{$tag}TRK1", 'url' => 'https://bosta.co/tracking-shipment/?track_num=' . $tag ) );
-		ShipmentBox::save( $d->get_id(), $fresh( $d->get_id() ) );
+		do_action( 'woocommerce_process_shop_order_meta', $d->get_id(), $fresh( $d->get_id() ) );
 		$_POST = array();
 		$sd    = Shipped::shipment( $fresh( $d->get_id() ) );
 		$notes = implode( ' | ', array_map( static fn ( $n ) => $n->content, wc_get_order_notes( array( 'order_id' => $d->get_id() ) ) ) );
@@ -129,6 +132,14 @@ run(
 		$_POST = array();
 		$sd    = Shipped::shipment( $fresh( $d->get_id() ) );
 		$notes = implode( ' | ', array_map( static fn ( $n ) => $n->content, wc_get_order_notes( array( 'order_id' => $d->get_id() ) ) ) );
+		$bad_urls = array();
+		foreach ( array( '/tracking', '#tracking', 'not a web address', 'https://' ) as $n => $bad ) {
+			$_POST = array( ShipmentBox::NONCE . '_nonce' => wp_create_nonce( ShipmentBox::NONCE ), 'mizzey_shipment' => array( 'carrier' => 'Bosta', 'tracking' => "{$tag}TRK2", 'url' => $bad ) );
+			do_action( 'woocommerce_process_shop_order_meta', $d->get_id(), $fresh( $d->get_id() ) );
+			$bad_urls[] = Shipped::shipment( $fresh( $d->get_id() ) )['url'];
+		}
+		$_POST = array();
+		$check( array( '', '', '', '' ) === $bad_urls, 'AC-3 a tracking address that is not a full web address is not kept (' . implode( ',', $bad_urls ) . ')' );
 		$check( "{$tag}TRK2" === $sd['tracking'] && '' === $sd['url'] && str_contains( $notes, "tracking number {$tag}TRK1 to {$tag}TRK2" ), 'AC-3 a wrong code is corrected and the correction noted; a non-web address is not kept' );
 		$_POST = array( ShipmentBox::NONCE . '_nonce' => 'bad', 'mizzey_shipment' => array( 'carrier' => 'X', 'tracking' => 'FORGED', 'url' => '' ) );
 		ShipmentBox::save( $d->get_id(), $fresh( $d->get_id() ) );
@@ -173,7 +184,23 @@ run(
 		$check( 'cancelled' === $cancelled->get_status() && "{$tag} customer changed their mind" === (string) $cancelled->get_meta( StatusModel::REASON_META ) && 0 === count( $cancelled->get_refunds() ) && 0.0 === (float) $cancelled->get_total_refunded(), 'AC-4 a paid order cancelled from the order screen keeps its reason and has no refund made by the cancellation (' . $cancelled->get_status() . ')' );
 
 		// ---- AC-5: refunds subject to the permission ----------------------------------------------------------
-		$check( user_can( $admin, RefundCapability::CAP ) && 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ) && user_can( $customer, 'edit_shop_orders' ) === false, 'AC-5 refunds from the order screen pass the refund permission first (specs/013); their reference is specs/029' );
+		$editor = (int) wp_insert_user( array( 'user_login' => "{$tag}editor", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}editor@example.invalid", 'role' => 'shop_manager' ) );
+		$s->track_user( $editor );
+		( new \WP_User( $editor ) )->add_cap( RefundCapability::CAP, false );
+		$refund_order = $make( 'cod', '', '2026-11-02', '01001110006' );
+		$refund_order->payment_complete();
+		$rest = static function ( string $amount ) use ( $refund_order ): \WP_REST_Response {
+			$r = new \WP_REST_Request( 'POST', '/wc/v3/orders/' . $refund_order->get_id() . '/refunds' );
+			$r->set_param( 'amount', $amount );
+			$r->set_param( 'api_refund', false );
+			return rest_get_server()->dispatch( $r );
+		};
+		wp_set_current_user( $editor );
+		$refused = $rest( '10' );
+		wp_set_current_user( $admin );
+		$partial = $rest( '60' );
+		$full    = $rest( (string) ( (float) $fresh( $refund_order->get_id() )->get_total() - 60 ) );
+		$check( user_can( $editor, 'edit_shop_orders' ) && 403 === $refused->get_status() && 201 === $partial->get_status() && 201 === $full->get_status() && 'refunded' === $fresh( $refund_order->get_id() )->get_status(), 'AC-5 staff who edit orders without the refund permission are refused (' . $refused->get_status() . '); permitted staff refund in part and then in full (' . $partial->get_status() . ', ' . $full->get_status() . ')' );
 
 		// ---- AC-6: the packing slip ----------------------------------------------------------------------------
 		$a_fresh = $fresh( $a->get_id() );

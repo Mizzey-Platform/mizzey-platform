@@ -106,7 +106,7 @@ final class OrderFilters
             return $args;
         }
         $c = self::current();
-        if ($c['payment'] !== '') {
+        if ($c['payment'] !== '' && array_key_exists($c['payment'], WC()->payment_gateways()->payment_gateways())) {
             $args['payment_method'] = $c['payment'];
         }
         if ($c['carrier'] !== '') {
@@ -116,11 +116,48 @@ final class OrderFilters
         }
         if ($c['from'] !== '' || $c['to'] !== '') {
             $tz   = wp_timezone();
-            $from = $c['from'] !== '' ? (new \DateTimeImmutable($c['from'] . ' 00:00:00', $tz))->getTimestamp() : 0;
-            $to   = $c['to'] !== '' ? (new \DateTimeImmutable($c['to'] . ' 23:59:59', $tz))->getTimestamp() : time() + DAY_IN_SECONDS;
-            $args['date_created'] = $from . '...' . $to;
+            $from = $c['from'] !== '' ? (new \DateTimeImmutable($c['from'] . ' 00:00:00', $tz))->getTimestamp() : null;
+            $to   = $c['to'] !== '' ? (new \DateTimeImmutable($c['to'] . ' 23:59:59', $tz))->getTimestamp() : null;
+            // WooCommerce's month filter, when chosen too, narrows the same range: both apply.
+            [$monthFrom, $monthTo] = self::range($args['date_created'] ?? null, $tz);
+            $from = max(array_filter([$from, $monthFrom], 'is_int') ?: [null]);
+            $to   = min(array_filter([$to, $monthTo], 'is_int') ?: [PHP_INT_MAX]);
+            $to   = $to === PHP_INT_MAX ? null : $to;
+            if ($from !== null && $to !== null) {
+                $args['date_created'] = $from <= $to ? $from . '...' . $to : '1...1'; // Ranges that do not meet: nothing matches.
+            } elseif ($from !== null) {
+                $args['date_created'] = '>=' . $from;
+            } else {
+                $args['date_created'] = '<=' . $to;
+            }
         }
 
         return $args;
+    }
+
+    /**
+     * The first and last moments of a "start...end" range WooCommerce's month filter sets, as timestamps.
+     *
+     * @param mixed $range
+     * @return array{0:?int,1:?int}
+     */
+    private static function range($range, \DateTimeZone $tz): array
+    {
+        if (! is_string($range) || substr_count($range, '...') !== 1) {
+            return [null, null];
+        }
+        [$a, $b] = explode('...', $range);
+        $stamp   = static function (string $v, bool $end) use ($tz): ?int {
+            if (ctype_digit($v)) {
+                return (int) $v;
+            }
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) === 1) {
+                return (new \DateTimeImmutable($v . ($end ? ' 23:59:59' : ' 00:00:00'), $tz))->getTimestamp();
+            }
+
+            return null;
+        };
+
+        return [$stamp($a, false), $stamp($b, true)];
     }
 }
