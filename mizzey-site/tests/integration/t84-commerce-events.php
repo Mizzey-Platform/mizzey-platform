@@ -205,15 +205,15 @@ run(
 		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 an order on hold, awaiting payment, pushes no purchase' );
 		$order = wc_get_order( $order->get_id() );
 		$order->update_status( 'processing' );
-		$bought = $receipt( wc_get_order( $order->get_id() ) );
-		$data   = $bought['ecommerce'] ?? array();
-		$check( 'purchase' === ( $bought['event'] ?? '' ) && (string) $order->get_order_number() === ( $data['transaction_id'] ?? '' ) && abs( (float) $order->get_total() - (float) ( $data['value'] ?? 0 ) ) < 0.001 && 45.0 === (float) ( $data['shipping'] ?? 0 ) && 2 === (int) ( $data['items'][0]['quantity'] ?? 0 ), 'AC-3 EVT-14 a confirmed order pushes purchase with its number, total, shipping and items' );
-		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 reloading the confirmation page pushes no second purchase' );
 		$_GET['key'] = 'wrong';
 		$as_page( wc_get_page_id( 'checkout' ) );
 		set_query_var( 'order-received', $order->get_id() );
 		$check( null === Events::purchase(), 'AC-3 a confirmation page with the wrong order key pushes nothing' );
 		$_GET = array();
+		$bought = $receipt( wc_get_order( $order->get_id() ) );
+		$data   = $bought['ecommerce'] ?? array();
+		$check( 'purchase' === ( $bought['event'] ?? '' ) && (string) $order->get_order_number() === ( $data['transaction_id'] ?? '' ) && abs( (float) $order->get_total() - (float) ( $data['value'] ?? 0 ) ) < 0.001 && 45.0 === (float) ( $data['shipping'] ?? 0 ) && 2 === (int) ( $data['items'][0]['quantity'] ?? 0 ), 'AC-3 EVT-14 a confirmed order pushes purchase with its number, total, shipping and items' );
+		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 reloading the confirmation page pushes no second purchase' );
 		$flat = wp_json_encode( $bought );
 		$check( ! str_contains( (string) $flat, "{$tag}buyer@example.invalid" ) && ! str_contains( (string) $flat, '01000000000' ), 'AC-5 the purchase carries no email address or phone number' );
 

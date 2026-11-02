@@ -401,9 +401,7 @@ final class Events
         if ($code === '') {
             return;
         }
-        if (WC()->cart) {
-            WC()->cart->calculate_totals();
-        }
+        // Heard at priority 999, after WooCommerce has recalculated the cart for the new coupon.
         $discount = WC()->cart ? (float) WC()->cart->get_coupon_discount_amount($code, false) : 0.0;
         self::queue(['event' => 'apply_coupon', 'params' => ['coupon' => $code, 'discount' => round($discount, 2), 'currency' => get_woocommerce_currency()]]);
     }
