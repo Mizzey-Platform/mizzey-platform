@@ -1,0 +1,14 @@
+Mutation check for specs/031-staff-activity-log, t71-staff-activity-log, 2 November 2026 (local runtime: WordPress 7.1.4, CoreX v0.47.0).
+Each deliberate defect was applied alone, t71 run, the file restored. The first M4 (a return after the listener was
+already registered) changed nothing and was replaced by one that stops the listener being registered.
+
+CAUGHT    M1 a staff sign-in is not recorded  <- AC-2 a staff sign-in and sign-out are recorded against the account
+CAUGHT    M2 customers' sign-ins are recorded too  <- AC-2 a customer's sign-in is not recorded
+CAUGHT    M3 a wrong second factor is filed as a wrong password  <- AC-2 a wrong password and a wrong second factor for the account are recorded, told apart
+CAUGHT    M5 the log is kept for a month  <- AC-2 entries are kept for a year
+CAUGHT    M6 the account filter is ignored  <- AC-3 search by account (by its email) finds only that account's entries (9)
+CAUGHT    M7 a shop manager can open the log
+CAUGHT    M8 order notes are not searched  <- AC-3 order notes are searched by their words
+CAUGHT    M4 CoreX's lockout is not heard  <- AC-2 CoreX's lockout and a password reset requested and completed are recorded
+
+8 of 8 caught.
