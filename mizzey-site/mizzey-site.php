@@ -46,6 +46,8 @@ require_once __DIR__ . '/src/Security/SignupRoutes.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';
+require_once __DIR__ . '/src/Security/StaffActivityLog.php';
+require_once __DIR__ . '/src/Security/StaffActivityScreen.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
@@ -78,6 +80,7 @@ require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
 require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
+require_once __DIR__ . '/src/Catalogue/ImageHandling.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
 require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
@@ -110,6 +113,7 @@ require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
 require_once __DIR__ . '/src/Account/AddressBook.php';
 require_once __DIR__ . '/src/Account/AccountPages.php';
+require_once __DIR__ . '/src/Account/CustomerRecords.php';
 require_once __DIR__ . '/src/Invoices/InvoiceSettings.php';
 require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
 require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
@@ -160,6 +164,11 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+MizzeySite\Security\StaffActivityLog::register();
+MizzeySite\Security\StaffActivityScreen::register();
+
+// NFR-02: heavy uploads refused, every generated size written as WebP. See specs/032-image-handling.
+MizzeySite\Catalogue\ImageHandling::register();
 
 // The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
@@ -234,6 +243,7 @@ MizzeySite\Emails\Shipped::register();
 // The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
 MizzeySite\Account\AddressBook::register();
 MizzeySite\Account\AccountPages::register();
+MizzeySite\Account\CustomerRecords::register();
 // The invoice (ADM-92), downloaded by staff and from the account (ACCT-12). See specs/023-invoice.
 MizzeySite\Invoices\InvoiceSettings::register();
 MizzeySite\Invoices\InvoiceNumber::register();
