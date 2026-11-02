@@ -97,6 +97,8 @@ run(
 		};
 		$o1 = $order( $en, 7, 'en' );
 		$o2 = $order( $ar, 5, 'ar' );
+		// Back to the default language: the dashboard is an administration screen, which is always in English.
+		do_action( 'wpml_switch_language', null );
 
 		// ---- AC-1, AC-2 --------------------------------------------------------------------------------------
 		[ $after, $before ] = StoreDashboard::range( '7d' );

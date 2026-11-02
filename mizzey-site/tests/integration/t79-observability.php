@@ -108,10 +108,15 @@ run(
 		$check( $logged( "{$tag} call to undefined function" ) && ! $logged( $card ), 'AC-1 it is in the application log (source ' . Monitoring::SOURCE . ')' );
 		// A real fatal error in another process: WP-CLI loads the site and calls a function that does not exist.
 		$bin = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
-		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "{$tag}_no_such_function();" ) . ' 2>&1', $out, $code );
+		// The children's deliberate fatals belong in the application log under test, not in PHP's own error log, which
+		// must stay free of errors: each child sends PHP's copy to a throwaway file, removed when the scenario ends.
+		$sink  = wp_normalize_path( get_temp_dir() ) . "{$tag}-children.log";
+		$quiet = "ini_set( 'error_log', " . var_export( $sink, true ) . ' ); ';
+		$s->on_finish( static function () use ( $sink ) { if ( is_file( $sink ) ) { unlink( $sink ); } } );
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( $quiet . "{$tag}_no_such_function();" ) . ' 2>&1', $out, $code );
 		$check( 0 !== $code && $logged( "{$tag}_no_such_function" ), 'AC-1 a fatal error that ends a real request is in the application log (exit ' . $code . ')' );
 		// Once output has started WordPress shows no error page: the end of the request is watched for that case.
-		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "echo 'started'; {$tag}_after_output();" ) . ' 2>&1', $out2, $code2 );
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( $quiet . "echo 'started'; {$tag}_after_output();" ) . ' 2>&1', $out2, $code2 );
 		$check( 0 !== $code2 && $logged( "{$tag}_after_output" ), 'AC-1 a fatal error after the page has started is in the application log too (exit ' . $code2 . ')' );
 		// WordPress's own handler shows its error page and ends the request: the error is taken from its message.
 		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();
@@ -129,7 +134,7 @@ run(
 		$check( str_contains( $scrubbed, "{$tag} scrub" ) && ! str_contains( $scrubbed, 'ops@example.com' ) && ! str_contains( $scrubbed, $token ) && ! str_contains( $scrubbed, wp_normalize_path( ABSPATH ) ) && ! str_contains( $scrubbed, 'srv' ) && ! str_contains( $scrubbed, 'secret_frame' ) && str_contains( $scrubbed, "in wp-content/plugins/{$tag}/z.php:3" ) && str_contains( $scrubbed, ' lib.php' ) && ! $logged( "{$tag}_secret_frame" ), 'AC-1 no email address, token, server path or stack trace is raised or logged (' . $scrubbed . ')' );
 		// Out of memory, reached in small steps so almost nothing is left: the monitor still reports, from memory it set aside.
 		$oom_before = $occurrences( 'Allowed memory size' );
-		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "if ( false === ini_set( 'memory_limit', (string) ( memory_get_usage( true ) + 33554432 ) ) ) { exit( 3 ); } \$keep = array(); while ( true ) { \$keep[] = str_repeat( 'x', 40 ); }" ) . ' 2>&1', $out3, $code3 );
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( $quiet . "if ( false === ini_set( 'memory_limit', (string) ( memory_get_usage( true ) + 33554432 ) ) ) { exit( 3 ); } \$keep = array(); while ( true ) { \$keep[] = str_repeat( 'x', 40 ); }" ) . ' 2>&1', $out3, $code3 );
 		$check( 3 !== $code3 && 0 !== $code3 && $occurrences( 'Allowed memory size' ) > $oom_before, 'AC-1 an out-of-memory error is still logged (exit ' . $code3 . ')' );
 		// A notification that could not be stored does not start the quiet hour: the next occurrence tries again.
 		$container = \Corex\Boot::app()->container();

@@ -16,6 +16,7 @@
 namespace MizzeySite\Tests\Integration;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_two_factor.php';
 require_once __DIR__ . '/_workflows.php';
 
 run(
@@ -32,6 +33,8 @@ run(
 		// An administrator's browser: session cookies for a fresh account.
 		$admin  = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 32 ), 'role' => 'administrator', 'user_email' => "{$tag}adm@example.invalid" ) );
 		$s->track_user( $admin );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $admin ) );
 		$expiry  = time() + HOUR_IN_SECONDS;
 		$token   = \WP_Session_Tokens::get_instance( $admin )->create( $expiry );
 		$cookies = array();
@@ -54,7 +57,7 @@ run(
 		$quick = $qm[1] ?? '';
 		$check( 200 === $code && '' !== $nonce, 'fixture: the products list opens and gives its bulk-edit nonce' );
 		$bulk = static function ( array $ids, array $fields ) use ( $get, $nonce, $quick ): array {
-			$query = array_merge( array( 'post_type' => 'product', 'action' => 'edit', 'action2' => '-1', '_wpnonce' => $nonce, 'woocommerce_quick_edit_nonce' => $quick, 'bulk_edit' => 'Update', '_status' => '-1' ), $fields );
+			$query = array_merge( array( 'post_type' => 'product', 'action' => 'edit', 'action2' => '-1', '_wpnonce' => $nonce, 'woocommerce_quick_edit_nonce' => $quick, 'bulk_edit' => 'Update', '_status' => '-1', 'change_stock' => '' ), $fields ); // the form's own defaults, stock unchanged
 			$url   = add_query_arg( $query, admin_url( 'edit.php' ) );
 			foreach ( $ids as $id ) {
 				$url .= '&post%5B%5D=' . (int) $id;

@@ -23,6 +23,9 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/src/I18n/Localisation.php';
 require_once __DIR__ . '/src/I18n/AdminEnglish.php';
 require_once __DIR__ . '/src/I18n/WpmlConfigSync.php';
+require_once __DIR__ . '/src/I18n/WcmlSettingsDefaults.php';
+require_once __DIR__ . '/src/I18n/ProductTranslationJob.php';
+require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
@@ -164,6 +167,10 @@ MizzeySite\I18n\Localisation::register();
 MizzeySite\I18n\AdminEnglish::register();
 // The site's wpml-config.xml applied as soon as it changes: specs/036-product-management.
 MizzeySite\I18n\WpmlConfigSync::register();
+// WooCommerce Multilingual's own setting defaults where the stored settings lack them: specs/048-clean-log.
+MizzeySite\I18n\WcmlSettingsDefaults::register();
+// WPML 4.9.7's product-save handler logs deprecations and does nothing: specs/048-clean-log.
+MizzeySite\I18n\WpmlProductSaveHook::register();
 // .htaccess names the site's root, never a language's: specs/034-sales-report.
 MizzeySite\I18n\RewriteRoot::register();
 

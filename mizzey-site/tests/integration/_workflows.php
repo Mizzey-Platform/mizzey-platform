@@ -77,7 +77,7 @@ final class Workflows {
 		$p->set_manage_stock( true );
 		$p->set_stock_quantity( 10 );
 		$p->set_status( 'publish' );
-		$p->set_cogs_value( $cost );
+		Scenario::set_cost( $p, $cost );
 		$p->save();
 		$this->as_english( $p->get_id(), 'product' );
 		$this->s->track_post( $p->get_id() );
@@ -109,7 +109,7 @@ final class Workflows {
 			$v->set_regular_price( '200' );
 			$v->set_manage_stock( true );
 			$v->set_stock_quantity( 5 );
-			$v->set_cogs_value( $cost );
+			Scenario::set_cost( $v, $cost );
 			$v->save();
 			$this->as_english( $v->get_id(), 'product_variation' );
 			$this->s->track_post( $v->get_id() );
@@ -122,15 +122,14 @@ final class Workflows {
 	// ---- Translations -----------------------------------------------------------------------------------------
 
 	public function translate( string $method, int $en_id ): int {
-		global $sitepress, $woocommerce_wpml, $wpdb;
+		global $sitepress;
 		if ( 'duplicate' === $method ) {
 			// make_duplicate's return value is not a reliable post id; resolve the translation through WPML.
 			$sitepress->make_duplicate( $en_id, 'ar' );
 			$ar = (int) apply_filters( 'wpml_object_id', $en_id, 'product', false, 'ar' );
 		} else {
-			$job = new \WCML_Editor_UI_Product_Job( array( 'job_id' => $en_id, 'target' => 'ar' ), $woocommerce_wpml, $sitepress, $wpdb );
-			$job->save_translations( array( md5( 'title' ) => 'منتج ' . $en_id, md5( 'slug' ) => '', md5( 'product_content' ) => '', md5( 'product_excerpt' ) => '' ) );
-			$ar = (int) apply_filters( 'wpml_object_id', $en_id, 'product', false, 'ar' );
+			// WooCommerce Multilingual's product editor, with the job and form its screen supplies.
+			$ar = \MizzeySite\I18n\ProductTranslationJob::save( $en_id, 'ar', array( 'title' => 'منتج ' . $en_id, 'slug' => '', 'product_content' => '', 'product_excerpt' => '' ) );
 		}
 		do_action( 'wpml_switch_language', 'en' );
 		// A translation only counts if it is a distinct post registered in Arabic, with the original in English.

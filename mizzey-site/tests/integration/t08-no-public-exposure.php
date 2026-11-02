@@ -114,7 +114,7 @@ run(
 		$order->set_customer_id( $customer_id );
 		$order->save();
 		ob_start();
-		wc_get_template( 'order/order-details.php', array( 'order_id' => $order->get_id() ) );
+		wc_get_template( 'order/order-details.php', array( 'order_id' => $order->get_id(), 'show_downloads' => false ) ); // the arguments WooCommerce's own caller passes
 		$html  = ob_get_clean();
 		$found = leaks( $html );
 		$ok    = $ok && ! $found && '' !== trim( $html );

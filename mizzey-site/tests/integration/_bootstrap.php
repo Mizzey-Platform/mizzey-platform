@@ -70,12 +70,25 @@ final class Scenario {
 		$this->observed[] = $line;
 	}
 
+	/**
+	 * Give a fixture its cost only while Cost of Goods Sold is on. With the feature off WooCommerce logs a "called
+	 * incorrectly" notice for every set_cogs_value() call, so a scenario that never enabled it passes null and sets
+	 * nothing; one that passes a cost without enabling the feature is a scenario bug and stops here.
+	 */
+	public static function set_cost( \WC_Product $product, ?float $cost ): void {
+		if ( self::features()->feature_is_enabled( 'cost_of_goods_sold' ) ) {
+			$product->set_cogs_value( $cost );
+		} elseif ( null !== $cost ) {
+			throw new \RuntimeException( 'A fixture cost needs enable_cogs() first.' );
+		}
+	}
+
 	public function simple_product( string $name, string $price, ?float $cost ): \WC_Product_Simple {
 		$product = new \WC_Product_Simple();
 		$product->set_name( $name );
 		$product->set_regular_price( $price );
 		$product->set_status( 'publish' );
-		$product->set_cogs_value( $cost );
+		self::set_cost( $product, $cost );
 		$product->save();
 		$this->track_post( $product->get_id() );
 		return $product;
@@ -144,13 +157,24 @@ final class Scenario {
 				$order->delete( true );
 			}
 		}
-		foreach ( array_reverse( $this->posts ) as $id ) {
-			$product = wc_get_product( $id );
-			if ( $product ) {
-				$product->delete( true );
-			} else {
-				wp_delete_post( $id, true );
+		// WooCommerce Multilingual queues an attribute lookup update for every translation saved in this process, to run
+		// at shutdown (priority 10), and WooCommerce fails on a product deleted before then. The product fixtures are
+		// removed after that work: at shutdown, priority 20, or now when shutdown has already begun.
+		$posts  = array_reverse( $this->posts );
+		$remove = static function () use ( $posts ): void {
+			foreach ( $posts as $id ) {
+				$product = wc_get_product( $id );
+				if ( $product ) {
+					$product->delete( true );
+				} else {
+					wp_delete_post( $id, true );
+				}
 			}
+		};
+		if ( doing_action( 'shutdown' ) || did_action( 'shutdown' ) ) {
+			$remove();
+		} else {
+			add_action( 'shutdown', $remove, 20 );
 		}
 		if ( $this->users ) {
 			require_once ABSPATH . 'wp-admin/includes/user.php';

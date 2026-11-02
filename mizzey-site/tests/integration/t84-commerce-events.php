@@ -19,6 +19,7 @@ use MizzeySite\Marketing\Events;
 use MizzeySite\Wishlist\Wishlist;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_two_factor.php';
 require_once __DIR__ . '/_workflows.php';
 require_once __DIR__ . '/_storefront.php';
 
@@ -162,8 +163,10 @@ run(
 		$check( array( 'password', 'link' ) === $logins, 'AC-2 EVT-16 a sign-in pushes login, with its method (' . implode( ',', $logins ) . ')' );
 		$staff = (int) wp_insert_user( array( 'user_login' => "{$tag}s", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}s@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $staff );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $staff ) );
 		Events::drain();
-		do_action( 'wp_login', "{$tag}s", get_userdata( $staff ) );
+		two_factor_completed_sign_in( get_userdata( $staff ) );
 		$check( array() === Events::drain(), 'AC-2 a staff sign-in is not a customer event' );
 
 		// The Store API delivers what the store queued.

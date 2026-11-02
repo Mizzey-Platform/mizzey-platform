@@ -52,13 +52,15 @@ run(
 		$pass    = 'Pw-' . wp_generate_password( 20, false );
 		$manager = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr", 'user_pass' => $pass, 'user_email' => "{$tag}mgr@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $manager );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $manager ) );
 		$buyer   = (int) wp_insert_user( array( 'user_login' => "{$tag}buyer", 'user_pass' => $pass, 'user_email' => "{$tag}buyer@example.invalid", 'role' => 'customer' ) );
 		$s->track_user( $buyer );
 		$check( $manager > 1 && user_can( $manager, 'edit_shop_orders' ) && null !== get_role( 'administrator' ) && null !== get_role( 'shop_manager' ), 'AC-1 a staff account is created with a launch role (shop manager), beside the administrator role' );
 
 		// ---- AC-2: what is recorded --------------------------------------------------------------------------
 		$mgr_user = get_user_by( 'id', $manager );
-		do_action( 'wp_login', $mgr_user->user_login, $mgr_user );
+		two_factor_completed_sign_in( $mgr_user );
 		do_action( 'wp_login', "{$tag}buyer", get_user_by( 'id', $buyer ) );
 		do_action( 'wp_login_failed', "{$tag}mgr", new \WP_Error( 'incorrect_password', 'x' ) );
 		do_action( 'wp_login_failed', "{$tag}mgr", new \WP_Error( 'authentication_failed', 'Invalid verification code.' ) );
@@ -89,8 +91,10 @@ run(
 		$check( 99 === has_action( 'wp_login', array( StaffActivityLog::class, 'signedIn' ) ), 'AC-2 the sign-in is recorded after WP 2FA has had its say (priority 99 against its 20)' );
 		$second = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr2", 'user_pass' => $pass, 'user_email' => "{$tag}mgr2@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $second );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $second ) );
 		do_action( 'wp_2fa_user_authenticated', get_user_by( 'id', $second ) );
-		do_action( 'wp_login', "{$tag}mgr2", get_user_by( 'id', $second ) );
+		two_factor_completed_sign_in( get_user_by( 'id', $second ) );
 		$check( 1 === count( $mine( array( 'actor_id' => $second, 'kind' => StaffActivityLog::SIGNIN ) ) ), 'AC-2 a sign-in WP 2FA completes is recorded once, even when wp_login follows it' );
 
 		// A wrong password sent with a second-factor field is still a wrong password.
@@ -118,6 +122,8 @@ run(
 		$_GET = array( 'page' => StaffActivityScreen::SLUG, 'account' => "{$tag}mgr", 'notes' => "{$tag} parcel" );
 		$owner = (int) wp_insert_user( array( 'user_login' => "{$tag}owner", 'user_pass' => $pass, 'user_email' => "{$tag}owner@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $owner );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $owner ) );
 		wp_set_current_user( $owner );
 		ob_start();
 		StaffActivityScreen::render();
