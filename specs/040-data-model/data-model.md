@@ -1,0 +1,29 @@
+# The contracted data model, as the running store holds it
+
+**Register section K** (ENT rows), checked against the local runtime and staging (`t80-data-model`). Native first
+(M-4): most entities are WooCommerce, WordPress or WPML structures; the Mizzey parts are named with the spec that
+built them. One commercial item is one record per language (WPML), each with its own meta rows; where an entity is a
+property of the item, not of a language, it is copied to the Arabic record or kept on the canonical (source-language)
+record only, as the "Languages" column says. HND-05 draws on this record.
+
+| Id | Entity (register wording) | Where it lives | Relations | Languages |
+|---|---|---|---|---|
+| ENT-01 | Product: general product data | `wp_posts` (`product`), `wp_postmeta`, `wc_product_meta_lookup`; SEO fields and the video and badges in post meta (specs/036) | Categories, brands, collections (taxonomies); variants (children); upsells as related products (D-19) | One record per language (`icl_translations`); price, cost, video and badges copied; SEO fields each language's own |
+| ENT-02 | Product Variant: SKU, barcode, attributes, price, stock, weight | `wp_posts` (`product_variation`); SKU and barcode (`_global_unique_id`) in `wc_product_meta_lookup`; attributes in post meta | Parent product | One record per language; the stock is the ERP's, read through the seam by the canonical record's SKU (specs/012, specs/026), never stored as authoritative |
+| ENT-03 | Category / Brand / Collection: classification, discovery, SEO | Taxonomies `product_cat`, `product_brand` (WooCommerce), `product_collection` (specs/003); SEO fields in term meta (specs/038) | Products | One term per language (WPML) |
+| ENT-05 | Customer / Address: account, addresses, preferences | `wp_users`, `wp_usermeta` (WooCommerce's billing and shipping fields), `wc_customer_lookup`; the address book (`_mizzey_addresses`, specs/022); marketing consent (`_mizzey_marketing_consent`, specs/017); staff notes and suspension (specs/033) | Orders, reviews, wishlist | One account across languages |
+| ENT-06 | Cart / Cart Item: current cart and pricing | WooCommerce sessions (`wc_sessions`), the persistent cart (user meta), the Store API cart | Products, coupons, the customer | One cart across languages (a language switch keeps it, D-20 B6) |
+| ENT-07 | Wishlist: saved items | User meta `_mizzey_wishlist` and, for a guest, the `mizzey_wishlist` cookie (specs/015); no native store exists (P-015) | Canonical products | Keyed to the canonical product, so one list across languages |
+| ENT-08 | Order / Order Item: snapshot at purchase | WooCommerce's order tables (HPOS: `wc_orders`, `wc_order_addresses`, `wc_order_operational_data`, `woocommerce_order_items`); the snapshot is #255's (specs/019) | Customer, payments, refunds, shipment, notes | An order line keeps the id of the language record ordered (D1); the order keeps its language (`wpml_language`) |
+| ENT-09 | Payment: transaction, reference, status, amount | The order's transaction id and paid date; every verified provider event in order meta `_mizzey_payment_events`, flags in `_mizzey_payment_attention` (specs/028) | Order, refunds | One per order |
+| ENT-10 | Shipment: carrier, tracking, rate, status | Order meta `_mizzey_carrier`, `_mizzey_tracking_number`, `_mizzey_tracking_url` (specs/030, written by #291), the shipping line (rate), the status model's shipping states (specs/010) | Order | One per order |
+| ENT-11 | Promotion / Coupon: conditions, rewards, eligibility, usage | `wp_posts` (`shop_coupon`) and its meta, with the conditions specs/011 adds | Orders (usage) | Language-neutral |
+| ENT-13 | Refund: amount, status, payment reference | WooCommerce's refunds (`shop_order_refund`), with `_mizzey_payment_reference`, `_mizzey_refund_reference` and its source (specs/029) | Order, payment | One per refund |
+| ENT-14 | Review: rating, text, status | `wp_comments` (type `review`), `rating` comment meta, moderation status; photos (`_mizzey_review_photos`, D-23, specs/025) | Product, customer, delivered order (D-17) | Shown on the product's records in both languages |
+| ENT-15 | Notification: channel, template, status, provider reference | Email: WooCommerce's emails and their settings (`woocommerce_*_settings`), the Shipped and review-invitation emails (specs/021, specs/020); staff notifications: CoreX notifications (D-20 A12). The sending provider's reference waits for the provider account (#284, I-10) | Order, customer | Sent in the order's language |
+| ENT-16 | Admin User / Role / Permission | WordPress roles and capabilities (`wp_user_roles`), the launch roles and the refund capability (specs/013), two-factor (specs/008) | Users | Not language-dependent |
+| ENT-17 | Audit Log: actor, action, entity, before-and-after values, timestamp | CoreX Activity (`corex_activity_events`): sign-ins and security events (specs/031); price changes with before and after values (`_mizzey_price_history`, specs/036); order notes. CX-03: no general audit of sensitive operations (ROLE-10 DEF) | Users, products, orders | Not language-dependent |
+| ENT-19 | Import Run: file, mapping used, row counts, outcome, actor, timestamp | The `run.json` written beside each run's reports (`FileImportRunRecorder`, specs/006); database persistence is CX-04's, pending | The catalogue | One per run |
+
+Not in this record: ENT-04 (inventory transactions, P1-E, PRE-09), ENT-12 (returns, DEF), ENT-18 (P2), ENT-20 (P3),
+ENT-21 (P2). ENT-08 is #255's row; it is listed for its relations.
