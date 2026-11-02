@@ -33,6 +33,7 @@ require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
+require_once __DIR__ . '/src/Catalogue/TranslationSync.php';
 require_once __DIR__ . '/src/Seo/ArchiveCanonical.php';
 require_once __DIR__ . '/src/Seo/MetaDescription.php';
 require_once __DIR__ . '/src/Seo/SitemapLanguages.php';
@@ -185,6 +186,8 @@ MizzeySite\I18n\CurrencyFormat::register();
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
 add_action('plugins_loaded', [MizzeySite\Catalogue\CostTranslationSync::class, 'register'], 20);
+// The same for price and every other field WPML copies, after a save by code: specs/036, specs/046 (#247).
+MizzeySite\Catalogue\TranslationSync::register();
 
 // The collection taxonomy, which gives IA-04 and IA-35 their archive route. The register settles the model:
 // ADM-57 makes manually curated collections P1, ADM-58 defers rules-based membership to P2.
