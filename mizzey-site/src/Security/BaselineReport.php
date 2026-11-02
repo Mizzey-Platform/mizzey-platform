@@ -59,7 +59,7 @@ final class BaselineReport
         return [
             self::row('generator', self::generatorHidden(), __('No WordPress, WooCommerce, CoreX or WPML generator mark', 'mizzey-site')),
             self::row('xmlrpc', self::xmlRpcClosed(), __('XML-RPC refused before dispatch; no method registered', 'mizzey-site')),
-            self::row('account_discovery', self::accountsHidden(), __('Visitors cannot list users or resolve ?author= numbers; no users sitemap', 'mizzey-site')),
+            self::row('account_discovery', self::accountsHidden(), __('Visitors cannot list users or resolve ?author= numbers; no users sitemap; oEmbed and feeds name the site, not the author', 'mizzey-site')),
             self::row('application_passwords', self::appPasswordsAdminOnly(), __('Application passwords for administrators only', 'mizzey-site')),
             self::row('sign_in_message', self::genericSignIn(), __('One sign-in failure message', 'mizzey-site')),
             self::row('recovery_limit', has_action('lostpassword_post', [RecoveryLimiter::class, 'limit']) !== false, self::limitsDetail()),
@@ -206,13 +206,19 @@ final class BaselineReport
         try {
             wp_set_current_user(0);
             $status  = rest_do_request(new WP_REST_Request('GET', '/wp/v2/users'))->get_status();
+            $upper   = rest_do_request(new WP_REST_Request('GET', '/wp/v2/USERS'))->get_status();
             $vars    = AccountDiscovery::noNumericAuthor(['author' => '1']);
+            $padded  = AccountDiscovery::noNumericAuthor(['author' => ' 1']);
             $sitemap = apply_filters('wp_sitemaps_add_provider', new \WP_Sitemaps_Users(), 'users');
 
             return in_array($status, [401, 403], true)
+                && in_array($upper, [401, 403], true)
                 && has_filter('request', [AccountDiscovery::class, 'noNumericAuthor']) !== false
                 && $vars === ['error' => '404']
-                && $sitemap === false;
+                && $padded === ['error' => '404']
+                && $sitemap === false
+                && has_filter('oembed_response_data', [AccountDiscovery::class, 'noEmbedAuthor']) !== false
+                && has_filter('the_author', [AccountDiscovery::class, 'noFeedAuthor']) !== false;
         } finally {
             wp_set_current_user($previous);
         }

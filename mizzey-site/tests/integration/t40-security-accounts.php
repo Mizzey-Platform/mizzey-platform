@@ -7,8 +7,9 @@
  * on the WordPress sign-in page and on the account page in both languages; the failure still fires
  * `wp_login_failed`, and CoreX's lockout error passes unchanged. AC-6: password recovery is limited per account and
  * per client address, on both recovery handlers; a username and an email of one account share one allowance; a
- * refused request sends no email; invalid settings fall back safely. Concurrent requests are limited best-effort: two
- * requests read in the same instant can both pass.
+ * refused request sends no email; invalid settings fall back safely. Concurrent requests are serialised by a database
+ * lock (audit of 2 November 2026): while another request holds it, a request waits and is then refused, and the lock
+ * is free again after every request.
  *
  * In process: the handlers themselves (WordPress `retrieve_password()` and WooCommerce's
  * `WC_Shortcode_My_Account::retrieve_password()`), with mail intercepted by `pre_wp_mail`, so the email claim is
@@ -215,8 +216,24 @@ run(
 		remove_filter( 'mizzey_recovery_limits', $broken );
 		$check( array( 'account' => 3, 'address' => 10, 'window' => 900 ) === $safe, 'AC-6: invalid settings fall back safely (' . wp_json_encode( $safe ) . ')' );
 
-		foreach ( array( '198.51.100.40', '198.51.100.41', '198.51.100.42', '198.51.100.43' ) as $address ) {
-			foreach ( array( $wp_user, $woo_user, $limited_user, $alias_user ) as $u ) {
+		// Parallel requests: a second database connection stands in for a request holding the counters' lock.
+		$_SERVER['REMOTE_ADDR'] = '198.51.100.44';
+		$locked_user = t40_user( $s, 'customer' );
+		$other       = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$held        = '1' === (string) $other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, %d)', RecoveryLimiter::lockName(), 1 ) );
+		$before      = $sent;
+		$started     = microtime( true );
+		$blocked     = retrieve_password( $locked_user->user_login );
+		$waited      = microtime( true ) - $started;
+		$other->query( $other->prepare( 'SELECT RELEASE_LOCK(%s)', RecoveryLimiter::lockName() ) );
+		$other->close();
+		$check( $held && is_wp_error( $blocked ) && 'mizzey_recovery_limited' === $blocked->get_error_code() && $sent === $before && $waited >= RecoveryLimiter::LOCK_WAIT - 0.5, sprintf( 'AC-6: while another request holds the counters, a request waits %.1f s and is refused with no email', $waited ) );
+		$after = retrieve_password( $locked_user->user_login );
+		$free  = 1 === (int) $GLOBALS['wpdb']->get_var( $GLOBALS['wpdb']->prepare( 'SELECT IS_FREE_LOCK(%s)', RecoveryLimiter::lockName() ) );
+		$check( true === $after && $free, 'AC-6: once the lock is released the request passes, and the limiter leaves the lock free' );
+
+		foreach ( array( '198.51.100.40', '198.51.100.41', '198.51.100.42', '198.51.100.43', '198.51.100.44' ) as $address ) {
+			foreach ( array( $wp_user, $woo_user, $limited_user, $alias_user, $locked_user ) as $u ) {
 				RecoveryLimiter::forget( $u->ID, $address );
 			}
 		}

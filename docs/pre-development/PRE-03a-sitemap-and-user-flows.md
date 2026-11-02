@@ -4,12 +4,12 @@
 
 | Item | Detail |
 |---|---|
-| **Document** | Companion to the Functional Specification MS-SPC-2026-032 version 1.2, for register row PRE-03a |
-| **Version** | 1.0 |
+| **Document** | Companion to the Functional Specification MS-SPC-2026-032, for register row PRE-03a |
+| **Version** | Internal working copy of 5 October 2026 (version 1.0, written against the specification's version 1.2). The issued client version is MS-CMP-2026-038 version 1.2, companion to the specification's version 1.4, in the Stage 1 submission of 21 October 2026, and it governs where the two differ |
 | **Date** | 5 October 2026 |
 | **Document id** | Not assigned. One is assigned if this companion is issued |
 | **Scope authority** | Feature Register MS-ANX-2026-006 version 1.5, which governs |
-| **Status** | Prepared. Not yet delivered to the client. Not approved. It adds no scope: every page and every step cites the register row that contracts it, and the Feature Register governs wherever this document differs. |
+| **Status** | Version 1.2 submitted for information with the Stage 1 set on 21 October 2026. Not approved. It adds no scope: every page and every step cites the register row that contracts it, and the Feature Register governs wherever this document differs. |
 
 ---
 

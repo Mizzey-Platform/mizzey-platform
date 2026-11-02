@@ -48,7 +48,7 @@ None. Nothing here waits for a client, vendor or ERP input.
 |---|---|---|---|
 | AC-1 | No page, feed or response header discloses the WordPress, WooCommerce, WPML or CoreX product or version through a generator mark (admin protection) | NFR-05 | final |
 | AC-2 | Every XML-RPC request, `?rsd` included, is refused before dispatch; pingbacks and trackbacks are off; no page advertises an XML-RPC or pingback address (admin protection) | NFR-05 | final |
-| AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint, not through a numeric author query, not through the users sitemap (admin protection) | NFR-05 | final |
+| AC-3 | A visitor who is not signed in cannot list or discover staff or customer accounts: not through the users endpoint (in any letter case), not through a numeric author query (padded or not), not through the users sitemap, the oEmbed answer or a feed (admin protection) | NFR-05 | final |
 | AC-4 | Application-password availability and authentication are restricted to users with `manage_options`; upstream restrictions stay effective (admin protection) | NFR-05 | final |
 | AC-5 | A failed sign-in, on the WordPress sign-in page and on the account page, gives one message whether the account exists or not, and the failure still reaches CoreX's lockout (admin protection) | NFR-05 | final |
 | AC-6 | Password-recovery requests are rate limited per account and per client address, on the WordPress page and on the account page, in both languages, and the limits are documented settings (rate limiting) | NFR-05 | final |
@@ -101,6 +101,10 @@ recovery request for one account within the window is refused.
 
 - A product review is a comment: AC-7 never closes comments on products.
 - The block editor lists authors through the users endpoint: a signed-in user who may edit content keeps that access.
+- WordPress matches REST routes without regard to case and reads `?author=%201`, `?author=+1` or `?author=1x` as
+  account 1, so the refusals match the same way (audit of 2 November 2026, t39).
+- A product created by a staff member in wp-admin carries that account as author: the oEmbed answer and the product
+  feed name the site instead, as core does for a post with no author.
 - WooCommerce integrations authenticate with WooCommerce API keys, which AC-4 does not touch. An integration that needs
   an application password uses an administrator service account; the test harness does the same.
 - CoreX's lockout message is not the generic message: AC-5 replaces only the unknown-account and wrong-password
@@ -117,7 +121,7 @@ recovery request for one account within the window is refused.
 |---|---|---|
 | Generator marks | WordPress `wp_generator`, WooCommerce `wc_generator_tag`, CoreX `GeneratorTag` (filter `corex_generator_tag`) | Switch each off through its own hook |
 | XML-RPC | `xmlrpc_enabled` leaves unauthenticated methods on; an empty `xmlrpc_methods` still leaves the server's `system.*` methods and `?rsd` | Refuse `XMLRPC_REQUEST` at `init` before dispatch; keep both native switches; remove the pingback header and discovery links |
-| User discovery | REST users controller, `?author=` canonical redirect, users sitemap provider | Restrict for visitors through the native filters |
+| User discovery | REST users controller, `?author=` canonical redirect and archive, users sitemap provider, oEmbed author fields, feed author | Restrict for visitors through the native filters (`rest_pre_dispatch`, `request`, `wp_sitemaps_add_provider`, `oembed_response_data`, `the_author` in feeds) |
 | Application passwords | `wp_is_application_passwords_available_for_user`, judged on the target user | Administrators only |
 | Sign-in failure message | Distinct WordPress errors; WooCommerce applies `login_errors` | Replace the two account-revealing codes in `authenticate`, after CoreX |
 | Recovery rate limit | None in WordPress, WooCommerce or CoreX (CoreX's limiter wraps its own controllers only) | Mizzey limiter on `lostpassword_post`, which both pages fire |
@@ -132,9 +136,11 @@ recovery request for one account within the window is refused.
   head.
 - **FR-002**: Every request entering through `xmlrpc.php`, `?rsd` included, MUST be refused with 403 before XML-RPC
   dispatch; the `X-Pingback` header, the RSD link and pingbacks MUST be off.
-- **FR-003**: For a visitor not signed in, the users REST collection and single-user routes MUST refuse; a numeric
-  `author` query MUST not redirect to or reveal an author slug; the users sitemap MUST not exist. Signed-in users with
-  `list_users` or `edit_posts` keep the users endpoint.
+- **FR-003**: For a visitor not signed in, the users REST collection and single-user routes MUST refuse, matched
+  without regard to case as WordPress matches routes; an `author` query that keeps a digit once WordPress strips it to
+  digits, commas and minus signs MUST answer not found and MUST not redirect to or reveal an author slug; the users
+  sitemap MUST not exist; the oEmbed answer and every feed item MUST name the site, never the author's display name or
+  archive address. Signed-in users with `list_users` or `edit_posts` keep the users endpoint.
 - **FR-004**: Application-password availability, and so authentication with one, MUST be restricted to target users
   with `manage_options`, preserving any upstream refusal.
 - **FR-005**: The unknown-username, unknown-email and wrong-password failures MUST return one generic message on both
@@ -142,7 +148,9 @@ recovery request for one account within the window is refused.
   `wp_login_failed`.
 - **FR-006**: Password-recovery requests MUST be limited per target account and per client address over a window;
   the limits and window MUST be filterable settings with documented defaults (3 per account and 10 per address per 15
-  minutes). A refused request MUST send no email and MUST show a plain message in the visitor's language.
+  minutes). A refused request MUST send no email and MUST show a plain message in the visitor's language. Reading and
+  raising the counters MUST be serialised, so parallel requests cannot pass together; a request that cannot take the
+  lock in time is refused (audit of 2 November 2026).
 - **FR-007**: Comments MUST be closed for every post type except `product`; for products the incoming `comments_open`
   result MUST be returned unchanged. Incoming pingbacks and trackbacks MUST be closed for every post type.
 - **FR-008**: `wp mizzey security check` MUST report each control of FR-001 to FR-007, plus the configuration facts the

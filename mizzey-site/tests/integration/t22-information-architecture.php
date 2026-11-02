@@ -290,6 +290,165 @@ run(
 		$s->note( 'AC-242-06 order-received endpoint query var: '
 			. ( WC()->query->get_query_vars()['order-received'] ?? 'MISSING' ) );
 
+		// ---- The production path (audit of 2 November 2026): `wp mizzey languages provision` ---------------
+		// The baseline is made by LanguageSetup, the code the release command runs. Run again it changes nothing,
+		// keeps every endpoint wording, and makes a missing Arabic record again, served at its Arabic address.
+		$before_pages = (int) $GLOBALS['wpdb']->get_var( "SELECT COUNT(*) FROM {$GLOBALS['wpdb']->posts} WHERE post_type = 'page'" );
+		$front_before = array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ), (int) get_option( 'woocommerce_terms_page_id' ) );
+		$again        = \MizzeySite\I18n\LanguageSetup::provision( false );
+		$after_pages  = (int) $GLOBALS['wpdb']->get_var( "SELECT COUNT(*) FROM {$GLOBALS['wpdb']->posts} WHERE post_type = 'page'" );
+		$front_after  = array( get_option( 'show_on_front' ), (int) get_option( 'page_on_front' ), (int) get_option( 'woocommerce_terms_page_id' ) );
+		$good = ! isset( $again['error'] ) && $before_pages === $after_pages && $front_before === $front_after
+			&& array() === $again['endpoints']['made'] && array() === $again['endpoints']['missing']
+			&& count( \MizzeySite\I18n\LanguageSetup::ENDPOINTS ) === count( $again['endpoints']['kept'] )
+			&& 'orders-ar' === ( $again['endpoints']['kept']['orders'] ?? '' )
+			&& array( 'product_brand' => true, 'product_collection' => true ) === $again['taxonomies']
+			&& count( \MizzeySite\I18n\LanguageSetup::PAGES ) === count( $again['pages']['ar'] ) && array() === $again['pages']['drafts']
+			&& array() === \MizzeySite\I18n\LanguageSetup::problems( $again );
+		$s->note( sprintf( '%s provision run again changes nothing: pages %d -> %d, endpoints kept %d, made %d, missing %s, taxonomies %s, drafts %s',
+			$good ? 'ok  ' : 'FAIL', $before_pages, $after_pages, count( $again['endpoints']['kept'] ?? array() ), count( $again['endpoints']['made'] ?? array() ),
+			implode( ',', $again['endpoints']['missing'] ?? array( 'error' ) ), wp_json_encode( $again['taxonomies'] ?? null ), implode( ',', $again['pages']['drafts'] ?? array() ) ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
+		// A missing Arabic record is made again, in the English record's group, with the same slug. Without --publish it
+		// is a draft, so no copied English text goes live; --publish then publishes it, and it is served.
+		$offers_en = (int) ( $again['pages']['en']['offers'] ?? 0 );
+		$offers_ar = (int) ( $again['pages']['ar']['offers'] ?? 0 );
+		$new_ar    = 0;
+		$as_draft  = false;
+		$published = false;
+		$served    = 0;
+		if ( $offers_en > 0 && $offers_ar > 0 ) {
+			wp_delete_post( $offers_ar, true );
+			$made     = \MizzeySite\I18n\LanguageSetup::provision( false );
+			$new_ar   = (int) ( $made['pages']['ar']['offers'] ?? 0 );
+			$trid     = $sitepress->get_element_trid( $offers_en, 'post_page' );
+			$group    = $trid ? $sitepress->get_element_translations( $trid, 'post_page' ) : array();
+			$as_draft = $new_ar > 0 && $new_ar !== $offers_ar && $new_ar !== $offers_en && isset( $group['ar'] ) && (int) $group['ar']->element_id === $new_ar
+				&& 'offers' === get_post_field( 'post_name', $new_ar ) && 'draft' === get_post_status( $new_ar );
+			\MizzeySite\I18n\LanguageSetup::provision( true );
+			$published = 'publish' === get_post_status( $new_ar );
+			$served    = t22_get( (string) apply_filters( 'wpml_permalink', get_permalink( $offers_en ), 'ar' ) )['status'];
+		}
+		$good = $as_draft && $published && 200 === $served;
+		$s->note( sprintf( '%s provision remakes a missing Arabic record (offers) in its group with its slug, as a draft without --publish (%s), published by --publish (%s); /ar/ answers %d',
+			$good ? 'ok  ' : 'FAIL', $as_draft ? 'draft' : 'NOT a draft', $published ? 'published' : 'NOT published', $served ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
+		// --publish never changes a status staff set: a private English page and a pending Arabic one stay so.
+		$kept_status = false;
+		if ( $offers_en > 0 && $new_ar > 0 ) {
+			wp_update_post( array( 'ID' => $offers_en, 'post_status' => 'private' ) );
+			wp_update_post( array( 'ID' => $new_ar, 'post_status' => 'pending' ) );
+			\MizzeySite\I18n\LanguageSetup::provision( true );
+			$kept_status = 'private' === get_post_status( $offers_en ) && 'pending' === get_post_status( $new_ar );
+			wp_update_post( array( 'ID' => $offers_en, 'post_status' => 'publish' ) );
+			wp_update_post( array( 'ID' => $new_ar, 'post_status' => 'publish' ) );
+		}
+		$s->note( sprintf( '%s provision --publish leaves a private and a pending page as staff set them', $kept_status ? 'ok  ' : 'FAIL' ) );
+		if ( ! $kept_status ) {
+			$ok = false;
+		}
+
+		// A slug held only by the Arabic record (the English one renamed) still resolves to the English record through
+		// its group: the Arabic page is never taken for English, and nothing new is made.
+		global $wpdb;
+		$about_en  = (int) ( $again['pages']['en']['about'] ?? 0 );
+		$about_ar  = (int) ( $again['pages']['ar']['about'] ?? 0 );
+		$languages_kept = false;
+		$renamed_report = array();
+		if ( $about_en > 0 && $about_ar > 0 ) {
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about-t22' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$count_before   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$renamed_report = \MizzeySite\I18n\LanguageSetup::provision( false );
+			$count_after    = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$languages_kept = $about_en === (int) ( $renamed_report['pages']['en']['about'] ?? 0 ) && $about_ar === (int) ( $renamed_report['pages']['ar']['about'] ?? 0 )
+				&& $count_before === $count_after && array() === \MizzeySite\I18n\LanguageSetup::problems( $renamed_report );
+		}
+		$s->note( sprintf( '%s a slug held only in Arabic resolves to the English record through its group (en %d, ar %d)', $languages_kept ? 'ok  ' : 'FAIL',
+			(int) ( $renamed_report['pages']['en']['about'] ?? 0 ), (int) ( $renamed_report['pages']['ar']['about'] ?? 0 ) ) );
+		if ( ! $languages_kept ) {
+			$ok = false;
+		}
+
+		// A nested page with a contracted slug (/company-t22/about/) is another page: with the English About renamed, the
+		// lookup must still reach it through the Arabic record's group, never take the nested English page, and make
+		// nothing for the decoy.
+		$decoy_parent  = 0;
+		$decoy         = 0;
+		$decoy_ignored = false;
+		$decoy_report  = array();
+		if ( $about_en > 0 && $about_ar > 0 ) {
+			$decoy_parent = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 't22 company', 'post_name' => 'company-t22' ) );
+			$decoy        = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 't22 nested about', 'post_name' => 'about', 'post_parent' => $decoy_parent ) );
+			foreach ( array( $decoy_parent, $decoy ) as $decoy_id ) {
+				if ( $decoy_id > 0 ) {
+					$sitepress->set_element_language_details( $decoy_id, 'post_page', null, 'en' );
+				}
+			}
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about-t22' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$count_before = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$decoy_report = \MizzeySite\I18n\LanguageSetup::provision( false );
+			$count_after  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$decoy_trid    = $decoy > 0 ? $sitepress->get_element_trid( $decoy, 'post_page' ) : 0;
+			$decoy_group   = $decoy_trid ? $sitepress->get_element_translations( $decoy_trid, 'post_page' ) : array();
+			$decoy_ignored = $decoy > 0 && 'about' === get_post_field( 'post_name', $decoy )
+				&& $about_en === (int) ( $decoy_report['pages']['en']['about'] ?? 0 ) && $about_ar === (int) ( $decoy_report['pages']['ar']['about'] ?? 0 )
+				&& ! isset( $decoy_group['ar'] ) && $count_before === $count_after;
+			if ( isset( $decoy_group['ar'] ) ) {
+				wp_delete_post( (int) $decoy_group['ar']->element_id, true );
+			}
+			wp_delete_post( $decoy, true );
+			wp_delete_post( $decoy_parent, true );
+		}
+		$s->note( sprintf( '%s a nested page with a contracted slug is not taken for the contracted page (en %d, decoy %d)', $decoy_ignored ? 'ok  ' : 'FAIL',
+			(int) ( $decoy_report['pages']['en']['about'] ?? 0 ), $decoy ) );
+		if ( ! $decoy_ignored ) {
+			$ok = false;
+		}
+
+		// Incomplete provisioning is reported, so the command exits non-zero: a WooCommerce page not assigned, and a
+		// page that could not be made.
+		$no_cart = static fn () => 0;
+		add_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$cartless = \MizzeySite\I18n\LanguageSetup::provision( false );
+		remove_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$broken = $again;
+		$broken['pages']['failed'] = array( 'offers' );
+		unset( $broken['pages']['en']['offers'], $broken['pages']['ar']['offers'] );
+		$cart_problems   = \MizzeySite\I18n\LanguageSetup::problems( $cartless );
+		$failed_problems = \MizzeySite\I18n\LanguageSetup::problems( $broken );
+		$good = in_array( 'system-page=cart', $cart_problems, true ) && in_array( 'page=offers', $failed_problems, true ) && in_array( 'incomplete-page=offers', $failed_problems, true );
+		$s->note( sprintf( '%s provision reports what it could not make (%s | %s)', $good ? 'ok  ' : 'FAIL', implode( ',', $cart_problems ), implode( ',', $failed_problems ) ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
+		// The command itself, in this process: it succeeds when everything is in place, and exits non-zero naming the
+		// missing cart page when the cart page is not assigned.
+		$cli = static fn () => \WP_CLI::runcommand( 'mizzey languages provision', array( 'launch' => false, 'return' => 'all', 'exit_error' => false ) );
+		$whole = $cli();
+		add_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$cartless_cli = $cli();
+		remove_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$good = 0 === (int) $whole->return_code
+			&& 0 !== (int) $cartless_cli->return_code && false !== strpos( (string) $cartless_cli->stderr, 'system-page=cart' );
+		$s->note( sprintf( '%s wp mizzey languages provision exits %d when complete and %d naming the cart when it is missing (%s)', $good ? 'ok  ' : 'FAIL',
+			(int) $whole->return_code, (int) $cartless_cli->return_code, trim( (string) $cartless_cli->stderr ) ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
 		// Recorded, not asserted: WooCommerce redirects an empty cart away from checkout, in both languages
 		// identically, so a checkout request says nothing about language resolution. Measured under #241.
 		return $ok;

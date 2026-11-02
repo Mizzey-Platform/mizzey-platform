@@ -28,4 +28,14 @@
 		<custom-field action="translate">_mizzey_seo_canonical</custom-field>
 		<custom-field action="ignore">_mizzey_price_history</custom-field>
 	</custom-fields>
+	<!--
+		Brand and collection archives are served per language (IA-04, IA-05, IA-35). product_brand ships with
+		WooCommerce untranslatable, and product_collection is this plugin's; until 2 November 2026 only the test
+		baseline made them translatable. MizzeySite\I18n\LanguageSetup sets the same, for a host where this file
+		has not been applied yet. See specs/003-information-architecture-urls.
+	-->
+	<taxonomies>
+		<taxonomy translate="1">product_brand</taxonomy>
+		<taxonomy translate="1">product_collection</taxonomy>
+	</taxonomies>
 </wpml-config>

@@ -366,6 +366,8 @@ page, structured data parsing as valid JSON with the expected types.
 
 - **A trailing-slash variant of a contracted URL is requested.** It must resolve to one canonical form rather
   than serving the same content at two addresses (G-1).
+- **A paginated archive page is requested.** `/shop/page/2/` lists products page 1 does not, so its canonical is
+  itself; a canonical pointing at page 1 would tell a search engine to drop them (audit of 2 November 2026, t23).
 - **An Arabic URL is requested for a page that has no Arabic record yet.** It must not silently serve the English
   record under the Arabic prefix, which would be a bilingual URL serving the wrong language record.
 - **Two pages are given the same slug in different languages.** WPML permits this when the language is known at
@@ -419,6 +421,8 @@ specific and small, and only three of them are code.
 - **FR-003**: The account and confirmation URLs MUST remain WooCommerce endpoints, with their Arabic slugs supplied through string translation, and no page record may duplicate an endpoint. (AC-242-04, G-1)
 - **FR-004**: The storefront's product, category, collection and brand URL patterns MUST be documented per language, and a URL naming a term MUST serve that term's archive. (AC-242-05)
 - **FR-005**: A canonical link MUST be emitted on every contracted URL, including archive URLs where core emits none. (AC-242-09)
+  Page N of a paginated archive is its own canonical form (`/shop/page/2/`), never page 1, and sorting or filter
+  parameters never reach it. Added by the audit of 2 November 2026.
 - **FR-005a**: Every address a contracted page points at as its canonical form or as a language counterpart MUST
   resolve to that page, in every language, and the address word of a taxonomy MUST NOT depend on the language of
   the request that builds the link or the routing rules. Added by the repair of 5 October 2026. (AC-242-09,
@@ -447,6 +451,27 @@ parallel metadata store**:
   second store to reconcile.
 - **FR-015**: no broad SEO plugin is added to satisfy #242. One would deliver the admin surfaces four other
   slices own, which M-1 forbids.
+
+### The configuration is the site's, not the test harness's
+
+Added by the audit of 2 November 2026: what made `/ar/` work existed only in the test baseline, which staging
+replays, so a clean production install would have served untranslated brand and collection archives and English
+endpoint slugs in Arabic.
+
+- **FR-016**: The Arabic records of the system and contracted pages, the static front page, the terms page, the brand
+  and collection taxonomies as translatable and the Arabic endpoint slugs MUST be made by the plugin
+  (`MizzeySite\I18n\LanguageSetup`), run at release as `wp mizzey languages provision` and by the test baseline
+  alike. Run again it MUST change nothing: an existing record, a chosen front or terms page and an endpoint wording
+  already translated are kept. Without `--publish` a new contracted page, English or Arabic, is a draft, so no empty
+  page and no copied English text goes live before its copy; `--publish` publishes only the drafts the command made,
+  an Arabic one only when its English page is published, and never changes a status staff set (private, pending, a
+  page staff made). The Arabic record of a WooCommerce system page, which holds WooCommerce's blocks and no copy,
+  takes its English page's published status. A contracted page is a top-level page, so a nested page with the same
+  slug is never taken for it. A page is matched by language: a slug held only by an Arabic record
+  stands for its English record through its translation group, and an Arabic record with no English one is reported.
+  The command exits non-zero naming anything not in place: an unassigned WooCommerce page, a page that could not be
+  made, an Arabic-only slug, a taxonomy or an endpoint. The two taxonomies are also declared in `wpml-config.xml`.
+  (AC-242-02, AC-242-04, AC-242-05; t22)
 
 ### Key Entities
 

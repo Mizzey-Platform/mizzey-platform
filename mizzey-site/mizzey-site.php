@@ -27,6 +27,9 @@ require_once __DIR__ . '/src/I18n/WcmlSettingsDefaults.php';
 require_once __DIR__ . '/src/I18n/ProductTranslationJob.php';
 require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
+require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
+require_once __DIR__ . '/src/I18n/LanguageSetup.php';
+require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
@@ -176,6 +179,8 @@ MizzeySite\I18n\WcmlSettingsDefaults::register();
 MizzeySite\I18n\WpmlProductSaveHook::register();
 // .htaccess names the site's root, never a language's: specs/034-sales-report.
 MizzeySite\I18n\RewriteRoot::register();
+// Prices on Arabic pages: the amount, then the Arabic symbol (NFR-04b): specs/032-image-handling.
+MizzeySite\I18n\CurrencyFormat::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
@@ -286,6 +291,8 @@ MizzeySite\Accounts\GoogleSignIn::register();
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
 if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('mizzey catalogue', MizzeySite\Catalogue\Import\Cli\CatalogueCommand::class);
+    // The Arabic storefront's records and settings, run at release: specs/003-information-architecture-urls.
+    WP_CLI::add_command('mizzey languages', MizzeySite\I18n\Cli\LanguagesCommand::class);
     // A preview or a validation run writes nothing to the catalogue, the load of WordPress included: the guard is
     // installed here, as this plugin loads, so WooCommerce's work on `init` is covered too.
     $mizzey_cli_arguments = WP_CLI::get_runner()->arguments;

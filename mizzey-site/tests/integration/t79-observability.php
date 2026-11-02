@@ -178,7 +178,9 @@ run(
 		@trigger_error( "{$tag} a notice", E_USER_WARNING ); // phpcs:ignore
 		Monitoring::shutdown();
 		$check( count( $raised ) === $before, 'AC-4 a warning that does not end the request is not raised as a fatal error' );
-		$check( false !== has_action( 'wp_login', array( \MizzeySite\Security\StaffActivityLog::class, 'signedIn' ) ), 'AC-4 sign-ins reach the staff log (specs/031), beside the order notes' );
+		// Only the wiring is checked here: that a staff sign-in is written to the log, with the account and the address,
+		// is proven by t71 (specs/031, AC-2), which signs a shop manager in and reads the record back.
+		$check( false !== has_action( 'wp_login', array( \MizzeySite\Security\StaffActivityLog::class, 'signedIn' ) ), 'AC-4 sign-ins are wired to the staff log (specs/031); the record itself is proven by t71 AC-2' );
 
 		foreach ( $raised as $entry ) {
 			$ours[] = $entry['kind'] . '|' . $entry['where'];

@@ -65,6 +65,20 @@ Under `wp-content/`:
 `mizzey-release.json` names the two runtime paths under `runtime_writable`, for the deploy to link to a writable
 place.
 
+## After a deploy: the Arabic storefront's records
+
+A fresh install, or a release that adds a contracted page, needs the Arabic records and settings the storefront
+relies on (specs/003, FR-016). Run once the translation plugins are active and set up with Arabic, and again after
+every deploy; it keeps everything already there:
+
+```bash
+wp mizzey languages provision            # new pages are drafts until their copy is written
+wp mizzey languages provision --publish  # when the copy is in place: publishes only the drafts it made
+```
+
+It never changes a page staff made or a status staff set, and it exits non-zero naming what is not in place. The Arabic endpoint words are placeholders (`orders-ar`) until
+the client's wording is entered in WPML's string translation, which the command then keeps.
+
 ## The translation plugin family
 
 `mizzey-release.json` lists the five plugins under `plugins.server_supplied`, each with its folder, the version

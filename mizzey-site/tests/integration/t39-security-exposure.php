@@ -4,7 +4,9 @@
  *
  * AC-1: no generator mark in a page, the head or a feed. AC-2: every XML-RPC entry, `?rsd` included, is refused with
  * 403, and no page carries a pingback header or a discovery link. AC-3: a visitor cannot list or discover accounts through the users endpoint, a numeric author
- * query or the users sitemap, while an editor keeps the users endpoint the block editor needs.
+ * query or the users sitemap, while an editor keeps the users endpoint the block editor needs. The audit of 2 November
+ * added the bypasses: a route in another letter case, an author number padded with a space or a plus sign, the oEmbed
+ * answer and the feeds' author name.
  *
  * Every visitor claim is read over HTTP, as a visitor with no cookies, because a hook that only works in process
  * proves nothing about the page a scanner receives. The editor claim is in process: it is about authorisation, not
@@ -61,12 +63,15 @@ run(
 
 		// ---- Fixtures ----------------------------------------------------------------------------------------
 		$author_login = 't39_author_' . wp_rand();
-		$author_id    = wp_insert_user( array( 'user_login' => $author_login, 'user_pass' => wp_generate_password( 32 ), 'role' => 'author', 'user_email' => $author_login . '@example.invalid' ) );
+		$author_name  = 'T39 Staff Name ' . wp_rand();
+		$author_id    = wp_insert_user( array( 'user_login' => $author_login, 'user_pass' => wp_generate_password( 32 ), 'role' => 'author', 'user_email' => $author_login . '@example.invalid', 'display_name' => $author_name ) );
 		$s->track_user( $author_id );
 		$author_slug = (string) get_userdata( $author_id )->user_nicename;
 		$post_id     = wp_insert_post( array( 'post_title' => 't39 post', 'post_content' => 't39', 'post_status' => 'publish', 'post_author' => $author_id ) );
 		$s->track_post( $post_id );
 		$product = $s->simple_product( 't39 product', '100', null );
+		// A product created by a staff account, as one made in wp-admin would be.
+		wp_update_post( array( 'ID' => $product->get_id(), 'post_author' => $author_id ) );
 
 		$pages = array(
 			'home (en)'    => home_url( '/' ),
@@ -111,10 +116,14 @@ run(
 			'single user'          => rest_url( 'wp/v2/users/' . $author_id ),
 			'collection, query'    => add_query_arg( 'rest_route', '/wp/v2/users', home_url( '/' ) ),
 			'single user, query'   => add_query_arg( 'rest_route', '/wp/v2/users/' . $author_id, home_url( '/' ) ),
+			// WordPress matches REST routes without regard to case.
+			'collection, case'     => rest_url( 'wp/v2/Users' ),
+			'single user, case'    => rest_url( 'wp/v2/USERS/' . $author_id ),
+			'collection, query, case' => add_query_arg( 'rest_route', '/wp/v2/USERS', home_url( '/' ) ),
 		);
 		foreach ( $routes as $label => $url ) {
 			$answer = t39_get( $url );
-			$check( in_array( $answer['status'], array( 401, 403 ), true ) && false === strpos( $answer['body'], $author_slug ), "AC-3: a visitor is refused the users {$label} (status {$answer['status']})" );
+			$check( in_array( $answer['status'], array( 401, 403 ), true ) && false === strpos( $answer['body'], $author_slug ) && false === strpos( $answer['body'], $author_name ), "AC-3: a visitor is refused the users {$label} (status {$answer['status']})" );
 		}
 
 		// An editor keeps the users routes: in process, because the claim is about authorisation. Native refusals
@@ -139,6 +148,35 @@ run(
 				$location = $answer['headers']['location'] ?? '';
 				$check( 404 === $answer['status'] && false === strpos( $location, $author_slug ) && false === strpos( $answer['body'], $author_slug ), "AC-3 [$lang] ?author= for a {$which} account answers 404 with no slug (status {$answer['status']}, location '{$location}')" );
 			}
+			// WP_Query keeps only digits, commas and minus signs, so a padded number still names the account.
+			$joiner = false === strpos( $home, '?' ) ? '?' : '&';
+			foreach ( array( 'leading space' => '%20' . $author_id, 'trailing space' => $author_id . '%20', 'plus sign' => '+' . $author_id, 'letters between' => substr( (string) $author_id, 0, 1 ) . 'x' . substr( (string) $author_id, 1 ) ) as $which => $value ) {
+				$answer   = t39_get( $home . $joiner . 'author=' . $value );
+				$location = $answer['headers']['location'] ?? '';
+				$check( 404 === $answer['status'] && false === strpos( $location, $author_slug ) && false === strpos( $answer['body'], $author_slug ) && false === strpos( $answer['body'], $author_name ), "AC-3 [$lang] ?author= with a {$which} answers 404 with no name or slug (status {$answer['status']}, location '{$location}')" );
+			}
+		}
+
+		// ---- AC-3: the oEmbed answer and the feeds name the site, not the author ------------------------------
+		foreach ( array( 'post' => (string) get_permalink( $post_id ), 'product' => (string) get_permalink( $product->get_id() ) ) as $label => $permalink ) {
+			$answer = t39_get( add_query_arg( 'url', rawurlencode( $permalink ), rest_url( 'oembed/1.0/embed' ) ) );
+			$data   = json_decode( $answer['body'], true );
+			$check(
+				200 === $answer['status'] && is_array( $data ) && ( $data['author_name'] ?? null ) === get_bloginfo( 'name' )
+					&& false === strpos( $answer['body'], $author_slug ) && false === strpos( $answer['body'], $author_name ),
+				"AC-3 [$label] the oEmbed answer names the site, not the author (status {$answer['status']}, author_name '" . ( is_array( $data ) ? (string) ( $data['author_name'] ?? '' ) : '' ) . "')"
+			);
+		}
+		$feeds = array(
+			'feed'         => array( get_feed_link(), 't39 post' ),
+			'atom feed'    => array( get_feed_link( 'atom' ), 't39 post' ),
+			'product feed' => array( (string) get_post_type_archive_feed_link( 'product' ), 't39 product' ),
+		);
+		foreach ( $feeds as $label => list( $url, $title ) ) {
+			$feed = t39_get( $url );
+			// The fixture must be in the feed, or the absence below proves nothing.
+			$check( 200 === $feed['status'] && false !== strpos( $feed['body'], $title ), "[$label] {$url} lists the '{$title}' fixture (status {$feed['status']})" );
+			$check( false === strpos( $feed['body'], $author_name ) && false === strpos( $feed['body'], $author_slug ), "AC-3 [$label] no item carries the author's name or slug" );
 		}
 
 		// ---- AC-3: the users sitemap, with the other sitemaps kept ---------------------------------------------
