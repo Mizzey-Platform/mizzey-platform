@@ -264,7 +264,7 @@ run(
 		$check( 200 === ( $r['status'] ?? 0 ) && 'refund already recorded' === $r['word'], 'AC-2 the notice of that refund stops without a second record' );
 		$dash = t68_obj( $b->get_id(), array( 'id' => 777002, 'amount_cents' => 1000, 'is_refund' => true, 'has_parent_transaction' => true ) );
 		$r    = $notice( $dash );
-		$check( 'recorded' === ( $r['word'] ?? '' ) && 0 === count( $fresh( $b->get_id() )->get_refunds() ), 'AC-2 a refund\'s own notice not made here is recorded and never reaches the gateway' );
+		$check( 'recorded' === ( $r['word'] ?? '' ) && 0 === count( $fresh( $b->get_id() )->get_refunds() ) && 2 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a refund\'s own notice not made here, of another Paymob order, is recorded, flagged for staff, written nowhere and never reaches the gateway' );
 		$r = $notice( $dash );
 		$check( 200 === ( $r['status'] ?? 0 ) && 'already handled' === $r['word'], 'AC-2 that refund notice again stops' );
 
@@ -308,7 +308,7 @@ run(
 		$r = $notice( t68_obj( $b->get_id(), array( 'id' => $second['id'], 'order' => $second['order'], 'is_refunded' => true, 'refunded_amount_cents' => 5000 ) ) );
 		$check( $b_refunds === count( $fresh( $b->get_id() )->get_refunds() ) && 'refunded' !== $fresh( $b->get_id() )->get_status(), 'AC-1 the refunded second payment, reported again by Paymob, adds no refund to the order paid by the first' );
 		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 777003, 'is_void' => true, 'has_parent_transaction' => true ) ) );
-		$check( 200 === ( $r['status'] ?? 0 ) && 2 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a void is recorded and flagged, not applied (' . ( $r['status'] ?? 0 ) . ', ' . wp_json_encode( array_column( PaymentRecord::attention( $fresh( $b->get_id() ) ), 'message' ) ) . ')' );
+		$check( 200 === ( $r['status'] ?? 0 ) && 3 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a void is recorded and flagged, not applied (' . ( $r['status'] ?? 0 ) . ', ' . wp_json_encode( array_column( PaymentRecord::attention( $fresh( $b->get_id() ) ), 'message' ) ) . ')' );
 
 		// ---- AC-8: the gate is the provider's ---------------------------------------------------------------------
 		$stand = new T68Provider();
