@@ -24,15 +24,17 @@ HND-06), so the site is built to load whatever container is named, and loads not
 | MKT-06 | P1-L | S1 | Google Merchant Center product feed: required for Google Shopping |
 | MKT-09 | P1-L | S1 | Campaign tracking preserved through to the order record, so revenue can be attributed to specific campaigns |
 | MKT-10 | P1-L | S1 | Consent management and cookie banner, configured for consent-aware tracking |
+| INT-09 | P1 | S1 | Google Analytics 4 and Tag Manager |
+| INT-10 | P1 | S1 | Meta Pixel |
+| INT-12 | P1-L | S1 | Google Merchant Center product feed |
 
-MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register.
+MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register. INT-09, INT-10 and INT-12 are #284's rows and the same integrations (its notes say so); they are traced here, and #284's email row (INT-05) is specs/045.
 
 ## Context rows (no obligation here)
 
 | ID | Scope | Why it matters here |
 |---|---|---|
 | MKT-21, MKT-23 | P1 | Tag Manager is the only route for tracking scripts; the Marketing role edits no files |
-| INT-09, INT-10 | P1 | The same integrations, owned by #284's row set |
 | EVT-01 to EVT-18 | P1, P1-L | The events the container receives; built in #312 |
 | NFR-12 | P1 | Consent capture and data minimisation |
 | MKT-04, MKT-07, MKT-08 | P2 | Snapchat, the TikTok catalogue feed, Meta's Conversions API: not built |
@@ -47,10 +49,10 @@ MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Google Tag Manager loads on every storefront page, in both languages, after Google's consent defaults, from a container named in admin; the Google Analytics, Meta and TikTok tags run inside it | MKT-01, MKT-02, MKT-03 | pending I-09 |
+| AC-1 | Google Tag Manager loads on every storefront page, in both languages, after Google's consent defaults, from a container named in admin; the Google Analytics, Meta and TikTok tags run inside it | MKT-01, MKT-02, MKT-03, INT-09, INT-10 | pending I-09 |
 | AC-2 | A consent banner, in the visitor's language, records the visitor's choice, which governs every tracking tag and the campaign capture | MKT-10 | provisional |
 | AC-3 | The campaign that brought the visitor is kept on the order | MKT-09 | provisional |
-| AC-4 | A product feed per language serves Google Merchant Center and the Meta catalogue | MKT-05, MKT-06 | pending I-09 |
+| AC-4 | A product feed per language serves Google Merchant Center and the Meta catalogue | MKT-05, MKT-06, INT-12 | pending I-09 |
 
 ## User Scenarios & Testing *(mandatory)*
 
