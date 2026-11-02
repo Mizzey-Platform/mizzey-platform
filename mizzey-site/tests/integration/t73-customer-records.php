@@ -45,6 +45,7 @@ run(
 			$o = wc_create_order( array( 'customer_id' => $customer ) );
 			$o->add_product( $product, $n );
 			$o->calculate_totals();
+			$o->set_date_created( time() - ( 3 - $n ) * HOUR_IN_SECONDS );
 			$o->save();
 			$s->track_order( $o->get_id() );
 			$orders[] = $o->get_id();
@@ -87,6 +88,19 @@ run(
 		$_POST = array();
 		$check( "{$tag} prefers delivery after 6 pm" === get_user_meta( $customer, CustomerRecords::NOTES, true ), 'AC-2 without the form\'s nonce nothing changes' );
 
+		// Who WordPress takes the visitor to be when the browser holds a valid signed-in cookie for the account, as a
+		// Google or sign-in-link session would leave it.
+		$cookie_user = static function ( int $id ): int {
+			$keep                          = $_COOKIE;
+			$token                         = \WP_Session_Tokens::get_instance( $id )->create( time() + HOUR_IN_SECONDS );
+			$_COOKIE[ LOGGED_IN_COOKIE ]   = wp_generate_auth_cookie( $id, time() + HOUR_IN_SECONDS, 'logged_in', $token );
+			$who                           = (int) apply_filters( 'determine_current_user', false );
+			$_COOKIE                       = $keep;
+			\WP_Session_Tokens::get_instance( $id )->destroy( $token );
+			return $who;
+		};
+		$check( $customer === $cookie_user( $customer ), 'fixture: a valid signed-in cookie makes the customer the visitor' );
+
 		// ---- AC-3: suspension ----------------------------------------------------------------------------
 		$token = \WP_Session_Tokens::get_instance( $customer )->create( time() + HOUR_IN_SECONDS );
 		$post( array( 'mizzey_suspended' => 'yes', 'mizzey_suspension_reason' => '' ) );
@@ -104,7 +118,7 @@ run(
 		wp_set_current_user( 0 );
 		$signon = wp_authenticate( "{$tag}cust", $pass );
 		$check( is_wp_error( $signon ) && 'mizzey_suspended' === $signon->get_error_code(), 'AC-3 a password sign-in is refused, saying the account is suspended' );
-		$check( 0 === apply_filters( 'determine_current_user', $customer ), 'AC-3 a cookie set by any other route (Google, a sign-in link) does not make it the signed-in user' );
+		$check( 0 === $cookie_user( $customer ), 'AC-3 a valid signed-in cookie, as Google or a sign-in link would set, does not make it the signed-in user' );
 		$http = sign_in_account( 'en', "{$tag}cust", $pass );
 		$check( ! sign_in_has_session( $http ) && str_contains( $http['body'], 'suspended' ), 'AC-3 over the real request, the account page refuses the sign-in and says why (' . $http['status'] . ')' );
 		$http_ar = sign_in_account( 'ar', "{$tag}cust", $pass );
@@ -114,7 +128,7 @@ run(
 		CustomerRecords::save( $customer );
 		$_POST = array();
 		wp_set_current_user( 0 );
-		$check( ! CustomerRecords::isSuspended( $customer ) && wp_authenticate( "{$tag}cust", $pass ) instanceof \WP_User && $customer === apply_filters( 'determine_current_user', $customer ), 'AC-3 reinstated, the customer can sign in again' );
+		$check( ! CustomerRecords::isSuspended( $customer ) && wp_authenticate( "{$tag}cust", $pass ) instanceof \WP_User && $customer === $cookie_user( $customer ), 'AC-3 reinstated, the customer can sign in again, by password or cookie' );
 		wp_set_current_user( $manager );
 		$post( array( 'mizzey_suspended' => 'yes', 'mizzey_suspension_reason' => 'x' ) );
 		CustomerRecords::save( $other );
