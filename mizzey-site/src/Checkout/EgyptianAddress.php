@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Checkout;
 
+use MizzeySite\Accounts\CustomerKey;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -34,6 +36,26 @@ final class EgyptianAddress
         add_action('woocommerce_init', [self::class, 'fields']);
         add_action('woocommerce_checkout_validate_order_before_payment', [self::class, 'beforePayment'], 10, 2);
         add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'payingOrder'], 10, 2);
+        add_filter('woocommerce_validate_phone', [self::class, 'validPhone'], 10, 3);
+    }
+
+    /**
+     * WooCommerce's phone check, which both checkouts and the account's address form run with the address's country:
+     * for Egypt, an Egyptian mobile number, typed in any spelling (Arabic digits included); elsewhere, also a number in
+     * Arabic digits.
+     *
+     * @param mixed $valid
+     * @param mixed $phone
+     * @param mixed $country
+     */
+    public static function validPhone($valid, $phone, $country = null): bool
+    {
+        $mobile = is_string($phone) && CustomerKey::phone($phone) !== null;
+        if ($country === 'EG') {
+            return $mobile;
+        }
+
+        return (bool) $valid || $mobile;
     }
 
     /**
@@ -62,7 +84,7 @@ final class EgyptianAddress
 
     /**
      * Before any Store API payment of an order, paying an existing order included: an Egyptian address has its
-     * district.
+     * district, and a phone given with it is an Egyptian mobile number (kept on the order in its `01` form, CustomerKey).
      *
      * @param mixed $order
      * @param mixed $errors
@@ -71,6 +93,15 @@ final class EgyptianAddress
     {
         if (! $order instanceof \WC_Order || ! $errors instanceof \WP_Error) {
             return;
+        }
+        // A phone given with an Egyptian address is a mobile number the carrier can call (CHK-11), in any spelling.
+        foreach (['billing', 'shipping'] as $type) {
+            $country = $type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
+            $phone   = trim((string) ($type === 'billing' ? $order->get_billing_phone() : $order->get_shipping_phone()));
+            if ($country === 'EG' && $phone !== '' && CustomerKey::phone($phone) === null) {
+                $errors->add('mizzey_phone_invalid', __('Please enter a mobile number such as 01012345678.', 'mizzey-site'));
+                break;
+            }
         }
         foreach (['billing', 'shipping'] as $type) {
             $country = $type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
