@@ -64,9 +64,24 @@ final class CurrencyFormat
         return __('EGP', 'mizzey-site');
     }
 
-    /** Whether text is being written in Arabic: an Arabic page, or an Arabic order's email or invoice. */
+    /**
+     * Whether text is being written in Arabic: an Arabic page, or an Arabic order's email or invoice. An explicit locale
+     * switch (an order's email or invoice) decides first; otherwise WPML's current language, since WPML answers the
+     * site locale with it and `get_locale()` alone can still read English while WPML serves Arabic.
+     */
     private static function arabic(): bool
     {
+        if (function_exists('is_locale_switched') && is_locale_switched()) {
+            $switcher = $GLOBALS['wp_locale_switcher'] ?? null;
+            $switched = $switcher instanceof \WP_Locale_Switcher ? (string) $switcher->get_switched_locale() : '';
+
+            return str_starts_with(strtolower($switched), 'ar');
+        }
+        $language = (string) apply_filters('wpml_current_language', null);
+        if ($language !== '') {
+            return $language === 'ar';
+        }
+
         return str_starts_with(strtolower((string) get_locale()), 'ar');
     }
 }
