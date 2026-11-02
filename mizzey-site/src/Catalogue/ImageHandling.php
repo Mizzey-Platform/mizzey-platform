@@ -32,13 +32,20 @@ final class ImageHandling
     public const MAX_PIXELS = 40000000;
 
     /** The image types the guard measures; other uploads are left to WordPress's own type checks. */
-    private const IMAGES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+    private const IMAGES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/bmp', 'image/tiff', 'image/heic', 'image/heif'];
+
+    /** Whether WordPress's image editor is saving an edit of an existing image (rotate, crop, scale). */
+    private static bool $editing = false;
 
     public static function register(): void
     {
         add_filter('wp_handle_upload_prefilter', [self::class, 'guard']);
         add_filter('wp_handle_sideload_prefilter', [self::class, 'guard']);
-        add_filter('image_editor_output_format', [self::class, 'webp']);
+        add_filter('image_editor_output_format', [self::class, 'webp'], 10, 3);
+        // An edit of an existing image keeps its format: WordPress records the file name it chose before saving, and
+        // a changed extension would leave the attachment pointing at a file that does not exist.
+        add_action('wp_ajax_image-editor', [self::class, 'editing'], 0);
+        add_filter('rest_pre_dispatch', [self::class, 'restEditing'], 0, 3);
     }
 
     /**
@@ -81,20 +88,62 @@ final class ImageHandling
         return $file;
     }
 
+    public static function editing(): void
+    {
+        self::$editing = true;
+    }
+
     /**
-     * JPEG and PNG sizes are written as WebP, where the server's image library can write it.
-     *
-     * @param mixed $formats
+     * @param mixed $result
+     * @param mixed $server
+     * @param mixed $request
      * @return mixed
      */
-    public static function webp($formats)
+    public static function restEditing($result, $server, $request)
+    {
+        if ($request instanceof \WP_REST_Request && preg_match('#^/wp/v2/media/\d+/edit$#', $request->get_route()) === 1) {
+            self::$editing = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * JPEG and PNG sizes are written as WebP, where the server's image library can write it; an edit of an existing
+     * image keeps the format of the file it replaces; a palette PNG (a transparent logo, say), which GD cannot encode
+     * as WebP, stays PNG.
+     *
+     * @param mixed $formats
+     * @param mixed $filename
+     * @param mixed $mime
+     * @return mixed
+     */
+    public static function webp($formats, $filename = null, $mime = null)
     {
         if (! is_array($formats) || ! wp_image_editor_supports(['mime_type' => 'image/webp'])) {
             return $formats;
         }
+        // An edit writes to the name WordPress chose from the stored file: WebP for an image uploaded since this
+        // change, JPEG or PNG for one uploaded before. The saved file must keep that name's format.
+        if (self::$editing && ! (is_string($filename) && str_ends_with(strtolower($filename), '.webp'))) {
+            return $formats;
+        }
         $formats['image/jpeg'] = 'image/webp';
-        $formats['image/png']  = 'image/webp';
+        if (! (is_string($filename) && self::palettePng($filename))) {
+            $formats['image/png'] = 'image/webp';
+        }
 
         return $formats;
+    }
+
+    /** A PNG whose colour type (byte 25 of its header) is 3, indexed colour. */
+    private static function palettePng(string $filename): bool
+    {
+        if (! is_readable($filename)) {
+            return false;
+        }
+        $head = (string) file_get_contents($filename, false, null, 0, 26);
+
+        return strlen($head) === 26 && str_starts_with($head, "\x89PNG") && ord($head[25]) === 3;
     }
 }

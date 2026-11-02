@@ -75,6 +75,68 @@ run(
 		$pmeta = is_wp_error( $png ) ? array() : wp_get_attachment_metadata( $png );
 		$check( ! is_wp_error( $png ) && array() !== (array) ( $pmeta['sizes'] ?? array() ) && array() === array_filter( (array) $pmeta['sizes'], static fn ( $sz ) => ! str_ends_with( (string) $sz['file'], '.webp' ) ), 'AC-2 a PNG\'s sizes are WebP too' );
 
+		// A palette PNG (a transparent logo) is stored and sized as PNG: GD cannot write a palette image as WebP.
+		$logo = imagecreate( 900, 400 );
+		imagecolortransparent( $logo, imagecolorallocate( $logo, 255, 255, 255 ) );
+		imagefilledrectangle( $logo, 100, 100, 800, 300, imagecolorallocate( $logo, 200, 40, 40 ) );
+		$logo_path = wp_tempnam( 't72-logo.png' );
+		imagepng( $logo, $logo_path );
+		imagedestroy( $logo );
+		$logo_id = $sideload( $logo_path, 't72-logo.png' );
+		$lmeta   = is_wp_error( $logo_id ) ? array() : wp_get_attachment_metadata( $logo_id );
+		$check( ! is_wp_error( $logo_id ) && array() !== (array) ( $lmeta['sizes'] ?? array() ) && array() === array_filter( (array) $lmeta['sizes'], static fn ( $sz ) => ! is_readable( dirname( (string) get_attached_file( $logo_id ) ) . '/' . $sz['file'] ) ), 'AC-2 a transparent palette PNG is stored with all its sizes, without an error (' . ( is_wp_error( $logo_id ) ? $logo_id->get_error_message() : count( (array) $lmeta['sizes'] ) . ' sizes' ) . ')' );
+
+		// Editing an existing image (rotate) keeps a file the attachment can find.
+		$edit = new \WP_REST_Request( 'POST', '/wp/v2/media/' . $jpg . '/edit' );
+		$edit->set_param( 'modifiers', array( array( 'type' => 'rotate', 'args' => array( 'angle' => 90 ) ) ) );
+		$edit->set_param( 'src', wp_get_attachment_url( $jpg ) );
+		$edited = rest_do_request( $edit );
+		$new_id = (int) ( $edited->get_data()['id'] ?? 0 );
+		if ( $new_id > 0 ) {
+			$made[] = $new_id;
+		}
+		$check( 201 === $edited->get_status() && $new_id > 0 && is_readable( (string) get_attached_file( $new_id ) ), 'AC-2 a rotated copy of an image is saved where its attachment points (' . $edited->get_status() . ', ' . basename( (string) get_attached_file( $new_id ) ) . ')' );
+
+		// The media library's own editor (admin-ajax image-editor, wp_save_image): rotate and save over the original.
+		require_once ABSPATH . 'wp-admin/includes/image-edit.php';
+		$_POST = $_REQUEST = array(
+			'action'      => 'image-editor',
+			'do'          => 'save',
+			'postid'      => (string) $jpg,
+			'_ajax_nonce' => wp_create_nonce( 'image_editor-' . $jpg ),
+			'history'     => wp_json_encode( array( array( 'r' => 90 ) ) ),
+			'target'      => 'all',
+			'context'     => 'edit-attachment',
+		);
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$stop = static function () {
+			return static function () {
+				throw new \RuntimeException( 'done' );
+			};
+		};
+		add_filter( 'wp_die_ajax_handler', $stop );
+		// admin-ajax.php fires the action, where WordPress's own handler (registered only there) calls wp_save_image().
+		do_action( 'wp_ajax_image-editor' );
+		$saved      = wp_save_image( $jpg );
+		$editor_out = ! empty( $saved->error ) ? (string) $saved->error : 'saved';
+		remove_filter( 'wp_die_ajax_handler', $stop );
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+		$_POST = $_REQUEST = array();
+		clean_post_cache( $jpg );
+		$check( is_readable( (string) get_attached_file( $jpg ) ) && str_contains( basename( (string) get_attached_file( $jpg ) ), '-e' ), 'AC-2 an image rotated in the media library\'s editor still points at a file that exists (' . basename( (string) get_attached_file( $jpg ) ) . ' ' . substr( $editor_out, 0, 200 ) . ')' );
+
+		// An image uploaded before this change (stored as JPEG), edited the same way, keeps a file it can find.
+		remove_filter( 'image_editor_output_format', array( ImageHandling::class, 'webp' ), 10 );
+		$old_jpg = $sideload( t72_image( 3000, 2000, 'jpg' ), 't72-older-photo.jpg' );
+		add_filter( 'image_editor_output_format', array( ImageHandling::class, 'webp' ), 10, 3 );
+		$_REQUEST = array( 'history' => wp_json_encode( array( array( 'r' => 90 ) ) ), 'target' => 'all', 'context' => 'edit-attachment', 'do' => 'save', 'postid' => (string) $old_jpg );
+		$_POST    = $_REQUEST;
+		do_action( 'wp_ajax_image-editor' );
+		$older = wp_save_image( $old_jpg );
+		$_POST = $_REQUEST = array();
+		clean_post_cache( $old_jpg );
+		$check( ! is_wp_error( $old_jpg ) && empty( $older->error ) && is_readable( (string) get_attached_file( $old_jpg ) ) && str_ends_with( (string) get_attached_file( $old_jpg ), '.jpg' ), 'AC-2 an image stored as JPEG before this change, rotated in the editor, stays a JPEG its attachment can find (' . basename( (string) get_attached_file( $old_jpg ) ) . ')' );
+
 		// ---- AC-3: served as WebP, lazy below the first image ----------------------------------------------
 		$product = $s->simple_product( 't72 product', '50.00', null );
 		$product->set_image_id( $jpg );
@@ -112,6 +174,13 @@ run(
 		$text     = wp_tempnam( 't72.txt' );
 		file_put_contents( $text, 'not an image' );
 		$other    = ImageHandling::guard( array( 'name' => 'notes.txt', 'type' => 'text/plain', 'tmp_name' => $text, 'size' => 30 * 1048576, 'error' => 0 ) );
+		$bmp_path = wp_tempnam( 't72.bmp' );
+		$bmp_img  = imagecreatetruecolor( 50, 50 );
+		imagebmp( $bmp_img, $bmp_path );
+		imagedestroy( $bmp_img );
+		$bmp = ImageHandling::guard( array( 'name' => 'scan.bmp', 'type' => 'image/bmp', 'tmp_name' => $bmp_path, 'size' => 25 * 1048576, 'error' => 0 ) );
+		@unlink( $bmp_path );
+		$check( str_contains( (string) ( $bmp['error'] ?? '' ), '20 MB' ), 'AC-1 a BMP over 20 MB is refused too, like every image type WordPress accepts' );
 		$check( empty( $ok_small['error'] ) && empty( $other['error'] ), 'AC-1 an ordinary photo passes; a file that is not an image is left to WordPress\'s own checks' );
 		@unlink( $bigpath );
 		@unlink( $small );
