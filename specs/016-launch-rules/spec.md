@@ -128,7 +128,9 @@ and change, and #255 (checkout) routes order placement, cancellation and failure
 - **FR-007**: No welcome discount MUST be issued, claimed or advertised to a customer who already has an order (by
   account, email, mailbox or mobile number), such as a guest making the account from the order confirmation. The mobile
   number counts while the account is being made: the one the registration form or checkout posts, as well as the one
-  saved on the account.
+  saved on the account; the session customer's number only when none is posted outside the account page's registration
+  form (the checkout, the order confirmation), so a shared browser's earlier checkout details never count against a
+  new customer.
 - **FR-008**: The one-per-email claim MUST be per mailbox: a `+tag`, Gmail's dots and googlemail.com are the same email.
 
 ### Key Entities

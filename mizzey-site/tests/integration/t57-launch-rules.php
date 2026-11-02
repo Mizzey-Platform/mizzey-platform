@@ -195,6 +195,27 @@ run(
 		}
 		$s->on_finish( static function () use ( $tag ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', "{$tag}-renumbered@example.invalid" ) ); } );
 		$check( ! is_wp_error( $numbered ) && 0 === (int) get_user_meta( (int) $numbered, WelcomeDiscount::USER_META, true ) && $guest_phone === get_user_meta( (int) $numbered, 'billing_phone', true ), 'BR-001 a guest who ordered, then registers with a new email and the same mobile number, is issued no welcome discount' );
+		// A shared browser still holding that guest's checkout details: someone new registering on the account page with
+		// their own number, or with none, is judged by what they give, not by the session's number.
+		WC()->customer->set_billing_phone( $guest_phone );
+		$newcomers = array();
+		foreach ( array( 'own' => '0102' . wp_rand( 1000000, 9999999 ), 'none' => '' ) as $kind => $own_phone ) {
+			$_POST = array( 'woocommerce-register-nonce' => wp_create_nonce( 'woocommerce-register' ) ) + ( '' !== $own_phone ? array( 'billing_phone' => $own_phone ) : array() );
+			$made  = wc_create_new_customer( "{$tag}-shared-{$kind}@example.invalid", '', wp_generate_password( 24 ) );
+			$_POST = array();
+			if ( is_wp_error( $made ) ) {
+				$newcomers[ $kind ] = 0;
+				continue;
+			}
+			$s->track_user( (int) $made );
+			$made_cp = (int) get_user_meta( (int) $made, WelcomeDiscount::USER_META, true );
+			if ( $made_cp > 0 ) {
+				$s->on_finish( static function () use ( $made_cp ) { wp_delete_post( $made_cp, true ); } );
+			}
+			$newcomers[ $kind ] = $made_cp;
+		}
+		WC()->customer->set_billing_phone( '' );
+		$check( 0 < $newcomers['own'] && 0 < $newcomers['none'], 'BR-001 on a shared browser holding a returning guest\'s checkout number, a new customer registering on the account page with their own number, or none, is still issued their welcome discount (' . wp_json_encode( $newcomers ) . ')' );
 		// A customer who was issued one, and whose saved number is that of an earlier order, is not told of it.
 		$told = t57_customer( $s, "{$tag}-told" );
 		update_user_meta( $told, 'billing_phone', $guest_phone );

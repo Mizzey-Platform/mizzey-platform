@@ -145,13 +145,18 @@ final class WelcomeDiscount
 
     /**
      * Whether the customer has ordered before, by account, email, mailbox or mobile number. The number is the account's
-     * saved one and, while the account is being made (`user_register` runs before it is saved), the one the form posts
-     * or the checkout's customer carries.
+     * saved one and, while the account is being made (`user_register` runs before it is saved), the one the form posts.
+     * Only when no number is posted and the account page's registration form is not the one posting (the checkout and
+     * the order confirmation), the session customer's number: a shared browser may still hold someone else's checkout
+     * details, which are not the registering customer's.
      */
     public static function hasOrdered(\WP_User $user): bool
     {
-        $phones = [(string) get_user_meta($user->ID, 'billing_phone', true), (string) \MizzeySite\Accounts\PhoneSignIn::posted()];
-        if (function_exists('WC') && WC()->customer instanceof \WC_Customer) {
+        $posted = \MizzeySite\Accounts\PhoneSignIn::posted();
+        $phones = [(string) get_user_meta($user->ID, 'billing_phone', true), (string) $posted];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- only whether the registration form is the one posting.
+        $registering = isset($_POST['woocommerce-register-nonce']);
+        if ($posted === null && ! $registering && function_exists('WC') && WC()->customer instanceof \WC_Customer) {
             $phones[] = (string) WC()->customer->get_billing_phone();
         }
 
