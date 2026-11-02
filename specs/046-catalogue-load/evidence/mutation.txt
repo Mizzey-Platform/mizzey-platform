@@ -1,0 +1,22 @@
+Mutation check for specs/046-catalogue-load, t86-catalogue-load, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7), on the code after the Codex review. Each defect is applied alone, the scenario run, the file restored.
+
+CAUGHT    M1 rejected rows are written  <- FAIL  AC-1 five rows planned, the bad price rejected, nothing written before the load runs
+CAUGHT    M2 no sale price  <- FAIL  AC-2 MIG-13 the product carries its name, description, price, sale price and cost (["WC_Product_Simple","Rose Water Toner 200 ml","25
+CAUGHT    M3 no cost  <- FAIL  AC-2 MIG-13 the product carries its name, description, price, sale price and cost (["WC_Product_Simple","Rose Water Toner 200 ml","250
+CAUGHT    M4 only the leaf category  <- FAIL  AC-2 MIG-11, MIG-12 the category path and the brand are mapped (Toners)
+CAUGHT    M5 no brand  <- FAIL  AC-2 MIG-11, MIG-12 the category path and the brand are mapped (Beauty > Skin care > Toners)
+CAUGHT    M6 no SEO fields  <- FAIL  AC-2 MIG-15 the SEO title and description are carried
+CAUGHT    M7 the parent lists no attribute values  <- FAIL  AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs (["WC_
+CAUGHT    M8 the byte order mark is kept  <- FAIL  AC-4 MIG-02, SSC-21 the Arabic record is its own, in the product's translation group, its text exactly as given (the by
+CAUGHT    M9 no Arabic phase  <- FAIL  AC-4 MIG-02, SSC-21 the Arabic record is its own, in the product's translation group, its text exactly as given (the byte order mar
+SURVIVED  M10 the alt text is left empty
+CAUGHT    M11 an image is downloaded again  <- FAIL  AC-5 each source image is stored once
+CAUGHT    M12 images without the rights flag  <- FAIL  AC-5 without the rights confirmed, the run plans no image download
+CAUGHT    M13 the gallery is dropped  <- FAIL  AC-2 MIG-13 the product carries its name, description, price, sale price and cost (["WC_Product_Simple","\u062a\u0648\u0646
+CAUGHT    M14 the parent's attribute is edited in place  <- FAIL  AC-2 MIG-13 the product carries its name, description, price, sale price and cost (["WC_Product_Simple",
+CAUGHT    M15 an update re-registers the language  <- FAIL  AC-2 MIG-13 the product carries its name, description, price, sale price and cost (["WC_Product_Simple","\u062
+
+M10 survived because an earlier run had left an image stored under the same address, which the load rightly reused with its alt text; the test now uses addresses of its own run and removes them after:
+CAUGHT    M10 the alt text is left empty  <- FAIL  AC-5 MIG-16, MIG-17 the images are downloaded to the store, the first as the product image, the title as alt text
+
+15 of 15 caught.
