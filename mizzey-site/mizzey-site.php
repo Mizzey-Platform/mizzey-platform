@@ -30,6 +30,9 @@ require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
 require_once __DIR__ . '/src/Seo/ArchiveCanonical.php';
 require_once __DIR__ . '/src/Seo/MetaDescription.php';
 require_once __DIR__ . '/src/Seo/SitemapLanguages.php';
+require_once __DIR__ . '/src/Seo/SeoFields.php';
+require_once __DIR__ . '/src/Seo/Redirects.php';
+require_once __DIR__ . '/src/Seo/SearchSettings.php';
 require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
 require_once __DIR__ . '/src/Reporting/StockReport.php';
 require_once __DIR__ . '/src/Reporting/StoreDashboard.php';
@@ -165,6 +168,11 @@ MizzeySite\Catalogue\Brands::register();
 MizzeySite\Seo\ArchiveCanonical::register();
 MizzeySite\Seo\MetaDescription::register();
 MizzeySite\Seo\SitemapLanguages::register();
+
+// The search engine controls staff use: MKT-12 to MKT-17. See specs/038-seo-controls.
+MizzeySite\Seo\SeoFields::register();
+MizzeySite\Seo\Redirects::register();
+MizzeySite\Seo\SearchSettings::register();
 
 // RPT-10: the standard stock report lists one line per physical item, whichever language its records are in and
 // whichever language the operator's session is in. Confined to that report's own query.
