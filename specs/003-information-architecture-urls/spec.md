@@ -462,8 +462,15 @@ endpoint slugs in Arabic.
   and collection taxonomies as translatable and the Arabic endpoint slugs MUST be made by the plugin
   (`MizzeySite\I18n\LanguageSetup`), run at release as `wp mizzey languages provision` and by the test baseline
   alike. Run again it MUST change nothing: an existing record, a chosen front or terms page and an endpoint wording
-  already translated are kept. Without `--publish` a new page is a draft, so no empty page goes live before its copy.
-  The two taxonomies are also declared in `wpml-config.xml`. (AC-242-02, AC-242-04, AC-242-05; t22)
+  already translated are kept. Without `--publish` a new contracted page, English or Arabic, is a draft, so no empty
+  page and no copied English text goes live before its copy; `--publish` publishes only the drafts the command made,
+  an Arabic one only when its English page is published, and never changes a status staff set (private, pending, a
+  page staff made). The Arabic record of a WooCommerce system page, which holds WooCommerce's blocks and no copy,
+  takes its English page's published status. A page is matched by language: a slug held only by an Arabic record
+  stands for its English record through its translation group, and an Arabic record with no English one is reported.
+  The command exits non-zero naming anything not in place: an unassigned WooCommerce page, a page that could not be
+  made, an Arabic-only slug, a taxonomy or an endpoint. The two taxonomies are also declared in `wpml-config.xml`.
+  (AC-242-02, AC-242-04, AC-242-05; t22)
 
 ### Key Entities
 

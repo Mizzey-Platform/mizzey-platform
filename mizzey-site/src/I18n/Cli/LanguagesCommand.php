@@ -25,13 +25,16 @@ final class LanguagesCommand
      * pages, the brand and collection taxonomies as translatable, and the Arabic endpoint slugs.
      *
      * Safe to run again: anything already there is kept, an endpoint wording already translated included. Run at
-     * every release, after the plugin is updated (docs/release-pipeline.md).
+     * every release, after the plugin is updated (docs/release-pipeline.md). Exits 1 naming anything missing: a
+     * WooCommerce page not assigned, a page that could not be made, a slug held only by an Arabic page, a taxonomy or
+     * an endpoint.
      *
      * ## OPTIONS
      *
      * [--publish]
-     * : Publish new pages and drafts of the contracted pages. Without it a new page is a draft, so no empty page goes
-     * live before its copy is written.
+     * : Publish the pages this command makes, and its own earlier drafts (an Arabic one only when its English page is
+     * published). A page staff made, or whose status staff set, is never changed. Without it a new page is a draft, so
+     * no empty page goes live before its copy is written.
      *
      * [--format=<format>]
      * : json for the full report.
@@ -81,9 +84,13 @@ final class LanguagesCommand
             ];
             WP_CLI\Utils\format_items('table', $rows, ['step', 'result']);
         }
-        $short = array_diff(LanguageSetup::TAXONOMIES, array_keys(array_filter($report['taxonomies'])));
-        if ($report['endpoints']['missing'] !== [] || count($report['pages']['ar']) < count($report['pages']['en']) || $short !== []) {
-            WP_CLI::error(__('Some records could not be made; see the report.', 'mizzey-site'));
+        $problems = LanguageSetup::problems($report);
+        if ($problems !== []) {
+            WP_CLI::error(sprintf(
+                /* translators: %s: what could not be made, comma separated. */
+                __('Not everything is in place: %s', 'mizzey-site'),
+                implode(', ', $problems),
+            ));
         }
         WP_CLI::success(__('The Arabic storefront records and settings are in place.', 'mizzey-site'));
     }

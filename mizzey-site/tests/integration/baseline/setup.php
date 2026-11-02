@@ -55,18 +55,21 @@ update_option( '_wcml_settings', $wcml );
 $ia_body = function ( $slug ) {
 	return '<!-- wp:paragraph --><p>Placeholder. Content for this page is a client input and is not written here.</p><!-- /wp:paragraph -->';
 };
+// WordPress's own privacy-policy and refund drafts are published here, as the baseline always has. The release
+// command never publishes a page it did not make, so on a live site staff publish these when their copy is ready.
+foreach ( array( 'privacy-policy', 'refund_returns' ) as $wp_draft_slug ) {
+	$wp_draft = get_page_by_path( $wp_draft_slug, OBJECT, 'page' );
+	if ( $wp_draft instanceof WP_Post && 'publish' !== $wp_draft->post_status ) {
+		wp_update_post( array( 'ID' => $wp_draft->ID, 'post_status' => 'publish' ) );
+	}
+}
+
 $system       = \MizzeySite\I18n\LanguageSetup::systemPages();
 $system_pages = $system['en'];
 $translated   = $system['ar'];
 $ia           = \MizzeySite\I18n\LanguageSetup::pages( true, $ia_body );
 $ia_en        = $ia['en'];
 $ia_ar        = $ia['ar'];
-
-// The existing WordPress refund draft is published too, as the baseline always has.
-$refund_draft = get_page_by_path( 'refund_returns', OBJECT, 'page' );
-if ( $refund_draft instanceof WP_Post && 'publish' !== $refund_draft->post_status ) {
-	wp_update_post( array( 'ID' => $refund_draft->ID, 'post_status' => 'publish' ) );
-}
 
 \MizzeySite\I18n\LanguageSetup::frontPage( $ia_en['home'] ?? 0 );
 \MizzeySite\I18n\LanguageSetup::termsPage( $ia_en['terms-and-conditions'] ?? 0 );

@@ -24,6 +24,14 @@ defined('ABSPATH') || exit;
  * endpoint translation already made (the client's wording) are never replaced. Page copy is content, never written
  * here: a new page is empty, except the order-tracking page, which holds WooCommerce's tracking form (IA-21).
  *
+ * Status. A contracted page this class makes is a draft, marked as its own (`PROVISIONED`); `--publish` publishes
+ * only those drafts, and an Arabic one only when its English record is published. A status staff set (private,
+ * pending, a draft of their own) is never changed. The Arabic record of a WooCommerce system page carries
+ * WooCommerce's blocks rather than copy, so it takes its English record's status when that is published.
+ *
+ * Records are matched by language: a page found by its slug in Arabic stands for its English record only through
+ * its translation group, and an Arabic page with no English record is reported, never taken for English.
+ *
  * The invariant of #241 (A11) throughout: every source record exists first, and the Arabic records are made in their
  * own pass, with the language switched before the insert so WPML does not suffix the slug.
  *
@@ -75,6 +83,9 @@ final class LanguageSetup
     /** The string context WPML and WooCommerce Multilingual keep endpoint slugs under. */
     private const ENDPOINT_CONTEXT = 'WP' . ' ' . 'Endpoints';
 
+    /** Post meta marking a page this class made, so `--publish` touches no page staff made or set. */
+    public const PROVISIONED = '_mizzey_provisioned';
+
     /**
      * Runs every step and returns what each found or made.
      *
@@ -115,23 +126,29 @@ final class LanguageSetup
     /**
      * Arabic records of the WooCommerce system pages, and WooCommerce's page options set per language.
      *
-     * @return array{en: array<string, int>, ar: array<string, int>}
+     * @return array{en: array<string, int>, ar: array<string, int>, missing: list<string>}
      */
     public static function systemPages(): array
     {
         global $sitepress;
         $sources = [];
+        $missing = [];
         foreach (self::SYSTEM_PAGES as $slug) {
             $id = (int) get_option('woocommerce_' . $slug . '_page_id');
             if ($id > 0 && get_post_type($id) === 'page') {
                 $sources[$slug] = $id;
+            } else {
+                $missing[] = $slug;
             }
         }
         $arabic = [];
         foreach ($sources as $slug => $source) {
-            $id = self::arabicRecord($source, null);
+            // No copy to write: the Arabic record goes live with its English record.
+            $id = self::arabicRecord($source, get_post_status($source) === 'publish' ? 'publish' : 'draft', false);
             if ($id > 0) {
                 $arabic[$slug] = $id;
+            } else {
+                $missing[] = $slug . ' (' . self::LANGUAGE . ')';
             }
         }
         // WPML keeps a per-language copy of an option it translates, and WCML registers WooCommerce's page options:
@@ -148,29 +165,35 @@ final class LanguageSetup
             }
         }
 
-        return ['en' => $sources, 'ar' => $arabic];
+        return ['en' => $sources, 'ar' => $arabic, 'missing' => $missing];
     }
 
     /**
      * The contracted pages in English, then their Arabic records.
      *
+     * @param bool                         $publish Publish this class's own drafts (see the class note).
      * @param null|callable(string):string $body
      *
-     * @return array{en: array<string, int>, ar: array<string, int>, drafts: list<string>}
+     * @return array{en: array<string, int>, ar: array<string, int>, drafts: list<string>, failed: list<string>, conflicts: list<string>}
      */
     public static function pages(bool $publish, ?callable $body = null): array
     {
         global $sitepress;
-        $english = [];
-        $titles  = self::titles();
+        $english   = [];
+        $failed    = [];
+        $conflicts = [];
+        $titles    = self::titles();
         foreach (array_keys(self::PAGES) as $slug) {
-            $existing = get_page_by_path($slug, OBJECT, 'page');
-            if ($existing instanceof \WP_Post) {
-                // WordPress's privacy-policy draft is reused rather than duplicated.
-                if ($publish && $existing->post_status !== 'publish') {
-                    wp_update_post(['ID' => $existing->ID, 'post_status' => 'publish']);
+            $found = self::englishRecord($slug);
+            if ($found === -1) {
+                $conflicts[] = $slug;
+                continue;
+            }
+            if ($found > 0) {
+                if ($publish) {
+                    self::publishOwnDraft($found);
                 }
-                $english[$slug] = (int) $existing->ID;
+                $english[$slug] = $found;
                 continue;
             }
             $id = wp_insert_post([
@@ -179,8 +202,10 @@ final class LanguageSetup
                 'post_title'   => $titles[$slug] ?? $slug,
                 'post_name'    => $slug,
                 'post_content' => self::body($slug, $body),
+                'meta_input'   => [self::PROVISIONED => 1],
             ], true);
-            if (is_wp_error($id)) {
+            if (is_wp_error($id) || (int) $id === 0) {
+                $failed[] = $slug;
                 continue;
             }
             // WPML attaches a language on save_post, which an insert from a command does not always reach.
@@ -195,9 +220,12 @@ final class LanguageSetup
 
         $arabic = [];
         foreach ($english as $slug => $source) {
-            $id = self::arabicRecord($source, $publish ? 'publish' : null);
+            $live = $publish && get_post_status($source) === 'publish';
+            $id   = self::arabicRecord($source, $live ? 'publish' : 'draft', $live);
             if ($id > 0) {
                 $arabic[$slug] = $id;
+            } else {
+                $failed[] = $slug . ' (' . self::LANGUAGE . ')';
             }
         }
 
@@ -210,7 +238,46 @@ final class LanguageSetup
             }
         }
 
-        return ['en' => $english, 'ar' => $arabic, 'drafts' => $drafts];
+        return ['en' => $english, 'ar' => $arabic, 'drafts' => $drafts, 'failed' => $failed, 'conflicts' => $conflicts];
+    }
+
+    /**
+     * What a provisioning report says could not be made. Empty when everything is in place.
+     *
+     * @param array<string, mixed> $report What provision() returned.
+     *
+     * @return list<string>
+     */
+    public static function problems(array $report): array
+    {
+        if (isset($report['error'])) {
+            return [(string) $report['error']];
+        }
+        $problems = [];
+        foreach ((array) ($report['system_pages']['missing'] ?? []) as $slug) {
+            $problems[] = 'system-page=' . $slug;
+        }
+        foreach ((array) ($report['pages']['failed'] ?? []) as $slug) {
+            $problems[] = 'page=' . $slug;
+        }
+        foreach ((array) ($report['pages']['conflicts'] ?? []) as $slug) {
+            $problems[] = 'arabic-only-page=' . $slug;
+        }
+        foreach (array_keys(self::PAGES) as $slug) {
+            if (! isset($report['pages']['en'][$slug], $report['pages']['ar'][$slug])) {
+                $problems[] = 'incomplete-page=' . $slug;
+            }
+        }
+        foreach (self::TAXONOMIES as $taxonomy) {
+            if (empty($report['taxonomies'][$taxonomy])) {
+                $problems[] = 'taxonomy=' . $taxonomy;
+            }
+        }
+        foreach ((array) ($report['endpoints']['missing'] ?? []) as $key) {
+            $problems[] = 'endpoint=' . $key;
+        }
+
+        return array_values(array_unique($problems));
     }
 
     /**
@@ -319,9 +386,10 @@ final class LanguageSetup
     /**
      * The Arabic record of an English page, made if missing, with the same slug and title.
      *
-     * @param null|string $status The status of a new record; the source's when null.
+     * @param string $status          The status of a new record.
+     * @param bool   $publishOwnDraft Publish an existing Arabic record that is this class's own draft.
      */
-    private static function arabicRecord(int $source, ?string $status): int
+    private static function arabicRecord(int $source, string $status, bool $publishOwnDraft): int
     {
         global $sitepress;
         $trid = $sitepress->get_element_trid($source, 'post_page');
@@ -331,8 +399,12 @@ final class LanguageSetup
         $group = $sitepress->get_element_translations($trid, 'post_page');
         if (isset($group[self::LANGUAGE])) {
             $id = (int) $group[self::LANGUAGE]->element_id;
-            if ($status === 'publish' && get_post_status($id) !== 'publish') {
-                wp_update_post(['ID' => $id, 'post_status' => 'publish']);
+            if ($id === $source) {
+                // A record cannot be its own counterpart.
+                return 0;
+            }
+            if ($publishOwnDraft) {
+                self::publishOwnDraft($id);
             }
 
             return $id;
@@ -343,18 +415,63 @@ final class LanguageSetup
         $sitepress->switch_lang(self::LANGUAGE, true);
         $id = wp_insert_post([
             'post_type'    => 'page',
-            'post_status'  => $status ?? (string) get_post_status($source),
+            'post_status'  => $status,
             'post_title'   => get_the_title($source),
             'post_name'    => (string) get_post_field('post_name', $source),
             'post_content' => (string) get_post_field('post_content', $source),
+            'meta_input'   => [self::PROVISIONED => 1],
         ], true);
         $sitepress->switch_lang($previous, true);
-        if (is_wp_error($id)) {
+        if (is_wp_error($id) || (int) $id === 0) {
             return 0;
         }
         $sitepress->set_element_language_details((int) $id, 'post_page', $trid, self::LANGUAGE, $sitepress->get_language_for_element($source, 'post_page'));
 
         return (int) $id;
+    }
+
+    /**
+     * The English record of a contracted page by its slug: its id, 0 when there is none, or -1 when the slug belongs
+     * only to an Arabic record with no English one (reported, never taken for English).
+     */
+    private static function englishRecord(string $slug): int
+    {
+        global $sitepress;
+        $ids = get_posts([
+            'post_type'        => 'page',
+            'name'             => $slug,
+            'post_status'      => ['publish', 'draft', 'pending', 'private', 'future'],
+            'numberposts'      => 10,
+            'fields'           => 'ids',
+            'suppress_filters' => true,
+            'orderby'          => 'ID',
+            'order'            => 'ASC',
+        ]);
+        foreach ($ids as $id) {
+            $language = $sitepress->get_language_for_element((int) $id, 'post_page');
+            if ($language === 'en' || $language === null || $language === '') {
+                return (int) $id;
+            }
+        }
+        $orphan = false;
+        foreach ($ids as $id) {
+            $trid  = $sitepress->get_element_trid((int) $id, 'post_page');
+            $group = $trid ? $sitepress->get_element_translations($trid, 'post_page') : [];
+            if (isset($group['en']) && (int) $group['en']->element_id !== (int) $id) {
+                return (int) $group['en']->element_id;
+            }
+            $orphan = true;
+        }
+
+        return $orphan ? -1 : 0;
+    }
+
+    /** Publish a page only when it is a draft this class made. */
+    private static function publishOwnDraft(int $id): void
+    {
+        if (get_post_status($id) === 'draft' && (int) get_post_meta($id, self::PROVISIONED, true) === 1) {
+            wp_update_post(['ID' => $id, 'post_status' => 'publish']);
+        }
     }
 
     /**

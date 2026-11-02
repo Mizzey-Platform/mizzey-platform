@@ -73,10 +73,10 @@ every deploy; it keeps everything already there:
 
 ```bash
 wp mizzey languages provision            # new pages are drafts until their copy is written
-wp mizzey languages provision --publish  # when the copy is in place
+wp mizzey languages provision --publish  # when the copy is in place: publishes only the drafts it made
 ```
 
-It exits non-zero and names what it could not make. The Arabic endpoint words are placeholders (`orders-ar`) until
+It never changes a page staff made or a status staff set, and it exits non-zero naming what is not in place. The Arabic endpoint words are placeholders (`orders-ar`) until
 the client's wording is entered in WPML's string translation, which the command then keeps.
 
 ## The translation plugin family
