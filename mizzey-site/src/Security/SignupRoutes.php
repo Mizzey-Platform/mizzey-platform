@@ -138,8 +138,10 @@ final class SignupRoutes
             }
             $extensions = $request['extensions'];
             $signup     = is_array($extensions) && is_array($extensions[self::STORE_NAMESPACE] ?? null) ? $extensions[self::STORE_NAMESPACE] : [];
-            // Checked now, spent only when the account is made (guard()): a checkout refused before that, on its cart or
-            // its stock, keeps the token for the customer's next try (audit D-305-7).
+            // Checked now, spent only when the account is made (spendAtCreation()): a checkout refused before that, on
+            // its cart or by another registration check, keeps the token for the customer's next try (audit D-305-7).
+            // The Store API makes the account before it reserves the stock, so a checkout refused on its stock has
+            // already made the account and spent the token.
             $valid = SignupCheck::inspect('checkout', $signup['token'] ?? null, $signup['trap'] ?? null);
             if ($valid === null || SignupCheck::spent($valid)) {
                 return new WP_Error(self::ERROR, SignupCheck::message(), ['status' => 400]);
