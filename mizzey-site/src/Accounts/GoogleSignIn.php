@@ -173,6 +173,9 @@ final class GoogleSignIn
 
             return self::back(self::accountUrl(), $why);
         }
+        if (\MizzeySite\Account\CustomerRecords::isSuspended($user->ID)) {
+            return self::back(self::accountUrl(), 'suspended');
+        }
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID, true);
         do_action('wp_login', $user->user_login, $user);
@@ -330,7 +333,9 @@ final class GoogleSignIn
                 ? __('Staff accounts sign in with their password.', 'mizzey-site')
                 : ($said === 'link'
                     ? __('Please sign in or register with your email and password.', 'mizzey-site')
-                    : __('Google sign-in did not complete. Please try again.', 'mizzey-site'));
+                    : ($said === 'suspended'
+                        ? __('This account is suspended. Please contact customer service.', 'mizzey-site')
+                        : __('Google sign-in did not complete. Please try again.', 'mizzey-site')));
             printf('<p class="mizzey-google-sign-in-notice">%s</p>', esc_html($text));
         }
     }

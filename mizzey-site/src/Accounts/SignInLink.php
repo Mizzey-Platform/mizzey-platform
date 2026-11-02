@@ -155,7 +155,7 @@ final class SignInLink
             return;
         }
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash((string) $_POST['_wpnonce'])) : '';
-        if (wp_verify_nonce($nonce, self::NONCE) && self::redeem($userId, $token)) {
+        if (wp_verify_nonce($nonce, self::NONCE) && ! \MizzeySite\Account\CustomerRecords::isSuspended($userId) && self::redeem($userId, $token)) {
             wp_set_current_user($userId);
             wp_set_auth_cookie($userId, false);
             wp_safe_redirect($account);
