@@ -110,6 +110,8 @@ run(
 		$editor = (int) wp_insert_user( array( 'user_login' => "{$tag}ed", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}ed@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $editor );
 		wp_set_current_user( $editor );
+		$_REQUEST['_wpnonce'] = wp_create_nonce( Transport::ACTION ); // A valid form: only the capability can refuse it.
+		$_POST['_wpnonce']    = $_REQUEST['_wpnonce'];
 		$refused = false;
 		$die     = static function () use ( &$refused ) { return static function () use ( &$refused ) { $refused = true; throw new \RuntimeException( 'refused' ); }; };
 		add_filter( 'wp_die_handler', $die, PHP_INT_MAX );
