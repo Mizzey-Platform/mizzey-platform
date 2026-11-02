@@ -1,0 +1,20 @@
+Mutation check for specs/036-product-management, t76-product-management, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7).
+Each deliberate defect was applied alone, t76 run, the file restored. M7 and M8 survived the first run: the test now saves
+the Arabic record itself, and checks that WPML's loader ran (WPML keeps its field rules in memory once a request).
+
+CAUGHT    M1 the SEO title is not emitted  <- AC-2 the product page carries the title, description, canonical and robots overrides
+CAUGHT    M2 the robots override is ignored  <- AC-2 the product page carries the title, description, canonical and robots overrides
+CAUGHT    M3 the fields save without their nonce  <- AC-2 without the form's nonce nothing changes
+CAUGHT    M4 badges are stored in the order ticked  <- AC-3 badges come in D-19's order: Limited, New, Best Seller, Trending
+CAUGHT    M5 the automatic related rail stays  <- AC-4 the related products are the assigned Upsells; WooCommerce's automatic rail is empty
+CAUGHT    M6 a price change is not recorded  <- AC-6 a change by staff and one from the REST API are each recorded with the user and the time (0 entries, last by ?)
+CAUGHT    M7 the Arabic record keeps a second history  <- AC-6 saving the Arabic record keeps no second history on it
+CAUGHT    M8 the site's WPML rules are not applied  <- fixture: the site's wpml-config.xml is applied when it changes
+
+After Codex's review (escaping, translations, duplicates, robots, addresses, zero prices):
+CAUGHT    M10 a duplicate copies the history  <- AC-6 a duplicate starts with no history of its own
+CAUGHT    M11 a change on the Arabic record is lost  <- AC-6 a change saved on the Arabic record is kept in the item's one history
+EQUIVALENT M9 the SEO title is printed unescaped: WordPress 7.1 strips markup from the document title itself, so the
+          page carries no script either way; the escaping stays as defence in depth for another title path.
+
+10 of 10 caught; 1 equivalent.
