@@ -48,12 +48,15 @@ final class StockGateway
         );
     }
 
-    /** The gateway for a display: one attempt, no pause, so a slow or absent source does not hold a page. */
+    /**
+     * The gateway for a display: one attempt, no pause, so a slow or absent source does not hold a page. Logged like
+     * every other attempt (specs/012 AC-6), so an outage first seen in the admin is in the log too.
+     */
     public static function quick(): self
     {
         $source = apply_filters(self::SOURCE_FILTER, null);
 
-        return new self($source instanceof StockSource ? $source : new UnconfiguredStockSource(), 1, null, 0);
+        return new self($source instanceof StockSource ? $source : new UnconfiguredStockSource(), 1, function_exists('wc_get_logger') ? wc_get_logger() : null, 0);
     }
 
     public function level(int $productId): StockAnswer
