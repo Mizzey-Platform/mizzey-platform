@@ -270,6 +270,25 @@ run(
 		unset( $GLOBALS['product_object'] );
 		$check( false !== strpos( $list_html, 'Stock from the stock source: 7' ) && false === strpos( $list_html, '(12)' ) && false !== strpos( $again, ': 7' ) && 2 === $source->reads && false !== strpos( $editor, 'Stock from the stock source: 7' ) && false !== strpos( $var_editor, 'Stock from the stock source: 7' ) && false !== strpos( $unknown, 'not known' ) && $locked, 'ADM-70, ADM-72 the products list and the product and variation editors show the figure from the stock source (7, not the stored 12), read once per product, or that it is not known; the stock fields\' lock is loaded on the product screen (' . $source->reads . ' reads)' );
 
+		// A slow source: past the list's time budget a row does not wait; its figure is read in the background.
+		$slow     = new T67Source( 9 );
+		$bind_slow = static fn () => $slow;
+		$spent    = static fn () => 0.0;
+		add_filter( StockGateway::SOURCE_FILTER, $bind_slow );
+		add_filter( StockWriteGuard::LIST_BUDGET, $spent );
+		delete_transient( StockWriteGuard::FIGURE . $id );
+		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
+		$deferred      = (string) apply_filters( 'woocommerce_admin_stock_html', 'In stock', wc_get_product( $id ) );
+		$reads_waiting = $slow->reads;
+		$queued_fill   = as_has_scheduled_action( StockWriteGuard::FILL_HOOK, array( $id ), 'mizzey' );
+		StockWriteGuard::fill( $id );
+		$filled = (string) apply_filters( 'woocommerce_admin_stock_html', 'In stock', wc_get_product( $id ) );
+		remove_filter( StockWriteGuard::LIST_BUDGET, $spent );
+		remove_filter( StockGateway::SOURCE_FILTER, $bind_slow );
+		delete_transient( StockWriteGuard::FIGURE . $id );
+		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
+		$check( 0 === $reads_waiting && str_contains( $deferred, 'being read' ) && $queued_fill && str_contains( $filled, 'Stock from the stock source: 9' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
+
 		return $ok;
 	}
 );
