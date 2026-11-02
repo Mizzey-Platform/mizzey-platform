@@ -48,10 +48,13 @@ final class ImportRunLog implements ImportRunRecorder
         return $name;
     }
 
-    /** @param array<string, mixed> $changes Fields added to a run's record when it ends; earlier fields are kept. */
+    /**
+     * @param string               $id      The run id, or the record's reference.
+     * @param array<string, mixed> $changes Fields added to a run's record when it ends; earlier fields are kept.
+     */
     public static function update(string $id, array $changes): void
     {
-        $name   = self::PREFIX . sanitize_key($id);
+        $name   = str_starts_with($id, self::PREFIX) ? $id : self::PREFIX . sanitize_key($id);
         $record = get_option($name, null);
         if (is_array($record)) {
             update_option($name, array_replace($record, $changes), false);

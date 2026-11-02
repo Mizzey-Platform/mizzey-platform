@@ -202,6 +202,10 @@ final class CatalogueCommand
         } catch (RuntimeException $failure) {
             $payload = array_replace($payload, ['outcome' => 'output-failure', 'reason' => $failure->getMessage(), 'error_reference' => 'output-failure']);
             $exit    = $exit === 0 ? self::EXIT_USAGE : $exit;
+            // The stored record must not say completed when its copy could not be written.
+            if (isset($payload['record'])) {
+                ImportRunLog::update((string) $payload['record'], ['outcome' => 'output-failure', 'reason' => $payload['reason'], 'error_reference' => 'output-failure']);
+            }
         }
         if ($exit !== 0) {
             WP_CLI::warning((string) $payload['reason']);

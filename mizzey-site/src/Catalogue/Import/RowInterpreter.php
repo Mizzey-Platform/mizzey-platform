@@ -124,13 +124,13 @@ final class RowInterpreter
         }
         $images = array_values(array_unique(array_filter(array_map('trim', explode('|', (string) ($fields['images'] ?? ''))), 'strlen')));
         foreach ($images as $address) {
-            $parts = wp_parse_url($address);
-            if (! is_array($parts) || ! in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true) || (string) ($parts['host'] ?? '') === '') {
+            // The load's own check (CatalogueLoad::attach): an address it would refuse is reported here first.
+            if (wp_http_validate_url($address) === false) {
                 $issues[] = LoadRules::issue('W7', (string) $mapping->columnFor('images'), sprintf(
                     /* translators: %s: the value found. */
-                    __('The image address "%s" is not a web address; the image will not be downloaded.', 'mizzey-site'),
+                    __('The image address "%s" is not a public web address; the image will not be downloaded.', 'mizzey-site'),
                     $address,
-                ), __('Give the full http or https address of the image.', 'mizzey-site'));
+                ), __('Give the full public http or https address of the image.', 'mizzey-site'));
             }
         }
         if (count($images) > CatalogueLoad::IMAGES_MAX) {

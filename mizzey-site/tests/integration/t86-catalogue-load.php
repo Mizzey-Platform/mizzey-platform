@@ -66,8 +66,9 @@ run(
 		// Addresses of this run only, so no image stored by an earlier run is reused.
 		$img1 = home_url( '/wp-includes/images/w-logo-blue.png?' . $tag );
 		$img2 = home_url( '/wp-includes/images/wpspin-2x.gif?' . $tag );
-		// Eleven addresses after one that is refused: the refused one and the eleventh are reported (B-09).
-		$many = array( "ftp://{$tag}.example/refused.jpg" );
+		// Eleven addresses after one that is refused: the refused one and the eleventh are reported (B-09). The refused
+		// one is a well-formed address on a private network, which only WordPress's own check refuses.
+		$many = array( 'http://10.255.255.1/refused.jpg' );
 		for ( $n = 1; $n <= 11; $n++ ) {
 			$many[] = home_url( "/wp-includes/images/w-logo-blue.png?n{$n}-{$tag}" );
 		}
@@ -107,6 +108,21 @@ run(
 		}
 		$check( $under_root && ! file_exists( "{$dir}/served/plan.json" ), 'AC-1 B-14 a run directory under the server\'s document root is refused' );
 		@rmdir( "{$dir}/served" ); // phpcs:ignore
+		// Under WP-CLI the document root is WordPress's own folder. With WordPress in a subfolder of the site (its address
+		// ends in that folder's name, as /wp does), the folder above it is the one the domain serves: refused too, and
+		// nothing is created there.
+		$sub     = basename( untrailingslashit( ABSPATH ) );
+		$address = static fn (): string => 'http://example.test/' . $sub;
+		add_filter( 'pre_option_siteurl', $address );
+		$above = dirname( untrailingslashit( ABSPATH ) ) . "/{$tag}-runs/inner";
+		try {
+			CatalogueLoad::start( "{$dir}/export.tsv", $mapping, $above, true );
+			$in_site = false;
+		} catch ( \RuntimeException $e ) {
+			$in_site = str_contains( $e->getMessage(), 'outside the website folder' );
+		}
+		remove_filter( 'pre_option_siteurl', $address );
+		$check( $in_site && ! file_exists( dirname( $above ) ), 'AC-1 B-14 with WordPress in a subfolder of the site, a run directory beside it in the site\'s folder is refused under WP-CLI, and not created' );
 		try {
 			CatalogueLoad::start( "{$dir}/export.tsv", $mapping, wp_upload_dir()['basedir'] . "/{$tag}-run", true );
 			$refused = false;
@@ -216,7 +232,6 @@ run(
 		$english = $export( 'en' );
 		$expect  = array( "{$tag}-ROSE", "{$tag}-MASK", "{$tag}-MASK-S", "{$tag}-MASK-L", "{$tag}-PLAIN", "{$tag}-AMP" );
 		$check( array() === array_diff( $expect, array_keys( $english ) ) && array( 1 ) === array_values( array_unique( array_values( $english ) ) ), 'AC-6 MIG-25 the export screen\'s query, in English, lists every loaded product and variation once (' . wp_json_encode( $english ) . ')' );
-		$s->note( 'MEASURED  the same export with all languages shown lists: ' . wp_json_encode( $export( 'all' ) ) );
 
 		// An update run, as the client's corrected file comes back (MIG-19): new prices with blank cells everywhere else,
 		// and a size added to the translated variable product.
@@ -224,7 +239,8 @@ run(
 		$update    = implode( "\t", $cols ) . "\n"
 			. implode( "\t", array( "{$tag}-ROSE", '', '', '', '', '260.00', '', '', '', '', '', '', '', '', '', '', '' ) ) . "\n"
 			. implode( "\t", array( "{$tag}-MASK-S", '', '', '', '', '155.00', '', '', 'child', "{$tag}-MASK", '', '', '', '', '', '', '' ) ) . "\n"
-			. implode( "\t", array( "{$tag}-MASK-M", '', '', '', '', '180.00', '', '70.00', 'child', "{$tag}-MASK", 'Medium', '', '', '', '', '', '' ) ) . "\n";
+			. implode( "\t", array( "{$tag}-MASK-M", '', '', '', '', '180.00', '', '70.00', 'child', "{$tag}-MASK", 'Medium', '', '', '', '', '', '' ) ) . "\n"
+			. implode( "\t", array( "{$tag}-PLAIN", '', '', '', '', '', '150.00', '', '', '', '', '', '', '', '', '', '' ) ) . "\n";
 		file_put_contents( "{$dir}/update.tsv", $update );
 		$upd = CatalogueLoad::start( "{$dir}/update.tsv", $mapping, "{$dir}/run-update", false );
 		$finish();
@@ -233,7 +249,10 @@ run(
 		$after     = wc_get_product( $rose->get_id() );
 		$ar_now    = (int) apply_filters( 'wpml_object_id', $rose->get_id(), 'product', false, 'ar' );
 		$check( 'done' === ( $upd_state['status'] ?? '' ) && array() === ( $upd_state['problems'] ?? array() ), 'AC-1 the update run ran to the end with no problem (' . wp_json_encode( $upd_state['problems'] ?? null ) . ')' );
-		$check( 2 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were (' . wp_json_encode( array( $upd['counts'] ?? null, $after->get_regular_price(), $after->get_sale_price(), $after->get_name(), $after->get_cogs_value() ) ) . ')' );
+		$upd_issues = array_map( 'str_getcsv', array_slice( (array) file( "{$dir}/run-update/" . ReportWriter::ISSUES, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ), 1 ) );
+		$w5         = array_filter( $upd_issues, static fn ( $r ) => "{$tag}-PLAIN" === ( $r[1] ?? '' ) && 'W5' === ( $r[5] ?? '' ) );
+		$check( 1 === count( $w5 ), 'B-15 a sale price given alone on an update, at or above the price the store holds (150 against 99), is a client issue before the load (' . count( $w5 ) . ' W5)' );
+		$check( 3 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were (' . wp_json_encode( array( $upd['counts'] ?? null, $after->get_regular_price(), $after->get_sale_price(), $after->get_name(), $after->get_cogs_value() ) ) . ')' );
 		$check( $rose_trid > 0 && $rose_trid === $trid( $rose->get_id(), 'post_product' ) && $ar_now === $rose_ar && 'تونر ماء الورد ٢٠٠ مل' === get_post_field( 'post_title', $ar_now ), 'AC-4 the update keeps the product and its Arabic record in one translation group, the Arabic text unchanged' );
 
 		// B-01: the Arabic records carry the new prices, and an Arabic order is charged them.
@@ -255,15 +274,38 @@ run(
 		$check( $mv instanceof \WC_Product_Variation && $mv->get_parent_id() === $mask_ar && '180' === (string) (float) $mv->get_regular_price() && 'Medium' === $mv->get_attribute( 'size' ) && in_array( 'Medium', $ar_values, true ) && 3 === count( $mask_arp->get_children() ), 'AC-3 B-02 a size added to a translated product gets its Arabic variation, its price, and its place in the Arabic size list (' . wp_json_encode( array( $medium_ar, $ar_values, $mv ? $mv->get_regular_price() : null, $mask_arp ? count( $mask_arp->get_children() ) : null ) ) . ')' );
 		$check( is_array( ImportRunLog::get( (string) $state['id'] ) ) && is_array( ImportRunLog::get( (string) $upd['id'] ) ) && (string) $state['id'] !== (string) $upd['id'], 'A-273-1 ENT-19 the earlier run\'s record is kept beside the update run\'s' );
 
+		// B-10: an images action that died at a time limit is resumed from the saved progress, by the watchdog it queued,
+		// and a product tried twice without finishing is given up and reported instead of being tried for ever.
+		$stranded = wp_generate_uuid4();
+		update_option( CatalogueLoad::RUN, array_merge( $state, array( 'id' => $stranded, 'status' => 'images', 'done' => array( 'sources' => 6, 'translations' => 6, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'image_tries' => array( 0 => 2 ), 'updated' => time() ) ), false );
+		CatalogueLoad::images( $stranded, 'resume' );
+		$resumed = CatalogueLoad::state();
+		$gave_up = array_filter( (array) $resumed['problems'], static fn ( $p ) => "{$tag}-ROSE" === $p['sku'] && str_contains( $p['problem'], 'two tries' ) );
+		$check( 'done' === $resumed['status'] && 2 === (int) $resumed['done']['images'] && 1 === count( $gave_up ) && false === as_has_scheduled_action( CatalogueLoad::IMAGES, array( $stranded, 'resume' ), CatalogueLoad::GROUP ), 'AC-5 B-10 a stranded images phase resumes from its saved progress, gives up a product after two tries with the reason, and leaves no watchdog behind (' . wp_json_encode( array( $resumed['status'], $resumed['done'], array_column( (array) $resumed['problems'], 'problem' ) ) ) . ')' );
+
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.
 		update_option( CatalogueLoad::RUN, array( 'status' => 'done' ), false );
 		$no = CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/run2", false );
 		$check( false === $no['images'], 'AC-5 without the rights confirmed, the run plans no image download' );
+		// B-12, last: the export with all languages, as WooCommerce Multilingual runs it when the export screen is shown
+		// in "All languages" (its flag in the submitted form, its own hooks lifting WPML's language filters for the
+		// query). One row per language record: twice for each product and variation with an Arabic record, once for
+		// the one without. It is last because WooCommerce Multilingual does not restore the filters in this process.
+		global $sitepress;
+		( new \WCML\Exporter\AllLanguagesHooks( $sitepress ) )->add_hooks();
+		$_POST['form'] = \WCML\Exporter\AllLanguagesHooks::KEY_EXPORT_ALL_LANGUAGES . '=1';
+		$all_languages = $export( 'all' );
+		unset( $_POST['form'] );
+		$per_record = array( "{$tag}-ROSE" => 2, "{$tag}-MASK" => 2, "{$tag}-MASK-S" => 2, "{$tag}-MASK-L" => 2, "{$tag}-MASK-M" => 2, "{$tag}-AMP" => 2, "{$tag}-PLAIN" => 1 );
+		ksort( $all_languages );
+		ksort( $per_record );
+		$check( $per_record === $all_languages, 'AC-6 B-12 the all-languages export lists each language record once: no row missing, none repeated (' . wp_json_encode( $all_languages ) . ')' );
+
 		foreach ( array( CatalogueLoad::SOURCES, CatalogueLoad::TRANSLATIONS, CatalogueLoad::IMAGES ) as $hook ) {
 			as_unschedule_all_actions( $hook, array(), CatalogueLoad::GROUP );
 		}
 		delete_option( CatalogueLoad::RUN );
-		foreach ( array( $state['id'], $upd['id'], $no['id'] ) as $run_id ) {
+		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded ) as $run_id ) {
 			delete_option( ImportRunLog::PREFIX . $run_id ); // This scenario's records only.
 		}
 

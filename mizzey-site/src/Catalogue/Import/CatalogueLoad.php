@@ -59,6 +59,10 @@ final class CatalogueLoad
     public const BATCH        = 20;
     public const IMAGE_BATCH  = 5;
     public const IMAGES_MAX   = 10;
+    /** Seconds after which an images action that died (a time limit) is resumed by its watchdog. */
+    public const WATCHDOG     = 300;
+    /** Tries per product before its images are given up, reported. */
+    public const IMAGE_TRIES  = 2;
     public const STALE        = 1800;
     public const IMAGE_BYTES  = 20971520;
     public const SOURCE_META  = '_mizzey_source_image';
@@ -175,28 +179,55 @@ final class CatalogueLoad
         return in_array($state['status'] ?? '', ['sources', 'translations', 'images'], true) && time() - (int) ($state['updated'] ?? 0) < self::STALE;
     }
 
-    /** The run directory, absolute, writable, and outside the web root (the plan holds costs). */
+    /**
+     * The run directory, absolute, writable, and outside every folder the web server can serve (the plan holds costs).
+     *
+     * Refused, each by its real path, before anything is created: WordPress's own folder; the uploads folder, which a
+     * server may keep elsewhere (staging links it in from outside the release); the site's root folder when WordPress
+     * sits in a subfolder of it (the site address names that subfolder, as /wp does, so the folder that much above
+     * WordPress is the one the domain serves); and the server's document root when the request names one. Under
+     * WP-CLI the document root is WordPress's own folder, which is why the site address is read as well.
+     */
     private static function directory(string $directory): string
     {
-        if ($directory === '' || ! wp_mkdir_p($directory) || ! is_writable($directory)) {
+        if ($directory === '') {
             throw new \RuntimeException(__('The run directory cannot be written.', 'mizzey-site'));
         }
-        $real = wp_normalize_path((string) realpath($directory));
-        // Every folder the web server can serve: WordPress's own and the uploads folder, which a server may keep
-        // elsewhere (staging links it in from outside the release), each by its real path.
-        // The server's document root too, when it sits above WordPress (a subdirectory install, a local web server).
-        $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? sanitize_text_field(wp_unslash((string) $_SERVER['DOCUMENT_ROOT'])) : '';
-        $served       = array_filter(array_map(
-            static fn (string $path): string => $path === '' ? '' : wp_normalize_path((string) realpath($path)),
-            [ABSPATH, (string) (wp_upload_dir(null, false)['basedir'] ?? ''), $documentRoot],
-        ));
-        foreach ($served as $root) {
+        // The real path of the directory as it will be: its nearest existing folder, resolved, and the rest as given.
+        $existing = $directory;
+        $rest     = '';
+        while (! file_exists($existing) && dirname($existing) !== $existing) {
+            $rest     = '/' . basename($existing) . $rest;
+            $existing = dirname($existing);
+        }
+        $base = realpath($existing);
+        $real = $base === false ? '' : rtrim(wp_normalize_path($base), '/') . $rest;
+        foreach (self::served() as $root) {
             if ($real === '' || str_starts_with($real . '/', rtrim($root, '/') . '/')) {
                 throw new \RuntimeException(__('Keep the run directory outside the website folder: the plan holds costs.', 'mizzey-site'));
             }
         }
+        if (! wp_mkdir_p($directory) || ! is_writable($directory)) {
+            throw new \RuntimeException(__('The run directory cannot be written.', 'mizzey-site'));
+        }
 
-        return rtrim($real, '/');
+        return rtrim(wp_normalize_path((string) realpath($directory)), '/');
+    }
+
+    /** @return list<string> The folders the web server can serve, by real path. */
+    private static function served(): array
+    {
+        $wordpress = rtrim(wp_normalize_path((string) realpath(ABSPATH)), '/');
+        $subfolder = trim((string) wp_parse_url(site_url(), PHP_URL_PATH), '/');
+        $siteRoot  = $subfolder !== '' && str_ends_with(strtolower($wordpress), '/' . strtolower($subfolder))
+            ? substr($wordpress, 0, -strlen('/' . $subfolder))
+            : '';
+        $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? sanitize_text_field(wp_unslash((string) $_SERVER['DOCUMENT_ROOT'])) : '';
+
+        return array_values(array_filter(array_map(
+            static fn (string $path): string => $path === '' ? '' : wp_normalize_path((string) realpath($path)),
+            [$wordpress, $siteRoot, (string) (wp_upload_dir(null, false)['basedir'] ?? ''), $documentRoot],
+        )));
     }
 
     /** @return array<string,mixed> */
@@ -710,15 +741,30 @@ final class CatalogueLoad
         require_once ABSPATH . 'wp-admin/includes/media.php';
         require_once ABSPATH . 'wp-admin/includes/file.php';
         require_once ABSPATH . 'wp-admin/includes/image.php';
-        $plan   = array_values(array_filter($all, static fn (array $e): bool => trim((string) ($e['fields']['images'] ?? '')) !== ''));
-        $offset = max(0, (int) $offset);
-        $limit  = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
+        $plan = array_values(array_filter($all, static fn (array $e): bool => trim((string) ($e['fields']['images'] ?? '')) !== ''));
+        // Downloads can outlast a web runner's time limit, which ends the action before it queues the next one. So a
+        // watchdog is queued first, to resume from the saved progress if this action dies, and is removed when it
+        // ends normally; the action stops early once half the time limit is spent; a product tried twice without
+        // finishing is given up and reported, so a resume never loops on it. Progress, not the queued offset, says
+        // where to start, which makes a resumed and a queued action agree.
+        $watchdog = [$state['id'], 'resume'];
+        as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
+        as_schedule_single_action(time() + self::WATCHDOG, self::IMAGES, $watchdog, self::GROUP);
+        $from    = max(0, (int) ($state['done']['images'] ?? 0));
+        $started = microtime(true);
+        $budget  = self::timeBudget();
+        $limit   = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
         add_filter('http_request_args', $limit, 99);
         try {
-            foreach (array_slice($plan, $offset, self::IMAGE_BATCH) as $entry) {
+            foreach (array_slice($plan, $from, self::IMAGE_BATCH, true) as $index => $entry) {
+                $tries = (int) ($state['image_tries'][$index] ?? 0) + 1;
+                $state['image_tries'][$index] = $tries;
+                self::save($state); // Saved before the downloads, so a try that dies is counted.
                 $id = (int) ($state['ids'][$entry['sku']] ?? 0);
                 try {
-                    if ($id > 0) {
+                    if ($tries > self::IMAGE_TRIES) {
+                        self::problem($state, $entry, __('The images did not finish downloading in two tries (a time limit); they were not attached.', 'mizzey-site'));
+                    } elseif ($id > 0) {
                         self::attach($id, $entry, $state);
                     }
                 } catch (\Throwable $e) {
@@ -726,17 +772,27 @@ final class CatalogueLoad
                 }
                 ++$state['done']['images'];
                 self::save($state);
+                if (microtime(true) - $started > $budget) {
+                    break;
+                }
             }
         } finally {
             remove_filter('http_request_args', $limit, 99);
         }
-        // Five products an action: up to ten downloads each must finish inside a web runner's time limit too.
-        $next = $offset + self::IMAGE_BATCH;
-        if ($next < count($plan)) {
-            as_enqueue_async_action(self::IMAGES, [$state['id'], $next], self::GROUP);
+        as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
+        if ((int) $state['done']['images'] < count($plan)) {
+            as_enqueue_async_action(self::IMAGES, [$state['id'], (int) $state['done']['images']], self::GROUP);
             return;
         }
         self::finish($state, 'done');
+    }
+
+    /** Seconds an images action may spend before it hands over: half the PHP time limit, or two minutes with none. */
+    private static function timeBudget(): float
+    {
+        $limit = (int) ini_get('max_execution_time');
+
+        return $limit > 0 ? max(5.0, $limit / 2) : 120.0;
     }
 
     /**

@@ -86,6 +86,20 @@ final class LoadRules
         if ($type === 'variation' && $parent !== null && ! $parent['usable']) {
             $issues[] = self::issue('R5', self::header('parent_sku', $mapping), $parent['reason'], $parent['correction'], $parent['owner']);
         }
+        // A sale price on an update that leaves the price blank is compared with the price the store holds.
+        $sale = trim((string) ($row['fields']['sale_price'] ?? ''));
+        if ($update && ($row['price'] ?? null) === null && preg_match('/^\d+(\.\d{1,2})?$/', $sale) === 1) {
+            $stored  = wc_get_product((int) $resolution['id']);
+            $regular = $stored instanceof \WC_Product ? (string) $stored->get_regular_price('edit') : '';
+            if ($regular !== '' && (float) $sale >= (float) $regular) {
+                $issues[] = self::issue('W5', self::header('sale_price', $mapping), sprintf(
+                    /* translators: 1: the sale price, 2: the store's price. */
+                    __('The sale price %1$s is not below the store\'s price %2$s, so it is not kept.', 'mizzey-site'),
+                    $sale,
+                    $regular,
+                ), __('Give a sale price below the price, or the new price in the same row.', 'mizzey-site'));
+            }
+        }
         if (! $update && $type !== null) {
             foreach ($mapping->arabicFields() as $field) {
                 if (($row['fields'][$field] ?? '') === '') {

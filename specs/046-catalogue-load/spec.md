@@ -91,10 +91,15 @@ SSC-21 is marked [key] in the register.
 - An image address that is not a public web address, and every address after the tenth: not downloaded, reported.
   The validation pass reports them first, as client issues.
 - Cost in the mapping while WooCommerce's cost of goods is off: the load refuses to start, so no cost is lost.
-- A run directory under WordPress, the uploads folder or the server's document root, or one that holds an earlier
-  plan: refused.
-- A web runner rather than WP-CLI: the images phase takes five products an action, so ten downloads fit inside a web
-  request's time limit; the load is run with `wp action-scheduler run` where the host allows it.
+- A run directory under WordPress, the uploads folder, the site's folder when WordPress sits in a subfolder of it (the
+  site address ends in that subfolder, as `/wp` does), or the request's document root, or one that holds an earlier
+  plan: refused, and nothing is created there. Under WP-CLI the document root is WordPress's own folder, so a web root
+  set higher than the site address shows is not known to the load: the runbook keeps run directories outside the web
+  server's folders (a home or temporary folder).
+- A web runner rather than WP-CLI: an images action takes at most five products and hands over once half the PHP time
+  limit is spent; it queues a watchdog first, which resumes from the saved progress if the action dies at the limit,
+  and a product tried twice without finishing is given up and reported. The load is run with
+  `wp action-scheduler run` where the host allows it.
 
 ## Native coverage
 
