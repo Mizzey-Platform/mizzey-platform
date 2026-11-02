@@ -185,34 +185,87 @@ final class StoreDashboard
     }
 
     /**
-     * Orders with a refund still to make, newest first, at most REFUND_LIMIT of each: paid orders cancelled and not
-     * fully refunded (selected by the database); and orders the payment layer flagged since their last refund, unless
-     * they have since been delivered or refunded.
+     * Orders with a refund still to make, newest first, at most the limit of each: paid orders cancelled and not fully
+     * refunded; and orders the payment layer flagged since their last refund, unless they have since been delivered or
+     * refunded. Each list is filtered first and limited after, so a resolved order never hides an open one.
      *
      * @return array{cancelled_paid:list<int>,flagged:list<int>}
      */
     public static function pendingRefunds(): array
     {
-        $open    = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
-        $flagged = array_values(array_filter(
-            wc_get_orders(['status' => $open, 'limit' => self::REFUND_LIMIT, 'orderby' => 'date', 'order' => 'DESC', 'type' => 'shop_order', 'meta_query' => [['key' => PaymentRecord::ATTENTION, 'compare' => 'EXISTS']]]), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-            static function ($o): bool {
-                if (! $o instanceof \WC_Order || $o->has_status(['completed', 'cod-collected', 'refunded'])) {
-                    return false;
-                }
-                $flags = PaymentRecord::attention($o);
-                $last  = $flags === [] ? 0 : max(array_map(static fn ($f): int => (int) ($f['at'] ?? 0), $flags));
-                $refunded = 0;
-                foreach ($o->get_refunds() as $refund) {
-                    $created  = $refund->get_date_created();
-                    $refunded = max($refunded, $created ? $created->getTimestamp() : 0);
-                }
+        return ['cancelled_paid' => self::cancelledPaid(), 'flagged' => self::flagged()];
+    }
 
-                return $last > $refunded;
+    /** The most orders a refund list holds (REFUND_LIMIT, or the `mizzey_dashboard_refund_limit` filter's). */
+    public static function limit(): int
+    {
+        return max(1, (int) apply_filters('mizzey_dashboard_refund_limit', self::REFUND_LIMIT));
+    }
+
+    /**
+     * Flagged orders still open, newest first, read a page at a time: each page's flags and latest refund dates are
+     * read in two queries (no order is loaded), until the limit is reached or none is left.
+     *
+     * @return list<int>
+     */
+    private static function flagged(): array
+    {
+        global $wpdb;
+        $hpos   = OrderUtil::custom_orders_table_usage_is_enabled();
+        $open   = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
+        $in     = implode("','", array_map('esc_sql', $open));
+        $limit  = self::limit();
+        $page   = 200;
+        $found  = [];
+        for ($offset = 0; count($found) < $limit; $offset += $page) {
+            $ids = $hpos
+                ? $wpdb->get_col($wpdb->prepare(
+                    "SELECT o.id FROM {$wpdb->prefix}wc_orders o JOIN {$wpdb->prefix}wc_orders_meta m ON m.order_id = o.id AND m.meta_key = %s
+                     WHERE o.type = 'shop_order' AND o.status IN ('{$in}') GROUP BY o.id ORDER BY MAX(o.date_created_gmt) DESC, o.id DESC LIMIT %d OFFSET %d",
+                    PaymentRecord::ATTENTION,
+                    $page,
+                    $offset
+                )) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                : $wpdb->get_col($wpdb->prepare(
+                    "SELECT p.ID FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = %s
+                     WHERE p.post_type = 'shop_order' AND p.post_status IN ('{$in}') GROUP BY p.ID ORDER BY MAX(p.post_date_gmt) DESC, p.ID DESC LIMIT %d OFFSET %d",
+                    PaymentRecord::ATTENTION,
+                    $page,
+                    $offset
+                )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $ids = array_map('intval', (array) $ids);
+            if ($ids === []) {
+                break;
             }
-        ));
+            $list  = implode(',', $ids);
+            $flags = $hpos
+                ? $wpdb->get_results($wpdb->prepare("SELECT order_id AS id, meta_value AS v FROM {$wpdb->prefix}wc_orders_meta WHERE meta_key = %s AND order_id IN ({$list})", PaymentRecord::ATTENTION)) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                : $wpdb->get_results($wpdb->prepare("SELECT post_id AS id, meta_value AS v FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id IN ({$list})", PaymentRecord::ATTENTION)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $refunds = $hpos
+                ? $wpdb->get_results($wpdb->prepare("SELECT parent_order_id AS id, MAX(date_created_gmt) AS at FROM {$wpdb->prefix}wc_orders WHERE type = %s AND parent_order_id IN ({$list}) GROUP BY parent_order_id", 'shop_order_refund')) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                : $wpdb->get_results($wpdb->prepare("SELECT post_parent AS id, MAX(post_date_gmt) AS at FROM {$wpdb->posts} WHERE post_type = %s AND post_parent IN ({$list}) GROUP BY post_parent", 'shop_order_refund')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $last = [];
+            foreach ((array) $flags as $row) {
+                $items = maybe_unserialize((string) $row->v);
+                foreach (is_array($items) ? $items : [] as $flag) {
+                    $last[(int) $row->id] = max($last[(int) $row->id] ?? 0, is_array($flag) ? (int) ($flag['at'] ?? 0) : 0);
+                }
+            }
+            $refunded = [];
+            foreach ((array) $refunds as $row) {
+                $refunded[(int) $row->id] = (int) strtotime((string) $row->at . ' UTC');
+            }
+            foreach ($ids as $id) {
+                if (($last[$id] ?? 0) > ($refunded[$id] ?? 0)) {
+                    $found[] = $id;
+                }
+            }
+            if (count($ids) < $page) {
+                break;
+            }
+        }
 
-        return ['cancelled_paid' => self::cancelledPaid(), 'flagged' => array_map(static fn ($o): int => $o->get_id(), $flagged)];
+        return array_slice($found, 0, $limit);
     }
 
     /**
@@ -233,7 +286,7 @@ final class StoreDashboard
                  WHERE o.type = 'shop_order' AND o.status = 'wc-cancelled' AND d.date_paid_gmt > '1970-01-01 00:00:00'
                  AND o.total_amount + COALESCE((SELECT SUM(r.total_amount) FROM {$orders} r WHERE r.type = 'shop_order_refund' AND r.parent_order_id = o.id), 0) > 0.005
                  ORDER BY o.id DESC LIMIT %d",
-                self::REFUND_LIMIT
+                self::limit()
             ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         } else {
             $sql = $wpdb->prepare(
@@ -245,7 +298,7 @@ final class StoreDashboard
                      JOIN {$wpdb->postmeta} rm ON rm.post_id = r.ID AND rm.meta_key = '_refund_amount'
                      WHERE r.post_type = 'shop_order_refund' AND r.post_parent = p.ID), 0) > 0.005
                  ORDER BY p.ID DESC LIMIT %d",
-                self::REFUND_LIMIT
+                self::limit()
             );
         }
 
@@ -262,7 +315,7 @@ final class StoreDashboard
         $count = number_format_i18n(count($ids));
 
         /* translators: %s: the number of orders, the most a list holds. */
-        return count($ids) >= self::REFUND_LIMIT ? sprintf(__('%s or more', 'mizzey-site'), $count) : $count;
+        return count($ids) >= self::limit() ? sprintf(__('%s or more', 'mizzey-site'), $count) : $count;
     }
 
     /**

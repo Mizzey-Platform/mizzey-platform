@@ -159,6 +159,21 @@ run(
 			wc_get_order( $flag->get_id() )->update_status( $step );
 		}
 		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded (' . wp_json_encode( array( $flagged_now, wc_get_order( $flag->get_id() )->get_status() ) ) . ')' );
+		// The limit applies after the filter: a newer flagged order since refunded never hides an older open one.
+		$older = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $older, 't75 an older payment to refund' );
+		$older = wc_get_order( $older->get_id() );
+		$older->set_date_created( time() - HOUR_IN_SECONDS );
+		$older->save();
+		$newer = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $newer, 't75 a newer payment, refunded since' );
+		wc_create_refund( array( 'order_id' => $newer->get_id(), 'amount' => '1' ) );
+		$one = static fn () => 1;
+		add_filter( 'mizzey_dashboard_refund_limit', $one );
+		$limited = StoreDashboard::pendingRefunds()['flagged'];
+		remove_filter( 'mizzey_dashboard_refund_limit', $one );
+		$unlimited = StoreDashboard::pendingRefunds()['flagged'];
+		$check( 1 === count( $limited ) && ! in_array( $newer->get_id(), $limited, true ) && in_array( $older->get_id(), $unlimited, true ) && ! in_array( $newer->get_id(), $unlimited, true ), 'AC-4 a flagged list limited to one still shows an open order when the newest flagged one was refunded since (' . wp_json_encode( array( $limited, $older->get_id(), $newer->get_id() ) ) . ')' );
 		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
 		$seen = array();
 		$spy  = static function ( $sql ) use ( &$seen ) {
