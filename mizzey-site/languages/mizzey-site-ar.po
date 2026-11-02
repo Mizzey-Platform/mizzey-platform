@@ -605,3 +605,13 @@ msgstr "مرجع الاسترداد: %s"
 #: mizzey-site/src/Orders/RefundReference.php
 msgid "Payment reference: %s"
 msgstr "مرجع الدفع: %s"
+
+#: mizzey-site/src/Account/CustomerRecords.php
+msgid "All %s order of this customer"
+msgid_plural "All %s orders of this customer"
+msgstr[0] "كل طلبات هذا العميل (%s)"
+msgstr[1] "طلب واحد لهذا العميل (%s)"
+msgstr[2] "طلبا هذا العميل (%s)"
+msgstr[3] "كل طلبات هذا العميل (%s)"
+msgstr[4] "كل طلبات هذا العميل (%s)"
+msgstr[5] "كل طلبات هذا العميل (%s)"

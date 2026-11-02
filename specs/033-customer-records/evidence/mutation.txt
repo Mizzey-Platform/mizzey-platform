@@ -9,6 +9,8 @@ CAUGHT    M4 no reason needed  <- AC-3 a suspension without a reason is refused 
 CAUGHT    M6 saved without the nonce  <- AC-2 without the form's nonce nothing changes
 CAUGHT    M7 who suspended is not kept  <- AC-3 who suspended it, when and why are kept and shown
 CAUGHT    M8 the orders are oldest first  <- AC-1 the profile lists the customer's orders, newest first, linked to each order
-CAUGHT    M5 staff can be suspended  <- AC-3 even an administrator, who may edit a shop manager, cannot suspend a staff account here
+CAUGHT    M5 staff can be suspended  <- AC-3 even an administrator, who may edit a shop manager, cannot suspend a staff account herAfter Codex's review (Google and sign-in links, cart tokens, order history):
+CAUGHT    M9 an old cart token keeps working  <- AC-3 the cart token issued before the suspension is refused (200)
+CAUGHT    M10 a sign-in completed by another route stands  <- AC-3 a sign-in any other route completes (Google, a sign-in link) is undone before anything else acts 
 
-8 of 8 caught.
+10 of 10 caught.

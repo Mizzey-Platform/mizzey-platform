@@ -65,6 +65,7 @@ run(
 		$fields = ( new \WC_Admin_Profile() )->get_customer_meta_fields();
 		$check( isset( $fields['billing']['fields']['billing_phone'], $fields['billing']['fields']['billing_email'], $fields['billing']['fields']['billing_address_1'], $fields['shipping']['fields']['shipping_address_1'] ), 'AC-1 the profile carries WooCommerce\'s contact and address fields (billing and shipping)' );
 		$html = $panel( $customer );
+		$check( str_contains( $html, 'All 2 orders of this customer' ) && str_contains( $html, '_customer_user=' . $customer ), 'AC-1 the profile links to all of the customer\'s orders in the orders list' );
 		$check( str_contains( $html, '#' . $orders[0] ) && str_contains( $html, '#' . $orders[1] ) && strpos( $html, '#' . $orders[1] ) < strpos( $html, '#' . $orders[0] ), 'AC-1 the profile lists the customer\'s orders, newest first, linked to each order' );
 
 		// ---- AC-2: internal notes ------------------------------------------------------------------------
@@ -102,6 +103,11 @@ run(
 		$check( $customer === $cookie_user( $customer ), 'fixture: a valid signed-in cookie makes the customer the visitor' );
 
 		// ---- AC-3: suspension ----------------------------------------------------------------------------
+		$session_token = \WP_Session_Tokens::get_instance( $customer )->create( time() + HOUR_IN_SECONDS );
+		$signed_in     = array( new \WP_Http_Cookie( array( 'name' => LOGGED_IN_COOKIE, 'value' => wp_generate_auth_cookie( $customer, time() + HOUR_IN_SECONDS, 'logged_in', $session_token ) ) ) );
+		$cart          = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null, array(), $signed_in );
+		$cart_token    = sign_in_header( $cart, 'cart-token' );
+		$check( '' !== $cart_token && 200 === $cart['status'], 'fixture: the customer holds a Store API cart token' );
 		$token = \WP_Session_Tokens::get_instance( $customer )->create( time() + HOUR_IN_SECONDS );
 		$post( array( 'mizzey_suspended' => 'yes', 'mizzey_suspension_reason' => '' ) );
 		CustomerRecords::save( $customer );
@@ -119,6 +125,29 @@ run(
 		$signon = wp_authenticate( "{$tag}cust", $pass );
 		$check( is_wp_error( $signon ) && 'mizzey_suspended' === $signon->get_error_code(), 'AC-3 a password sign-in is refused, saying the account is suspended' );
 		$check( 0 === $cookie_user( $customer ), 'AC-3 a valid signed-in cookie, as Google or a sign-in link would set, does not make it the signed-in user' );
+		$with_token = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null, array( 'Cart-Token' => $cart_token ) );
+		$check( 403 === $with_token['status'], 'AC-3 the cart token issued before the suspension is refused (' . $with_token['status'] . ')' );
+		$died  = null;
+		$catch = static function () use ( &$died ) {
+			return static function ( $m, $t = '', $a = array() ) use ( &$died ) {
+				$died = (int) ( is_array( $a ) ? ( $a['response'] ?? 0 ) : 0 );
+				throw new \RuntimeException( 'died' );
+			};
+		};
+		add_filter( 'wp_die_handler', $catch );
+		$after_login = 0;
+		$watch       = static function () use ( &$after_login ) { $after_login++; };
+		add_action( 'wp_login', $watch, 10 );
+		wp_set_current_user( $customer );
+		try {
+			do_action( 'wp_login', "{$tag}cust", get_user_by( 'id', $customer ) );
+		} catch ( \RuntimeException $e ) {
+			unset( $e );
+		}
+		remove_action( 'wp_login', $watch, 10 );
+		remove_filter( 'wp_die_handler', $catch );
+		$check( 403 === $died && 0 === $after_login && 0 === get_current_user_id(), 'AC-3 a sign-in any other route completes (Google, a sign-in link) is undone before anything else acts on it' );
+		wp_set_current_user( 0 );
 		$http = sign_in_account( 'en', "{$tag}cust", $pass );
 		$check( ! sign_in_has_session( $http ) && str_contains( $http['body'], 'suspended' ), 'AC-3 over the real request, the account page refuses the sign-in and says why (' . $http['status'] . ')' );
 		$http_ar = sign_in_account( 'ar', "{$tag}cust", $pass );

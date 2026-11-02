@@ -39,6 +39,10 @@ final class CustomerRecords
         add_action('edit_user_profile_update', [self::class, 'save'], 20);
         add_filter('authenticate', [self::class, 'refuseSignIn'], 99, 1);
         add_filter('determine_current_user', [self::class, 'refuseSession'], 99);
+        add_filter('rest_pre_dispatch', [self::class, 'refuseCartToken'], 5, 3);
+        // The last door: whatever route completed a sign-in (password, Google, a sign-in link, a future one), it is
+        // undone before anything else acts on it (a wishlist or cart merge, say).
+        add_action('wp_login', [self::class, 'refuseCompletedSignIn'], 0, 2);
     }
 
     public static function isSuspended(int $userId): bool
@@ -65,6 +69,7 @@ final class CustomerRecords
 
         echo '<table class="form-table" role="presentation"><tr><th>' . esc_html__('Orders', 'mizzey-site') . '</th><td>';
         $orders = wc_get_orders(['customer_id' => $user->ID, 'limit' => self::ORDERS, 'orderby' => 'date', 'order' => 'DESC', 'type' => 'shop_order']);
+        $count  = count(wc_get_orders(['customer_id' => $user->ID, 'limit' => -1, 'return' => 'ids', 'type' => 'shop_order']));
         if ($orders === []) {
             esc_html_e('No orders yet.', 'mizzey-site');
         } else {
@@ -88,6 +93,11 @@ final class CustomerRecords
                 );
             }
             echo '</tbody></table>';
+            printf(
+                '<p><a href="%s">%s</a></p>',
+                esc_url(add_query_arg(['page' => 'wc-orders', '_customer_user' => $user->ID], admin_url('admin.php'))),
+                esc_html(sprintf(_n('All %s order of this customer', 'All %s orders of this customer', $count, 'mizzey-site'), number_format_i18n($count)))
+            );
         }
         echo '</td></tr>';
 
@@ -162,6 +172,51 @@ final class CustomerRecords
         update_user_meta($user->ID, self::REASON, $reason);
         self::remember($user->ID, 'suspended', $reason);
         \WP_Session_Tokens::get_instance($user->ID)->destroy_all();
+        // The account's store session too (its cart, reached by a Store API cart token).
+        if (class_exists('\WC_Session_Handler')) {
+            (new \WC_Session_Handler())->delete_session((string) $user->ID);
+        }
+    }
+
+    /**
+     * @param mixed $login
+     * @param mixed $user
+     */
+    public static function refuseCompletedSignIn($login, $user = null): void
+    {
+        if (! $user instanceof \WP_User || ! self::isSuspended($user->ID)) {
+            return;
+        }
+        wp_clear_auth_cookie();
+        \WP_Session_Tokens::get_instance($user->ID)->destroy_all();
+        wp_set_current_user(0);
+        wp_die(esc_html__('This account is suspended. Please contact customer service.', 'mizzey-site'), '', ['response' => 403]);
+    }
+
+    /**
+     * A Store API cart token issued to the account before it was suspended is refused.
+     *
+     * @param mixed $result
+     * @param mixed $server
+     * @param mixed $request
+     * @return mixed
+     */
+    public static function refuseCartToken($result, $server, $request)
+    {
+        if ($result !== null || ! $request instanceof \WP_REST_Request || ! str_starts_with($request->get_route(), '/wc/store/')) {
+            return $result;
+        }
+        $token = (string) $request->get_header('cart_token');
+        if ($token === '' || ! class_exists('\Automattic\WooCommerce\StoreApi\Utilities\CartTokenUtils')) {
+            return $result;
+        }
+        $payload = \Automattic\WooCommerce\StoreApi\Utilities\CartTokenUtils::get_cart_token_payload($token);
+        $userId  = isset($payload['user_id']) && is_numeric($payload['user_id']) ? (int) $payload['user_id'] : 0;
+        if (self::isSuspended($userId)) {
+            return new \WP_Error('mizzey_suspended', __('This account is suspended. Please contact customer service.', 'mizzey-site'), ['status' => 403]);
+        }
+
+        return $result;
     }
 
     public static function reinstate(\WP_User $user, string $reason = ''): void
