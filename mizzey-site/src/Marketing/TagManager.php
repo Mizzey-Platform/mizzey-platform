@@ -30,9 +30,9 @@ final class TagManager
     public static function register(): void
     {
         add_action('wp_head', [self::class, 'head'], 1);
-        add_action('wp_body_open', [self::class, 'body'], 1);
         add_action('admin_menu', [self::class, 'menu']);
         add_action('admin_init', [self::class, 'settings']);
+        add_filter('option_page_capability_' . self::PAGE, static fn (): string => 'manage_woocommerce');
     }
 
     /** The container id, or nothing when none (or a malformed one) is set. */
@@ -65,18 +65,6 @@ final class TagManager
         if ($id !== '') {
             wp_print_inline_script_tag(str_replace('__MIZZEY_GTM_ID__', esc_js($id), self::asset('gtm.js')), ['id' => 'mizzey-gtm']);
         }
-    }
-
-    public static function body(): void
-    {
-        $id = self::container();
-        if (is_admin() || $id === '') {
-            return;
-        }
-        printf(
-            '<noscript><iframe src="%s" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>',
-            esc_url('https://www.googletagmanager.com/ns.html?id=' . rawurlencode($id))
-        );
     }
 
     public static function menu(): void
@@ -112,6 +100,7 @@ final class TagManager
             esc_html__('Tag Manager container', 'mizzey-site'),
             esc_attr(self::container())
         );
+        do_action('mizzey_marketing_tags_fields');
         submit_button();
         echo '</form>';
         printf(

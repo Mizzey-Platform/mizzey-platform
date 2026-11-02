@@ -26,7 +26,10 @@ final class ProductFeed
 {
     public const QUERY = 'mizzey_feed';
     public const CACHE = 'mizzey_feed_products_';
-    public const MAX   = 5000;
+    public const MAX   = 500;
+
+    /** Attributes Google reads to tell variants apart, by the store's attribute name. */
+    public const VARIANT_FIELDS = ['size' => 'g:size', 'color' => 'g:color', 'colour' => 'g:color', 'shade' => 'g:color', 'material' => 'g:material', 'pattern' => 'g:pattern'];
 
     public static function register(): void
     {
@@ -80,10 +83,17 @@ final class ProductFeed
         $w->writeElement('title', wp_strip_all_tags((string) get_bloginfo('name')));
         $w->writeElement('link', self::url($lang));
         $w->writeElement('description', wp_strip_all_tags((string) get_bloginfo('description')));
-        $ids = wc_get_products(['status' => 'publish', 'visibility' => 'visible', 'type' => ['simple', 'variable'], 'limit' => self::MAX, 'return' => 'ids', 'orderby' => 'ID', 'order' => 'ASC']);
-        foreach ((array) $ids as $id) {
+        $ids = [];
+        for ($page = 1; $page <= 200; $page++) {
+            $batch = wc_get_products(['status' => 'publish', 'visibility' => 'visible', 'type' => ['simple', 'variable'], 'limit' => self::MAX, 'page' => $page, 'return' => 'ids', 'orderby' => 'ID', 'order' => 'ASC']);
+            $ids   = array_merge($ids, (array) $batch);
+            if (count((array) $batch) < self::MAX) {
+                break;
+            }
+        }
+        foreach ($ids as $id) {
             $product = wc_get_product((int) $id);
-            if (! $product instanceof \WC_Product) {
+            if (! $product instanceof \WC_Product || post_password_required($product->get_id()) || (string) get_post_field('post_password', $product->get_id()) !== '') {
                 continue;
             }
             if ($product instanceof \WC_Product_Variable) {
@@ -127,10 +137,11 @@ final class ProductFeed
             }
         }
         $w->writeElement('g:availability', $product->is_in_stock() ? 'in_stock' : 'out_of_stock');
-        $w->writeElement('g:price', sprintf('%s %s', wc_format_decimal($price, wc_get_price_decimals()), $currency));
+        $taxed = static fn (string $amount): string => wc_format_decimal(wc_get_price_including_tax($product, ['price' => (float) $amount]), wc_get_price_decimals());
+        $w->writeElement('g:price', sprintf('%s %s', $taxed($price), $currency));
         $sale = (string) $product->get_sale_price();
-        if ($sale !== '' && (float) $sale < (float) $price) {
-            $w->writeElement('g:sale_price', sprintf('%s %s', wc_format_decimal($sale, wc_get_price_decimals()), $currency));
+        if ($sale !== '' && $product->is_on_sale() && (float) $sale < (float) $price) {
+            $w->writeElement('g:sale_price', sprintf('%s %s', $taxed($sale), $currency));
         }
         $w->writeElement('g:condition', 'new');
         $brands = get_the_terms($base->get_id(), 'product_brand');
@@ -144,6 +155,13 @@ final class ProductFeed
         }
         if ($parent instanceof \WC_Product) {
             $w->writeElement('g:item_group_id', self::id($parent));
+            foreach ($product->get_attributes() as $name => $value) {
+                $field = self::VARIANT_FIELDS[(string) preg_replace('/^pa_/', '', (string) $name)] ?? null;
+                if ($field !== null && (string) $value !== '') {
+                    $term = taxonomy_exists((string) $name) ? get_term_by('slug', (string) $value, (string) $name) : null;
+                    $w->writeElement($field, $term instanceof \WP_Term ? $term->name : (string) $value);
+                }
+            }
         }
         $cats = get_the_terms($base->get_id(), 'product_cat');
         if (is_array($cats) && $cats !== []) {
@@ -155,8 +173,12 @@ final class ProductFeed
     /** The SKU, which both language records share; the record's id when there is none. */
     public static function id(\WC_Product $product): string
     {
-        $sku = trim((string) $product->get_sku());
+        $sku = trim((string) $product->get_sku('edit')); // A variation's own SKU, never its parent's.
+        if ($sku !== '') {
+            return $sku;
+        }
+        $canonical = \MizzeySite\Catalogue\CanonicalProduct::of($product->get_id());
 
-        return $sku !== '' ? $sku : (string) $product->get_id();
+        return (string) ($canonical instanceof \WC_Product ? $canonical->get_id() : $product->get_id());
     }
 }

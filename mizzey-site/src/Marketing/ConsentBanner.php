@@ -29,6 +29,7 @@ final class ConsentBanner
     public static function register(): void
     {
         add_action('wp_footer', [self::class, 'banner'], 5);
+        add_action('wp_footer', [self::class, 'settingsLink'], 4);
         add_action('wp_enqueue_scripts', [self::class, 'enqueue']);
         add_filter('wc_order_attribution_allow_tracking', [self::class, 'attribution']);
     }
@@ -53,6 +54,15 @@ final class ConsentBanner
     {
         $file = WP_PLUGIN_DIR . '/mizzey-site/assets/consent.js';
         wp_enqueue_script(self::SCRIPT, plugins_url('mizzey-site/assets/consent.js'), [], is_readable($file) ? (string) filemtime($file) : null, true);
+    }
+
+    /** The footer's "Cookie settings", which reopens the banner. Placed in the footer design with PRE-03b. */
+    public static function settingsLink(): void
+    {
+        if (is_admin()) {
+            return;
+        }
+        printf('<p class="mizzey-cookie-settings"><a href="#" data-mizzey-consent-open="1">%s</a></p>', esc_html__('Cookie settings', 'mizzey-site'));
     }
 
     public static function banner(): void

@@ -21,6 +21,10 @@
 				analytics_storage: value
 			});
 		}
+		// WooCommerce's campaign capture follows the choice at once, without waiting for the next page.
+		if (window.wc_order_attribution && typeof window.wc_order_attribution.setOrderTracking === 'function') {
+			window.wc_order_attribution.setOrderTracking(value === 'granted');
+		}
 		window.dataLayer = window.dataLayer || [];
 		window.dataLayer.push({ event: 'mizzey_consent', consent: value });
 		banner.hidden = true;
