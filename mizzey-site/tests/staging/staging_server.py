@@ -90,6 +90,7 @@ LAYER_SOURCES = {
 SEED_SCRIPTS = ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
                 "30-catalogue-translations.php", "40-orders.php", "50-reports.php")
 PARITY_FILES = ("wpml-remote-config.json", "wpml-development-settings.json")
+BOSTA_DISTRICTS = "bosta-districts.json"
 NOT_HERE = {
     "db-create": "the server creates the database and its account when it creates the site",
     "up": "the server's own stack serves staging; this tool does not start it",
@@ -241,6 +242,10 @@ def layer_files() -> dict[str, Path]:
     carried = STATE / "parity" / PARITY_FILES[0]
     if carried.is_file():
         files[f"parity/{PARITY_FILES[0]}"] = carried
+    # Bosta's district list, which the staging plugin answers the carrier plugin's request from.
+    districts = STATE / "parity" / BOSTA_DISTRICTS
+    if districts.is_file():
+        files[f"parity/{BOSTA_DISTRICTS}"] = districts
     return files
 
 

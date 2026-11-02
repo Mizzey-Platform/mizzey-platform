@@ -65,7 +65,8 @@ def item_ids() -> dict:
 
 
 def set_stock(product_id: int, quantity: int) -> None:
-    staging.wp("eval", f"wc_update_product_stock({product_id}, {quantity}, 'set'); wc_delete_product_transients({product_id});")
+    # The fixture's stock stands in for the ERP's projection (D-19 item 5; StockWriteGuard).
+    staging.wp("eval", f"add_filter('mizzey_stock_write_permitted', '__return_true'); wc_update_product_stock({product_id}, {quantity}, 'set'); wc_delete_product_transients({product_id});")
 
 
 def stock_of(ids: dict) -> dict:

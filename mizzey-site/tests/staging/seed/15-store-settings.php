@@ -10,10 +10,14 @@
  *  - one shipping zone for Egypt with one flat price, so the checkout has a shipping option to offer;
  *  - guest checkout allowed;
  *  - the "coming soon" screen off, so a reviewer sees the store and not a placeholder;
- *  - cost capture on, before the catalogue and the orders are made.
+ *  - cost capture on, before the catalogue and the orders are made;
+ *  - the stand-in stock source on, so the cart and the checkout can confirm stock until the ERP adapter exists.
  *
  * @package MizzeySite\Tests\Staging
  */
+
+// The seed stands in for the ERP's projection, so it may set stock (D-19 item 5; StockWriteGuard).
+add_filter( 'mizzey_stock_write_permitted', '__return_true' );
 
 defined( 'ABSPATH' ) || exit;
 defined( 'MIZZEY_STAGING' ) && MIZZEY_STAGING || WP_CLI::error( 'staging only' );
@@ -36,6 +40,10 @@ update_option( 'woocommerce_coming_soon', 'no' );
 update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', 'yes' );
 update_option( 'woocommerce_manage_stock', 'yes' );
 update_option( 'woocommerce_notify_low_stock_amount', 3 );
+// Since the cart asks the stock source (specs/018-cart), a site with no source refuses every checkout: "We could not
+// confirm that ... is in stock". Staging uses the stand-in until PRE-09's adapter is bound (FR-002, D-10); it never
+// binds on a production site. Found on 1 November 2026, when the first browser checkout on staging was refused.
+update_option( 'mizzey_stock_fixture', 'yes' );
 
 $zone_name = 'Egypt (staging, invented price)';
 $existing  = array_filter( WC_Shipping_Zones::get_zones(), static fn ( array $z ): bool => $zone_name === $z['zone_name'] );
@@ -63,5 +71,6 @@ echo wp_json_encode(
 		'guest'         => get_option( 'woocommerce_enable_guest_checkout' ),
 		'coming_soon'   => get_option( 'woocommerce_coming_soon' ),
 		'cost_capture'  => get_option( 'woocommerce_feature_cost_of_goods_sold_enabled' ),
+		'stock_source'  => get_option( 'mizzey_stock_fixture' ),
 	)
 ), "\n";

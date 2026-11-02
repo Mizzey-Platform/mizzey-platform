@@ -532,9 +532,17 @@ def cmd_parity_export(a) -> None:
         raise SystemExit("development holds no downloaded WPML configuration: nothing was written")
     settings = out / "wpml-development-settings.json"
     settings.write_text(json.dumps(wpml_settings(DEV_APP / "wp")) + "\n", encoding="utf-8", newline="\n")
-    say(f"written: {carried} ({', '.join(sorted(sent['files']))}) and {settings}")
-    say("Copy both files into ~/mizzey-staging/parity/ on the server. They are WPML's own configuration: keep them "
-        "out of this repository.")
+    # Bosta's district list, which the carrier plugin builds Egypt's governorates from and staging cannot fetch.
+    zoning = json.loads(wp("eval", "echo wp_json_encode(bosta_get_zoning());", path=DEV_APP / "wp").splitlines()[-1])
+    if not zoning:
+        raise SystemExit("development holds no Bosta district list (bosta_get_zoning() is empty): nothing was written")
+    districts = out / "bosta-districts.json"
+    districts.write_text(json.dumps({"success": True, "data": zoning}, ensure_ascii=False) + "\n", encoding="utf-8",
+                         newline="\n")
+    say(f"written: {carried} ({', '.join(sorted(sent['files']))}), {settings} and {districts} ({len(zoning)} "
+        "governorates)")
+    say("Copy the three files into ~/mizzey-staging/parity/ on the server. They are WPML's own configuration and "
+        "Bosta's district list: keep them out of this repository.")
 
 
 def seed() -> None:

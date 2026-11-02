@@ -2143,3 +2143,80 @@ protection (D-21) applies; each image has alternative text. The values are set i
 
 **4. Where it is built.** Inside #309 (E-SF-11), under D-22: upload, checks, storage and moderation now; the designed
 form and display after PRE-03b.
+
+
+## 2026-10-31 - D-24: our own code over ready-made plugins
+
+**Status: the owner's decision of 31 October 2026, in his words: "i don't want to use plugins ! if we can create
+something custom and will be better and more compatible with our flows and business we should do that ... don't use
+ready made plugin, create ours".** Internal record. It changes no register row, no fee and no stage, and is not a
+Change Request. It amends constitution M-4 (version 2.0.0).
+
+**1. The rule.** Where WooCommerce or WPML/WCML do not cover a requirement, it is built as our own code on CoreX and
+`mizzey-site`, not with a ready-made third-party plugin. A named plugin is used only when the owner approves it over
+our own code, with the reason recorded here or in the spec: for example a carrier's own integration, or security code
+that gains from a maintained, audited plugin.
+
+**2. What it settles now.**
+- #280's invoice and packing slip (ADM-92, ADM-93, and the download of ACCT-12) are our own code, with a PDF library
+  that shapes Arabic correctly, not an invoice plugin.
+- Google sign-in (#305) is our own code, not Nextend Social Login, which was proposed and never installed.
+- Redirection, approved on 21 October 2026 and never installed, is weighed again under this rule before any install.
+
+**3. What stays.** WooCommerce and the WPML stack (WPML, String Translation, WooCommerce Multilingual) are the
+contracted base. Bosta for WooCommerce is the carrier's own integration. WP 2FA, the staff two-factor sign-in of
+specs/008, stays until the owner decides otherwise: it is security code, where a maintained, audited plugin is the
+safer choice.
+
+**4. Constitution.** M-4 is redefined, so the constitution moves from 1.2.0 to 2.0.0 (MAJOR: a principle redefined).
+
+
+## 2026-11-01 - D-25: Paymob through its official plugin, and a second payment refunded automatically
+
+**Status: the owner's decisions of 1 November 2026.** Internal record. It changes no register row, no fee and no
+stage, and is not a Change Request.
+
+**1. Paymob's official plugin is used, under D-24's exception.** PAY-13 contracts "Paymob via its official
+WooCommerce integration, wrapped in an abstraction layer", so the plugin (Paymob for WooCommerce, from wordpress.org,
+version in `stack.lock.json`) takes the payment and makes refunds, and Mizzey's own code is the layer around it
+(`mizzey-site/src/Payments/`, specs/028-payments). The contract decides this, not a preference. The layer verifies
+every callback itself before the plugin acts, and does not rely on the plugin's own checks.
+
+**2. A second payment of a paid order is refunded at once.** Asked whether a duplicate payment should be refunded
+automatically or only flagged, the owner said: "do the right decision and secured". Decided: the layer refunds it in
+full through the provider, at once. PAY-05 says a double click must never create a duplicate charge, and leaving the
+money with the store until staff notice breaks that. The refund runs only for a second signed and verified successful
+payment of an order already paid by a different recorded payment; it runs once (the payment is recorded first, so a
+repeat of its notice stops), and the provider's notice of the refund is acknowledged without a second record. When
+the provider does not make the refund, staff are flagged to make it. A payment that arrives for a cancelled order is
+not refunded automatically: staff may restore the order, so it stays a flag.
+
+**3. The plugin's weaknesses are reported to Paymob privately.** The details stay out of this public repository until
+Paymob has fixed them or a date is agreed with them.
+
+## 2026-11-01 - D-26: Quick Look on product cards, a recorded gift
+
+**Status: the owner's decision of 1 November 2026, in his words: "Add it as a gift".** Internal record. It adds no
+register row, changes no fee and is not a Change Request.
+
+**1. What is given.** On a product card in a listing, search result or product rail, a Quick Look control opens a
+preview of the product without leaving the page: its images, name and brand, price and saving, stock status, key
+features, the option picker where the product has options, Add to cart, Add to wishlist, and a link to the full product
+page. The preview uses only behaviour the register already contracts (PDP-01, PDP-03 to PDP-11, PLP-04, PLP-05); the
+preview window itself is the gift.
+
+**2. Why it is a gift and not owed.** No register row names a quick view or preview, and neither did the Option C
+register, so giving it does not blur the difference between the two offers. It is given on the owner's choice and
+recorded so it is never read as owed: comparison (IA-12, WISH-08), frequently bought together (PDP-20) or any other P2
+row are not owed because this was given. The client is told in writing, when the storefront is presented, that Quick
+Look is included at no charge beyond the contracted scope. Defects in it are fixed like any delivered code; extensions
+to it are not owed.
+
+**3. Working design default.** Desktop and larger screens. On phones the contracted quick add and its in-place option
+picker (the frozen product card wireframe) stay the fast path, and a card opens the product page. The low-fidelity
+addition and the high-fidelity design settle the details; nothing in the frozen wireframes changes until that pass.
+It meets D-21: keyboard and screen reader complete (focus moved in, kept in and returned), no layout shift, and the
+preview's data loaded only when it is opened. It must absorb the real catalogue data: long names, images of any shape
+shown whole.
+
+**4. Where it is built.** With the storefront, after PRE-03b, beside the product card (PLP-04, PLP-05).

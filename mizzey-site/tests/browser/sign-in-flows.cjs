@@ -119,12 +119,7 @@ async function checkoutWithAccount(browser, plan) {
 	if (await password.count()) {
 		await password.fill(plan.password);
 	}
-	for (const [field, value] of Object.entries(plan.checkout.billing)) {
-		const input = page.locator(`#billing-${field}`);
-		if (await input.count() && await input.isEditable()) {
-			await input.fill(value);
-		}
-	}
+	// The governorate first: choosing it re-renders the address, which can clear a field filled before it (the district).
 	const state = page.locator('#billing-state');
 	if (await state.count()) {
 		const tag = await state.evaluate((el) => el.tagName);
@@ -132,6 +127,13 @@ async function checkoutWithAccount(browser, plan) {
 			await state.selectOption(plan.checkout.state);
 		} else if (await state.isEditable()) {
 			await state.fill(plan.checkout.state);
+		}
+		await wait(1500);
+	}
+	for (const [field, value] of Object.entries(plan.checkout.billing)) {
+		const input = page.locator(`#billing-${field}`);
+		if (await input.count() && await input.isEditable()) {
+			await input.fill(value);
 		}
 	}
 	await wait(4000);
@@ -179,15 +181,16 @@ async function checkoutWithTrapFilled(browser, plan) {
 	if (await password.count()) {
 		await password.fill(plan.password);
 	}
+	const state = page.locator('#billing-state');
+	if (await state.count() && (await state.evaluate((el) => el.tagName)) === 'SELECT') {
+		await state.selectOption(plan.checkout.state);
+		await wait(1500);
+	}
 	for (const [field, value] of Object.entries(plan.checkout.billing)) {
 		const input = page.locator(`#billing-${field}`);
 		if (await input.count() && await input.isEditable()) {
 			await input.fill(value);
 		}
-	}
-	const state = page.locator('#billing-state');
-	if (await state.count() && (await state.evaluate((el) => el.tagName)) === 'SELECT') {
-		await state.selectOption(plan.checkout.state);
 	}
 	// What a form-filling script does: put a value in every input, the hidden one included.
 	row.trapRendered = await page.locator('input[name="mizzey_signup_extra"]').count();

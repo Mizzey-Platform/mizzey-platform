@@ -1,0 +1,44 @@
+Deliberate defects, each run against t59 and then reverted (31 October 2026):
+
+M1  an unanswered stock question passes                               -> t59 fails (1 check)
+M2  the merge replaces a line instead of adding                       -> t59 fails (2 checks)
+M3  the merge ignores confirmed stock                                 -> t59 fails (1 check)
+M5  a sign-in does not mark the merge                                 -> t59 fails (2 checks)
+M6  the merged cart is not saved to the account                       -> t59 fails (2 checks)
+M7  the guest window is ignored                                       -> t59 fails (1 check)
+M8  no items-needed figure                                            -> t59 fails (1 check)
+M9  suggestions read the Cross-sells field                            -> t59 fails (2 checks)
+M10 the fixture applies a key twice                                   -> t59 fails (1 check)
+M11 a line moved to the wishlist stays in the cart                    -> t59 fails (1 check)
+
+M4 (an item sold one at a time merged as more) was not caught then: WooCommerce's purchase limit, which also capped the
+merge, is 1 for such an item. The first review removed that limit from the merge (it reads WooCommerce's own stock
+field, D-19), and the one-at-a-time cap is back as the merge's own.
+
+After the first review (31 October 2026):
+
+M12 any sign-in merges, not only a moved guest session                -> t59 fails (1 check)
+M13 local stock caps the merge                                        -> t59 fails (1 check)
+M14 lines of one stock item each get its whole stock                  -> t59 fails (1 check)
+M15 move to wishlist without the nonce                                -> t59 fails (1 check)
+M16 any zero rate on offer counts as free                             -> t59 fails (1 check)
+M17 an item target where no free method takes it                      -> t59 fails (1 check)
+M18 WooCommerce order stock writers left on                           -> t59 fails (1 check)
+
+The fixture's ledger lock guards two requests at once, which one PHP process cannot create: no mutation check.
+
+After the second review (31 October 2026):
+
+M19 a change the fixture could not store is reported as made          -> t59 fails (1 check)
+M20 an item target beside an entered individual-use code              -> t59 fails (1 check)
+
+After the third review (31 October 2026):
+
+M21 one at a time per line, not per item                              -> t59 fails (2 checks)
+M22 an item target while another automatic promotion stands           -> t59 fails (1 check)
+
+After the fifth, sixth and seventh reviews (31 October 2026):
+
+M23 an item target beside an individual-use automatic promotion       -> t59 fails (1 check)
+M24 a minimum after discounts taken as met beside another discount    -> t59 fails (1 check)
+M25 a discount that also ships free not counted                       -> t59 fails (1 check)

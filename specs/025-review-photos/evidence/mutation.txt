@@ -1,0 +1,21 @@
+Deliberate defects, each run against t66 and then reverted (31 October 2026):
+
+M2 no pixel or memory budget                                          -> t66 crashes (the decode exhausts memory)
+M3 another customer attaches                                          -> t66 fails (2 checks)
+M4 a sixth photo taken                                                -> t66 fails (2 checks)
+M5 stored as sent                                                     -> t66 fails (1 check)
+M6 shown while held                                                   -> t66 fails (1 check)
+M7 a photo the approval did not have shown                            -> t66 fails (1 check)
+M8 cached                                                             -> t66 fails (1 check)
+M9 files kept after delete                                            -> t66 fails (1 check)
+M10 no moderator view                                                 -> t66 fails (1 check)
+M11 nothing swept                                                     -> t66 fails (1 check)
+M12 the sweep takes young files                                       -> t66 fails (1 check)
+M13 a deleted review's list kept                                      -> t66 fails (1 check)
+
+Equivalent: M1 (the content check skipped). GD's decode refuses the same files, so a file that is not a picture
+is refused either way.
+
+M10 was not caught at first: t66 called the admin list directly. It now goes through comment_text.
+
+The per-review lock guards two requests at once, which one PHP process cannot create: no mutation check.

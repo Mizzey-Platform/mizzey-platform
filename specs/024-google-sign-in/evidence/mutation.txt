@@ -1,0 +1,17 @@
+Deliberate defects, each run against t65 and then reverted (31 October 2026):
+
+M1 the state not bound to the cookie                                  -> t65 fails (1 check)
+M2 the nonce not checked                                              -> t65 fails (1 check)
+M3 the audience not checked                                           -> t65 fails (1 check)
+M4 any email linked                                                   -> t65 fails (1 check)
+M5 staff signed in with Google                                        -> t65 fails (1 check)
+M6 the squatter keeps the password                                    -> t65 fails (1 check)
+M7 the squatter keeps the session                                     -> t65 fails (1 check)
+M8 no permit past the sign-up check                                   -> t65 fails (1 check)
+M9 azp not checked                                                    -> t65 fails (1 check)
+M10 no guest orders linked                                            -> t65 fails (2 checks)
+
+M1 was not caught at first: the HTTP callback without the cookie failed at Google's real token endpoint anyway. t65
+now sends a good code with a state not bound to the browser's cookie, in process.
+
+The email lock and the claimed state guard two requests at once, which one PHP process cannot create: no mutation check.

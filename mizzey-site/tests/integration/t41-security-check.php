@@ -46,13 +46,28 @@ run(
 		$check( ! comments_open( $closed->get_id() ), 'AC-7: a product with reviews off stays closed' );
 
 		// Over HTTP, as a visitor: the comment form endpoint and the trackback endpoint.
-		$comment = function ( int $post, string $text ): int {
-			$r = wp_remote_post( site_url( '/wp-comments-post.php' ), array( 'timeout' => 30, 'redirection' => 0, 'body' => array( 'comment_post_ID' => $post, 'comment' => $text, 'author' => 't41 visitor', 'email' => 't41-' . wp_rand() . '@example.invalid', 'rating' => 5 ) ) );
+		$comment = function ( int $post, string $text, array $cookies = array() ): int {
+			$r = wp_remote_post( site_url( '/wp-comments-post.php' ), array( 'timeout' => 30, 'redirection' => 0, 'cookies' => $cookies, 'body' => array( 'comment_post_ID' => $post, 'comment' => $text, 'author' => 't41 visitor', 'email' => 't41-' . wp_rand() . '@example.invalid', 'rating' => 5 ) ) );
 			return is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
 		};
 		$on_post = $comment( $post_id, 't41 comment on a post' );
 		$check( 403 === $on_post && 0 === (int) get_comments( array( 'post_id' => $post_id, 'count' => true, 'status' => 'all' ) ), "AC-7 [HTTP] a comment on a post is refused (status {$on_post})" );
-		$review = $comment( $product->get_id(), 't41 review of a product' );
+		// A review needs a signed-in customer whose order for the product was delivered (D-17, specs/020).
+		$reviewer = wp_insert_user( array( 'user_login' => 't41-reviewer-' . wp_rand(), 'user_email' => 't41-reviewer-' . wp_rand() . '@example.invalid', 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
+		$reviewer = is_wp_error( $reviewer ) ? 0 : (int) $reviewer;
+		if ( $reviewer > 1 ) {
+			$s->track_user( $reviewer );
+		}
+		$delivered = wc_create_order( array( 'customer_id' => $reviewer ) );
+		$delivered->add_product( $product, 1 );
+		$delivered->calculate_totals();
+		$delivered->save();
+		$s->track_order( $delivered->get_id() );
+		foreach ( array( 'processing', 'preparing', 'shipped', 'completed' ) as $step ) {
+			wc_get_order( $delivered->get_id() )->update_status( $step );
+		}
+		$signed_in = array( new \WP_Http_Cookie( array( 'name' => LOGGED_IN_COOKIE, 'value' => wp_generate_auth_cookie( $reviewer, time() + HOUR_IN_SECONDS, 'logged_in' ) ) ) );
+		$review    = $comment( $product->get_id(), 't41 review of a product', $signed_in );
 		$reviews = get_comments( array( 'post_id' => $product->get_id(), 'type' => 'review', 'status' => 'all' ) );
 		$check( 302 === $review && 1 === count( $reviews ) && 5 === (int) get_comment_meta( $reviews[0]->comment_ID, 'rating', true ), "AC-7 [HTTP] a product review is stored with rating 5 (status {$review})" );
 		$tb = wp_remote_post( add_query_arg( 'p', $post_id, site_url( '/wp-trackback.php' ) ), array( 'timeout' => 30, 'body' => array( 'url' => 'https://example.invalid/', 'title' => 't41', 'blog_name' => 't41' ) ) );

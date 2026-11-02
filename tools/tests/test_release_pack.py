@@ -29,6 +29,7 @@ STACK = {
     "woocommerce": {"version": "11.1.0"},
     "bosta": {"version": "4.5.7"},
     "wp-2fa": {"version": "4.2.1"},
+    "paymob": {"version": "4.1.15"},
     "wpml": {"version": "4.9.7"},
     "wpml-string-translation": {"version": "3.5.4"},
     "wpml-media-translation": {"version": "3.1.2"},
@@ -94,6 +95,8 @@ class Fixture(unittest.TestCase):
                 plugin_zip("bosta-woocommerce", "bosta-woocommerce.php", "4.5.7"),
             rp.PLUGIN_URL.format(slug="wp-2fa", version="4.2.1"):
                 plugin_zip("wp-2fa", "wp-2fa.php", "4.2.1"),
+            rp.PLUGIN_URL.format(slug="paymob-for-woocommerce", version="4.1.15"):
+                plugin_zip("paymob-for-woocommerce", "init-paymob.php", "4.1.15"),
             rp.CORE_PACK_URL.format(version="7.1.2", locale="ar"): zipped({"ar.mo": b"core", "admin-ar.mo": b"admin"}),
             rp.PLUGIN_PACK_URL.format(slug="woocommerce", version="11.1.0", locale="ar"):
                 zipped({"woocommerce-ar.mo": b"woo"}),
@@ -137,6 +140,7 @@ class TheArchive(Fixture):
                          "wp-content/plugins/woocommerce/woocommerce.php",
                          "wp-content/plugins/bosta-woocommerce/bosta-woocommerce.php",
                          "wp-content/plugins/wp-2fa/wp-2fa.php",
+                         "wp-content/plugins/paymob-for-woocommerce/init-paymob.php",
                          "wp-content/languages/ar.mo", "wp-content/languages/plugins/woocommerce-ar.mo"):
             self.assertIn(expected, names)
 
@@ -202,7 +206,7 @@ class NothingPaid(Fixture):
 
     def test_nothing_is_asked_of_any_host_but_wordpress_org(self):
         self.pack()
-        self.assertEqual(len(self.asked), 5)
+        self.assertEqual(len(self.asked), 6)
         for url in self.asked:
             self.assertTrue(url.startswith("https://downloads.wordpress.org/"), url)
             self.assertFalse([slug for slug, _ in rp.SERVER_SUPPLIED.values() if slug in url], url)

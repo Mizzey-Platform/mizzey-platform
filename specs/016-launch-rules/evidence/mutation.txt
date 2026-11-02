@@ -1,0 +1,50 @@
+Deliberate defects, each run against t57 and then reverted (31 October 2026):
+
+M1  the welcome discount is not issued                                -> t57 fails (2 checks)
+M2  the template is accepted as a code                                -> t57 fails (1 check)
+M3  welcome coupons are store-wide automatic promotions               -> t57 fails (1 check)
+M4  combining off does not force one promotion per order              -> t57 fails (1 check)
+M5  combining on is ignored                                           -> t57 fails (1 check)
+M6  any role gets a welcome discount                                  -> t57 fails (1 check)
+
+After the first review (31 October 2026):
+
+M7   a welcome code works for anyone                                  -> t57 fails (1 check)
+M8   eligibility ignores the account email                            -> t57 fails (1 check)
+M9   an email can get a second welcome                                -> t57 fails (1 check)
+M10  settle keeps every entered code                                  -> t57 fails (1 check)
+M11  an order takes a second code                                     -> t57 fails (1 check)
+M12  the Store API refuses instead of replacing                       -> t57 fails (1 check)
+M13  entered codes are not measured in                                -> t57 fails (1 check)
+M14  brand conditions are not copied                                  -> t57 fails (1 check)
+M15  no refund ceiling per line                                       -> t57 fails (1 check)
+
+After the second review (31 October 2026; M9 re-run against the atomic claim):
+
+M9   an email can get a second welcome (the claim)                    -> t57 fails (1 check)
+M16  an order takes two individual-use codes with combining on        -> t57 fails (1 check)
+M17  entered codes are not simulated before a candidate               -> t57 fails (1 check)
+M18  free shipping is valued without the chosen discount              -> t57 fails (1 check)
+
+After the third review (31 October 2026):
+
+M19  coupons not applied in WooCommerce's order                       -> t57 fails (1 check)
+M20  individual-use free shipping joins a discount                    -> t57 fails (1 check)
+M21  carts not reconciled with current individual-use boxes           -> t57 fails (1 check)
+M22  an email can be claimed twice                                    -> t57 fails (2 checks)
+M23  a candidate is credited with what entered codes take             -> t57 fails (1 check)
+
+After the fourth review (31 October 2026):
+
+M24  the free shipping baseline ignores the simulated discount         -> t57 fails
+M25  an entered free shipping code is ignored in the estimates         -> t57 fails
+M26  individual-use candidates ranked beside entered codes             -> t57 fails
+
+After the fifth review (31 October 2026):
+
+M27  free shipping paired with the best discount only                  -> t57 fails
+M28  the paid saving taken on the difference of discounts              -> t57 fails
+
+After the sixth review (31 October 2026):
+
+M29  a discount that loses alone is not paired with free shipping      -> t57 fails

@@ -62,10 +62,66 @@ require_once __DIR__ . '/src/Orders/StatusModel.php';
 require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
+require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
 require_once __DIR__ . '/src/Promotions/AutomaticPromotions.php';
+require_once __DIR__ . '/src/Promotions/Combination.php';
+require_once __DIR__ . '/src/Promotions/WelcomeDiscount.php';
+require_once __DIR__ . '/src/Accounts/VerificationOnRegistration.php';
+require_once __DIR__ . '/src/Accounts/MarketingConsent.php';
+require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
+require_once __DIR__ . '/src/Accounts/SignInLink.php';
+require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
+require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
+require_once __DIR__ . '/src/Stock/StockItem.php';
+require_once __DIR__ . '/src/Stock/StockAnswer.php';
+require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
+require_once __DIR__ . '/src/Stock/StockSourceRefused.php';
+require_once __DIR__ . '/src/Stock/StockSource.php';
+require_once __DIR__ . '/src/Stock/UnconfiguredStockSource.php';
+require_once __DIR__ . '/src/Stock/StockIdentity.php';
+require_once __DIR__ . '/src/Stock/StockGateway.php';
+require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
+require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
+require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
+require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/Reviews/ReviewPhotos.php';
+require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
+require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
+require_once __DIR__ . '/src/Stock/StockWriteGuard.php';
+require_once __DIR__ . '/src/Cart/CartStock.php';
+require_once __DIR__ . '/src/Cart/CartMerge.php';
+require_once __DIR__ . '/src/Cart/GuestCartRetention.php';
+require_once __DIR__ . '/src/Cart/FreeShippingProgress.php';
+require_once __DIR__ . '/src/Cart/CartSuggestions.php';
+require_once __DIR__ . '/src/Checkout/EgyptianAddress.php';
+require_once __DIR__ . '/src/Checkout/OrderStock.php';
+require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
+require_once __DIR__ . '/src/Wishlist/Wishlist.php';
+require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
+require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
+require_once __DIR__ . '/src/Emails/OrderLanguage.php';
+require_once __DIR__ . '/src/Emails/EmailAdditions.php';
+require_once __DIR__ . '/src/Emails/Shipped.php';
+require_once __DIR__ . '/src/Account/AddressBook.php';
+require_once __DIR__ . '/src/Account/AccountPages.php';
+require_once __DIR__ . '/src/Invoices/InvoiceSettings.php';
+require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
+require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
+require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
+require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
+require_once __DIR__ . '/src/Payments/PaymentEvent.php';
+require_once __DIR__ . '/src/Payments/CallbackResult.php';
+require_once __DIR__ . '/src/Payments/PaymentProvider.php';
+require_once __DIR__ . '/src/Payments/Paymob/PaymobProvider.php';
+require_once __DIR__ . '/src/Payments/Paymob/CallbackAddress.php';
+require_once __DIR__ . '/src/Payments/Paymob/PluginSurface.php';
+require_once __DIR__ . '/src/Payments/PaymentRecord.php';
+require_once __DIR__ . '/src/Payments/RefundLedger.php';
+require_once __DIR__ . '/src/Payments/PaymentGate.php';
 
 // The site text domain, for this plugin and for the theme. Nothing else loads it: Corex loads only its own
 // `corex` domain. See specs/002-bilingual-platform-baseline (NFR-04a).
@@ -102,6 +158,25 @@ MizzeySite\Security\Security::register();
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
 MizzeySite\Orders\StatusRegistry::register();
 MizzeySite\Orders\TransitionGuard::register();
+
+// Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
+MizzeySite\Roles\RefundCapability::register();
+// The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
+MizzeySite\Stock\FixtureStockSource::register();
+MizzeySite\Stock\LocalStockWriters::register();
+MizzeySite\Stock\StockWriteGuard::register();
+MizzeySite\Cart\CartStock::register();
+MizzeySite\Cart\CartMerge::register();
+MizzeySite\Cart\GuestCartRetention::register();
+MizzeySite\Cart\FreeShippingProgress::register();
+MizzeySite\Cart\CartSuggestions::register();
+// The checkout: the Egyptian address and stock reserved at placement (#255). See specs/019-checkout.
+MizzeySite\Checkout\EgyptianAddress::register();
+MizzeySite\Checkout\OrderStock::register();
+// The wishlist and recently viewed lists (WISH-01 to WISH-04, WISH-07; B17). See specs/015-wishlist.
+MizzeySite\Wishlist\Wishlist::register();
+MizzeySite\Wishlist\RecentlyViewed::register();
+MizzeySite\Wishlist\WishlistRoutes::register();
 MizzeySite\Orders\CancellationField::register();
 
 // The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,
@@ -110,6 +185,17 @@ MizzeySite\Promotions\PromotionSettings::register();
 MizzeySite\Promotions\PromotionRules::register();
 MizzeySite\Promotions\DiscountCap::register();
 MizzeySite\Promotions\AutomaticPromotions::register();
+MizzeySite\Promotions\Combination::register();
+MizzeySite\Promotions\WelcomeDiscount::register();
+MizzeySite\Orders\RefundIntegrity::register();
+
+// Accounts: verification sent at registration, marketing consent, phone sign-in, sign-in links (#305). See specs/017-accounts.
+MizzeySite\Accounts\VerificationOnRegistration::register();
+MizzeySite\Accounts\MarketingConsent::register();
+MizzeySite\Accounts\PhoneSignIn::register();
+MizzeySite\Accounts\SignInLink::register();
+// Google sign-in, one account per email (AUTH-10, AUTH-13; D-24). See specs/024-google-sign-in.
+MizzeySite\Accounts\GoogleSignIn::register();
 
 // The catalogue import specification and validation pass, Developer-operated only: MIG-01, MIG-03, MIG-04,
 // MIG-06, MIG-19, specs/006-catalogue-import-spec. Nothing is hooked on a web request.
@@ -123,3 +209,32 @@ if (defined('WP_CLI') && WP_CLI) {
     }
     unset($mizzey_cli_arguments);
 }
+
+// Product reviews: eligibility by delivered purchase (D-17), moderation, the rating, the invitation. REV-01 to REV-05,
+// specs/020-reviews.
+MizzeySite\Reviews\ReviewEligibility::register();
+MizzeySite\Reviews\ReviewModeration::register();
+MizzeySite\Reviews\ReviewInvitation::register();
+// Photos in reviews, a recorded gift (D-23). See specs/025-review-photos.
+MizzeySite\Reviews\ReviewPhotos::register();
+
+// Customer emails: the welcome discount and the payment retry link added to WooCommerce's own, and the Shipped email.
+// NOTF-01 to NOTF-13, specs/021-emails.
+MizzeySite\Emails\EmailAdditions::register();
+MizzeySite\Emails\Shipped::register();
+
+// The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
+MizzeySite\Account\AddressBook::register();
+MizzeySite\Account\AccountPages::register();
+// The invoice (ADM-92), downloaded by staff and from the account (ACCT-12). See specs/023-invoice.
+MizzeySite\Invoices\InvoiceSettings::register();
+MizzeySite\Invoices\InvoiceNumber::register();
+MizzeySite\Invoices\InvoiceRoutes::register();
+
+// The payment layer around the provider's gateway: every callback verified, matched to its order and applied once;
+// the payment record on the order; refunds counted once. PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, specs/028-payments.
+add_action('plugins_loaded', [MizzeySite\Payments\PaymentGate::class, 'register'], 20);
+MizzeySite\Payments\PaymentRecord::register();
+MizzeySite\Payments\RefundLedger::register();
+MizzeySite\Payments\Paymob\CallbackAddress::register();
+MizzeySite\Payments\Paymob\PluginSurface::register();

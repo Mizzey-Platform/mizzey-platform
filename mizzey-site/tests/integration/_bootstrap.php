@@ -13,6 +13,10 @@
 
 namespace MizzeySite\Tests\Integration;
 
+// The scenarios' fixtures stand in for the ERP's projection, so they may set stock (D-19 item 5; StockWriteGuard).
+// t67 takes the permit away to check the guard.
+add_filter( 'mizzey_stock_write_permitted', '__return_true' );
+
 use Automattic\WooCommerce\Internal\Features\FeaturesController;
 
 if ( ! class_exists( 'WooCommerce' ) ) {
@@ -97,8 +101,15 @@ final class Scenario {
 		$this->orders[] = $id;
 	}
 
+	/**
+	 * Track a user for deletion when the scenario finishes. Never user 1, the site's first administrator, and never an
+	 * id of 0 or less: `(int)` of a failed `wp_insert_user()`'s WP_Error is 1, and deleting user 1 takes the store's own
+	 * pages with it (31 October 2026, on the development runtime).
+	 */
 	public function track_user( int $id ): void {
-		$this->users[] = $id;
+		if ( $id > 1 ) {
+			$this->users[] = $id;
+		}
 	}
 
 	/** Place an order for $qty of $product, as WooCommerce does at checkout (totals calculated), and return it. */
