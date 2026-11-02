@@ -131,7 +131,7 @@ run(
 		[ , $by_local ]  = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => '01112223335', 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
 		[ , $by_spaced ] = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => rawurlencode( '+20 111 222 3334' ), 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
 		[ , $by_arabic ] = $get( add_query_arg( array( 'page' => 'wc-orders', 's' => rawurlencode( '٠١١١٢٢٢٣٣٣٥' ), 'search-filter' => 'all' ), admin_url( 'admin.php' ) ) );
-		$check( $in_list( $by_local, $typed->get_id() ) && $in_list( $by_spaced, $order->get_id() ) && $in_list( $by_arabic, $typed->get_id() ), 'AC-3 an order is found by the phone however the customer and staff typed it: +20 and spaces, the local form, Arabic digits' );
+		$check( $in_list( $by_local, $typed->get_id() ) && $in_list( $by_spaced, $order->get_id() ) && $in_list( $by_arabic, $typed->get_id() ), 'AC-3 an order is found by the phone however the customer and staff typed it: +20 and spaces, the local form, Arabic digits' . ' (' . wp_json_encode( array( $in_list( $by_local, $typed->get_id() ), $in_list( $by_spaced, $order->get_id() ), $in_list( $by_arabic, $typed->get_id() ) ) ) . ')');
 
 		// ---- AC-4: bulk order status, export --------------------------------------------------------------------
 		$o2 = wc_create_order();
