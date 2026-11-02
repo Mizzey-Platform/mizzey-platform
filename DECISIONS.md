@@ -2260,3 +2260,40 @@ for search. The initial entries of the list stay a content input from the client
 (v0.1.12 and v0.1.13, recorded on the issue), so it is Verified, not Accepted, and its dependants #292 and #293 are
 Ready by the status rule (D-10, D-12). #253, #254, #302, #303, #310 and #311 move from Blocked to Ready under item 1;
 #304 stays Blocked until #303 is verified.
+
+## 2026-11-02 - D-28: the store keeps its own stock as well, and each product can be switched between the two
+
+**Status: the owner's ruling of 2 November 2026, in his words (translated from Arabic): "I want our system to have
+something so that if we use the ERP we work with the ERP, and we can switch whether a product reads from the ERP or
+from internal stock. Either the whole store reads from the ERP; or per product, this product reads from the ERP or
+from normal stock in our database; or everything reads from our own stock in our database, and then we expose APIs
+that the ERP calls to update stock. If the ERP is not there we work without it; if it is there but has stock problems
+we work mixed; if it has problems completely we switch it off and work with our internal stock."** Internal record:
+not a client confirmation, adds no register row, changes no fee, stage or signed document, and is not a Change
+Request. The ERP integration stays contracted as signed (ERP-01 to ERP-07, INT-16): this is resilience around it,
+not a replacement for it, and the ERP team is asked for nothing new.
+
+**1. Two stock sources, one gateway.** Every stock read and change still goes through `StockGateway` (specs/012).
+Behind it a router chooses, per stock item, between the ERP adapter (bound when PRE-09 is approved; the mock until
+then, D-22 and M-3) and the store's own stock, held in the store's database with the same contract: one level per
+stock item, every change applied once per operation key, every change recorded with its reason.
+
+**2. The switch.** A store-wide setting chooses the default source, ERP or the store's own stock. Each product or
+variation can follow the default or name its own source, so the store can run wholly on the ERP, wholly on its own
+stock, or mixed. A master switch, "ERP off", sends every item to the store's own stock at once, whatever the
+products say, for the day the ERP cannot be relied on. Turning it back on restores each product's own choice.
+Every change of the setting, the master switch or a product's source is written to the stock log.
+
+**3. The store's own stock can be fed by the ERP.** For items on the store's own stock an authenticated REST route
+lets an outside system (the ERP, or a person's tool) set a level or apply a change, by SKU, singly or in batches,
+each change once per operation key, refused for an item on the ERP source so the two never fight. Staff set an item's
+own stock from the product editor, with a reason, recorded with their name (ADM-73). The 31 October ruling ("I
+shouldn't enter stock by hand") stands for every item on the ERP source: its stock is never typed in.
+
+**4. No silent fail-over.** When the ERP does not answer, the store does what specs/012 and 019 already do: it
+refuses to sell what it cannot confirm, and logs an outage for operations. It never switches itself to its own
+stock, because the store's figure may be stale; switching is a person's decision, through the master switch.
+
+**5. Not changed.** D-19 item 5 holds for items on the ERP source: no local writer alters their stock. The ERP
+adapter, its mechanism and its reconciliation still wait on PRE-09; the route is offered to PRE-09, not chosen (M-3).
+With nothing set, every item reads the ERP, as before this record. Built in specs/049-stock-source-switch.
