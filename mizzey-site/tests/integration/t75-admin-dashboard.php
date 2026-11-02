@@ -159,12 +159,17 @@ run(
 			wc_get_order( $flag->get_id() )->update_status( $step );
 		}
 		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded (' . wp_json_encode( array( $flagged_now, wc_get_order( $flag->get_id() )->get_status() ) ) . ')' );
-		// The limit applies after the filter: a newer flagged order since refunded never hides an older open one.
-		$older = $order( $en, 1, 'en' );
-		\MizzeySite\Payments\PaymentRecord::flag( $older, 't75 an older payment to refund' );
-		$older = wc_get_order( $older->get_id() );
-		$older->set_date_created( time() - HOUR_IN_SECONDS );
-		$older->save();
+		// The limit applies after the filter: with two older open flagged orders and a newer one refunded since, a list
+		// limited to one holds exactly one open order (a limit taken before the filter would hold none; no limit, both).
+		$olders = array();
+		foreach ( array( 2, 1 ) as $hours ) {
+			$open_flag = $order( $en, 1, 'en' );
+			\MizzeySite\Payments\PaymentRecord::flag( $open_flag, 't75 an older payment to refund' );
+			$open_flag = wc_get_order( $open_flag->get_id() );
+			$open_flag->set_date_created( time() - $hours * HOUR_IN_SECONDS );
+			$open_flag->save();
+			$olders[] = $open_flag->get_id();
+		}
 		$newer = $order( $en, 1, 'en' );
 		\MizzeySite\Payments\PaymentRecord::flag( $newer, 't75 a newer payment, refunded since' );
 		wc_create_refund( array( 'order_id' => $newer->get_id(), 'amount' => '1' ) );
@@ -173,10 +178,14 @@ run(
 		$limited = StoreDashboard::pendingRefunds()['flagged'];
 		remove_filter( 'mizzey_dashboard_refund_limit', $one );
 		$unlimited = StoreDashboard::pendingRefunds()['flagged'];
-		$check( 1 === count( $limited ) && ! in_array( $newer->get_id(), $limited, true ) && in_array( $older->get_id(), $unlimited, true ) && ! in_array( $newer->get_id(), $unlimited, true ), 'AC-4 a flagged list limited to one still shows an open order when the newest flagged one was refunded since (' . wp_json_encode( array( $limited, $older->get_id(), $newer->get_id() ) ) . ')' );
+		$check( 1 === count( $limited ) && ! in_array( $newer->get_id(), $limited, true ) && array() === array_diff( $olders, $unlimited ) && ! in_array( $newer->get_id(), $unlimited, true ), 'AC-4 a flagged list limited to one holds exactly one open order when the newest flagged one was refunded since; unlimited, both open ones (' . wp_json_encode( array( $limited, $olders, $newer->get_id() ) ) . ')' );
 		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
-		$seen = array();
-		$spy  = static function ( $sql ) use ( &$seen ) {
+		$seen    = array();
+		$flagged = 0;
+		$spy     = static function ( $sql ) use ( &$seen, &$flagged ) {
+			if ( is_string( $sql ) && str_contains( $sql, \MizzeySite\Payments\PaymentRecord::ATTENTION ) ) {
+				++$flagged;
+			}
 			// One order's own refunds (WooCommerce's get_refunds(), by parent id) are not a list of orders.
 			if ( is_string( $sql ) && preg_match( "/'wc-(cancelled|on-hold|processing|preparing|delivery-failed)'/", $sql ) && ! preg_match( '/(parent_order_id|post_parent)\s*(=|IN)\s*\(?\s*\d/i', $sql ) ) {
 				$seen[] = $sql;
@@ -188,7 +197,7 @@ run(
 		StoreDashboard::pendingRefunds();
 		remove_filter( 'query', $spy, 99 );
 		$unbounded = array_values( array_filter( $seen, static fn ( $q ) => ! preg_match( '/\bLIMIT\b|COUNT\(|FOUND_ROWS/i', $q ) ) );
-		$check( array() !== $seen && array() === $unbounded, 'AC-4 the orders requiring action are counted by the database and the refund lists are limited, never every order loaded (' . count( $seen ) . ' queries, unbounded: ' . wp_json_encode( array_map( static fn ( $q ) => substr( preg_replace( '/\s+/', ' ', $q ), 0, 160 ), $unbounded ) ) . ')' );
+		$check( array() !== $seen && array() === $unbounded && 1 === $flagged, 'AC-4 the orders requiring action are counted by the database and the refund lists are limited, never every order loaded; the flagged list is one query, however many orders were flagged (' . count( $seen ) . ' queries, ' . $flagged . ' for the flagged list, unbounded: ' . wp_json_encode( array_map( static fn ( $q ) => substr( preg_replace( '/\s+/', ' ', $q ), 0, 160 ), $unbounded ) ) . ')' );
 		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'mizzey_refunds=cancelled_paid' ) && str_contains( $html, 'mizzey_refunds=flagged' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------

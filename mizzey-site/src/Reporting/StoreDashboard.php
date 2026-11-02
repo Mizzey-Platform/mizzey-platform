@@ -203,69 +203,46 @@ final class StoreDashboard
     }
 
     /**
-     * Flagged orders still open, newest first, read a page at a time: each page's flags and latest refund dates are
-     * read in two queries (no order is loaded), until the limit is reached or none is left.
+     * Flagged orders still open, newest first, in one bounded query: the flag list is stored in order (PaymentRecord
+     * appends), so its last `at` is the latest flag; an order counts while that is later than its latest refund. Times
+     * are compared as seconds since 1970 in UTC, whatever the database session's time zone.
      *
      * @return list<int>
      */
     private static function flagged(): array
     {
         global $wpdb;
-        $hpos   = OrderUtil::custom_orders_table_usage_is_enabled();
-        $open   = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
-        $in     = implode("','", array_map('esc_sql', $open));
-        $limit  = self::limit();
-        $page   = 200;
-        $found  = [];
-        for ($offset = 0; count($found) < $limit; $offset += $page) {
-            $ids = $hpos
-                ? $wpdb->get_col($wpdb->prepare(
-                    "SELECT o.id FROM {$wpdb->prefix}wc_orders o JOIN {$wpdb->prefix}wc_orders_meta m ON m.order_id = o.id AND m.meta_key = %s
-                     WHERE o.type = 'shop_order' AND o.status IN ('{$in}') GROUP BY o.id ORDER BY MAX(o.date_created_gmt) DESC, o.id DESC LIMIT %d OFFSET %d",
-                    PaymentRecord::ATTENTION,
-                    $page,
-                    $offset
-                )) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                : $wpdb->get_col($wpdb->prepare(
-                    "SELECT p.ID FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = %s
-                     WHERE p.post_type = 'shop_order' AND p.post_status IN ('{$in}') GROUP BY p.ID ORDER BY MAX(p.post_date_gmt) DESC, p.ID DESC LIMIT %d OFFSET %d",
-                    PaymentRecord::ATTENTION,
-                    $page,
-                    $offset
-                )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $ids = array_map('intval', (array) $ids);
-            if ($ids === []) {
-                break;
-            }
-            $list  = implode(',', $ids);
-            $flags = $hpos
-                ? $wpdb->get_results($wpdb->prepare("SELECT order_id AS id, meta_value AS v FROM {$wpdb->prefix}wc_orders_meta WHERE meta_key = %s AND order_id IN ({$list})", PaymentRecord::ATTENTION)) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                : $wpdb->get_results($wpdb->prepare("SELECT post_id AS id, meta_value AS v FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id IN ({$list})", PaymentRecord::ATTENTION)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $refunds = $hpos
-                ? $wpdb->get_results($wpdb->prepare("SELECT parent_order_id AS id, MAX(date_created_gmt) AS at FROM {$wpdb->prefix}wc_orders WHERE type = %s AND parent_order_id IN ({$list}) GROUP BY parent_order_id", 'shop_order_refund')) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                : $wpdb->get_results($wpdb->prepare("SELECT post_parent AS id, MAX(post_date_gmt) AS at FROM {$wpdb->posts} WHERE post_type = %s AND post_parent IN ({$list}) GROUP BY post_parent", 'shop_order_refund')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $last = [];
-            foreach ((array) $flags as $row) {
-                $items = maybe_unserialize((string) $row->v);
-                foreach (is_array($items) ? $items : [] as $flag) {
-                    $last[(int) $row->id] = max($last[(int) $row->id] ?? 0, is_array($flag) ? (int) ($flag['at'] ?? 0) : 0);
-                }
-            }
-            $refunded = [];
-            foreach ((array) $refunds as $row) {
-                $refunded[(int) $row->id] = (int) strtotime((string) $row->at . ' UTC');
-            }
-            foreach ($ids as $id) {
-                if (($last[$id] ?? 0) > ($refunded[$id] ?? 0)) {
-                    $found[] = $id;
-                }
-            }
-            if (count($ids) < $page) {
-                break;
-            }
-        }
+        $open = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
+        $in   = implode("','", array_map('esc_sql', $open));
+        // How PHP stores each flag's time inside the list: `s:2:"at";i:` and the number.
+        $at = serialize('at') . 'i:'; // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+        $ids  = OrderUtil::custom_orders_table_usage_is_enabled()
+            ? $wpdb->get_col($wpdb->prepare(
+                "SELECT o.id FROM {$wpdb->prefix}wc_orders o
+                 JOIN {$wpdb->prefix}wc_orders_meta m ON m.order_id = o.id AND m.meta_key = %s
+                 WHERE o.type = 'shop_order' AND o.status IN ('{$in}')
+                 AND CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(m.meta_value, %s, -1), ';', 1) AS UNSIGNED) > COALESCE((
+                     SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.date_created_gmt)) FROM {$wpdb->prefix}wc_orders r
+                     WHERE r.type = 'shop_order_refund' AND r.parent_order_id = o.id), 0)
+                 ORDER BY o.date_created_gmt DESC, o.id DESC LIMIT %d",
+                PaymentRecord::ATTENTION,
+                $at,
+                self::limit()
+            )) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            : $wpdb->get_col($wpdb->prepare(
+                "SELECT p.ID FROM {$wpdb->posts} p
+                 JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = %s
+                 WHERE p.post_type = 'shop_order' AND p.post_status IN ('{$in}')
+                 AND CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(m.meta_value, %s, -1), ';', 1) AS UNSIGNED) > COALESCE((
+                     SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.post_date_gmt)) FROM {$wpdb->posts} r
+                     WHERE r.post_type = 'shop_order_refund' AND r.post_parent = p.ID), 0)
+                 ORDER BY p.post_date_gmt DESC, p.ID DESC LIMIT %d",
+                PaymentRecord::ATTENTION,
+                $at,
+                self::limit()
+            )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        return array_slice($found, 0, $limit);
+        return array_values(array_unique(array_map('intval', (array) $ids)));
     }
 
     /**
