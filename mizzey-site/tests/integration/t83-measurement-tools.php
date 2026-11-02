@@ -114,7 +114,11 @@ run(
 		ProductFeed::forget();
 		$items = static function ( string $xml ): array {
 			$out = array();
-			$doc = simplexml_load_string( $xml );
+			// A page that is not a feed (the feed switched off) is an expected answer here, not a parser warning to log.
+			$quiet = libxml_use_internal_errors( true );
+			$doc   = simplexml_load_string( $xml );
+			libxml_clear_errors();
+			libxml_use_internal_errors( $quiet );
 			if ( false === $doc ) {
 				return $out;
 			}

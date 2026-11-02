@@ -20,6 +20,7 @@ use MizzeySite\Catalogue\PriceHistory;
 use MizzeySite\Catalogue\ProductFields;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_two_factor.php';
 require_once __DIR__ . '/_workflows.php';
 require_once __DIR__ . '/_storefront.php';
 
@@ -76,6 +77,8 @@ run(
 		// machine's Apache (Xdebug in develop mode, exit 0xC0000005, t11 shows it on main too); it is checked on staging.
 		$staff = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}mgr@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $staff );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $staff ) );
 		wp_set_current_user( $staff );
 		$_POST = array(
 			ProductFields::NONCE . '_nonce' => wp_create_nonce( ProductFields::NONCE ),
@@ -116,6 +119,8 @@ run(
 
 		$api = (int) wp_insert_user( array( 'user_login' => "{$tag}rest", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}rest@example.invalid", 'role' => 'shop_manager' ) );
 		$s->track_user( $api );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $api ) );
 		wp_set_current_user( $api );
 		$evil = new \WP_REST_Request( 'PUT', '/wc/v3/products/' . $bulk_target = $w->simple( "{$tag}-XSS", null ) );
 		$evil->set_param( 'meta_data', array( array( 'key' => ProductFields::SEO_TITLE, 'value' => '</title><script>t76xss()</script>' ) ) );
@@ -168,6 +173,8 @@ run(
 		$admin_set = 'ok';
 		$api_admin = (int) wp_insert_user( array( 'user_login' => "{$tag}api", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}api@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $api_admin );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $api_admin ) );
 		wp_set_current_user( $api_admin );
 		$put = new \WP_REST_Request( 'PUT', '/wc/v3/products/' . $en );
 		$put->set_param( 'sale_price', '180' );

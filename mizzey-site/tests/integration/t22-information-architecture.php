@@ -216,9 +216,17 @@ run(
 		// ---- AC-242-05: term archives, per language -----------------------------------------------------
 		// IA-04 in the admin: the products list gives the Collections column a width, so it is not squeezed.
 		set_current_screen( 'edit-product' );
+		// A web request always names its host; WordPress's admin head reads it (wp_admin_canonical_url).
+		$had_host             = $_SERVER['HTTP_HOST'] ?? null;
+		$_SERVER['HTTP_HOST'] = (string) wp_parse_url( home_url(), PHP_URL_HOST );
 		ob_start();
 		do_action( 'admin_head' );
 		$admin_head = (string) ob_get_clean();
+		if ( null === $had_host ) {
+			unset( $_SERVER['HTTP_HOST'] );
+		} else {
+			$_SERVER['HTTP_HOST'] = $had_host;
+		}
 		set_current_screen( 'front' );
 		$width_ok = false !== strpos( $admin_head, '.column-taxonomy-product_collection{width:9%}' );
 		$s->note( ( $width_ok ? 'ok   ' : 'FAIL ' ) . 'IA-04 the products list gives the Collections column a width' );

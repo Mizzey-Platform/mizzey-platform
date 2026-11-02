@@ -58,7 +58,7 @@ function t61_post( int $user, int $product, int $rating ) {
 	$thrower         = static fn () => static function ( $message ) { throw new \RuntimeException( is_string( $message ) ? $message : 'died' ); };
 	add_filter( 'wp_die_handler', $thrower );
 	try {
-		$id = wp_new_comment( array( 'comment_post_ID' => $product, 'comment_content' => 'Lovely texture.', 'comment_author' => 'Salma', 'comment_author_email' => (string) get_userdata( $user )->user_email, 'user_id' => $user, 'comment_type' => 'review' ), true );
+		$id = wp_new_comment( array( 'comment_post_ID' => $product, 'comment_content' => 'Lovely texture.', 'comment_author' => 'Salma', 'comment_author_email' => (string) get_userdata( $user )->user_email, 'comment_author_url' => '', 'user_id' => $user, 'comment_type' => 'review' ), true );
 		return is_wp_error( $id ) ? $id->get_error_message() : (int) $id;
 	} catch ( \RuntimeException $e ) {
 		return $e->getMessage();

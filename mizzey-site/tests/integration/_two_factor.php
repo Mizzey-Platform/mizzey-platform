@@ -65,6 +65,27 @@ function two_factor_enrol( \WP_User $user ): array {
 	return array_values( (array) \WP2FA\Methods\Backup_Codes::generate_codes( $user ) );
 }
 
+/**
+ * The `wp_login` hooks of a sign-in WP 2FA has already completed, for scenarios that test what follows a sign-in. WP 2FA's
+ * own `wp_login` handler is set aside for the call: for an enrolled user it would show its second-factor screen and end
+ * the process, and for one who must enrol it would redirect to the set-up screen.
+ */
+function two_factor_completed_sign_in( \WP_User $user ): void {
+	// The class name exactly as WP 2FA registers it (no leading backslash), or WordPress does not find the callback.
+	$handler  = array( 'WP2FA\Authenticator\Login', 'wp_login' );
+	$priority = class_exists( 'WP2FA\Authenticator\Login' ) ? has_action( 'wp_login', $handler ) : false;
+	if ( false !== $priority ) {
+		remove_action( 'wp_login', $handler, $priority );
+	}
+	try {
+		do_action( 'wp_login', $user->user_login, $user );
+	} finally {
+		if ( false !== $priority ) {
+			add_action( 'wp_login', $handler, $priority, 2 );
+		}
+	}
+}
+
 /** A TOTP code for the user, from an independent RFC 6238 implementation: SHA-1, six digits, 30-second steps. */
 function two_factor_code( \WP_User $user, int $step_offset = 0 ): string {
 	return two_factor_code_for_key( (string) \WP2FA\Methods\TOTP::get_totp_decrypted( $user ), $step_offset );

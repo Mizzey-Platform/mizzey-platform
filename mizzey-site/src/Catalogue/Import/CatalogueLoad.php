@@ -485,10 +485,6 @@ final class CatalogueLoad
     /** @param array<string,string> $f */
     private static function writeTranslation(int $id, array $f): void
     {
-        global $sitepress, $woocommerce_wpml, $wpdb;
-        if (! class_exists('\WCML_Editor_UI_Product_Job') || ! $sitepress || ! $woocommerce_wpml) {
-            throw new \RuntimeException(__('WooCommerce Multilingual is not active.', 'mizzey-site'));
-        }
         // A blank cell keeps what the Arabic record already has (blank means no change).
         $existing = (int) apply_filters('wpml_object_id', $id, 'product', false, 'ar');
         $existing = $existing > 0 && $existing !== $id ? get_post($existing) : null;
@@ -497,14 +493,12 @@ final class CatalogueLoad
         if ($title === '') {
             throw new \RuntimeException(__('The Arabic record needs a title.', 'mizzey-site'));
         }
-        $job = new \WCML_Editor_UI_Product_Job(['job_id' => $id, 'target' => 'ar'], $woocommerce_wpml, $sitepress, $wpdb);
-        $job->save_translations([
-            md5('title')           => $title,
-            md5('slug')            => (string) ($existing->post_name ?? ''),
-            md5('product_content') => $body,
-            md5('product_excerpt') => (string) ($existing->post_excerpt ?? ''),
+        $ar = \MizzeySite\I18n\ProductTranslationJob::save($id, 'ar', [
+            'title'           => $title,
+            'slug'            => (string) ($existing->post_name ?? ''),
+            'product_content' => $body,
+            'product_excerpt' => (string) ($existing->post_excerpt ?? ''),
         ]);
-        $ar = (int) apply_filters('wpml_object_id', $id, 'product', false, 'ar');
         if ($ar <= 0 || $ar === $id) {
             throw new \RuntimeException(__('The Arabic record was not created.', 'mizzey-site'));
         }

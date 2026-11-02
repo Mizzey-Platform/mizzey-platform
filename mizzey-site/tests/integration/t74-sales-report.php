@@ -18,6 +18,7 @@ use Automattic\WooCommerce\Internal\Admin\Schedulers\OrdersScheduler;
 use MizzeySite\I18n\RewriteRoot;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_two_factor.php';
 require_once __DIR__ . '/_workflows.php';
 
 const T74_DAY = '2025-03-15';
@@ -112,6 +113,8 @@ run(
 		// ---- AC-1: in process ----------------------------------------------------------------------------
 		$admin = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}adm@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $admin );
+		// Staff are enrolled in two-factor sign-in where it is enforced (staging, production: D-21), as they would be.
+		two_factor_enrol( get_userdata( $admin ) );
 		wp_set_current_user( $admin );
 		$req = new \WP_REST_Request( 'GET', '/wc-analytics/reports/revenue/stats' );
 		$req->set_query_params( $params );
