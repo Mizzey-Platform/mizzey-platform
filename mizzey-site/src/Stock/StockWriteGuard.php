@@ -49,6 +49,8 @@ final class StockWriteGuard
     public const FILL_HOOK = 'mizzey_stock_figure_fill';
     /** Seconds one products list may spend asking the stock source; the rest is read in the background. */
     public const LIST_BUDGET = 'mizzey_stock_list_budget';
+    /** Set for five minutes when one read took longer than the list's budget: lists then read in the background only. */
+    public const SLOW = 'mizzey_stock_source_slow';
     private const DEFAULTS = ['_stock' => '', '_stock_status' => 'instock', '_manage_stock' => 'no', '_backorders' => 'no'];
     private const REST     = ['stock_quantity', 'stock_status', 'manage_stock', 'backorders', 'in_stock', 'inventory_delta'];
 
@@ -637,9 +639,12 @@ final class StockWriteGuard
             return $html;
         }
         $id = (int) $product->get_id();
-        // A list asks the source row by row only within its time budget, so a slow source never holds the page; the
-        // remaining rows are read in the background and shown on the next load.
-        if (self::kept($id) === null && self::$listSpent >= (float) apply_filters(self::LIST_BUDGET, 2.0)) {
+        // A list asks the source row by row only while the time it has spent asking stays within its budget, and not
+        // at all for five minutes after one read alone took longer than the budget; the remaining rows are read in the
+        // background and shown on the next load. One read is one attempt (StockGateway::quick()); how long a single
+        // call may take is the adapter's own timeout (PRE-09), which no page can shorten.
+        $budget = (float) apply_filters(self::LIST_BUDGET, 2.0);
+        if (self::kept($id) === null && (self::$listSpent >= $budget || get_transient(self::SLOW) !== false)) {
             if (function_exists('as_enqueue_async_action') && ! as_has_scheduled_action(self::FILL_HOOK, [$id], 'mizzey')) {
                 as_enqueue_async_action(self::FILL_HOOK, [$id], 'mizzey');
             }
@@ -648,7 +653,11 @@ final class StockWriteGuard
         }
         $started = microtime(true);
         $label   = self::label($id);
-        self::$listSpent += microtime(true) - $started;
+        $took    = microtime(true) - $started;
+        self::$listSpent += $took;
+        if ($took >= $budget) {
+            set_transient(self::SLOW, 1, 5 * MINUTE_IN_SECONDS);
+        }
 
         return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html($label));
     }

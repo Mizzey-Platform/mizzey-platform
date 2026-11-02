@@ -24,9 +24,17 @@ require_once __DIR__ . '/_sign_in.php';
 /** A stock source that reports one quantity for everything, counts its reads and changes nothing. */
 final class T67Source implements StockSource {
 	public int $reads = 0;
+	/** How long each read takes, in milliseconds: a slow source. */
+	public int $delay = 0;
 	public function __construct( public int $quantity ) {}
 	public function name(): string { return 't67'; }
-	public function level( StockItem $item ): int { $this->reads++; return $this->quantity; }
+	public function level( StockItem $item ): int {
+		$this->reads++;
+		if ( $this->delay > 0 ) {
+			usleep( $this->delay * 1000 );
+		}
+		return $this->quantity;
+	}
 	public function adjust( StockItem $item, int $delta, string $operationKey ): int { return $this->quantity; }
 }
 
@@ -245,6 +253,7 @@ run(
 		$check( '12' === t67_stored( $id )['qty'] && 6 === (int) t67_stored( $variation->get_id() )['qty'] && 'outofstock' === $parent_before && 'instock' === t67_stored( $parent->get_id() )['status'] && ! StockWriteGuard::permitted(), 'D-19 the adapter\'s projection writes the stock and brings the variable parent back in stock; a copy loaded before it and saved after it does not undo it (' . wp_json_encode( array( t67_stored( $id )['qty'], t67_stored( $variation->get_id() ), t67_stored( $parent->get_id() )['status'] ) ) . ')' );
 
 		// AC-2: the figure from the stock source, read once, in the list and the editors; the fields disabled.
+		delete_transient( StockWriteGuard::SLOW );
 		$source = new T67Source( 7 );
 		$bind   = static fn () => $source;
 		add_filter( StockGateway::SOURCE_FILTER, $bind );
@@ -290,6 +299,45 @@ run(
 		delete_transient( StockWriteGuard::FIGURE . $id );
 		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
 		$check( 0 === $reads_waiting && str_contains( $deferred, 'being read' ) && $queued_fill && str_contains( $filled, 'Stock from the stock source: 9' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
+
+		// The budget counts the time the list has spent: with reads of 0.1 s and a 0.15 s budget, two rows are read and
+		// the third waits for the background. A single read longer than the budget makes lists read only in the
+		// background for five minutes, whatever their budget.
+		$rows = array( $id, $variation->get_id() );
+		for ( $i = 0; $i < 3; $i++ ) {
+			$rows[] = $s->simple_product( "t67 row {$i}", '10.00', null )->get_id();
+		}
+		foreach ( $rows as $row ) {
+			delete_transient( StockWriteGuard::FIGURE . $row );
+		}
+		delete_transient( StockWriteGuard::SLOW );
+		$timed        = new T67Source( 4 );
+		$timed->delay = 100;
+		$bind_timed   = static fn () => $timed;
+		$budget       = 0.15;
+		$budget_of    = static function () use ( &$budget ) { return $budget; };
+		add_filter( StockGateway::SOURCE_FILTER, $bind_timed );
+		add_filter( StockWriteGuard::LIST_BUDGET, $budget_of );
+		$column = static fn ( int $row ): string => (string) apply_filters( 'woocommerce_admin_stock_html', 'In stock', wc_get_product( $row ) );
+		$first_three = array( $column( $rows[0] ), $column( $rows[1] ), $column( $rows[2] ) );
+		$reads_three = $timed->reads;
+		$slow_after_three = false !== get_transient( StockWriteGuard::SLOW );
+		$budget       = 0.3;
+		$timed->delay = 350;
+		$fourth       = $column( $rows[3] );
+		$slow_set     = false !== get_transient( StockWriteGuard::SLOW );
+		$budget       = 100.0;
+		$fifth        = $column( $rows[4] );
+		$reads_five   = $timed->reads;
+		remove_filter( StockWriteGuard::LIST_BUDGET, $budget_of );
+		remove_filter( StockGateway::SOURCE_FILTER, $bind_timed );
+		delete_transient( StockWriteGuard::SLOW );
+		foreach ( $rows as $row ) {
+			delete_transient( StockWriteGuard::FIGURE . $row );
+		}
+		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
+		$check( 2 === $reads_three && str_contains( $first_three[1], ': 4' ) && str_contains( $first_three[2], 'being read' ) && ! $slow_after_three, 'ADM-70 the list\'s budget counts the time it has spent asking: two reads of 0.1 s fit 0.15 s, the third row waits (' . $reads_three . ' reads)' );
+		$check( str_contains( $fourth, ': 4' ) && $slow_set && str_contains( $fifth, 'being read' ) && 3 === $reads_five, 'ADM-70 one read longer than the budget makes the next lists read in the background only, whatever their budget (' . $reads_five . ' reads)' );
 
 		return $ok;
 	}
