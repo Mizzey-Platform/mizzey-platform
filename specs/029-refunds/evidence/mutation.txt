@@ -1,0 +1,16 @@
+Mutation check for specs/029-refunds, t69-refunds, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0).
+Each deliberate defect was applied alone, t69 run, the file restored. M4 survived the first run (masked by the nonce and
+permission checks); the scenario now sends the field with a valid nonce from permitted staff on another request, and M4 is caught.
+
+CAUGHT    M1 the payment reference is not stamped on the refund  <- AC-1, AC-2 a partial refund through the gateway keeps the payment's reference and the provider's refund reference; a typed one is not 
+CAUGHT    M2 the refund permission is not checked for a typed reference  <- AC-5 a reference sent by staff without the refund permission is not kept
+CAUGHT    M3 the nonce is not checked for a typed reference  <- AC-5 a request without a valid nonce does not set a reference
+CAUGHT    M5 the gateway's refund reference is not kept on the refund  <- AC-1, AC-2 a partial refund through the gateway keeps the payment's reference and the provider's refund reference; a typed one is not 
+CAUGHT    M6 a dashboard refund is not marked as made there  <- AC-3 a 25.00 refund made in Paymob's dashboard is recorded once, with the payment reference, marked as made there (refunds reconciled,
+CAUGHT    M7 the partial refund email is not given the reference  <- AC-4 the customer receives the standard refunded-order email naming the reference
+CAUGHT    M8 a typed reference is not cut to 100 characters  <- FR-004 a typed reference is kept as plain text of at most 100 characters (150)
+CAUGHT    M9 a manual refund's typed reference is dropped  <- AC-1, AC-2 a partial manual refund keeps the reference staff typed, marked as typed; the order paid on delivery has no payment referen
+CAUGHT    M10 the refund line hides the refund reference  <- AC-2 the order screen's refund line shows it: Payment reference: none on the order | Recorded by hand
+CAUGHT    M4 the typed reference is read outside WooCommerce's refund request  <- AC-5 the same field outside the order screen's refund request is not kept
+
+10 of 10 caught.

@@ -45,6 +45,8 @@ require_once __DIR__ . '/src/Security/SignupRoutes.php';
 require_once __DIR__ . '/src/Security/BaselineReport.php';
 require_once __DIR__ . '/src/Security/Cli/SecurityCommand.php';
 require_once __DIR__ . '/src/Security/Security.php';
+require_once __DIR__ . '/src/Security/StaffActivityLog.php';
+require_once __DIR__ . '/src/Security/StaffActivityScreen.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
@@ -63,6 +65,7 @@ require_once __DIR__ . '/src/Orders/StatusRegistry.php';
 require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
+require_once __DIR__ . '/src/Orders/RefundReference.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
@@ -78,6 +81,7 @@ require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
 require_once __DIR__ . '/src/Catalogue/ProductFields.php';
 require_once __DIR__ . '/src/Catalogue/PriceHistory.php';
+require_once __DIR__ . '/src/Catalogue/ImageHandling.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
 require_once __DIR__ . '/src/Stock/StockSourceUnavailable.php';
@@ -110,11 +114,15 @@ require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
 require_once __DIR__ . '/src/Account/AddressBook.php';
 require_once __DIR__ . '/src/Account/AccountPages.php';
+require_once __DIR__ . '/src/Account/CustomerRecords.php';
 require_once __DIR__ . '/src/Invoices/InvoiceSettings.php';
 require_once __DIR__ . '/src/Invoices/InvoiceNumber.php';
 require_once __DIR__ . '/src/Invoices/InvoiceDocument.php';
 require_once __DIR__ . '/src/Invoices/InvoicePdf.php';
 require_once __DIR__ . '/src/Invoices/InvoiceRoutes.php';
+require_once __DIR__ . '/src/Orders/PackingSlip.php';
+require_once __DIR__ . '/src/Orders/ShipmentBox.php';
+require_once __DIR__ . '/src/Orders/OrderFilters.php';
 require_once __DIR__ . '/src/Payments/PaymentEvent.php';
 require_once __DIR__ . '/src/Payments/CallbackResult.php';
 require_once __DIR__ . '/src/Payments/PaymentProvider.php';
@@ -155,6 +163,11 @@ MizzeySite\Reporting\StockReport::register();
 
 // The site-level security baseline: NFR-05, specs/007-security-baseline.
 MizzeySite\Security\Security::register();
+MizzeySite\Security\StaffActivityLog::register();
+MizzeySite\Security\StaffActivityScreen::register();
+
+// NFR-02: heavy uploads refused, every generated size written as WebP. See specs/032-image-handling.
+MizzeySite\Catalogue\ImageHandling::register();
 
 // Product fields WooCommerce lacks, and the price history: #276. See specs/036-product-management.
 MizzeySite\Catalogue\ProductFields::register();
@@ -194,6 +207,7 @@ MizzeySite\Promotions\AutomaticPromotions::register();
 MizzeySite\Promotions\Combination::register();
 MizzeySite\Promotions\WelcomeDiscount::register();
 MizzeySite\Orders\RefundIntegrity::register();
+MizzeySite\Orders\RefundReference::register();
 
 // Accounts: verification sent at registration, marketing consent, phone sign-in, sign-in links (#305). See specs/017-accounts.
 MizzeySite\Accounts\VerificationOnRegistration::register();
@@ -232,10 +246,14 @@ MizzeySite\Emails\Shipped::register();
 // The account area: the address book, order tracking and the wishlist page. ACCT-01 to ACCT-08, specs/022-my-account.
 MizzeySite\Account\AddressBook::register();
 MizzeySite\Account\AccountPages::register();
+MizzeySite\Account\CustomerRecords::register();
 // The invoice (ADM-92), downloaded by staff and from the account (ACCT-12). See specs/023-invoice.
 MizzeySite\Invoices\InvoiceSettings::register();
 MizzeySite\Invoices\InvoiceNumber::register();
 MizzeySite\Invoices\InvoiceRoutes::register();
+MizzeySite\Orders\PackingSlip::register();
+MizzeySite\Orders\ShipmentBox::register();
+MizzeySite\Orders\OrderFilters::register();
 
 // The payment layer around the provider's gateway: every callback verified, matched to its order and applied once;
 // the payment record on the order; refunds counted once. PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, specs/028-payments.

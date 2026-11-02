@@ -61,6 +61,9 @@ final class RefundLedger
             $order->add_meta_data(self::MADE_HERE, $reference, false);
             $order->save_meta_data();
         }
+        if ($reference !== null) {
+            \MizzeySite\Orders\RefundReference::fromGateway($order, $reference);
+        }
 
         return $data;
     }
