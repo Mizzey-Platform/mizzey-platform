@@ -192,6 +192,27 @@ run(
 		Redirects::logMissing();
 		$kept_now = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE kind = 'm'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$check( $inserts <= Redirects::NEW_PER_MINUTE && Redirects::KEEP === $kept_now && 10 === (int) ( Redirects::missing()[ $often ]['hits'] ?? 0 ), 'AC-3 a flood of new paths is admitted at most ' . Redirects::NEW_PER_MINUTE . ' a minute, also when each is trimmed again at once (' . $inserts . ' of ' . ( Redirects::NEW_PER_MINUTE + 5 ) . '); the log stays at ' . Redirects::KEEP . '; a known path is still counted' );
+		// A new path that another request logs while this one waits for the admission lock: one row, two hits, and no
+		// admission spent. The other connection inserts it just before this request asks for the lock.
+		$raced    = "/{$tag}-raced";
+		$admitted = static fn (): int => (int) $wpdb->get_var( "SELECT COALESCE(SUM(hits), 0) FROM {$table} WHERE kind = 'n'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$before   = $admitted();
+		$racer    = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$raced_in = false;
+		$race     = static function ( $sql ) use ( &$raced_in, $racer, $table, $raced ) {
+			if ( ! $raced_in && str_contains( (string) $sql, 'GET_LOCK' ) && str_contains( (string) $sql, Redirects::admitLock() ) ) {
+				$raced_in = true;
+				$racer->query( $racer->prepare( "INSERT INTO {$table} (kind, path_hash, path, hits, first_seen, last_seen, referrer) VALUES ('m', %s, %s, 1, %d, %d, '')", md5( $raced ), $raced, time(), time() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+			return $sql;
+		};
+		add_filter( 'query', $race );
+		$_SERVER['REQUEST_URI'] = $raced . '/';
+		Redirects::logMissing();
+		remove_filter( 'query', $race );
+		$racer->close();
+		$raced_rows = (array) $wpdb->get_col( $wpdb->prepare( "SELECT hits FROM {$table} WHERE kind = 'm' AND path_hash = %s", md5( $raced ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$check( $raced_in && array( '2' ) === array_map( 'strval', $raced_rows ) && $before === $admitted(), 'AC-3 a path logged by another request while this one waited is counted once more on the same row, with no admission spent (' . implode( ',', $raced_rows ) . ')' );
 		if ( null === $uri ) {
 			unset( $_SERVER['REQUEST_URI'] );
 		} else {

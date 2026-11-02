@@ -298,8 +298,8 @@ final class Redirects
         $table = self::table();
         $now   = time();
         $hash  = md5($path);
-        $done  = $wpdb->query($wpdb->prepare("UPDATE {$table} SET hits = hits + 1, last_seen = %d, referrer = IF(%s = '', referrer, %s) WHERE kind = %s AND path_hash = %s", $now, $referrer, $referrer, $kind, $hash)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        if ((int) $done > 0) {
+        $update = static fn (): int => (int) $wpdb->query($wpdb->prepare("UPDATE {$table} SET hits = hits + 1, last_seen = %d, referrer = IF(%s = '', referrer, %s) WHERE kind = %s AND path_hash = %s", $now, $referrer, $referrer, $kind, $hash)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        if ($update() > 0) {
             return;
         }
         $insert = static fn () => $wpdb->query($wpdb->prepare("INSERT INTO {$table} (kind, path_hash, path, hits, first_seen, last_seen, referrer) VALUES (%s, %s, %s, 1, %d, %d, %s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = %d", $kind, $hash, mb_substr($path, 0, 300), $now, $now, $referrer, $now)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -312,6 +312,10 @@ final class Redirects
             return;
         }
         try {
+            // Logged by another request while this one waited for the lock: one more hit, not a new admission.
+            if ($update() > 0) {
+                return;
+            }
             $minute = 'minute-' . intdiv($now, MINUTE_IN_SECONDS);
             $taken  = (int) $wpdb->get_var($wpdb->prepare("SELECT hits FROM {$table} WHERE kind = %s AND path_hash = %s", self::ADMITTED, md5($minute))); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             if ($taken >= self::NEW_PER_MINUTE) {
