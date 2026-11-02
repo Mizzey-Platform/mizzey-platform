@@ -57,11 +57,13 @@ final class TwoFactor
     /**
      * Some administration writes run before `admin_init`: WooCommerce saves its settings on `wp_loaded`. A form sent to
      * the administration by a user who must enrol is refused there too, so the guard does not rest on those forms'
-     * nonces alone (audit F-5). Pages, background requests and REST are left to the guards that already cover them.
+     * nonces alone (audit F-5). That covers admin-ajax.php too, where WooCommerce's settings save also runs on
+     * `wp_loaded`; WP 2FA's own enrolment actions stay allowed. Page views, background jobs and REST are left to the
+     * guards that already cover them.
      */
     public static function guardEarlyWrites(): void
     {
-        if (is_admin() && ! wp_doing_ajax() && ! wp_doing_cron() && ! (defined('REST_REQUEST') && REST_REQUEST) && self::method() !== 'GET') {
+        if (is_admin() && ! wp_doing_cron() && ! (defined('REST_REQUEST') && REST_REQUEST) && (wp_doing_ajax() || self::method() !== 'GET')) {
             self::guardAdministration();
         }
     }
