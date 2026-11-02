@@ -111,7 +111,7 @@ final class ProductFields
             return;
         }
         $text = static fn (string $key, int $max): string => isset($_POST[$key]) ? mb_substr(sanitize_text_field(wp_unslash((string) $_POST[$key])), 0, $max) : '';
-        $url  = static fn (string $key): string => isset($_POST[$key]) ? esc_url_raw(trim(wp_unslash((string) $_POST[$key])), ['http', 'https']) : '';
+        $url  = static fn (string $key): string => isset($_POST[$key]) ? self::webAddress(wp_unslash((string) $_POST[$key])) : '';
         $product->update_meta_data(self::VIDEO, $url('mizzey_video'));
         $product->update_meta_data(self::SEO_TITLE, $text('mizzey_seo_title', 120));
         $product->update_meta_data(self::SEO_DESC, isset($_POST['mizzey_seo_description']) ? mb_substr(sanitize_textarea_field(wp_unslash((string) $_POST['mizzey_seo_description'])), 0, 320) : '');
@@ -120,6 +120,16 @@ final class ProductFields
         $product->update_meta_data(self::ROBOTS, in_array($robots, self::ROBOT_CHOICES, true) ? $robots : '');
         $badges = isset($_POST['mizzey_badges']) && is_array($_POST['mizzey_badges']) ? array_map('sanitize_key', wp_unslash($_POST['mizzey_badges'])) : [];
         $product->update_meta_data(self::BADGES, array_values(array_intersect(self::BADGE_ORDER, $badges)));
+    }
+
+    /** A full http or https address with a host, or nothing. */
+    public static function webAddress(string $url): string
+    {
+        $url  = trim($url);
+        $host = (string) wp_parse_url($url, PHP_URL_HOST);
+        $ok   = filter_var($url, FILTER_VALIDATE_URL) !== false && in_array(strtolower((string) wp_parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true) && str_contains($host, '.');
+
+        return $ok && mb_strlen($url) <= 500 ? esc_url_raw($url, ['http', 'https']) : '';
     }
 
     /**
@@ -167,9 +177,10 @@ final class ProductFields
     public static function title($title)
     {
         $p = self::current();
-        $own = $p ? trim((string) $p->get_meta(self::SEO_TITLE)) : '';
+        $own = $p ? trim(sanitize_text_field((string) $p->get_meta(self::SEO_TITLE))) : '';
 
-        return $own !== '' ? $own : $title;
+        // WordPress prints this filter's value as it is: escaped here, whatever route stored the field.
+        return $own !== '' ? esc_html($own) : $title;
     }
 
     /**

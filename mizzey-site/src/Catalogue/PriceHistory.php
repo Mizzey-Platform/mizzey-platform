@@ -22,7 +22,6 @@ defined('ABSPATH') || exit;
 final class PriceHistory
 {
     public const META = '_mizzey_price_history';
-    public const KEEP = 200;
 
     /** @var array<int,array{regular:string,sale:string}> Prices as stored before the save that is running. */
     private static array $before = [];
@@ -34,6 +33,7 @@ final class PriceHistory
         add_action('woocommerce_before_product_variation_object_save', [self::class, 'remember'], 10, 1);
         add_action('woocommerce_after_product_variation_object_save', [self::class, 'record'], 10, 1);
         add_action('add_meta_boxes', [self::class, 'box']);
+        add_filter('woocommerce_duplicate_product_exclude_meta', [self::class, 'notCloned']);
     }
 
     /** @param mixed $product */
@@ -61,25 +61,29 @@ final class PriceHistory
         $id     = $product->get_id();
         $before = self::$before[$id];
         unset(self::$before[$id]);
-        $canonical = CanonicalProduct::of($id);
-        if ($canonical instanceof \WC_Product && $canonical->get_id() !== $id) {
-            return;
-        }
         $after = ['regular' => (string) $product->get_regular_price('edit'), 'sale' => (string) $product->get_sale_price('edit')];
         if ($after === $before) {
             return;
         }
-        $user    = wp_get_current_user();
-        $history = get_post_meta($id, self::META, true);
-        $history = is_array($history) ? $history : [];
+        // One history per item: a change saved on a language record is kept on the item's canonical record, once.
+        $canonical = CanonicalProduct::of($id);
+        $item      = $canonical instanceof \WC_Product ? $canonical->get_id() : $id;
+        $user      = wp_get_current_user();
+        $history   = get_post_meta($item, self::META, true);
+        $history   = is_array($history) ? $history : [];
+        $last      = $history === [] ? null : $history[count($history) - 1];
+        if ($item !== $id && is_array($last) && ($last['regular'][1] ?? null) === $after['regular'] && ($last['sale'][1] ?? null) === $after['sale'] && time() - (int) ($last['at'] ?? 0) < 60) {
+            return; // The translation following the item's own change (WooCommerce Multilingual's copy).
+        }
         $history[] = [
             'at'      => time(),
             'user'    => $user->exists() ? $user->ID : 0,
             'login'   => $user->exists() ? $user->user_login : (defined('WP_CLI') && WP_CLI ? 'wp-cli' : 'system'),
             'regular' => [$before['regular'], $after['regular']],
             'sale'    => [$before['sale'], $after['sale']],
+            'record'  => $id,
         ];
-        update_post_meta($id, self::META, array_slice($history, -self::KEEP));
+        update_post_meta($item, self::META, $history);
     }
 
     /** @return list<array{at:int,user:int,login:string,regular:array{0:string,1:string},sale:array{0:string,1:string}}> */
@@ -88,6 +92,23 @@ final class PriceHistory
         $history = get_post_meta($id, self::META, true);
 
         return is_array($history) ? array_values($history) : [];
+    }
+
+    /** A stored price as staff read it: "0" is a price, an empty value is none. */
+    private static function shown(string $price): string
+    {
+        return $price === '' ? '-' : $price;
+    }
+
+    /**
+     * A duplicate is a new item: it starts with no history.
+     *
+     * @param mixed $exclude
+     * @return mixed
+     */
+    public static function notCloned($exclude)
+    {
+        return is_array($exclude) ? array_merge($exclude, [self::META]) : $exclude;
     }
 
     public static function box(): void
@@ -122,10 +143,10 @@ final class PriceHistory
         foreach (array_slice($lines, 0, 30) as [$at, $id, $e]) {
             $what = [];
             if ($e['regular'][0] !== $e['regular'][1]) {
-                $what[] = sprintf(__('regular %1$s to %2$s', 'mizzey-site'), $e['regular'][0] ?: '-', $e['regular'][1] ?: '-');
+                $what[] = sprintf(__('regular %1$s to %2$s', 'mizzey-site'), self::shown($e['regular'][0]), self::shown($e['regular'][1]));
             }
             if ($e['sale'][0] !== $e['sale'][1]) {
-                $what[] = sprintf(__('sale %1$s to %2$s', 'mizzey-site'), $e['sale'][0] ?: '-', $e['sale'][1] ?: '-');
+                $what[] = sprintf(__('sale %1$s to %2$s', 'mizzey-site'), self::shown($e['sale'][0]), self::shown($e['sale'][1]));
             }
             printf(
                 '<li>%s</li>',

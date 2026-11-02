@@ -22,7 +22,7 @@
 		<!-- specs/036: the video and the badges are the item's; the SEO words and addresses are each language's own. -->
 		<custom-field action="copy">_mizzey_product_video</custom-field>
 		<custom-field action="copy">_mizzey_badges</custom-field>
-		<custom-field action="copy">_mizzey_seo_robots</custom-field>
+		<custom-field action="translate">_mizzey_seo_robots</custom-field>
 		<custom-field action="translate">_mizzey_seo_title</custom-field>
 		<custom-field action="translate">_mizzey_seo_description</custom-field>
 		<custom-field action="translate">_mizzey_seo_canonical</custom-field>

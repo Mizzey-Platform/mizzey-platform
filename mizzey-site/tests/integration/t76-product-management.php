@@ -70,7 +70,7 @@ run(
 		delete_option( \MizzeySite\I18n\WpmlConfigSync::OPTION );
 		$applied = \MizzeySite\I18n\WpmlConfigSync::sync();
 		$fields  = get_option( 'icl_sitepress_settings' )['translation-management']['custom_fields_translation'] ?? array();
-		$check( $applied && true === $ran->getValue() && 1 === (int) ( $fields[ ProductFields::BADGES ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::SEO_TITLE ] ?? -1 ), 'fixture: the site\'s wpml-config.xml is applied when it changes (badges copied, SEO title translated): ' . wp_json_encode( array( $fields[ ProductFields::BADGES ] ?? null, $fields[ ProductFields::SEO_TITLE ] ?? null ) ) );
+		$check( $applied && true === $ran->getValue() && 1 === (int) ( $fields[ ProductFields::BADGES ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::SEO_TITLE ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::ROBOTS ] ?? -1 ), 'fixture: the site\'s wpml-config.xml is applied when it changes (badges copied, SEO title translated): ' . wp_json_encode( array( $fields[ ProductFields::BADGES ] ?? null, $fields[ ProductFields::SEO_TITLE ] ?? null ) ) );
 		// The product screen's save, as WooCommerce runs it (WC_Meta_Box_Product_Data::save): the posted fields, the
 		// woocommerce_admin_process_product_object action, then the save. The same request over HTTP crashes this
 		// machine's Apache (Xdebug in develop mode, exit 0xC0000005, t11 shows it on main too); it is checked on staging.
@@ -113,6 +113,18 @@ run(
 		$_POST = array();
 		wp_set_current_user( 0 );
 		$check( 'https://www.youtube.com/watch?v=t76video' === $fresh( $en )->get_meta( ProductFields::VIDEO ), 'AC-2 without the form\'s nonce nothing changes' );
+
+		$api = (int) wp_insert_user( array( 'user_login' => "{$tag}rest", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}rest@example.invalid", 'role' => 'shop_manager' ) );
+		$s->track_user( $api );
+		wp_set_current_user( $api );
+		$evil = new \WP_REST_Request( 'PUT', '/wc/v3/products/' . $bulk_target = $w->simple( "{$tag}-XSS", null ) );
+		$evil->set_param( 'meta_data', array( array( 'key' => ProductFields::SEO_TITLE, 'value' => '</title><script>t76xss()</script>' ) ) );
+		rest_get_server()->dispatch( $evil );
+		wp_set_current_user( 0 );
+		$xss_url  = get_permalink( $bulk_target );
+		$xss_page = (string) wp_remote_retrieve_body( wp_remote_get( $xss_url, array( 'timeout' => 30 ) ) );
+		$check( ! str_contains( $xss_page, '<script>t76xss()' ), 'AC-2 an SEO title stored by another route is printed escaped' );
+		$check( '' === ProductFields::webAddress( 'https://' ) && '' === ProductFields::webAddress( 'http:///bad' ) && '' === ProductFields::webAddress( '#fragment' ) && '' !== ProductFields::webAddress( 'https://www.youtube.com/watch?v=x' ), 'AC-2 only a full web address is kept for the video and the canonical' );
 
 		// ---- AC-3: badges -----------------------------------------------------------------------------------
 		$p = $fresh( $en );
@@ -176,10 +188,38 @@ run(
 		$ar_product->set_regular_price( '77' );
 		$ar_product->save();
 		wp_set_current_user( 0 );
-		$check( $bulk_check_ar > 0 && array() === PriceHistory::of( $bulk_check_ar ), 'AC-6 saving the Arabic record keeps no second history on it' );
+		$item_history = PriceHistory::of( $bulk_check_en );
+		$last_entry   = end( $item_history );
+		$check( $bulk_check_ar > 0 && array() === PriceHistory::of( $bulk_check_ar ) && $bulk_check_ar === (int) ( $last_entry['record'] ?? 0 ) && '77' === ( $last_entry['regular'][1] ?? '' ), 'AC-6 a change saved on the Arabic record is kept in the item\'s one history, marked with the record it was made on' );
+		$zero = $fresh( $bulk_check_en );
+		$zero->set_regular_price( '0' );
+		$zero->save();
+		ob_start();
+		PriceHistory::render( get_post( $bulk_check_en ) );
+		$zero_box = (string) ob_get_clean();
+		$check( str_contains( $zero_box, 'to 0' ), 'AC-6 a price changed to 0 is shown as 0, not as no price' );
+		require_once WC_ABSPATH . 'includes/admin/class-wc-admin-duplicate-product.php';
+		$copy = ( new \WC_Admin_Duplicate_Product() )->product_duplicate( $fresh( $en ) );
+		$s->track_post( $copy->get_id() );
+		$check( array() === PriceHistory::of( $copy->get_id() ) && array() !== PriceHistory::of( $en ), 'AC-6 a duplicate starts with no history of its own' );
+
+		[ $var_parent, $var_ids ] = $w->variable( "{$tag}-VAR", array( 'S' => null, 'L' => null ) );
+		$v = $fresh( $var_ids[0] );
+		$v->set_regular_price( '90' );
+		$v->set_weight( '0.25' );
+		$v->set_global_unique_id( '62' . wp_rand( 10000000000, 99999999999 ) );
+		$v->save();
+		$v_fresh = $fresh( $var_ids[0] );
+		$check( '90' === $v_fresh->get_regular_price( 'edit' ) && '0.25' === $v_fresh->get_weight() && '' !== $v_fresh->get_global_unique_id() && '' !== $v_fresh->get_sku() && array() !== $v_fresh->get_attributes(), 'AC-1 a variation keeps its own attributes, SKU, barcode, price and weight' );
 
 		// ---- AC-7: bulk -------------------------------------------------------------------------------------------
-		$check( class_exists( '\WC_Product_CSV_Exporter' ) || is_readable( WC_ABSPATH . 'includes/export/class-wc-product-csv-exporter.php' ), 'AC-7 bulk export is WooCommerce\'s CSV exporter' );
+		require_once WC_ABSPATH . 'includes/export/class-wc-product-csv-exporter.php';
+		$exporter = new \WC_Product_CSV_Exporter();
+		$exporter->set_product_ids_to_export( array( $en, $var_parent ) );
+		$exporter->prepare_data_to_export();
+		$rows = ( function () { return $this->row_data; } )->call( $exporter );
+		$skus = array_map( static fn ( $r ) => (string) ( $r['sku'] ?? '' ), (array) $rows );
+		$check( in_array( "{$tag}-ONE", $skus, true ) && in_array( "{$tag}-VAR", $skus, true ), 'AC-7 the CSV export writes the products with their SKUs (' . count( (array) $rows ) . ' rows)' );
 		$bulk_en = $w->simple( "{$tag}-BULK", null );
 		$bulk_p  = $fresh( $bulk_en );
 		$bulk_p->set_regular_price( '200' );
