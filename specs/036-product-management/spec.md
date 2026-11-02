@@ -74,7 +74,7 @@ The owner's instruction of 2 November 2026 puts it in the admin set that needs n
 | AC-5 | A sale price shows as a saving against the regular (compare-at) price only when it is lower | ADM-29 | provisional |
 | AC-6 | Every price change is kept with the user and time | ADM-50 | provisional |
 | AC-7 | Products are imported and exported in bulk, and price, status and category are updated in bulk, both language records following | ADM-47, ADM-48, ADM-49 | provisional |
-| AC-8 | Stock per variant is read from the ERP by variant SKU; its bulk update and history follow PRE-09 | ADM-34, ADM-49, ADM-50 | pending PRE-09 |
+| AC-8 | Stock per variant is read from the ERP by variant SKU; its bulk update and change history follow the ERP Integration Specification | ADM-34, ADM-49, ADM-50 | pending PRE-09 |
 
 ## User Scenarios & Testing *(mandatory)*
 
