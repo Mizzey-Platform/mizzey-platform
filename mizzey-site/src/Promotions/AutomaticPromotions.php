@@ -20,6 +20,9 @@ defined('ABSPATH') || exit;
  * the place of automatic promotions; removing it brings them back. The combination setting is #290's (BR-004).
  *
  * The cart works the same for the block cart and checkout (Store API) and the classic pages, so both are covered.
+ * The choice is made once per request for the same cart, codes, customer and shipping (WooCommerce calculates totals
+ * several times a request), and made again after any change to an option, a coupon, an order, a user, a shipping zone
+ * or a tax rate.
  *
  * Register ids: PROMO-11, PROMO-23. See specs/011-promotion-engine, FR-004.
  */
@@ -32,8 +35,28 @@ final class AutomaticPromotions
 
     private static bool $busy = false;
 
+    /** @var array<string,list<string>> The winners already chosen in this request, by what they depend on. */
+    private static array $memo = [];
+
+    /** Moved on by anything that can change a promotion's value or validity, so the memo is never stale. */
+    private static int $generation = 0;
+
+    /** What can change a winner without changing the cart: options, coupons, orders, users, zones and tax rates. */
+    private const CHANGES = [
+        'added_option', 'updated_option', 'deleted_option', 'added_post_meta', 'updated_post_meta', 'deleted_post_meta',
+        'save_post', 'deleted_post', 'transition_post_status', 'woocommerce_new_order', 'woocommerce_update_order',
+        'woocommerce_order_status_changed', 'woocommerce_after_shipping_zone_object_save',
+        'woocommerce_shipping_zone_method_added', 'woocommerce_shipping_zone_method_deleted',
+        'woocommerce_shipping_zone_method_status_toggled', 'woocommerce_tax_rate_added', 'woocommerce_tax_rate_updated',
+        'woocommerce_tax_rate_deleted', 'profile_update', 'added_user_meta', 'updated_user_meta', 'deleted_user_meta',
+        'set_user_role', 'set_current_user',
+    ];
+
     public static function register(): void
     {
+        foreach (self::CHANGES as $hook) {
+            add_action($hook, [self::class, 'changed'], 10, 0);
+        }
         add_action('woocommerce_after_calculate_totals', [self::class, 'settle'], 20, 1);
         add_filter('woocommerce_apply_with_individual_use_coupon', [self::class, 'stepAside'], 10, 3);
         add_filter('woocommerce_coupon_message', [self::class, 'quiet'], 10, 3);
@@ -102,6 +125,76 @@ final class AutomaticPromotions
      * @return list<string>
      */
     public static function winners(\WC_Cart $cart, array $automatic, array $entered): array
+    {
+        // WooCommerce calculates a cart's totals several times in one request: the choice is made once for the same
+        // cart, codes, customer and shipping, and made again after anything else changes (changed()).
+        $key = self::memoKey($cart, $automatic, $entered);
+        if (isset(self::$memo[$key])) {
+            return self::$memo[$key];
+        }
+        if (count(self::$memo) >= 20) {
+            self::$memo = [];
+        }
+
+        return self::$memo[$key] = self::choose($cart, $automatic, $entered);
+    }
+
+    /** True while this class applies or removes automatic promotions (not the customer's act). */
+    public static function busy(): bool
+    {
+        return self::$busy;
+    }
+
+    /** Forgets the winners chosen so far in this request. */
+    public static function changed(): void
+    {
+        self::$generation++;
+        self::$memo = [];
+    }
+
+    /**
+     * What the winners depend on: the cart's lines as calculated, the codes, the customer, the shipping destination and
+     * rates, the settings that change a promotion's value, and the generation.
+     *
+     * @param list<string> $automatic
+     * @param list<string> $entered
+     */
+    private static function memoKey(\WC_Cart $cart, array $automatic, array $entered): string
+    {
+        $lines = [];
+        foreach ($cart->get_cart() as $key => $line) {
+            $product = $line['data'] ?? null;
+            $lines[] = [(string) $key, (int) ($line['quantity'] ?? 0), (string) ($line['line_subtotal'] ?? ''), (string) ($line['line_subtotal_tax'] ?? ''), $line['line_tax_data']['subtotal'] ?? null, $product instanceof \WC_Product ? [$product->get_id(), $product->get_price('edit'), $product->get_tax_class()] : null];
+        }
+        $packages = [];
+        foreach (WC()->shipping()->get_packages() as $package) {
+            $rates = [];
+            foreach ((array) ($package['rates'] ?? []) as $id => $rate) {
+                $rates[(string) $id] = $rate instanceof \WC_Shipping_Rate ? [$rate->get_cost(), $rate->get_taxes()] : null;
+            }
+            $packages[] = [$package['destination'] ?? [], $rates];
+        }
+        $customer = WC()->customer;
+
+        return md5((string) wp_json_encode([
+            self::$generation,
+            get_current_user_id(),
+            $customer ? [$customer->get_billing_email(), $customer->get_is_vat_exempt()] : null,
+            $automatic,
+            $entered,
+            Combination::allowed(),
+            $cart->display_prices_including_tax(),
+            $lines,
+            $packages,
+        ]));
+    }
+
+    /**
+     * @param list<string> $automatic
+     * @param list<string> $entered
+     * @return list<string>
+     */
+    private static function choose(\WC_Cart $cart, array $automatic, array $entered): array
     {
         if (! Combination::allowed()) {
             $winner = $entered === [] ? self::winner($cart, $automatic) : null;
@@ -606,6 +699,7 @@ final class AutomaticPromotions
     public static function forget(): void
     {
         delete_transient(self::CACHE);
+        self::changed();
     }
 
     /** @return list<string> */
