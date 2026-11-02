@@ -1,0 +1,5 @@
+Mutation check for specs/034-sales-report, t74-sales-report, 2 November 2026 (local runtime on Apache, WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7).
+The slice has one piece of code; removing it brings back the Arabic Analytics request's HTTP 500.
+
+CAUGHT    M1 the rules are written for the language prefix  <- AC-2 [ar] the Analytics screen's own request gives the same figures (500: orders_count=NULL
+1 of 1 caught
