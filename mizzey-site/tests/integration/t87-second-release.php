@@ -112,16 +112,17 @@ run(
 		$s->track_user( $staff );
 		wp_set_current_user( $staff );
 		ob_start();
-		CustomerMetrics::record( get_userdata( $customer ) );
-		PrivacyRequests::staffExport( get_userdata( $customer ) );
-		CustomerMetrics::dashboard();
+		do_action( 'mizzey_customer_record_panel', get_userdata( $customer ) );
+		do_action( 'mizzey_dashboard_widget_end' );
 		$panel = (string) ob_get_clean();
 		$check( str_contains( $panel, 'Total spend' ) && str_contains( $panel, 'mizzey_customer_export' ) && str_contains( $panel, 'Google Analytics' ), 'AC-5 ADM-07, ADM-105 the record shows the figures and the export button; the dashboard names where the conversion rate is' );
 
 		// ---- AC-3: an export prepared by staff, not emailed --------------------------------------------------------
 		$mails = array();
 		$export = PrivacyRequests::request( get_userdata( $customer ), 'export_personal_data', true );
-		PrivacyRequests::run( $export, false );
+		// Run as Action Scheduler would: with the arguments the request queued.
+		$queued_export = array_values( array_filter( as_get_scheduled_actions( array( 'hook' => PrivacyRequests::HOOK, 'status' => \ActionScheduler_Store::STATUS_PENDING, 'per_page' => 50 ), ARRAY_A ), static fn ( $a ) => (int) ( $a['args'][0] ?? 0 ) === (int) $export ) );
+		PrivacyRequests::run( ...( $queued_export[0]['args'] ?? array( $export, true ) ) );
 		$file = (string) get_post_meta( (int) $export, '_export_file_name', true );
 		$check( ! is_wp_error( $export ) && '' !== $file && array() === array_filter( $mails, static fn ( $m ) => str_contains( (string) $m['to'], "{$tag}c@" ) ), 'AC-3 ADM-105 a copy prepared by staff is built for download and not emailed to the customer' );
 
