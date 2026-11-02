@@ -89,7 +89,7 @@ SHIP-14, SHIP-16 and SHIP-17 are marked [key] in the register.
 - A move the status model refuses (for example delivered while still Processing): review, no move.
 - A tracking number typed by staff: kept; the carrier's fills the shipment only when staff gave none.
 - A remittance on a card order: not offered.
-- A cash collection is dated by Bosta's own delivery time, as its plugin stores it, not by when the store read the code, so a code mapped later dates each order correctly (ADR-0002 item 3).
+- A cash collection is dated by Bosta's own delivery time, as its plugin stores it, not by when the store read the code, so a code mapped later dates each order correctly (ADR-0002 item 3); both of the plugin's forms are read (its status refresh's, and its webhook's, which has no year).
 - A remittance recorded from the order screen hands WooCommerce's own save the Delivered status, so the timeline records no refused change.
 - The delivery estimate's language is part of the shipping package, so WooCommerce's cached rates are kept per language.
 - A carrier status the store could not apply is logged (source `mizzey-shipping`, warning) as well as put in review.
