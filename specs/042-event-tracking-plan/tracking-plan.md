@@ -36,7 +36,7 @@ change, not development.
 |---|---|
 | Names | Google Analytics 4's recommended e-commerce names, unchanged. A custom name only where none exists (`view_home`, `zero_result_search`) |
 | Currency | `EGP` on every event that carries a value (the launch market is Egypt) |
-| Values | Item prices as charged, after any sale price. `purchase` carries tax, shipping and the discount separately |
+| Values | Item prices as charged, after any sale price. `purchase` carries tax and shipping as their own parameters, and the discount on each item (`discount`, per unit, in `items`), with the coupon code in `coupon` |
 | Language | Every event carries `language` (`en` or `ar`), so the two storefronts' funnels can be read apart or together |
 | Personal data | None in any parameter: no email, phone, name or address. The order number joins an event to the order inside the store, where the personal data already lives (NFR-12) |
 | Firing | Once per occurrence. A refresh, a back navigation or a repeated callback does not count twice |
@@ -77,7 +77,7 @@ that need one name group by `item_id`. A product with no SKU falls back to the s
 | EVT-11 | `begin_checkout` | Checkout is opened | `value`, `currency`, `coupon` | P1 |
 | EVT-12 | `add_shipping_info` | A shipping method is chosen | `value`, `currency`, `shipping_tier` | P1 |
 | EVT-13 | `add_payment_info` | A payment method is chosen | `value`, `currency`, `payment_type` | P1 |
-| EVT-14 | `purchase` | The order is confirmed: payment confirmed by the gateway, or a cash-on-delivery order accepted. Not when Place Order is pressed | `transaction_id`, `value`, `tax`, `shipping`, `currency`, `coupon` | P1 |
+| EVT-14 | `purchase` | The order is confirmed: payment confirmed by the gateway, or a cash-on-delivery order accepted. Not when Place Order is pressed | `transaction_id`, `value`, `tax`, `shipping`, `currency`, `coupon`; the discount per item in `items` | P1 |
 | EVT-15 | `refund` | A refund completes, in full or in part | `transaction_id`, `value`, `currency`; `items` on a partial refund | P1-L |
 | EVT-16 | `sign_up`, `login` | An account is created; a customer signs in (not staff) | `method`: `email` or `google` for sign-up; `password`, `google` or `link` for sign-in | P1 |
 | EVT-18 | `zero_result_search` | A search returns nothing | `search_term` | P1-L |
