@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Checkout;
 
+use Automattic\WooCommerce\StoreApi\Utilities\CartTokenUtils;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -16,8 +18,9 @@ defined('ABSPATH') || exit;
  * The block checkout's two requests for one cart, sent at the same moment, each found the cart full and each made an
  * order: WooCommerce reuses a draft order only for requests that come one after the other, and each request reads its
  * cart before it runs. Each Store API checkout of a cart now runs under a lock of its own (MySQL GET_LOCK, keyed by the
- * cart's token or session); a second one that finds the lock held waits for the first to finish and is then refused,
- * since the cart it read is the one just ordered.
+ * cart's session); a second one that finds the lock held waits for the first to finish and is then refused, since the
+ * cart it read is the one just ordered. The lock is held until WooCommerce has written the session, so a checkout that
+ * starts after it reads the cart as the first one left it.
  *
  * Found by the audit of 2 November 2026 (C M-3). See specs/028-payments AC-1.
  */
@@ -31,7 +34,8 @@ final class CheckoutOnce
     public static function register(): void
     {
         add_filter('rest_request_before_callbacks', [self::class, 'before'], 5, 3);
-        add_filter('rest_request_after_callbacks', [self::class, 'after'], 999, 3);
+        // After WooCommerce writes the session (shutdown, priority 20).
+        add_action('shutdown', [self::class, 'release'], 30);
     }
 
     /**
@@ -64,18 +68,6 @@ final class CheckoutOnce
         return $response;
     }
 
-    /**
-     * @param mixed $response
-     * @param mixed $handler
-     * @return mixed
-     */
-    public static function after($response, $handler, \WP_REST_Request $request)
-    {
-        self::release();
-
-        return $response;
-    }
-
     public static function release(): void
     {
         if (self::$held === null) {
@@ -92,16 +84,24 @@ final class CheckoutOnce
         return preg_match('#^/wc/store(/v\d+)?/checkout/?$#', (string) $request->get_route()) === 1;
     }
 
-    /** The cart's token (Store API clients), or the visitor's WooCommerce session cookie (the block checkout). */
+    /**
+     * The visitor's cart session, one key however it is presented: the session id inside a valid cart token (Store API
+     * clients; WooCommerce issues new tokens for one session as they near expiry), or the id in the visitor's valid
+     * WooCommerce session cookie (the block checkout). An invalid token or cookie gives none, so a forged one cannot
+     * hold another visitor's checkout.
+     */
     private static function cartKey(\WP_REST_Request $request): string
     {
         $token = trim((string) $request->get_header('cart_token'));
-        if ($token !== '') {
-            return 'token:' . $token;
+        if ($token !== '' && class_exists(CartTokenUtils::class)) {
+            $session = (string) (CartTokenUtils::get_cart_token_payload($token)['user_id'] ?? '');
+
+            return $session !== '' ? 'session:' . $session : '';
         }
-        foreach ($_COOKIE as $name => $value) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-            if (is_string($name) && str_starts_with($name, 'wp_woocommerce_session_') && is_string($value) && $value !== '') {
-                return 'session:' . $value;
+        if (class_exists(\WC_Session_Handler::class)) {
+            $cookie = (new \WC_Session_Handler())->get_session_cookie();
+            if (is_array($cookie) && (string) ($cookie[0] ?? '') !== '') {
+                return 'session:' . (string) $cookie[0];
             }
         }
 

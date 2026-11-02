@@ -165,24 +165,28 @@ final class PaymentGate
             self::stop($channel, 200, 'already handled', $order->get_id(), '', $order);
             return;
         }
+        if (in_array($event->kind, [PaymentEvent::REFUND, PaymentEvent::REFUNDED], true) && $channel !== 'notice') {
+            // Refunds are taken from Paymob's server notice only, never from a customer's return; not even recorded, so the
+            // notice that follows is not taken for a repeat.
+            self::stop($channel, 200, 'ignored', $order->get_id(), '', $order);
+            return;
+        }
         PaymentRecord::add($order, $event);
 
         $amount = self::money($event->amountCents, $event->currency);
         switch ($event->kind) {
             case PaymentEvent::REFUND:
-                // A refund's own notice never reaches the gateway, which would count it again: a refund made here is
-                // already on the order, and one made in the provider's dashboard is recorded from the payment's
-                // refunded total.
-                self::stop($channel, 200, RefundLedger::madeHere($order, $event->reference) ? 'refund already recorded' : 'recorded', $order->get_id(), '', $order);
-                return;
-            case PaymentEvent::REFUNDED:
-                $refundProblem = self::refundedProblem($order, $event, $channel);
-                if ($refundProblem !== null) {
-                    // Recorded above; not reconciled against this order's own refunds.
-                    self::stop($channel, 200, 'recorded', $order->get_id(), $refundProblem, $order);
+                // A refund's own notice never reaches the gateway, which would count it again. One made here is already
+                // on the order; one made in the provider's dashboard is recorded from this notice, whose amount and
+                // provider order the provider signs.
+                if (RefundLedger::madeHere($order, $event->reference)) {
+                    self::stop($channel, 200, 'refund already recorded', $order->get_id(), '', $order);
                     return;
                 }
-                self::reconcileRefunds($order, $event, $channel);
+                self::dashboardRefund($order, $event, $channel);
+                return;
+            case PaymentEvent::REFUNDED:
+                self::compareRefunds($order, $event, $channel);
                 return;
             case PaymentEvent::PAYMENT:
                 break;
@@ -281,65 +285,63 @@ final class PaymentGate
     }
 
     /**
-     * The provider reports the total refunded on the payment so far. The order's own refunds are compared with it: equal
-     * is the usual case (a refund made from the order screen); more at the provider is a refund made in its dashboard,
-     * recorded on the order for the difference without asking the provider again (PAY-17); less at the provider is
-     * flagged for staff. The order is locked, so a refund being made from the order screen is saved before this runs.
+     * A refund made in the provider's dashboard (PAY-17), from the refund's own notice: its amount and its provider order
+     * are signed. It is recorded on the order once (its event key), for its amount, only when it belongs to the provider
+     * order that paid this one and fits what is left to refund; otherwise staff are told and nothing is written. An order
+     * paid before the paying provider order was kept has none to match, so its dashboard refunds are flagged too.
      */
-    private static function reconcileRefunds(\WC_Order $order, PaymentEvent $event, string $channel): void
+    private static function dashboardRefund(\WC_Order $order, PaymentEvent $event, string $channel): void
     {
-        $atProvider = $event->amountCents;
-        $onOrder    = (int) round((float) $order->get_total_refunded() * 100);
-        if ($atProvider > $onOrder) {
-            $refund = wc_create_refund([
-                'order_id'       => $order->get_id(),
-                'amount'         => ($atProvider - $onOrder) / 100,
-                /* translators: 1: payment provider, 2: provider's payment reference. */
-                'reason'         => sprintf(__('Refund made in the %1$s dashboard (payment %2$s)', 'mizzey-site'), $event->provider, $event->reference),
-                'refund_payment' => false,
-                'restock_items'  => false,
-                // The refund was made at the provider: its record says so (specs/029).
-                'mizzey_from_dashboard' => true,
-            ]);
-            if (is_wp_error($refund)) {
-                PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s, and the difference could not be recorded. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));
-            }
-        } elseif ($atProvider < $onOrder) {
-            PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));
+        $paidBy    = (string) $order->get_meta(self::PROVIDER_ORDER, true);
+        $remaining = (int) round(((float) $order->get_total() - (float) $order->get_total_refunded()) * 100);
+        if ($paidBy === '' || $paidBy !== (string) ($event->signed['provider_order'] ?? '') || $event->amountCents <= 0 || $event->amountCents > $remaining) {
+            PaymentRecord::flag($order, sprintf(
+                /* translators: 1: payment provider, 2: amount, 3: provider's reference. */
+                __('%1$s reported a refund of %2$s (reference %3$s) that could not be matched to this order\'s payment or does not fit what is left to refund. Nothing was recorded: check it in the %1$s dashboard.', 'mizzey-site'),
+                $event->provider,
+                self::money($event->amountCents, $event->currency),
+                $event->reference
+            ), 'refund' . '-' . $event->key());
+            self::stop($channel, 200, 'recorded', $order->get_id(), 'refund_not_matched', $order);
+            return;
         }
-        self::stop($channel, 200, $atProvider === $onOrder ? 'refunds match' : 'refunds reconciled', $order->get_id(), '', $order);
+        $refund = wc_create_refund([
+            'order_id'              => $order->get_id(),
+            'amount'                => $event->amountCents / 100,
+            /* translators: 1: payment provider, 2: provider's refund reference. */
+            'reason'                => sprintf(__('Refund made in the %1$s dashboard (refund %2$s)', 'mizzey-site'), $event->provider, $event->reference),
+            'refund_payment'        => false,
+            'restock_items'         => false,
+            // The refund was made at the provider: its record says so (specs/029).
+            'mizzey_from_dashboard' => true,
+        ]);
+        if (is_wp_error($refund)) {
+            PaymentRecord::flag($order, sprintf(__('%1$s reported a refund of %2$s (reference %3$s) that could not be recorded. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($event->amountCents, $event->currency), $event->reference));
+            self::stop($channel, 200, 'recorded', $order->get_id(), 'refund_not_recorded', $order);
+            return;
+        }
+        RefundLedger::record($order, $event->reference);
+        self::stop($channel, 200, 'refund recorded', $order->get_id(), '', $order);
     }
 
     /**
-     * Why a provider's "payment refunded" report must not be reconciled against this order's refunds, or null.
-     * - It refunds another payment than the one that paid the order (a second payment, refunded under D-25): its
-     *   refund is not the order's (audit, Codex 3).
-     * - Its refunded total, which the provider does not sign, exceeds the payment's own signed amount (Codex 4).
-     * - It came on the customer's return rather than the provider's server notice: only the notice writes refunds.
+     * The provider's running total of what was refunded on the payment, which it does not sign: compared with the
+     * order's refunds, never written. Less at the provider than on the order is flagged for staff; more is a refund
+     * whose own notice has not arrived yet. Only for the payment that paid the order.
      */
-    private static function refundedProblem(\WC_Order $order, PaymentEvent $event, string $channel): ?string
+    private static function compareRefunds(\WC_Order $order, PaymentEvent $event, string $channel): void
     {
-        // The payment that paid the order is the first success recorded on it (a second payment comes after it).
-        $payment = (string) ($event->signed['payment'] ?? '');
-        $paidBy  = '';
-        foreach (PaymentRecord::events($order) as $recorded) {
-            if ($recorded['kind'] === PaymentEvent::PAYMENT && $recorded['outcome'] === PaymentEvent::SUCCESS) {
-                $paidBy = (string) $recorded['reference'];
-                break;
-            }
+        $paidBy = (string) $order->get_meta(self::PROVIDER_ORDER, true);
+        if (self::$foreign || $paidBy === '' || $paidBy !== (string) ($event->signed['provider_order'] ?? '')) {
+            self::stop($channel, 200, 'recorded', $order->get_id(), '', $order);
+            return;
         }
-        if (self::$foreign || ($payment !== '' && $paidBy !== '' && $payment !== $paidBy)) {
-            return 'refund_of_another_payment';
+        $atProvider = $event->amountCents;
+        $onOrder    = (int) round((float) $order->get_total_refunded() * 100);
+        if ($atProvider < $onOrder) {
+            PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)), 'below' . '-' . $event->key());
         }
-        if (isset($event->signed['payment_cents']) && $event->amountCents > (int) $event->signed['payment_cents']) {
-            PaymentRecord::flag($order, sprintf(__('%1$s reported %2$s refunded on a payment of %3$s (reference %4$s). Nothing was recorded: check the refunds in the %1$s dashboard.', 'mizzey-site'), $event->provider, self::money($event->amountCents, $event->currency), self::money((int) $event->signed['payment_cents'], $event->currency), $event->reference), 'over' . '-' . $event->key());
-            return 'refunded_above_payment';
-        }
-        if ($channel !== 'notice') {
-            return 'refund_on_return';
-        }
-
-        return null;
+        self::stop($channel, 200, $atProvider === $onOrder ? 'refunds match' : ($atProvider > $onOrder ? 'refund awaited' : 'refunds differ'), $order->get_id(), '', $order);
     }
 
     /** Take a named lock for the rest of the request. */
