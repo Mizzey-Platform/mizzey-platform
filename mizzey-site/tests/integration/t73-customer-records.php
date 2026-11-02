@@ -91,6 +91,17 @@ run(
 		$notes_html = $panel( $customer );
 		$check( 3 === count( $notes ) && "{$tag} an older single note" === $notes[0]['text'] && "{$tag} prefers delivery after 6 pm" === $notes[1]['text'] && "{$tag}mgr" === $notes[1]['by'] && "{$tag} refused delivery twice" === $notes[2]['text'] && "{$tag}mgr2" === $notes[2]['by'] && abs( $notes[2]['at'] - time() ) < 60, 'AC-2, US-19-02 notes are added, each with its author and time; a later note keeps the earlier ones, and a note saved before notes were entries is kept as the first' );
 		$check( str_contains( $notes_html, 'prefers delivery after 6 pm' ) && str_contains( $notes_html, "by {$tag}mgr2" ) && strpos( $notes_html, 'refused delivery twice' ) < strpos( $notes_html, 'prefers delivery after 6 pm' ), 'AC-2 the profile shows each note with its author, newest first' );
+		// Another request holding the customer's note lock (a second database connection) past the wait: nothing written.
+		$rival = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$taken = 1 === (int) $rival->get_var( $rival->prepare( 'SELECT GET_LOCK(%s, 0)', CustomerRecords::notesLock( $customer ) ) );
+		$post( array( 'mizzey_customer_note' => "{$tag} written while locked" ) );
+		CustomerRecords::save( $customer );
+		$_POST       = array();
+		$busy_errors = new \WP_Error();
+		do_action_ref_array( 'user_profile_update_errors', array( &$busy_errors, true, get_user_by( 'id', $customer ) ) );
+		$rival->get_var( $rival->prepare( 'SELECT RELEASE_LOCK(%s)', CustomerRecords::notesLock( $customer ) ) );
+		$rival->close();
+		$check( $taken && 3 === count( CustomerRecords::notes( $customer ) ) && in_array( 'mizzey_customer_note_busy', $busy_errors->get_error_codes(), true ), 'AC-2 a note whose turn does not come (another save holds the customer\'s notes) is not written, and staff are told to add it again' );
 		wp_set_current_user( $customer );
 		$me = rest_do_request( new \WP_REST_Request( 'GET', '/wp/v2/users/me' ) );
 		$me->set_status( $me->get_status() );

@@ -197,8 +197,12 @@ final class CustomerRecords
             return;
         }
         $note = isset($_POST['mizzey_customer_note']) && is_string($_POST['mizzey_customer_note']) ? trim(sanitize_textarea_field(wp_unslash($_POST['mizzey_customer_note']))) : '';
-        if ($note !== '') {
-            self::addNote($user->ID, $note);
+        if ($note !== '' && ! self::addNote($user->ID, $note)) {
+            add_action('user_profile_update_errors', static function ($errors): void {
+                if ($errors instanceof \WP_Error) {
+                    $errors->add('mizzey_customer_note_busy', __('The note was not saved, as another note on this customer was being saved. Please add it again.', 'mizzey-site'));
+                }
+            });
         }
         $want   = isset($_POST['mizzey_suspended']) && $_POST['mizzey_suspended'] === 'yes';
         $reason = isset($_POST['mizzey_suspension_reason']) && is_string($_POST['mizzey_suspension_reason']) ? mb_substr(sanitize_text_field(wp_unslash($_POST['mizzey_suspension_reason'])), 0, 300) : '';
@@ -239,23 +243,35 @@ final class CustomerRecords
         return $notes;
     }
 
-    /** Adds a note by the signed-in staff member, now; the notes before it are kept as they are. */
-    public static function addNote(int $userId, string $text): void
+    /** The MySQL named lock that note writes on one customer take in turn. */
+    public static function notesLock(int $userId): string
     {
         global $wpdb;
-        // Two staff adding a note at once take turns, so neither note is lost.
-        $lock = substr('mz_' . $wpdb->prefix . 'customer_notes_' . $userId, 0, 64);
-        $held = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+        return substr('mz_' . $wpdb->prefix . 'customer_notes_' . $userId, 0, 64);
+    }
+
+    /**
+     * Adds a note by the signed-in staff member, now; the notes before it are kept as they are. Two staff adding a note at
+     * once take turns; when the turn does not come within five seconds nothing is written (false), so no note is lost.
+     */
+    public static function addNote(int $userId, string $text): bool
+    {
+        global $wpdb;
+        $lock = self::notesLock($userId);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return false;
+        }
         try {
             wp_cache_delete($userId, 'user_meta');
             $notes   = self::notes($userId);
             $staff   = wp_get_current_user();
             $notes[] = ['text' => mb_substr($text, 0, self::NOTE_LENGTH), 'by' => $staff->exists() ? $staff->user_login : '', 'at' => time()];
             update_user_meta($userId, self::NOTES, array_slice($notes, -self::NOTES_KEPT));
+
+            return true;
         } finally {
-            if ($held) {
-                $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            }
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
     }
 

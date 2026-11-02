@@ -62,6 +62,8 @@ ADM-103 and ADM-104 are P1-L with no reduction written in Part One 1.2; they are
 - A note saved before notes were entries (one text box): kept as the first entry, its author and time unknown.
 - A saved note is not edited or removed from the screen; a note is kept up to 2,000 characters, and the newest 200 notes
   are kept.
+- Two staff adding a note to one customer at once take turns; a note whose turn does not come within five seconds is
+  not written, and the screen says to add it again, so no note replaces another.
 - A staff account or one's own: cannot be suspended here.
 - Google sign-in or a sign-in link for a suspended account: the cookie gives no session.
 
