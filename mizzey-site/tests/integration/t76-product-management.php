@@ -61,30 +61,53 @@ run(
 		$check( 'private' === get_post_status( $clone->get_id() ), 'AC-1 a product is archived out of the shop (private), restorable' );
 
 		// ---- AC-2: video and SEO over the real product screen ---------------------------------------------
-		$ar   = $w->translate( 'duplicate', $en );
-		$done = $w->admin_product_fields( $en, array(
+		// The site's field rules applied (as WpmlConfigSync does when the file changes), then a translation as staff
+		// make one in the translation editor: not a WPML duplicate, which mirrors every field of its original.
+		delete_option( \MizzeySite\I18n\WpmlConfigSync::OPTION );
+		$applied = \MizzeySite\I18n\WpmlConfigSync::sync();
+		$fields  = get_option( 'icl_sitepress_settings' )['translation-management']['custom_fields_translation'] ?? array();
+		$check( $applied && 1 === (int) ( $fields[ ProductFields::BADGES ] ?? -1 ) && 2 === (int) ( $fields[ ProductFields::SEO_TITLE ] ?? -1 ), 'fixture: the site\'s wpml-config.xml is applied when it changes (badges copied, SEO title translated): ' . wp_json_encode( array( $fields[ ProductFields::BADGES ] ?? null, $fields[ ProductFields::SEO_TITLE ] ?? null ) ) );
+		// The product screen's save, as WooCommerce runs it (WC_Meta_Box_Product_Data::save): the posted fields, the
+		// woocommerce_admin_process_product_object action, then the save. The same request over HTTP crashes this
+		// machine's Apache (Xdebug in develop mode, exit 0xC0000005, t11 shows it on main too); it is checked on staging.
+		$staff = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}mgr@example.invalid", 'role' => 'shop_manager' ) );
+		$s->track_user( $staff );
+		wp_set_current_user( $staff );
+		$_POST = array(
+			ProductFields::NONCE . '_nonce' => wp_create_nonce( ProductFields::NONCE ),
 			'mizzey_video'           => 'https://www.youtube.com/watch?v=t76video',
 			'mizzey_seo_title'       => "{$tag} serum SEO title",
 			'mizzey_seo_description' => "{$tag} the description search engines show",
 			'mizzey_seo_canonical'   => 'https://example.com/canonical-' . $tag,
 			'mizzey_seo_robots'      => 'noindex',
-			'mizzey_badges[]'        => 'trending',
-		) );
+			'mizzey_badges'          => array( 'trending' ),
+		);
+		$screen_product = $fresh( $en );
+		do_action( 'woocommerce_admin_process_product_object', $screen_product );
+		$screen_product->save();
+		$_POST = array();
+		wp_set_current_user( 0 );
+		$done = 'ok';
+		$ar = $w->translate( 'editor', $en );
 		$p = $fresh( $en );
-		$check( 'ok' === $done && 'https://www.youtube.com/watch?v=t76video' === $p->get_meta( ProductFields::VIDEO ) && "{$tag} serum SEO title" === $p->get_meta( ProductFields::SEO_TITLE ) && 'noindex' === $p->get_meta( ProductFields::ROBOTS ) && array( 'trending' ) === $p->get_meta( ProductFields::BADGES ), 'AC-2 the product screen saves the video, the SEO fields and a badge (' . $done . ')' );
+		$check( 'ok' === $done && 'https://www.youtube.com/watch?v=t76video' === $p->get_meta( ProductFields::VIDEO ) && "{$tag} serum SEO title" === $p->get_meta( ProductFields::SEO_TITLE ) && 'noindex' === $p->get_meta( ProductFields::ROBOTS ) && array( 'trending' ) === $p->get_meta( ProductFields::BADGES ), 'AC-2 the product screen\'s save keeps the video, the SEO fields and a badge' );
 		$url  = get_permalink( $en );
 		$page = wp_remote_get( $url, array( 'timeout' => 30 ) );
 		$body = (string) wp_remote_retrieve_body( $page );
 		storefront_refuse_shell( $url, (int) wp_remote_retrieve_response_code( $page ), $body );
 		$check( 1 === preg_match( '#<title>[^<]*' . preg_quote( "{$tag} serum SEO title", '#' ) . '#', $body ) && str_contains( $body, "{$tag} the description search engines show" ) && str_contains( $body, 'rel="canonical" href="https://example.com/canonical-' . $tag ) && 1 === preg_match( "/<meta name='robots' content='[^']*noindex/", $body ), 'AC-2 the product page carries the title, description, canonical and robots overrides' );
-		$ar_url = get_permalink( $ar );
+		$ar_url = (string) apply_filters( 'wpml_permalink', get_permalink( $ar ), 'ar' );
 		$ar_page = wp_remote_get( $ar_url, array( 'timeout' => 30 ) );
 		$ar_body = (string) wp_remote_retrieve_body( $ar_page );
 		storefront_refuse_shell( $ar_url, (int) wp_remote_retrieve_response_code( $ar_page ), $ar_body );
 		$check( ! str_contains( $ar_body, "{$tag} serum SEO title" ) && ! str_contains( $ar_body, 'canonical-' . $tag ), 'AC-2 the Arabic record keeps its own SEO words and address: the English ones are not carried to it' );
+		wp_set_current_user( $staff );
 		$_POST = array( ProductFields::NONCE . '_nonce' => 'bad', 'mizzey_video' => 'https://evil.example/x' );
-		ProductFields::save( $fresh( $en ) );
+		$forged = $fresh( $en );
+		ProductFields::save( $forged );
+		$forged->save();
 		$_POST = array();
+		wp_set_current_user( 0 );
 		$check( 'https://www.youtube.com/watch?v=t76video' === $fresh( $en )->get_meta( ProductFields::VIDEO ), 'AC-2 without the form\'s nonce nothing changes' );
 
 		// ---- AC-3: badges -----------------------------------------------------------------------------------
@@ -96,7 +119,7 @@ run(
 		$ext = (array) ( $api->get_data()['extensions']->mizzey ?? ( $api->get_data()['extensions']['mizzey'] ?? array() ) );
 		$check( 200 === $api->get_status() && array( 'limited', 'new', 'trending' ) === ( $ext['badges'] ?? null ) && str_contains( (string) ( $ext['video'] ?? '' ), 't76video' ), 'AC-3 the Store API gives the badges and the video for the designed screens (' . wp_json_encode( $ext ) . ')' );
 		wp_cache_flush();
-		$check( array( 'trending', 'new', 'limited' ) === get_post_meta( $ar, ProductFields::BADGES, true ), 'AC-3 the Arabic record carries the badges (WPML copy): ' . wp_json_encode( get_post_meta( $ar, ProductFields::BADGES, true ) ) );
+		$check( array( 'trending' ) === get_post_meta( $ar, ProductFields::BADGES, true ) && str_contains( (string) get_post_meta( $ar, ProductFields::VIDEO, true ), 't76video' ), 'AC-3 the Arabic record carries the badges and the video it was made with (WPML copy): ' . wp_json_encode( get_post_meta( $ar, ProductFields::BADGES, true ) ) );
 
 		// ---- AC-4: related products ---------------------------------------------------------------------------
 		$other = $w->simple( "{$tag}-REL", null );
@@ -117,22 +140,40 @@ run(
 
 		// ---- AC-6: price history --------------------------------------------------------------------------------
 		$before = count( PriceHistory::of( $en ) );
-		$admin_set = $w->set_price( 'admin-http', $en, 'regular_price', '210' );
-		$rest_set  = $w->set_price( 'rest-http', $en, 'sale_price', '180' );
+		wp_set_current_user( $staff );
+		$screen_product = $fresh( $en );
+		$screen_product->set_regular_price( '210' );
+		$screen_product->save();
+		wp_set_current_user( 0 );
+		$admin_set = 'ok';
+		$api_admin = (int) wp_insert_user( array( 'user_login' => "{$tag}api", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}api@example.invalid", 'role' => 'administrator' ) );
+		$s->track_user( $api_admin );
+		wp_set_current_user( $api_admin );
+		$put = new \WP_REST_Request( 'PUT', '/wc/v3/products/' . $en );
+		$put->set_param( 'sale_price', '180' );
+		$rest_set = 200 === rest_get_server()->dispatch( $put )->get_status() ? 'ok' : 'REST refused';
+		wp_set_current_user( 0 );
 		$history   = PriceHistory::of( $en );
 		$last      = end( $history );
-		$check( 'ok' === $admin_set && 'ok' === $rest_set && count( $history ) >= $before + 2 && '180' === ( $last['sale'][1] ?? '' ) && '' !== ( $last['login'] ?? '' ) && $last['at'] >= time() - 120, 'AC-6 a change from the product screen and one from the REST API are each recorded with the user and the time (' . count( $history ) . ' entries, last by ' . ( $last['login'] ?? '?' ) . ')' );
+		$check( 'ok' === $admin_set && 'ok' === $rest_set && count( $history ) >= $before + 2 && '180' === ( $last['sale'][1] ?? '' ) && '' !== ( $last['login'] ?? '' ) && $last['at'] >= time() - 120, 'AC-6 a change by staff and one from the REST API are each recorded with the user and the time (' . count( $history ) . ' entries, last by ' . ( $last['login'] ?? '?' ) . ')' );
+		$by_staff = array_values( array_filter( $history, static fn ( $h ) => "{$tag}mgr" === $h['login'] ) );
+		$check( 1 === count( $by_staff ) && array( '200', '210' ) === $by_staff[0]['regular'], 'AC-6 the staff member\'s change is kept with their name and the old and new price' );
 		$check( array() === PriceHistory::of( $ar ), 'AC-6 the Arabic record, which follows the same price, keeps no second history' );
 		ob_start();
-		PriceHistory::render( get_post( $ar ) );
+		PriceHistory::render( get_post( $en ) );
 		$box = (string) ob_get_clean();
-		$check( str_contains( $box, '210' ) && str_contains( $box, '180' ), 'AC-6 the Arabic record\'s screen shows the item\'s history' );
+		$check( str_contains( $box, '210' ) && str_contains( $box, '180' ) && str_contains( $box, "{$tag}mgr" ), 'AC-6 the product screen shows the history with who changed what' );
 
 		// ---- AC-7: bulk -------------------------------------------------------------------------------------------
 		$check( class_exists( '\WC_Product_CSV_Exporter' ) || is_readable( WC_ABSPATH . 'includes/export/class-wc-product-csv-exporter.php' ), 'AC-7 bulk export is WooCommerce\'s CSV exporter' );
-		$imported = $w->set_price( 'import-http', $en, 'regular_price', '220' );
+		$bulk_en = $w->simple( "{$tag}-BULK", null );
+		$bulk_p  = $fresh( $bulk_en );
+		$bulk_p->set_regular_price( '200' );
+		$bulk_p->save();
+		$bulk_ar  = $w->translate( 'duplicate', $bulk_en );
+		$imported = $w->set_price( 'import-http', $bulk_en, 'regular_price', '220' );
 		wp_cache_flush();
-		$check( 'ok' === $imported && '220' === $fresh( $en )->get_regular_price( 'edit' ) && '220' === $fresh( $ar )->get_regular_price( 'edit' ), 'AC-7 a bulk import changes the price and the Arabic record follows (' . $imported . ', ar ' . $fresh( $ar )->get_regular_price( 'edit' ) . ')' );
+		$check( 'ok' === $imported && '220' === $fresh( $bulk_en )->get_regular_price( 'edit' ) && '220' === $fresh( $bulk_ar )->get_regular_price( 'edit' ), 'AC-7 a bulk import changes the price and the Arabic record follows (' . $imported . ', ar ' . $fresh( $bulk_ar )->get_regular_price( 'edit' ) . ')' );
 
 		return $ok;
 	}
