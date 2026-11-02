@@ -194,7 +194,7 @@ run(
 		}
 		unset( $_COOKIE[ GoogleSignIn::COOKIE ] );
 		wp_set_current_user( 0 );
-		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $made instanceof \WP_User && $signed === $made->ID && $issued === $made->ID, 'AUTH-10 the callback with the state, its cookie and a good code, for someone new, makes their account through the sign-up check, signs them in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ')' );
+		$check( 302 === $landed->get_status() && home_url( '/shop/' ) === ( $landed->get_headers()['Location'] ?? '' ) && $made instanceof \WP_User && $signed === $made->ID && $issued === $made->ID, 'AUTH-10 the callback with the state, its cookie and a good code, for someone new, makes their account through the sign-up check, signs them in, issuing their sign-in cookie, and returns them to where they began (' . $landed->get_status() . ', user ' . $signed . ', made ' . ( $made instanceof \WP_User ? $made->ID : 'none' ) . ', cookie for ' . $issued . ', to ' . ( $landed->get_headers()['Location'] ?? '' ) . ')' );
 
 		sign_in_forget( array( "{$tag}-known", "{$tag}-squat", "{$tag}-staff", "{$tag}-outside" ) );
 		return $ok;
