@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
  * One customer's contact details compared as one, however they were typed.
  *
  * - A mobile number: its Egyptian form (`01` and nine digits), from any spelling: spaces, dashes, brackets, dots, the
- *   `+20` and `0020` prefixes, Arabic-Indic and Eastern Arabic-Indic digits (an Arabic keyboard's), and the direction
+ *   `+20`, `0020` and `20` prefixes, Arabic-Indic and Eastern Arabic-Indic digits (an Arabic keyboard's), and the direction
  *   marks a number copied from right-to-left text carries.
  * - An email: its mailbox, lower case, with a `+tag` removed, and for Gmail the dots removed and `googlemail.com` read
  *   as `gmail.com`, so the spellings that reach one inbox are one key. A key for comparing, never an address to write to.
@@ -60,6 +60,9 @@ final class CustomerKey
             $digits = '0' . substr($digits, 3);
         } elseif (str_starts_with($digits, '0020')) {
             $digits = '0' . substr($digits, 4);
+        } elseif (preg_match('/^201[0125][0-9]{8}$/', $digits) === 1) {
+            // The country code with its plus lost (a search box, a pasted number).
+            $digits = '0' . substr($digits, 2);
         }
 
         return preg_match('/^01[0125][0-9]{8}$/', $digits) === 1 ? $digits : null;
