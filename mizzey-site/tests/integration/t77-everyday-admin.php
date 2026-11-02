@@ -77,8 +77,10 @@ run(
 		$pa->set_global_unique_id( '62' . wp_rand( 10000000000, 99999999999 ) );
 		$pa->save();
 		$gtin = $fresh( $a )->get_global_unique_id();
-		$a_ar = $w->translate( 'duplicate', $a );
-		$b_ar = $w->translate( 'duplicate', $b );
+		// Translations as staff and the catalogue load make them (the translation editor), not WPML duplicates, which
+		// mirror every field of their original on each save and so would hide a field that does not follow (B-21).
+		$a_ar = $w->translate( 'editor', $a );
+		$b_ar = $w->translate( 'editor', $b );
 		$check( $a_ar > 0 && $b_ar > 0, 'fixture: both products have an Arabic record' );
 
 		// ---- AC-1: bulk price by percentage, then by amount ---------------------------------------------------
@@ -103,6 +105,7 @@ run(
 			$statuses[] = get_post_status( $a ) . '/' . get_post_status( $b );
 		}
 		$check( array( 'draft/draft', 'private/private', 'publish/publish' ) === $statuses, 'AC-2 unpublish, archive and publish across a selection (' . implode( ', ', $statuses ) . ')' );
+		$s->note( 'MEASURED  after the bulk actions the Arabic records are ' . get_post_status( $a_ar ) . '/' . get_post_status( $b_ar ) . ', with categories ' . wp_json_encode( array( wp_get_post_terms( $a_ar, 'product_cat', array( 'fields' => 'names' ) ), wp_get_post_terms( $b_ar, 'product_cat', array( 'fields' => 'names' ) ) ) ) . ' (the category has no Arabic translation here)' );
 
 		// ---- AC-3: find a product by SKU, title, barcode; an order by phone ------------------------------------
 		$found = static function ( string $term ) use ( $get, $a ): bool {
