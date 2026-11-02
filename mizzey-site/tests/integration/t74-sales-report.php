@@ -143,6 +143,15 @@ run(
 		$rules = (string) $GLOBALS['wp_rewrite']->mod_rewrite_rules();
 		do_action( 'wpml_switch_language', 'en' );
 		$check( str_contains( $rules, 'RewriteBase ' . RewriteRoot::base() . "\n" ) && ! str_contains( $rules, '/ar/index.php' ), 'AC-2 the rewrite rules written in Arabic name the site root (' . RewriteRoot::base() . '), not /ar/' );
+		do_action( 'wpml_switch_language', 'ar' );
+		$verbose_before                       = $GLOBALS['wp_rewrite']->use_verbose_rules;
+		$GLOBALS['wp_rewrite']->use_verbose_rules = true;
+		$verbose                              = (string) $GLOBALS['wp_rewrite']->mod_rewrite_rules();
+		$GLOBALS['wp_rewrite']->use_verbose_rules = $verbose_before;
+		$foreign = "RewriteBase /portal/\nRewriteRule . /portal/index.php [L]\n";
+		$kept    = RewriteRoot::root( $foreign );
+		do_action( 'wpml_switch_language', 'en' );
+		$check( ! str_contains( $verbose, '/ar/index.php' ) && $kept === $foreign, 'AC-2 with verbose rules too no target keeps /ar/, and another block\'s own base and target are left alone' );
 
 		// ---- AC-2: the real request of the Analytics screen, in English and in Arabic ---------------------
 		$w = new Workflows( $s );
