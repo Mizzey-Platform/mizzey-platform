@@ -1,0 +1,17 @@
+Mutation check for specs/043-measurement-tools, t83-measurement-tools, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7), on the code after the Codex review. Each defect is applied alone, the scenario run over the real request, the file restored.
+
+CAUGHT    M1 Tag Manager is not loaded  <- FAIL  AC-1 Tag Manager loads on the storefront, after the consent defaults
+CAUGHT    M2 consent defaults to granted  <- FAIL  AC-1 consent is denied until the visitor accepts; the data layer names the language (en)
+CAUGHT    M3 any container id is accepted  <- FAIL  AC-1 a malformed container id is refused, so nothing can be injected
+CAUGHT    M4 the language is not named  <- FAIL  AC-1 the Arabic storefront loads the same container, with the language ar
+CAUGHT    M5 no banner  <- FAIL  AC-2 the consent banner and its script are on the English storefront
+CAUGHT    M6 attribution runs without consent  <- FAIL  AC-2 the campaign is recorded on the order (WooCommerce order attribution) only once the visitor accepts
+CAUGHT    M7 a hidden product is in the feed  <- FAIL  AC-3 a hidden, draft or password-protected product is not in the feed
+CAUGHT    M8 the feed names items by record id  <- FAIL  AC-3 the English feed lists the product by its SKU, price and sale price in EGP, availability and English address
+CAUGHT    M9 variations are not grouped  <- FAIL  AC-3 a variable product is one item per variation, grouped by the product's SKU
+CAUGHT    M10 no sale price  <- FAIL  AC-3 the English feed lists the product by its SKU, price and sale price in EGP, availability and English address (24 items)
+CAUGHT    M11 the feed is not served  <- FAIL  AC-3 the English feed lists the product by its SKU, price and sale price in EGP, availability and English address (0 items)
+CAUGHT    M12 a password-protected product is listed  <- FAIL  AC-3 a hidden, draft or password-protected product is not in the feed
+CAUGHT    M13 no way back to the cookie choice  <- FAIL  AC-2 a "Cookie settings" link reopens the choice, in both languages
+
+13 of 13 caught.

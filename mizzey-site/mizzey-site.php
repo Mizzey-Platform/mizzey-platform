@@ -33,6 +33,10 @@ require_once __DIR__ . '/src/Seo/SitemapLanguages.php';
 require_once __DIR__ . '/src/Seo/SeoFields.php';
 require_once __DIR__ . '/src/Seo/Redirects.php';
 require_once __DIR__ . '/src/Seo/SearchSettings.php';
+require_once __DIR__ . '/src/Marketing/TagManager.php';
+require_once __DIR__ . '/src/Marketing/ConsentBanner.php';
+require_once __DIR__ . '/src/Marketing/ProductFeed.php';
+require_once __DIR__ . '/src/Marketing/Events.php';
 require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
 require_once __DIR__ . '/src/Reporting/StockReport.php';
 require_once __DIR__ . '/src/Reporting/StoreDashboard.php';
@@ -75,6 +79,11 @@ require_once __DIR__ . '/src/Orders/TransitionGuard.php';
 require_once __DIR__ . '/src/Orders/CancellationField.php';
 require_once __DIR__ . '/src/Orders/RefundIntegrity.php';
 require_once __DIR__ . '/src/Orders/RefundReference.php';
+require_once __DIR__ . '/src/Shipping/Carrier.php';
+require_once __DIR__ . '/src/Shipping/BostaCarrier.php';
+require_once __DIR__ . '/src/Shipping/CarrierStatus.php';
+require_once __DIR__ . '/src/Shipping/CodReconciliation.php';
+require_once __DIR__ . '/src/Shipping/DeliveryEstimate.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
@@ -175,6 +184,10 @@ MizzeySite\Seo\SitemapLanguages::register();
 MizzeySite\Seo\SeoFields::register();
 MizzeySite\Seo\Redirects::register();
 MizzeySite\Seo\SearchSettings::register();
+MizzeySite\Marketing\TagManager::register();
+MizzeySite\Marketing\ConsentBanner::register();
+MizzeySite\Marketing\ProductFeed::register();
+MizzeySite\Marketing\Events::register();
 
 // RPT-10: the standard stock report lists one line per physical item, whichever language its records are in and
 // whichever language the operator's session is in. Confined to that report's own query.
@@ -234,6 +247,11 @@ MizzeySite\Promotions\AutomaticPromotions::register();
 MizzeySite\Promotions\Combination::register();
 MizzeySite\Promotions\WelcomeDiscount::register();
 MizzeySite\Orders\RefundIntegrity::register();
+
+// Bosta through its plugin, inside Mizzey's carrier layer: SHIP-01 to SHIP-17. See specs/041-bosta.
+MizzeySite\Shipping\CarrierStatus::register();
+MizzeySite\Shipping\CodReconciliation::register();
+MizzeySite\Shipping\DeliveryEstimate::register();
 MizzeySite\Orders\RefundReference::register();
 
 // Accounts: verification sent at registration, marketing consent, phone sign-in, sign-in links (#305). See specs/017-accounts.

@@ -158,6 +158,7 @@ final class SignInLink
         if (wp_verify_nonce($nonce, self::NONCE) && ! \MizzeySite\Account\CustomerRecords::isSuspended($userId) && self::redeem($userId, $token)) {
             wp_set_current_user($userId);
             wp_set_auth_cookie($userId, false);
+            do_action('mizzey_signed_in_by', 'link', $userId);
             wp_safe_redirect($account);
             exit;
         }
