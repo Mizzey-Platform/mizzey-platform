@@ -240,7 +240,7 @@ run(
 		$check( null !== $die && str_contains( $die, 'not available' ), 'AC-6 a customer with a valid link is refused the packing slip (staff only)' );
 		$res = wp_remote_get( add_query_arg( PackingSlip::QUERY, $a->get_id(), admin_url( 'admin.php' ) ), array( 'redirection' => 0, 'timeout' => 20 ) ); // storefront-guard: exempt, a staff address that must refuse a visitor, the page itself is not read
 		$code = is_wp_error( $res ) ? 0 : (int) wp_remote_retrieve_response_code( $res );
-		$check( in_array( $code, array( 302, 403 ), true ) && ( 403 === $code || str_contains( (string) wp_remote_retrieve_header( $res, 'location' ), 'wp-login' ) ), 'AC-6 over the real request a visitor is sent to sign in, never given the slip (' . $code . ')' );
+		$check( in_array( $code, array( 302, 403 ), true ) && ( 403 === $code || str_contains( (string) wp_remote_retrieve_header( $res, 'location' ), (string) wp_parse_url( wp_login_url(), PHP_URL_PATH ) ) ), 'AC-6 over the real request a visitor is sent to sign in, never given the slip (' . $code . ')' );
 
 		return $ok;
 	}
