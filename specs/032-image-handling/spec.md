@@ -47,7 +47,7 @@ pages.
 | AC-1 | An image too heavy to serve (over 20 MB or 40 megapixels) is refused with a message saying why, on every upload route | NFR-02 | provisional |
 | AC-2 | Every size made of an uploaded JPEG or PNG is an optimised WebP; the full size is scaled to 2,560 px and the original kept | NFR-02 | provisional |
 | AC-3 | Product images are served as WebP and lazy loaded below the first images | NFR-02 | provisional |
-| AC-4 | Prices, numbers and dates are formatted per locale, with Western digits on Arabic pages | NFR-04b | provisional |
+| AC-4 | Prices, numbers and dates are formatted per locale, with Western digits on Arabic pages; the currency is written per language (English `EGP` before the amount, Arabic the amount, a space, then the Arabic symbol) | NFR-04b | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -63,6 +63,10 @@ pages.
 - A transparent PNG: its WebP sizes keep the transparency.
 - A server whose image library cannot write WebP: sizes stay JPEG or PNG; nothing breaks.
 - A file that is not an image: left to WordPress's own type checks.
+- The administration is English (ADM-159): staff see and save the stored currency position and symbol; only Arabic
+  output is written the Arabic way.
+- The Arabic symbol is the working default the reviewed Arabic wireframes draw; the localisation review may change
+  the wording through the translation file, with no code change.
 
 ## Native coverage
 
@@ -73,7 +77,8 @@ pages.
 | Lazy loading | WordPress's `loading="lazy"` | Native, verified |
 | CoreX WebP copies | Served only through CoreX's picture helper, which WooCommerce's images do not use | Not used: generation stays off (D-20 A9) |
 | Refusing heavy images with a reason | Only PHP's upload limit, with no useful message | Gap: an upload guard |
-| Number, price and date formatting | WordPress and WooCommerce locale formatting | Native, verified |
+| Number and date formatting | WordPress locale formatting | Native, verified |
+| Currency symbol and position per language | None: WooCommerce keeps one symbol and one position for every language, so the Arabic shop printed `EGP91.00` like the English one (audit of 2 November 2026). WooCommerce's own locale data for the pound in Arabic is the amount, a space, then the symbol (`i18n/locale-info.php`, EG) | Gap: `MizzeySite\I18n\CurrencyFormat` sets the position option and the symbol (a translation) on Arabic pages, emails and invoices |
 
 ## Requirements
 
@@ -85,6 +90,9 @@ pages.
 - **FR-003**: WordPress's big-image threshold MUST stay at 2,560 px and the original MUST be kept (AC-2).
 - **FR-004**: One mechanism MUST produce WebP: WordPress's, with CoreX Media's generation off (AC-2; ADR-0003).
 - **FR-005**: Prices, numbers and dates on Arabic pages MUST use Western digits with Arabic formatting (AC-4).
+- **FR-006**: On Arabic pages, and in an Arabic order's email or invoice, a price MUST be written as the amount, a space,
+  then the Arabic symbol of the pound; English keeps the store's setting. The cart and checkout blocks and the Store API
+  MUST write it the same way as the page (AC-4).
 
 ## Optional safeguards (not owed)
 

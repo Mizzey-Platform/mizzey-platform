@@ -27,6 +27,7 @@ require_once __DIR__ . '/src/I18n/WcmlSettingsDefaults.php';
 require_once __DIR__ . '/src/I18n/ProductTranslationJob.php';
 require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
+require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
 require_once __DIR__ . '/src/Catalogue/CostTranslationSync.php';
@@ -176,6 +177,8 @@ MizzeySite\I18n\WcmlSettingsDefaults::register();
 MizzeySite\I18n\WpmlProductSaveHook::register();
 // .htaccess names the site's root, never a language's: specs/034-sales-report.
 MizzeySite\I18n\RewriteRoot::register();
+// Prices on Arabic pages: the amount, then the Arabic symbol (NFR-04b): specs/032-image-handling.
+MizzeySite\I18n\CurrencyFormat::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.

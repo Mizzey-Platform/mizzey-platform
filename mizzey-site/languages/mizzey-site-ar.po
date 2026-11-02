@@ -675,3 +675,6 @@ msgstr "الأساسية فقط"
 
 msgid "Cookie settings"
 msgstr "إعدادات ملفات تعريف الارتباط"
+
+msgid "EGP"
+msgstr "ج.م"

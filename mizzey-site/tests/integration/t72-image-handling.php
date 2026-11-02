@@ -7,7 +7,9 @@
  *       REST API.
  * AC-2: every size WordPress makes of a JPEG or a PNG is WebP; the full size is scaled to 2,560 px and the original kept.
  * AC-3: a product's image is served as WebP and lazy loaded below the first image.
- * AC-4: prices, numbers and dates use Western digits on Arabic pages, with locale formatting.
+ * AC-4: prices, numbers and dates use Western digits on Arabic pages, with locale formatting. The currency is read
+ *       from served product pages (audit of 2 November 2026): English `EGP` before the amount, Arabic the amount, a
+ *       space and the Arabic symbol after it.
  *
  * @package MizzeySite\Tests\Integration
  */
@@ -17,6 +19,8 @@ namespace MizzeySite\Tests\Integration;
 use MizzeySite\Catalogue\ImageHandling;
 
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/_storefront.php';
+require_once __DIR__ . '/_catalogue.php';
 require_once ABSPATH . 'wp-admin/includes/image.php';
 require_once ABSPATH . 'wp-admin/includes/file.php';
 require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -195,6 +199,32 @@ run(
 		$eastern = '/[\x{0660}-\x{0669}\x{06F0}-\x{06F9}]/u';
 		$check( 1 === preg_match( '/12[^0-9]?345/', $price ) && 1 !== preg_match( $eastern, $price . $date . $num ), 'AC-4 on an Arabic page a price, a number and a date use Western digits 0 to 9 (' . $price . ' | ' . $num . ' | ' . $date . ')' );
 		$check( 1 === preg_match( '/\p{Arabic}/u', $date ), 'AC-4 the Arabic date is formatted for the locale, with the month in Arabic (' . $date . ')' );
+
+		// AC-4 on served pages: an in-process locale switch is not the page a visitor gets.
+		$en_id = catalogue_simple( $s, 'T72-PRICE-' . wp_rand( 1000, 9999 ), 't72 price product' );
+		$en    = wc_get_product( $en_id );
+		$en->set_regular_price( '12345.50' );
+		$en->save();
+		$ar_id = catalogue_duplicate( $s, $en_id );
+		$check( $ar_id > 0, 'AC-4 the price fixture has its Arabic record (' . $ar_id . ')' );
+		$page_text = static function ( string $url ): string {
+			$r      = wp_remote_get( $url, array( 'timeout' => 30, 'redirection' => 0, 'cookies' => array() ) );
+			$status = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
+			$body   = is_wp_error( $r ) ? '' : (string) wp_remote_retrieve_body( $r );
+			storefront_refuse_shell( $url, $status, $body );
+			return 200 === $status ? html_entity_decode( wp_strip_all_tags( $body ), ENT_QUOTES, 'UTF-8' ) : '';
+		};
+		$space     = '[\s\x{00A0}]';
+		$en_text   = $page_text( (string) get_permalink( $en_id ) );
+		$ar_text   = $ar_id > 0 ? $page_text( (string) get_permalink( $ar_id ) ) : '';
+		$en_symbol = 1 === preg_match( '/EGP' . $space . '*12,?345\.50/u', $en_text, $en_m );
+		$ar_symbol = 1 === preg_match( '/12,?345\.50' . $space . '+\x{062C}\.\x{0645}/u', $ar_text, $ar_m );
+		$check( $en_symbol, 'AC-4 the served English product page writes EGP before the amount (' . ( $en_m[0] ?? 'not found' ) . ')' );
+		$check( $ar_symbol && 1 !== preg_match( '/EGP' . $space . '*12,?345\.50/u', $ar_text ), 'AC-4 the served Arabic product page writes the amount in Western digits, a space, then the Arabic symbol, and never the English form (' . ( $ar_m[0] ?? 'not found' ) . ')' );
+		switch_to_locale( 'ar' );
+		$switched_price = html_entity_decode( wp_strip_all_tags( wc_price( 10 ) ), ENT_QUOTES, 'UTF-8' );
+		restore_previous_locale();
+		$check( 1 === preg_match( '/^10\.00' . $space . '\x{062C}\.\x{0645}$/u', $switched_price ), 'AC-4 an Arabic email or invoice, which switches to the order\'s language, writes the Arabic form too (' . $switched_price . ')' );
 
 		return $ok;
 	}
