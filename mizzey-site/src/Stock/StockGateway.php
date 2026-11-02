@@ -65,7 +65,9 @@ final class StockGateway
             return StockAnswer::unknown(null, 'no stock identity');
         }
 
-        return $this->attempt('level', $item, '', fn (): int => $this->source->level($item));
+        $source = $this->sourceFor($item);
+
+        return $this->attempt('level', $item, '', fn (): int => $source->level($item), $source);
     }
 
     /** Whether `$quantity` units can be sold: only when the source answered, and holds enough. */
@@ -88,48 +90,60 @@ final class StockGateway
             return StockAnswer::unknown($item, $reason);
         }
 
-        return $this->attempt('adjust', $item, $operationKey, fn (): int => $this->source->adjust($item, $delta, $operationKey));
+        $source = $this->sourceFor($item);
+
+        return $this->attempt('adjust', $item, $operationKey, fn (): int => $source->adjust($item, $delta, $operationKey), $source);
+    }
+
+    /**
+     * The source that holds the item: the router's choice for it (D-28, specs/049), or the bound source itself.
+     */
+    public function sourceFor(StockItem $item): StockSource
+    {
+        return $this->source instanceof RoutedStockSource ? $this->source->for($item) : $this->source;
     }
 
     /** @param callable(): int $call */
-    private function attempt(string $operation, StockItem $item, string $key, callable $call): StockAnswer
+    private function attempt(string $operation, StockItem $item, string $key, callable $call, ?StockSource $source = null): StockAnswer
     {
+        $source ??= $this->source;
         for ($attempt = 1; $attempt <= $this->attempts; $attempt++) {
             try {
                 $quantity = $call();
-                $this->log($operation === 'adjust' ? 'info' : 'debug', $operation, $item, $attempt, 'answered ' . $quantity, $key);
+                $this->log($operation === 'adjust' ? 'info' : 'debug', $operation, $item, $attempt, 'answered ' . $quantity, $key, $source);
 
                 return StockAnswer::known($item, $quantity);
             } catch (StockSourceRefused $e) {
-                $this->log('warning', $operation, $item, $attempt, 'refused: ' . $e->getMessage(), $key);
+                $this->log('warning', $operation, $item, $attempt, 'refused: ' . $e->getMessage(), $key, $source);
 
                 return StockAnswer::unknown($item, 'refused');
             } catch (StockSourceUnavailable $e) {
-                $this->log('warning', $operation, $item, $attempt, 'unavailable: ' . $e->getMessage(), $key);
+                $this->log('warning', $operation, $item, $attempt, 'unavailable: ' . $e->getMessage(), $key, $source);
                 if ($attempt < $this->attempts && $this->pauseMs > 0) {
                     usleep($this->pauseMs * 1000);
                 }
             } catch (\Throwable $e) {
                 // An adapter that breaks its contract is not trusted to answer again: fail closed at once.
-                $this->log('error', $operation, $item, $attempt, get_class($e) . ': ' . $e->getMessage(), $key);
+                $this->log('error', $operation, $item, $attempt, get_class($e) . ': ' . $e->getMessage(), $key, $source);
 
                 return StockAnswer::unknown($item, 'adapter error');
             }
         }
         // Every attempt found the source unavailable: an outage, logged as an error so operations hear of it.
-        $this->log('error', $operation, $item, $this->attempts, 'unavailable after every attempt', $key);
+        $this->log('error', $operation, $item, $this->attempts, 'unavailable after every attempt', $key, $source);
 
         return StockAnswer::unknown($item, 'exhausted');
     }
 
     /** Diagnostics never change the stock answer: a failing logger, or an adapter whose name() fails, is ignored. */
-    private function log(string $level, string $operation, ?StockItem $item, int $attempt, string $outcome, string $key = ''): void
+    private function log(string $level, string $operation, ?StockItem $item, int $attempt, string $outcome, string $key = '', ?StockSource $source = null): void
     {
+        $source ??= $this->source;
         try {
             try {
-                $name = $this->source->name();
+                $name = $source->name();
             } catch (\Throwable) {
-                $name = get_class($this->source);
+                $name = get_class($source);
             }
             $this->logger?->log($level, sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $name, $outcome), [
                 'source'    => self::LOG_SOURCE,
