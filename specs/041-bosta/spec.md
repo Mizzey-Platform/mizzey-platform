@@ -58,10 +58,10 @@ SHIP-14, SHIP-16 and SHIP-17 are marked [key] in the register.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Staff manage shipping zones by governorate with their rates in admin, and a free-shipping promotion overrides the rate | SHIP-01, SHIP-05, SHIP-15 | pending CR-03 |
+| AC-1 | Staff manage shipping zones by governorate with their rates in admin, and a free-shipping promotion overrides the rate | SHIP-01, SHIP-05, SHIP-15 | provisional |
 | AC-2 | A rate shows the customer its delivery estimate, in their language, where staff gave one | SHIP-04 | provisional |
-| AC-3 | Orders are pushed to Bosta through its official plugin, behind a carrier layer; the tracking number returned is linked to the order and shown to the customer; pickups are requested and followed in the plugin | SHIP-03, SHIP-08, SHIP-09, SHIP-12, INT-02 | pending CR-03 |
-| AC-4 | A carrier status is reflected on the order through a mapping table visible and editable in admin; a code with no mapping, or a move the status model refuses, never moves the order and marks it for review | SHIP-13, SHIP-14 | pending I-08 |
+| AC-3 | Orders are pushed to Bosta through its official plugin, behind a carrier layer; the tracking number returned is linked to the order and shown to the customer; pickups are requested and followed in the plugin | SHIP-03, SHIP-08, SHIP-09, SHIP-12, INT-02 | provisional |
+| AC-4 | A carrier status is reflected on the order through a mapping table visible and editable in admin; a code with no mapping, or a move the status model refuses, never moves the order and marks it for review | SHIP-13, SHIP-14 | provisional |
 | AC-5 | Returned to origin is its own state and is never recorded as delivered | SHIP-17 | provisional |
 | AC-6 | For each cash order, the amount collected and the amount remitted are recorded apart, and staff can list the orders collected and not remitted | SHIP-16 | pending OD-20 |
 
