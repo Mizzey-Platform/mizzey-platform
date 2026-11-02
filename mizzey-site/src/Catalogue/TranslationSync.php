@@ -55,12 +55,18 @@ final class TranslationSync
         'WCML\Synchronization\Component\VariationTaxonomies',
     ];
 
+    /**
+     * Every stored price field. A change to any price property copies them all: WooCommerce may change another one
+     * while it saves (a lower regular price clears a sale price that is no longer below it), after the change was noted.
+     */
+    private const PRICE_FIELDS = ['_regular_price', '_sale_price', '_price', '_sale_price_dates_from', '_sale_price_dates_to'];
+
     /** Product properties and the stored fields a change to each one writes. */
     private const PROPERTY_FIELDS = [
-        'regular_price'     => ['_regular_price', '_price'],
-        'sale_price'        => ['_sale_price', '_price'],
-        'date_on_sale_from' => ['_sale_price_dates_from', '_price'],
-        'date_on_sale_to'   => ['_sale_price_dates_to', '_price'],
+        'regular_price'     => self::PRICE_FIELDS,
+        'sale_price'        => self::PRICE_FIELDS,
+        'date_on_sale_from' => self::PRICE_FIELDS,
+        'date_on_sale_to'   => self::PRICE_FIELDS,
         'sku'               => ['_sku'],
         'global_unique_id'  => ['_global_unique_id'],
         'weight'            => ['_weight'],
@@ -109,6 +115,14 @@ final class TranslationSync
         }
         foreach ($product->get_meta_data() as $meta) {
             if ($meta instanceof \WC_Meta_Data && (empty($meta->id) || $meta->get_changes() !== [])) {
+                $fields[] = (string) $meta->key;
+            }
+        }
+        // A field being deleted: WooCommerce keeps it in its pending meta with a null value, which get_meta_data() hides.
+        $pending = new \ReflectionProperty(\WC_Data::class, 'meta_data');
+        $pending->setAccessible(true);
+        foreach ((array) $pending->getValue($product) as $meta) {
+            if ($meta instanceof \WC_Meta_Data && $meta->value === null && ! empty($meta->id)) {
                 $fields[] = (string) $meta->key;
             }
         }

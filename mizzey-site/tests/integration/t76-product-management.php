@@ -201,6 +201,22 @@ run(
 		$ar_charged = (float) $s->order_for( $ar_after, 1 )->get_subtotal();
 		do_action( 'wpml_switch_language', 'en' );
 		$check( '210' === $ar_after->get_regular_price( 'edit' ) && '180' === $ar_after->get_sale_price( 'edit' ) && 180.0 === $ar_charged, 'AC-6 B-18 the price changed by staff in code and over the REST API reaches the Arabic record, and an Arabic order is charged it (' . wp_json_encode( array( $ar_after->get_regular_price( 'edit' ), $ar_after->get_sale_price( 'edit' ), $ar_charged ) ) . ')' );
+		// A lower regular price clears a sale price no longer below it, while WooCommerce saves: the Arabic record follows
+		// that too, so it is not left charging the old sale once the price goes back up (Codex).
+		$clear = $fresh( $en );
+		$clear->set_regular_price( '150' );
+		$clear->save();
+		$clear = $fresh( $en );
+		$clear->set_regular_price( '210' );
+		$clear->save();
+		$ar_cleared = $fresh( $ar );
+		$check( '' === $fresh( $en )->get_sale_price( 'edit' ) && '' === $ar_cleared->get_sale_price( 'edit' ) && '210' === $ar_cleared->get_price( 'edit' ), 'AC-6 B-18 a sale price WooCommerce clears while saving a lower price is cleared on the Arabic record too (' . wp_json_encode( array( $fresh( $en )->get_sale_price( 'edit' ), $ar_cleared->get_sale_price( 'edit' ), $ar_cleared->get_price( 'edit' ) ) ) . ')' );
+		// A copied field deleted in code is deleted on the Arabic record too.
+		$no_video = $fresh( $en );
+		$no_video->delete_meta_data( ProductFields::VIDEO );
+		$no_video->save();
+		wp_cache_flush();
+		$check( '' === (string) get_post_meta( $en, ProductFields::VIDEO, true ) && '' === (string) get_post_meta( $ar, ProductFields::VIDEO, true ), 'AC-3 a copied field deleted in code (the video) is gone from the Arabic record too (' . (string) get_post_meta( $ar, ProductFields::VIDEO, true ) . ')' );
 		$by_staff = array_values( array_filter( $history, static fn ( $h ) => "{$tag}mgr" === $h['login'] ) );
 		$check( 1 === count( $by_staff ) && array( '200', '210' ) === $by_staff[0]['regular'], 'AC-6 the staff member\'s change is kept with their name and the old and new price' );
 		$check( array() === PriceHistory::of( $ar ), 'AC-6 the Arabic record, which follows the same price, keeps no second history' );
