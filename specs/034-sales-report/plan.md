@@ -13,7 +13,7 @@ through the Analytics screen's own request in both admin languages.
 | Item | Value |
 |---|---|
 | Stack | WordPress 7.1.4, WooCommerce 11.1.0 Analytics, WPML 4.9.7, WCML 5.5.7 |
-| Code | None, unless a check fails |
+| Code | `mizzey-site/src/I18n/RewriteRoot.php`: the one gap the checks found, `.htaccess` written with `RewriteBase /ar/` from an Arabic admin page, which made the Arabic Analytics request answer 500 |
 | Testing | `t74-sales-report` |
 
 ## Constitution Check

@@ -62,6 +62,7 @@ RPT-03).
 | Orders, units (items sold), average order value | WooCommerce Analytics, Orders report | Native, verified |
 | Every order counted once in both languages | Analytics reads order-level statistics (`wc_order_stats`), which WPML does not split | Native, verified (the product split P-019 measured does not apply) |
 | Access | WooCommerce's `view_woocommerce_reports` | Native |
+| The Analytics screen opened in Arabic on an Apache host | WordPress writes `.htaccess` from the language-prefixed home address when a queued rewrite flush runs on an Arabic admin page (`RewriteBase /ar/`), and every Arabic address then loops (HTTP 500) | Gap, measured on 2 November 2026 (t26 and t74 failed with it): the rules always name the site root |
 
 ## Requirements
 
@@ -72,6 +73,8 @@ RPT-03).
 - **FR-002**: The figures MUST be checked against a hand calculation over English and Arabic orders, in process and
   through the screen's own request in both admin languages (AC-1, AC-2).
 - **FR-003**: A failure of either check MUST be fixed in Mizzey's code at its cause, not by a parallel report.
+- **FR-004**: The web server's rewrite rules MUST name the site's root whatever language the page that writes them is
+  in, so the Arabic screens answer (AC-2).
 
 ## Optional safeguards (not owed)
 
