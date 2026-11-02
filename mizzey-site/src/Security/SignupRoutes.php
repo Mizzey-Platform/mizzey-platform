@@ -124,7 +124,7 @@ final class SignupRoutes
     public static function restBefore(mixed $response, array $handler, WP_REST_Request $request): mixed
     {
         $depth          = count(self::$frames);
-        self::$frames[] = ['request' => $request, 'permit' => null];
+        self::$frames[] = ['request' => $request, 'permit' => null, 'token' => null];
         try {
             if (is_wp_error($response) || ! self::isCheckoutHandler($handler) || $request->get_method() !== 'POST') {
                 return $response;
@@ -134,11 +134,15 @@ final class SignupRoutes
             }
             $extensions = $request['extensions'];
             $signup     = is_array($extensions) && is_array($extensions[self::STORE_NAMESPACE] ?? null) ? $extensions[self::STORE_NAMESPACE] : [];
-            if (! SignupCheck::verify('checkout', $signup['token'] ?? null, $signup['trap'] ?? null)) {
+            // Checked now, spent only when the account is made (guard()): a checkout refused before that, on its cart or
+            // its stock, keeps the token for the customer's next try (audit D-305-7).
+            $valid = SignupCheck::inspect('checkout', $signup['token'] ?? null, $signup['trap'] ?? null);
+            if ($valid === null || SignupCheck::spent($valid)) {
                 return new WP_Error(self::ERROR, SignupCheck::message(), ['status' => 400]);
             }
             $billing = $request['billing_address'];
             self::$frames[$depth]['permit'] = self::normalise(is_array($billing) ? (string) ($billing['email'] ?? '') : '');
+            self::$frames[$depth]['token']  = $valid;
 
             return $response;
         } catch (Throwable $error) {
@@ -255,9 +259,12 @@ final class SignupRoutes
         if (self::$frames !== []) {
             $top = array_key_last(self::$frames);
             if ($email !== '' && self::$frames[$top]['permit'] === $email) {
+                $token                        = self::$frames[$top]['token'] ?? null;
                 self::$frames[$top]['permit'] = null;
-
-                return $errors;
+                self::$frames[$top]['token']  = null;
+                if (! is_array($token) || SignupCheck::spend($token)) {
+                    return $errors;
+                }
             }
         } elseif (self::$offerDepth > 0) {
             $posted = self::normalise(sanitize_email((string) self::posted('email')));
