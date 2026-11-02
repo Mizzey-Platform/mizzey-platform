@@ -206,6 +206,8 @@ final class PaymentGate
                 'reason'         => sprintf(__('Refund made in the %1$s dashboard (payment %2$s)', 'mizzey-site'), $event->provider, $event->reference),
                 'refund_payment' => false,
                 'restock_items'  => false,
+                // The refund was made at the provider: its record says so (specs/029).
+                'mizzey_from_dashboard' => true,
             ]);
             if (is_wp_error($refund)) {
                 PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s, and the difference could not be recorded. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));

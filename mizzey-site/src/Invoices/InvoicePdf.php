@@ -34,6 +34,13 @@ final class InvoicePdf
         if ($html === '') {
             return '';
         }
+
+        return self::render($html, InvoiceNumber::of((int) $order->get_id()), InvoiceDocument::rtl($order));
+    }
+
+    /** A document's HTML as a PDF, with the invoice's font and styles: also the packing slip's (ADM-93, specs/030). */
+    public static function render(string $html, string $title, bool $rtl): string
+    {
         require_once dirname(__DIR__, 2) . '/lib/autoload.php';
         $temp = trailingslashit(get_temp_dir()) . 'mizzey-mpdf';
         wp_mkdir_p($temp);
@@ -43,12 +50,11 @@ final class InvoicePdf
             'tempDir'          => $temp,
             'fontdata'         => ['dejavusans' => ['R' => 'DejaVuSans.ttf', 'B' => 'DejaVuSans-Bold.ttf', 'useOTL' => 0xFF, 'useKashida' => 75]],
             'default_font'     => 'dejavusans',
-            'directionality'   => InvoiceDocument::rtl($order) ? 'rtl' : 'ltr',
+            'directionality'   => $rtl ? 'rtl' : 'ltr',
             'autoScriptToLang' => true,
             'autoLangToFont'   => false,
         ]);
-        $mpdf->SetTitle(InvoiceNumber::of((int) $order->get_id()));
-        $rtl = InvoiceDocument::rtl($order);
+        $mpdf->SetTitle($title);
         $mpdf->WriteHTML(str_replace(['{start}', '{end}'], $rtl ? ['right', 'left'] : ['left', 'right'], self::STYLE), \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
 
