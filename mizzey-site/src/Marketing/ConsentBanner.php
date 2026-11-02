@@ -61,7 +61,7 @@ final class ConsentBanner
         }
         wp_add_inline_script(
             'wc-order-attribution',
-            'if(window.wc_order_attribution&&window.wc_order_attribution.params&&/(?:^|; )mizzey_consent=granted(?:;|$)/.test(document.cookie)){window.wc_order_attribution.params.allowTracking=true;}',
+            'if(window.wc_order_attribution&&window.wc_order_attribution.params&&/(?:^|;\s*)mizzey_consent=granted(?:;|$)/.test(document.cookie)){window.wc_order_attribution.params.allowTracking=true;}',
             'before'
         );
     }
