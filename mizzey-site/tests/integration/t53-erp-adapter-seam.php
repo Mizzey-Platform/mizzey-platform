@@ -202,7 +202,7 @@ run(
 		$mock->failures = array( 'unavailable', 'unavailable', 'unavailable', 'unavailable' );
 		$log            = new T53Logger();
 		$answer         = ( new StockGateway( $mock, 3, $log, 0 ) )->level( $en );
-		$check( ! $answer->isKnown() && ! $answer->sellable( 1 ) && 3 === count( $mock->calls ) && 3 === count( $log->lines ), "AC-3, AC-4 a source that keeps failing is asked three times, then the answer is unknown ({$answer->reason})" );
+		$check( ! $answer->isKnown() && ! $answer->sellable( 1 ) && 3 === count( $mock->calls ) && array( 'warning', 'warning', 'warning', 'error' ) === array_column( $log->lines, 0 ), "AC-3, AC-4 a source that keeps failing is asked three times, each logged, the outage then logged as an error, and the answer is unknown ({$answer->reason})" );
 		$mock->calls    = array();
 		$mock->failures = array( 'refused' );
 		$answer         = ( new StockGateway( $mock, 3, new T53Logger(), 0 ) )->level( $en );
