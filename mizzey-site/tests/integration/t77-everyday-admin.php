@@ -39,7 +39,7 @@ run(
 			$cookies[] = new \WP_Http_Cookie( array( 'name' => $name, 'value' => wp_generate_auth_cookie( $admin, $expiry, $scheme, $token ) ) );
 		}
 		$get = static function ( string $url ) use ( $cookies ): array {
-			$r = wp_remote_get( $url, array( 'cookies' => $cookies, 'timeout' => 90, 'redirection' => 0 ) );
+			$r = wp_remote_get( $url, array( 'cookies' => $cookies, 'timeout' => 90, 'redirection' => 0 ) ); // storefront-guard: exempt, signed-in admin screens and not the storefront.
 			return is_wp_error( $r ) ? array( 0, $r->get_error_message(), '' ) : array( (int) wp_remote_retrieve_response_code( $r ), (string) wp_remote_retrieve_body( $r ), (string) wp_remote_retrieve_header( $r, 'location' ) );
 		};
 		$fresh = static function ( int $id ): \WC_Product {
