@@ -68,6 +68,7 @@ not forensic reporting or log analytics (Feature Register section 1.2).
 ### Edge Cases
 
 - A failed sign-in for an account that does not exist: recorded with what was typed.
+- A wrong application password sent with REST Basic authentication: recorded as a failed sign-in with the login sent.
 - CoreX not booted: nothing is recorded and the sign-in is not affected.
 - A shop manager opening the log's address: refused.
 
@@ -88,7 +89,7 @@ not forensic reporting or log analytics (Feature Register section 1.2).
 
 - **FR-001**: The adapter MUST record into CoreX Activity, area security: a staff sign-in and sign-out, every failed
   sign-in with the reason (password or second factor), CoreX's lockout, a password reset requested and completed
-  (AC-2).
+  (AC-2). A wrong application password over the REST API is a failed sign-in too, recorded once per attempt.
 - **FR-002**: A customer's successful sign-in MUST NOT be recorded (AC-2).
 - **FR-003**: Each entry MUST keep the account, what was typed, the time, the outcome and the visitor's address as
   CoreX's sign-in protection resolves it behind the trusted proxy (AC-2).

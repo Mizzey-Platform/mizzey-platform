@@ -397,6 +397,119 @@ run(
 		$before_trash = $late_source->levels[ $five->get_id() ];
 		wc_get_order( $trashed->get_id() )->delete( false );
 		$after_trash = $late_source->levels[ $five->get_id() ];
+		// A Confirmed order trashed (a duplicate) gives its stock back; restored, it is reserved again. A Shipped order
+		// trashed keeps it: the stock has left.
+		$duplicate = t60_order( $s, array( $five->get_id() => 2 ) );
+		OrderStock::reserve( $duplicate, StockGateway::make() );
+		wc_get_order( $duplicate->get_id() )->update_status( 'processing' );
+		$dup_held = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $duplicate->get_id() )->delete( false );
+		$dup_trashed = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $duplicate->get_id() )->untrash();
+		$dup_restored = $late_source->levels[ $five->get_id() ];
+		$restored_ok  = 'processing' === wc_get_order( $duplicate->get_id() )->get_status() && OrderStock::active( wc_get_order( $duplicate->get_id() ) );
+		$gone = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $gone, StockGateway::make() );
+		foreach ( array( 'processing', 'preparing', 'shipped' ) as $step ) {
+			wc_get_order( $gone->get_id() )->update_status( $step );
+		}
+		$gone_held = $late_source->levels[ $five->get_id() ];
+		wc_get_order( $gone->get_id() )->delete( false );
+		$check( $dup_trashed === $dup_held + 2 && $dup_restored === $dup_held && $restored_ok && $late_source->levels[ $five->get_id() ] === $gone_held, 'CHK-12 a Confirmed order trashed gives its stock back and, restored, holds it again; a Shipped order trashed gives nothing back (' . wp_json_encode( array( $dup_held, $dup_trashed, $dup_restored, $gone_held, $late_source->levels[ $five->get_id() ] ) ) . ')' );
+		// A cancellation whose order is locked elsewhere is retried in the background, and gives the stock back then.
+		global $wpdb;
+		$busy = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $busy, StockGateway::make() );
+		$busy_held = $late_source->levels[ $five->get_id() ];
+		$other     = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$lock_name = substr( 'mz_' . $wpdb->prefix . 'order_stock_' . $busy->get_id(), 0, 64 );
+		$other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 0)', $lock_name ) );
+		$busy_fresh = wc_get_order( $busy->get_id() );
+		$busy_fresh->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't60 locked elsewhere' );
+		$busy_fresh->update_status( 'cancelled', 't60' );
+		$busy_waiting   = $late_source->levels[ $five->get_id() ];
+		$busy_scheduled = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
+		$other->get_var( $other->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+		$other->close();
+		OrderStock::retryRelease( $busy->get_id() );
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
+		}
+		$check( $busy_waiting === $busy_held && $busy_scheduled && $late_source->levels[ $five->get_id() ] === $busy_held + 1 && '' === wc_get_order( $busy->get_id() )->get_meta( OrderStock::UNRELEASED ), 'CHK-12 a cancellation that finds its order locked elsewhere is retried in the background, and the retry gives the stock back (' . wp_json_encode( array( $busy_held, $busy_waiting, $late_source->levels[ $five->get_id() ] ) ) . ')' );
+		// A Confirmed order trashed while the source refuses keeps its record unsettled: emptying the trash is refused
+		// while the source still refuses, so the record reconciliation needs is not lost; once the source answers, the
+		// release is sent again under its own key and the order goes. A Confirmed order trashed normally is deleted.
+		$outage = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $outage, StockGateway::make() );
+		wc_get_order( $outage->get_id() )->update_status( 'processing' );
+		$outage_held         = $late_source->levels[ $five->get_id() ];
+		$late_source->refuse = array( $five->get_id() );
+		wc_get_order( $outage->get_id() )->delete( false );
+		$outage_states       = array_column( OrderStock::record( wc_get_order( $outage->get_id() ) ), 'state' );
+		$outage_deleted      = wc_get_order( $outage->get_id() )->delete( true );
+		$outage_kept         = wc_get_order( $outage->get_id() ) instanceof \WC_Order;
+		$late_source->refuse = array();
+		$outage_later        = wc_get_order( $outage->get_id() )->delete( true );
+		$outage_given        = $late_source->levels[ $five->get_id() ];
+		$clean = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $clean, StockGateway::make() );
+		wc_get_order( $clean->get_id() )->update_status( 'processing' );
+		wc_get_order( $clean->get_id() )->delete( false );
+		$clean_deleted = wc_get_order( $clean->get_id() )->delete( true );
+		$check( in_array( 'unsettled', $outage_states, true ) && false === $outage_deleted && $outage_kept && true === $outage_later && $outage_given === $outage_held + 1 && true === $clean_deleted && ! wc_get_order( $clean->get_id() ), 'CHK-12 an order whose stock could not be given back is not deleted for good while the source refuses; once it answers the release is sent again and the order goes; a settled one is deleted (' . wp_json_encode( array( $outage_states, $outage_deleted, $outage_kept, $outage_later, $outage_held, $outage_given ) ) . ')' );
+		// The deletion decides from the order as stored: a copy loaded while Confirmed, deleted after another request
+		// shipped the order, gives nothing back. A quantity change still unanswered keeps even a Shipped order.
+		$moved = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $moved, StockGateway::make() );
+		wc_get_order( $moved->get_id() )->update_status( 'processing' );
+		$moved_copy = wc_get_order( $moved->get_id() );
+		foreach ( array( 'preparing', 'shipped' ) as $step ) {
+			wc_get_order( $moved->get_id() )->update_status( $step );
+		}
+		$moved_held   = $late_source->levels[ $five->get_id() ];
+		$moved_answer = OrderStock::beforePermanentDeletion( null, $moved_copy, true );
+		$moved_after  = $late_source->levels[ $five->get_id() ];
+		$resizing     = wc_get_order( $moved->get_id() );
+		$moved_record = OrderStock::record( $resizing );
+		foreach ( array_keys( $moved_record ) as $line_id ) {
+			$moved_record[ $line_id ]['resize'] = array( 'op' => 1, 'to' => 2 );
+		}
+		$resizing->update_meta_data( OrderStock::RECORD, $moved_record );
+		$resizing->save_meta_data();
+		$resize_answer = OrderStock::beforePermanentDeletion( null, wc_get_order( $moved->get_id() ), true );
+		$check( null === $moved_answer && $moved_after === $moved_held && array() !== $moved_record && false === $resize_answer, 'CHK-12 a deletion decided on a stale Confirmed copy of a Shipped order gives nothing back; a Shipped order with a quantity change unanswered is not deleted for good (' . wp_json_encode( array( $moved_held, $moved_after, $resize_answer ) ) . ')' );
+		// A cancellation whose release the source refuses: the background retry sends it again and, refused again,
+		// marks the order for staff; once the source answers, a retry gives the stock back.
+		$refusal = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $refusal, StockGateway::make() );
+		wc_get_order( $refusal->get_id() )->update_status( 'processing' );
+		$refusal_held        = $late_source->levels[ $five->get_id() ];
+		$late_source->refuse = array( $five->get_id() );
+		$refusal_fresh       = wc_get_order( $refusal->get_id() );
+		$refusal_fresh->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't60 refused release' );
+		$refusal_fresh->update_status( 'cancelled', 't60' );
+		$refusal_queued = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		// A retry that finds the order locked elsewhere does not mark it: it is queued again.
+		as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		$holder      = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$refusal_key = substr( 'mz_' . $wpdb->prefix . 'order_stock_' . $refusal->get_id(), 0, 64 );
+		$holder->get_var( $holder->prepare( 'SELECT GET_LOCK(%s, 0)', $refusal_key ) );
+		OrderStock::retryRelease( $refusal->get_id() );
+		$busy_unmarked = '' === wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$busy_requeued = false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		$holder->get_var( $holder->prepare( 'SELECT RELEASE_LOCK(%s)', $refusal_key ) );
+		$holder->close();
+		OrderStock::retryRelease( $refusal->get_id() );
+		$refusal_marked      = '' !== wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$refusal_still       = $late_source->levels[ $five->get_id() ];
+		$late_source->refuse = array();
+		OrderStock::retryRelease( $refusal->get_id() );
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		}
+		$refusal_states  = array_column( OrderStock::record( wc_get_order( $refusal->get_id() ) ), 'state' );
+		$refusal_cleared = '' === wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$check( $refusal_queued && $busy_unmarked && $busy_requeued && $refusal_marked && $refusal_still === $refusal_held && $late_source->levels[ $five->get_id() ] === $refusal_held + 1 && array( 'released' ) === $refusal_states && $refusal_cleared, 'CHK-12 a refused release is retried in the background; a retry that finds the order locked is queued again, unmarked; refused again, the order is marked for staff; a later retry gives the stock back and clears the mark (' . wp_json_encode( array( $busy_unmarked, $busy_requeued, $refusal_held, $refusal_still, $late_source->levels[ $five->get_id() ], $refusal_states, $refusal_cleared ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );
@@ -504,8 +617,9 @@ run(
 		wp_cache_flush();
 		$made     = wc_get_order( $order_id );
 		$district = $made ? (string) $made->get_meta( '_wc_billing/' . EgyptianAddress::DISTRICT ) : '';
-		$ledger   = (array) get_option( FixtureStockSource::LEDGER, array() );
-		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ' ' . wp_strip_all_tags( (string) ( $placed['data']['message'] ?? '' ) ) . '; before it ' . ( $missing['data']['code'] ?? '' ) . ', ' . ( $missing_ar['data']['code'] ?? '' ) . ')' );
+		// This order's entries only: another scenario's cleanup may have left entries of its own.
+		$ledger   = array_filter( (array) get_option( FixtureStockSource::LEDGER, array() ), static fn ( $key ) => str_starts_with( (string) $key, 'order-' . $order_id . '-' ), ARRAY_FILTER_USE_KEY );
+		$check( 200 === $placed['status'] && $made && 'Garden City' === $district && 'Ring twice' === $made->get_customer_note() && OrderStock::active( $made ) && 1 === count( $ledger ) && 5 === (int) wc_get_product( $five->get_id() )->get_stock_quantity() && 3 === StockGateway::make()->level( $five->get_id() )->quantity, '[HTTP] CHK-01, CHK-06, CHK-12 an order is placed with its district and note; its line is reserved with the stock source (3 of 5 left there), and WooCommerce\'s stock field is untouched (status ' . $placed['status'] . ' ' . wp_strip_all_tags( (string) ( $placed['data']['message'] ?? '' ) ) . '; before it ' . ( $missing['data']['code'] ?? '' ) . ', ' . ( $missing_ar['data']['code'] ?? '' ) . '; ' . wp_json_encode( array( 'made' => (bool) $made, 'district' => $district, 'note' => $made ? $made->get_customer_note() : null, 'active' => $made ? OrderStock::active( $made ) : null, 'ledger' => count( $ledger ), 'wc' => (int) wc_get_product( $five->get_id() )->get_stock_quantity(), 'level' => StockGateway::make()->level( $five->get_id() )->quantity ) ) . ')' );
 		// [HTTP] PAY-05: Place Order pressed twice. Two checkouts of one cart sent at the same moment make one order, with
 		// one reservation per line; and pressing again after it was placed makes none.
 		$store4 = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );

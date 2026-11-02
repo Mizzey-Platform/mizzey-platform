@@ -45,6 +45,12 @@ final class StockWriteGuard
     public const PERMIT    = 'mizzey_stock_write_permitted';
     public const KEYS      = ['_stock', '_stock_status', '_manage_stock', '_backorders'];
     public const FIGURE    = 'mizzey_stock_figure_';
+    /** The background job that reads a figure the products list did not wait for. */
+    public const FILL_HOOK = 'mizzey_stock_figure_fill';
+    /** Seconds one products list may spend asking the stock source; the rest is read in the background. */
+    public const LIST_BUDGET = 'mizzey_stock_list_budget';
+    /** Set for five minutes when one read took longer than the list's budget: lists then read in the background only. */
+    public const SLOW = 'mizzey_stock_source_slow';
     private const DEFAULTS = ['_stock' => '', '_stock_status' => 'instock', '_manage_stock' => 'no', '_backorders' => 'no'];
     private const REST     = ['stock_quantity', 'stock_status', 'manage_stock', 'backorders', 'in_stock', 'inventory_delta'];
 
@@ -63,6 +69,9 @@ final class StockWriteGuard
 
     private static bool $inQuery = false;
 
+    /** Seconds this request's products list has spent asking the stock source. */
+    private static float $listSpent = 0.0;
+
     public static function register(): void
     {
         add_action('woocommerce_before_product_object_save', [self::class, 'keep'], 1, 1);
@@ -78,6 +87,7 @@ final class StockWriteGuard
         add_action('woocommerce_variation_set_stock', [self::class, 'reread'], 0, 1);
         add_filter('rest_pre_dispatch', [self::class, 'rest'], 1, 3);
         add_filter('woocommerce_admin_stock_html', [self::class, 'listColumn'], 20, 2);
+        add_action(self::FILL_HOOK, [self::class, 'fill'], 10, 1);
         add_action('woocommerce_product_options_stock_status', [self::class, 'editor']);
         add_action('woocommerce_variation_options_inventory', [self::class, 'variationEditor'], 10, 3);
         add_action('admin_enqueue_scripts', [self::class, 'lockFields']);
@@ -537,7 +547,7 @@ final class StockWriteGuard
     public static function rest($result, $server, $request)
     {
         if ($result !== null || ! $request instanceof \WP_REST_Request || self::permitted() || $request->get_method() === 'GET'
-            || preg_match('#^/wc/v\d+/products(/|$)#', $request->get_route()) !== 1) {
+            || preg_match('#^/wc/v\d+/products(/|$)#i', $request->get_route()) !== 1) {
             return $result;
         }
         // What the request sent, not the schema's defaults.
@@ -563,18 +573,49 @@ final class StockWriteGuard
         return $result;
     }
 
-    /** The quantity the stock source reports, read once and kept five minutes, or null when it is not known. */
+    /**
+     * The quantity the stock source reports, read once and kept five minutes, or null when it is not known. It is kept
+     * per stock identity, so an English and an Arabic record of one item share one answer.
+     */
     public static function figure(int $productId): ?int
     {
-        $kept = get_transient(self::FIGURE . $productId);
-        if (is_array($kept)) {
+        $kept = self::kept($productId);
+        if ($kept !== null) {
             return $kept['q'];
         }
         $answer = StockGateway::quick()->level($productId);
         $figure = $answer->isKnown() ? (int) $answer->quantity : null;
-        set_transient(self::FIGURE . $productId, ['q' => $figure], 5 * MINUTE_IN_SECONDS);
+        set_transient(self::key($productId), ['q' => $figure], 5 * MINUTE_IN_SECONDS);
 
         return $figure;
+    }
+
+    /** @return array{q:int|null}|null The kept answer, or null when none is kept. */
+    private static function kept(int $productId): ?array
+    {
+        $kept = get_transient(self::key($productId));
+
+        return is_array($kept) && array_key_exists('q', $kept) ? $kept : null;
+    }
+
+    private static function key(int $productId): string
+    {
+        $item = StockIdentity::resolve($productId);
+
+        return self::FIGURE . ($item !== null ? $item->id : $productId);
+    }
+
+    /**
+     * The background read of a figure the products list did not wait for.
+     *
+     * @param mixed $productId
+     */
+    public static function fill($productId): void
+    {
+        $productId = (int) $productId;
+        if ($productId > 0 && self::kept($productId) === null) {
+            self::figure($productId);
+        }
     }
 
     private static function label(int $productId): string
@@ -597,8 +638,28 @@ final class StockWriteGuard
         if (! $product instanceof \WC_Product) {
             return $html;
         }
+        $id = (int) $product->get_id();
+        // A list asks the source row by row only while the time it has spent asking stays within its budget, and not
+        // at all for five minutes after one read alone took longer than the budget; the remaining rows are read in the
+        // background and shown on the next load. One read is one attempt (StockGateway::quick()); how long a single
+        // call may take is the adapter's own timeout (PRE-09), which no page can shorten.
+        $budget = (float) apply_filters(self::LIST_BUDGET, 2.0);
+        if (self::kept($id) === null && (self::$listSpent >= $budget || get_transient(self::SLOW) !== false)) {
+            if (function_exists('as_enqueue_async_action') && ! as_has_scheduled_action(self::FILL_HOOK, [$id], 'mizzey')) {
+                as_enqueue_async_action(self::FILL_HOOK, [$id], 'mizzey');
+            }
 
-        return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html(self::label((int) $product->get_id())));
+            return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html__('Stock from the stock source: being read, reload the page in a moment', 'mizzey-site'));
+        }
+        $started = microtime(true);
+        $label   = self::label($id);
+        $took    = microtime(true) - $started;
+        self::$listSpent += $took;
+        if ($took >= $budget) {
+            set_transient(self::SLOW, 1, 5 * MINUTE_IN_SECONDS);
+        }
+
+        return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html($label));
     }
 
     public static function editor(): void

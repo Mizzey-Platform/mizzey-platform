@@ -103,6 +103,30 @@ final class SignupCheck
     }
 
     /**
+     * Spend a token already inspected: for a route that checks it early and creates the account later, so a request
+     * that fails before the account is made (the Store API checkout, refused on its cart) keeps its token.
+     *
+     * @param array{nonce:string,issued:int} $valid What inspect() returned.
+     */
+    public static function spend(array $valid): bool
+    {
+        return self::claim($valid['nonce'], $valid['issued']);
+    }
+
+    /**
+     * Whether an inspected token was already spent: a request that will spend it later still refuses a used one at
+     * once, before anything else runs.
+     *
+     * @param array{nonce:string,issued:int} $valid What inspect() returned.
+     */
+    public static function spent(array $valid): bool
+    {
+        global $wpdb;
+
+        return $wpdb->get_var($wpdb->prepare("SELECT option_name FROM {$wpdb->options} WHERE option_name = %s", self::CLAIM . $valid['nonce'])) !== null; // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    }
+
+    /**
      * The hidden fields a form carries: the token and the trap, which people never see or fill.
      */
     public static function fields(string $route): string

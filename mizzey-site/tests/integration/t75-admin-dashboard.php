@@ -115,7 +115,7 @@ run(
 		// ---- AC-3: top products once per physical item -------------------------------------------------------
 		$top  = StoreDashboard::topProducts( $after, $before, 50 );
 		$mine = array_values( array_filter( $top, static fn ( $l ) => in_array( $l['id'], array( $en, $ar ), true ) ) );
-		$check( 1 === count( $mine ) && $en === $mine[0]['id'] && $mine[0]['units'] >= 12, 'AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units (' . wp_json_encode( $mine ) . ')' );
+		$check( 1 === count( $mine ) && $en === $mine[0]['id'] && 12 === $mine[0]['units'], 'AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units (' . wp_json_encode( $mine ) . ')' );
 
 		[ $parent, $variations ] = $w->variable( "{$tag}-VAR", array( 'S' => null, 'L' => null ) );
 		$order( $variations[0], 3, 'en' );
@@ -159,6 +159,65 @@ run(
 			wc_get_order( $flag->get_id() )->update_status( $step );
 		}
 		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded (' . wp_json_encode( array( $flagged_now, wc_get_order( $flag->get_id() )->get_status() ) ) . ')' );
+		// The limit applies after the filter: with two older open flagged orders and a newer one refunded since, a list
+		// limited to one holds exactly one open order (a limit taken before the filter would hold none; no limit, both).
+		$olders = array();
+		foreach ( array( 2, 1 ) as $hours ) {
+			$open_flag = $order( $en, 1, 'en' );
+			\MizzeySite\Payments\PaymentRecord::flag( $open_flag, 't75 an older payment to refund' );
+			$open_flag = wc_get_order( $open_flag->get_id() );
+			$open_flag->set_date_created( time() - $hours * HOUR_IN_SECONDS );
+			$open_flag->save();
+			$olders[] = $open_flag->get_id();
+		}
+		$newer = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $newer, 't75 a newer payment, refunded since' );
+		wc_create_refund( array( 'order_id' => $newer->get_id(), 'amount' => '1' ) );
+		$one = static fn () => 1;
+		add_filter( 'mizzey_dashboard_refund_limit', $one );
+		$limited = StoreDashboard::pendingRefunds()['flagged'];
+		remove_filter( 'mizzey_dashboard_refund_limit', $one );
+		$unlimited = StoreDashboard::pendingRefunds()['flagged'];
+		$check( 1 === count( $limited ) && ! in_array( $newer->get_id(), $limited, true ) && array() === array_diff( $olders, $unlimited ) && ! in_array( $newer->get_id(), $unlimited, true ), 'AC-4 a flagged list limited to one holds exactly one open order when the newest flagged one was refunded since; unlimited, both open ones (' . wp_json_encode( array( $limited, $olders, $newer->get_id() ) ) . ')' );
+		// The flag's time is its own number, not read from the messages: a message that mimics the stored time does not
+		// keep a refunded order listed. Two time rows on one order are one line, not two places in the limit.
+		$crafted = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $crafted, 'ref s:2:"at";i:9999999999; s:2:"at";i:9999999999;' );
+		wc_create_refund( array( 'order_id' => $crafted->get_id(), 'amount' => '1' ) );
+		$twice = wc_get_order( $olders[1] );
+		$twice->add_meta_data( StoreDashboard::ATTENTION_AT, time(), false );
+		$twice->save_meta_data();
+		$two = static fn () => 2;
+		add_filter( 'mizzey_dashboard_refund_limit', $two );
+		$two_listed = StoreDashboard::pendingRefunds()['flagged'];
+		remove_filter( 'mizzey_dashboard_refund_limit', $two );
+		$check( ! in_array( $crafted->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ) && 2 === count( array_unique( $two_listed ) ) && 2 === count( $two_listed ), 'AC-4 a message that looks like a flag time does not keep a refunded order listed; an order with two time rows takes one place (' . wp_json_encode( $two_listed ) . ')' );
+		// An order flagged before the flag time was stored separately gets it once, and is listed.
+		$legacy = $order( $en, 1, 'en' );
+		$legacy->update_meta_data( \MizzeySite\Payments\PaymentRecord::ATTENTION, array( array( 'at' => time(), 'message' => 't75 flagged before the time key' ) ) );
+		$legacy->save_meta_data();
+		delete_option( StoreDashboard::ATTENTION_FILLED );
+		$legacy_listed = in_array( $legacy->get_id(), StoreDashboard::pendingRefunds()['flagged'], true );
+		$check( $legacy_listed && '' !== (string) wc_get_order( $legacy->get_id() )->get_meta( StoreDashboard::ATTENTION_AT ) && '1' === get_option( StoreDashboard::ATTENTION_FILLED ), 'AC-4 an order flagged before the flag time had its own key gets it once and is listed' );
+		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
+		$seen    = array();
+		$flagged = 0;
+		$spy     = static function ( $sql ) use ( &$seen, &$flagged ) {
+			if ( is_string( $sql ) && str_contains( $sql, \MizzeySite\Payments\PaymentRecord::ATTENTION ) ) {
+				++$flagged;
+			}
+			// One order's own refunds (WooCommerce's get_refunds(), by parent id) are not a list of orders.
+			if ( is_string( $sql ) && preg_match( "/'wc-(cancelled|on-hold|processing|preparing|delivery-failed)'/", $sql ) && ! preg_match( '/(parent_order_id|post_parent)\s*(=|IN)\s*\(?\s*\d/i', $sql ) ) {
+				$seen[] = $sql;
+			}
+			return $sql;
+		};
+		add_filter( 'query', $spy, 99 );
+		StoreDashboard::needingAction();
+		StoreDashboard::pendingRefunds();
+		remove_filter( 'query', $spy, 99 );
+		$unbounded = array_values( array_filter( $seen, static fn ( $q ) => ! preg_match( '/\bLIMIT\b|COUNT\(|FOUND_ROWS/i', $q ) ) );
+		$check( array() !== $seen && array() === $unbounded && 1 === $flagged, 'AC-4 the orders requiring action are counted by the database and the refund lists are limited, never every order loaded; the flagged list is one query, however many orders were flagged (' . count( $seen ) . ' queries, ' . $flagged . ' for the flagged list, unbounded: ' . wp_json_encode( array_map( static fn ( $q ) => substr( preg_replace( '/\s+/', ' ', $q ), 0, 160 ), $unbounded ) ) . ')' );
 		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'mizzey_refunds=cancelled_paid' ) && str_contains( $html, 'mizzey_refunds=flagged' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------

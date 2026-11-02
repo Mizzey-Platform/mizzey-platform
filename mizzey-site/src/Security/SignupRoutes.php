@@ -49,12 +49,16 @@ final class SignupRoutes
 
     private static int $offerDepth = 0;
 
+    /** @var array{nonce:string,issued:int}|null The checkout token the guard let through, spent last on the same filter. */
+    private static ?array $spendNext = null;
+
     public static function register(): void
     {
         add_filter('woocommerce_process_registration_errors', [self::class, 'account'], 10, 4);
         add_action('wp_loaded', [self::class, 'wrapAccountHandler'], 19);
         add_filter('registration_errors', [self::class, 'wordpress'], 10, 3);
         add_filter('woocommerce_registration_errors', [self::class, 'guard'], 999, 3);
+        add_filter('woocommerce_registration_errors', [self::class, 'spendAtCreation'], PHP_INT_MAX, 1);
         add_filter('rest_request_before_callbacks', [self::class, 'restBefore'], 10, 3);
         add_filter('rest_request_after_callbacks', [self::class, 'restAfter'], 10, 3);
         add_filter('rest_endpoints', [self::class, 'wrapCheckoutHandler']);
@@ -124,7 +128,7 @@ final class SignupRoutes
     public static function restBefore(mixed $response, array $handler, WP_REST_Request $request): mixed
     {
         $depth          = count(self::$frames);
-        self::$frames[] = ['request' => $request, 'permit' => null];
+        self::$frames[] = ['request' => $request, 'permit' => null, 'token' => null];
         try {
             if (is_wp_error($response) || ! self::isCheckoutHandler($handler) || $request->get_method() !== 'POST') {
                 return $response;
@@ -134,11 +138,17 @@ final class SignupRoutes
             }
             $extensions = $request['extensions'];
             $signup     = is_array($extensions) && is_array($extensions[self::STORE_NAMESPACE] ?? null) ? $extensions[self::STORE_NAMESPACE] : [];
-            if (! SignupCheck::verify('checkout', $signup['token'] ?? null, $signup['trap'] ?? null)) {
+            // Checked now, spent only when the account is made (spendAtCreation()): a checkout refused before that, on
+            // its cart or by another registration check, keeps the token for the customer's next try (audit D-305-7).
+            // The Store API makes the account before it reserves the stock, so a checkout refused on its stock has
+            // already made the account and spent the token.
+            $valid = SignupCheck::inspect('checkout', $signup['token'] ?? null, $signup['trap'] ?? null);
+            if ($valid === null || SignupCheck::spent($valid)) {
                 return new WP_Error(self::ERROR, SignupCheck::message(), ['status' => 400]);
             }
             $billing = $request['billing_address'];
             self::$frames[$depth]['permit'] = self::normalise(is_array($billing) ? (string) ($billing['email'] ?? '') : '');
+            self::$frames[$depth]['token']  = $valid;
 
             return $response;
         } catch (Throwable $error) {
@@ -255,7 +265,10 @@ final class SignupRoutes
         if (self::$frames !== []) {
             $top = array_key_last(self::$frames);
             if ($email !== '' && self::$frames[$top]['permit'] === $email) {
+                // The token is spent only once every other check has passed (spendAtCreation, last on this filter).
+                self::$spendNext              = self::$frames[$top]['token'] ?? null;
                 self::$frames[$top]['permit'] = null;
+                self::$frames[$top]['token']  = null;
 
                 return $errors;
             }
@@ -272,6 +285,25 @@ final class SignupRoutes
         }
 
         $errors->add(self::ERROR, SignupCheck::message());
+
+        return $errors;
+    }
+
+    /**
+     * The checkout's token is spent last, after every other check on account creation (another at the same priority
+     * included, such as the e-mail lock of Google sign-in), so an account refused by any of them keeps it. If it was
+     * spent meanwhile by another request, the account is refused.
+     */
+    public static function spendAtCreation(mixed $errors): mixed
+    {
+        $token           = self::$spendNext;
+        self::$spendNext = null;
+        if (! is_array($token) || ! $errors instanceof WP_Error || $errors->has_errors()) {
+            return $errors;
+        }
+        if (! SignupCheck::spend($token)) {
+            $errors->add(self::ERROR, SignupCheck::message());
+        }
 
         return $errors;
     }

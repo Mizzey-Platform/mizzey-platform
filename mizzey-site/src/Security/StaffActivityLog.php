@@ -14,8 +14,8 @@ defined('ABSPATH') || exit;
  * The log of sign-ins and security events (ADM-132, ADM-134), kept in CoreX Activity behind this thin adapter (D-20
  * A14): CoreX owns the record, its table and its retention; Mizzey decides which events are written and shows them.
  *
- * Recorded, in CoreX's `security` area: a staff sign-in, a sign-out, every failed sign-in (a wrong password or a wrong
- * second factor, for any account), a lockout CoreX's sign-in protection imposes, a password reset requested and
+ * Recorded, in CoreX's `security` area: a staff sign-in, a sign-out, every failed sign-in (a wrong password, a wrong
+ * application password over the REST API or a wrong second factor, for any account), a lockout CoreX's sign-in protection imposes, a password reset requested and
  * completed. A customer's successful sign-in is not recorded: it is not a security event, and the log is the staff's.
  * Nothing here records refunds, prices, stock or permission changes: that audit trail is ROLE-10, deferred (CX-03).
  *
@@ -45,6 +45,9 @@ final class StaffActivityLog
     /** Whether this request failed at the password stage (before the sign-in messages make every failure alike). */
     private static bool $passwordStageFailed = false;
 
+    /** The login of a failed application password this request recorded, which `wp_login_failed` may report again. */
+    private static ?string $applicationPasswordRecorded = null;
+
     /** @var array<int,bool> Accounts whose sign-in this request has recorded. */
     private static array $recorded = [];
 
@@ -56,6 +59,7 @@ final class StaffActivityLog
         add_action('wp_2fa_user_authenticated', [self::class, 'secondFactorPassed'], 10, 1);
         add_filter('authenticate', [self::class, 'notePasswordStage'], 99, 1);
         add_action('wp_login_failed', [self::class, 'failed'], 20, 2);
+        add_action('application_password_failed_authentication', [self::class, 'applicationPasswordFailed'], 20, 1);
         add_action('wp_logout', [self::class, 'signedOut'], 20, 1);
         add_action('retrieve_password', [self::class, 'resetRequested'], 20, 1);
         add_action('after_password_reset', [self::class, 'resetDone'], 20, 1);
@@ -139,11 +143,34 @@ final class StaffActivityLog
     public static function failed($login, $error = null): void
     {
         $typed = mb_substr(sanitize_text_field((string) $login), 0, 100);
+        if (self::$applicationPasswordRecorded !== null && self::$applicationPasswordRecorded === $typed) {
+            // The same attempt, already recorded as a failed application password.
+            self::$applicationPasswordRecorded = null;
+
+            return;
+        }
         $user  = $typed === '' ? false : (get_user_by('login', $typed) ?: get_user_by('email', $typed));
         $code  = $error instanceof \WP_Error ? (string) $error->get_error_code() : '';
         $kind  = self::secondFactor($error) ? self::SECOND_FACTOR : self::SIGNIN_FAILED;
         $id    = $user instanceof \WP_User ? $user->ID : 0;
         self::write($id, $user instanceof \WP_User ? $user->user_login : '', $kind, 'failure', (string) $id, $typed, ['reason' => sanitize_key($code)]);
+    }
+
+    /**
+     * A failed sign-in with an application password (REST Basic authentication), which WordPress reports here and not
+     * through `wp_login_failed`. The error names no account, so the login is the one the request sent.
+     *
+     * @param mixed $error
+     */
+    public static function applicationPasswordFailed($error = null): void
+    {
+        $sent  = isset($_SERVER['PHP_AUTH_USER']) ? (string) wp_unslash($_SERVER['PHP_AUTH_USER']) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitised as a login below.
+        $typed = mb_substr(sanitize_text_field($sent), 0, 100);
+        $user  = $typed === '' ? false : (get_user_by('login', $typed) ?: get_user_by('email', $typed));
+        $code  = $error instanceof \WP_Error ? (string) $error->get_error_code() : '';
+        $id    = $user instanceof \WP_User ? $user->ID : 0;
+        self::write($id, $user instanceof \WP_User ? $user->user_login : '', self::SIGNIN_FAILED, 'failure', (string) $id, $typed, ['reason' => sanitize_key($code), 'method' => 'application-password']);
+        self::$applicationPasswordRecorded = $typed;
     }
 
     /**

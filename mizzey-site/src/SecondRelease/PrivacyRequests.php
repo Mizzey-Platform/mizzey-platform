@@ -18,7 +18,8 @@ defined('ABSPATH') || exit;
  * - **Once confirmed**, the request is handled in the background with WordPress's and WooCommerce's own exporters and
  *   erasers: the export is built and its link emailed; for a deletion, the personal data is erased as WooCommerce's
  *   privacy settings say (orders are kept for the accounts the law requires, with or without their personal data as
- *   those settings choose) and the customer account is then deleted. A staff account is never deleted this way.
+ *   those settings choose) and the customer account is then deleted. A staff account is never deleted this way, and
+ *   a request staff create in Tools, Erase Personal Data, erases the data without deleting the account.
  * - **Staff** prepare a customer's export from the customer's record (ADM-105): the same confirmed request, listed in
  *   Tools, Export Personal Data, behind `export_others_personal_data`.
  * - Offered only once the second release is on.
@@ -31,6 +32,10 @@ final class PrivacyRequests
     public const HOOK    = 'mizzey_privacy_request_run';
     public const GROUP   = 'mizzey-privacy';
     public const SOURCE  = 'mizzey-privacy';
+
+    /** Where a request was made, kept in its request data. */
+    public const ORIGIN       = 'mizzey_origin';
+    public const FROM_ACCOUNT = 'my-account';
 
     public static function register(): void
     {
@@ -80,7 +85,7 @@ final class PrivacyRequests
     public static function request(\WP_User $user, string $action, bool $confirmed)
     {
         require_once ABSPATH . 'wp-admin/includes/user.php';
-        $id = wp_create_user_request($user->user_email, $action, [], $confirmed ? 'confirmed' : 'pending');
+        $id = wp_create_user_request($user->user_email, $action, [self::ORIGIN => $confirmed ? 'staff' : self::FROM_ACCOUNT], $confirmed ? 'confirmed' : 'pending');
         if (is_wp_error($id)) {
             return $id;
         }
@@ -162,6 +167,12 @@ final class PrivacyRequests
                     break;
                 }
             }
+        }
+        // Only the customer's own request from My Account deletes the account. A request staff make in Tools, Erase
+        // Personal Data erases the data as WordPress does and keeps the account.
+        $origin = (string) (((array) $request->request_data)[self::ORIGIN] ?? '');
+        if ($origin !== self::FROM_ACCOUNT) {
+            return;
         }
         $user = get_user_by('email', $request->email);
         if ($user instanceof \WP_User && ! user_can($user, 'edit_posts')) {

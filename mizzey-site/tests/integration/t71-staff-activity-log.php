@@ -82,6 +82,20 @@ run(
 		$check( array() === $mine( array( 'actor_id' => $buyer ) ), 'AC-2 a customer\'s sign-in is not recorded' );
 		$check( $by_mgr && $by_mgr[0]->retentionUntil > new \DateTimeImmutable( '+364 days' ), 'AC-2 entries are kept for a year' );
 
+		// A wrong application password over the REST API's Basic authentication: WordPress reports it on its own action.
+		$auth_user                = $_SERVER['PHP_AUTH_USER'] ?? null;
+		$_SERVER['PHP_AUTH_USER'] = "{$tag}mgr";
+		do_action( 'application_password_failed_authentication', new \WP_Error( 'incorrect_password', 'The provided password is an invalid application password.' ) );
+		do_action( 'wp_login_failed', "{$tag}mgr", new \WP_Error( 'incorrect_password', 'x' ) );
+		if ( null === $auth_user ) {
+			unset( $_SERVER['PHP_AUTH_USER'] );
+		} else {
+			$_SERVER['PHP_AUTH_USER'] = $auth_user;
+		}
+		$api = array_values( array_filter( $mine( array( 'actor_id' => $manager, 'kind' => StaffActivityLog::SIGNIN_FAILED ) ), static fn ( $e ) => 'application-password' === ( $e->context['method'] ?? '' ) ) );
+		$all_failed = count( $mine( array( 'actor_id' => $manager, 'kind' => StaffActivityLog::SIGNIN_FAILED ) ) );
+		$check( 1 === count( $api ) && 'incorrect_password' === ( $api[0]->context['reason'] ?? '' ) && 'failure' === $api[0]->outcome && 2 === $all_failed, 'AC-2 a wrong application password for the account is recorded as a failed sign-in, once, even when the same attempt also reaches wp_login_failed (' . count( $api ) . ' of ' . $all_failed . ')' );
+
 		// Over the real request: a failed sign-in on wp-login.php.
 		$answer = sign_in_wp_login( "{$tag}mgr", 'wrong-' . $pass );
 		$http   = array_values( array_filter( $mine( array( 'actor_id' => $manager, 'kind' => StaffActivityLog::SIGNIN_FAILED ) ), static fn ( $e ) => $e->occurredAt->format( 'Y-m-d H:i:s' ) >= $started ) );

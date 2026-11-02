@@ -42,6 +42,7 @@ require_once __DIR__ . '/src/Marketing/ProductFeed.php';
 require_once __DIR__ . '/src/Marketing/Events.php';
 require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
 require_once __DIR__ . '/src/Reporting/StockReport.php';
+require_once __DIR__ . '/src/Reporting/SalesReport.php';
 require_once __DIR__ . '/src/Reporting/StoreDashboard.php';
 require_once __DIR__ . '/src/Security/Disclosure.php';
 require_once __DIR__ . '/src/Security/XmlRpc.php';

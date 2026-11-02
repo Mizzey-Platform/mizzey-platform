@@ -151,12 +151,15 @@ final class Scenario {
 		foreach ( $this->finishers as $fn ) {
 			$fn();
 		}
+		// The fixtures' own orders go whatever their stock reservation (a scenario may leave one unsettled on purpose).
+		add_filter( 'mizzey_order_stock_forget_permitted', '__return_true' );
 		foreach ( $this->orders as $id ) {
 			$order = wc_get_order( $id );
 			if ( $order ) {
 				$order->delete( true );
 			}
 		}
+		remove_filter( 'mizzey_order_stock_forget_permitted', '__return_true' );
 		// WooCommerce Multilingual queues an attribute lookup update for every translation saved in this process, to run
 		// at shutdown (priority 10), and WooCommerce fails on a product deleted before then. The product fixtures are
 		// removed after that work: at shutdown, priority 20, or now when shutdown has already begun.

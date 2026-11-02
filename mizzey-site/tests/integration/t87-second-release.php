@@ -141,6 +141,15 @@ run(
 		PrivacyRequests::run( (int) $staff_request, true );
 		clean_user_cache( $staff );
 		$check( false !== get_userdata( $staff ), 'AC-3 a staff account is never deleted this way' );
+		// An erasure staff create in Tools, Erase Personal Data (WordPress's own request): erased, the account kept.
+		$kept_customer = (int) wp_insert_user( array( 'user_login' => "{$tag}k", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}k@example.invalid", 'role' => 'customer' ) );
+		$s->track_user( $kept_customer );
+		$core_request = wp_create_user_request( "{$tag}k@example.invalid", 'remove_personal_data', array(), 'confirmed' );
+		do_action( 'user_request_action_confirmed', (int) $core_request );
+		$core_queued = as_get_scheduled_actions( array( 'hook' => PrivacyRequests::HOOK, 'args' => array( (int) $core_request, true ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		PrivacyRequests::run( (int) $core_request, true );
+		clean_user_cache( $kept_customer );
+		$check( ! is_wp_error( $core_request ) && 1 === count( $core_queued ) && 'request-completed' === get_post_status( (int) $core_request ) && false !== get_userdata( $kept_customer ), 'AC-3 an erasure request made in Tools, Erase Personal Data is handled, and the customer\'s account is kept, as WordPress\'s erasure does' );
 		as_unschedule_all_actions( PrivacyRequests::HOOK );
 
 		// ---- AC-6: native ------------------------------------------------------------------------------------------

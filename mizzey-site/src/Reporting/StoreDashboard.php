@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace MizzeySite\Reporting;
 
+use Automattic\WooCommerce\Utilities\OrderUtil;
 use MizzeySite\Catalogue\CanonicalProduct;
 use MizzeySite\Payments\PaymentRecord;
 use MizzeySite\Stock\StockGateway;
@@ -43,11 +44,20 @@ final class StoreDashboard
     public const BATCH      = 200;
     public const PERIODS    = ['today' => 0, '7d' => 6, '30d' => 29];
 
+    /** The most orders a refund list holds, newest first; the count then reads "or more". */
+    public const REFUND_LIMIT = 500;
+
+    /** The latest payment flag's time on an order (PaymentRecord::flag() writes it), and the one-time backfill's mark. */
+    public const ATTENTION_AT     = PaymentRecord::ATTENTION . '_at';
+    public const ATTENTION_FILLED = 'mizzey_payment_attention_at_filled';
+
     /** The statuses whose orders wait for staff, in the order work is done. */
     public const ACTION_STATUSES = ['on-hold', 'processing', 'preparing', 'delivery-failed'];
 
     public static function register(): void
     {
+        // The sales report's settings, which these figures read (specs/034 AC-4).
+        SalesReport::register();
         add_action('wp_dashboard_setup', [self::class, 'widget']);
         add_action(self::COUNT_HOOK, [self::class, 'countBatch'], 10, 1);
         add_filter('woocommerce_order_list_table_prepare_items_query_args', [self::class, 'listOnly'], 30);
@@ -119,15 +129,34 @@ final class StoreDashboard
         global $wpdb;
         $column   = self::dateColumn();
         $excluded = implode("','", array_map('esc_sql', self::excludedStatuses()));
-        // The order's own row, or for a refund its parent order's, carries the date and the status.
+        $after    = str_replace('T', ' ', $after);
+        $before   = str_replace('T', ' ', $before);
+        // The period's orders, found through the date column's index; a refund belongs to its parent order's period.
+        $first = $wpdb->get_var($wpdb->prepare(
+            "SELECT MIN(o.date_created) FROM {$wpdb->prefix}wc_order_stats o WHERE o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')",
+            $after,
+            $before
+        )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        if ($first === null) {
+            return [];
+        }
+        // A refund is made after its order, so only refunds since the period's first order can belong to it.
         $rows = (array) $wpdb->get_results($wpdb->prepare(
             "SELECT l.product_id, l.variation_id, SUM(l.product_qty) AS qty FROM {$wpdb->prefix}wc_order_product_lookup l
-             JOIN {$wpdb->prefix}wc_order_stats s ON s.order_id = l.order_id
-             JOIN {$wpdb->prefix}wc_order_stats o ON o.order_id = IF(s.parent_id = 0, s.order_id, s.parent_id)
-             WHERE o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')
+             JOIN (
+                 SELECT o.order_id FROM {$wpdb->prefix}wc_order_stats o
+                 WHERE o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')
+                 UNION ALL
+                 SELECT r.order_id FROM {$wpdb->prefix}wc_order_stats r
+                 JOIN {$wpdb->prefix}wc_order_stats o ON o.order_id = r.parent_id
+                 WHERE r.date_created >= %s AND r.parent_id > 0 AND o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')
+             ) ids ON ids.order_id = l.order_id
              GROUP BY l.product_id, l.variation_id",
-            str_replace('T', ' ', $after),
-            str_replace('T', ' ', $before)
+            $after,
+            $before,
+            (string) $first,
+            $after,
+            $before
         )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $units = [];
         foreach ($rows as $row) {
@@ -147,48 +176,153 @@ final class StoreDashboard
         return $out;
     }
 
-    /** @return array<string,int> Orders waiting for staff, by status. */
+    /** @return array<string,int> Orders waiting for staff, by status, counted by the database. */
     public static function needingAction(): array
     {
         $counts = [];
         foreach (self::ACTION_STATUSES as $status) {
-            $counts[$status] = count(wc_get_orders(['status' => [$status], 'limit' => -1, 'return' => 'ids', 'type' => 'shop_order']));
+            $found           = wc_get_orders(['status' => [$status], 'limit' => 1, 'paginate' => true, 'return' => 'ids', 'type' => 'shop_order']);
+            $counts[$status] = is_object($found) && isset($found->total) ? (int) $found->total : 0;
         }
 
         return $counts;
     }
 
     /**
-     * Orders with a refund still to make: paid orders cancelled and not fully refunded; and orders the payment layer
-     * flagged since their last refund, unless they have since been delivered or refunded.
+     * Orders with a refund still to make, newest first, at most the limit of each: paid orders cancelled and not fully
+     * refunded; and orders the payment layer flagged since their last refund, unless they have since been delivered or
+     * refunded. Each list is filtered first and limited after, so a resolved order never hides an open one.
      *
      * @return array{cancelled_paid:list<int>,flagged:list<int>}
      */
     public static function pendingRefunds(): array
     {
-        $cancelled = array_values(array_filter(
-            wc_get_orders(['status' => ['cancelled'], 'limit' => -1, 'type' => 'shop_order']),
-            static fn ($o): bool => $o instanceof \WC_Order && $o->get_date_paid() !== null && (float) $o->get_total_refunded() + 0.005 < (float) $o->get_total()
-        ));
-        $flagged = array_values(array_filter(
-            wc_get_orders(['limit' => -1, 'type' => 'shop_order', 'meta_query' => [['key' => PaymentRecord::ATTENTION, 'compare' => 'EXISTS']]]), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-            static function ($o): bool {
-                if (! $o instanceof \WC_Order || $o->has_status(['completed', 'cod-collected', 'refunded'])) {
-                    return false;
-                }
-                $flags = PaymentRecord::attention($o);
-                $last  = $flags === [] ? 0 : max(array_map(static fn ($f): int => (int) ($f['at'] ?? 0), $flags));
-                $refunded = 0;
-                foreach ($o->get_refunds() as $refund) {
-                    $created  = $refund->get_date_created();
-                    $refunded = max($refunded, $created ? $created->getTimestamp() : 0);
-                }
+        return ['cancelled_paid' => self::cancelledPaid(), 'flagged' => self::flagged()];
+    }
 
-                return $last > $refunded;
+    /** The most orders a refund list holds (REFUND_LIMIT, or the `mizzey_dashboard_refund_limit` filter's). */
+    public static function limit(): int
+    {
+        return max(1, (int) apply_filters('mizzey_dashboard_refund_limit', self::REFUND_LIMIT));
+    }
+
+    /**
+     * Flagged orders still open, newest first, in one bounded query: an order counts while the time of its latest flag
+     * (`ATTENTION_AT`, an integer PaymentRecord::flag() writes) is later than its latest refund. Times are compared as
+     * seconds since 1970 in UTC, whatever the database session's time zone; one row per order, then the limit.
+     *
+     * @return list<int>
+     */
+    private static function flagged(): array
+    {
+        global $wpdb;
+        self::backfillAttention();
+        $open = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
+        $in   = implode("','", array_map('esc_sql', $open));
+        $ids  = OrderUtil::custom_orders_table_usage_is_enabled()
+            ? $wpdb->get_col($wpdb->prepare(
+                "SELECT o.id FROM {$wpdb->prefix}wc_orders o
+                 JOIN {$wpdb->prefix}wc_orders_meta m ON m.order_id = o.id AND m.meta_key = %s
+                 WHERE o.type = 'shop_order' AND o.status IN ('{$in}')
+                 AND CAST(m.meta_value AS UNSIGNED) > COALESCE((
+                     SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.date_created_gmt)) FROM {$wpdb->prefix}wc_orders r
+                     WHERE r.type = 'shop_order_refund' AND r.parent_order_id = o.id), 0)
+                 GROUP BY o.id ORDER BY MAX(o.date_created_gmt) DESC, o.id DESC LIMIT %d",
+                self::ATTENTION_AT,
+                self::limit()
+            )) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            : $wpdb->get_col($wpdb->prepare(
+                "SELECT p.ID FROM {$wpdb->posts} p
+                 JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = %s
+                 WHERE p.post_type = 'shop_order' AND p.post_status IN ('{$in}')
+                 AND CAST(m.meta_value AS UNSIGNED) > COALESCE((
+                     SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.post_date_gmt)) FROM {$wpdb->posts} r
+                     WHERE r.post_type = 'shop_order_refund' AND r.post_parent = p.ID), 0)
+                 GROUP BY p.ID ORDER BY MAX(p.post_date_gmt) DESC, p.ID DESC LIMIT %d",
+                self::ATTENTION_AT,
+                self::limit()
+            )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+        return array_values(array_map('intval', (array) $ids));
+    }
+
+    /**
+     * Once: an order flagged before `ATTENTION_AT` existed gets it from its stored flag list, a batch at a time.
+     */
+    private static function backfillAttention(): void
+    {
+        if (get_option(self::ATTENTION_FILLED) === '1') {
+            return;
+        }
+        $rounds = 0;
+        do {
+            $orders = wc_get_orders([
+                'limit'      => 100,
+                'type'       => 'shop_order',
+                'status'     => array_keys(wc_get_order_statuses()),
+                'meta_query' => [['key' => PaymentRecord::ATTENTION, 'compare' => 'EXISTS'], ['key' => self::ATTENTION_AT, 'compare' => 'not exists']], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+            ]);
+            foreach ($orders as $order) {
+                if (! $order instanceof \WC_Order) {
+                    continue;
+                }
+                $flags = PaymentRecord::attention($order);
+                $last  = $flags === [] ? 0 : max(array_map(static fn ($f): int => is_array($f) ? (int) ($f['at'] ?? 0) : 0, $flags));
+                $order->update_meta_data(self::ATTENTION_AT, $last);
+                $order->save_meta_data();
             }
-        ));
+        } while (count($orders) === 100 && ++$rounds < 1000);
+        update_option(self::ATTENTION_FILLED, '1', true);
+    }
 
-        return ['cancelled_paid' => array_map(static fn ($o): int => $o->get_id(), $cancelled), 'flagged' => array_map(static fn ($o): int => $o->get_id(), $flagged)];
+    /**
+     * Cancelled orders with a paid date whose refunds do not cover their total, summed as WooCommerce sums refunds in
+     * the order storage in use.
+     *
+     * @return list<int>
+     */
+    private static function cancelledPaid(): array
+    {
+        global $wpdb;
+        if (OrderUtil::custom_orders_table_usage_is_enabled()) {
+            $orders = $wpdb->prefix . 'wc_orders';
+            // A refund's total is stored negative, as WooCommerce's get_total_refunded() reads it.
+            $sql = $wpdb->prepare(
+                "SELECT o.id FROM {$orders} o
+                 JOIN {$wpdb->prefix}wc_order_operational_data d ON d.order_id = o.id
+                 WHERE o.type = 'shop_order' AND o.status = 'wc-cancelled' AND d.date_paid_gmt > '1970-01-01 00:00:00'
+                 AND o.total_amount + COALESCE((SELECT SUM(r.total_amount) FROM {$orders} r WHERE r.type = 'shop_order_refund' AND r.parent_order_id = o.id), 0) > 0.005
+                 ORDER BY o.id DESC LIMIT %d",
+                self::limit()
+            ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        } else {
+            $sql = $wpdb->prepare(
+                "SELECT p.ID FROM {$wpdb->posts} p
+                 JOIN {$wpdb->postmeta} paid ON paid.post_id = p.ID AND paid.meta_key = '_date_paid' AND paid.meta_value NOT IN ('', '0')
+                 JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total'
+                 WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-cancelled'
+                 AND CAST(total.meta_value AS DECIMAL(26,8)) - COALESCE((SELECT SUM(CAST(rm.meta_value AS DECIMAL(26,8))) FROM {$wpdb->posts} r
+                     JOIN {$wpdb->postmeta} rm ON rm.post_id = r.ID AND rm.meta_key = '_refund_amount'
+                     WHERE r.post_type = 'shop_order_refund' AND r.post_parent = p.ID), 0) > 0.005
+                 ORDER BY p.ID DESC LIMIT %d",
+                self::limit()
+            );
+        }
+
+        return array_map('intval', (array) $wpdb->get_col($sql)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+    }
+
+    /**
+     * A refund list's count, "or more" when the list reached its limit.
+     *
+     * @param list<int> $ids
+     */
+    private static function refundCount(array $ids): string
+    {
+        $count = number_format_i18n(count($ids));
+
+        /* translators: %s: the number of orders, the most a list holds. */
+        return count($ids) >= self::limit() ? sprintf(__('%s or more', 'mizzey-site'), $count) : $count;
     }
 
     /**
@@ -346,8 +480,8 @@ final class StoreDashboard
 
         $pending = self::pendingRefunds();
         printf('<h3>%s</h3><ul>', esc_html__('Refunds to make', 'mizzey-site'));
-        printf('<li><a href="%s">%s: %s</a></li>', esc_url(self::ordersUrl(['mizzey_refunds' => 'cancelled_paid'])), esc_html__('Paid orders cancelled and not refunded', 'mizzey-site'), esc_html(number_format_i18n(count($pending['cancelled_paid']))));
-        printf('<li><a href="%s">%s: %s</a></li>', esc_url(self::ordersUrl(['mizzey_refunds' => 'flagged'])), esc_html__('Orders the payment layer flagged', 'mizzey-site'), esc_html(number_format_i18n(count($pending['flagged']))));
+        printf('<li><a href="%s">%s: %s</a></li>', esc_url(self::ordersUrl(['mizzey_refunds' => 'cancelled_paid'])), esc_html__('Paid orders cancelled and not refunded', 'mizzey-site'), esc_html(self::refundCount($pending['cancelled_paid'])));
+        printf('<li><a href="%s">%s: %s</a></li>', esc_url(self::ordersUrl(['mizzey_refunds' => 'flagged'])), esc_html__('Orders the payment layer flagged', 'mizzey-site'), esc_html(self::refundCount($pending['flagged'])));
         echo '</ul>';
 
         $stock = self::stock();
