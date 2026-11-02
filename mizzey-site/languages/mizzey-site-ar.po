@@ -394,6 +394,18 @@ msgstr "تم شحن طلبك"
 msgid "Your order has been handed to the carrier."
 msgstr "تم تسليم طلبك إلى شركة الشحن."
 
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Tracking details for your order #{order_number}"
+msgstr "تفاصيل تتبع طلبك رقم #{order_number}"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Your tracking details"
+msgstr "تفاصيل التتبع"
+
+#: mizzey-site/src/Emails/ShippedEmail.php
+msgid "Here are the tracking details we promised for your order."
+msgstr "إليك تفاصيل تتبع طلبك كما وعدناك."
+
 #. translators: 1: carrier name, 2: tracking number.
 #: mizzey-site/src/Emails/ShippedEmail.php
 #, php-format

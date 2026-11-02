@@ -59,8 +59,10 @@ above. Email only at launch is agreed (OD-11).
 | AC-9 | Emails are sent as transactional mail through the store's sending service, to the order's address only | NOTF-13 | provisional |
 
 Provisional: verified by automated tests; acceptance follows the events triggered on staging and the emails received
-in English and Arabic, and the client's approval. AC-4's tracking number comes from the carrier integration (#291,
-Stage 4); until then the email says the details follow. AC-9's sending service and its domain authentication are
+in English and Arabic, and the client's approval. AC-4's tracking number comes from the carrier integration (#291) or
+from staff attaching the shipment; when the order enters Shipped before it is known, the email says the details follow,
+and a short tracking email sends them, once, as soon as both the carrier and the tracking number are known while the
+order is still on its way. AC-9's sending service and its domain authentication are
 #284's (INT-05), and the sending address waits for OD-18.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -77,6 +79,9 @@ Stage 4); until then the email says the details follow. AC-9's sending service a
 
 - A customer who declined marketing still receives every order email.
 - An order shipped twice (back from Out for Delivery) is told once.
+- An order moved to Shipped before its shipment is attached: the Shipped email says the details follow; attaching the
+  carrier and tracking number later sends them in one tracking email, in the order's language; correcting them again
+  sends nothing more; once the order is delivered, nothing is sent.
 
 ## Native coverage
 
@@ -95,7 +100,8 @@ Stage 4); until then the email says the details follow. AC-9's sending service a
 - **FR-001**: The new account email MUST name the welcome discount, what it gives, its code and its last day (AC-1).
 - **FR-002**: The failed order email MUST carry the link to pay for the order again (AC-3).
 - **FR-003**: Entering Shipped MUST send one email with the carrier and the tracking number, in the order's language
-  (AC-4, AC-8).
+  (AC-4, AC-8). When they are not known then, the first time both are known while the order is Shipped or Out for
+  Delivery MUST send one tracking email with them, in the order's language (AC-4, AC-8).
 - **FR-004**: Every customer-facing message MUST be translated (FIX-04).
 
 ### Key Entities

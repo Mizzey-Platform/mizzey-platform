@@ -41,6 +41,12 @@ run(
 		$trap  = static function ( $short, $atts ) use ( &$mails ) { $mails[] = $atts; return true; };
 		add_filter( 'pre_wp_mail', $trap, 10, 2 );
 		$s->on_finish( static function () use ( $trap ) { remove_filter( 'pre_wp_mail', $trap, 10 ); } );
+		// Which WooCommerce email each sent message was, by its id.
+		$sent_ids = array();
+		$by_id    = static function ( $result, $id ) use ( &$sent_ids ): void { $sent_ids[] = (string) $id; };
+		add_action( 'woocommerce_email_sent', $by_id, 10, 2 );
+		$s->on_finish( static function () use ( $by_id ) { remove_action( 'woocommerce_email_sent', $by_id, 10 ); } );
+		$count_id = static function ( string $id ) use ( &$sent_ids ): int { return count( array_keys( $sent_ids, $id, true ) ); };
 		$to = static function ( string $address ) use ( &$mails ): array {
 			return array_values( array_filter( $mails, static fn ( $m ) => ( $m['to'] ?? '' ) === $address ) );
 		};
@@ -103,15 +109,17 @@ run(
 		$check( 1 === count( $shipped ) && 1 === count( $again ) && false !== strpos( (string) $shipped[0]['message'], 'Bosta' ) && '' !== wc_get_order( $order->get_id() )->get_meta( Shipped::SENT ), 'NOTF-04 entering Shipped sends one email with the carrier and the tracking number; again, none more' );
 
 		// NOTF-06: delivered, WooCommerce's completed email; the review invitation is specs/020's.
-		$mails = array();
-		$order = t62_walk( $order, 'completed' );
+		$mails    = array();
+		$sent_ids = array();
+		$order    = t62_walk( $order, 'completed' );
 		$delivered = $to( $buyer );
-		$check( 1 <= count( $delivered ), 'NOTF-06 a delivered order sends its confirmation (' . implode( ' | ', array_map( static fn ( $m ) => (string) $m['subject'], $delivered ) ) . ')' );
+		$check( 1 === $count_id( 'customer_completed_order' ) && 1 <= count( $delivered ), 'NOTF-06, NOTF-12 a delivered order sends WooCommerce\'s completed order email, once (' . implode( ' | ', array_map( static fn ( $m ) => (string) $m['subject'], $delivered ) ) . ')' );
 
 		// NOTF-08: refunded, WooCommerce's refunded order email.
-		$mails = array();
+		$mails    = array();
+		$sent_ids = array();
 		wc_create_refund( array( 'order_id' => $order->get_id(), 'amount' => (string) $order->get_total() ) );
-		$check( 1 <= count( $to( $buyer ) ), 'NOTF-08 a refund sends WooCommerce\'s refunded order email' );
+		$check( 1 === $count_id( 'customer_refunded_order' ) && 1 <= count( $to( $buyer ) ), 'NOTF-08, NOTF-12 a refund sends WooCommerce\'s refunded order email, once (' . implode( ',', $sent_ids ) . ')' );
 
 		// NOTF-03: payment failed, with a link to pay again.
 		$mails  = array();
@@ -144,6 +152,18 @@ run(
 		$after_locale = get_locale();
 		$arabic_mails = array_values( array_filter( $to( "{$tag}-ar@example.invalid" ), static fn ( $m ) => false !== strpos( (string) ( $m['message'] ?? '' ), 'شركة الشحن' ) || false !== strpos( (string) ( $m['message'] ?? '' ), 'التتبع' ) ) );
 		$check( 1 === count( $arabic_mails ) && false !== strpos( (string) $arabic_mails[0]['subject'], 'في الطريق' ) && 'en_US' === $after_locale, 'NOTF-04, D6 an Arabic order\'s Shipped email is in Arabic (' . ( $arabic_mails[0]['subject'] ?? 'none' ) . ')' );
+
+		// E-285-1: that email promised the tracking details; attaching them later sends them, once, in Arabic.
+		$owed  = '' !== (string) wc_get_order( $arabic->get_id() )->get_meta( Shipped::OWED );
+		$mails = array();
+		\MizzeySite\Orders\ShipmentBox::set( wc_get_order( $arabic->get_id() ), array( 'carrier' => 'Bosta', 'tracking' => 'BST-88002', 'url' => '' ) );
+		$followed = array_values( array_filter( $to( "{$tag}-ar@example.invalid" ), static fn ( $m ) => false !== strpos( (string) ( $m['message'] ?? '' ), 'BST-88002' ) ) );
+		\MizzeySite\Orders\ShipmentBox::set( wc_get_order( $arabic->get_id() ), array( 'carrier' => 'Bosta', 'tracking' => 'BST-88003', 'url' => '' ) );
+		$order_again = wc_get_order( $arabic->get_id() );
+		$order_again->save();
+		$more = array_values( array_filter( $to( "{$tag}-ar@example.invalid" ), static fn ( $m ) => false !== strpos( (string) ( $m['message'] ?? '' ), 'BST-8800' ) ) );
+		$check( $owed && 1 === count( $followed ) && 1 === count( $more ) && false !== strpos( (string) $followed[0]['message'], 'Bosta' ) && false !== strpos( (string) $followed[0]['subject'], 'تفاصيل تتبع' ) && '' === (string) wc_get_order( $arabic->get_id() )->get_meta( Shipped::OWED ), 'NOTF-04 a Shipped email sent before the tracking number is followed, once the shipment is attached, by one email with the carrier and the tracking number, in Arabic (' . ( $followed[0]['subject'] ?? 'none' ) . ')' );
+		$check( '' === (string) $order->get_meta( Shipped::OWED ) && '' === (string) wc_get_order( $order->get_id() )->get_meta( Shipped::OWED ), 'NOTF-04 a Shipped email that carried the tracking number owes nothing' );
 
 		return $ok;
 	}
