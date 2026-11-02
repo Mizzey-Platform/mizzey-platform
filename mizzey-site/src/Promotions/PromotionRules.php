@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Promotions;
 
+use MizzeySite\Accounts\CustomerKey;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -94,37 +96,60 @@ final class PromotionRules
     }
 
     /**
-     * Whether the customer already has an order, by account, by the account's email and by the billing email, ignoring
-     * the order being placed: a guest's earlier order under the account's email counts, whatever billing email is given.
+     * Whether the customer already has an order, ignoring the order being placed: by account, by the account's email and
+     * the billing email, by either email under another spelling of the same mailbox, and by the billing mobile number.
+     * A guest's earlier order under the account's email counts, whatever billing email is given.
      *
      * @param mixed $object The cart or order the coupon is checked against.
      */
     public static function hasEarlierOrder($object): bool
     {
-        $exclude = [];
         if ($object instanceof \WC_Order) {
-            $userId    = $object->get_customer_id();
-            $email     = $object->get_billing_email();
-            $exclude[] = $object->get_id();
-        } else {
-            $userId = get_current_user_id();
-            $email  = function_exists('WC') && WC()->customer ? WC()->customer->get_billing_email() : '';
-            if ($email === '' && $userId) {
-                $email = (string) get_userdata($userId)->user_email;
-            }
+            return self::customerHasOrder($object->get_customer_id(), [$object->get_billing_email()], $object->get_billing_phone(), [$object->get_id()]);
         }
-        $statuses = array_values(array_diff(array_keys(wc_get_order_statuses()), self::NOT_AN_ORDER));
-        $account  = $userId ? (string) (get_userdata((int) $userId)->user_email ?? '') : '';
-        foreach (array_unique(array_filter([$userId ?: null, $email !== '' ? $email : null, $account !== '' ? $account : null])) as $customer) {
-            $found = wc_get_orders([
-                'customer' => $customer,
-                'status'   => $statuses,
-                'exclude'  => $exclude,
-                'limit'    => 1,
-                'return'   => 'ids',
-                'type'     => 'shop_order',
-            ]);
-            if ($found !== []) {
+        $userId   = get_current_user_id();
+        $customer = function_exists('WC') && WC()->customer ? WC()->customer : null;
+        $email    = $customer ? (string) $customer->get_billing_email() : '';
+        $phone    = $customer ? (string) $customer->get_billing_phone() : '';
+
+        return self::customerHasOrder($userId, [$email], $phone);
+    }
+
+    /**
+     * Whether a customer has an order that makes them a returning customer: by account id, by each email and the account's
+     * email exactly, by the mailbox those emails reach (`CustomerKey`, kept on each order), and by the mobile number.
+     *
+     * @param list<string> $emails
+     * @param list<int>    $exclude Orders not to count, such as the one being placed.
+     */
+    public static function customerHasOrder(int $userId, array $emails, string $phone = '', array $exclude = []): bool
+    {
+        $account = $userId > 0 ? get_userdata($userId) : false;
+        if ($account instanceof \WP_User) {
+            $emails[] = $account->user_email;
+        }
+        $emails  = array_values(array_unique(array_filter(array_map('strval', $emails), static fn (string $e): bool => $e !== '')));
+        $queries = [];
+        foreach (array_merge($userId > 0 ? [$userId] : [], $emails) as $customer) {
+            $queries[] = ['customer' => $customer];
+        }
+        $keys = array_values(array_unique(array_map([CustomerKey::class, 'email'], $emails)));
+        if ($keys !== []) {
+            $queries[] = ['meta_query' => [['key' => CustomerKey::EMAIL_META, 'value' => $keys, 'compare' => 'IN']]]; // phpcs:ignore WordPress.DB.SlowDBQuery
+        }
+        $normal = $phone !== '' ? CustomerKey::phone($phone) : null;
+        if ($normal !== null) {
+            $queries[] = ['billing_phone' => $normal];
+        }
+        $base = [
+            'status'  => array_values(array_diff(array_keys(wc_get_order_statuses()), self::NOT_AN_ORDER)),
+            'exclude' => array_values(array_filter(array_map('intval', $exclude))),
+            'limit'   => 1,
+            'return'  => 'ids',
+            'type'    => 'shop_order',
+        ];
+        foreach ($queries as $query) {
+            if (wc_get_orders($base + $query) !== []) {
                 return true;
             }
         }

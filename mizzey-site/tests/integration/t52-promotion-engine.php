@@ -175,6 +175,18 @@ run(
 		$check( 'This coupon is for a first order only.' === t52_valid( $first ), 'AC-2 a guest is judged by billing email' );
 		WC()->customer->set_billing_email( 'new-' . $tag . '@example.invalid' );
 		$check( true === t52_valid( $first ), 'AC-2 a guest with a new email is allowed' );
+		// E-281-1, E-290-2: another spelling of the same mailbox, or the same mobile number, is the same customer.
+		$past_phone = '0100' . wp_rand( 1000000, 9999999 );
+		$past->set_billing_phone( '+20 ' . substr( $past_phone, 1, 3 ) . ' ' . substr( $past_phone, 4 ) );
+		$past->save();
+		WC()->customer->set_billing_email( 'Returning-' . $tag . '+again@example.invalid' );
+		$by_alias = t52_valid( $first );
+		WC()->customer->set_billing_email( 'other-' . $tag . '@example.invalid' );
+		WC()->customer->set_billing_phone( $past_phone );
+		$by_phone = t52_valid( $first );
+		WC()->customer->set_billing_phone( '' );
+		WC()->customer->set_billing_email( 'new-' . $tag . '@example.invalid' );
+		$check( 'This coupon is for a first order only.' === $by_alias && 'This coupon is for a first order only.' === $by_phone && $past_phone === wc_get_order( $past->get_id() )->get_billing_phone(), 'AC-2 a guest is refused under a plus-tag spelling of an earlier order\'s email, or with its mobile number; the order keeps the number in its local form (' . wp_json_encode( array( $by_alias, $by_phone ) ) . ')' );
 		$own = wc_create_order( array( 'customer_id' => $newcomer->ID ) );
 		$own->add_product( $cream, 1 );
 		$own->set_billing_email( 'new-' . $tag . '@example.invalid' );

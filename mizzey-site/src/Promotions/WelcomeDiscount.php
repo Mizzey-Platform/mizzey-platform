@@ -18,7 +18,9 @@ defined('ABSPATH') || exit;
  * and "Valid for (days)" sets its expiry. The template itself is never accepted as a code. When a customer account is
  * created, the customer gets their own promotion copied from it: restricted to their email, one use, first order only
  * (new customers only), expiring after the set days, and applied automatically for them alone (AutomaticPromotions), so
- * no code has to reach them. Without a published, unpaused template no welcome discount is issued.
+ * no code has to reach them. Without a published, unpaused template no welcome discount is issued. None is issued to a
+ * customer who has ordered before (PromotionRules::customerHasOrder()), and one mailbox claims one, whatever spelling of
+ * its email registers.
  *
  * OD-03's example (10 percent off the first order, capped at 200 EGP, minimum order 500 EGP, valid 14 days, one use, new
  * customers only, not combined) is a working default the client replaces; it is the template staff are asked to set up.
@@ -90,6 +92,11 @@ final class WelcomeDiscount
         if ($template === null || ! is_email($user->user_email)) {
             return;
         }
+        // Someone who has ordered before (a guest making the account from the order confirmation, say) is not a new
+        // customer: a first-order discount could never be used, so none is issued, advertised or claimed.
+        if (PromotionRules::customerHasOrder($user->ID, [$user->user_email], (string) get_user_meta($user->ID, 'billing_phone', true))) {
+            return;
+        }
         // One claim per email, made atomically: an insert that does nothing when the email's claim row exists, so two
         // registrations at once cannot both pass (add_option() upserts, so it cannot tell them apart).
         if (! self::claim($user->user_email)) {
@@ -136,11 +143,14 @@ final class WelcomeDiscount
         }
     }
 
-    /** Claims the email's one welcome discount; false when it was claimed before, by this or any account. */
+    /**
+     * Claims the mailbox's one welcome discount; false when it was claimed before, by this or any account, under any
+     * spelling of the email that reaches the same inbox (a `+tag`, Gmail's dots, googlemail.com).
+     */
     public static function claim(string $email): bool
     {
         global $wpdb;
-        $name     = self::ISSUED . '_' . hash('sha256', wc_strtolower($email));
+        $name     = self::ISSUED . '_' . hash('sha256', \MizzeySite\Accounts\CustomerKey::email($email));
         $inserted = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'off')", $name, '1')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         wp_cache_delete('notoptions', 'options');
 

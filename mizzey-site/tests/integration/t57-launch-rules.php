@@ -169,6 +169,9 @@ run(
 		WC()->customer->set_billing_email( "{$tag}-elsewhere@example.invalid" );
 		t57_cart( array( $mid->get_id() => 1 ) );
 		$check( array() === t57_applied(), 'BR-001 a guest who ordered, then registered, gets no welcome discount, whatever billing email they give' );
+		$returning_mail = \MizzeySite\Emails\EmailAdditions::welcome( '', get_userdata( $returning ), null );
+		$check( 0 === (int) get_user_meta( $returning, WelcomeDiscount::USER_META, true ) && '' === $returning_mail && WelcomeDiscount::claim( $returning_email ), 'BR-001 a customer who ordered before registering is issued no welcome discount, is not told of one, and the email\'s one claim is left unspent' );
+		$s->on_finish( static function () use ( $returning_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', \MizzeySite\Accounts\CustomerKey::email( $returning_email ) ) ); } );
 		wp_set_current_user( 0 );
 		WC()->customer->set_billing_email( '' );
 		require_once ABSPATH . 'wp-admin/includes/user.php';
@@ -532,6 +535,9 @@ run(
 		$claim_email = "{$tag}-claim@example.invalid";
 		$s->on_finish( static function () use ( $claim_email ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', wc_strtolower( $claim_email ) ) ); } );
 		$check( WelcomeDiscount::claim( $claim_email ) && ! WelcomeDiscount::claim( strtoupper( $claim_email ) ), 'BR-001 an email is claimed once, whatever its case: the second claim fails' );
+		$gmail = "{$tag}.claim@gmail.com";
+		$s->on_finish( static function () use ( $gmail ) { delete_option( WelcomeDiscount::ISSUED . '_' . hash( 'sha256', \MizzeySite\Accounts\CustomerKey::email( $gmail ) ) ); } );
+		$check( ! WelcomeDiscount::claim( "{$tag}-claim+2@example.invalid" ) && WelcomeDiscount::claim( $gmail ) && ! WelcomeDiscount::claim( "{$tag}claim+1@googlemail.com" ) && ! WelcomeDiscount::claim( strtoupper( "{$tag}.c.l.a.i.m@gmail.com" ) ), 'BR-001, SC-001 one mailbox claims one welcome discount: a plus-tag alias, Gmail\'s dots and googlemail.com are the same mailbox' );
 		foreach ( array( $auto, $two ) as $done ) {
 			$done->update_meta_data( PromotionSettings::AUTOMATIC, 'no' );
 			$done->save();

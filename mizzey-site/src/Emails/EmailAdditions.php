@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace MizzeySite\Emails;
 
+use MizzeySite\Promotions\PromotionRules;
 use MizzeySite\Promotions\WelcomeDiscount;
 
 defined('ABSPATH') || exit;
@@ -49,6 +50,11 @@ final class EmailAdditions
         $expired = $coupon instanceof \WC_Coupon && $coupon->get_date_expires() && $coupon->get_date_expires()->getTimestamp() < time();
         $usedUp  = $coupon instanceof \WC_Coupon && $coupon->get_usage_limit() > 0 && $coupon->get_usage_count() >= $coupon->get_usage_limit();
         if (! $coupon instanceof \WC_Coupon || ! $coupon->get_id() || $expired || $usedUp) {
+            return $content;
+        }
+        // A first-order gift is not advertised to someone who has already ordered.
+        $account = get_userdata($userId);
+        if (PromotionRules::customerHasOrder($userId, $account instanceof \WP_User ? [$account->user_email] : [])) {
             return $content;
         }
         $value   = $coupon->is_type('percent')
