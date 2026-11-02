@@ -273,7 +273,8 @@ run(
 		$g_paid = t68_obj( $g->get_id() );
 		$notice( $g_paid );
 		$fresh( $g->get_id() )->payment_complete( (string) $g_paid['id'] );
-		$update = fn ( int $refunded ) => t68_obj( $g->get_id(), array( 'id' => $g_paid['id'], 'is_refunded' => true, 'refunded_amount_cents' => $refunded ) );
+		// Paymob reports the same transaction, of the same Paymob order, marked refunded.
+		$update = fn ( int $refunded ) => t68_obj( $g->get_id(), array( 'id' => $g_paid['id'], 'order' => $g_paid['order'], 'is_refunded' => true, 'refunded_amount_cents' => $refunded ) );
 		PaymentGate::releaseAll();
 		wc_create_refund( array( 'order_id' => $g->get_id(), 'amount' => 20, 'reason' => 't68 order screen', 'refund_payment' => false ) );
 		$r = $notice( $update( 2000 ) );

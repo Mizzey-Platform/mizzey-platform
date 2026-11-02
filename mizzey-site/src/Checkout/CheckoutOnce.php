@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @package MizzeySite
+ */
+
+declare(strict_types=1);
+
+namespace MizzeySite\Checkout;
+
+defined('ABSPATH') || exit;
+
+/**
+ * Place Order pressed twice makes one order (PAY-05).
+ *
+ * The block checkout's two requests for one cart, sent at the same moment, each found the cart full and each made an
+ * order: WooCommerce reuses a draft order only for requests that come one after the other. Each Store API checkout of a
+ * cart now runs under a lock of its own (MySQL GET_LOCK, keyed by the cart's token or session), so the second waits for
+ * the first and then finds its cart ordered and empty, and is refused like any checkout of an empty cart.
+ *
+ * Found by the audit of 2 November 2026 (C M-3). See specs/028-payments AC-1.
+ */
+final class CheckoutOnce
+{
+    /** How long a second press waits for the first, in seconds. */
+    private const WAIT = 30;
+
+    private static ?string $held = null;
+
+    public static function register(): void
+    {
+        add_filter('rest_request_before_callbacks', [self::class, 'before'], 5, 3);
+        add_filter('rest_request_after_callbacks', [self::class, 'after'], 999, 3);
+    }
+
+    /**
+     * @param mixed $response
+     * @param mixed $handler
+     * @return mixed
+     */
+    public static function before($response, $handler, \WP_REST_Request $request)
+    {
+        if (is_wp_error($response) || self::$held !== null || $request->get_method() !== 'POST' || ! self::isCheckout($request)) {
+            return $response;
+        }
+        $key = self::cartKey($request);
+        if ($key === '') {
+            return $response;
+        }
+        global $wpdb;
+        $name = substr('mz_checkout_' . md5($wpdb->prefix . $key), 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', $name, self::WAIT)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return new \WP_Error('mizzey_checkout_busy', __('Your order is already being placed. Please wait a moment.', 'mizzey-site'), ['status' => 409]);
+        }
+        self::$held = $name;
+
+        return $response;
+    }
+
+    /**
+     * @param mixed $response
+     * @param mixed $handler
+     * @return mixed
+     */
+    public static function after($response, $handler, \WP_REST_Request $request)
+    {
+        self::release();
+
+        return $response;
+    }
+
+    public static function release(): void
+    {
+        if (self::$held === null) {
+            return;
+        }
+        global $wpdb;
+        $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::$held)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        self::$held = null;
+    }
+
+    /** The Store API checkout route, not pay-for-order (`/checkout/{id}`), which pays one existing order. */
+    private static function isCheckout(\WP_REST_Request $request): bool
+    {
+        return preg_match('#^/wc/store(/v\d+)?/checkout/?$#', (string) $request->get_route()) === 1;
+    }
+
+    /** The cart's token (Store API clients), or the visitor's WooCommerce session cookie (the block checkout). */
+    private static function cartKey(\WP_REST_Request $request): string
+    {
+        $token = trim((string) $request->get_header('cart_token'));
+        if ($token !== '') {
+            return 'token:' . $token;
+        }
+        foreach ($_COOKIE as $name => $value) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+            if (is_string($name) && str_starts_with($name, 'wp_woocommerce_session_') && is_string($value) && $value !== '') {
+                return 'session:' . $value;
+            }
+        }
+
+        return '';
+    }
+}

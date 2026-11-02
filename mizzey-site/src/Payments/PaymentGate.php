@@ -319,8 +319,15 @@ final class PaymentGate
      */
     private static function refundedProblem(\WC_Order $order, PaymentEvent $event, string $channel): ?string
     {
+        // The payment that paid the order is the first success recorded on it (a second payment comes after it).
         $payment = (string) ($event->signed['payment'] ?? '');
-        $paidBy  = (string) $order->get_transaction_id();
+        $paidBy  = '';
+        foreach (PaymentRecord::events($order) as $recorded) {
+            if ($recorded['kind'] === PaymentEvent::PAYMENT && $recorded['outcome'] === PaymentEvent::SUCCESS) {
+                $paidBy = (string) $recorded['reference'];
+                break;
+            }
+        }
         if (self::$foreign || ($payment !== '' && $paidBy !== '' && $payment !== $paidBy)) {
             return 'refund_of_another_payment';
         }

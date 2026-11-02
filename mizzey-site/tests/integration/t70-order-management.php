@@ -214,7 +214,7 @@ run(
 		wp_set_current_user( $admin );
 		$allowed = $fresh( $by_status->get_id() );
 		$allowed->update_status( 'refunded', '', true );
-		$check( 400 === $put_answer->get_status() && 'refunded' !== $after_staff->get_status() && 0 === count( $after_staff->get_refunds() ) && 'refunded' === $fresh( $by_status->get_id() )->get_status(), 'AC-5 staff without the refund permission cannot move an order to Refunded, over REST or by a manual change, so no full refund is recorded; permitted staff can (' . $put_answer->get_status() . ', ' . $after_staff->get_status() . ')' );
+		$check( 400 === $put_answer->get_status() && 'refunded' !== $after_staff->get_status() && 0 === count( $after_staff->get_refunds() ) && 'refunded' === $fresh( $by_status->get_id() )->get_status(), 'AC-5 staff without the refund permission cannot move an order to Refunded, over REST or by a manual change, so no full refund is recorded; permitted staff can (' . $put_answer->get_status() . ', ' . $after_staff->get_status() . ', ' . count( $after_staff->get_refunds() ) . ', then ' . $fresh( $by_status->get_id() )->get_status() . ')' );
 
 		// ---- AC-6: the packing slip ----------------------------------------------------------------------------
 		$a_fresh = $fresh( $a->get_id() );
