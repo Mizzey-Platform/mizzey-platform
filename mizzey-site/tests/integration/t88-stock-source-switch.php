@@ -130,7 +130,10 @@ run(
 		$store->set( $item( $vars[0] ), 0, "{$tag}-zero", StoreStockSource::STAFF, 'counted', 0 );
 		$check( 'outofstock' === wc_get_product( $vars[0] )->get_stock_status(), 'S-3 a variation set to nothing on its own stock is out of stock' );
 		$store->set( $item( $vars[0] ), 3, "{$tag}-three", StoreStockSource::STAFF, 'counted', 0 );
+		// The scenarios' fixtures hold the stock-write permit (they stand in for the ERP): it is set aside for this check.
+		remove_filter( 'mizzey_stock_write_permitted', '__return_true' );
 		$blocked = update_post_meta( $a, '_stock', '99' );
+		add_filter( 'mizzey_stock_write_permitted', '__return_true' );
 		$check( 5 === $level( $a ) && 'instock' === wc_get_product( $vars[0] )->get_stock_status(), 'D-19 a direct write to the stock field of an own-stock item is still refused (' . var_export( $blocked, true ) . ')' );
 
 		// ---- The checkout's reservation on the store's own stock ---------------------------------------------------

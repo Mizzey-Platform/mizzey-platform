@@ -189,11 +189,15 @@ final class StoreStockSource implements StockSource
                 }
                 if ($counted || $target !== null) {
                     StockWriteGuard::projection(static function () use ($product, $after): void {
-                        if (! $product->managing_stock()) {
-                            $product->set_manage_stock(true);
-                            $product->save();
+                        // The item's figure, and each language record's: the language records share the one stock
+                        // identity, and WooCommerce Multilingual does not follow a direct stock update.
+                        foreach (self::records($product) as $record) {
+                            if (! $record->managing_stock()) {
+                                $record->set_manage_stock(true);
+                                $record->save();
+                            }
+                            wc_update_product_stock($record, $after, 'set');
                         }
-                        wc_update_product_stock($product, $after, 'set');
                     });
                 }
                 $wpdb->query('COMMIT'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -232,6 +236,31 @@ final class StoreStockSource implements StockSource
         }
 
         return $product;
+    }
+
+    /**
+     * The stock identity record and its translations, as products.
+     *
+     * @return list<\WC_Product>
+     */
+    private static function records(\WC_Product $product): array
+    {
+        $records = [$product];
+        $type    = $product->is_type('variation') ? 'post_product_variation' : 'post_product';
+        $trid    = apply_filters('wpml_element_trid', null, $product->get_id(), $type);
+        if ($trid) {
+            foreach ((array) apply_filters('wpml_get_element_translations', [], $trid, $type) as $translation) {
+                $id = (int) ($translation->element_id ?? 0);
+                if ($id > 0 && $id !== $product->get_id()) {
+                    $record = wc_get_product($id);
+                    if ($record instanceof \WC_Product) {
+                        $records[] = $record;
+                    }
+                }
+            }
+        }
+
+        return $records;
     }
 
     /** Drops the admin's kept figure for the item in every language (StockWriteGuard::figure). */
