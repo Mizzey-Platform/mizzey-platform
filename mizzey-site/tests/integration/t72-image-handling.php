@@ -216,7 +216,8 @@ run(
 		};
 		$space     = '[\s\x{00A0}]';
 		$en_text   = $page_text( (string) get_permalink( $en_id ) );
-		$ar_text   = $ar_id > 0 ? $page_text( (string) get_permalink( $ar_id ) ) : '';
+		// The Arabic record's address as WPML serves it (/ar/...): get_permalink() alone gives the English one here.
+		$ar_text   = $ar_id > 0 ? $page_text( (string) apply_filters( 'wpml_permalink', get_permalink( $ar_id ), 'ar' ) ) : '';
 		$en_symbol = 1 === preg_match( '/EGP' . $space . '*12,?345\.50/u', $en_text, $en_m );
 		$ar_symbol = 1 === preg_match( '/12,?345\.50' . $space . '+\x{062C}\.\x{0645}/u', $ar_text, $ar_m );
 		$check( $en_symbol, 'AC-4 the served English product page writes EGP before the amount (' . ( $en_m[0] ?? 'not found' ) . ')' );
