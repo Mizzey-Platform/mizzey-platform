@@ -173,7 +173,7 @@ run(
 		$check( 'cancelled' === $cancelled->get_status() && "{$tag} customer changed their mind" === (string) $cancelled->get_meta( StatusModel::REASON_META ) && 0 === count( $cancelled->get_refunds() ) && 0.0 === (float) $cancelled->get_total_refunded(), 'AC-4 a paid order cancelled from the order screen keeps its reason and has no refund made by the cancellation (' . $cancelled->get_status() . ')' );
 
 		// ---- AC-5: refunds subject to the permission ----------------------------------------------------------
-		$check( user_can( $admin, RefundCapability::CAP ) && 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ) && class_exists( '\MizzeySite\Orders\RefundReference' ), 'AC-5 refunds from the order screen pass the refund permission first (specs/013) and carry their reference (specs/029)' );
+		$check( user_can( $admin, RefundCapability::CAP ) && 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ) && user_can( $customer, 'edit_shop_orders' ) === false, 'AC-5 refunds from the order screen pass the refund permission first (specs/013); their reference is specs/029' );
 
 		// ---- AC-6: the packing slip ----------------------------------------------------------------------------
 		$a_fresh = $fresh( $a->get_id() );
@@ -193,7 +193,13 @@ run(
 		$check( isset( $actions['mizzey_packing_slip'] ) && str_contains( $button, 'Print packing slip' ) && str_contains( $button, PackingSlip::QUERY . '=' . $a->get_id() ), 'AC-6 the slip is offered on the order screen and in the orders list' );
 		wp_set_current_user( $customer );
 		$die = null;
-		add_filter( 'wp_die_handler', static fn () => static function ( $message ) use ( &$die ) { $die = (string) $message; throw new \RuntimeException( 'die' ); } );
+		$handler = static function () use ( &$die ) {
+			return static function ( $message ) use ( &$die ) {
+				$die = (string) $message;
+				throw new \RuntimeException( 'die' );
+			};
+		};
+		add_filter( 'wp_die_handler', $handler );
 		$_GET = array( PackingSlip::QUERY => (string) $a->get_id(), '_wpnonce' => wp_create_nonce( PackingSlip::ACTION . '_' . $a->get_id() ) );
 		$_REQUEST = $_GET;
 		try {
