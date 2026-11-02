@@ -222,6 +222,15 @@ run(
 		$held_back = Wishlist::moveToCart( $en );
 		remove_filter( StockGateway::SOURCE_FILTER, $sold_out, 20 );
 		$check( is_wp_error( $held_back ) && 'mizzey_wishlist_out_of_stock' === $held_back->get_error_code() && array( $en ) === Wishlist::ids() && array() === WC()->cart->get_cart(), 'WISH-04, D-19 an item WooCommerce shows in stock but the stock source holds none of is not moved, and stays saved' );
+		// The other way round (pending PRE-09): the source holds units but WooCommerce's own field says out of stock, and the
+		// cart, which reads that field, refuses; the customer is told the cart's own reason, and the item stays saved.
+		Wishlist::add( $gone );
+		$held_units = static fn () => new T56Source( array( $gone => 5 ) );
+		add_filter( StockGateway::SOURCE_FILTER, $held_units, 20 );
+		$cart_says = Wishlist::moveToCart( $gone );
+		remove_filter( StockGateway::SOURCE_FILTER, $held_units, 20 );
+		$said = is_wp_error( $cart_says ) ? $cart_says->get_error_message() : '';
+		$check( is_wp_error( $cart_says ) && 'mizzey_wishlist_not_added' === $cart_says->get_error_code() && 409 === ( $cart_says->get_error_data()['status'] ?? 0 ) && str_contains( $said, 'out of stock' ) && str_contains( $said, 'stays in your wishlist' ) && in_array( $gone, Wishlist::ids(), true ), 'WISH-04, FR-009 an item the stock source holds but WooCommerce\'s field shows sold out is refused by the cart until PRE-09, with the cart\'s own reason, and stays saved (' . $said . ')' );
 		WC()->cart->empty_cart();
 
 		// WISH-07: recently viewed.

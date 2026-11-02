@@ -164,9 +164,22 @@ final class Wishlist
         $parent    = $variation ? $shown->get_parent_id() : $shown->get_id();
         $key       = WC()->cart->add_to_cart($parent, 1, $variation, $variation ? $shown->get_variation_attributes() : []);
         if (! $key) {
+            // The cart's own reason, such as WooCommerce's stock field saying out of stock while the stock source holds
+            // units (that field follows the source only once PRE-09's projection exists; specs/015 FR-009).
+            $said = '';
+            foreach ((array) wc_get_notices('error') as $notice) {
+                $said = trim(html_entity_decode(wp_strip_all_tags((string) (is_array($notice) ? ($notice['notice'] ?? '') : $notice)), ENT_QUOTES, 'UTF-8'));
+                if ($said !== '') {
+                    break;
+                }
+            }
             wc_clear_notices();
+            $message = $said !== ''
+                /* translators: %s: the cart's reason for refusing the item. */
+                ? sprintf(__('%s It stays in your wishlist.', 'mizzey-site'), $said)
+                : __('This item could not be added to your cart, so it stays in your wishlist.', 'mizzey-site');
 
-            return new \WP_Error('mizzey_wishlist_not_added', __('This item could not be added to your cart, so it stays in your wishlist.', 'mizzey-site'), ['status' => 409]);
+            return new \WP_Error('mizzey_wishlist_not_added', $message, ['status' => 409]);
         }
         self::remove($canonical->get_id());
 

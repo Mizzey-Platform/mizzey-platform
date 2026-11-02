@@ -168,6 +168,12 @@ msgstr "هذا المنتج غير متوفر حاليًا، لذلك يبقى �
 msgid "This item could not be added to your cart, so it stays in your wishlist."
 msgstr "تعذّرت إضافة هذا المنتج إلى سلتك، لذلك يبقى في قائمة أمنياتك."
 
+#. translators: %s: the cart's reason for refusing the item.
+#: mizzey-site/src/Wishlist/Wishlist.php
+#, php-format
+msgid "%s It stays in your wishlist."
+msgstr "%s يبقى المنتج في قائمة أمنياتك."
+
 #: mizzey-site/src/Wishlist/WishlistRoutes.php
 msgid "This product could not be found."
 msgstr "تعذّر العثور على هذا المنتج."

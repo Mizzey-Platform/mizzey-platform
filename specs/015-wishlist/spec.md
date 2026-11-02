@@ -115,8 +115,11 @@ and acceptance follows manual testing on staging and the client's approval.
 - **FR-007**: A sign-in by email link (specs/017) MUST merge the guest's lists as the other routes do (FR-003).
 - **FR-008**: The guest lists' cookies MUST be SameSite=Lax, so another site's request carries neither.
 - **FR-009**: Moving to the cart MUST ask the stock source (D-19) first; WooCommerce's own stock field decides only when
-  the source does not answer, as the cart's own check then fails closed at checkout (FR-004). The list's `in_stock`
-  flag stays WooCommerce's display field until PRE-09's stock projection exists.
+  the source does not answer, as the cart's own check then fails closed at checkout (FR-004). Pending PRE-09: until the
+  stock projection keeps WooCommerce's field in line with the source, an item the source holds but that field shows
+  sold out (or short) is refused by WooCommerce's cart; the move answers 409 with the cart's own reason ("... is out of
+  stock. It stays in your wishlist.") and the item stays saved. The list's `in_stock` flag stays WooCommerce's display
+  field until then too.
 
 ### Key Entities
 
