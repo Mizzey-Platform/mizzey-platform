@@ -42,16 +42,23 @@ final class Events
     public const LIST_MAX  = 30;
     public const QUEUE_MAX = 20;
 
+    /** True while WooCommerce adds to the cart: its quantity update of an existing line is part of the add. */
+    private static bool $adding = false;
+
+    /** @var array<string,array<string,mixed>> The listed items by product id, for a card clicked in the page. */
+    private static array $listed = [];
+
     /** @var string|null The sign-in method of the request, when it is not a password. */
     private static ?string $method = null;
 
     public static function register(): void
     {
         add_action('wp_enqueue_scripts', [self::class, 'enqueue'], 20);
+        add_filter('woocommerce_add_to_cart_quantity', [self::class, 'adding'], 1);
         add_action('woocommerce_add_to_cart', [self::class, 'added'], 20, 6);
         add_action('woocommerce_cart_item_removed', [self::class, 'removed'], 20, 2);
         add_action('woocommerce_after_cart_item_quantity_update', [self::class, 'quantity'], 20, 4);
-        add_action('woocommerce_applied_coupon', [self::class, 'coupon'], 20, 1);
+        add_action('woocommerce_applied_coupon', [self::class, 'coupon'], 999, 1);
         add_action('mizzey_wishlist_added', [self::class, 'wishlist'], 20, 1);
         add_action('mizzey_signed_in_by', [self::class, 'signedInBy'], 10, 2);
         add_action('wp_login', [self::class, 'login'], 30, 2);
@@ -62,6 +69,23 @@ final class Events
         add_action('woocommerce_blocks_loaded', [self::class, 'storeApi']);
         add_action('admin_init', [self::class, 'settings'], 20);
         add_action('mizzey_marketing_tags_fields', [self::class, 'fields']);
+        add_filter('woocommerce_redirect_single_search_result', [self::class, 'singleResult'], 99);
+    }
+
+    /**
+     * A search with one result is sent straight to that product by WooCommerce, so no results page is shown: the
+     * search is queued and pushed on the product page instead.
+     *
+     * @param mixed $redirect
+     * @return mixed
+     */
+    public static function singleResult($redirect)
+    {
+        if ($redirect && is_search()) {
+            self::queue(['event' => 'search', 'params' => ['search_term' => self::term((string) get_search_query(false)), 'results_count' => 1]]);
+        }
+
+        return $redirect;
     }
 
     /** The refund's route to Analytics: the property's measurement id and a Measurement Protocol API secret. */
@@ -139,7 +163,7 @@ final class Events
         $search = is_search() && (get_query_var('post_type') === 'product' || (function_exists('is_shop') && is_shop()));
         if ($search) {
             $count    = (int) ($GLOBALS['wp_query']->found_posts ?? 0);
-            $term     = mb_substr(sanitize_text_field(get_search_query(false)), 0, 100);
+            $term     = self::term((string) get_search_query(false));
             $events[] = ['event' => 'search', 'params' => ['search_term' => $term, 'results_count' => $count]];
             if ($count === 0) {
                 $events[] = ['event' => 'zero_result_search', 'params' => ['search_term' => $term]];
@@ -151,7 +175,9 @@ final class Events
             foreach ((array) ($GLOBALS['wp_query']->posts ?? []) as $i => $post) {
                 $product = wc_get_product($post);
                 if ($product instanceof \WC_Product && count($items) < self::LIST_MAX) {
-                    $items[] = self::item($product) + ['index' => $i, 'item_list_id' => $list[0], 'item_list_name' => $list[1]];
+                    $item                                  = self::item($product) + ['index' => $i, 'item_list_id' => $list[0], 'item_list_name' => $list[1]];
+                    $items[]                               = $item;
+                    self::$listed[(string) $product->get_id()] = $item;
                 }
             }
             if ($items !== []) {
@@ -181,6 +207,16 @@ final class Events
         return $events;
     }
 
+    /** A search term with any email address or long number (a phone, an order) masked: no personal data. */
+    public static function term(string $term): string
+    {
+        $term = sanitize_text_field($term);
+        $term = (string) preg_replace('/\S+@\S+/', '[email]', $term);
+        $term = (string) preg_replace('/\+?\d[\d\s-]{5,}\d/', '[number]', $term);
+
+        return mb_substr($term, 0, 100);
+    }
+
     /** @return array{0:string,1:string} The list's id and name. */
     private static function listName(bool $search): array
     {
@@ -201,7 +237,8 @@ final class Events
         $items = [];
         foreach (WC()->cart->get_cart() as $line) {
             if (($line['data'] ?? null) instanceof \WC_Product) {
-                $items[] = self::item($line['data'], (int) $line['quantity']);
+                $qty     = max(1, (int) $line['quantity']);
+                $items[] = self::item($line['data'], $qty, ((float) ($line['line_total'] ?? 0) + (float) ($line['line_tax'] ?? 0)) / $qty);
             }
         }
 
@@ -218,11 +255,24 @@ final class Events
         if (! $order instanceof \WC_Order || $key === '' || ! hash_equals($order->get_order_key(), $key)) {
             return null;
         }
-        if ($order->has_status(['pending', 'failed', 'cancelled', 'checkout-draft']) || (string) $order->get_meta(self::TRACKED) !== '') {
+        if ($order->has_status(['pending', 'on-hold', 'failed', 'cancelled', 'checkout-draft'])) {
             return null;
         }
-        $order->update_meta_data(self::TRACKED, (string) time());
-        $order->save_meta_data();
+        global $wpdb;
+        $lock = substr('mz_' . $wpdb->prefix . 'purchase_' . $order->get_id(), 0, 64);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return null;
+        }
+        try {
+            // Read from the database under the lock: two confirmation pages at once push one purchase.
+            if (\MizzeySite\Reviews\StoredOrderMeta::get($order->get_id(), self::TRACKED) !== '') {
+                return null;
+            }
+            $order->update_meta_data(self::TRACKED, (string) time());
+            $order->save_meta_data();
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
 
         return ['event' => 'purchase', 'id' => 'purchase-' . $order->get_id(), 'ecommerce' => self::orderPayload($order)];
     }
@@ -255,7 +305,13 @@ final class Events
     /** @param array<string,mixed> $event */
     public static function queue(array $event): void
     {
-        if (! function_exists('WC') || ! WC()->session) {
+        if (! function_exists('WC')) {
+            return;
+        }
+        if (! WC()->session && method_exists(WC(), 'initialize_session')) {
+            WC()->initialize_session(); // A REST request (a sign-in, the wishlist) has none until asked.
+        }
+        if (! WC()->session) {
             return;
         }
         $queue   = (array) WC()->session->get(self::SESSION, []);
@@ -288,10 +344,22 @@ final class Events
      */
     public static function added($key, $productId, $quantity, $variationId = 0, $variation = [], $data = []): void
     {
-        $product = wc_get_product((int) $variationId > 0 ? (int) $variationId : (int) $productId);
+        self::$adding = false;
+        $product      = wc_get_product((int) $variationId > 0 ? (int) $variationId : (int) $productId);
         if ($product instanceof \WC_Product && (int) $quantity > 0) {
             self::queue(['event' => 'add_to_cart', 'ecommerce' => self::commerce([self::item($product, (int) $quantity)])]);
         }
+    }
+
+    /**
+     * @param mixed $quantity
+     * @return mixed
+     */
+    public static function adding($quantity)
+    {
+        self::$adding = true;
+
+        return $quantity;
     }
 
     /**
@@ -315,6 +383,9 @@ final class Events
      */
     public static function quantity($key, $quantity, $old, $cart): void
     {
+        if (self::$adding) {
+            return; // The add itself is pushed by added().
+        }
         $line    = $cart instanceof \WC_Cart ? ($cart->cart_contents[(string) $key] ?? null) : null;
         $product = is_array($line) && ($line['data'] ?? null) instanceof \WC_Product ? $line['data'] : null;
         $change  = (int) $quantity - (int) $old;
@@ -329,6 +400,9 @@ final class Events
         $code = wc_format_coupon_code((string) $code);
         if ($code === '') {
             return;
+        }
+        if (WC()->cart) {
+            WC()->cart->calculate_totals();
         }
         $discount = WC()->cart ? (float) WC()->cart->get_coupon_discount_amount($code, false) : 0.0;
         self::queue(['event' => 'apply_coupon', 'params' => ['coupon' => $code, 'discount' => round($discount, 2), 'currency' => get_woocommerce_currency()]]);
@@ -410,7 +484,7 @@ final class Events
         $deps = wp_script_is('wp-hooks', 'registered') ? ['wp-hooks'] : [];
         wp_enqueue_script(self::SCRIPT, plugins_url('mizzey-site/assets/events.js'), $deps, is_readable($file) ? (string) filemtime($file) : null, true);
         $events = array_merge(self::page(), self::drain());
-        wp_add_inline_script(self::SCRIPT, 'window.mizzeyEvents=' . wp_json_encode(['language' => TagManager::language(), 'currency' => get_woocommerce_currency(), 'events' => $events]) . ';', 'before');
+        wp_add_inline_script(self::SCRIPT, 'window.mizzeyEvents=' . wp_json_encode(['language' => TagManager::language(), 'currency' => get_woocommerce_currency(), 'events' => $events, 'listed' => self::$listed]) . ';', 'before');
     }
 
     // ---- Refunds, from the store ---------------------------------------------------------------------------
@@ -418,7 +492,7 @@ final class Events
     /** The Analytics client id from the visitor's `_ga` cookie, kept on the order to tie a later refund to it. */
     public static function client($order): void
     {
-        if (! $order instanceof \WC_Order || ! isset($_COOKIE['_ga'])) {
+        if (! $order instanceof \WC_Order || ! isset($_COOKIE['_ga']) || ! ConsentBanner::granted()) {
             return;
         }
         $parts = explode('.', sanitize_text_field(wp_unslash((string) $_COOKIE['_ga'])));
@@ -441,7 +515,7 @@ final class Events
         if ($id === '' || $secret === '' || ! $order instanceof \WC_Order || ! $refund instanceof \WC_Order_Refund) {
             return;
         }
-        $params = ['transaction_id' => (string) $order->get_order_number(), 'value' => round(abs((float) $refund->get_amount()), 2), 'currency' => $order->get_currency()];
+        $params = ['transaction_id' => (string) $order->get_order_number(), 'value' => round(abs((float) $refund->get_amount()), 2), 'currency' => $order->get_currency(), 'language' => (string) $order->get_meta('wpml_language') === 'ar' ? 'ar' : 'en'];
         $items  = [];
         foreach ($refund->get_items() as $line) {
             if ($line instanceof \WC_Order_Item_Product && $line->get_product() instanceof \WC_Product && abs((int) $line->get_quantity()) > 0) {

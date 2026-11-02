@@ -62,6 +62,17 @@
 		return out;
 	}
 
+	// A cart line at what it costs after discounts, tax included.
+	function line(l) {
+		var totals = l.totals || {};
+		var unit = Math.pow(10, totals.currency_minor_unit || 0);
+		var out = item(l, l.quantity);
+		if (totals.line_total !== undefined) {
+			out.price = (parseInt(totals.line_total, 10) + parseInt(totals.line_total_tax || '0', 10)) / unit / (l.quantity || 1);
+		}
+		return out;
+	}
+
 	function cart() {
 		var data = window.wp && window.wp.data;
 		var store = data && data.select('wc/store/cart');
@@ -70,22 +81,32 @@
 
 	function cartPayload(extra) {
 		var c = cart();
-		var items = c ? (c.items || []).map(function (line) { return item(line, line.quantity); }) : [];
-		var totals = c && c.totals ? c.totals : {};
-		var unit = Math.pow(10, totals.currency_minor_unit || 0);
-		var payload = { currency: config.currency, value: totals.total_items ? parseInt(totals.total_items, 10) / unit : 0, items: items };
+		var items = c ? (c.items || []).map(line) : [];
+		var value = items.reduce(function (sum, i) { return sum + i.price * i.quantity; }, 0);
+		var payload = { currency: config.currency, value: Math.round(value * 100) / 100, items: items };
 		Object.keys(extra || {}).forEach(function (key) { payload[key] = extra[key]; });
 		return payload;
 	}
 
 	// Events queued by the store, in the cart's answer.
-	if (window.wp && window.wp.data && window.wp.data.subscribe) {
-		window.wp.data.subscribe(function () {
-			var c = cart();
-			var queued = c && c.extensions && c.extensions['mizzey-events'] ? c.extensions['mizzey-events'].events : null;
-			(queued || []).forEach(push);
-		});
+	function fromCart() {
+		var c = cart();
+		var queued = c && c.extensions && c.extensions['mizzey-events'] ? c.extensions['mizzey-events'].events : null;
+		(queued || []).forEach(push);
 	}
+	if (window.wp && window.wp.data && window.wp.data.subscribe) {
+		window.wp.data.subscribe(fromCart);
+		fromCart(); // An answer that arrived before this script.
+	}
+
+	// A card clicked in WooCommerce's Product Collection block.
+	document.addEventListener('wc-blocks_viewed_product', function (e) {
+		var id = e && e.detail ? String(e.detail.productId || '') : '';
+		var listed = (config.listed || {})[id];
+		if (listed) {
+			push({ event: 'select_item', ecommerce: { item_list_id: listed.item_list_id, item_list_name: listed.item_list_name, items: [listed] } });
+		}
+	});
 
 	// Choices made in the page, from WooCommerce's blocks.
 	if (window.wp && window.wp.hooks) {

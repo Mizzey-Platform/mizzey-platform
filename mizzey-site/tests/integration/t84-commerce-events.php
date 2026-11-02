@@ -59,6 +59,12 @@ run(
 			return $body;
 		};
 
+		$page_with = static function ( string $url, array $cookies ): string {
+			$r    = wp_remote_get( $url, array( 'timeout' => 60, 'cookies' => $cookies ) );
+			$body = is_wp_error( $r ) ? '' : (string) wp_remote_retrieve_body( $r );
+			storefront_refuse_shell( $url, is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r ), $body );
+			return $body;
+		};
 		// The catalogue: one product in a category, with its Arabic record.
 		$w     = new Workflows( $s );
 		$sku   = "{$tag}-SKU";
@@ -71,6 +77,11 @@ run(
 		$tid  = is_wp_error( $term ) ? 0 : (int) $term['term_id'];
 		$s->on_finish( static function () use ( $tid ) { wp_delete_term( $tid, 'product_cat' ); } );
 		wp_set_object_terms( $en_id, array( $tid ), 'product_cat' );
+		$twin = $w->simple( "{$tag}-TWIN", null );
+		$tw   = wc_get_product( $twin );
+		$tw->set_regular_price( '80' );
+		$tw->save();
+		// Translated last: no product is created after a translation in one process (#247, A11).
 		$ar_id = $w->translate( 'editor', $en_id );
 
 		// ---- AC-1: page events ---------------------------------------------------------------------------------
@@ -88,7 +99,13 @@ run(
 		$check( $sku === ( $ar_view[0]['ecommerce']['items'][0]['item_id'] ?? '' ), 'AC-5 the Arabic product page names the same item, by the same SKU' );
 		$found = $events_of( $page( add_query_arg( array( 's' => $tag, 'post_type' => 'product' ), home_url( '/' ) ) ) )['events'] ?? array();
 		$search = $named( $found, 'search' );
-		$check( 1 === count( $search ) && $tag === ( $search[0]['params']['search_term'] ?? '' ) && 1 <= (int) ( $search[0]['params']['results_count'] ?? 0 ) && array() === $named( $found, 'zero_result_search' ), 'AC-1 EVT-03 a search pushes search with its term and result count' );
+		$check( 1 === count( $search ) && $tag === ( $search[0]['params']['search_term'] ?? '' ) && 1 <= (int) ( $search[0]['params']['results_count'] ?? 0 ) && array() === $named( $found, 'zero_result_search' ), 'AC-1 EVT-03 a search pushes search with its term and result count (' . wp_json_encode( $search ) . ')' );
+		// One match: WooCommerce sends the visitor to the product; the search still arrives, on the product page.
+		$one     = wp_remote_get( add_query_arg( array( 's' => "{$tag}-TWIN", 'post_type' => 'product' ), home_url( '/' ) ), array( 'timeout' => 60, 'redirection' => 0 ) ); // storefront-guard: exempt, a redirect whose target is fetched next.
+		$landing = (string) wp_remote_retrieve_header( $one, 'location' );
+		$after   = '' !== $landing ? $events_of( $page_with( $landing, wp_remote_retrieve_cookies( $one ) ) )['events'] ?? array() : array();
+		$check( 1 === (int) ( $named( $after, 'search' )[0]['params']['results_count'] ?? 0 ) && 1 === count( $named( $after, 'view_item' ) ), 'AC-1 EVT-03 a search with one result, sent straight to the product, still pushes search there' );
+		$check( '[email] [number]' === Events::term( 'jane@example.com 01012345678' ), 'AC-5 an email address or a phone number typed in the search box is masked' );
 		$nothing = $events_of( $page( add_query_arg( array( 's' => "{$tag}zzqx", 'post_type' => 'product' ), home_url( '/' ) ) ) )['events'] ?? array();
 		$check( 1 === count( $named( $nothing, 'zero_result_search' ) ) && 0 === (int) ( $named( $nothing, 'search' )[0]['params']['results_count'] ?? -1 ), 'AC-1 EVT-18 a search with no results pushes zero_result_search' );
 
@@ -110,7 +127,10 @@ run(
 		$added  = $named( $queued, 'add_to_cart' );
 		$fewer  = $named( $queued, 'remove_from_cart' );
 		$check( 1 === count( $added ) && 2 === (int) ( $added[0]['ecommerce']['items'][0]['quantity'] ?? 0 ) && 300.0 === (float) ( $added[0]['ecommerce']['value'] ?? 0 ) && 1 === count( $fewer ) && 1 === (int) ( $fewer[0]['ecommerce']['items'][0]['quantity'] ?? 0 ), 'AC-2 EVT-07, EVT-08 adding two and going down to one: add_to_cart (2, 300) and remove_from_cart (1)' );
-		$check( "{$tag}ten" === ( $named( $queued, 'apply_coupon' )[0]['params']['coupon'] ?? '' ), 'AC-2 EVT-10 an accepted coupon pushes apply_coupon' );
+		$check( "{$tag}ten" === ( $named( $queued, 'apply_coupon' )[0]['params']['coupon'] ?? '' ) && 10.0 === (float) ( $named( $queued, 'apply_coupon' )[0]['params']['discount'] ?? 0 ), 'AC-2 EVT-10 an accepted coupon pushes apply_coupon with its discount' );
+		WC()->cart->add_to_cart( $en_id, 1 );
+		$again = Events::drain();
+		$check( 1 === count( $named( $again, 'add_to_cart' ) ) && array() === $named( $again, 'remove_from_cart' ), 'AC-2 EVT-07 adding a product already in the cart is one add_to_cart' );
 		WC()->cart->apply_coupon( "{$tag}nosuch" );
 		wc_clear_notices();
 		$check( array() === $named( Events::drain(), 'apply_coupon' ), 'AC-2 EVT-10 a refused coupon pushes nothing' );
@@ -118,20 +138,13 @@ run(
 		WC()->cart->remove_cart_item( $key );
 		$check( 1 === count( $named( Events::drain(), 'remove_from_cart' ) ), 'AC-2 EVT-08 removing a line pushes remove_from_cart' );
 
-		// The cart and checkout pages.
-		WC()->cart->add_to_cart( $en_id, 1 );
-		WC()->cart->calculate_totals();
-		Events::drain();
-		$as_page = static function ( int $page_id ): array {
-			$query                   = new \WP_Query( array( 'page_id' => $page_id ) );
-			$GLOBALS['wp_query']     = $query;
-			$GLOBALS['wp_the_query'] = $query;
-			return Events::page();
-		};
-		$cart_events = $as_page( wc_get_page_id( 'cart' ) );
-		$checkout    = $as_page( wc_get_page_id( 'checkout' ) );
-		$check( 1 === count( $named( $cart_events, 'view_cart' ) ) && $sku === ( $named( $cart_events, 'view_cart' )[0]['ecommerce']['items'][0]['item_id'] ?? '' ), 'AC-2 EVT-09 the cart page pushes view_cart with its lines' );
-		$check( 1 === count( $named( $checkout, 'begin_checkout' ) ), 'AC-2 EVT-11 the checkout page pushes begin_checkout' );
+		// The cart and checkout pages, over real requests with a cart session.
+		$added   = wp_remote_get( add_query_arg( 'add-to-cart', $en_id, home_url( '/' ) ), array( 'timeout' => 60, 'redirection' => 0 ) ); // storefront-guard: exempt, the add-to-cart request; the pages are fetched next.
+		$session = wp_remote_retrieve_cookies( $added );
+		$cart_events = $events_of( $page_with( wc_get_cart_url(), $session ) )['events'] ?? array();
+		$checkout    = $events_of( $page_with( wc_get_checkout_url(), $session ) )['events'] ?? array();
+		$check( 1 === count( $named( $cart_events, 'view_cart' ) ) && $sku === ( $named( $cart_events, 'view_cart' )[0]['ecommerce']['items'][0]['item_id'] ?? '' ) && 1 === count( $named( array_merge( $events_of( (string) wp_remote_retrieve_body( $added ) )['events'] ?? array(), $cart_events ), 'add_to_cart' ) ), 'AC-2 EVT-07, EVT-09 the cart page pushes view_cart with its lines; the add_to_cart arrives once, on the next page shown (' . wp_json_encode( array_column( $cart_events, 'event' ) ) . ')' );
+		$check( 1 === count( $named( $checkout, 'begin_checkout' ) ) && array() === $named( $checkout, 'add_to_cart' ), 'AC-2 EVT-11 the checkout page pushes begin_checkout; the add_to_cart is not pushed twice' );
 
 		// The wishlist, sign-up and sign-in.
 		$customer = (int) wp_insert_user( array( 'user_login' => "{$tag}c", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}c@example.invalid", 'role' => 'customer' ) );
@@ -173,6 +186,11 @@ run(
 		$order->calculate_totals();
 		$order->save();
 		$s->track_order( $order->get_id() );
+		$as_page = static function ( int $page_id ): void {
+			$query                   = new \WP_Query( array( 'page_id' => $page_id ) );
+			$GLOBALS['wp_query']     = $query;
+			$GLOBALS['wp_the_query'] = $query;
+		};
 		$receipt = static function ( \WC_Order $o ) use ( $as_page ): ?array {
 			$_GET['key'] = $o->get_order_key();
 			$as_page( wc_get_page_id( 'checkout' ) );
@@ -182,6 +200,9 @@ run(
 			return $event;
 		};
 		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 an order not yet confirmed (pending payment) pushes no purchase' );
+		$held = wc_get_order( $order->get_id() );
+		$held->update_status( 'on-hold' );
+		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 an order on hold, awaiting payment, pushes no purchase' );
 		$order = wc_get_order( $order->get_id() );
 		$order->update_status( 'processing' );
 		$bought = $receipt( wc_get_order( $order->get_id() ) );
