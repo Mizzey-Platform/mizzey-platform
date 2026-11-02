@@ -56,6 +56,12 @@ final class RowInterpreter
                 $issues[] = LoadRules::issue('R6', $name, __('The text is not valid in the declared encoding.', 'mizzey-site'), __('Re-export the file in the encoding the mapping declares.', 'mizzey-site'));
                 $value = '';
             }
+            // Several columns may name images (a main image and the others): they are kept together, in column order.
+            if ($entry['to'] === 'images' && ($fields['images'] ?? '') !== '' && trim($value) !== '') {
+                $value = $fields['images'] . '|' . $value;
+            } elseif ($entry['to'] === 'images' && trim($value) === '' && isset($fields['images'])) {
+                $value = $fields['images'];
+            }
             $fields[$entry['to']] = $value;
         }
 

@@ -208,6 +208,73 @@ final class CatalogueCommand
     }
 
     /**
+     * Load the catalogue in the background: the English records, then the Arabic ones, then the images.
+     *
+     * ## OPTIONS
+     *
+     * <file>
+     * : The agreed export.
+     *
+     * --out=<directory>
+     * : Where the run's plan is kept.
+     *
+     * [--mapping=<file>]
+     * : The mapping. Defaults to the plugin's.
+     *
+     * [--images-rights-confirmed]
+     * : Download the product images. Only once the client has confirmed the rights to them (CR-08).
+     *
+     * @param list<string>          $args
+     * @param array<string, string> $assoc
+     */
+    public function load(array $args, array $assoc): void
+    {
+        $mapping = $this->mapping($assoc);
+        $file    = $this->file($args);
+        $out     = rtrim((string) ($assoc['out'] ?? ''), '/\\');
+        if ($out === '') {
+            WP_CLI::warning(__('--out must name a directory that can be written.', 'mizzey-site'));
+            WP_CLI::halt(self::EXIT_USAGE);
+        }
+        try {
+            $state = \MizzeySite\Catalogue\Import\CatalogueLoad::start($file, $mapping, $out, isset($assoc['images-rights-confirmed']));
+        } catch (RuntimeException $failure) {
+            WP_CLI::warning($failure->getMessage());
+            WP_CLI::halt(self::EXIT_FILE_FAILURE);
+        }
+        foreach ($state['counts'] as $name => $count) {
+            WP_CLI::log(sprintf('%-18s %d', $name, $count));
+        }
+        WP_CLI::success(sprintf(
+            /* translators: %d: rows planned. */
+            __('%d rows planned. The load runs in the background; follow it with: wp mizzey catalogue status', 'mizzey-site'),
+            (int) $state['total'],
+        ));
+    }
+
+    /**
+     * Where the catalogue load stands.
+     *
+     * @param list<string>          $args
+     * @param array<string, string> $assoc
+     */
+    public function status(array $args, array $assoc): void
+    {
+        $state = \MizzeySite\Catalogue\Import\CatalogueLoad::state();
+        if ($state === []) {
+            WP_CLI::log(__('No catalogue load has run.', 'mizzey-site'));
+            return;
+        }
+        WP_CLI::log(sprintf('%-18s %s', 'status', (string) $state['status']));
+        foreach ((array) $state['done'] as $phase => $count) {
+            WP_CLI::log(sprintf('%-18s %d', $phase, (int) $count));
+        }
+        foreach ((array) $state['problems'] as $problem) {
+            WP_CLI::log(sprintf(__('row %1$d %2$s: %3$s', 'mizzey-site'), (int) $problem['row'], (string) $problem['sku'], (string) $problem['problem']));
+        }
+    }
+
+    /**
      * @param array<string, string> $assoc
      */
     private function mapping(array $assoc): Mapping

@@ -67,6 +67,7 @@ require_once __DIR__ . '/src/Catalogue/Import/ValidationPass.php';
 require_once __DIR__ . '/src/Catalogue/Import/ReportWriter.php';
 require_once __DIR__ . '/src/Catalogue/Import/ImportRunRecorder.php';
 require_once __DIR__ . '/src/Catalogue/Import/FileImportRunRecorder.php';
+require_once __DIR__ . '/src/Catalogue/Import/CatalogueLoad.php';
 require_once __DIR__ . '/src/Catalogue/Import/Cli/CatalogueCommand.php';
 require_once __DIR__ . '/src/Orders/StatusModel.php';
 require_once __DIR__ . '/src/Orders/StatusRegistry.php';
@@ -194,6 +195,7 @@ MizzeySite\Catalogue\ImageHandling::register();
 // Product fields WooCommerce lacks, and the price history: #276. See specs/036-product-management.
 MizzeySite\Catalogue\ProductFields::register();
 MizzeySite\Catalogue\PriceHistory::register();
+MizzeySite\Catalogue\Import\CatalogueLoad::register();
 
 // Errors and failed scheduled actions logged and raised: NFR-10. See specs/039-observability.
 MizzeySite\Security\Monitoring::register();

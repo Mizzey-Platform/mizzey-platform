@@ -29,7 +29,7 @@ final class Mapping
      * `source_asin` keeps Amazon's identifier as a hidden source reference, never shown or searched (owner,
      * 30 October 2026).
      */
-    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar', 'source_asin'];
+    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar', 'source_asin', 'sale_price', 'cost', 'category', 'brand', 'images', 'image_alt', 'seo_title', 'seo_description'];
 
     /** Row types the rules know. */
     public const ROW_TYPES = ['simple', 'variable', 'variation'];
