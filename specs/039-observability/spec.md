@@ -77,8 +77,13 @@ hosting logs, no custom operational audit trail.
 - **FR-003**: An error logged under any Mizzey log source (`mizzey-` followed by the area) MUST be raised, except
   the monitor's own source (AC-3).
 - **FR-004**: One kind of failure at one place MUST be raised at most once an hour.
-- **FR-005**: No card-like number and no absolute server path MUST be logged or raised by the monitor.
+- **FR-005**: No card-like number, absolute server path, stack trace, email address or long token MUST be logged or
+  raised by the monitor, and a card-like number MUST be masked in any Mizzey log line.
 - **FR-006**: A failure of the monitor itself MUST NOT affect the request.
+- **FR-007**: The log line and the notification MUST be attempted apart; the quiet hour MUST start only once a
+  notification is stored; memory MUST be set aside so an out-of-memory error can still be reported.
+- **FR-008**: A stock source that stays unavailable after every attempt MUST be logged as an error (an outage), so it
+  is raised (AC-3).
 
 ## Optional safeguards (not owed)
 

@@ -46,8 +46,12 @@ final class Monitoring
 
     private static bool $fatalSeen = false;
 
+    /** Memory set aside at start and released before reporting, so an out-of-memory error can still be reported. */
+    private static ?string $reserve = null;
+
     public static function register(): void
     {
+        self::$reserve = str_repeat('0', 512 * 1024);
         register_shutdown_function([self::class, 'shutdown']);
         // WordPress's own handler runs first at shutdown and ends the request with its error page, so the error is
         // taken from its message filter too; the shutdown function covers the cases where WordPress shows no page.
@@ -89,6 +93,8 @@ final class Monitoring
             return; // One fatal error per request, whichever of the two routes saw it first.
         }
         self::$fatalSeen = true;
+        self::$reserve   = null;
+
         $where = self::relative($file) . ':' . $line;
         self::error('fatal', $where, sprintf('Fatal error at %s: %s', $where, self::clean($message)), 'error');
     }
@@ -122,6 +128,9 @@ final class Monitoring
     public static function watch($message, $level = '', $context = [], $handler = null)
     {
         $source = is_array($context) ? (string) ($context['source'] ?? '') : '';
+        if (is_string($message) && str_starts_with($source, self::WATCHED_PREFIX)) {
+            $message = self::maskCards($message); // A Mizzey log line never keeps a card-like number.
+        }
         if (! self::$raising && str_starts_with($source, self::WATCHED_PREFIX) && $source !== self::SOURCE && in_array((string) $level, ['error', 'critical', 'alert', 'emergency'], true)) {
             self::error('integration', $source, sprintf('%s logged an error: %s', $source, self::clean((string) $message)), 'error', false);
         }
@@ -149,10 +158,26 @@ final class Monitoring
         return str_starts_with($file, $root) ? substr($file, strlen($root)) : basename($file);
     }
 
-    /** One line, no markup, a bounded length, card-like digit runs masked. */
+    /** A run of 13 to 19 digits, spaces or hyphens allowed between them, as a card number is written. */
+    private static function maskCards(string $text): string
+    {
+        return (string) preg_replace('/(?<!\d)(?:\d[\x20-]?){12,18}\d(?!\d)/', '[#]', $text);
+    }
+
+    /**
+     * One line, no markup, a bounded length; no stack trace, server path, card-like number, email address or long
+     * token.
+     */
     private static function clean(string $text): string
     {
-        $text = (string) preg_replace('/\d{12,19}/', '[#]', wp_strip_all_tags($text));
+        $text = (string) preg_split('/Stack\x20trace:/', wp_strip_all_tags($text))[0];
+        $root = wp_normalize_path(ABSPATH);
+        $text = str_replace([$root, str_replace('/', '\\', $root)], '', $text);
+        // Any other absolute path (outside the site, or another server's) keeps only its file name.
+        $text = (string) preg_replace('#(?<![\w.-])(?:[A-Za-z]:)?[\\\\/](?:[\w.-]+[\\\\/])+([\w.-]+\.php)#', '$1', $text);
+        $text = (string) preg_replace('/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/', '[email]', $text);
+        $text = (string) preg_replace('/\b[A-Za-z0-9_-]{32,}\b/', '[token]', $text);
+        $text = self::maskCards($text);
 
         return mb_substr(trim((string) preg_replace('/\s+/', ' ', $text)), 0, 400);
     }
@@ -165,32 +190,39 @@ final class Monitoring
     public static function error(string $kind, string $where, string $line, string $severity, bool $log = true): void
     {
         self::$raising = true;
+        // Monitoring never stops the request it watches. The log line and the notification are tried apart, so
+        // either still happens when the other fails.
         try {
             if ($log && function_exists('wc_get_logger')) {
                 wc_get_logger()->log($severity === 'error' ? 'critical' : 'warning', $line, ['source' => self::SOURCE]);
             }
+        } catch (\Throwable $e) {
+            unset($e);
+        }
+        try {
             $key = 'mizzey_monitor_' . md5($kind . '|' . $where);
             if (get_transient($key) !== false) {
                 return;
             }
-            set_transient($key, 1, self::QUIET);
             $entry = ['kind' => $kind, 'where' => $where, 'line' => $line];
             if (is_callable(self::$sink)) {
                 (self::$sink)($entry);
             }
-            self::notify($entry);
+            if (self::notify($entry)) {
+                set_transient($key, 1, self::QUIET); // The quiet hour starts once staff have been told.
+            }
         } catch (\Throwable $e) {
-            unset($e); // Monitoring never stops the request it watches.
+            unset($e);
         } finally {
             self::$raising = false;
         }
     }
 
     /** @param array{kind:string,where:string,line:string} $entry */
-    private static function notify(array $entry): void
+    private static function notify(array $entry): bool
     {
         if (! class_exists('\Corex\Boot') || ! \Corex\Boot::booted() || ! class_exists('\Corex\Notifications\Notification')) {
-            return;
+            return false;
         }
         $titles = [
             'fatal'       => __('The site hit a fatal error', 'mizzey-site'),
@@ -220,5 +252,7 @@ final class Monitoring
                 __('Open the logs', 'mizzey-site'),
             ),
         ));
+
+        return true;
     }
 }

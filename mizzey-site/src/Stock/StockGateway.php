@@ -116,6 +116,8 @@ final class StockGateway
                 return StockAnswer::unknown($item, 'adapter error');
             }
         }
+        // Every attempt found the source unavailable: an outage, logged as an error so operations hear of it.
+        $this->log('error', $operation, $item, $this->attempts, 'unavailable after every attempt', $key);
 
         return StockAnswer::unknown($item, 'exhausted');
     }

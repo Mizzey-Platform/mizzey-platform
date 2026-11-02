@@ -17,6 +17,43 @@ use MizzeySite\Security\Monitoring;
 
 require_once __DIR__ . '/_bootstrap.php';
 
+/** A notification store that is down. */
+final class T79FailingNotifications implements \Corex\Notifications\NotificationService {
+	public function publish( \Corex\Notifications\Notification $notification ): \Corex\Notifications\Notification {
+		throw new \RuntimeException( 'the notification store is down' );
+	}
+	public function resolve( string $dedupKey, string $reason ): int {
+		return 0;
+	}
+	public function forCurrentActor( \Corex\Notifications\NotificationQuery $query ): array {
+		return array();
+	}
+	public function unreadCountForCurrentActor(): int {
+		return 0;
+	}
+	public function findForCurrentActor( int $notificationId ): ?array {
+		return null;
+	}
+	public function markReadForCurrentActor( int $notificationId ): bool {
+		return false;
+	}
+	public function markUnreadForCurrentActor( int $notificationId ): bool {
+		return false;
+	}
+	public function dismissForCurrentActor( int $notificationId ): bool {
+		return false;
+	}
+	public function snoozeForCurrentActor( int $notificationId, \DateTimeImmutable $until ): bool {
+		return false;
+	}
+	public function markAllReadForCurrentActor(): int {
+		return 0;
+	}
+	public function resolveById( int $notificationId, string $reason ): bool {
+		return false;
+	}
+}
+
 run(
 	new Scenario( 't79-observability', 'NFR-10: logs and error monitoring' ),
 	function ( Scenario $s ): bool {
@@ -42,16 +79,25 @@ run(
 				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}corex_notifications WHERE source_type = %s AND source_id LIKE %s", 'mizzey_monitor', '%' . $wpdb->esc_like( "eval()'d code" ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			}
 		);
-		$logged = static function ( string $needle ): bool {
+		$logged = static function ( string $needle, string $source = Monitoring::SOURCE ): bool {
 			$dir = defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : trailingslashit( wp_upload_dir()['basedir'] ) . 'wc-logs/';
-			foreach ( (array) glob( trailingslashit( $dir ) . Monitoring::SOURCE . '-*.log' ) as $file ) {
+			foreach ( (array) glob( trailingslashit( $dir ) . $source . '-*.log' ) as $file ) {
 				if ( str_contains( (string) file_get_contents( $file ), $needle ) ) {
 					return true;
 				}
 			}
 			global $wpdb;
 			$table = $wpdb->prefix . 'woocommerce_log';
-			return (bool) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE source = %s AND message LIKE %s", Monitoring::SOURCE, '%' . $wpdb->esc_like( $needle ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return (bool) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE source = %s AND message LIKE %s", $source, '%' . $wpdb->esc_like( $needle ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		};
+
+		$occurrences = static function ( string $needle ): int {
+			$dir = defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : trailingslashit( wp_upload_dir()['basedir'] ) . 'wc-logs/';
+			$n   = 0;
+			foreach ( (array) glob( trailingslashit( $dir ) . Monitoring::SOURCE . '-*.log' ) as $file ) {
+				$n += substr_count( (string) file_get_contents( $file ), $needle );
+			}
+			return $n;
 		};
 
 		// ---- AC-1: a fatal error -----------------------------------------------------------------------------
@@ -74,6 +120,24 @@ run(
 		$check( count( $raised ) === $before + 1 && str_contains( $raised[ $before ]['line'] ?? '', "{$tag} shown by WordPress" ), 'AC-1 a fatal error WordPress shows its error page for is raised too' );
 		$stored = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}corex_notifications WHERE dedup_key = %s", 'mizzey.monitor|' . md5( "fatal|wp-content/plugins/{$tag}/y.php:7" ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$check( 1 === $stored, 'AC-1 it reaches the operations staff as a CoreX notification' );
+		// An uncaught exception's message carries the server's paths, a stack trace and whatever the code put in it.
+		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();
+		$token  = str_repeat( 'a1B2', 10 );
+		$before = count( $raised );
+		Monitoring::fromWordPress( 'page', array( 'type' => E_ERROR, 'message' => "Uncaught Error: {$tag} scrub for ops@example.com with key {$token} in " . ABSPATH . "wp-content/plugins/{$tag}/z.php:3 and C:\\srv\\other\\lib.php\nStack trace:\n#0 {$tag}_secret_frame()", 'file' => ABSPATH . "wp-content/plugins/{$tag}/z.php", 'line' => 3 ) );
+		$scrubbed = (string) ( $raised[ $before ]['line'] ?? '' );
+		$check( str_contains( $scrubbed, "{$tag} scrub" ) && ! str_contains( $scrubbed, 'ops@example.com' ) && ! str_contains( $scrubbed, $token ) && ! str_contains( $scrubbed, wp_normalize_path( ABSPATH ) ) && ! str_contains( $scrubbed, 'srv' ) && ! str_contains( $scrubbed, 'secret_frame' ) && str_contains( $scrubbed, "in wp-content/plugins/{$tag}/z.php:3" ) && str_contains( $scrubbed, ' lib.php' ) && ! $logged( "{$tag}_secret_frame" ), 'AC-1 no email address, token, server path or stack trace is raised or logged (' . $scrubbed . ')' );
+		// Out of memory, reached in small steps so almost nothing is left: the monitor still reports, from memory it set aside.
+		$oom_before = $occurrences( 'Allowed memory size' );
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "if ( false === ini_set( 'memory_limit', (string) ( memory_get_usage( true ) + 33554432 ) ) ) { exit( 3 ); } \$keep = array(); while ( true ) { \$keep[] = str_repeat( 'x', 40 ); }" ) . ' 2>&1', $out3, $code3 );
+		$check( 3 !== $code3 && 0 !== $code3 && $occurrences( 'Allowed memory size' ) > $oom_before, 'AC-1 an out-of-memory error is still logged (exit ' . $code3 . ')' );
+		// A notification that could not be stored does not start the quiet hour: the next occurrence tries again.
+		$container = \Corex\Boot::app()->container();
+		$real      = $container->make( \Corex\Notifications\NotificationService::class );
+		$container->instance( \Corex\Notifications\NotificationService::class, new T79FailingNotifications() );
+		Monitoring::error( 'integration', "mizzey-{$tag}-down", "{$tag} notifications are down", 'error' );
+		$container->instance( \Corex\Notifications\NotificationService::class, $real );
+		$check( false === get_transient( 'mizzey_monitor_' . md5( "integration|mizzey-{$tag}-down" ) ) && $logged( "{$tag} notifications are down" ), 'AC-1 when the notification cannot be stored the line is still logged and the next occurrence is raised again' );
 
 		// ---- AC-2: a failed scheduled action --------------------------------------------------------------------
 		$hook = "{$tag}_failing_task";
@@ -98,6 +162,10 @@ run(
 		wc_get_logger()->error( "{$tag} someone else's plugin", array( 'source' => "{$tag}-other-plugin" ) );
 		$new = array_slice( $raised, $before );
 		$check( 2 === count( $new ) && "mizzey-{$tag}-stock" === $new[0]['where'] && "mizzey-{$tag}-payments" === $new[1]['where'], 'AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an info line and another plugin\'s error are not (' . count( $new ) . ')' );
+
+		$spaced = implode( ' ', str_split( $card, 4 ) );
+		wc_get_logger()->error( "{$tag} declined card {$spaced}", array( 'source' => "mizzey-{$tag}-payments" ) );
+		$check( $logged( "{$tag} declined card [#]", "mizzey-{$tag}-payments" ) && ! $logged( $spaced, "mizzey-{$tag}-payments" ), 'AC-3 a card-like number is masked in the integration log line too' );
 
 		// ---- AC-4: not fatal --------------------------------------------------------------------------------------
 		( function () { self::$fatalSeen = false; } )->bindTo( null, Monitoring::class )();

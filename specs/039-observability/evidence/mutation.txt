@@ -1,4 +1,4 @@
-Mutation check for specs/039-observability, t79-observability, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). Each defect is applied alone, the scenario run (two real fatal errors in WP-CLI child processes), the file restored.
+Mutation check for specs/039-observability, t79-observability (and t53 for the stock outage line), 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). Each defect is applied alone, the scenario run (three real fatal errors in WP-CLI child processes, one of them out of memory), the file restored. This set follows the Codex review.
 
 CAUGHT    M1 the end of a request is not watched  <- FAIL  AC-1 a fatal error after the page has started is in the application log too (exit 255)
 CAUGHT    M2 WordPress's error page route is not watched  <- FAIL  AC-1 a fatal error that ends a real request is in the application log (exit 1)
@@ -13,5 +13,14 @@ CAUGHT    M10 info lines are raised  <- FAIL  AC-3 an error from the stock and t
 CAUGHT    M11 a warning is raised as a fatal error  <- FAIL  AC-4 a warning that does not end the request is not raised as a fatal error
 CAUGHT    M12 operations staff are not notified  <- FAIL  AC-1 it reaches the operations staff as a CoreX notification
 CAUGHT    M13 the monitor's own line is raised again  <- FAIL  AC-3 an error from the stock and the payment integrations is raised once each; a repeat within the hour, an
+SURVIVED  M14 the memory set aside is not released
+CAUGHT    M15 the integration's own line keeps a card number  <- FAIL  AC-3 a card-like number is masked in the integration log line too
+CAUGHT    M16 email addresses are kept  <- FAIL  AC-1 no email address, token, server path or stack trace is raised or logged (Fatal error at wp-content/plugins/t797241/z
+CAUGHT    M17 the stack trace is kept  <- FAIL  AC-1 no email address, token, server path or stack trace is raised or logged (Fatal error at wp-content/plugins/t798056/z.
+CAUGHT    M18 the quiet hour starts before the notification is stored  <- FAIL  AC-1 when the notification cannot be stored the line is still logged and the next occurren
+CAUGHT    M19 long tokens are kept  <- FAIL  AC-1 no email address, token, server path or stack trace is raised or logged (Fatal error at wp-content/plugins/t794259/z.php
+CAUGHT    M20 an exhausted stock retry is only a warning  <- FAIL  AC-3, AC-4 a source that keeps failing is asked three times, each logged, the outage then logged as an 
 
-13 of 13 caught.
+M14 is not exercised: the out-of-memory run fails while an array doubles its storage, a large allocation, so enough memory is left to report without the reserve. The reserve is kept for an exhaustion that leaves less; a run that reliably does so would depend on PHP's allocator and is not attempted.
+
+19 of 20 caught, 1 not exercised.
