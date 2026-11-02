@@ -93,6 +93,9 @@ ADM-157 is marked [key] in the register.
 - **FR-001**: Each G10 task MUST work in the standard administration, checked through the request the screen makes.
 - **FR-002**: A bulk price change MUST reach the Arabic record; if it does not, the gap MUST be fixed at its cause.
 - **FR-003**: The administration MUST stay in English for staff (ADM-159).
+- **FR-004**: Searching the orders list by a mobile number MUST find the order however the customer typed it and
+  however staff type it (`+20`, spaces, Arabic digits): orders keep the number in the `01` form, and the search reads
+  the number in that form (ADM-157).
 
 ## Optional safeguards (not owed)
 

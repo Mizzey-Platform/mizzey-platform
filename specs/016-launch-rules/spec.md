@@ -125,6 +125,9 @@ and change, and #255 (checkout) routes order placement, cancellation and failure
 - **FR-005**: A refund MUST NOT return more for a line than was paid for it after discounts, less earlier refunds
   (AC-5).
 - **FR-006**: Every customer-facing message MUST be translated (FIX-04).
+- **FR-007**: No welcome discount MUST be issued, claimed or advertised to a customer who already has an order (by
+  account, email, mailbox or mobile number), such as a guest making the account from the order confirmation.
+- **FR-008**: The one-per-email claim MUST be per mailbox: a `+tag`, Gmail's dots and googlemail.com are the same email.
 
 ### Key Entities
 

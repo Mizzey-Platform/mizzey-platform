@@ -179,6 +179,9 @@ more", saves it, and it applies by itself on those dates.
 - **FR-007**: Each of these settings MUST be a field on the coupon's admin screen, saved with it (AC-8)
 - **FR-008**: A refused code MUST say why, in the customer's language (AC-2, AC-4, AC-5)
 - **FR-009**: The brand condition MUST be verified native and used as it is (AC-2)
+- **FR-010**: "First order only" MUST also count an earlier order under another spelling of the same mailbox (a
+  `+tag`, Gmail's dots, googlemail.com; each order keeps its email's key) or with the same mobile number in any
+  spelling (AC-2).
 
 ### Key Entities
 

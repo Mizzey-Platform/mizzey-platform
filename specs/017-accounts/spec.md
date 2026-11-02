@@ -101,6 +101,9 @@ Provisional: verified by automated tests; acceptance follows manual testing on s
   account exists.
 - An account made from the order confirmation is verified by WooCommerce when its set-password link is used; it is not
   sent a second email.
+- A sign-in link opened: the address bar holds the plain account page, the token only an HTTP-only cookie for the
+  link's lifetime; confirming spends the link and clears the cookie.
+- A form value sent as a list (`billing_phone[]=...`): ignored, with no PHP warning.
 
 ## Native coverage
 
@@ -121,12 +124,16 @@ Provisional: verified by automated tests; acceptance follows manual testing on s
 - **FR-001**: The verification email MUST be sent when a customer account is created, through WooCommerce's own
   controller, when its email is enabled (AC-5).
 - **FR-002**: The registration form MUST offer an unticked marketing consent box; the choice MUST be recorded with its
-  time and source, and registering MUST NOT need it (AC-1, AC-9).
+  time and source, and registering MUST NOT need it (AC-1, AC-9). An account made where the box was not offered (Google,
+  the checkout, the order confirmation) MUST record no consent decision.
 - **FR-003**: The registration form MUST offer an optional mobile number, kept in the Egyptian mobile form, one per
-  account; sign-in MUST accept it in place of the email or username with the account's password (AC-2).
+  account; sign-in MUST accept it in place of the email or username with the account's password (AC-2). A number typed
+  with Arabic-Indic or Eastern Arabic-Indic digits MUST be read as the same number.
 - **FR-004**: A customer MUST be able to ask for a sign-in link by email; it MUST work once, expire (default 15
   minutes), share the password-reset limits, never go to staff, and the answer MUST NOT disclose whether an account
-  exists (AC-11).
+  exists (AC-11). Opening the link MUST move its token out of the address (into a short-lived HTTP-only cookie) and
+  redirect to the plain account page before any page is printed, so no tag, pixel or referrer carries it; a sign-in by
+  link MUST move the guest's wishlist and recently viewed list to the account as the other sign-in routes do.
 - **FR-005**: Every customer-facing message MUST be translated (FIX-04).
 
 ### Key Entities
