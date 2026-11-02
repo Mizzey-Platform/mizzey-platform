@@ -14,9 +14,10 @@ defined('ABSPATH') || exit;
  * Place Order pressed twice makes one order (PAY-05).
  *
  * The block checkout's two requests for one cart, sent at the same moment, each found the cart full and each made an
- * order: WooCommerce reuses a draft order only for requests that come one after the other. Each Store API checkout of a
- * cart now runs under a lock of its own (MySQL GET_LOCK, keyed by the cart's token or session), so the second waits for
- * the first and then finds its cart ordered and empty, and is refused like any checkout of an empty cart.
+ * order: WooCommerce reuses a draft order only for requests that come one after the other, and each request reads its
+ * cart before it runs. Each Store API checkout of a cart now runs under a lock of its own (MySQL GET_LOCK, keyed by the
+ * cart's token or session); a second one that finds the lock held waits for the first to finish and is then refused,
+ * since the cart it read is the one just ordered.
  *
  * Found by the audit of 2 November 2026 (C M-3). See specs/028-payments AC-1.
  */
@@ -49,8 +50,14 @@ final class CheckoutOnce
         }
         global $wpdb;
         $name = substr('mz_checkout_' . md5($wpdb->prefix . $key), 0, 64);
-        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', $name, self::WAIT)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            return new \WP_Error('mizzey_checkout_busy', __('Your order is already being placed. Please wait a moment.', 'mizzey-site'), ['status' => 409]);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', $name)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            // Another checkout of this cart is running. This request read the cart before it finished, so it would order
+            // the same cart again: it waits for that one to end, then is refused. The customer sees the order placed.
+            if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', $name, self::WAIT)) === 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $name)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            }
+
+            return new \WP_Error('mizzey_checkout_busy', __('Your order is already being placed.', 'mizzey-site'), ['status' => 409]);
         }
         self::$held = $name;
 

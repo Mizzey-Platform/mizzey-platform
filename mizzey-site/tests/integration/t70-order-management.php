@@ -210,11 +210,13 @@ run(
 		$put_answer = rest_get_server()->dispatch( $put );
 		$screen     = $fresh( $by_status->get_id() );
 		$screen->update_status( 'refunded', '', true );
-		$after_staff = $fresh( $by_status->get_id() );
+		$after_staff   = $fresh( $by_status->get_id() );
+		$staff_status  = $after_staff->get_status();
+		$staff_refunds = count( $after_staff->get_refunds() );
 		wp_set_current_user( $admin );
 		$allowed = $fresh( $by_status->get_id() );
 		$allowed->update_status( 'refunded', '', true );
-		$check( 400 === $put_answer->get_status() && 'refunded' !== $after_staff->get_status() && 0 === count( $after_staff->get_refunds() ) && 'refunded' === $fresh( $by_status->get_id() )->get_status(), 'AC-5 staff without the refund permission cannot move an order to Refunded, over REST or by a manual change, so no full refund is recorded; permitted staff can (' . $put_answer->get_status() . ', ' . $after_staff->get_status() . ', ' . count( $after_staff->get_refunds() ) . ', then ' . $fresh( $by_status->get_id() )->get_status() . ')' );
+		$check( 400 === $put_answer->get_status() && 'refunded' !== $staff_status && 0 === $staff_refunds && 'refunded' === $fresh( $by_status->get_id() )->get_status(), 'AC-5 staff without the refund permission cannot move an order to Refunded, over REST or by a manual change, so no full refund is recorded; permitted staff can (' . $put_answer->get_status() . ', ' . $staff_status . ', ' . $staff_refunds . ' refunds, then ' . $fresh( $by_status->get_id() )->get_status() . ')' );
 
 		// ---- AC-6: the packing slip ----------------------------------------------------------------------------
 		$a_fresh = $fresh( $a->get_id() );
