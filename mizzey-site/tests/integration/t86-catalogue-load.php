@@ -45,6 +45,9 @@ run(
 				global $wpdb;
 				$like = $wpdb->esc_like( $tag ) . '%';
 				$ids  = $wpdb->get_col( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_sku' AND meta_value LIKE %s", $like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				foreach ( (array) $wpdb->get_col( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value LIKE %s", CatalogueLoad::SOURCE_META, '%' . $wpdb->esc_like( $tag ) ) ) as $media ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+					wp_delete_attachment( (int) $media, true );
+				}
 				foreach ( $ids as $id ) {
 					foreach ( array_merge( array( (int) $id ), (array) get_children( array( 'post_parent' => (int) $id, 'post_type' => 'attachment', 'fields' => 'ids' ) ) ) as $post ) {
 						wp_delete_post( (int) $post, true );
@@ -54,8 +57,9 @@ run(
 		);
 
 		// The export, as the client's file would carry it, and its mapping.
-		$img1 = home_url( '/wp-includes/images/w-logo-blue.png' );
-		$img2 = home_url( '/wp-includes/images/wpspin-2x.gif' );
+		// Addresses of this run only, so no image stored by an earlier run is reused.
+		$img1 = home_url( '/wp-includes/images/w-logo-blue.png?' . $tag );
+		$img2 = home_url( '/wp-includes/images/wpspin-2x.gif?' . $tag );
 		$cols = array( 'seller-sku', 'item-name', 'item-name-ar', 'item-description', 'item-description-ar', 'price', 'sale-price', 'cost', 'parent-child', 'parent-sku', 'size-name', 'category', 'brand', 'main-image', 'other-image', 'seo-title', 'seo-description' );
 		$rows = array(
 			array( "{$tag}-ROSE", 'Rose Water Toner 200 ml', "\u{FEFF}تونر ماء الورد ٢٠٠ مل", 'A gentle toner.', 'تونر لطيف للبشرة.', '250.00', '199.00', '120.00', '', '', '', 'Beauty > Skin care > Toners', "{$tag} Labs", $img1, $img2, 'Rose water toner', 'Toner with rose water.' ),
