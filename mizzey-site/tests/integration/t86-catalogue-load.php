@@ -310,7 +310,7 @@ run(
 		// B-10: an images action that died at a time limit is resumed from the saved progress, by the watchdog it queued,
 		// and a product tried twice without finishing is given up and reported instead of being tried for ever.
 		$stranded = wp_generate_uuid4();
-		update_option( CatalogueLoad::RUN, array_merge( $state, array( 'id' => $stranded, 'status' => 'images', 'done' => array( 'sources' => 6, 'translations' => 6, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'image_tries' => array( 0 => 2 ), 'updated' => time() ) ), false );
+		update_option( CatalogueLoad::RUN, array_merge( $state, array( 'id' => $stranded, 'status' => 'images', 'done' => array( 'sources' => 6, 'translations' => 6, 'images' => 0 ), 'problems' => $problems, 'warnings' => array(), 'image_tries' => array( 0 => 2 ), 'updated' => time() ) ), false );
 		// A live worker of this run holds its lock (another database connection stands for it): an images action that
 		// starts now takes nothing and only leaves the watchdog queued.
 		$other = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
@@ -337,7 +337,28 @@ run(
 		$check( 1 === count( $watchdogs ) && $queued_during, 'AC-5 B-10 the watchdog is a real queued action, and the worker it starts queues its own while it works (' . count( $watchdogs ) . ')' );
 		$resumed = CatalogueLoad::state();
 		$gave_up = array_filter( (array) $resumed['problems'], static fn ( $p ) => "{$tag}-ROSE" === $p['sku'] && str_contains( $p['problem'], 'two tries' ) );
+		// The stranded run had already recorded AMP's two image problems; taking AMP up again records them once.
+		$amp_again = array_filter( (array) $resumed['problems'], static fn ( $p ) => "{$tag}-AMP" === $p['sku'] );
+		$check( 2 === count( $amp_again ), 'AC-5 B-10 a product taken up again by a resumed action reports each problem once (' . count( $amp_again ) . ')' );
 		$check( 'done' === $resumed['status'] && 2 === (int) $resumed['done']['images'] && 1 === count( $gave_up ) && ! CatalogueLoad::watchdogPending( $stranded ), 'AC-5 B-10 a stranded images phase resumes from its saved progress, gives up a product after two tries with the reason, and leaves no watchdog behind (' . wp_json_encode( array( $resumed['status'], $resumed['done'], array_column( (array) $resumed['problems'], 'problem' ) ) ) . ')' );
+
+		// The time budget is checked between downloads: an action whose time is spent before a product's next download
+		// hands over without downloading it, and the handover is not counted as one of the product's two tries.
+		$handover = wp_generate_uuid4();
+		wp_mkdir_p( "{$dir}/handover" );
+		$fresh_image = home_url( '/wp-includes/images/w-logo-blue.png?fresh-' . $tag );
+		file_put_contents( "{$dir}/handover/plan.json", (string) wp_json_encode( array( array( 'row' => 2, 'sku' => "{$tag}-ROSE", 'type' => 'simple', 'outcome' => 'update', 'id' => $rose->get_id(), 'parent_sku' => '', 'price' => null, 'fields' => array( 'images' => $fresh_image ), 'attributes' => array() ) ) ) );
+		update_option( CatalogueLoad::RUN, array( 'id' => $handover, 'plan' => "{$dir}/handover/plan.json", 'total' => 1, 'counts' => array(), 'images' => true, 'status' => 'images', 'ids' => array( "{$tag}-ROSE" => $rose->get_id() ), 'done' => array( 'sources' => 1, 'translations' => 1, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'updated' => time() ), false );
+		$no_time = static fn (): float => 0.0;
+		add_filter( 'mizzey_catalogue_image_seconds', $no_time );
+		CatalogueLoad::images( $handover, 0 );
+		remove_filter( 'mizzey_catalogue_image_seconds', $no_time );
+		$handed  = CatalogueLoad::state();
+		$fetched = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s", CatalogueLoad::SOURCE_META, $fresh_image ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$next    = as_get_scheduled_actions( array( 'hook' => CatalogueLoad::IMAGES, 'args' => array( $handover, 0 ), 'group' => CatalogueLoad::GROUP, 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		$check( 0 === $fetched && 'images' === $handed['status'] && 0 === (int) $handed['done']['images'] && 0 === (int) ( $handed['image_tries'][0] ?? -1 ) && array() === $handed['problems'] && 1 === count( $next ) && ! CatalogueLoad::watchdogPending( $handover ), 'AC-5 B-10 with its time spent, an images action hands over before the next download, queues the next action, and does not count the handover as a try (' . wp_json_encode( array( $fetched, $handed['done'], $handed['image_tries'] ?? null, count( $next ) ) ) . ')' );
+		as_unschedule_all_actions( CatalogueLoad::IMAGES, array( $handover, 0 ), CatalogueLoad::GROUP );
+		@unlink( "{$dir}/handover/plan.json" ); // phpcs:ignore
 
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.
 		// A run that stopped moving more than half an hour ago is replaced; its record is finalised, not left running.
@@ -367,7 +388,7 @@ run(
 			as_unschedule_all_actions( $hook, array(), CatalogueLoad::GROUP );
 		}
 		delete_option( CatalogueLoad::RUN );
-		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded, $stale ) as $run_id ) {
+		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded, $stale, $handover ) as $run_id ) {
 			delete_option( ImportRunLog::PREFIX . $run_id ); // This scenario's records only.
 		}
 

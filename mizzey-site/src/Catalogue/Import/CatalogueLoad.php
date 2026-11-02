@@ -776,12 +776,25 @@ final class CatalogueLoad
             return;
         }
         try {
+            // Read again under the lock: a worker that held it may have moved the run on, or ended it, meanwhile.
+            $state = self::current((string) $runId, 'images');
+            if ($state === null) {
+                return;
+            }
             as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
             as_schedule_single_action(time() + self::WATCHDOG, self::IMAGES, $watchdog, self::GROUP);
-            self::imageBatch($state, $plan);
+            $state = self::imageBatch($state, $plan);
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $worker)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
+        // After the lock is released: the next action, or the end; only then the watchdog goes, so at no moment is
+        // the run left with neither.
+        if ((int) $state['done']['images'] < count($plan)) {
+            as_enqueue_async_action(self::IMAGES, [$state['id'], (int) $state['done']['images']], self::GROUP);
+        } else {
+            self::finish($state, 'done');
+        }
+        as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
     }
 
     /** Whether a watchdog of this run waits in the queue; the one running now does not count. */
@@ -804,10 +817,10 @@ final class CatalogueLoad
      *
      * @param array<string,mixed>       $state
      * @param list<array<string,mixed>> $plan
+     * @return array<string,mixed> The state as this action leaves it.
      */
-    private static function imageBatch(array $state, array $plan): void
+    private static function imageBatch(array $state, array $plan): array
     {
-        $watchdog = [$state['id'], 'resume'];
         $from     = max(0, (int) ($state['done']['images'] ?? 0));
         $deadline = microtime(true) + self::timeBudget();
         $limit    = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
@@ -844,20 +857,19 @@ final class CatalogueLoad
         } finally {
             remove_filter('http_request_args', $limit, 99);
         }
-        as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
-        if ((int) $state['done']['images'] < count($plan)) {
-            as_enqueue_async_action(self::IMAGES, [$state['id'], (int) $state['done']['images']], self::GROUP);
-            return;
-        }
-        self::finish($state, 'done');
+
+        return $state;
     }
 
-    /** Seconds an images action may spend before it hands over: half the PHP time limit, or two minutes with none. */
+    /**
+     * Seconds an images action may spend before it hands over: half the PHP time limit, or two minutes with none.
+     * A host with an unusual limit sets its own through `mizzey_catalogue_image_seconds`.
+     */
     private static function timeBudget(): float
     {
         $limit = (int) ini_get('max_execution_time');
 
-        return $limit > 0 ? max(5.0, $limit / 2) : 120.0;
+        return max(0.0, (float) apply_filters('mizzey_catalogue_image_seconds', $limit > 0 ? max(5.0, $limit / 2) : 120.0));
     }
 
     /**
