@@ -69,6 +69,38 @@ final class ProductTranslationJob
             }
         }
 
-        return (int) apply_filters('wpml_object_id', $originalId, 'product', false, $language);
+        $translated = (int) apply_filters('wpml_object_id', $originalId, 'product', false, $language);
+        if ($translated > 0 && $translated !== $originalId) {
+            self::ensureLinked($originalId, $translated, $language);
+        }
+
+        return $translated;
+    }
+
+    /**
+     * The translation's own language row in the database, in the original's translation group. The editor's save can
+     * leave a new translation without one (seen when the product was saved from its screen earlier in the request),
+     * while WPML's in-memory cache still answers the link; the row is then written, as WPML's own API writes it.
+     */
+    private static function ensureLinked(int $originalId, int $translatedId, string $language): void
+    {
+        global $wpdb;
+        $table    = $wpdb->prefix . 'icl_translations';
+        $original = $wpdb->get_row($wpdb->prepare("SELECT trid, language_code FROM {$table} WHERE element_id = %d AND element_type = %s", $originalId, 'post_product')); // phpcs:ignore WordPress.DB
+        if (! $original || (int) $original->trid <= 0) {
+            return;
+        }
+        $row = $wpdb->get_row($wpdb->prepare("SELECT trid, language_code FROM {$table} WHERE element_id = %d AND element_type = %s", $translatedId, 'post_product')); // phpcs:ignore WordPress.DB
+        if ($row && (int) $row->trid === (int) $original->trid && (string) $row->language_code === $language) {
+            return;
+        }
+        do_action('wpml_set_element_language_details', [
+            'element_id'           => $translatedId,
+            'element_type'         => 'post_product',
+            'trid'                 => (int) $original->trid,
+            'language_code'        => $language,
+            'source_language_code' => (string) $original->language_code,
+        ]);
+        do_action('wpml_cache_clear');
     }
 }
