@@ -336,12 +336,15 @@ run(
 		SignInLink::request( "{$tag}-keen@example.invalid" );
 		$http_token = preg_match( '/mizzey_sign_in=([A-Za-z0-9]+)/', (string) ( $mails[0]['message'] ?? '' ), $ht ) ? $ht[1] : '';
 		$opened     = two_factor_http( 'GET', add_query_arg( array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen ), wc_get_page_permalink( 'myaccount' ) ) );
-		$nonce      = two_factor_field( $opened['body'], '_wpnonce' );
-		$fields     = array( SignInLink::PARAM => $http_token, SignInLink::USER => $keen, '_wpnonce' => $nonce );
-		$foreign    = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields );
-		$followed   = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
-		$again      = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $opened['cookies'] );
-		$check( '' !== $http_token && ! sign_in_has_session( $opened ) && '' !== $nonce && ! sign_in_has_session( $foreign ), '[HTTP] AUTH-12 opening the link signs no one in and asks to confirm; the confirmation from another browser session is refused' );
+		$held       = array_values( array_filter( sign_in_jar( $opened['cookies'] ), static fn ( $c ) => SignInLink::COOKIE === $c->name ) );
+		$page       = two_factor_http( 'GET', wc_get_page_permalink( 'myaccount' ), array(), $opened['cookies'] );
+		$nonce      = two_factor_field( $page['body'], '_wpnonce' );
+		$check( '' !== $http_token && in_array( $opened['status'], array( 301, 302, 303 ), true ) && wc_get_page_permalink( 'myaccount' ) === $opened['location'] && isset( $held[0] ) && false === strpos( $opened['location'] . $page['body'], $http_token ), '[HTTP] AUTH-12 opening the link redirects at once to the plain account page, the token kept in a cookie: it is in no address and no page the tags or a referrer could carry (' . $opened['status'] . ')' );
+		$fields     = array( SignInLink::CONFIRM => '1', '_wpnonce' => $nonce );
+		$foreign    = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $held );
+		$followed   = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $page['cookies'] );
+		$again      = two_factor_http( 'POST', wc_get_page_permalink( 'myaccount' ), $fields, $page['cookies'] );
+		$check( ! sign_in_has_session( $opened ) && ! sign_in_has_session( $page ) && '' !== $nonce && ! sign_in_has_session( $foreign ), '[HTTP] AUTH-12 opening the link signs no one in and asks to confirm; the confirmation from another browser session (the link cookie without the session) is refused' );
 		$check( sign_in_has_session( $followed ) && ! sign_in_has_session( $again ), '[HTTP] AUTH-12 confirming in the browser that opened the link signs the customer in; confirming again does not' );
 
 		return $ok;

@@ -14,8 +14,8 @@ defined('ABSPATH') || exit;
  * A guest's list of product ids, kept in a signed cookie: the ids, their expiry, and an HMAC over the cookie's name,
  * the ids and the expiry with the site's own salt, so a visitor cannot plant ids, stretch the lifetime or pass one
  * list's cookie off as another's. A cookie that is altered, expired or unreadable is an empty list. A lifetime of 0 is a
- * browser-session cookie with no timed expiry (written as expiry 0). The cookie is HTTP-only and SameSite=Lax
- * (WooCommerce's own cookie defaults through `wc_setcookie()`).
+ * browser-session cookie with no timed expiry (written as expiry 0). The cookie is HTTP-only (`wc_setcookie()`), and
+ * SameSite=Lax for the two guest lists (`Wishlist::cookieOptions()`, as WooCommerce sets no SameSite of its own).
  *
  * See specs/015-wishlist.
  */
@@ -28,7 +28,7 @@ final class GuestCookie
     /** @return list<int> */
     public function read(): array
     {
-        $raw   = isset($_COOKIE[$this->name]) ? (string) wp_unslash($_COOKIE[$this->name]) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+        $raw   = isset($_COOKIE[$this->name]) && is_string($_COOKIE[$this->name]) ? wp_unslash($_COOKIE[$this->name]) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
         $parts = explode('|', $raw);
         if (count($parts) !== 3 || ! ctype_digit($parts[1]) || ((int) $parts[1] !== 0 && (int) $parts[1] < time())) {
             return [];

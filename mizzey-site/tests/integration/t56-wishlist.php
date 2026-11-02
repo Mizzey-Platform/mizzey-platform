@@ -14,12 +14,30 @@
 
 namespace MizzeySite\Tests\Integration;
 
+use MizzeySite\Stock\StockGateway;
+use MizzeySite\Stock\StockItem;
+use MizzeySite\Stock\StockSource;
+use MizzeySite\Stock\StockSourceRefused;
 use MizzeySite\Wishlist\GuestCookie;
 use MizzeySite\Wishlist\RecentlyViewed;
 use MizzeySite\Wishlist\Wishlist;
 
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_catalogue.php';
+
+/** A stock source answering fixed levels by stock identity, refusing any other item. */
+final class T56Source implements StockSource {
+	/** @param array<int,int> $levels */
+	public function __construct( public array $levels ) {}
+	public function name(): string { return 't56'; }
+	public function level( StockItem $item ): int {
+		if ( ! array_key_exists( $item->id, $this->levels ) ) {
+			throw new StockSourceRefused( 'unknown' );
+		}
+		return $this->levels[ $item->id ];
+	}
+	public function adjust( StockItem $item, int $delta, string $operationKey ): int { throw new StockSourceRefused( 'read only' ); }
+}
 
 /** A fresh visitor: nobody signed in, no wishlist or recently viewed cookie. */
 function t56_guest(): void {
@@ -150,6 +168,18 @@ run(
 		$newcomer = (int) wp_insert_user( array( 'user_login' => "{$tag}-n", 'user_email' => "{$tag}-n@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
 		$s->track_user( $newcomer );
 		$check( array( $b ) === get_user_meta( $newcomer, Wishlist::META, true ), 'US-11-06 registering keeps the guest\'s list on the new account' );
+		// A sign-in by email link (AUTH-12) fires no wp_login: the lists still join the account (CART-17, US-11-06).
+		t56_guest();
+		$linked = (int) wp_insert_user( array( 'user_login' => "{$tag}-l", 'user_email' => "{$tag}-l@example.invalid", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer' ) );
+		$s->track_user( $linked );
+		t56_guest();
+		Wishlist::add( $c );
+		RecentlyViewed::record( $b );
+		do_action( 'mizzey_signed_in_by', 'link', $linked );
+		$check( array( $c ) === get_user_meta( $linked, Wishlist::META, true ) && array( $b ) === get_user_meta( $linked, RecentlyViewed::META, true ) && ! isset( $_COOKIE[ Wishlist::COOKIE ] ), 'US-11-06, CART-17 signing in by an email link adds the guest\'s wishlist and recently viewed products to the account, and clears the guest\'s' );
+		$options = (array) apply_filters( 'woocommerce_set_cookie_options', array( 'expires' => 0 ), Wishlist::COOKIE, 'x' );
+		$recent  = (array) apply_filters( 'woocommerce_set_cookie_options', array( 'expires' => 0 ), RecentlyViewed::COOKIE, 'x' );
+		$check( 'Lax' === ( $options['samesite'] ?? '' ) && 'Lax' === ( $recent['samesite'] ?? '' ), 'WISH-03 the guest lists\' cookies are SameSite=Lax, so another site\'s request carries neither' );
 
 		// WISH-02: a customer's list is on the account, on any device.
 		t56_as( $customer );
@@ -183,6 +213,15 @@ run(
 		$check( is_wp_error( $refused ) && 'mizzey_wishlist_out_of_stock' === $refused->get_error_code() && 409 === ( $refused->get_error_data()['status'] ?? 0 ) && array( $gone ) === Wishlist::ids(), 'WISH-04 an out-of-stock item is not moved, stays saved, and the reason is given (' . ( is_wp_error( $refused ) ? $refused->get_error_message() : 'moved' ) . ')' );
 		$not_saved = Wishlist::moveToCart( $c );
 		$check( is_wp_error( $not_saved ) && 404 === ( $not_saved->get_error_data()['status'] ?? 0 ), 'WISH-04 an item that is not saved is not moved' );
+		WC()->cart->empty_cart();
+		// D-19: the stock source decides, not WooCommerce's own field.
+		t56_guest();
+		Wishlist::add( $en );
+		$sold_out = static fn () => new T56Source( array( $en => 0 ) );
+		add_filter( StockGateway::SOURCE_FILTER, $sold_out, 20 );
+		$held_back = Wishlist::moveToCart( $en );
+		remove_filter( StockGateway::SOURCE_FILTER, $sold_out, 20 );
+		$check( is_wp_error( $held_back ) && 'mizzey_wishlist_out_of_stock' === $held_back->get_error_code() && array( $en ) === Wishlist::ids() && array() === WC()->cart->get_cart(), 'WISH-04, D-19 an item WooCommerce shows in stock but the stock source holds none of is not moved, and stays saved' );
 		WC()->cart->empty_cart();
 
 		// WISH-07: recently viewed.

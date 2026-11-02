@@ -24,9 +24,11 @@ defined('ABSPATH') || exit;
  * replaces it. Requests count against the password-reset limits (`RecoveryLimiter`: per account and per address), so
  * neither route multiplies the other. Staff accounts are never sent one: their sign-in needs two-factor (ADM-131).
  *
- * Opening the link signs no one in: the account page asks the visitor to confirm, by a form tied to their own browser
- * session (a WooCommerce session nonce), so a link cannot sign a visitor in to someone else's account by being opened,
- * and a mail scanner that opens it spends nothing. Confirming spends the link in one delete that only one request can
+ * Opening the link signs no one in. The token leaves the address at once: the request that opens it keeps the token in
+ * a short-lived HTTP-only cookie and redirects to the plain account page, before any page or tag is printed, so the
+ * token never reaches analytics, pixels or a referrer. The account page then asks the visitor to confirm, by a form tied
+ * to their own browser session (a WooCommerce session nonce), so a link cannot sign a visitor in to someone else's
+ * account by being opened, and a mail scanner that opens it spends nothing. Confirming spends the link in one delete that only one request can
  * win. A visitor already signed in to another account is not switched. The token is bound to the account's email and
  * password, so changing either ends every link already sent.
  *
@@ -42,6 +44,10 @@ final class SignInLink
     public const USER   = 'mizzey_sign_in_user';
     /** Starts with "woocommerce", so WooCommerce ties the nonce to the visitor's session (`nonce_user_logged_out`). */
     public const NONCE  = 'woocommerce-mizzey-sign-in-link';
+    /** The cookie that holds an opened link's account and token until it is confirmed. */
+    public const COOKIE  = 'mizzey_sign_in_link';
+    /** The confirmation form's field. */
+    public const CONFIRM = 'mizzey_sign_in_confirm';
 
     public static function register(): void
     {
@@ -124,38 +130,48 @@ final class SignInLink
     }
 
     /**
-     * A link opened: the account page asks to confirm. A confirmation posted from that page: sign in and spend the
-     * link, or say plainly that it is spent or expired.
+     * A link opened: its token goes into a cookie and the visitor to the plain account page, which asks to confirm. A
+     * confirmation posted from that page: sign in and spend the link, or say plainly that it is spent or expired.
      */
     public static function follow(): void
     {
         // phpcs:disable WordPress.Security.NonceVerification -- the confirmation is verified below; the link only shows the form.
-        $posted = isset($_POST[self::PARAM], $_POST[self::USER]);
-        if (! $posted && ! isset($_GET[self::PARAM], $_GET[self::USER])) {
+        $opened = isset($_GET[self::PARAM], $_GET[self::USER]);
+        $posted = isset($_POST[self::CONFIRM]);
+        if (! $opened && ! $posted) {
             return;
         }
-        $source = $posted ? $_POST : $_GET;
-        $token  = sanitize_text_field(wp_unslash((string) $source[self::PARAM]));
-        $userId = absint($source[self::USER]);
         // phpcs:enable WordPress.Security.NonceVerification
         $account = wc_get_page_permalink('myaccount');
-        if (is_user_logged_in()) {
-            if (get_current_user_id() !== $userId) {
-                wc_add_notice(__('You are already signed in to another account. Sign out first to use this sign-in link.', 'mizzey-site'), 'error');
+        if ($opened) {
+            $token  = is_string($_GET[self::PARAM]) ? sanitize_text_field(wp_unslash($_GET[self::PARAM])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $userId = is_scalar($_GET[self::USER]) ? absint($_GET[self::USER]) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if (is_user_logged_in()) {
+                if (get_current_user_id() !== $userId) {
+                    wc_add_notice(__('You are already signed in to another account. Sign out first to use this sign-in link.', 'mizzey-site'), 'error');
+                }
+            } elseif ($token !== '' && $userId > 0) {
+                self::cookie($userId . '|' . $token, time() + self::lifetime());
+                // The form's nonce is tied to this visitor's own session.
+                if (WC()->session) {
+                    WC()->session->set_customer_session_cookie(true);
+                }
+            }
+            if (! headers_sent()) {
+                header('Referrer-Policy: no-referrer');
+                header('Cache-Control: no-store');
             }
             wp_safe_redirect($account);
             exit;
         }
-        if (! $posted) {
-            // The form's nonce is tied to this visitor's own session.
-            if (WC()->session) {
-                WC()->session->set_customer_session_cookie(true);
-            }
-
-            return;
+        if (is_user_logged_in()) {
+            wp_safe_redirect($account);
+            exit;
         }
-        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash((string) $_POST['_wpnonce'])) : '';
-        if (wp_verify_nonce($nonce, self::NONCE) && ! \MizzeySite\Account\CustomerRecords::isSuspended($userId) && self::redeem($userId, $token)) {
+        [$userId, $token] = self::opened();
+        self::cookie('', time() - HOUR_IN_SECONDS);
+        $nonce = isset($_POST['_wpnonce']) && is_string($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+        if ($userId > 0 && wp_verify_nonce($nonce, self::NONCE) && ! \MizzeySite\Account\CustomerRecords::isSuspended($userId) && self::redeem($userId, $token)) {
             wp_set_current_user($userId);
             wp_set_auth_cookie($userId, false);
             do_action('mizzey_signed_in_by', 'link', $userId);
@@ -170,24 +186,44 @@ final class SignInLink
     /** The confirmation on the account page, for a link opened by a visitor who is signed out. */
     public static function confirmation(): void
     {
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- showing the form changes nothing.
-        if (is_user_logged_in() || ! isset($_GET[self::PARAM], $_GET[self::USER])) {
+        if (is_user_logged_in() || self::opened()[0] <= 0) {
             return;
         }
-        $token  = sanitize_text_field(wp_unslash((string) $_GET[self::PARAM]));
-        $userId = absint($_GET[self::USER]);
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
         printf(
-            '<form class="mizzey-sign-in-link" method="post" action="%s"><p>%s</p><input type="hidden" name="%s" value="%s" /><input type="hidden" name="%s" value="%d" />%s<p><button type="submit" class="button">%s</button></p></form>',
+            '<form class="mizzey-sign-in-link" method="post" action="%s"><p>%s</p><input type="hidden" name="%s" value="1" />%s<p><button type="submit" class="button">%s</button></p></form>',
             esc_url(wc_get_page_permalink('myaccount')),
             esc_html__('Sign in with the link from your email?', 'mizzey-site'),
-            esc_attr(self::PARAM),
-            esc_attr($token),
-            esc_attr(self::USER),
-            $userId,
+            esc_attr(self::CONFIRM),
             wp_nonce_field(self::NONCE, '_wpnonce', false, false),
             esc_html__('Sign in', 'mizzey-site')
         );
+    }
+
+    /**
+     * The account and token of the link this browser opened, from its cookie; [0, ''] when there is none.
+     *
+     * @return array{0:int,1:string}
+     */
+    public static function opened(): array
+    {
+        $raw = isset($_COOKIE[self::COOKIE]) && is_string($_COOKIE[self::COOKIE]) ? sanitize_text_field(wp_unslash($_COOKIE[self::COOKIE])) : '';
+        if (preg_match('/^([1-9][0-9]*)\|([A-Za-z0-9]{1,64})$/', $raw, $m) !== 1) {
+            return [0, ''];
+        }
+
+        return [(int) $m[1], $m[2]];
+    }
+
+    private static function cookie(string $value, int $expires): void
+    {
+        if ($value === '') {
+            unset($_COOKIE[self::COOKIE]);
+        } else {
+            $_COOKIE[self::COOKIE] = $value;
+        }
+        if (! headers_sent()) {
+            setcookie(self::COOKIE, $value, ['expires' => $expires, 'path' => COOKIEPATH ? COOKIEPATH : '/', 'domain' => COOKIE_DOMAIN, 'secure' => is_ssl(), 'httponly' => true, 'samesite' => 'Lax']);
+        }
     }
 
     /** Whether the token is the user's live link; a live link is spent by redeeming it, by one request only. */
