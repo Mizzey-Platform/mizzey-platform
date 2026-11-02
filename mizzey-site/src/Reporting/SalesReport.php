@@ -31,7 +31,10 @@ final class SalesReport
     /** Set once the settings are written; autoloaded, so the check costs no query. */
     public const SETTLED    = 'mizzey_sales_report_settled';
     public const DATE_TYPE  = 'date_created';
-    public const NOT_SALES  = ['delivery-failed'];
+    /** Statuses that are never sales: WooCommerce's defaults and Delivery Failed. */
+    public const NOT_SALES  = ['pending', 'failed', 'cancelled', 'delivery-failed'];
+    /** The settings' version: a site settled by an earlier one is settled again. */
+    public const VERSION    = '2';
 
     public static function register(): void
     {
@@ -40,16 +43,17 @@ final class SalesReport
 
     public static function settle(): void
     {
-        if (get_option(self::SETTLED) === '1') {
+        if (get_option(self::SETTLED) === self::VERSION) {
             return;
         }
         update_option('woocommerce_date_type', self::DATE_TYPE);
-        $excluded = (array) get_option('woocommerce_excluded_report_order_statuses', ['pending', 'failed', 'cancelled']);
+        // Whatever the store excluded already is kept, and every status that is never a sale is added to it.
+        $excluded = (array) get_option('woocommerce_excluded_report_order_statuses', []);
         update_option('woocommerce_excluded_report_order_statuses', array_values(array_unique(array_merge(array_map('strval', $excluded), self::NOT_SALES))));
         update_option('woocommerce_actionable_order_statuses', StoreDashboard::ACTION_STATUSES);
         if (class_exists(\Automattic\WooCommerce\Admin\API\Reports\Cache::class)) {
             \Automattic\WooCommerce\Admin\API\Reports\Cache::invalidate();
         }
-        update_option(self::SETTLED, '1', true);
+        update_option(self::SETTLED, self::VERSION, true);
     }
 }

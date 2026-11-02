@@ -146,6 +146,12 @@ run(
 		// ---- AC-4: what counts as a sale: cash on delivery by the order's date, Delivery Failed never ------------
 		$excluded_now = (array) get_option( 'woocommerce_excluded_report_order_statuses', array() );
 		$check( SalesReport::DATE_TYPE === get_option( 'woocommerce_date_type' ) && 'date_created' === SalesReport::DATE_TYPE && in_array( 'delivery-failed', $excluded_now, true ) && array() === array_diff( array( 'pending', 'failed', 'cancelled' ), $excluded_now ), 'AC-4 Analytics\' own settings count an order by its date and leave out Pending Payment, Payment Failed, Cancelled and Delivery Failed (' . get_option( 'woocommerce_date_type' ) . '; ' . implode( ',', $excluded_now ) . ')' );
+		// A store that had narrowed the exclusions (only Pending Payment) still gets every status that is never a sale.
+		update_option( 'woocommerce_excluded_report_order_statuses', array( 'pending' ) );
+		delete_option( SalesReport::SETTLED );
+		SalesReport::settle();
+		$resettled = (array) get_option( 'woocommerce_excluded_report_order_statuses', array() );
+		$check( array() === array_diff( array( 'pending', 'failed', 'cancelled', 'delivery-failed' ), $resettled ) && SalesReport::VERSION === get_option( SalesReport::SETTLED ), 'AC-4 from a narrowed list the settings still exclude Pending Payment, Payment Failed, Cancelled and Delivery Failed (' . implode( ',', $resettled ) . ')' );
 		$walk = static function ( \WC_Order $o, array $steps ): \WC_Order {
 			foreach ( $steps as $step ) {
 				wc_get_order( $o->get_id() )->update_status( $step, '', true );

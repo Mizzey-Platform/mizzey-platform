@@ -83,8 +83,8 @@ RPT-03).
   in, so the Arabic screens answer (AC-2).
 - **FR-005**: The report MUST count an order by the date it was placed (Analytics' date type `date_created`) and MUST
   leave out Pending Payment, Payment Failed, Cancelled and Delivery Failed / Returned to Origin (Analytics' excluded
-  statuses). Both are written once into Analytics' own settings, keeping any status the store already excluded, and
-  a later change there is kept. Analytics' actionable statuses are the dashboard's orders requiring action (AC-4).
+  statuses). Both are written once into Analytics' own settings: the four statuses are always added to whatever the
+  store already excluded, even a list narrowed before, and a later change there is kept. Analytics' actionable statuses are the dashboard's orders requiring action (AC-4).
 
 ## Optional safeguards (not owed)
 
