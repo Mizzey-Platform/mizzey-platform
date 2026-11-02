@@ -148,7 +148,9 @@ recovery request for one account within the window is refused.
   `wp_login_failed`.
 - **FR-006**: Password-recovery requests MUST be limited per target account and per client address over a window;
   the limits and window MUST be filterable settings with documented defaults (3 per account and 10 per address per 15
-  minutes). A refused request MUST send no email and MUST show a plain message in the visitor's language.
+  minutes). A refused request MUST send no email and MUST show a plain message in the visitor's language. Reading and
+  raising the counters MUST be serialised, so parallel requests cannot pass together; a request that cannot take the
+  lock in time is refused (audit of 2 November 2026).
 - **FR-007**: Comments MUST be closed for every post type except `product`; for products the incoming `comments_open`
   result MUST be returned unchanged. Incoming pingbacks and trackbacks MUST be closed for every post type.
 - **FR-008**: `wp mizzey security check` MUST report each control of FR-001 to FR-007, plus the configuration facts the

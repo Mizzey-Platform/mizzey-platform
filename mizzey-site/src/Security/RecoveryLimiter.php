@@ -28,6 +28,10 @@ use WP_User;
  * account limit can reveal that an account exists. Each counter is a fixed window from its first request; a refused
  * request does not count and does not extend the window.
  *
+ * Reading and raising the counters happens under one database lock, so parallel requests cannot all read the same
+ * count and all pass (audit of 2 November 2026). A request that cannot take the lock within a few seconds is refused:
+ * a rate limit fails closed.
+ *
  * Register id: NFR-05 (rate limiting). See specs/007-security-baseline, FR-006.
  */
 final class RecoveryLimiter
@@ -36,6 +40,9 @@ final class RecoveryLimiter
 
     /** @var array{account:int,address:int,window:int} */
     private const DEFAULTS = ['account' => 3, 'address' => 10, 'window' => 900];
+
+    /** Seconds a request waits for the counters' lock before it is refused. */
+    public const LOCK_WAIT = 3;
 
     public static function register(): void
     {
@@ -81,21 +88,49 @@ final class RecoveryLimiter
             $counters[] = [self::key('address', $address), $limits['address']];
         }
 
-        $now = time();
-        foreach ($counters as [$key, $max]) {
-            if (self::read($key, $now, $limits['window'])['count'] >= $max) {
-                $errors->add(
-                    self::ERROR,
-                    __('Too many password reset requests. Please wait a few minutes and try again.', 'mizzey-site'),
-                );
+        if ($counters === []) {
+            return;
+        }
 
-                return;
+        global $wpdb;
+        $lock = self::lockName();
+        if ((string) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', $lock, self::LOCK_WAIT)) !== '1') {
+            self::refuse($errors);
+
+            return;
+        }
+        try {
+            $now = time();
+            foreach ($counters as [$key, $max]) {
+                if (self::read($key, $now, $limits['window'])['count'] >= $max) {
+                    self::refuse($errors);
+
+                    return;
+                }
             }
+            foreach ($counters as [$key]) {
+                $counter = self::read($key, $now, $limits['window']);
+                set_transient($key, ['count' => $counter['count'] + 1, 'until' => $counter['until']], max(1, $counter['until'] - $now));
+            }
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock));
         }
-        foreach ($counters as [$key]) {
-            $counter = self::read($key, $now, $limits['window']);
-            set_transient($key, ['count' => $counter['count'] + 1, 'until' => $counter['until']], max(1, $counter['until'] - $now));
-        }
+    }
+
+    /** The name of the lock that serialises the counters, one per site; MySQL allows 64 characters. */
+    public static function lockName(): string
+    {
+        global $wpdb;
+
+        return substr('mizzey_recovery_' . $wpdb->prefix, 0, 64);
+    }
+
+    private static function refuse(WP_Error $errors): void
+    {
+        $errors->add(
+            self::ERROR,
+            __('Too many password reset requests. Please wait a few minutes and try again.', 'mizzey-site'),
+        );
     }
 
     /**
