@@ -128,8 +128,11 @@ final class StoreDashboard
         $after    = str_replace('T', ' ', $after);
         $before   = str_replace('T', ' ', $before);
         // The period's orders, found through the date column's index; a refund belongs to its parent order's period.
-        $orders = "FROM {$wpdb->prefix}wc_order_stats o WHERE o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')";
-        $first  = $wpdb->get_var($wpdb->prepare("SELECT MIN(o.date_created) {$orders}", $after, $before)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $first = $wpdb->get_var($wpdb->prepare(
+            "SELECT MIN(o.date_created) FROM {$wpdb->prefix}wc_order_stats o WHERE o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')",
+            $after,
+            $before
+        )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         if ($first === null) {
             return [];
         }
@@ -137,7 +140,8 @@ final class StoreDashboard
         $rows = (array) $wpdb->get_results($wpdb->prepare(
             "SELECT l.product_id, l.variation_id, SUM(l.product_qty) AS qty FROM {$wpdb->prefix}wc_order_product_lookup l
              JOIN (
-                 SELECT o.order_id {$orders}
+                 SELECT o.order_id FROM {$wpdb->prefix}wc_order_stats o
+                 WHERE o.parent_id = 0 AND o.{$column} BETWEEN %s AND %s AND o.status NOT IN ('{$excluded}')
                  UNION ALL
                  SELECT r.order_id FROM {$wpdb->prefix}wc_order_stats r
                  JOIN {$wpdb->prefix}wc_order_stats o ON o.order_id = r.parent_id
