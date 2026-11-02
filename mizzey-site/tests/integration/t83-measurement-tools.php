@@ -37,7 +37,7 @@ run(
 		$s->on_finish(
 			static function () use ( $keep ): void {
 				null === $keep ? delete_option( TagManager::CONTAINER ) : update_option( TagManager::CONTAINER, $keep );
-				ProductFeed::forget();
+				ProductFeed::purge();
 				unset( $_COOKIE[ ConsentBanner::COOKIE ] );
 			}
 		);
@@ -121,9 +121,18 @@ run(
 		$d->set_regular_price( '99' );
 		$d->set_status( 'draft' );
 		$d->save();
+		// E-288-3: a title with control characters, as staff may paste them (written directly: kses would strip them for a
+		// visitor, not for staff with unfiltered HTML).
+		$ctl = $w->simple( "{$tag}-CTL", null );
+		$cp  = wc_get_product( $ctl );
+		$cp->set_regular_price( '50' );
+		$cp->save();
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_title' => "Serum\x0Bplus\x01 {$tag}" ), array( 'ID' => $ctl ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		clean_post_cache( $ctl );
 		// Translated last: no product is created after a translation in one process (#247, A11).
 		$ar_id = $w->translate( 'editor', $en_id );
-		ProductFeed::forget();
+		ProductFeed::purge();
 		$items = static function ( string $xml ): array {
 			$out = array();
 			// A page that is not a feed (the feed switched off) is an expected answer here, not a parser warning to log.
@@ -136,7 +145,7 @@ run(
 			}
 			foreach ( $doc->channel->item as $item ) {
 				$g = $item->children( 'http://base.google.com/ns/1.0' );
-				$out[ (string) $g->id ] = array( 'price' => (string) $g->price, 'sale' => (string) $g->sale_price, 'link' => (string) $g->link, 'group' => (string) $g->item_group_id, 'availability' => (string) $g->availability );
+				$out[ (string) $g->id ] = array( 'price' => (string) $g->price, 'sale' => (string) $g->sale_price, 'link' => (string) $g->link, 'group' => (string) $g->item_group_id, 'availability' => (string) $g->availability, 'title' => (string) $g->title );
 			}
 			return $out;
 		};
@@ -146,6 +155,16 @@ run(
 		$grouped = array_filter( $en_items, static fn ( array $i ): bool => "{$tag}-VAR" === $i['group'] );
 		$check( 2 === count( $grouped ) && ! isset( $en_items[ "{$tag}-VAR" ] ), 'AC-3 a variable product is one item per variation, grouped by the product\'s SKU' );
 		$check( ! isset( $en_items[ "{$tag}-HID" ] ) && ! isset( $en_items[ "{$tag}-DRF" ] ) && ! isset( $en_items[ "{$tag}-PWD" ] ), 'AC-3 a hidden, draft or password-protected product is not in the feed' );
+		$check( false !== simplexml_load_string( $feed_en ) && "Serumplus {$tag}" === ( $en_items[ "{$tag}-CTL" ]['title'] ?? '' ) && 'Serum' === ProductFeed::text( "Ser\x00u\x1Fm\x7F" ), 'AC-3 a control character pasted into a product is removed, so the feed stays valid XML (' . ( $en_items[ "{$tag}-CTL" ]['title'] ?? 'missing' ) . ')' );
+		// E-288-4: after a product is saved, while another request builds the feed, the last good copy is served at once.
+		$lock = substr( 'mz_' . $wpdb->prefix . 'feed_en', 0, 64 );
+		$held = 1 === (int) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		ProductFeed::forget();
+		$started = microtime( true );
+		[ $busy_code, $busy_feed ] = $page( ProductFeed::url( 'en' ) );
+		$took = microtime( true ) - $started;
+		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$check( $held && 200 === $busy_code && isset( $items( $busy_feed )[ $sku ] ) && $took < 20 && false === get_transient( ProductFeed::CACHE . 'en' ), 'AC-3 while one request rebuilds the feed, another is served the last good copy without building it (' . round( $took, 1 ) . ' s)' );
 		[ , $feed_ar ] = $page( ProductFeed::url( 'ar' ) );
 		$ar_items = $items( $feed_ar );
 		$check( $ar_id > 0 && isset( $ar_items[ $sku ] ) && str_contains( $ar_items[ $sku ]['link'], '/ar/' ), 'AC-3 the Arabic feed lists the same item, by the same SKU, at its Arabic address' );

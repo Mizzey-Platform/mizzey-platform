@@ -100,7 +100,8 @@ MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register. INT-09, INT-
 - **FR-006**: Each language MUST have a product feed in Google's product format, listing published, visible, priced
   products by SKU (variations by their own, grouped by the product's), with title, description, address, images,
   availability, price and sale price in EGP, brand, barcode and category; rebuilt at most hourly and after a product
-  is saved (AC-4).
+  is saved, by one request at a time while others get the last good copy; every value cleaned of the control
+  characters XML does not allow, so one product cannot make the feed invalid (AC-4).
 - **FR-007**: The visitor's standing choice MUST be pushed to the data layer as the `mizzey_consent` event on every
   page, before the container loads, as well as when it is made, so a tag that does not read Google's consent mode can
   wait for it; the container settings that tags other than Google's need are in the tracking plan, section 8 (AC-1,
