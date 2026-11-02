@@ -162,7 +162,8 @@ run(
 		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
 		$seen = array();
 		$spy  = static function ( $sql ) use ( &$seen ) {
-			if ( is_string( $sql ) && preg_match( "/'wc-(cancelled|on-hold|processing|preparing|delivery-failed)'/", $sql ) ) {
+			// One order's own refunds (WooCommerce's get_refunds(), by parent id) are not a list of orders.
+			if ( is_string( $sql ) && preg_match( "/'wc-(cancelled|on-hold|processing|preparing|delivery-failed)'/", $sql ) && ! preg_match( '/(parent_order_id|post_parent)\s*(=|IN)\s*\(?\s*\d/i', $sql ) ) {
 				$seen[] = $sql;
 			}
 			return $sql;

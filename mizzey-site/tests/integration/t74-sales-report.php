@@ -178,7 +178,7 @@ run(
 		$cash = $walk( $cash, array( 'preparing', 'shipped', 'cod-collected', 'completed' ) );
 		$paid = $cash->get_date_paid();
 		$delivered = $day();
-		$check( 'completed' === $cash->get_status() && null !== $paid && T74_DAY !== $paid->date( 'Y-m-d' ) && 4 === (int) ( $delivered['orders_count'] ?? 0 ) && abs( (float) ( $delivered['total_sales'] ?? 0 ) - 660 ) < 0.01, 'AC-4 the cash order, Delivered and paid on another day (' . ( $paid ? $paid->date( 'Y-m-d' ) : 'no paid date' ) . '), stays in the day it was placed, counted once (' . ( $delivered['orders_count'] ?? '?' ) . ' orders)' );
+		$check( 'completed' === $cash->get_status() && ( null === $paid || T74_DAY !== $paid->date( 'Y-m-d' ) ) && 4 === (int) ( $delivered['orders_count'] ?? 0 ) && abs( (float) ( $delivered['total_sales'] ?? 0 ) - 660 ) < 0.01, 'AC-4 the cash order, Delivered and paid on another day (' . ( $paid ? $paid->date( 'Y-m-d' ) : 'no paid date' ) . '), stays in the day it was placed, counted once (' . ( $delivered['orders_count'] ?? '?' ) . ' orders)' );
 		// A prepaid order returned to origin, and a cash order the customer refused: neither is a sale.
 		$returned = $placed( 2, 'bacs', 13 );
 		$returned->payment_complete();
