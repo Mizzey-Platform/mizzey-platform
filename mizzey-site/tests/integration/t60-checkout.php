@@ -436,23 +436,69 @@ run(
 			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
 		}
 		$check( $busy_waiting === $busy_held && $busy_scheduled && $late_source->levels[ $five->get_id() ] === $busy_held + 1 && '' === wc_get_order( $busy->get_id() )->get_meta( OrderStock::UNRELEASED ), 'CHK-12 a cancellation that finds its order locked elsewhere is retried in the background, and the retry gives the stock back (' . wp_json_encode( array( $busy_held, $busy_waiting, $late_source->levels[ $five->get_id() ] ) ) . ')' );
-		// A Confirmed order trashed while the source refuses keeps its record unsettled: emptying the trash is refused,
-		// so the record reconciliation needs is not lost. A Confirmed order trashed normally is deleted for good.
+		// A Confirmed order trashed while the source refuses keeps its record unsettled: emptying the trash is refused
+		// while the source still refuses, so the record reconciliation needs is not lost; once the source answers, the
+		// release is sent again under its own key and the order goes. A Confirmed order trashed normally is deleted.
 		$outage = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $outage, StockGateway::make() );
 		wc_get_order( $outage->get_id() )->update_status( 'processing' );
+		$outage_held         = $late_source->levels[ $five->get_id() ];
 		$late_source->refuse = array( $five->get_id() );
 		wc_get_order( $outage->get_id() )->delete( false );
+		$outage_states       = array_column( OrderStock::record( wc_get_order( $outage->get_id() ) ), 'state' );
+		$outage_deleted      = wc_get_order( $outage->get_id() )->delete( true );
+		$outage_kept         = wc_get_order( $outage->get_id() ) instanceof \WC_Order;
 		$late_source->refuse = array();
-		$outage_states  = array_column( OrderStock::record( wc_get_order( $outage->get_id() ) ), 'state' );
-		$outage_deleted = wc_get_order( $outage->get_id() )->delete( true );
-		$outage_kept    = wc_get_order( $outage->get_id() ) instanceof \WC_Order;
+		$outage_later        = wc_get_order( $outage->get_id() )->delete( true );
+		$outage_given        = $late_source->levels[ $five->get_id() ];
 		$clean = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $clean, StockGateway::make() );
 		wc_get_order( $clean->get_id() )->update_status( 'processing' );
 		wc_get_order( $clean->get_id() )->delete( false );
 		$clean_deleted = wc_get_order( $clean->get_id() )->delete( true );
-		$check( in_array( 'unsettled', $outage_states, true ) && false === $outage_deleted && $outage_kept && true === $clean_deleted && ! wc_get_order( $clean->get_id() ), 'CHK-12 an order whose stock could not be given back is not deleted for good, and keeps its record; a settled one is (' . wp_json_encode( array( $outage_states, $outage_deleted, $outage_kept, $clean_deleted ) ) . ')' );
+		$check( in_array( 'unsettled', $outage_states, true ) && false === $outage_deleted && $outage_kept && true === $outage_later && $outage_given === $outage_held + 1 && true === $clean_deleted && ! wc_get_order( $clean->get_id() ), 'CHK-12 an order whose stock could not be given back is not deleted for good while the source refuses; once it answers the release is sent again and the order goes; a settled one is deleted (' . wp_json_encode( array( $outage_states, $outage_deleted, $outage_kept, $outage_later, $outage_held, $outage_given ) ) . ')' );
+		// The deletion decides from the order as stored: a copy loaded while Confirmed, deleted after another request
+		// shipped the order, gives nothing back. A quantity change still unanswered keeps even a Shipped order.
+		$moved = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $moved, StockGateway::make() );
+		wc_get_order( $moved->get_id() )->update_status( 'processing' );
+		$moved_copy = wc_get_order( $moved->get_id() );
+		foreach ( array( 'preparing', 'shipped' ) as $step ) {
+			wc_get_order( $moved->get_id() )->update_status( $step );
+		}
+		$moved_held   = $late_source->levels[ $five->get_id() ];
+		$moved_answer = OrderStock::beforePermanentDeletion( null, $moved_copy, true );
+		$moved_after  = $late_source->levels[ $five->get_id() ];
+		$resizing     = wc_get_order( $moved->get_id() );
+		$moved_record = OrderStock::record( $resizing );
+		foreach ( array_keys( $moved_record ) as $line_id ) {
+			$moved_record[ $line_id ]['resize'] = array( 'op' => 1, 'to' => 2 );
+		}
+		$resizing->update_meta_data( OrderStock::RECORD, $moved_record );
+		$resizing->save_meta_data();
+		$resize_answer = OrderStock::beforePermanentDeletion( null, wc_get_order( $moved->get_id() ), true );
+		$check( null === $moved_answer && $moved_after === $moved_held && array() !== $moved_record && false === $resize_answer, 'CHK-12 a deletion decided on a stale Confirmed copy of a Shipped order gives nothing back; a Shipped order with a quantity change unanswered is not deleted for good (' . wp_json_encode( array( $moved_held, $moved_after, $resize_answer ) ) . ')' );
+		// A cancellation whose release the source refuses: the background retry sends it again and, refused again,
+		// marks the order for staff; once the source answers, a retry gives the stock back.
+		$refusal = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $refusal, StockGateway::make() );
+		wc_get_order( $refusal->get_id() )->update_status( 'processing' );
+		$refusal_held        = $late_source->levels[ $five->get_id() ];
+		$late_source->refuse = array( $five->get_id() );
+		$refusal_fresh       = wc_get_order( $refusal->get_id() );
+		$refusal_fresh->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't60 refused release' );
+		$refusal_fresh->update_status( 'cancelled', 't60' );
+		$refusal_queued = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		OrderStock::retryRelease( $refusal->get_id() );
+		$refusal_marked      = '' !== wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$refusal_still       = $late_source->levels[ $five->get_id() ];
+		$late_source->refuse = array();
+		OrderStock::retryRelease( $refusal->get_id() );
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		}
+		$refusal_states = array_column( OrderStock::record( wc_get_order( $refusal->get_id() ) ), 'state' );
+		$check( $refusal_queued && $refusal_marked && $refusal_still === $refusal_held && $late_source->levels[ $five->get_id() ] === $refusal_held + 1 && array( 'released' ) === $refusal_states, 'CHK-12 a refused release is retried in the background, sent again, and the order marked for staff while the source still refuses; a later retry gives the stock back (' . wp_json_encode( array( $refusal_held, $refusal_still, $late_source->levels[ $five->get_id() ], $refusal_states ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );

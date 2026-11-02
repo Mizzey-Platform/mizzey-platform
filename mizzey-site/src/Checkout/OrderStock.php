@@ -45,8 +45,12 @@ defined('ABSPATH') || exit;
  *   refused here, and the status model (specs/010) decides where it may move next.
  * - A cancelled or failed order, and an order trashed or deleted before it is Shipped, releases what it reserved,
  *   once; restored from the trash to a paid status, it is reserved again or marked for staff.
- * - A line whose undo or release went unanswered stays marked unsettled for reconciliation with the source (PRE-09);
- *   a later placement asks for it with new keys.
+ * - A line whose undo or release went unanswered stays marked unsettled for reconciliation with the source (PRE-09),
+ *   with the change it was sending; a later release (the cancellation's background retry, a removal) sends that change
+ *   again under its own key, and a later placement asks for the line with new keys. A cancellation whose release is
+ *   still not given back after its retry is marked (`UNRELEASED`) with a note for staff.
+ * - An order is not deleted for good while its record is open (an unanswered reserve, undo, release or quantity
+ *   change, or a line still held by an order that gives its stock back), decided on the order as stored.
  *
  * Register ids: CHK-12. See specs/019-checkout.
  */
@@ -171,7 +175,17 @@ final class OrderStock
     public static function retryRelease($orderId): void
     {
         $order = wc_get_order((int) $orderId);
-        if (! $order instanceof \WC_Order || self::releaseCancelled($order)) {
+        if (! $order instanceof \WC_Order) {
+            return;
+        }
+        if (self::releaseCancelled($order)) {
+            // Given back at last: a mark left by an earlier retry no longer applies.
+            $order = wc_get_order((int) $orderId);
+            if ($order instanceof \WC_Order && $order->get_meta(self::UNRELEASED) !== '') {
+                $order->delete_meta_data(self::UNRELEASED);
+                $order->save_meta_data();
+            }
+
             return;
         }
         $order = wc_get_order((int) $orderId);
@@ -266,23 +280,25 @@ final class OrderStock
      */
     private static function settledForDeletion(\WC_Order $order): bool
     {
-        $status = $order->get_status();
-        if ($status === 'trash') {
-            $before = (string) $order->get_meta('_wp_trash_meta_status');
-            $before = $before !== '' ? $before : (string) get_post_meta($order->get_id(), '_wp_trash_meta_status', true);
-            $status = (string) preg_replace('/^wc-/', '', $before);
-        }
-        $gives_back = in_array($status, self::RELEASED_ON_REMOVAL, true);
         if (apply_filters(self::FORGET, false) === true) {
             // Test fixtures removing their own orders, which may be left unsettled on purpose; the site never sets it.
             return true;
         }
-        $settled    = self::locked($order, static function (\WC_Order $fresh) use ($gives_back): bool {
-            if ($gives_back) {
+        // Decided on the order as stored, inside its lock: a copy loaded earlier may show a status it has since left.
+        $settled = self::locked($order, static function (\WC_Order $fresh): bool {
+            $status = $fresh->get_status();
+            if ($status === 'trash') {
+                $before = (string) $fresh->get_meta('_wp_trash_meta_status');
+                $before = $before !== '' ? $before : (string) get_post_meta($fresh->get_id(), '_wp_trash_meta_status', true);
+                $status = (string) preg_replace('/^wc-/', '', $before);
+            }
+            $givesBack = in_array($status, self::RELEASED_ON_REMOVAL, true);
+            if ($givesBack) {
                 self::releaseLocked($fresh, StockGateway::make());
             }
             foreach (self::record($fresh) as $line) {
-                if (in_array($line['state'], ['reserving', 'undoing', 'releasing', 'unsure', 'unsettled'], true) || ($gives_back && $line['state'] === 'reserved')) {
+                // An unanswered change, a quantity change still unanswered included, keeps its key and its record.
+                if (self::open($line) || ($givesBack && $line['state'] === 'reserved')) {
                     return false;
                 }
             }
@@ -478,13 +494,17 @@ final class OrderStock
     private static function releaseLocked(\WC_Order $order, StockGateway $gateway): bool
     {
         $record  = self::record($order);
-        $all     = true;
         $sending = [];
         foreach (array_keys($record) as $itemId) {
+            // A change left unanswered by an earlier attempt is sent again as it was, under its own key, which the source
+            // applies once: an undo or a release, or a quantity change.
+            if ($record[$itemId]['state'] === 'unsettled' && isset($record[$itemId]['unanswered'])) {
+                $record[$itemId]['state'] = $record[$itemId]['unanswered'] === 'undo' ? 'undoing' : 'releasing';
+            } elseif ($record[$itemId]['state'] === 'unsettled' && isset($record[$itemId]['resize'])) {
+                $record[$itemId]['state'] = 'reserved';
+            }
             // An undo or a release a crash cut short is finished first; left unanswered, something may still be held.
-            $was = $record[$itemId]['state'];
             self::settle($order, $gateway, $itemId, $record[$itemId]);
-            $all  = $all && ! (in_array($was, ['undoing', 'releasing', 'reserving', 'unsure'], true) && in_array($record[$itemId]['state'], ['unsettled', 'unsure'], true));
             $line = $record[$itemId];
             if ($line['state'] !== 'reserved') {
                 continue;
@@ -492,7 +512,6 @@ final class OrderStock
             if (isset($line['resize'])) {
                 // A resize still unanswered: what the line holds is not known, so it waits for reconciliation (PRE-09).
                 $record[$itemId]['state'] = 'unsettled';
-                $all                      = false;
                 continue;
             }
             $record[$itemId]['state'] = 'releasing';
@@ -500,11 +519,27 @@ final class OrderStock
         }
         self::save($order, $record);
         foreach ($sending as $itemId) {
-            $all = self::settle($order, $gateway, $itemId, $record[$itemId]) && $all;
+            self::settle($order, $gateway, $itemId, $record[$itemId]);
         }
         self::save($order, $record);
+        foreach ($record as $line) {
+            if (self::open($line)) {
+                return false;
+            }
+        }
 
-        return $all;
+        return true;
+    }
+
+    /**
+     * Whether a line of the record is still open with the source: a reserve, an undo, a release or a quantity change
+     * sent and not answered.
+     *
+     * @param array{state:string,resize?:array{op:int,to:int}} $line
+     */
+    private static function open(array $line): bool
+    {
+        return in_array($line['state'], ['reserving', 'undoing', 'releasing', 'unsure', 'unsettled'], true) || isset($line['resize']);
     }
 
     /**
@@ -587,6 +622,12 @@ final class OrderStock
             $step          = $line['state'] === 'undoing' ? 'undo' : 'release';
             $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step))->isKnown();
             $line['state'] = $done ? ($step === 'undo' ? 'undone' : 'released') : 'unsettled';
+            // Which change went unanswered, so a later release sends it again under the same key.
+            if ($done) {
+                unset($line['unanswered']);
+            } else {
+                $line['unanswered'] = $step;
+            }
 
             return $done;
         }
