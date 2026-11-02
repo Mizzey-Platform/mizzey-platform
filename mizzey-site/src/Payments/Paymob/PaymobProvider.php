@@ -10,6 +10,7 @@ namespace MizzeySite\Payments\Paymob;
 
 use MizzeySite\Payments\CallbackResult;
 use MizzeySite\Payments\PaymentEvent;
+use MizzeySite\Payments\PaymentGate;
 use MizzeySite\Payments\PaymentProvider;
 
 defined('ABSPATH') || exit;
@@ -123,7 +124,7 @@ final class PaymobProvider implements PaymentProvider
             strtoupper($fields['currency']),
             $fields['created_at'],
             $channel,
-            ['provider_order' => $fields['order'], 'integration' => $fields['integration_id']],
+            ['provider_order' => $fields['order'], 'integration' => $fields['integration_id'], 'payment' => $fields['id'], 'payment_cents' => (int) $fields['amount_cents']],
         ));
     }
 

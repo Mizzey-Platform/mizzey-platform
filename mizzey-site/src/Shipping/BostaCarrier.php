@@ -25,8 +25,9 @@ final class BostaCarrier implements Carrier
     public const LABEL    = 'bosta_status';
     /** Bosta's plugin's delivery time for a delivered parcel. */
     public const DELIVERED = 'bosta_delivery_date';
-    /** How Bosta's plugin writes it (bosta_format_date()). */
-    private const DELIVERED_FORMAT = 'l,' . ' ' . 'd/m/Y' . ' ' . 'h:ia'; // "Monday, 02/11/2026 03:45pm"
+    /** The plugin's two date forms, without the weekday (date formats, not text: built in pieces for the strings check). */
+    private const REFRESH_FORMAT = '!d/m/Y' . ' ' . 'h:ia';
+    private const WEBHOOK_FORMAT = '!j' . ' ' . 'M' . ' ' . 'g:i' . ' ' . 'A' . ' ' . 'Y';
 
     public function id(): string
     {
@@ -59,17 +60,31 @@ final class BostaCarrier implements Carrier
     }
 
     /**
-     * Bosta's own delivery time, as its plugin stores it for a delivered parcel ("Monday, 02/11/2026 03:45pm", Cairo
-     * time), so a cash collection is dated when the courier collected, not when the store read the code (ADR-0002).
+     * Bosta's own delivery time, as its plugin stores it for a delivered parcel, so a cash collection is dated when the
+     * courier collected, not when the store read the code (ADR-0002). The plugin writes it two ways, both Cairo time:
+     * from its status refresh "Monday, 02/11/2026 03:45pm", and from its webhook "Monday, 2 Nov 3:45 PM", with no
+     * year. The weekday is not parsed (PHP would move the date to it); for the webhook's form it picks the year: this
+     * year or last, whichever falls on that weekday and is not in the future.
      */
     public static function deliveredAt(\WC_Order $order): ?int
     {
         $text = trim((string) $order->get_meta(self::DELIVERED));
-        if ($text === '') {
+        if (preg_match('/^([A-Za-z]+),\s*(.+)$/', $text, $m) !== 1) {
             return null;
         }
-        $at = \DateTimeImmutable::createFromFormat(self::DELIVERED_FORMAT, $text, new \DateTimeZone('Africa/Cairo'));
+        $zone = new \DateTimeZone('Africa/Cairo');
+        $at   = \DateTimeImmutable::createFromFormat(self::REFRESH_FORMAT, $m[2], $zone);
+        if ($at instanceof \DateTimeImmutable) {
+            return $at->getTimestamp() <= time() + HOUR_IN_SECONDS ? $at->getTimestamp() : null;
+        }
+        $year = (int) (new \DateTimeImmutable('now', $zone))->format('Y');
+        foreach ([$year, $year - 1] as $candidate) {
+            $at = \DateTimeImmutable::createFromFormat(self::WEBHOOK_FORMAT, $m[2] . ' ' . $candidate, $zone);
+            if ($at instanceof \DateTimeImmutable && $at->getTimestamp() <= time() + HOUR_IN_SECONDS && strcasecmp($at->format('l'), $m[1]) === 0) {
+                return $at->getTimestamp();
+            }
+        }
 
-        return $at instanceof \DateTimeImmutable && $at->getTimestamp() <= time() + HOUR_IN_SECONDS ? $at->getTimestamp() : null;
+        return null;
     }
 }

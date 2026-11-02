@@ -166,6 +166,13 @@ run(
 		$r = CodReconciliation::of( $o );
 		$check( $o->has_status( 'completed' ) && $collected === $r['remitted'] && '2026-11-02' === $r['remitted_at'] && "{$tag}RMT" === $r['reference'] && $collected === $r['collected'], 'AC-6 the remittance is kept apart from the collection, and the order is Delivered (' . $o->get_status() . ')' );
 		$check( ! in_array( $cash, $unremitted(), true ), 'AC-6 a remitted order leaves the unremitted list' );
+		// The plugin's webhook writes the time without a year ("Monday, 2 Nov 3:45 PM"): read too, the year from the weekday.
+		$hooked = $make( 'cod', StatusModel::SHIPPED );
+		$h      = $fresh( $hooked );
+		$h->update_meta_data( \MizzeySite\Shipping\BostaCarrier::DELIVERED, 'Monday, 2 Nov 3:45 PM' );
+		$h->save();
+		$o = $bosta( $hooked, 45, 'Delivered' );
+		$check( $bosta_at === (int) $o->get_meta( CodReconciliation::COLLECTED_AT ), 'AC-6 the time from Bosta\'s webhook, written without a year, dates the collection too (' . $o->get_meta( CodReconciliation::COLLECTED_AT ) . ')' );
 		// From the order screen: WooCommerce's own save runs after the remittance and must keep Delivered.
 		$cash2 = $make( 'cod', StatusModel::SHIPPED );
 		$bosta( $cash2, 45, 'Delivered' );

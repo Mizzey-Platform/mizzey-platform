@@ -176,6 +176,12 @@ final class PaymentGate
                 self::stop($channel, 200, RefundLedger::madeHere($order, $event->reference) ? 'refund already recorded' : 'recorded', $order->get_id(), '', $order);
                 return;
             case PaymentEvent::REFUNDED:
+                $refundProblem = self::refundedProblem($order, $event, $channel);
+                if ($refundProblem !== null) {
+                    // Recorded above; not reconciled against this order's own refunds.
+                    self::stop($channel, 200, 'recorded', $order->get_id(), $refundProblem, $order);
+                    return;
+                }
                 self::reconcileRefunds($order, $event, $channel);
                 return;
             case PaymentEvent::PAYMENT:
@@ -302,6 +308,31 @@ final class PaymentGate
             PaymentRecord::flag($order, sprintf(__('%1$s reports %2$s refunded but the order records %3$s. Check the order\'s refunds.', 'mizzey-site'), $event->provider, self::money($atProvider, $event->currency), self::money($onOrder, $event->currency)));
         }
         self::stop($channel, 200, $atProvider === $onOrder ? 'refunds match' : 'refunds reconciled', $order->get_id(), '', $order);
+    }
+
+    /**
+     * Why a provider's "payment refunded" report must not be reconciled against this order's refunds, or null.
+     * - It refunds another payment than the one that paid the order (a second payment, refunded under D-25): its
+     *   refund is not the order's (audit, Codex 3).
+     * - Its refunded total, which the provider does not sign, exceeds the payment's own signed amount (Codex 4).
+     * - It came on the customer's return rather than the provider's server notice: only the notice writes refunds.
+     */
+    private static function refundedProblem(\WC_Order $order, PaymentEvent $event, string $channel): ?string
+    {
+        $payment = (string) ($event->signed['payment'] ?? '');
+        $paidBy  = (string) $order->get_transaction_id();
+        if (self::$foreign || ($payment !== '' && $paidBy !== '' && $payment !== $paidBy)) {
+            return 'refund_of_another_payment';
+        }
+        if (isset($event->signed['payment_cents']) && $event->amountCents > (int) $event->signed['payment_cents']) {
+            PaymentRecord::flag($order, sprintf(__('%1$s reported %2$s refunded on a payment of %3$s (reference %4$s). Nothing was recorded: check the refunds in the %1$s dashboard.', 'mizzey-site'), $event->provider, self::money($event->amountCents, $event->currency), self::money((int) $event->signed['payment_cents'], $event->currency), $event->reference), 'over' . '-' . $event->key());
+            return 'refunded_above_payment';
+        }
+        if ($channel !== 'notice') {
+            return 'refund_on_return';
+        }
+
+        return null;
     }
 
     /** Take a named lock for the rest of the request. */
