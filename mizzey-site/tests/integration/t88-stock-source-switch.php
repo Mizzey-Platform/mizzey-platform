@@ -181,7 +181,8 @@ run(
 			return rest_do_request( $r );
 		};
 		wp_set_current_user( $cust );
-		$denied = $post( array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 1, 'key' => "{$tag}-x" ) ) ) );
+		$denied       = $post( array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 1, 'key' => "{$tag}-x" ) ) ) );
+		$after_denied = $level( $a );
 		wp_set_current_user( $feeder );
 		$batch = $post( array( 'items' => array(
 			array( 'sku' => $sku( $a ), 'set' => 20, 'key' => "{$tag}-f1" ),
@@ -199,7 +200,7 @@ run(
 		$get    = new \WP_REST_Request( 'GET', '/mizzey/v1/stock' );
 		$get->set_param( 'skus', $sku( $a ) . ',' . $sku( $b ) );
 		$got    = rest_do_request( $get )->get_data()['items'] ?? array();
-		$check( 403 === $denied->get_status() && 12 === $level( $a ), 'S-4 an account without the feed permission is refused (' . $denied->get_status() . ')' );
+		$check( 403 === $denied->get_status() && 12 === $after_denied, 'S-4 an account without the feed permission is refused (' . $denied->get_status() . ')' );
 		$check( array( 'applied', 'applied', 'erp-item', 'unknown-sku', 'invalid', 'refused', 'invalid' ) === $st && 20 === $level( $a ) && 5 === $level( $vars[0] ) && 40 === $level( $b ), 'S-4 the feed sets and changes own stock by SKU, and answers each item: an ERP item, an unknown SKU, a bad value or key, and a change below zero are refused alone (' . wp_json_encode( $st ) . ')' );
 		$check( 'already-applied' === ( $repeat->get_data()['items'][0]['status'] ?? '' ) && 20 === $level( $a ) && 400 === $big->get_status() && 400 === $read->get_status(), 'S-4 a key sent again changes nothing; more than 100 items, or a read without SKUs, is refused whole' );
 		$check( 'store' === ( $got[0]['source'] ?? '' ) && 20 === ( $got[0]['level'] ?? null ) && 'erp' === ( $got[1]['source'] ?? '' ) && ! isset( $got[1]['level'] ), 'S-4 a read gives each SKU\'s source, and the store\'s figure only where it is the one in use' );
