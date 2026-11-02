@@ -234,19 +234,23 @@ run(
 		};
 		$dash = $paid( 'paymob-t69', '991234999' );
 		$obj  = array(
-			'id' => 991234999, 'amount_cents' => (int) round( (float) $dash->get_total() * 100 ), 'created_at' => '2026-11-02T10:00:00.000000',
-			'currency' => 'EGP', 'error_occured' => false, 'has_parent_transaction' => false, 'integration_id' => 6030296,
-			'is_3d_secure' => true, 'is_auth' => false, 'is_capture' => false, 'is_refunded' => true, 'refunded_amount_cents' => 2500,
-			'is_standalone_payment' => true, 'is_voided' => false, 'is_refund' => false, 'is_void' => false,
+			// The refund's own notice: its amount and Paymob order are signed (specs/028).
+			'id' => 991235000, 'amount_cents' => 2500, 'created_at' => '2026-11-02T10:00:00.000000',
+			'currency' => 'EGP', 'error_occured' => false, 'has_parent_transaction' => true, 'integration_id' => 6030296,
+			'is_3d_secure' => true, 'is_auth' => false, 'is_capture' => false, 'is_refunded' => false,
+			'is_standalone_payment' => false, 'is_voided' => false, 'is_refund' => true, 'is_void' => false,
 			'order' => array( 'id' => 650000001, 'merchant_order_id' => $dash->get_id() . '_1793539999' ), 'owner' => 1, 'pending' => false,
 			'source_data' => array( 'pan' => '2346', 'sub_type' => 'MasterCard', 'type' => 'card' ), 'success' => true,
 		);
+		// Paid through the gate, which keeps the Paymob order that paid it.
+		$dash->update_meta_data( PaymentGate::PROVIDER_ORDER, '650000001' );
+		$dash->save();
 		PaymentGate::releaseAll();
 		PaymentGate::handle( new PaymobProvider(), 'POST', array( 'hmac' => PaymobProvider::sign( PaymobProvider::fromNotice( $obj ), $secret ) ), (string) wp_json_encode( array( 'type' => 'TRANSACTION', 'obj' => $obj ) ) );
 		PaymentGate::releaseAll();
 		$dash_refunds = $fresh( $dash->get_id() )->get_refunds();
 		$got8         = $dash_refunds ? RefundReference::of( $dash_refunds[0] ) : array();
-		$check( 'refunds reconciled' === ( $last['word'] ?? '' ) && 1 === count( $dash_refunds ) && RefundReference::BY_DASHBOARD === ( $got8['source'] ?? '' ) && '991234999' === ( $got8['payment'] ?? '' ) && str_contains( $line( $dash_refunds[0] ), 'dashboard' ), 'AC-3 a 25.00 refund made in Paymob\'s dashboard is recorded once, with the payment reference, marked as made there (' . ( $last['word'] ?? 'no answer' ) . ', ' . wp_json_encode( $got8 ) . ')' );
+		$check( 'refund recorded' === ( $last['word'] ?? '' ) && 1 === count( $dash_refunds ) && RefundReference::BY_DASHBOARD === ( $got8['source'] ?? '' ) && '991234999' === ( $got8['payment'] ?? '' ) && str_contains( $line( $dash_refunds[0] ), 'dashboard' ), 'AC-3 a 25.00 refund made in Paymob\'s dashboard is recorded once, with the payment reference, marked as made there (' . ( $last['word'] ?? 'no answer' ) . ', ' . wp_json_encode( $got8 ) . ')' );
 
 		// ---- The field on the order screen ----------------------------------------------------------------------
 		$js = WP_PLUGIN_DIR . '/mizzey-site/assets/admin-refund-reference.js';

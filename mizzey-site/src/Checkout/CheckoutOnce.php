@@ -96,12 +96,12 @@ final class CheckoutOnce
         if ($token !== '' && class_exists(CartTokenUtils::class)) {
             $session = (string) (CartTokenUtils::get_cart_token_payload($token)['user_id'] ?? '');
 
-            return $session !== '' ? 'session:' . $session : '';
+            return $session !== '' ? 'session' . '-' . $session : '';
         }
         if (class_exists(\WC_Session_Handler::class)) {
             $cookie = (new \WC_Session_Handler())->get_session_cookie();
             if (is_array($cookie) && (string) ($cookie[0] ?? '') !== '') {
-                return 'session:' . (string) $cookie[0];
+                return 'session' . '-' . (string) $cookie[0];
             }
         }
 
