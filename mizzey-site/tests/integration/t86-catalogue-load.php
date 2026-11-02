@@ -360,6 +360,26 @@ run(
 		as_unschedule_all_actions( CatalogueLoad::IMAGES, array( $handover, 0 ), CatalogueLoad::GROUP );
 		@unlink( "{$dir}/handover/plan.json" ); // phpcs:ignore
 
+		// The run is read again once the worker lock is taken: here another worker ends the run between the first read
+		// and the lock, and the late action leaves it as that worker left it.
+		$late = wp_generate_uuid4();
+		update_option( CatalogueLoad::RUN, array_merge( $state, array( 'id' => $late, 'status' => 'images', 'done' => array( 'sources' => 6, 'translations' => 6, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'updated' => time() ) ), false );
+		$ends = static function ( string $query ) use ( &$ends, $late ): string {
+			if ( str_contains( $query, 'GET_LOCK' ) && str_contains( $query, CatalogueLoad::imageLock( $late ) ) ) {
+				remove_filter( 'query', $ends );
+				$ended           = CatalogueLoad::state();
+				$ended['status'] = 'done';
+				update_option( CatalogueLoad::RUN, $ended, false );
+			}
+			return $query;
+		};
+		add_filter( 'query', $ends );
+		CatalogueLoad::images( $late, 0 );
+		remove_filter( 'query', $ends );
+		$after_late = CatalogueLoad::state();
+		$late_next  = as_get_scheduled_actions( array( 'hook' => CatalogueLoad::IMAGES, 'args' => array( $late, 0 ), 'group' => CatalogueLoad::GROUP, 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		$check( 'done' === $after_late['status'] && 0 === (int) $after_late['done']['images'] && array() === $late_next && ! CatalogueLoad::watchdogPending( $late ), 'AC-5 B-10 an images action that takes the lock after another worker ended the run does no work on its stale copy (' . wp_json_encode( array( $after_late['status'], $after_late['done'] ) ) . ')' );
+
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.
 		// A run that stopped moving more than half an hour ago is replaced; its record is finalised, not left running.
 		$stale = wp_generate_uuid4();
@@ -388,7 +408,7 @@ run(
 			as_unschedule_all_actions( $hook, array(), CatalogueLoad::GROUP );
 		}
 		delete_option( CatalogueLoad::RUN );
-		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded, $stale, $handover ) as $run_id ) {
+		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded, $stale, $handover, $late ) as $run_id ) {
 			delete_option( ImportRunLog::PREFIX . $run_id ); // This scenario's records only.
 		}
 
