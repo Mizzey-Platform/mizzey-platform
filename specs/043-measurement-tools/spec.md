@@ -68,6 +68,10 @@ MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register. INT-09, INT-
 
 - No container named: nothing loads but the consent defaults and the data layer.
 - A malformed container id: refused.
+- A pixel that does not read Google's consent mode: held back by the container's own consent settings (tracking plan,
+  section 8, C3 and C4), which the site's `mizzey_consent` event on every page makes possible.
+- A full-page cache: the banner and order attribution are decided in the browser, so a cached page is the same for
+  every visitor.
 - A hidden, draft or unpriced product: not in the feed.
 
 ## Native coverage
@@ -90,11 +94,18 @@ MKT-03, MKT-05, MKT-06 and MKT-09 are marked [key] in the register. INT-09, INT-
 - **FR-003**: The data layer MUST name the page's language (AC-1).
 - **FR-004**: The banner MUST offer "Accept all" and "Essential only" in the visitor's language, keep the choice
   180 days, send it to the consent mode at once, and reopen from any `data-mizzey-consent-open` link (AC-2).
-- **FR-005**: WooCommerce's order attribution MUST run only once the visitor accepts (AC-2, AC-3).
+- **FR-005**: WooCommerce's order attribution MUST run only once the visitor accepts (AC-2, AC-3). The page MUST be
+  printed with it off and the browser MUST switch it on from the consent cookie, so a cached page never carries one
+  visitor's choice to another.
 - **FR-006**: Each language MUST have a product feed in Google's product format, listing published, visible, priced
   products by SKU (variations by their own, grouped by the product's), with title, description, address, images,
   availability, price and sale price in EGP, brand, barcode and category; rebuilt at most hourly and after a product
-  is saved (AC-4).
+  is saved, by one request at a time while others get the last good copy; every value cleaned of the control
+  characters XML does not allow, so one product cannot make the feed invalid (AC-4).
+- **FR-007**: The visitor's standing choice MUST be pushed to the data layer as the `mizzey_consent` event on every
+  page, before the container loads, as well as when it is made, so a tag that does not read Google's consent mode can
+  wait for it; the container settings that tags other than Google's need are in the tracking plan, section 8 (AC-1,
+  AC-2).
 
 ## Optional safeguards (not owed)
 

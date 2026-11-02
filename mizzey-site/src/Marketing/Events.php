@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace MizzeySite\Marketing;
 
+use MizzeySite\Promotions\AutomaticPromotions;
+use MizzeySite\Promotions\WelcomeDiscount;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -23,8 +26,8 @@ defined('ABSPATH') || exit;
  *   from WooCommerce's blocks (`assets/events.js`).
  * - **Purchase** fires once per order, when the order is confirmed, on its confirmation page.
  * - **Refund** is sent by the store to Google Analytics (Measurement Protocol) when a refund is made, because no
- *   customer's browser is open then. It needs the property's measurement id and an API secret, set in Settings,
- *   Marketing tags; without them nothing is sent.
+ *   customer's browser is open then; it is queued and sent in the background, tried twice. It needs the property's
+ *   measurement id and an API secret, set in Settings, Marketing tags; without them nothing is sent.
  *
  * No personal data is in any event. An item is named by its SKU, shared by both language records.
  *
@@ -41,6 +44,7 @@ final class Events
     public const NAMESPACE = 'mizzey-events';
     public const LIST_MAX  = 30;
     public const QUEUE_MAX = 20;
+    public const REFUND_HOOK = 'mizzey_analytics_refund';
 
     /** True while WooCommerce adds to the cart: its quantity update of an existing line is part of the add. */
     private static bool $adding = false;
@@ -66,6 +70,7 @@ final class Events
         add_action('woocommerce_checkout_order_created', [self::class, 'client'], 20, 1);
         add_action('woocommerce_store_api_checkout_order_processed', [self::class, 'client'], 20, 1);
         add_action('woocommerce_order_refunded', [self::class, 'refund'], 20, 2);
+        add_action(self::REFUND_HOOK, [self::class, 'sendRefund'], 10, 3);
         add_action('woocommerce_blocks_loaded', [self::class, 'storeApi']);
         add_action('admin_init', [self::class, 'settings'], 20);
         add_action('mizzey_marketing_tags_fields', [self::class, 'fields']);
@@ -194,7 +199,7 @@ final class Events
             $events[] = ['event' => 'view_cart', 'ecommerce' => self::commerce(self::cartItems())];
         }
         if (function_exists('is_checkout') && is_checkout() && ! is_order_received_page() && WC()->cart && ! WC()->cart->is_empty()) {
-            $coupons  = implode(',', WC()->cart->get_applied_coupons());
+            $coupons  = self::couponList(WC()->cart->get_applied_coupons());
             $events[] = ['event' => 'begin_checkout', 'ecommerce' => self::commerce(self::cartItems(), $coupons !== '' ? ['coupon' => $coupons] : [])];
         }
         if (function_exists('is_order_received_page') && is_order_received_page()) {
@@ -287,7 +292,7 @@ final class Events
                 $items[] = self::item($line->get_product(), $qty, ((float) $line->get_total() + (float) $line->get_total_tax()) / $qty);
             }
         }
-        $coupons = implode(',', $order->get_coupon_codes());
+        $coupons = self::couponList($order->get_coupon_codes());
 
         return array_filter([
             'transaction_id' => (string) $order->get_order_number(),
@@ -394,16 +399,40 @@ final class Events
         }
     }
 
-    /** @param mixed $code */
+    /**
+     * A code the customer applied. An automatic promotion the store applies itself is not the customer's act, so it
+     * pushes nothing.
+     *
+     * @param mixed $code
+     */
     public static function coupon($code): void
     {
         $code = wc_format_coupon_code((string) $code);
-        if ($code === '') {
+        if ($code === '' || AutomaticPromotions::busy() || in_array($code, AutomaticPromotions::automaticCodes(), true)) {
             return;
         }
         // Heard at priority 999, after WooCommerce has recalculated the cart for the new coupon.
         $discount = WC()->cart ? (float) WC()->cart->get_coupon_discount_amount($code, false) : 0.0;
-        self::queue(['event' => 'apply_coupon', 'params' => ['coupon' => $code, 'discount' => round($discount, 2), 'currency' => get_woocommerce_currency()]]);
+        self::queue(['event' => 'apply_coupon', 'params' => ['coupon' => self::couponName($code), 'discount' => round($discount, 2), 'currency' => get_woocommerce_currency()]]);
+    }
+
+    /**
+     * A coupon as the trackers see it: a customer's own welcome discount is `welcome`, never its code, which is unique
+     * to one person and so would identify them.
+     */
+    public static function couponName(string $code): string
+    {
+        $code   = wc_format_coupon_code($code);
+        $coupon = new \WC_Coupon($code);
+        $own    = $coupon->get_id() > 0 ? WelcomeDiscount::owner($coupon) > 0 : preg_match('/^welcome-[a-z0-9]{10}$/', $code) === 1;
+
+        return $own ? 'welcome' : $code;
+    }
+
+    /** @param list<string> $codes */
+    private static function couponList(array $codes): string
+    {
+        return implode(',', array_values(array_unique(array_map(static fn ($c): string => self::couponName((string) $c), $codes))));
     }
 
     /** @param mixed $productId */
@@ -501,10 +530,32 @@ final class Events
     }
 
     /**
+     * A refund is queued for Analytics (Action Scheduler), so the refund itself never waits on Google.
+     *
      * @param mixed $orderId
      * @param mixed $refundId
      */
     public static function refund($orderId, $refundId): void
+    {
+        if (trim((string) get_option(self::GA4_ID, '')) === '' || trim((string) get_option(self::GA4_KEY, '')) === '') {
+            return;
+        }
+        $args = [(int) $orderId, (int) $refundId, 1];
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action(self::REFUND_HOOK, $args, 'mizzey');
+            return;
+        }
+        self::sendRefund(...$args);
+    }
+
+    /**
+     * Sends one refund to Analytics; a failed first try is tried once more five minutes later.
+     *
+     * @param mixed $orderId
+     * @param mixed $refundId
+     * @param mixed $attempt
+     */
+    public static function sendRefund($orderId, $refundId, $attempt = 1): void
     {
         $id     = trim((string) get_option(self::GA4_ID, ''));
         $secret = trim((string) get_option(self::GA4_KEY, ''));
@@ -529,7 +580,10 @@ final class Events
         $url    = add_query_arg(['measurement_id' => rawurlencode($id), 'api_secret' => rawurlencode($secret)], 'https://www.google-analytics.com/mp/collect');
         $answer = wp_remote_post($url, ['body' => wp_json_encode($body), 'headers' => ['Content-Type' => 'application/json'], 'timeout' => 5]);
         if (is_wp_error($answer) || (int) wp_remote_retrieve_response_code($answer) >= 300) {
-            wc_get_logger()->warning(sprintf('refund %s not sent to Analytics: %s', $params['transaction_id'], is_wp_error($answer) ? $answer->get_error_message() : (string) wp_remote_retrieve_response_code($answer)), ['source' => 'mizzey-analytics']);
+            wc_get_logger()->warning(sprintf('refund %s not sent to Analytics (try %d): %s', $params['transaction_id'], (int) $attempt, is_wp_error($answer) ? $answer->get_error_message() : (string) wp_remote_retrieve_response_code($answer)), ['source' => 'mizzey-analytics']);
+            if ((int) $attempt < 2 && function_exists('as_schedule_single_action')) {
+                as_schedule_single_action(time() + 5 * MINUTE_IN_SECONDS, self::REFUND_HOOK, [(int) $orderId, (int) $refundId, (int) $attempt + 1], 'mizzey');
+            }
         }
     }
 

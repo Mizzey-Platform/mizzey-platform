@@ -5,8 +5,9 @@
  *
  * AC-1: with a container named, every storefront page loads Tag Manager after consent defaults of "denied"; with
  *       none, nothing is loaded; the data layer names the language; the admin is untouched.
- * AC-2: the consent banner is on every storefront page, in the visitor's language; campaign attribution on the order
- *       (WooCommerce's) runs only with consent.
+ * AC-2: the consent banner is on every storefront page, in the visitor's language; the standing choice is pushed as the
+ *       mizzey_consent event on every page; campaign attribution on the order (WooCommerce's) runs only with consent,
+ *       decided in the browser, never in the cached page.
  * AC-3: one product feed per language, in Google's product format: the SKU as the id, the price in EGP, the
  *       language's link, variations grouped; a hidden or draft product is not in it.
  *
@@ -36,7 +37,7 @@ run(
 		$s->on_finish(
 			static function () use ( $keep ): void {
 				null === $keep ? delete_option( TagManager::CONTAINER ) : update_option( TagManager::CONTAINER, $keep );
-				ProductFeed::forget();
+				ProductFeed::purge();
 				unset( $_COOKIE[ ConsentBanner::COOKIE ] );
 			}
 		);
@@ -60,6 +61,10 @@ run(
 		$check( false !== $consent_at && false !== $gtm_at && $consent_at < $gtm_at && str_contains( $home, "'GTM-T83TEST'" ) , 'AC-1 Tag Manager loads on the storefront, after the consent defaults' );
 		$check( ! str_contains( $home, 'ns.html?id=' ), 'AC-1 no no-script container: without the script no consent can be given, so nothing loads' );
 		$check( str_contains( $home, "value = match && match[1] === 'granted' ? 'granted' : 'denied'" ) && str_contains( $home, 'window.mizzeyLanguage="en"' ), 'AC-1 consent is denied until the visitor accepts; the data layer names the language (en)' );
+		// E-288-1: the standing choice is pushed as an event on every page, before the container, so a pixel that does not
+		// read Google's consent mode can wait for it.
+		$event_at = strpos( $home, "window.dataLayer.push({ event: 'mizzey_consent', consent: value });" );
+		$check( false !== $event_at && false !== $gtm_at && $event_at < $gtm_at, 'AC-2 every page pushes the standing choice of the visitor (mizzey_consent) before Tag Manager loads' );
 		[ , $ar ] = $page( $ar_home );
 		$check( str_contains( $ar, 'window.mizzeyLanguage="ar"' ) && str_contains( $ar, "'GTM-T83TEST'" ), 'AC-1 the Arabic storefront loads the same container, with the language ar' );
 		update_option( TagManager::CONTAINER, '"><script>alert(1)</script>' );
@@ -78,7 +83,14 @@ run(
 		$_COOKIE[ ConsentBanner::COOKIE ] = 'granted';
 		$granted = apply_filters( 'wc_order_attribution_allow_tracking', true );
 		unset( $_COOKIE[ ConsentBanner::COOKIE ] );
-		$check( false === $denied && false === $refused && true === $granted && 'yes' === get_option( 'woocommerce_feature_order_attribution_enabled' ), 'AC-2 the campaign is recorded on the order (WooCommerce order attribution) only once the visitor accepts' );
+		// E-288-2: the server never prints attribution on, whatever the cookie, so a cached page cannot carry one visitor's
+		// consent to another; the browser switches it on from its own cookie, before WooCommerce's script starts.
+		$switch    = 'mizzey_consent=granted(?:;|$)/.test(document.cookie)){window.wc_order_attribution.params.allowTracking=true;}';
+		$switch_at = strpos( $home, $switch );
+		$wc_at     = strpos( $home, 'order-attribution' );
+		$script_at = false === $switch_at ? false : strpos( $home, 'js/frontend/order-attribution', $switch_at );
+		$check( false === $denied && false === $refused && false === $granted && 'yes' === get_option( 'woocommerce_feature_order_attribution_enabled' ), 'AC-2 the page is always printed with campaign attribution off, whatever the cookie of the visitor' );
+		$check( false !== $switch_at && false !== $wc_at && false !== $script_at, 'AC-2 the campaign is recorded on the order (WooCommerce order attribution) only once the visitor accepts: switched on in the browser from the consent cookie, before the WooCommerce script' );
 
 		// ---- AC-3: the product feeds --------------------------------------------------------------------------------
 		$w     = new Workflows( $s );
@@ -109,9 +121,18 @@ run(
 		$d->set_regular_price( '99' );
 		$d->set_status( 'draft' );
 		$d->save();
+		// E-288-3: a title with control characters, as staff may paste them (written directly: kses would strip them for a
+		// visitor, not for staff with unfiltered HTML).
+		$ctl = $w->simple( "{$tag}-CTL", null );
+		$cp  = wc_get_product( $ctl );
+		$cp->set_regular_price( '50' );
+		$cp->save();
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_title' => "Serum\x0Bplus\x01 {$tag}" ), array( 'ID' => $ctl ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		clean_post_cache( $ctl );
 		// Translated last: no product is created after a translation in one process (#247, A11).
 		$ar_id = $w->translate( 'editor', $en_id );
-		ProductFeed::forget();
+		ProductFeed::purge();
 		$items = static function ( string $xml ): array {
 			$out = array();
 			// A page that is not a feed (the feed switched off) is an expected answer here, not a parser warning to log.
@@ -124,7 +145,7 @@ run(
 			}
 			foreach ( $doc->channel->item as $item ) {
 				$g = $item->children( 'http://base.google.com/ns/1.0' );
-				$out[ (string) $g->id ] = array( 'price' => (string) $g->price, 'sale' => (string) $g->sale_price, 'link' => (string) $g->link, 'group' => (string) $g->item_group_id, 'availability' => (string) $g->availability );
+				$out[ (string) $g->id ] = array( 'price' => (string) $g->price, 'sale' => (string) $g->sale_price, 'link' => (string) $g->link, 'group' => (string) $g->item_group_id, 'availability' => (string) $g->availability, 'title' => (string) $g->title );
 			}
 			return $out;
 		};
@@ -134,6 +155,28 @@ run(
 		$grouped = array_filter( $en_items, static fn ( array $i ): bool => "{$tag}-VAR" === $i['group'] );
 		$check( 2 === count( $grouped ) && ! isset( $en_items[ "{$tag}-VAR" ] ), 'AC-3 a variable product is one item per variation, grouped by the product\'s SKU' );
 		$check( ! isset( $en_items[ "{$tag}-HID" ] ) && ! isset( $en_items[ "{$tag}-DRF" ] ) && ! isset( $en_items[ "{$tag}-PWD" ] ), 'AC-3 a hidden, draft or password-protected product is not in the feed' );
+		$check( false !== simplexml_load_string( $feed_en ) && "Serumplus {$tag}" === ( $en_items[ "{$tag}-CTL" ]['title'] ?? '' ) && 'Serum' === ProductFeed::text( "Ser\x00u\x1Fm\x7F" ), 'AC-3 a control character pasted into a product is removed, so the feed stays valid XML (' . ( $en_items[ "{$tag}-CTL" ]['title'] ?? 'missing' ) . ')' );
+		// E-288-4: after a product is saved, while another request builds the feed, the last good copy is served at once.
+		// The last good copy is marked, so only a request that did not rebuild can return the mark.
+		$transient = '_transient_' . ProductFeed::CACHE . 'en';
+		$marker    = '<!-- t83 last good copy ' . $tag . ' -->';
+		update_option( ProductFeed::LAST . 'en', $feed_en . $marker, false );
+		$lock = substr( 'mz_' . $wpdb->prefix . 'feed_en', 0, 64 );
+		$held = 1 === (int) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		ProductFeed::forget();
+		[ $busy_code, $busy_feed ] = $page( ProductFeed::url( 'en' ) );
+		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$stored = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $transient ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$check( $held && 200 === $busy_code && str_contains( $busy_feed, $marker ) && isset( $items( $busy_feed )[ $sku ] ) && null === $stored, 'AC-3 while another request holds the build, the feed is served from the last good copy and is not rebuilt (read from the database)' );
+		// A request that waited for the lock reads the feed the other request stored meanwhile, not its own earlier miss.
+		ProductFeed::forget();
+		get_transient( ProductFeed::CACHE . 'en' );
+		$meanwhile = $feed_en . '<!-- t83 built meanwhile ' . $tag . ' -->';
+		$wpdb->insert( $wpdb->options, array( 'option_name' => '_transient_timeout_' . ProductFeed::CACHE . 'en', 'option_value' => (string) ( time() + 600 ), 'autoload' => 'off' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$wpdb->insert( $wpdb->options, array( 'option_name' => $transient, 'option_value' => $meanwhile, 'autoload' => 'off' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$waited = ( new \ReflectionMethod( ProductFeed::class, 'fresh' ) )->invoke( null, 'en' );
+		$check( $waited === $meanwhile, 'AC-3 a request that waited for the build serves the feed stored meanwhile, and does not build it again' );
+		ProductFeed::forget();
 		[ , $feed_ar ] = $page( ProductFeed::url( 'ar' ) );
 		$ar_items = $items( $feed_ar );
 		$check( $ar_id > 0 && isset( $ar_items[ $sku ] ) && str_contains( $ar_items[ $sku ]['link'], '/ar/' ), 'AC-3 the Arabic feed lists the same item, by the same SKU, at its Arabic address' );

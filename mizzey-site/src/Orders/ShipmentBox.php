@@ -114,6 +114,8 @@ final class ShipmentBox
             ? sprintf(__('Shipment attached by %1$s: carrier %2$s, tracking number %3$s.', 'mizzey-site'), $who, $new['carrier'] ?: '-', $new['tracking'] ?: '-')
             : sprintf(__('Shipment corrected by %1$s: carrier %2$s to %3$s, tracking number %4$s to %5$s.', 'mizzey-site'), $who, $old['carrier'] ?: '-', $new['carrier'] ?: '-', $old['tracking'] ?: '-', $new['tracking'] ?: '-');
         $order->add_order_note($note, 0, false);
+        // A Shipped email that went out without these details promised them: they are sent now (NOTF-04).
+        Shipped::followUp($order);
 
         return true;
     }

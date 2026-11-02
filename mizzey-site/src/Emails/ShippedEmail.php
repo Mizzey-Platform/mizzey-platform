@@ -14,13 +14,17 @@ defined('ABSPATH') || exit;
  * The Shipped email (NOTF-04): a WooCommerce email, listed with the store's other emails, sent to the order's billing
  * email when the order first enters Shipped (the status model of specs/010), in the order's language, with
  * the carrier and the tracking number. Those come from the order's shipment (`Shipped::shipment()`): the carrier
- * integration supplies them (#291, Stage 4); until it does, the email says the tracking details follow.
+ * integration or staff supply them. When they are not known yet, the email says the tracking details follow, and the
+ * same email, sent as a follow-up (`trigger($order, true)`), brings them once they are.
  *
  * Register ids: NOTF-04. See specs/021-emails.
  */
 final class ShippedEmail extends \WC_Email
 {
     public const ID = 'mizzey_customer_shipped';
+
+    /** True while the email is the follow-up with the tracking details. */
+    private bool $followUp = false;
 
     public function __construct()
     {
@@ -45,6 +49,9 @@ final class ShippedEmail extends \WC_Email
     /** A subject staff set goes through WooCommerce's own path; the default follows the language of the moment. */
     public function get_subject()
     {
+        if ($this->followUp) {
+            return apply_filters('woocommerce_email_subject_' . $this->id, $this->format_string(__('Tracking details for your order #{order_number}', 'mizzey-site')), $this->object, $this);
+        }
         if (trim((string) ($this->settings['subject'] ?? '')) !== '') {
             return parent::get_subject();
         }
@@ -54,6 +61,9 @@ final class ShippedEmail extends \WC_Email
 
     public function get_heading()
     {
+        if ($this->followUp) {
+            return apply_filters('woocommerce_email_heading_' . $this->id, $this->format_string(__('Your tracking details', 'mizzey-site')), $this->object, $this);
+        }
         if (trim((string) ($this->settings['heading'] ?? '')) !== '') {
             return parent::get_heading();
         }
@@ -70,8 +80,9 @@ final class ShippedEmail extends \WC_Email
     {
     }
 
-    public function trigger(\WC_Order $order): bool
+    public function trigger(\WC_Order $order, bool $followUp = false): bool
     {
+        $this->followUp                       = $followUp;
         $this->object                         = $order;
         $this->recipient                      = $order->get_billing_email();
         $this->placeholders['{order_number}'] = $order->get_order_number();
@@ -91,7 +102,7 @@ final class ShippedEmail extends \WC_Email
                 __('Hello %s,', 'mizzey-site'),
                 $order instanceof \WC_Order ? $order->get_billing_first_name() : ''
             ),
-            __('Your order has been handed to the carrier.', 'mizzey-site'),
+            $this->followUp ? __('Here are the tracking details we promised for your order.', 'mizzey-site') : __('Your order has been handed to the carrier.', 'mizzey-site'),
         ];
         if ($shipment['carrier'] !== '' && $shipment['tracking'] !== '') {
             /* translators: 1: carrier name, 2: tracking number. */

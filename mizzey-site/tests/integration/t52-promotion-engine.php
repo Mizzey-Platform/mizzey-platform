@@ -202,6 +202,26 @@ run(
 		$auto_b->save();
 		t52_cart( array( $lipstick->get_id() => 2 ) );
 		$check( array( $auto_a->get_code() ) === t52_applied(), 'Q1 on a tie (20 and 20) the one created first applies' );
+		// E-281-2: the winner is chosen once for the same cart in a request; a change to a promotion chooses again.
+		$measured = 0;
+		$count_b  = static function ( $valid, $coupon = null ) use ( &$measured, $auto_b ) {
+			if ( $coupon instanceof \WC_Coupon && wc_format_coupon_code( $coupon->get_code() ) === wc_format_coupon_code( $auto_b->get_code() ) ) {
+				++$measured;
+			}
+			return $valid;
+		};
+		add_filter( 'woocommerce_coupon_is_valid', $count_b, 10, 2 );
+		WC()->cart->calculate_totals();
+		WC()->cart->calculate_totals();
+		$repeated = $measured;
+		$auto_b->set_amount( '21' );
+		$auto_b->save();
+		WC()->cart->calculate_totals();
+		remove_filter( 'woocommerce_coupon_is_valid', $count_b, 10 );
+		$check( 0 === $repeated && $measured > 0 && array( $auto_b->get_code() ) === t52_applied(), 'Q1 recalculating the same cart does not measure the promotions again (' . $repeated . '); changing one does, and the larger now applies (' . implode( ',', t52_applied() ) . ')' );
+		$auto_b->set_amount( '20' );
+		$auto_b->save();
+		t52_cart( array( $lipstick->get_id() => 2 ) );
 		WC()->cart->apply_coupon( $percent->get_code() );
 		WC()->cart->calculate_totals();
 		$check( array( $percent->get_code() ) === t52_applied(), 'AC-3 a code the customer enters takes the place of the automatic promotion' );

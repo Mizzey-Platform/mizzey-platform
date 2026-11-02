@@ -141,6 +141,24 @@ to the other.
 
 Consent reduces measured volume by design. Section 7 already allows for it.
 
+**What the site does, and what the container must do.** The site sets Google's consent mode before the container
+loads (denied until the visitor accepts), updates it when the visitor chooses, and pushes the choice to the data layer
+as the event `mizzey_consent` with `consent` set to `granted` or `denied`: on every page, and again at the moment of
+choosing. Google's own tags obey consent mode by themselves. **Tags that are not Google's (the Meta and TikTok pixels,
+and any other) do not read consent mode**, so the container must hold them back itself. Whoever builds the container
+(the client's team or agency, HND-06) configures it this way:
+
+| # | Container setting |
+|---|---|
+| C1 | Admin, Container settings: "Enable consent overview" switched on |
+| C2 | Every Google tag (Google tag, GA4 events): consent settings left at "Not set", which uses Google's built-in consent checks |
+| C3 | Every tag that is not Google's (Meta pixel, TikTok pixel, any other): consent settings, "Require additional consent for tag to fire", with `ad_storage` (and `analytics_storage` for an analytics tag) |
+| C4 | The same tags' triggers fire on the custom event `mizzey_consent` with the data layer variable `consent` equal to `granted` (for a page view tag), or on the commerce event itself (for a pixel's purchase or add to cart), never on "All Pages" or "Initialization" alone |
+| C5 | No tag is added outside Tag Manager (MKT-21, MKT-23), and no custom HTML tag sets a cookie before C3 is met |
+
+A container configured the ordinary way (a pixel on "All Pages" with no extra consent check) fires the pixel before
+the visitor chooses. That is a container fault, not a site fault, and check 5 below catches it.
+
 ## 9. How the plan is verified
 
 DOD-05 asks for the events to be verified. Before launch, on staging:
@@ -151,10 +169,13 @@ DOD-05 asks for the events to be verified. Before launch, on staging:
 | 2 | `purchase` carries the order's total, tax and shipping to the piaster |
 | 3 | An order submitted twice produces one `purchase`; a failed payment produces none |
 | 4 | A refund produces one `refund` with the refunded value |
-| 5 | With consent refused, no advertising request leaves the browser (checked in the network log) |
+| 5 | With consent refused, no advertising request leaves the browser (checked in the network log): before any choice, after "Essential only", and on a second page after "Essential only". The container's settings C1 to C5 (section 8) are confirmed in Tag Manager's consent overview |
 | 6 | `item_id` is the same for the English and the Arabic record of one product |
+| 7 | After "Accept all", the Meta and TikTok pixels fire on the next page without a new choice (the `mizzey_consent` event on page load) |
 
 ## 10. Handover
 
 The plan is handed over (HND-12) with the Tag Manager container, the Analytics property and the pixels, all in
-accounts the client owns (HND-06). Nothing in the measurement stack is held in a developer account.
+accounts the client owns (HND-06). Nothing in the measurement stack is held in a developer account. The container
+settings C1 to C5 of section 8 are part of the handover: the client's team or agency keeps them for every tag it adds
+later, and checks 5 and 7 of section 9 are run again after any change to the container.
