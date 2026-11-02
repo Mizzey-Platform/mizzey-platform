@@ -69,7 +69,11 @@ MKT-13 is marked [key] in the register.
 
 ### Edge Cases
 
-- A redirect to itself: refused.
+- A redirect to itself: refused, also through other redirects (`/a` to `/b` once `/b` goes to `/a`).
+- A visitor arriving with campaign parameters on an old path: the parameters go with them to the target, unless the
+  target has a query of its own.
+- A scanner asking for many missing paths: new paths are taken at most 30 a minute and the least asked leave first, so
+  the pages staff need stay in the log; no visitor request rewrites an option.
 - Probes for server files: not logged as missing pages.
 - A robots line that is not a directive: not kept.
 - A verification code with other characters: cleaned to letters, digits, hyphens and underscores.
@@ -96,10 +100,13 @@ MKT-13 is marked [key] in the register.
   collections and brands MUST have the SEO title, description, canonical and
   robots fields, per language record, saved with a nonce by staff who may edit them (AC-1).
 - **FR-002**: Redirects MUST be 301, matched on the normalised path before WordPress looks for a page, counted, and
-  MUST refuse a redirect to the same page and a target that is not a full web address (a bare query or fragment); a
-  target given as a path keeps its language prefix (AC-2).
+  MUST refuse a redirect to the same page, directly or through other redirects of the site, and a target that is not a
+  full web address (a bare query or fragment); a target given as a path keeps its language prefix; the request's query
+  string MUST be carried to a target that has none (AC-2).
 - **FR-003**: Missing pages MUST be logged by path with count, last time and referrer, never the visitor's address,
-  at most 500 paths (AC-3).
+  at most 500 paths (AC-3). The counts of missing pages and of redirect uses MUST be kept in the log's own table, each
+  as one atomic row update; at most 30 new missing paths a minute are taken, and when the log is full the least asked
+  and oldest path leaves first.
 - **FR-004**: Staff MUST choose which content kinds the sitemap lists; an item marked "do not index" MUST be left out;
   extra robots lines MUST be directives only (AC-4).
 - **FR-005**: The Google and Bing verification codes MUST be printed on the home page (AC-5).

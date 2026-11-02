@@ -174,7 +174,7 @@ final class SearchSettings
         } elseif ($task === 'redirect_remove') {
             Redirects::remove(isset($_POST['from']) ? sanitize_text_field(wp_unslash((string) $_POST['from'])) : '');
         } elseif ($task === 'missing_clear') {
-            update_option(Redirects::MISSING, [], false);
+            Redirects::clearMissing();
         } elseif ($task === 'settings') {
             $kinds = isset($_POST['listed']) && is_array($_POST['listed']) ? array_map('sanitize_key', wp_unslash($_POST['listed'])) : [];
             update_option(self::EXCLUDED, array_values(array_diff(array_keys(self::KINDS), $kinds)), false);
