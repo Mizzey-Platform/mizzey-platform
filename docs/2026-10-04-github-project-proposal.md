@@ -111,7 +111,7 @@ Neither template invents acceptance criteria. Criteria come from the spec, which
 ## The 74 PBIs, as the live board holds them
 
 **Read from the live Project, which is the operational state; this document records it, never the reverse.**
-Regenerated 31 October 2026, by `tools/gen_backlog_docs.py` from the live Project.
+Regenerated 2 November 2026, by `tools/gen_backlog_docs.py` from the live Project.
 
 | Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
