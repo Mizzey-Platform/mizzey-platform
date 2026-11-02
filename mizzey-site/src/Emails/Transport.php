@@ -47,6 +47,7 @@ final class Transport
     public static function relay(): array
     {
         $get = static fn (string $name): string => defined($name) ? trim((string) constant($name)) : '';
+        $raw = static fn (string $name): string => defined($name) ? (string) constant($name) : '';
         $secure = strtolower($get('MIZZEY_SMTP_SECURE'));
 
         return [
@@ -54,7 +55,7 @@ final class Transport
             'port'     => (int) ($get('MIZZEY_SMTP_PORT') !== '' ? $get('MIZZEY_SMTP_PORT') : 587),
             'secure'   => in_array($secure, ['tls', 'ssl', 'none'], true) ? $secure : 'tls',
             'user'     => $get('MIZZEY_SMTP_USER'),
-            'password' => $get('MIZZEY_SMTP_PASSWORD'),
+            'password' => $raw('MIZZEY_SMTP_PASSWORD'), // As given: a password may begin or end with a space.
         ];
     }
 
@@ -79,7 +80,9 @@ final class Transport
         $mailer->Username    = $relay['user'];
         $mailer->Password    = $relay['password'];
         $mailer->Timeout     = 15;
-        $mailer->Sender      = self::address();
+        if ((string) $mailer->Sender === '') {
+            $mailer->Sender = self::address(); // A bounce address someone else set is kept.
+        }
     }
 
     /** WooCommerce's sender address, or the site's admin address. */
@@ -90,13 +93,21 @@ final class Transport
         return is_email($woo) ? $woo : (string) get_option('admin_email');
     }
 
+    /** The address WordPress makes up when a message names no sender: wordpress@ and the site's domain. */
+    public static function wordpressDefault(): string
+    {
+        $host = strtolower((string) wp_parse_url(network_home_url(), PHP_URL_HOST));
+
+        return 'wordpress@' . (str_starts_with($host, 'www.') ? substr($host, 4) : $host);
+    }
+
     /**
      * @param mixed $from
      * @return mixed
      */
     public static function from($from)
     {
-        return is_string($from) && str_starts_with(strtolower($from), 'wordpress@') ? self::address() : $from;
+        return is_string($from) && strtolower($from) === self::wordpressDefault() ? self::address() : $from;
     }
 
     /**
@@ -116,7 +127,8 @@ final class Transport
         if (! $error instanceof \WP_Error || ! function_exists('wc_get_logger')) {
             return;
         }
-        $why = (string) preg_replace('/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/', '[email]', wp_strip_all_tags($error->get_error_message()));
+        // Any token around an @ is masked, whatever characters the address uses.
+        $why = (string) preg_replace('/[^\s<>"\x27(),;:\[\]]+@[^\s<>"\x27(),;:\[\]]+/', '[email]', wp_strip_all_tags($error->get_error_message()));
         wc_get_logger()->error('mail not sent: ' . mb_substr($why, 0, 300), ['source' => self::SOURCE]);
     }
 

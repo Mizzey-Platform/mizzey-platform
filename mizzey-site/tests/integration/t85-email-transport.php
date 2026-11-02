@@ -44,7 +44,7 @@ run(
 		define( 'MIZZEY_SMTP_HOST', 'smtp.relay.example.invalid' );
 		define( 'MIZZEY_SMTP_PORT', '2525' );
 		define( 'MIZZEY_SMTP_USER', "{$tag}user" );
-		define( 'MIZZEY_SMTP_PASSWORD', "{$tag}-secret-pass" );
+		define( 'MIZZEY_SMTP_PASSWORD', " {$tag}-secret-pass " );
 		$keep = get_option( 'woocommerce_email_from_address', null );
 		$name = get_option( 'woocommerce_email_from_name', null );
 		$s->on_finish(
@@ -57,8 +57,15 @@ run(
 		update_option( 'woocommerce_email_from_address', "orders-{$tag}@example.com" );
 		update_option( 'woocommerce_email_from_name', 'Mizzey' );
 		$m = $mailer();
-		$check( 'smtp' === $m->Mailer && 'smtp.relay.example.invalid' === $m->Host && 2525 === (int) $m->Port && 'tls' === $m->SMTPSecure && true === $m->SMTPAuth && "{$tag}user" === $m->Username && "orders-{$tag}@example.com" === $m->Sender, 'AC-1 every message leaves through the relay the server names, with TLS, authenticated, and WooCommerce\'s sender as its return path' );
-		$check( "orders-{$tag}@example.com" === apply_filters( 'wp_mail_from', 'wordpress@example.com' ) && 'Mizzey' === apply_filters( 'wp_mail_from_name', 'WordPress' ) && 'shop@x.example' === apply_filters( 'wp_mail_from', 'shop@x.example' ), 'AC-1 WordPress\'s own messages take WooCommerce\'s sender; a sender set on purpose is kept' );
+		$check( 'smtp' === $m->Mailer && 'smtp.relay.example.invalid' === $m->Host && 2525 === (int) $m->Port && 'tls' === $m->SMTPSecure && true === $m->SMTPAuth && "{$tag}user" === $m->Username && " {$tag}-secret-pass " === $m->Password && "orders-{$tag}@example.com" === $m->Sender, 'AC-1 every message leaves through the relay the server names, with TLS, authenticated, and WooCommerce\'s sender as its return path' );
+		$preset = ( static function (): object {
+			$m         = new \PHPMailer\PHPMailer\PHPMailer( true );
+			$m->Sender = 'bounces@relay.example';
+			do_action_ref_array( 'phpmailer_init', array( &$m ) );
+			return $m;
+		} )();
+		$check( 'bounces@relay.example' === $preset->Sender, 'AC-1 a bounce address set by someone else is kept; the password is used exactly as given' );
+		$check( "orders-{$tag}@example.com" === apply_filters( 'wp_mail_from', 'wordpress@example.com' ) && 'Mizzey' === apply_filters( 'wp_mail_from_name', 'WordPress' ) && 'shop@x.example' === apply_filters( 'wp_mail_from', 'shop@x.example' ) && 'wordpress@vendor.example' === apply_filters( 'wp_mail_from', 'wordpress@vendor.example' ), 'AC-1 WordPress\'s own messages take WooCommerce\'s sender; a sender set on purpose is kept' );
 		$admin = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}adm@example.invalid", 'role' => 'administrator' ) );
 		$s->track_user( $admin );
 		wp_set_current_user( $admin );
@@ -71,13 +78,13 @@ run(
 		$raised = array();
 		Monitoring::$sink = static function ( array $entry ) use ( &$raised ) { $raised[] = $entry; };
 		$s->on_finish( static function () { Monitoring::$sink = null; } );
-		do_action( 'wp_mail_failed', new \WP_Error( 'wp_mail_failed', "SMTP Error: The following recipients failed: {$tag}customer@example.com" ) );
+		do_action( 'wp_mail_failed', new \WP_Error( 'wp_mail_failed', "SMTP Error: The following recipients failed: {$tag}customer@example.com, jane.doe!{$tag}@example.com" ) );
 		$dir   = defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : trailingslashit( wp_upload_dir()['basedir'] ) . 'wc-logs/';
 		$lines = '';
 		foreach ( (array) glob( trailingslashit( $dir ) . Transport::SOURCE . '-*.log' ) as $file ) {
 			$lines .= (string) file_get_contents( $file );
 		}
-		$check( str_contains( $lines, 'mail not sent: SMTP Error: The following recipients failed: [email]' ) && ! str_contains( $lines, "{$tag}customer@example.com" ), 'AC-2 a failed message is logged under mizzey-email, with the address masked' );
+		$check( str_contains( $lines, 'mail not sent: SMTP Error: The following recipients failed: [email]' ) && ! str_contains( $lines, "{$tag}customer@example.com" ) && ! str_contains( $lines, "{$tag}@example.com" ), 'AC-2 a failed message is logged under mizzey-email, with the address masked' );
 		$check( array() !== array_filter( $raised, static fn ( $r ) => Transport::SOURCE === $r['where'] ), 'AC-2 the failure is raised to operations' );
 		delete_transient( 'mizzey_monitor_' . md5( 'integration|' . Transport::SOURCE ) );
 
