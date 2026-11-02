@@ -95,10 +95,14 @@ final class PaymentRecord
         $order->save();
     }
 
-    public static function flag(\WC_Order $order, string $message): void
+    /** A flag for staff, once per `$key` when one is given (a repeated event is not flagged again). */
+    public static function flag(\WC_Order $order, string $message, string $key = ''): void
     {
-        $items   = self::attention($order);
-        $items[] = ['at' => time(), 'message' => $message];
+        $items = self::attention($order);
+        if ($key !== '' && in_array($key, array_column($items, 'key'), true)) {
+            return;
+        }
+        $items[] = ['at' => time(), 'message' => $message] + ($key !== '' ? ['key' => $key] : []);
         $order->update_meta_data(self::ATTENTION, $items);
         $order->save();
         $order->add_order_note($message);

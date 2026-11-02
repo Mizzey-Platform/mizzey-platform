@@ -47,4 +47,10 @@ interface PaymentProvider
      * refund, or null when the provider did not make it.
      */
     public function refundTransaction(string $reference, int $amountCents): ?string;
+
+    /**
+     * Why a verified event cannot belong to this order (a signed fact that contradicts it), or null. The order
+     * reference a provider sends back may not be covered by its signature, so this is the check that ties the two.
+     */
+    public function bindingProblem(\WC_Order $order, PaymentEvent $event): ?string;
 }

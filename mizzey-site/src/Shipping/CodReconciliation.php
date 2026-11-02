@@ -157,6 +157,10 @@ final class CodReconciliation
         $problem = self::remit($order, $amount, $date, $ref);
         if ($problem !== null && class_exists('\WC_Admin_Meta_Boxes')) {
             \WC_Admin_Meta_Boxes::add_error($problem);
+        } elseif ($problem === null) {
+            // WooCommerce's own save runs next and sets the status from the form, which still says COD Collected: it
+            // is told the status the remittance moved the order to, so the timeline records no refused change.
+            $_POST['order_status'] = 'wc-' . wc_get_order($order->get_id())->get_status();
         }
     }
 

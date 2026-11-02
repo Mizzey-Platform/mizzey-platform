@@ -53,6 +53,7 @@ final class T68Provider implements PaymentProvider {
 	}
 	public function refundReferenceInNote( string $note ): ?string { return null; }
 	public function refundTransaction( string $reference, int $amountCents ): ?string { return null; }
+	public function bindingProblem( \WC_Order $order, PaymentEvent $event ): ?string { return null; }
 }
 
 /** A Paymob transaction object as Paymob sends it, for an order. */
@@ -165,9 +166,14 @@ run(
 		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 notice altered after signing (amount) refused 403' );
 		$r = $notice( t68_obj( 999999999 ) );
 		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 signed notice for an unknown order refused 403' );
-		$cod = $order( 'cod' );
-		$r   = $notice( t68_obj( $cod->get_id() ) );
-		$check( 403 === ( $r['status'] ?? 0 ), 'AC-4 signed notice for an order of another gateway refused 403' );
+		// A card payment for an order that now pays by cash on delivery: the money was taken, so it is recorded and
+		// flagged for staff, once, and the gateway never acts on the order.
+		$cod     = $order( 'cod' );
+		$cod_obj = t68_obj( $cod->get_id() );
+		$r       = $notice( $cod_obj );
+		$cod_now = $fresh( $cod->get_id() );
+		$again   = $notice( $cod_obj );
+		$check( 200 === ( $r['status'] ?? 0 ) && 'pending' === $cod_now->get_status() && 1 === count( PaymentRecord::events( $cod_now ) ) && 1 === count( PaymentRecord::attention( $cod_now ) ) && 403 === ( $again['status'] ?? 0 ) && 1 === count( PaymentRecord::attention( $fresh( $cod->get_id() ) ) ), 'AC-4 a signed payment for an order of another method is recorded and flagged for staff once, not applied (' . ( $r['status'] ?? 0 ) . ', ' . $cod_now->get_status() . ')' );
 		$last = null;
 		PaymentGate::handle( $paymob, 'POST', array( 'hmac' => 'x' ), (string) wp_json_encode( array( 'intention' => array( 'id' => 'pi_test' ) ) ) );
 		$check( 403 === ( $last['status'] ?? 0 ), 'AC-4 a notice of another shape refused 403' );
@@ -447,6 +453,52 @@ run(
 		wp_set_current_user( $who );
 		$res = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'body' => array( 'action' => 'paymob_aw_cart_amount' ), 'timeout' => 20 ) ); // storefront-guard: exempt, an ajax endpoint answering JSON, not a page
 		$check( 403 === (int) wp_remote_retrieve_response_code( $res ) && str_contains( (string) wp_remote_retrieve_body( $res ), 'not_available' ), 'Security: over the real request, an unused plugin entry point answers 403 not_available (' . wp_remote_retrieve_response_code( $res ) . ')' );
+
+		// ---- Binding: a signed transaction is tied to the order it pays (audit 2 November, C M-1, L-2, L-3) ---------
+		// Someone else's success presented with a paid order's reference: refunded as a second payment, and never shown
+		// that order's confirmation page.
+		// Paymob's API is stood in for here too: nothing leaves this machine.
+		$no_net = static fn ( $pre, $args, $req_url ) => str_contains( (string) $req_url, 'paymob.com' ) ? array( 'headers' => array(), 'body' => '{"success":false}', 'response' => array( 'code' => 400, 'message' => 'Bad Request' ), 'cookies' => array(), 'filename' => null ) : $pre;
+		add_filter( 'pre_http_request', $no_net, 10, 3 );
+		$replay = t68_obj( $b->get_id() );
+		$r      = $return( $replay );
+		remove_filter( 'pre_http_request', $no_net, 10 );
+		$check( ( $r['status'] ?? 0 ) < 400 && ! str_contains( (string) ( $r['location'] ?? '' ), 'order-received' ) && (string) $paid['order']['id'] === (string) $fresh( $b->get_id() )->get_meta( PaymentGate::PROVIDER_ORDER ), 'M-1 a transaction of another Paymob order, returned with a paid order\'s reference, never reaches that order\'s confirmation page; the paying Paymob order stays pinned (' . ( $r['location'] ?? '' ) . ')' );
+		// A failure of another amount cannot fail an order awaiting payment; one of its own amount can.
+		$waiting = $order();
+		$waiting->update_meta_data( 'PaymobCentsAmount', '5000' );
+		$waiting->save();
+		$r_other = $notice( t68_obj( $waiting->get_id(), array( 'success' => false, 'amount_cents' => 7300 ) ) );
+		$r_own   = $notice( t68_obj( $waiting->get_id(), array( 'success' => false ) ) );
+		$check( 403 === ( $r_other['status'] ?? 0 ) && null === $r_own && 'pending' === $fresh( $waiting->get_id() )->get_status(), 'M-1 a signed failure of another amount is refused for an order awaiting payment; a failure of its own amount goes to the gateway' );
+		// A transaction of an integration the store does not use is refused.
+		$plugin = get_option( PaymobProvider::SETTINGS );
+		update_option( PaymobProvider::SETTINGS, array_merge( (array) $plugin, array( 'integration_id_hidden' => '111222 : Card (EGP),333444 : Wallet (EGP)' ) ) );
+		$foreign = $notice( t68_obj( $order()->get_id() ) );
+		$ours    = $notice( t68_obj( $order()->get_id(), array( 'integration_id' => 333444 ) ) );
+		update_option( PaymobProvider::SETTINGS, $plugin );
+		$check( 403 === ( $foreign['status'] ?? 0 ) && null === $ours, 'M-1 a transaction of an integration the store does not use is refused; one of its own goes on' );
+		// A success of the wrong amount, returned again and again, is flagged once.
+		$short = $order();
+		$low   = t68_obj( $short->get_id(), array( 'amount_cents' => 4000 ) );
+		$return( $low );
+		$return( $low );
+		$return( $low );
+		$check( 1 === count( PaymentRecord::attention( $fresh( $short->get_id() ) ) ) && 'pending' === $fresh( $short->get_id() )->get_status(), 'L-2 a mismatched success returned three times is flagged once and does not pay the order' );
+		// FR-011: keys that do not match the environment are pointed out to staff.
+		$keys = get_option( 'woocommerce_paymob-main_settings' );
+		$test_mode = PaymobProvider::keyMode();
+		update_option( 'woocommerce_paymob-main_settings', array_merge( (array) $keys, array( 'sec_key' => 'egy_sk_live_t68', 'pub_key' => 'egy_pk_live_t68' ) ) );
+		$live_mode = PaymobProvider::keyMode();
+		$admin_ids = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
+		$was       = get_current_user_id();
+		wp_set_current_user( (int) ( $admin_ids[0] ?? 0 ) );
+		ob_start();
+		PaymentGate::keyNotice();
+		$warned = (string) ob_get_clean();
+		wp_set_current_user( $was );
+		update_option( 'woocommerce_paymob-main_settings', $keys );
+		$check( 'test' === $test_mode && 'live' === $live_mode && ( 'production' === wp_get_environment_type() || str_contains( $warned, 'live keys' ) ), 'FR-011 the stored keys\' mode is read from their prefixes, and live keys outside the live store are pointed out to staff (' . $test_mode . ', ' . $live_mode . ')' );
 
 		// ---- AC-5: no card number kept ---------------------------------------------------------------------------
 		$like = '%' . $wpdb->esc_like( T68_PAN ) . '%';

@@ -201,6 +201,20 @@ run(
 		$partial = $rest( '60' );
 		$full    = $rest( (string) ( (float) $fresh( $refund_order->get_id() )->get_total() - 60 ) );
 		$check( user_can( $editor, 'edit_shop_orders' ) && 403 === $refused->get_status() && 201 === $partial->get_status() && 201 === $full->get_status() && 'refunded' === $fresh( $refund_order->get_id() )->get_status(), 'AC-5 staff who edit orders without the refund permission are refused (' . $refused->get_status() . '); permitted staff refund in part and then in full (' . $partial->get_status() . ', ' . $full->get_status() . ')' );
+		// Moving an order to Refunded makes WooCommerce record a full refund: the same permission, on every route.
+		$by_status = $make( 'cod', '', '2026-11-02', '01001110007' );
+		$by_status->payment_complete();
+		wp_set_current_user( $editor );
+		$put = new \WP_REST_Request( 'PUT', '/wc/v3/orders/' . $by_status->get_id() );
+		$put->set_param( 'status', 'refunded' );
+		$put_answer = rest_get_server()->dispatch( $put );
+		$screen     = $fresh( $by_status->get_id() );
+		$screen->update_status( 'refunded', '', true );
+		$after_staff = $fresh( $by_status->get_id() );
+		wp_set_current_user( $admin );
+		$allowed = $fresh( $by_status->get_id() );
+		$allowed->update_status( 'refunded', '', true );
+		$check( 400 === $put_answer->get_status() && 'refunded' !== $after_staff->get_status() && 0 === count( $after_staff->get_refunds() ) && 'refunded' === $fresh( $by_status->get_id() )->get_status(), 'AC-5 staff without the refund permission cannot move an order to Refunded, over REST or by a manual change, so no full refund is recorded; permitted staff can (' . $put_answer->get_status() . ', ' . $after_staff->get_status() . ')' );
 
 		// ---- AC-6: the packing slip ----------------------------------------------------------------------------
 		$a_fresh = $fresh( $a->get_id() );

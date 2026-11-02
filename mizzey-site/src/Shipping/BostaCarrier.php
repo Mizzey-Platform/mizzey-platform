@@ -23,6 +23,8 @@ final class BostaCarrier implements Carrier
     public const TRACKING = 'bosta_tracking_number';
     public const CODE     = 'bosta_state_code';
     public const LABEL    = 'bosta_status';
+    /** Bosta's plugin's delivery time for a delivered parcel. */
+    public const DELIVERED = 'bosta_delivery_date';
 
     public function id(): string
     {
@@ -51,6 +53,21 @@ final class BostaCarrier implements Carrier
             return null;
         }
 
-        return ['code' => $code, 'label' => mb_substr(sanitize_text_field((string) $order->get_meta(self::LABEL)), 0, 120), 'at' => time()];
+        return ['code' => $code, 'label' => mb_substr(sanitize_text_field((string) $order->get_meta(self::LABEL)), 0, 120), 'at' => self::deliveredAt($order) ?? time()];
+    }
+
+    /**
+     * Bosta's own delivery time, as its plugin stores it for a delivered parcel ("Monday, 02/11/2026 03:45pm", Cairo
+     * time), so a cash collection is dated when the courier collected, not when the store read the code (ADR-0002).
+     */
+    public static function deliveredAt(\WC_Order $order): ?int
+    {
+        $text = trim((string) $order->get_meta(self::DELIVERED));
+        if ($text === '') {
+            return null;
+        }
+        $at = \DateTimeImmutable::createFromFormat('l, d/m/Y h:ia', $text, new \DateTimeZone('Africa/Cairo'));
+
+        return $at instanceof \DateTimeImmutable && $at->getTimestamp() <= time() + HOUR_IN_SECONDS ? $at->getTimestamp() : null;
     }
 }

@@ -29,6 +29,34 @@ final class DeliveryEstimate
             add_filter("woocommerce_shipping_instance_form_fields_{$method}", [self::class, 'fields']);
         }
         add_filter('woocommerce_package_rates', [self::class, 'rates'], 20, 1);
+        add_filter('woocommerce_cart_shipping_packages', [self::class, 'packages'], 20, 1);
+    }
+
+    /**
+     * WooCommerce keeps calculated rates in the session by a hash of the package, which does not include the language:
+     * the language is added, so a cart seen in English and then in Arabic gets its estimate in each.
+     *
+     * @param mixed $packages
+     * @return mixed
+     */
+    public static function packages($packages)
+    {
+        if (! is_array($packages)) {
+            return $packages;
+        }
+        $lang = self::language();
+        foreach ($packages as $i => $package) {
+            if (is_array($package)) {
+                $packages[$i]['mizzey_language'] = $lang;
+            }
+        }
+
+        return $packages;
+    }
+
+    private static function language(): string
+    {
+        return (string) apply_filters('wpml_current_language', null) === 'ar' ? 'ar' : 'en';
     }
 
     /**
@@ -55,7 +83,7 @@ final class DeliveryEstimate
         if (! is_array($rates)) {
             return $rates;
         }
-        $lang = (string) apply_filters('wpml_current_language', null) === 'ar' ? 'ar' : 'en';
+        $lang = self::language();
         foreach ($rates as $rate) {
             if (! $rate instanceof \WC_Shipping_Rate) {
                 continue;

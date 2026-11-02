@@ -137,9 +137,14 @@ run(
 
 		// ---- AC-6: cash on delivery ----------------------------------------------------------------------------
 		$cash = $make( 'cod', StatusModel::SHIPPED );
+		// Bosta's plugin stores its own delivery time with the delivered state; the collection is dated by it.
+		$with_time = $fresh( $cash );
+		$with_time->update_meta_data( \MizzeySite\Shipping\BostaCarrier::DELIVERED, 'Monday, 02/11/2026 03:45pm' );
+		$with_time->save();
 		$o    = $bosta( $cash, 45, 'Delivered' );
 		$collected = (string) $o->get_meta( CodReconciliation::COLLECTED );
-		$check( $o->has_status( StatusModel::COD_COLLECTED ) && wc_format_decimal( $o->get_total() ) === $collected && (int) $o->get_meta( CodReconciliation::COLLECTED_AT ) > 0, 'AC-6 a delivered cash order is COD Collected, with the amount and time kept (' . $o->get_status() . ', ' . $collected . ')' );
+		$bosta_at  = ( new \DateTimeImmutable( '2026-11-02 15:45:00', new \DateTimeZone( 'Africa/Cairo' ) ) )->getTimestamp();
+		$check( $o->has_status( StatusModel::COD_COLLECTED ) && wc_format_decimal( $o->get_total() ) === $collected && $bosta_at === (int) $o->get_meta( CodReconciliation::COLLECTED_AT ), 'AC-6 a delivered cash order is COD Collected, with the amount kept and the time Bosta delivered it, not the time the store read the code (' . $o->get_status() . ', ' . $collected . ', ' . $o->get_meta( CodReconciliation::COLLECTED_AT ) . ')' );
 		$o->update_meta_data( BostaCarrier::CODE, '' );
 		$o->save();
 		$o = $bosta( $cash, 45, 'Delivered' );
@@ -161,6 +166,23 @@ run(
 		$r = CodReconciliation::of( $o );
 		$check( $o->has_status( 'completed' ) && $collected === $r['remitted'] && '2026-11-02' === $r['remitted_at'] && "{$tag}RMT" === $r['reference'] && $collected === $r['collected'], 'AC-6 the remittance is kept apart from the collection, and the order is Delivered (' . $o->get_status() . ')' );
 		$check( ! in_array( $cash, $unremitted(), true ), 'AC-6 a remitted order leaves the unremitted list' );
+		// From the order screen: WooCommerce's own save runs after the remittance and must keep Delivered.
+		$cash2 = $make( 'cod', StatusModel::SHIPPED );
+		$bosta( $cash2, 45, 'Delivered' );
+		wp_set_current_user( $staff );
+		$posted = $_POST;
+		$_POST  = array(
+			CodReconciliation::NONCE . '_nonce' => wp_create_nonce( CodReconciliation::NONCE ),
+			'mizzey_cod_remitted'               => (string) $fresh( $cash2 )->get_meta( CodReconciliation::COLLECTED ),
+			'mizzey_cod_remitted_at'            => '2026-11-02',
+			'mizzey_cod_reference'              => "{$tag}SCR",
+			'order_status'                      => 'wc-' . StatusModel::COD_COLLECTED,
+		);
+		CodReconciliation::save( $cash2 );
+		$form_status = (string) $_POST['order_status'];
+		$_POST       = $posted;
+		wp_set_current_user( 0 );
+		$check( 'wc-completed' === $form_status && $fresh( $cash2 )->has_status( 'completed' ), 'AC-6 a remittance from the order screen hands WooCommerce\'s own save the Delivered status, so no refused change is recorded (' . $form_status . ')' );
 
 		// ---- No path from a doubtful carrier status to Delivered ------------------------------------------------------
 		// An unmapped code on a shipped order: it stays shipped, in review.
@@ -287,6 +309,16 @@ run(
 		$bare = new \WC_Shipping_Rate( 'free_shipping:' . $free, 'Free', 0, array(), 'free_shipping', $free );
 		DeliveryEstimate::rates( array( $bare ) );
 		$check( ! isset( $bare->get_meta_data()[ DeliveryEstimate::META ] ), 'AC-2 a rate with no estimate shows none' );
+		// WooCommerce caches rates per package hash: the language is part of the package, so the hash differs per language.
+		$package = static function ( string $lang ): string {
+			do_action( 'wpml_switch_language', $lang );
+			$p = DeliveryEstimate::packages( array( array( 'contents' => array(), 'destination' => array( 'country' => 'EG', 'state' => 'EG-01' ) ) ) );
+			return md5( wp_json_encode( $p[0] ) );
+		};
+		$hash_en = $package( 'en' );
+		$hash_ar = $package( 'ar' );
+		do_action( 'wpml_switch_language', null );
+		$check( $hash_en !== $hash_ar, 'AC-2 the same cart in English and in Arabic is a different shipping package, so a cached English estimate is never shown in Arabic' );
 
 		return $ok;
 	}
