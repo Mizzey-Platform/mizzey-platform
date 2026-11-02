@@ -157,10 +157,8 @@ final class SignInLink
                     WC()->session->set_customer_session_cookie(true);
                 }
             }
-            if (! headers_sent()) {
-                header('Referrer-Policy: no-referrer');
-                header('Cache-Control: no-store');
-            }
+            // The redirect loads nothing, so no referrer carries the token; it is not cached.
+            nocache_headers();
             wp_safe_redirect($account);
             exit;
         }
