@@ -95,11 +95,14 @@ run(
 		$_POST = array();
 		$check( str_contains( $form, 'mizzey_pref_reviews' ) && false === apply_filters( 'mizzey_review_invitation_allowed', true, $done ) && MarketingConsent::given( $customer ), 'AC-4 IA-23, ACCT-11 the customer turns the review invitation off and offers on' );
 
+		$later = $order( 'completed', 1 );
+		$check( '' === (string) wc_get_order( $later->get_id() )->get_meta( \MizzeySite\Reviews\ReviewInvitation::SENT ), 'AC-4 an order delivered after the customer turned invitations off sends no review invitation' );
+
 		// ---- AC-5: figures -------------------------------------------------------------------------------------------
 		$second = $order( 'processing', 1 );
 		wc_create_refund( array( 'order_id' => $done->get_id(), 'amount' => '50', 'reason' => 't87' ) );
 		$m = CustomerMetrics::of( $customer );
-		$check( 2 === $m['orders'] && 400.0 === $m['spend'] && 200.0 === $m['average'] && 1 === $m['refunded'], 'AC-5 ADM-101 total spend net of refunds, paid orders, average order value, refunded orders (' . wp_json_encode( $m ) . ')' );
+		$check( 3 === $m['orders'] && 550.0 === $m['spend'] && round( 550 / 3, 2 ) === $m['average'] && 1 === $m['refunded'], 'AC-5 ADM-101 total spend net of refunds, paid orders, average order value, refunded orders (' . wp_json_encode( $m ) . ')' );
 		foreach ( array( $done->get_id(), $second->get_id() ) as $id ) {
 			\Automattic\WooCommerce\Internal\Admin\Schedulers\OrdersScheduler::import( $id );
 		}
