@@ -160,15 +160,38 @@ run(
 		$kept = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE kind = 'm'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$log  = Redirects::missing();
 		$check( Redirects::KEEP === $kept && isset( $log[ $often ] ) && isset( $log[ "/{$tag}-fresh" ] ), 'AC-3 the log stays at ' . Redirects::KEEP . ' paths; a new path drops one asked once, never one asked often (' . $kept . ')' );
-		// New paths are taken at most NEW_PER_MINUTE a minute; a path already logged is still counted.
+		// The log full of paths asked twice: a new path is trimmed again at once, so only counting admissions limits it.
+		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET hits = 2 WHERE kind = 'm' AND path LIKE %s", '/' . $wpdb->esc_like( "{$tag}-junk-" ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$inserts       = 0;
+		$count_inserts = static function ( $sql ) use ( &$inserts, $table ) {
+			if ( str_starts_with( ltrim( (string) $sql ), "INSERT INTO {$table}" ) && str_contains( (string) $sql, "VALUES ('m', " ) ) {
+				++$inserts;
+			}
+			return $sql;
+		};
+		add_filter( 'query', $count_inserts );
+		// New paths are admitted one request at a time: while another connection holds the admission lock, none is.
+		$other      = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$other_held = 1 === (int) $other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 5)', Redirects::admitLock() ) );
+		$_SERVER['REQUEST_URI'] = "/{$tag}-while-locked/";
+		Redirects::logMissing();
+		$other->get_var( $other->prepare( 'SELECT RELEASE_LOCK(%s)', Redirects::admitLock() ) );
+		$other->close();
+		$check( $other_held && 0 === $inserts, 'AC-3 a new missing path is admitted (counted and trimmed) by one request at a time: none while another holds the admission lock' );
+		// New paths are admitted at most NEW_PER_MINUTE a minute, within one minute; a path already logged is still counted.
+		if ( time() % MINUTE_IN_SECONDS > 45 ) {
+			sleep( MINUTE_IN_SECONDS - time() % MINUTE_IN_SECONDS + 1 );
+		}
+		$inserts = 0;
 		for ( $n = 0; $n < Redirects::NEW_PER_MINUTE + 5; $n++ ) {
 			$_SERVER['REQUEST_URI'] = "/{$tag}-flood-{$n}/";
 			Redirects::logMissing();
 		}
-		$recent = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE kind = 'm' AND first_seen >= %d", time() - MINUTE_IN_SECONDS ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$_SERVER['REQUEST_URI'] = "/{$tag}-fresh/";
+		remove_filter( 'query', $count_inserts );
+		$_SERVER['REQUEST_URI'] = $often . '/';
 		Redirects::logMissing();
-		$check( $recent <= Redirects::NEW_PER_MINUTE && ! isset( Redirects::missing()[ "/{$tag}-flood-" . ( Redirects::NEW_PER_MINUTE + 4 ) ] ) && 2 === (int) ( Redirects::missing()[ "/{$tag}-fresh" ]['hits'] ?? 0 ), 'AC-3 a flood of new paths is taken at most ' . Redirects::NEW_PER_MINUTE . ' a minute (' . $recent . '); a known path is still counted' );
+		$kept_now = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE kind = 'm'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$check( $inserts <= Redirects::NEW_PER_MINUTE && Redirects::KEEP === $kept_now && 10 === (int) ( Redirects::missing()[ $often ]['hits'] ?? 0 ), 'AC-3 a flood of new paths is admitted at most ' . Redirects::NEW_PER_MINUTE . ' a minute, also when each is trimmed again at once (' . $inserts . ' of ' . ( Redirects::NEW_PER_MINUTE + 5 ) . '); the log stays at ' . Redirects::KEEP . '; a known path is still counted' );
 		if ( null === $uri ) {
 			unset( $_SERVER['REQUEST_URI'] );
 		} else {

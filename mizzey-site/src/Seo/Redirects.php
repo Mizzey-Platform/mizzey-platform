@@ -38,6 +38,7 @@ final class Redirects
     /** A redirect's use and a missing page, as the table names their kind. */
     private const REDIRECT = 'r';
     private const MISS     = 'm';
+    private const ADMITTED = 'n'; // One row per minute: how many new missing paths were admitted in it.
 
     public static function register(): void
     {
@@ -273,10 +274,20 @@ final class Redirects
         self::count(self::MISS, $path, mb_substr($referrer, 0, 300));
     }
 
+    /** The named lock that admits new missing paths one at a time. */
+    public static function admitLock(): string
+    {
+        global $wpdb;
+
+        return substr('mz_' . $wpdb->prefix . 'seo_log_admit', 0, 64);
+    }
+
     /**
-     * One more use of a path, as a single row update. A new missing path is taken only while fewer than
-     * `NEW_PER_MINUTE` were taken in the last minute, and the log is then trimmed to `KEEP` paths, the least asked
-     * and the oldest leaving first. A redirect's path is always counted: staff set those, so they are few.
+     * One more use of a path, as a single row update. A new missing path is admitted under a named lock, one request at
+     * a time: only while fewer than `NEW_PER_MINUTE` were admitted this minute (counted as admissions, in a counter
+     * row, so paths trimmed again at once still count), and the log is then trimmed to `KEEP` paths, the least asked
+     * and the oldest leaving first. A request that cannot take the lock within a second admits nothing. A redirect's
+     * path is always counted: staff set those, so they are few.
      */
     private static function count(string $kind, string $path, string $referrer): void
     {
@@ -291,19 +302,31 @@ final class Redirects
         if ((int) $done > 0) {
             return;
         }
-        if ($kind === self::MISS) {
-            $recent = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE kind = %s AND first_seen >= %d", $kind, $now - MINUTE_IN_SECONDS)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            if ($recent >= self::NEW_PER_MINUTE) {
-                return;
-            }
-        }
-        $wpdb->query($wpdb->prepare("INSERT INTO {$table} (kind, path_hash, path, hits, first_seen, last_seen, referrer) VALUES (%s, %s, %s, 1, %d, %d, %s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = %d", $kind, $hash, mb_substr($path, 0, 300), $now, $now, $referrer, $now)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $insert = static fn () => $wpdb->query($wpdb->prepare("INSERT INTO {$table} (kind, path_hash, path, hits, first_seen, last_seen, referrer) VALUES (%s, %s, %s, 1, %d, %d, %s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = %d", $kind, $hash, mb_substr($path, 0, 300), $now, $now, $referrer, $now)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         if ($kind !== self::MISS) {
+            $insert();
             return;
         }
-        $over = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE kind = %s", $kind)) - self::KEEP; // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        if ($over > 0) {
-            $wpdb->query($wpdb->prepare("DELETE FROM {$table} WHERE kind = %s ORDER BY hits ASC, last_seen ASC LIMIT %d", $kind, $over)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $lock = self::admitLock();
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 1)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return;
+        }
+        try {
+            $minute = 'minute-' . intdiv($now, MINUTE_IN_SECONDS);
+            $taken  = (int) $wpdb->get_var($wpdb->prepare("SELECT hits FROM {$table} WHERE kind = %s AND path_hash = %s", self::ADMITTED, md5($minute))); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            if ($taken >= self::NEW_PER_MINUTE) {
+                return;
+            }
+            $insert();
+            $wpdb->query($wpdb->prepare("INSERT INTO {$table} (kind, path_hash, path, hits, first_seen, last_seen, referrer) VALUES (%s, %s, %s, 1, %d, %d, '') ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = %d", self::ADMITTED, md5($minute), $minute, $now, $now, $now)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $wpdb->query($wpdb->prepare("DELETE FROM {$table} WHERE kind = %s AND first_seen < %d", self::ADMITTED, $now - 2 * MINUTE_IN_SECONDS)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            // Counted and trimmed by one request at a time, so two requests never both trim for the same excess.
+            $over = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE kind = %s", $kind)) - self::KEEP; // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            if ($over > 0) {
+                $wpdb->query($wpdb->prepare("DELETE FROM {$table} WHERE kind = %s ORDER BY hits ASC, last_seen ASC LIMIT %d", $kind, $over)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            }
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
     }
 

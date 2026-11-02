@@ -105,8 +105,8 @@ MKT-13 is marked [key] in the register.
   string MUST be carried to a target that has none (AC-2).
 - **FR-003**: Missing pages MUST be logged by path with count, last time and referrer, never the visitor's address,
   at most 500 paths (AC-3). The counts of missing pages and of redirect uses MUST be kept in the log's own table, each
-  as one atomic row update; at most 30 new missing paths a minute are taken, and when the log is full the least asked
-  and oldest path leaves first.
+  as one atomic row update; new missing paths are admitted one request at a time, at most 30 a minute (counted as
+  admissions, whatever is trimmed afterwards), and when the log is full the least asked and oldest path leaves first.
 - **FR-004**: Staff MUST choose which content kinds the sitemap lists; an item marked "do not index" MUST be left out;
   extra robots lines MUST be directives only (AC-4).
 - **FR-005**: The Google and Bing verification codes MUST be printed on the home page (AC-5).
