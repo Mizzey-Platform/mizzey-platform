@@ -59,6 +59,8 @@ final class OrderStock
     public const UNRELEASED = '_mizzey_stock_unreleased';
     /** The background retry of a release that could not run (its order's lock was busy). */
     public const RETRY_RELEASE = 'mizzey_order_stock_release';
+    /** Lets test fixtures delete their own orders whatever their reservation; the site's own code never sets it. */
+    public const FORGET = 'mizzey_order_stock_forget_permitted';
 
     /** Paid or fulfilled statuses: an order there should hold a reservation. */
     private const HOLDING = ['processing', 'on-hold', 'preparing', 'shipped', 'out-for-delivery', 'cod-collected', 'completed'];
@@ -77,6 +79,8 @@ final class OrderStock
         add_action('woocommerce_before_trash_order', [self::class, 'beforeRemoval'], 10, 1);
         add_action('woocommerce_before_delete_order', [self::class, 'beforeRemoval'], 10, 1);
         add_action('untrashed_post', [self::class, 'restored'], 20, 1);
+        add_filter('woocommerce_pre_delete_order', [self::class, 'beforePermanentDeletion'], 10, 3);
+        add_filter('pre_delete_post', [self::class, 'beforePostDeletion'], 10, 3);
         add_filter('mizzey_cart_stock_held', [self::class, 'heldByVisitor'], 10, 1);
         add_action(self::RETRY_RELEASE, [self::class, 'retryRelease'], 10, 1);
     }
@@ -216,6 +220,82 @@ final class OrderStock
         if ($order instanceof \WC_Order) {
             self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), self::RELEASED_ON_REMOVAL, true) || self::releaseLocked($fresh, StockGateway::make()));
         }
+    }
+
+    /**
+     * A permanent deletion through WooCommerce's order object is refused while the order's reservation is not settled.
+     *
+     * @param mixed $check
+     * @param mixed $order
+     * @param mixed $force
+     * @return mixed
+     */
+    public static function beforePermanentDeletion($check, $order, $force = false)
+    {
+        if ($check !== null || ! $force || ! $order instanceof \WC_Order || $order->get_id() <= 0) {
+            return $check;
+        }
+
+        return self::settledForDeletion($order) ? $check : false;
+    }
+
+    /**
+     * The same for an order stored as a post and deleted through WordPress (the posts list, the trash emptied on
+     * schedule).
+     *
+     * @param mixed $check
+     * @param mixed $post
+     * @param mixed $force
+     * @return mixed
+     */
+    public static function beforePostDeletion($check, $post, $force = false)
+    {
+        if ($check !== null || ! $post instanceof \WP_Post || $post->post_type !== 'shop_order') {
+            return $check;
+        }
+        $order = wc_get_order($post->ID);
+
+        return ! $order instanceof \WC_Order || self::settledForDeletion($order) ? $check : false;
+    }
+
+    /**
+     * Whether nothing of the order's reservation is left open, so its record can go with it. An order that gives its
+     * stock back on removal (by its status, or the status it was trashed from) gives it back first; a line still held
+     * by such an order, or a reserve, undo or release left unanswered, keeps the order (and its record, which
+     * reconciliation with the stock source needs) until it is settled. The refusal is noted on the order.
+     */
+    private static function settledForDeletion(\WC_Order $order): bool
+    {
+        $status = $order->get_status();
+        if ($status === 'trash') {
+            $before = (string) $order->get_meta('_wp_trash_meta_status');
+            $before = $before !== '' ? $before : (string) get_post_meta($order->get_id(), '_wp_trash_meta_status', true);
+            $status = (string) preg_replace('/^wc-/', '', $before);
+        }
+        $gives_back = in_array($status, self::RELEASED_ON_REMOVAL, true);
+        if (apply_filters(self::FORGET, false) === true) {
+            // Test fixtures removing their own orders, which may be left unsettled on purpose; the site never sets it.
+            return true;
+        }
+        $settled    = self::locked($order, static function (\WC_Order $fresh) use ($gives_back): bool {
+            if ($gives_back) {
+                self::releaseLocked($fresh, StockGateway::make());
+            }
+            foreach (self::record($fresh) as $line) {
+                if (in_array($line['state'], ['reserving', 'undoing', 'releasing', 'unsure', 'unsettled'], true) || ($gives_back && $line['state'] === 'reserved')) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+        if (! $settled) {
+            $message = __('Order not deleted: its stock reservation is not settled with the stock source. Reconcile it first.', 'mizzey-site');
+            $order->add_order_note($message);
+            wc_get_logger()->warning($message, ['source' => 'mizzey-order-stock', 'order_id' => $order->get_id()]);
+        }
+
+        return $settled;
     }
 
     /**

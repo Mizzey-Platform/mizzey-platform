@@ -121,7 +121,9 @@ performance gates.
   per line; any failure MUST release the lines reserved and refuse the order before payment, with a message (AC-7).
 - **FR-004**: A cancelled or failed order MUST release its reservation once (AC-7). So MUST an order trashed or deleted
   before it is Shipped (a duplicate, a test order); restored from the trash to a paid status, it MUST be reserved again
-  or marked for staff. From Shipped on, the stock has left and a removal gives nothing back.
+  or marked for staff. From Shipped on, the stock has left and a removal gives nothing back. A permanent deletion
+  MUST be refused while the order's reservation is not settled (a line still held by an order that gives its stock
+  back, or a reserve, undo or release left unanswered), so the record reconciliation needs is kept.
 - **FR-005**: Every customer-facing message MUST be translated (FIX-04).
 - **FR-006**: For an Egyptian address, a phone given MUST be an Egyptian mobile number, accepted in any spelling (`+20`,
   spaces, Arabic-Indic digits) on both checkouts and before payment, refused otherwise with a message in the

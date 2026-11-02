@@ -436,6 +436,23 @@ run(
 			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
 		}
 		$check( $busy_waiting === $busy_held && $busy_scheduled && $late_source->levels[ $five->get_id() ] === $busy_held + 1 && '' === wc_get_order( $busy->get_id() )->get_meta( OrderStock::UNRELEASED ), 'CHK-12 a cancellation that finds its order locked elsewhere is retried in the background, and the retry gives the stock back (' . wp_json_encode( array( $busy_held, $busy_waiting, $late_source->levels[ $five->get_id() ] ) ) . ')' );
+		// A Confirmed order trashed while the source refuses keeps its record unsettled: emptying the trash is refused,
+		// so the record reconciliation needs is not lost. A Confirmed order trashed normally is deleted for good.
+		$outage = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $outage, StockGateway::make() );
+		wc_get_order( $outage->get_id() )->update_status( 'processing' );
+		$late_source->refuse = array( $five->get_id() );
+		wc_get_order( $outage->get_id() )->delete( false );
+		$late_source->refuse = array();
+		$outage_states  = array_column( OrderStock::record( wc_get_order( $outage->get_id() ) ), 'state' );
+		$outage_deleted = wc_get_order( $outage->get_id() )->delete( true );
+		$outage_kept    = wc_get_order( $outage->get_id() ) instanceof \WC_Order;
+		$clean = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $clean, StockGateway::make() );
+		wc_get_order( $clean->get_id() )->update_status( 'processing' );
+		wc_get_order( $clean->get_id() )->delete( false );
+		$clean_deleted = wc_get_order( $clean->get_id() )->delete( true );
+		$check( in_array( 'unsettled', $outage_states, true ) && false === $outage_deleted && $outage_kept && true === $clean_deleted && ! wc_get_order( $clean->get_id() ), 'CHK-12 an order whose stock could not be given back is not deleted for good, and keeps its record; a settled one is (' . wp_json_encode( array( $outage_states, $outage_deleted, $outage_kept, $clean_deleted ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );
