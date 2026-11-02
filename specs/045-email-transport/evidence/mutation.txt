@@ -1,0 +1,15 @@
+Mutation check for specs/045-email-transport, t85-email-transport, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7), on the code after the Codex review. Each defect is applied alone, the scenario run, the file restored.
+
+CAUGHT    M1 the relay is not used  <- FAIL  AC-1 every message leaves through the relay the server names, with TLS, authenticated, and WooCommerce's sender as its return
+CAUGHT    M2 no TLS by default  <- FAIL  AC-1 every message leaves through the relay the server names, with TLS, authenticated, and WooCommerce's sender as its return pat
+CAUGHT    M3 WordPress keeps its own sender  <- FAIL  AC-1 WordPress's own messages take WooCommerce's sender; a sender set on purpose is kept
+CAUGHT    M4 a chosen sender is overwritten  <- FAIL  AC-1 WordPress's own messages take WooCommerce's sender; a sender set on purpose is kept
+CAUGHT    M5 failures are not logged  <- FAIL  AC-2 the failure is raised to operations
+CAUGHT    M6 addresses stay in the log  <- FAIL  AC-2 a failed message is logged under mizzey-email, with the address masked
+SURVIVED  M7 the test needs no capability
+CAUGHT    M8 the password is shown  <- FAIL  AC-1 Settings, Email delivery shows the relay and never its password
+
+M7 survived because the shop manager's attempt also lacked a valid nonce, so it was refused for that reason; the test now gives it a valid form, so only the capability can refuse it:
+CAUGHT    M7 the test needs no capability
+
+8 of 8 caught.
