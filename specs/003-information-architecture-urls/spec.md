@@ -466,7 +466,8 @@ endpoint slugs in Arabic.
   page and no copied English text goes live before its copy; `--publish` publishes only the drafts the command made,
   an Arabic one only when its English page is published, and never changes a status staff set (private, pending, a
   page staff made). The Arabic record of a WooCommerce system page, which holds WooCommerce's blocks and no copy,
-  takes its English page's published status. A page is matched by language: a slug held only by an Arabic record
+  takes its English page's published status. A contracted page is a top-level page, so a nested page with the same
+  slug is never taken for it. A page is matched by language: a slug held only by an Arabic record
   stands for its English record through its translation group, and an Arabic record with no English one is reported.
   The command exits non-zero naming anything not in place: an unassigned WooCommerce page, a page that could not be
   made, an Arabic-only slug, a taxonomy or an endpoint. The two taxonomies are also declared in `wpml-config.xml`.

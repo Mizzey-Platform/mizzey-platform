@@ -440,6 +440,8 @@ final class LanguageSetup
         $ids = get_posts([
             'post_type'        => 'page',
             'name'             => $slug,
+            // The contracted pages are top level: a nested page with the same slug (/company/about/) is another page.
+            'post_parent'      => 0,
             'post_status'      => ['publish', 'draft', 'pending', 'private', 'future'],
             'numberposts'      => 10,
             'fields'           => 'ids',

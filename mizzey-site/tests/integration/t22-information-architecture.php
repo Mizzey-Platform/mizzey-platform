@@ -378,6 +378,45 @@ run(
 			$ok = false;
 		}
 
+		// A nested page with a contracted slug (/company-t22/about/) is another page: with the English About renamed, the
+		// lookup must still reach it through the Arabic record's group, never take the nested English page, and make
+		// nothing for the decoy.
+		$decoy_parent  = 0;
+		$decoy         = 0;
+		$decoy_ignored = false;
+		$decoy_report  = array();
+		if ( $about_en > 0 && $about_ar > 0 ) {
+			$decoy_parent = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 't22 company', 'post_name' => 'company-t22' ) );
+			$decoy        = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 't22 nested about', 'post_name' => 'about', 'post_parent' => $decoy_parent ) );
+			foreach ( array( $decoy_parent, $decoy ) as $decoy_id ) {
+				if ( $decoy_id > 0 ) {
+					$sitepress->set_element_language_details( $decoy_id, 'post_page', null, 'en' );
+				}
+			}
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about-t22' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$count_before = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$decoy_report = \MizzeySite\I18n\LanguageSetup::provision( false );
+			$count_after  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'page'" );
+			$wpdb->update( $wpdb->posts, array( 'post_name' => 'about' ), array( 'ID' => $about_en ) );
+			clean_post_cache( $about_en );
+			$decoy_trid    = $decoy > 0 ? $sitepress->get_element_trid( $decoy, 'post_page' ) : 0;
+			$decoy_group   = $decoy_trid ? $sitepress->get_element_translations( $decoy_trid, 'post_page' ) : array();
+			$decoy_ignored = $decoy > 0 && 'about' === get_post_field( 'post_name', $decoy )
+				&& $about_en === (int) ( $decoy_report['pages']['en']['about'] ?? 0 ) && $about_ar === (int) ( $decoy_report['pages']['ar']['about'] ?? 0 )
+				&& ! isset( $decoy_group['ar'] ) && $count_before === $count_after;
+			if ( isset( $decoy_group['ar'] ) ) {
+				wp_delete_post( (int) $decoy_group['ar']->element_id, true );
+			}
+			wp_delete_post( $decoy, true );
+			wp_delete_post( $decoy_parent, true );
+		}
+		$s->note( sprintf( '%s a nested page with a contracted slug is not taken for the contracted page (en %d, decoy %d)', $decoy_ignored ? 'ok  ' : 'FAIL',
+			(int) ( $decoy_report['pages']['en']['about'] ?? 0 ), $decoy ) );
+		if ( ! $decoy_ignored ) {
+			$ok = false;
+		}
+
 		// Incomplete provisioning is reported, so the command exits non-zero: a WooCommerce page not assigned, and a
 		// page that could not be made.
 		$no_cart = static fn () => 0;
@@ -391,6 +430,21 @@ run(
 		$failed_problems = \MizzeySite\I18n\LanguageSetup::problems( $broken );
 		$good = in_array( 'system-page=cart', $cart_problems, true ) && in_array( 'page=offers', $failed_problems, true ) && in_array( 'incomplete-page=offers', $failed_problems, true );
 		$s->note( sprintf( '%s provision reports what it could not make (%s | %s)', $good ? 'ok  ' : 'FAIL', implode( ',', $cart_problems ), implode( ',', $failed_problems ) ) );
+		if ( ! $good ) {
+			$ok = false;
+		}
+
+		// The command itself, in this process: it succeeds when everything is in place, and exits non-zero naming the
+		// missing cart page when the cart page is not assigned.
+		$cli = static fn () => \WP_CLI::runcommand( 'mizzey languages provision', array( 'launch' => false, 'return' => 'all', 'exit_error' => false ) );
+		$whole = $cli();
+		add_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$cartless_cli = $cli();
+		remove_filter( 'pre_option_woocommerce_cart_page_id', $no_cart );
+		$good = 0 === (int) $whole->return_code
+			&& 0 !== (int) $cartless_cli->return_code && false !== strpos( (string) $cartless_cli->stderr, 'system-page=cart' );
+		$s->note( sprintf( '%s wp mizzey languages provision exits %d when complete and %d naming the cart when it is missing (%s)', $good ? 'ok  ' : 'FAIL',
+			(int) $whole->return_code, (int) $cartless_cli->return_code, trim( (string) $cartless_cli->stderr ) ) );
 		if ( ! $good ) {
 			$ok = false;
 		}
