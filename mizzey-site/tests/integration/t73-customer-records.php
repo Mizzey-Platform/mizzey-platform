@@ -135,6 +135,12 @@ run(
 		CustomerRecords::save( $manager );
 		$_POST = array();
 		$check( ! CustomerRecords::isSuspended( $other ) && ! CustomerRecords::isSuspended( $manager ) && '' === $panel( $other ), 'AC-3 a staff account, and one\'s own, cannot be suspended here' );
+		$owner = $mk( 'owner', 'administrator' );
+		wp_set_current_user( $owner );
+		$post( array( 'mizzey_suspended' => 'yes', 'mizzey_suspension_reason' => 'x' ) );
+		CustomerRecords::save( $other );
+		$_POST = array();
+		$check( current_user_can( 'edit_user', $other ) && ! CustomerRecords::isSuspended( $other ), 'AC-3 even an administrator, who may edit a shop manager, cannot suspend a staff account here' );
 
 		return $ok;
 	}

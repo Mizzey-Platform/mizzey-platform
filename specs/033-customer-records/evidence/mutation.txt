@@ -1,0 +1,14 @@
+Mutation check for specs/033-customer-records, t73-customer-records, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0).
+Each deliberate defect was applied alone, t73 run, the file restored. M5 survived the first run, masked by WordPress's own
+edit permission; an administrator, who may edit a shop manager, now tries to suspend one, and M5 is caught.
+
+CAUGHT    M1 a suspended account still signs in by password  <- AC-3 a password sign-in is refused, saying the account is suspended
+CAUGHT    M2 a suspended account keeps its cookie session  <- AC-3 a valid signed-in cookie, as Google or a sign-in link would set, does not make it the signed-in user
+CAUGHT    M3 sessions are not ended  <- AC-3 the account is suspended with its reason and its sessions end
+CAUGHT    M4 no reason needed  <- AC-3 a suspension without a reason is refused with a message
+CAUGHT    M6 saved without the nonce  <- AC-2 without the form's nonce nothing changes
+CAUGHT    M7 who suspended is not kept  <- AC-3 who suspended it, when and why are kept and shown
+CAUGHT    M8 the orders are oldest first  <- AC-1 the profile lists the customer's orders, newest first, linked to each order
+CAUGHT    M5 staff can be suspended  <- AC-3 even an administrator, who may edit a shop manager, cannot suspend a staff account here
+
+8 of 8 caught.
