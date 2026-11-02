@@ -103,9 +103,11 @@ run(
 		$check( 'done' === ( $state['status'] ?? '' ) && array() === ( $state['problems'] ?? array() ), 'AC-1 the load ran in the background to the end, with no problem (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( $state['problems'] ?? array() ) . ')' );
 		$check( 0 === wc_get_product_id_by_sku( "{$tag}-BAD" ), 'AC-1 the rejected row is not written' );
 
+		// A SKU is shared by both language records: the English one is asked for by name.
+		$by_sku = static fn ( string $sku ): int => (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( $sku ), 'product', true, 'en' );
 		// ---- AC-2: the English record ---------------------------------------------------------------------------
 		do_action( 'wpml_switch_language', 'en' );
-		$rose = wc_get_product( wc_get_product_id_by_sku( "{$tag}-ROSE" ) );
+		$rose = wc_get_product( $by_sku( "{$tag}-ROSE" ) );
 		$cats = $rose ? wp_get_post_terms( $rose->get_id(), 'product_cat', array( 'fields' => 'names' ) ) : array();
 		$leaf = $rose ? wp_get_post_terms( $rose->get_id(), 'product_cat' ) : array();
 		$path = array();
@@ -118,9 +120,9 @@ run(
 		$check( $rose && 'Rose water toner' === $rose->get_meta( ProductFields::SEO_TITLE ) && 'Toner with rose water.' === $rose->get_meta( ProductFields::SEO_DESC ), 'AC-2 MIG-15 the SEO title and description are carried' );
 
 		// ---- AC-3: the variable product ---------------------------------------------------------------------------
-		$mask   = wc_get_product( wc_get_product_id_by_sku( "{$tag}-MASK" ) );
-		$small  = wc_get_product( wc_get_product_id_by_sku( "{$tag}-MASK-S" ) );
-		$large  = wc_get_product( wc_get_product_id_by_sku( "{$tag}-MASK-L" ) );
+		$mask   = wc_get_product( $by_sku( "{$tag}-MASK" ) );
+		$small  = wc_get_product( (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( "{$tag}-MASK-S" ), 'product_variation', true, 'en' ) );
+		$large  = wc_get_product( (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( "{$tag}-MASK-L" ), 'product_variation', true, 'en' ) );
 		$values = $mask instanceof \WC_Product_Variable && isset( $mask->get_attributes()['size'] ) ? $mask->get_attributes()['size']->get_options() : array();
 		$check( $mask instanceof \WC_Product_Variable && $small instanceof \WC_Product_Variation && $large instanceof \WC_Product_Variation && $small->get_parent_id() === $mask->get_id() && array( 'Small', 'Large' ) === $values && 'Small' === $small->get_attribute( 'size' ) && 60.0 === (float) $small->get_cogs_value() && '240' === (string) (float) $large->get_regular_price(), 'AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs (' . wp_json_encode( array( $mask ? get_class( $mask ) : null, $values, $small ? array( $small->get_parent_id(), $small->get_attribute( 'size' ), $small->get_cogs_value() ) : null, $large ? $large->get_regular_price() : null ) ) . ')' );
 
@@ -135,7 +137,7 @@ run(
 		$sv = $small_ar > 0 ? wc_get_product( $small_ar ) : null;
 		$lv = $large_ar > 0 ? wc_get_product( $large_ar ) : null;
 		$check( $mask_ar > 0 && 'قناع الطين' === get_post_field( 'post_title', $mask_ar ) && $sv && $lv && '' !== $sv->get_attribute( 'size' ) && '' !== $lv->get_attribute( 'size' ) && $trid( $small_ar, 'post_product_variation' ) === $trid( $small->get_id(), 'post_product_variation' ) && $trid( $mask_ar, 'post_product' ) === $trid( $mask->get_id(), 'post_product' ), 'AC-4 #247 the Arabic variable product and its variations keep their attributes and their translation groups' );
-		$plain    = wc_get_product_id_by_sku( "{$tag}-PLAIN" );
+		$plain    = $by_sku( "{$tag}-PLAIN" );
 		$plain_ar = (int) apply_filters( 'wpml_object_id', $plain, 'product', false, 'ar' );
 		$check( $plain > 0 && ( 0 === $plain_ar || $plain_ar === $plain ), 'AC-4 a row with no Arabic text has no Arabic record' );
 
