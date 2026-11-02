@@ -285,6 +285,16 @@ run(
 		$check( 'refunds reconciled' === ( $r['word'] ?? '' ) && 2 === count( $g_now->get_refunds() ) && 3000 === (int) round( (float) $g_now->get_total_refunded() * 100 ), 'PAY-17 a further 10.00 refunded in Paymob\'s dashboard is recorded on the order for the difference (refunded ' . $g_now->get_total_refunded() . ')' );
 		$r = $notice( $update( 2500 ) );
 		$check( 2 === count( $fresh( $g->get_id() )->get_refunds() ) && 1 === count( PaymentRecord::attention( $fresh( $g->get_id() ) ) ), 'PAY-17 a refunded total below the order\'s refunds adds nothing and is flagged' );
+		// The refunded total is not signed by Paymob: above the signed payment it is flagged, never recorded; and only the
+		// server notice writes refunds, never a customer's return (audit, Codex 4).
+		$r = $notice( $update( 9000 ) );
+		$check( 2 === count( $fresh( $g->get_id() )->get_refunds() ) && 2 === count( PaymentRecord::attention( $fresh( $g->get_id() ) ) ), 'PAY-17 a refunded total above the signed payment amount records nothing and is flagged' );
+		$r = $return( $update( 4000 ) );
+		$check( 2 === count( $fresh( $g->get_id() )->get_refunds() ), 'PAY-17 a refunded total on the customer\'s return records nothing' );
+		// The second payment's own refund, reported as that payment marked refunded, is not the paid order's refund (Codex 3).
+		$b_refunds = count( $fresh( $b->get_id() )->get_refunds() );
+		$r = $notice( t68_obj( $b->get_id(), array( 'id' => $second['id'], 'order' => $second['order'], 'is_refunded' => true, 'refunded_amount_cents' => 5000 ) ) );
+		$check( $b_refunds === count( $fresh( $b->get_id() )->get_refunds() ) && 'refunded' !== $fresh( $b->get_id() )->get_status(), 'AC-1 the refunded second payment, reported again by Paymob, adds no refund to the order paid by the first' );
 		$r = $notice( t68_obj( $b->get_id(), array( 'id' => 777003, 'is_void' => true, 'has_parent_transaction' => true ) ) );
 		$check( 200 === ( $r['status'] ?? 0 ) && 2 === count( PaymentRecord::attention( $fresh( $b->get_id() ) ) ), 'AC-2 a void is recorded and flagged, not applied' );
 
