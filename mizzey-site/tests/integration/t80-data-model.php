@@ -40,7 +40,7 @@ run(
 		$check( taxonomy_exists( 'product_cat' ) && taxonomy_exists( 'product_brand' ) && taxonomy_exists( 'product_collection' ), 'ENT-03 categories, brands and collections' );
 
 		// ENT-05: customers and addresses.
-		$check( $table( 'wc_customer_lookup' ) && defined( '\MizzeySite\Account\AddressBook::META' ) && defined( '\MizzeySite\Accounts\MarketingConsent::META' ), 'ENT-05 customers, the address book and the consent record' );
+		$check( $table( 'wc_customer_lookup' ) && '_mizzey_addresses' === \MizzeySite\Account\AddressBook::META && '_mizzey_marketing_consent' === \MizzeySite\Accounts\MarketingConsent::META, 'ENT-05 customers, the address book (_mizzey_addresses) and the consent record (_mizzey_marketing_consent)' );
 
 		// ENT-06: carts.
 		$check( $table( 'woocommerce_sessions' ), 'ENT-06 the cart in WooCommerce sessions' );
@@ -58,11 +58,12 @@ run(
 		$check( post_type_exists( 'shop_coupon' ), 'ENT-11 promotions as coupons' );
 
 		// ENT-14: reviews.
-		$check( post_type_supports( 'product', 'comments' ) && defined( '\MizzeySite\Reviews\ReviewPhotos::META' ), 'ENT-14 reviews with ratings and photos' );
+		$check( post_type_supports( 'product', 'comments' ) && '_mizzey_review_photos' === \MizzeySite\Reviews\ReviewPhotos::META, 'ENT-14 reviews with ratings and photos' );
 
 		// ENT-15: notifications.
 		$emails = array_keys( WC()->mailer()->get_emails() );
-		$check( in_array( 'WC_Email_Customer_Refunded_Order', $emails, true ) && in_array( 'MizzeySite_Customer_Shipped', $emails, true ) && class_exists( '\Corex\Notifications\Notification' ), 'ENT-15 email templates (WooCommerce and Mizzey) and CoreX notifications' );
+		$check( in_array( 'WC_Email_Customer_Refunded_Order', $emails, true ) && in_array( 'MizzeySite_Customer_Shipped', $emails, true ) && $table( 'corex_notifications' ), 'ENT-15 email templates (WooCommerce and Mizzey) and CoreX notifications' );
+		$check( '_mizzey_shipped_emailed' === \MizzeySite\Emails\Shipped::SENT && '_mizzey_review_invited' === \MizzeySite\Reviews\ReviewInvitation::SENT, 'ENT-15 the Shipped and review-invitation emails mark the order once sent' );
 
 		// ENT-16: roles.
 		$check( null !== get_role( 'administrator' ) && null !== get_role( 'shop_manager' ) && null !== get_role( 'customer' ), 'ENT-16 the launch roles' );
