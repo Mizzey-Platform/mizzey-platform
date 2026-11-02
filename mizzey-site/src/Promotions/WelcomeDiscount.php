@@ -94,7 +94,7 @@ final class WelcomeDiscount
         }
         // Someone who has ordered before (a guest making the account from the order confirmation, say) is not a new
         // customer: a first-order discount could never be used, so none is issued, advertised or claimed.
-        if (PromotionRules::customerHasOrder($user->ID, [$user->user_email], (string) get_user_meta($user->ID, 'billing_phone', true))) {
+        if (self::hasOrdered($user)) {
             return;
         }
         // One claim per email, made atomically: an insert that does nothing when the email's claim row exists, so two
@@ -141,6 +141,21 @@ final class WelcomeDiscount
             }
             update_user_meta($user->ID, self::USER_META, $coupon->get_id());
         }
+    }
+
+    /**
+     * Whether the customer has ordered before, by account, email, mailbox or mobile number. The number is the account's
+     * saved one and, while the account is being made (`user_register` runs before it is saved), the one the form posts
+     * or the checkout's customer carries.
+     */
+    public static function hasOrdered(\WP_User $user): bool
+    {
+        $phones = [(string) get_user_meta($user->ID, 'billing_phone', true), (string) \MizzeySite\Accounts\PhoneSignIn::posted()];
+        if (function_exists('WC') && WC()->customer instanceof \WC_Customer) {
+            $phones[] = (string) WC()->customer->get_billing_phone();
+        }
+
+        return PromotionRules::customerHasOrder($user->ID, [$user->user_email], $phones);
     }
 
     /**

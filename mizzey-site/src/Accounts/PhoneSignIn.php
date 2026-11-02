@@ -172,12 +172,22 @@ final class PhoneSignIn
         return $errors;
     }
 
+    /**
+     * The mobile number the form being posted gives (registration, the classic checkout), in its Egyptian form, or null:
+     * known while the account is being made, before save() keeps it.
+     */
+    public static function posted(): ?string
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- read only; the form's own handler verified its nonce.
+        $given = isset($_POST[self::FIELD]) && is_string($_POST[self::FIELD]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD])) : '';
+
+        return $given !== '' ? self::normalise($given) : null;
+    }
+
     /** @param mixed $customerId */
     public static function save($customerId): void
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verified the registration form's nonce.
-        $given  = isset($_POST[self::FIELD]) && is_string($_POST[self::FIELD]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD])) : '';
-        $normal = $given !== '' ? self::normalise($given) : null;
+        $normal = self::posted();
         if ((int) $customerId > 0 && $normal !== null) {
             update_user_meta((int) $customerId, self::FIELD, $normal);
         }

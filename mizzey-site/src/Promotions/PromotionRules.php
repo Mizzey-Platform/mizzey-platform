@@ -119,10 +119,11 @@ final class PromotionRules
      * Whether a customer has an order that makes them a returning customer: by account id, by each email and the account's
      * email exactly, by the mailbox those emails reach (`CustomerKey`, kept on each order), and by the mobile number.
      *
-     * @param list<string> $emails
-     * @param list<int>    $exclude Orders not to count, such as the one being placed.
+     * @param list<string>        $emails
+     * @param string|list<string> $phones  The customer's mobile numbers, in any spelling.
+     * @param list<int>           $exclude Orders not to count, such as the one being placed.
      */
-    public static function customerHasOrder(int $userId, array $emails, string $phone = '', array $exclude = []): bool
+    public static function customerHasOrder(int $userId, array $emails, string|array $phones = '', array $exclude = []): bool
     {
         $account = $userId > 0 ? get_userdata($userId) : false;
         if ($account instanceof \WP_User) {
@@ -137,9 +138,15 @@ final class PromotionRules
         if ($keys !== []) {
             $queries[] = ['meta_query' => [['key' => CustomerKey::EMAIL_META, 'value' => $keys, 'compare' => 'IN']]]; // phpcs:ignore WordPress.DB.SlowDBQuery
         }
-        $normal = $phone !== '' ? CustomerKey::phone($phone) : null;
-        if ($normal !== null) {
-            $queries[] = ['billing_phone' => $normal];
+        $normals = [];
+        foreach ((array) $phones as $phone) {
+            $normal = is_string($phone) && $phone !== '' ? CustomerKey::phone($phone) : null;
+            if ($normal !== null) {
+                $normals[$normal] = true;
+            }
+        }
+        foreach (array_keys($normals) as $normal) {
+            $queries[] = ['billing_phone' => (string) $normal];
         }
         $base = [
             'status'  => array_values(array_diff(array_keys(wc_get_order_statuses()), self::NOT_AN_ORDER)),
