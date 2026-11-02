@@ -74,16 +74,26 @@ run(
 		$mapping = Mapping::load( "{$dir}/mapping.json" );
 
 		// ---- AC-1: planned, nothing written yet -------------------------------------------------------------------
+		try {
+			CatalogueLoad::start( "{$dir}/export.tsv", $mapping, wp_upload_dir()['basedir'] . "/{$tag}-run", true );
+			$refused = false;
+		} catch ( \RuntimeException $e ) {
+			$refused = str_contains( $e->getMessage(), 'outside the website folder' );
+		}
+		$check( $refused && ! file_exists( wp_upload_dir()['basedir'] . "/{$tag}-run/plan.json" ), 'AC-1 a run directory inside the website is refused: the plan holds costs' );
+		@rmdir( wp_upload_dir()['basedir'] . "/{$tag}-run" ); // phpcs:ignore
 		$state = CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/run", true );
 		$check( 5 === (int) $state['total'] && 1 === (int) $state['counts']['reject'] && 0 === wc_get_product_id_by_sku( "{$tag}-ROSE" ), 'AC-1 five rows planned, the bad price rejected, nothing written before the load runs' );
 
-		// The load runs in the background, in other processes.
-		$bin = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
-		for ( $round = 0; $round < 12 && 'done' !== ( CatalogueLoad::state()['status'] ?? '' ); $round++ ) {
-			exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' action-scheduler run --group=' . CatalogueLoad::GROUP . ' --batch-size=1 --batches=1 2>&1', $out, $code );
-			wp_cache_delete( CatalogueLoad::RUN, 'options' );
-			wp_cache_flush();
-		}
+		// The load runs in the background, in other processes, as Action Scheduler's runner takes it.
+		$bin    = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
+		$finish = static function () use ( $bin ): void {
+			for ( $round = 0; $round < 12 && in_array( CatalogueLoad::state()['status'] ?? '', array( 'sources', 'translations', 'images' ), true ); $round++ ) {
+				exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' action-scheduler run --group=' . CatalogueLoad::GROUP . ' 2>&1', $out, $code );
+				wp_cache_flush();
+			}
+		};
+		$finish();
 		$state = CatalogueLoad::state();
 		$check( 'done' === ( $state['status'] ?? '' ) && array() === ( $state['problems'] ?? array() ), 'AC-1 the load ran in the background to the end, with no problem (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( $state['problems'] ?? array() ) . ')' );
 		$check( 0 === wc_get_product_id_by_sku( "{$tag}-BAD" ), 'AC-1 the rejected row is not written' );
@@ -140,11 +150,25 @@ run(
 		$skus     = array_map( static fn ( $r ) => (string) ( $r['sku'] ?? '' ), (array) $rows_out );
 		$check( in_array( "{$tag}-ROSE", $skus, true ) && in_array( "{$tag}-MASK", $skus, true ), 'AC-6 MIG-25 the loaded catalogue exports through WooCommerce\'s CSV exporter' );
 
+		// An update run: a new price, blank cells everywhere else.
+		$rose_trid = $rose ? $trid( $rose->get_id(), 'post_product' ) : 0;
+		$update    = implode( "\t", $cols ) . "\n" . implode( "\t", array( "{$tag}-ROSE", '', '', '', '', '260.00', '', '', '', '', '', '', '', '', '', '', '' ) ) . "\n";
+		file_put_contents( "{$dir}/update.tsv", $update );
+		$upd = CatalogueLoad::start( "{$dir}/update.tsv", $mapping, "{$dir}/run-update", false );
+		$finish();
+		wp_cache_flush();
+		$after   = wc_get_product( $rose->get_id() );
+		$ar_now  = (int) apply_filters( 'wpml_object_id', $rose->get_id(), 'product', false, 'ar' );
+		$check( 1 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were' );
+		$check( $rose_trid > 0 && $rose_trid === $trid( $rose->get_id(), 'post_product' ) && $ar_now === $rose_ar && 'تونر ماء الورد ٢٠٠ مل' === get_post_field( 'post_title', $ar_now ), 'AC-4 the update keeps the product and its Arabic record in one translation group, the Arabic text unchanged' );
+
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.
 		update_option( CatalogueLoad::RUN, array( 'status' => 'done' ), false );
 		$no = CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/run2", false );
 		$check( false === $no['images'], 'AC-5 without the rights confirmed, the run plans no image download' );
-		as_unschedule_all_actions( '', array(), CatalogueLoad::GROUP );
+		foreach ( array( CatalogueLoad::SOURCES, CatalogueLoad::TRANSLATIONS, CatalogueLoad::IMAGES ) as $hook ) {
+			as_unschedule_all_actions( $hook, array(), CatalogueLoad::GROUP );
+		}
 		delete_option( CatalogueLoad::RUN );
 
 		return $ok;

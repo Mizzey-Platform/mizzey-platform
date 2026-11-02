@@ -193,7 +193,8 @@ final class Mapping
                         $header,
                         is_string($to) ? $to : '?',
                     );
-                } elseif (in_array($to, $targets, true)) {
+                } elseif ($to !== 'images' && in_array($to, $targets, true)) {
+                    // Images may come from several columns (a main image and the others); every other field from one.
                     $problems[] = sprintf(
                         /* translators: %s: a store field. */
                         __('columns: two columns fill "%s"', 'mizzey-site'),
