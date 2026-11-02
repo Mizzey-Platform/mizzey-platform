@@ -35,6 +35,7 @@ run(
 			$ok = $ok && $condition;
 		};
 		$tag = 'T86' . wp_rand( 1000, 9999 );
+		$s->enable_cogs(); // The cost is WooCommerce's cost of goods (MIG-13).
 		$dir = trailingslashit( get_temp_dir() ) . strtolower( $tag );
 		wp_mkdir_p( $dir );
 		$keep = get_option( CatalogueLoad::RUN, null );
@@ -108,7 +109,7 @@ run(
 			array_unshift( $path, $t->name );
 		}
 		$brand = $rose ? wp_get_post_terms( $rose->get_id(), 'product_brand', array( 'fields' => 'names' ) ) : array();
-		$check( $rose instanceof \WC_Product_Simple && 'Rose Water Toner 200 ml' === $rose->get_name() && 'A gentle toner.' === $rose->get_description() && '250' === (string) (float) $rose->get_regular_price() && '199' === (string) (float) $rose->get_sale_price() && 120.0 === (float) $rose->get_cogs_value(), 'AC-2 MIG-13 the product carries its name, description, price, sale price and cost' );
+		$check( $rose instanceof \WC_Product_Simple && 'Rose Water Toner 200 ml' === $rose->get_name() && 'A gentle toner.' === $rose->get_description() && '250' === (string) (float) $rose->get_regular_price() && '199' === (string) (float) $rose->get_sale_price() && 120.0 === (float) $rose->get_cogs_value(), 'AC-2 MIG-13 the product carries its name, description, price, sale price and cost (' . ( $rose ? wp_json_encode( array( get_class( $rose ), $rose->get_name(), $rose->get_regular_price(), $rose->get_sale_price(), $rose->get_cogs_value() ) ) : 'none' ) . ')' );
 		$check( array( 'Beauty', 'Skin care', 'Toners' ) === $path && array( "{$tag} Labs" ) === $brand, 'AC-2 MIG-11, MIG-12 the category path and the brand are mapped (' . implode( ' > ', $path ) . ')' );
 		$check( $rose && 'Rose water toner' === $rose->get_meta( ProductFields::SEO_TITLE ) && 'Toner with rose water.' === $rose->get_meta( ProductFields::SEO_DESC ), 'AC-2 MIG-15 the SEO title and description are carried' );
 
@@ -117,7 +118,7 @@ run(
 		$small  = wc_get_product( wc_get_product_id_by_sku( "{$tag}-MASK-S" ) );
 		$large  = wc_get_product( wc_get_product_id_by_sku( "{$tag}-MASK-L" ) );
 		$values = $mask instanceof \WC_Product_Variable && isset( $mask->get_attributes()['size'] ) ? $mask->get_attributes()['size']->get_options() : array();
-		$check( $mask instanceof \WC_Product_Variable && $small instanceof \WC_Product_Variation && $large instanceof \WC_Product_Variation && $small->get_parent_id() === $mask->get_id() && array( 'Small', 'Large' ) === $values && 'Small' === $small->get_attribute( 'size' ) && 60.0 === (float) $small->get_cogs_value() && '240' === (string) (float) $large->get_regular_price(), 'AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs' );
+		$check( $mask instanceof \WC_Product_Variable && $small instanceof \WC_Product_Variation && $large instanceof \WC_Product_Variation && $small->get_parent_id() === $mask->get_id() && array( 'Small', 'Large' ) === $values && 'Small' === $small->get_attribute( 'size' ) && 60.0 === (float) $small->get_cogs_value() && '240' === (string) (float) $large->get_regular_price(), 'AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs (' . wp_json_encode( array( $mask ? get_class( $mask ) : null, $values, $small ? array( $small->get_parent_id(), $small->get_attribute( 'size' ), $small->get_cogs_value() ) : null, $large ? $large->get_regular_price() : null ) ) . ')' );
 
 		// ---- AC-4: the Arabic records ------------------------------------------------------------------------------
 		$trid    = static fn ( int $id, string $type ) => (int) $wpdb->get_var( $wpdb->prepare( "SELECT trid FROM {$wpdb->prefix}icl_translations WHERE element_id = %d AND element_type = %s", $id, $type ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -159,7 +160,7 @@ run(
 		wp_cache_flush();
 		$after   = wc_get_product( $rose->get_id() );
 		$ar_now  = (int) apply_filters( 'wpml_object_id', $rose->get_id(), 'product', false, 'ar' );
-		$check( 1 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were' );
+		$check( 1 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were (' . wp_json_encode( array( $upd['counts'] ?? null, $after->get_regular_price(), $after->get_sale_price(), $after->get_name(), $after->get_cogs_value() ) ) . ')' );
 		$check( $rose_trid > 0 && $rose_trid === $trid( $rose->get_id(), 'post_product' ) && $ar_now === $rose_ar && 'تونر ماء الورد ٢٠٠ مل' === get_post_field( 'post_title', $ar_now ), 'AC-4 the update keeps the product and its Arabic record in one translation group, the Arabic text unchanged' );
 
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.

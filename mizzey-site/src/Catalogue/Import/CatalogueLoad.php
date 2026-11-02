@@ -310,7 +310,11 @@ final class CatalogueLoad
             self::money($v) ? $product->set_sale_price($v) : self::problem($state, $entry, sprintf(__('The sale price "%s" is not a number; it was not written.', 'mizzey-site'), $v));
         });
         self::set($f, 'cost', static function (string $v) use ($product, &$state, $entry): void {
-            self::money($v) && method_exists($product, 'set_cogs_value') ? $product->set_cogs_value((float) $v) : self::problem($state, $entry, sprintf(__('The cost "%s" is not a number; it was not written.', 'mizzey-site'), $v));
+            if (! self::costsOn()) {
+                self::problem($state, $entry, __('Cost of goods is switched off in WooCommerce, so the cost was not written.', 'mizzey-site'));
+                return;
+            }
+            self::money($v) ? $product->set_cogs_value((float) $v) : self::problem($state, $entry, sprintf(__('The cost "%s" is not a number; it was not written.', 'mizzey-site'), $v));
         });
         self::set($f, 'source_asin', static fn (string $v) => $product->update_meta_data('_mizzey_source_asin', sanitize_text_field($v)));
         if (! $product instanceof \WC_Product_Variation) {
@@ -330,6 +334,12 @@ final class CatalogueLoad
         }
 
         return $id;
+    }
+
+    /** WooCommerce's cost of goods (MIG-13 writes the cost there) must be switched on to hold a cost. */
+    private static function costsOn(): bool
+    {
+        return wc_get_container()->get(\Automattic\WooCommerce\Internal\Features\FeaturesController::class)->feature_is_enabled('cost_of_goods_sold');
     }
 
     private static function money(string $v): bool
@@ -400,7 +410,8 @@ final class CatalogueLoad
         $current = $parent->get_attributes();
         foreach ($attributes as $name => $value) {
             $key       = sanitize_title((string) $name);
-            $attribute = $current[$key] ?? null;
+            // A copy: WooCommerce hands back the objects it holds, and an object changed in place is not seen as a change.
+            $attribute = isset($current[$key]) && $current[$key] instanceof \WC_Product_Attribute ? clone $current[$key] : null;
             if (! $attribute instanceof \WC_Product_Attribute) {
                 $attribute = new \WC_Product_Attribute();
                 $attribute->set_name(ucfirst((string) $name));
