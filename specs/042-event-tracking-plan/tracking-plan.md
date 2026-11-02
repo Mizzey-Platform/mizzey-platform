@@ -53,7 +53,7 @@ that need one name group by `item_id`. A product with no SKU falls back to the s
 | `item_id` | SKU (the variation's SKU when a variation was chosen) | Same on both language records |
 | `item_name` | Product name in the language shown | |
 | `item_brand` | Brand | Empty when none |
-| `item_category` | Primary category, in the source language | `item_category2` and on for the parents |
+| `item_category` | Primary category, in the language shown | Reports group by `item_id` across languages |
 | `item_variant` | The chosen attributes | Empty for a simple product |
 | `price` | Unit price charged | The sale price where one applies |
 | `discount` | Discount per unit | 0 when none |
@@ -79,7 +79,7 @@ that need one name group by `item_id`. A product with no SKU falls back to the s
 | EVT-13 | `add_payment_info` | A payment method is chosen | `value`, `currency`, `payment_type` | P1 |
 | EVT-14 | `purchase` | The order is confirmed: payment confirmed by the gateway, or a cash-on-delivery order accepted. Not when Place Order is pressed | `transaction_id`, `value`, `tax`, `shipping`, `currency`, `coupon` | P1 |
 | EVT-15 | `refund` | A refund completes, in full or in part | `transaction_id`, `value`, `currency`; `items` on a partial refund | P1-L |
-| EVT-16 | `sign_up`, `login` | An account is created; a customer signs in | `method`: `email`, `google` or `link` | P1 |
+| EVT-16 | `sign_up`, `login` | An account is created; a customer signs in (not staff) | `method`: `email` or `google` for sign-up; `password`, `google` or `link` for sign-in | P1 |
 | EVT-18 | `zero_result_search` | A search returns nothing | `search_term` | P1-L |
 
 **Two triggers that are not the obvious ones.** `purchase` fires on confirmation, because a pressed button is an
