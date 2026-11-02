@@ -95,7 +95,7 @@ run(
 		$same = static function ( array $x, array $y ): bool { sort( $x ); sort( $y ); return $x === $y; };
 		$check( $same( $list( array( 'mizzey_payment' => 'cod' ) ), $ids( $a, $c, $d ) ), 'AC-1 filter by payment method: cash on delivery finds its three orders' );
 		$check( $same( $list( array( 'mizzey_carrier' => "{$tag}Bosta" ) ), $ids( $a, $b ) ), 'AC-1 filter by carrier' );
-		$check( $same( $list( array( 'mizzey_from' => '2026-10-15', 'mizzey_to' => '2026-10-31' ) ), $ids( $b, $c ) ), 'AC-1 filter by a date range, both ends included' );
+		$check( $same( $list( array( 'mizzey_from' => '2026-10-20', 'mizzey_to' => '2026-10-25' ) ), $ids( $b, $c ) ), 'AC-1 filter by a date range, both ends included (orders at noon on the first and the last day)' );
 		$check( $same( $list( array( 'mizzey_payment' => 'cod', 'mizzey_carrier' => "{$tag}Bosta" ) ), $ids( $a ) ), 'AC-1 filters combine: payment and carrier' );
 		$check( $same( $list( array( 'mizzey_payment' => 'cod', 'mizzey_from' => '2026-10-21' ), array( 'status' => array( 'wc-pending' ) ) ), $ids( $c, $d ) ), 'AC-1 filters combine with WooCommerce\'s status filter and an open-ended date' );
 		$check( $same( $list( array( 'mizzey_from' => '2026-13-40', 'mizzey_payment' => '<script>' ) ), $ids( $a, $b, $c, $d ) ), 'AC-1 an invalid date or method is ignored, not applied' );
@@ -142,7 +142,7 @@ run(
 		$check( "{$tag}TRK2" === Shipped::shipment( $fresh( $d->get_id() ) )['tracking'], 'AC-3 without the form\'s nonce, or by someone who cannot edit orders, the shipment does not change' );
 		switch_to_locale( 'ar' );
 		ob_start();
-		ShipmentBox::customer( $fresh( $d->get_id() ) );
+		do_action( 'woocommerce_order_details_after_order_table', $fresh( $d->get_id() ) );
 		$view = (string) ob_get_clean();
 		restore_previous_locale();
 		$check( str_contains( $view, "{$tag}TRK2" ) && str_contains( $view, 'Bosta' ) && str_contains( $view, 'رقم التتبع' ), 'AC-3 the customer sees the carrier and the tracking number on the order, in Arabic on an Arabic page' );
