@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Seo;
 
+use MizzeySite\Catalogue\ProductFields;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -53,10 +55,12 @@ final class Redirects
     {
         $from = self::normalise($from);
         $to   = trim($to);
-        if (str_starts_with($to, '/')) {
-            $to = home_url($to);
+        if (str_starts_with($to, '/') && ! str_starts_with($to, '//')) {
+            // The site's own root, not home_url(): WPML rewrites that to the admin's language and drops "/ar/".
+            $to = untrailingslashit((string) get_option('home')) . $to;
         }
-        $to = esc_url_raw($to, ['http', 'https']);
+        // A full address with a host only: a bare "?query" or "#part" would send the old path back to itself.
+        $to = ProductFields::webAddress($to);
         if ($from === '/' || $to === '') {
             return __('Give the old path and a full new address.', 'mizzey-site');
         }

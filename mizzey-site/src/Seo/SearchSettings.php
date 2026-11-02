@@ -115,6 +115,10 @@ final class SearchSettings
             'name'     => wp_strip_all_tags((string) get_bloginfo('name')),
             'url'      => home_url('/'),
         ];
+        $address = self::address();
+        if ($address !== []) {
+            $data['address'] = $address;
+        }
         $logo = (int) get_theme_mod('custom_logo') ?: (int) get_option('site_icon');
         $src  = $logo > 0 ? wp_get_attachment_image_url($logo, 'full') : false;
         if (is_string($src) && $src !== '') {
@@ -122,6 +126,24 @@ final class SearchSettings
         }
         echo '<script type="application/ld+json">' . wp_json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . "</script>
 ";
+    }
+
+    /** @return array<string,string> The store address set in WooCommerce, General, as a schema.org PostalAddress. */
+    private static function address(): array
+    {
+        $street  = trim(implode(', ', array_filter([(string) get_option('woocommerce_store_address', ''), (string) get_option('woocommerce_store_address_2', '')])));
+        $country = explode(':', (string) get_option('woocommerce_default_country', ''))[0];
+        $parts   = array_filter([
+            'streetAddress'   => $street,
+            'addressLocality' => trim((string) get_option('woocommerce_store_city', '')),
+            'postalCode'      => trim((string) get_option('woocommerce_store_postcode', '')),
+            'addressCountry'  => $country,
+        ], static fn (string $v): bool => $v !== '');
+        if (! isset($parts['streetAddress']) && ! isset($parts['addressLocality'])) {
+            return [];
+        }
+
+        return ['@type' => 'PostalAddress'] + array_map('wp_strip_all_tags', $parts);
     }
 
     /** Only letters, digits, underscores and hyphens: what both services issue. */

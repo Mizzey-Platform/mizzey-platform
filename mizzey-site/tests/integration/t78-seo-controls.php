@@ -35,7 +35,7 @@ run(
 		};
 		$tag  = 't78' . wp_rand( 1000, 9999 );
 		$keep = array();
-		foreach ( array( Redirects::OPTION, Redirects::MISSING, SearchSettings::EXCLUDED, SearchSettings::ROBOTS, SearchSettings::GOOGLE, SearchSettings::BING ) as $option ) {
+		foreach ( array( Redirects::OPTION, Redirects::MISSING, SearchSettings::EXCLUDED, SearchSettings::ROBOTS, SearchSettings::GOOGLE, SearchSettings::BING, 'woocommerce_store_address', 'woocommerce_store_city' ) as $option ) {
 			$keep[ $option ] = get_option( $option, null );
 		}
 		$s->on_finish(
@@ -78,6 +78,16 @@ run(
 		storefront_refuse_shell( (string) $term_url, $c, $body );
 		$check( str_contains( $body, "<title>{$tag} category title" ) && str_contains( $body, "{$tag} category description" ) && str_contains( $body, 'https://example.com/cat-' . $tag ), 'AC-1 a category carries its edited title, description and canonical' );
 
+		// The Shop page is served as the product archive: its own fields still reach it.
+		$shop      = (int) wc_get_page_id( 'shop' );
+		$shop_keep = get_post_meta( $shop, ProductFields::SEO_TITLE, true );
+		$s->on_finish( static function () use ( $shop, $shop_keep ): void { update_post_meta( $shop, ProductFields::SEO_TITLE, $shop_keep ); } );
+		update_post_meta( $shop, ProductFields::SEO_TITLE, "{$tag} shop title" );
+		$shop_url = wc_get_page_permalink( 'shop' );
+		[ $c, $body ] = $page( $shop_url );
+		storefront_refuse_shell( $shop_url, $c, $body );
+		$check( $shop > 0 && str_contains( $body, "<title>{$tag} shop title" ), 'AC-1 the Shop page carries its edited title' );
+
 		// ---- AC-2: redirects -----------------------------------------------------------------------------
 		// The requests ran in other processes: read the stored lists afresh.
 		$afresh = static function (): void {
@@ -91,6 +101,16 @@ run(
 		Redirects::save( "/ar/{$tag}-qadim/", home_url( '/ar/' ) );
 		[ $c, , $loc ] = $page( home_url( "/ar/{$tag}-qadim/" ) );
 		$check( 301 === $c && str_contains( $loc, '/ar/' ), 'AC-2 an Arabic path is redirected too (' . $c . ')' );
+		$check( null !== Redirects::save( "/{$tag}-query/", '?utm_source=x' ) && null !== Redirects::save( "/{$tag}-part/", '#top' ), 'AC-2 a target with no address of its own (a bare query or fragment) is refused' );
+		// Saved while the admin works in either language, the target is the path given.
+		$targets = array();
+		foreach ( array( 'en', 'ar' ) as $lang ) {
+			do_action( 'wpml_switch_language', $lang );
+			Redirects::save( "/ar/{$tag}-old-{$lang}/", "/ar/{$tag}-new/" );
+			$targets[] = (string) ( Redirects::all()[ "/ar/{$tag}-old-{$lang}" ]['to'] ?? '' );
+		}
+		do_action( 'wpml_switch_language', null );
+		$check( str_ends_with( $targets[0], "/ar/{$tag}-new/" ) && $targets[0] === $targets[1] && ! str_contains( $targets[1], '/ar/ar/' ), 'AC-2 an Arabic target given as a path keeps its language, whatever the language of the admin' );
 		$afresh();
 		$check( 1 <= (int) ( Redirects::all()[ "/{$tag}-old-page" ]['hits'] ?? 0 ), 'AC-2 each redirect counts its use' );
 
@@ -128,6 +148,8 @@ run(
 		// ---- AC-5: structured data, hreflang, verification ----------------------------------------------------
 		update_option( SearchSettings::GOOGLE, SearchSettings::code( "g-{$tag}\"><x" ), false );
 		update_option( SearchSettings::BING, SearchSettings::code( "B{$tag}" ), false );
+		update_option( 'woocommerce_store_address', "{$tag} 9 Nile Street" );
+		update_option( 'woocommerce_store_city', 'Cairo' );
 		[ $c, $home ] = $page( home_url( '/' ) );
 		storefront_refuse_shell( home_url( '/' ), $c, $home );
 		$check( str_contains( $home, 'name="google-site-verification" content="g-' . $tag . 'x"' ) && str_contains( $home, 'name="msvalidate.01" content="B' . $tag . '"' ), 'AC-5 the Google and Bing verification codes are on the home page, cleaned' );
@@ -135,7 +157,7 @@ run(
 		[ $c, $pdp ] = $page( (string) get_permalink( $listed->get_id() ) );
 		storefront_refuse_shell( (string) get_permalink( $listed->get_id() ), $c, $pdp );
 		$check( str_contains( $pdp, '"@type":"Product"' ) && str_contains( $pdp, '"@type":"BreadcrumbList"' ), 'AC-5 a product page carries product and breadcrumb structured data' );
-		$check( str_contains( $home, '"@type":"Organization"' ) && str_contains( $home, '"url":"' . home_url( '/' ) . '"' ), 'AC-5 the home page carries the organisation\'s structured data' );
+		$check( str_contains( $home, '"@type":"Organization"' ) && str_contains( $home, '"url":"' . home_url( '/' ) . '"' ) && str_contains( $home, '"streetAddress":"' . $tag . ' 9 Nile Street"' ) && str_contains( $home, '"addressLocality":"Cairo"' ), 'AC-5 the home page carries the organisation\'s structured data' );
 
 		// ---- AC-6: a landing page from blocks ------------------------------------------------------------------
 		$landing = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => "{$tag} Ramadan offers", 'post_content' => '<!-- wp:heading --><h2 class="wp-block-heading">Ramadan offers</h2><!-- /wp:heading --><!-- wp:woocommerce/product-collection {"queryId":1} /-->' ) );

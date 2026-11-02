@@ -136,6 +136,12 @@ final class SeoFields
         if (is_page()) {
             return ['post', (int) get_queried_object_id()];
         }
+        if (function_exists('is_shop') && is_shop()) {
+            // WooCommerce serves the Shop page as the product archive: its page's fields still apply.
+            $shop = (int) wc_get_page_id('shop');
+
+            return $shop > 0 ? ['post', $shop] : null;
+        }
         $object = get_queried_object();
         if ($object instanceof \WP_Term && in_array($object->taxonomy, self::TAXONOMIES, true)) {
             return ['term', $object->term_id];

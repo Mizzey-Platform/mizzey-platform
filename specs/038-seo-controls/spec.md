@@ -92,10 +92,12 @@ MKT-13 is marked [key] in the register.
 
 ### Functional Requirements
 
-- **FR-001**: Pages, product categories, collections and brands MUST have the SEO title, description, canonical and
+- **FR-001**: Pages (the Shop page included, which WooCommerce serves as the product archive), product categories,
+  collections and brands MUST have the SEO title, description, canonical and
   robots fields, per language record, saved with a nonce by staff who may edit them (AC-1).
 - **FR-002**: Redirects MUST be 301, matched on the normalised path before WordPress looks for a page, counted, and
-  MUST refuse a redirect to the same page (AC-2).
+  MUST refuse a redirect to the same page and a target that is not a full web address (a bare query or fragment); a
+  target given as a path keeps its language prefix (AC-2).
 - **FR-003**: Missing pages MUST be logged by path with count, last time and referrer, never the visitor's address,
   at most 500 paths (AC-3).
 - **FR-004**: Staff MUST choose which content kinds the sitemap lists; an item marked "do not index" MUST be left out;
@@ -125,5 +127,9 @@ MKT-13 is marked [key] in the register.
 Contractual stage: S1. Engineering timing: November 2026 (D-22, D-27).
 
 ## Assumptions
+
+- Known limit: "do not index" is set per language record. If every English record of one content kind were hidden
+  while its Arabic translations were not, WordPress would count no sitemap page for that kind and the index would not
+  list it. Not expected in practice (the fields are set item by item); recorded from the review.
 
 - Marketing work is done by staff who manage the store (the launch roles, specs/013); the Marketing profile is DEF.
