@@ -131,6 +131,12 @@ run(
 
 		// REV-01, REV-02, D-17: who may review.
 		$check( null === ReviewEligibility::refusal( $keen, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $waiting, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( 0, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $refunded, $balm->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $keen, $balm->get_id() ) && null === ReviewEligibility::refusal( $by_amount, $cream->get_id() ) && null === ReviewEligibility::refusal( $free_customer, $cream->get_id() ) && ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $by_amount, $balm->get_id() ), 'REV-01, D-17 a delivered order makes its product reviewable; a processing order, a guest, a line refunded in full (by quantity, or by amount alone) and another product do not; a delivered line that cost nothing counts' );
+		$lines_read = 0;
+		$count_read = static function ( $items ) use ( &$lines_read ) { $lines_read++; return $items; };
+		add_filter( 'woocommerce_order_get_items', $count_read );
+		$other_product = ReviewEligibility::refusal( $keen, $balm->get_id() );
+		remove_filter( 'woocommerce_order_get_items', $count_read );
+		$check( ReviewEligibility::NOT_ELIGIBLE === $other_product && 0 === $lines_read, 'D-309-1 asking about a product none of the customer\'s delivered orders holds loads no order\'s lines (' . $lines_read . ' read)' );
 
 		// The form post: refused for the ineligible, held for moderation for the eligible, once.
 		$refused = t61_post( $waiting, $cream->get_id(), 5 );
@@ -218,7 +224,7 @@ run(
 		$approve->set_param( 'status', 'approved' );
 		$approved   = rest_do_request( $approve );
 		wp_set_current_user( 0 );
-		$check( in_array( $approved->get_status(), array( 401, 403 ), true ) && is_int( $first ) && '1' !== (string) get_comment( $first )->comment_approved || ! is_int( $first ), 'D-17 a held review cannot be approved through the REST reviews update of WooCommerce by someone without moderation rights (' . $approved->get_status() . ')' );
+		$check( in_array( $approved->get_status(), array( 401, 403 ), true ) && is_int( $first ) && '1' !== (string) get_comment( $first )->comment_approved, 'D-17 a held review cannot be approved through the REST reviews update of WooCommerce by someone without moderation rights (' . $approved->get_status() . ')' );
 		$check( in_array( $woo_answer->get_status(), array( 401, 403 ), true ), 'D-17 WooCommerce\'s REST reviews endpoint refuses a review from someone without moderation rights or a delivery, and an approved status from them (' . $woo_answer->get_status() . ' ' . ( $woo_answer->get_data()['code'] ?? '' ) . ')' );
 
 		// The older nested routes, and WordPress's own comments endpoint, from someone who may edit any product but not
