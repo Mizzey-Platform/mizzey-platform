@@ -6,6 +6,8 @@
  *       (revenue, net sales, orders, units, average order value, discounts, shipping) match a hand calculation.
  * AC-2: the same figures through the real request the Analytics screen makes, opened in English and in Arabic.
  * AC-3: staff without access to reports cannot read them.
+ * AC-4: an order counts on the day it was placed, so a cash on delivery order counts that day through Confirmed,
+ *       Shipped, COD Collected and Delivered; Delivery Failed / Returned to Origin is not a sale.
  *
  * The orders sit on 15 March 2025, a day no other scenario uses, so the day's figures are the fixtures' alone.
  *
@@ -16,6 +18,7 @@ namespace MizzeySite\Tests\Integration;
 
 use Automattic\WooCommerce\Internal\Admin\Schedulers\OrdersScheduler;
 use MizzeySite\I18n\RewriteRoot;
+use MizzeySite\Reporting\SalesReport;
 
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_two_factor.php';
@@ -139,6 +142,58 @@ run(
 		$expected['total_sales'] = 560.0;
 		// The average order value is the orders' own (550 / 3): WooCommerce reports a refund apart from it.
 		unset( $expected['gross_sales'] );
+
+		// ---- AC-4: what counts as a sale: cash on delivery by the order's date, Delivery Failed never ------------
+		$excluded_now = (array) get_option( 'woocommerce_excluded_report_order_statuses', array() );
+		$check( SalesReport::DATE_TYPE === get_option( 'woocommerce_date_type' ) && 'date_created' === SalesReport::DATE_TYPE && in_array( 'delivery-failed', $excluded_now, true ) && array() === array_diff( array( 'pending', 'failed', 'cancelled' ), $excluded_now ), 'AC-4 Analytics\' own settings count an order by its date and leave out Pending Payment, Payment Failed, Cancelled and Delivery Failed (' . get_option( 'woocommerce_date_type' ) . '; ' . implode( ',', $excluded_now ) . ')' );
+		$walk = static function ( \WC_Order $o, array $steps ): \WC_Order {
+			foreach ( $steps as $step ) {
+				wc_get_order( $o->get_id() )->update_status( $step, '', true );
+			}
+			$o = wc_get_order( $o->get_id() );
+			OrdersScheduler::import( $o->get_id() );
+			return $o;
+		};
+		$placed = function ( int $qty, string $method, int $hour ) use ( $s, $product ): \WC_Order {
+			$o = wc_create_order();
+			$o->add_product( $product, $qty );
+			$o->set_payment_method( $method );
+			$o->update_meta_data( 'wpml_language', 'ar' );
+			$o->calculate_totals();
+			$o->set_date_created( T74_DAY . sprintf( ' %02d:00:00', $hour ) );
+			$o->save();
+			$s->track_order( $o->get_id() );
+			return $o;
+		};
+		$day = static function () use ( $req ): array {
+			return (array) ( rest_do_request( $req )->get_data()['totals'] ?? array() );
+		};
+		// A cash order placed that day and confirmed: a sale of that day, before any money is collected. The gateways are
+		// loaded first, as on a checkout, so the cash gateway's own payment rule applies.
+		WC()->payment_gateways();
+		$cash      =$walk( $placed( 1, 'cod', 11 ), array( 'processing' ) );
+		$confirmed = $day();
+		$check( 4 === (int) ( $confirmed['orders_count'] ?? 0 ) && 7 === (int) ( $confirmed['num_items_sold'] ?? 0 ) && abs( (float) ( $confirmed['total_sales'] ?? 0 ) - 660 ) < 0.01 && null === $cash->get_date_paid(), 'AC-4 a cash on delivery order confirmed that day counts that day, unpaid: 4 orders, 7 units, revenue 660.00 (' . wp_json_encode( array( $confirmed['orders_count'] ?? null, $confirmed['num_items_sold'] ?? null, $confirmed['total_sales'] ?? null ) ) . ')' );
+		// Shipped, COD Collected, then Delivered when the remittance is recorded (today): still that day's sale.
+		$cash = $walk( $cash, array( 'preparing', 'shipped', 'cod-collected', 'completed' ) );
+		$paid = $cash->get_date_paid();
+		$delivered = $day();
+		$check( 'completed' === $cash->get_status() && null !== $paid && T74_DAY !== $paid->date( 'Y-m-d' ) && 4 === (int) ( $delivered['orders_count'] ?? 0 ) && abs( (float) ( $delivered['total_sales'] ?? 0 ) - 660 ) < 0.01, 'AC-4 the cash order, Delivered and paid on another day (' . ( $paid ? $paid->date( 'Y-m-d' ) : 'no paid date' ) . '), stays in the day it was placed, counted once (' . ( $delivered['orders_count'] ?? '?' ) . ' orders)' );
+		// A prepaid order returned to origin, and a cash order the customer refused: neither is a sale.
+		$returned = $placed( 2, 'bacs', 13 );
+		$returned->payment_complete();
+		$returned = wc_get_order( $returned->get_id() );
+		$returned->set_date_paid( T74_DAY . ' 13:05:00' );
+		$returned->save();
+		$returned = $walk( $returned, array( 'preparing', 'shipped', 'delivery-failed' ) );
+		$refused  = $walk( $placed( 1, 'cod', 14 ), array( 'processing', 'preparing', 'shipped', 'delivery-failed' ) );
+		$failed   = $day();
+		$check( 'delivery-failed' === $returned->get_status() && 'delivery-failed' === $refused->get_status() && 4 === (int) ( $failed['orders_count'] ?? 0 ) && 7 === (int) ( $failed['num_items_sold'] ?? 0 ) && abs( (float) ( $failed['total_sales'] ?? 0 ) - 660 ) < 0.01, 'AC-4 a prepaid order returned to origin and a refused cash order, both Delivery Failed, are not counted: still 4 orders, 7 units, 660.00 (' . wp_json_encode( array( $failed['orders_count'] ?? null, $failed['num_items_sold'] ?? null, $failed['total_sales'] ?? null ) ) . ')' );
+		$expected['orders_count']    = 4;
+		$expected['num_items_sold']  = 7;
+		$expected['net_revenue']     = 600.0;
+		$expected['total_sales']     = 660.0;
+		$expected['avg_order_value'] = 650 / 4;
 
 		// The web server's rules are written for the site's root even when WordPress writes them in Arabic (the cause of
 		// the Arabic screen's 500 on an Apache host: RewriteBase /ar/ loops every Arabic address).

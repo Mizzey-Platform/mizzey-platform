@@ -115,7 +115,7 @@ run(
 		// ---- AC-3: top products once per physical item -------------------------------------------------------
 		$top  = StoreDashboard::topProducts( $after, $before, 50 );
 		$mine = array_values( array_filter( $top, static fn ( $l ) => in_array( $l['id'], array( $en, $ar ), true ) ) );
-		$check( 1 === count( $mine ) && $en === $mine[0]['id'] && $mine[0]['units'] >= 12, 'AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units (' . wp_json_encode( $mine ) . ')' );
+		$check( 1 === count( $mine ) && $en === $mine[0]['id'] && 12 === $mine[0]['units'], 'AC-3 the product sold in English (7) and in Arabic (5) is one line with 12 units (' . wp_json_encode( $mine ) . ')' );
 
 		[ $parent, $variations ] = $w->variable( "{$tag}-VAR", array( 'S' => null, 'L' => null ) );
 		$order( $variations[0], 3, 'en' );
@@ -159,6 +159,20 @@ run(
 			wc_get_order( $flag->get_id() )->update_status( $step );
 		}
 		$check( $flagged_now && ! in_array( $flag->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ), 'AC-4 a flagged order is a refund to make until it is delivered or refunded (' . wp_json_encode( array( $flagged_now, wc_get_order( $flag->get_id() )->get_status() ) ) . ')' );
+		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
+		$seen = array();
+		$spy  = static function ( $sql ) use ( &$seen ) {
+			if ( is_string( $sql ) && preg_match( "/'wc-(cancelled|on-hold|processing|preparing|delivery-failed)'/", $sql ) ) {
+				$seen[] = $sql;
+			}
+			return $sql;
+		};
+		add_filter( 'query', $spy, 99 );
+		StoreDashboard::needingAction();
+		StoreDashboard::pendingRefunds();
+		remove_filter( 'query', $spy, 99 );
+		$unbounded = array_values( array_filter( $seen, static fn ( $q ) => ! preg_match( '/\bLIMIT\b|COUNT\(|FOUND_ROWS/i', $q ) ) );
+		$check( array() !== $seen && array() === $unbounded, 'AC-4 the orders requiring action are counted by the database and the refund lists are limited, never every order loaded (' . count( $seen ) . ' queries, unbounded: ' . wp_json_encode( array_map( static fn ( $q ) => substr( preg_replace( '/\s+/', ' ', $q ), 0, 160 ), $unbounded ) ) . ')' );
 		$check( str_contains( $html, 'status=wc-on-hold' ) && str_contains( $html, 'mizzey_refunds=cancelled_paid' ) && str_contains( $html, 'mizzey_refunds=flagged' ) && str_contains( $html, 'Orders requiring action' ), 'AC-4 the counts link to the filtered orders list' );
 
 		// ---- AC-5: stock as the stock source reports it --------------------------------------------------------

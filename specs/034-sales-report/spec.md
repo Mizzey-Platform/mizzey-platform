@@ -41,6 +41,7 @@ RPT-03).
 | AC-1 | For any period, the report gives revenue, net sales, orders, units, average order value, discounts and shipping, counting English and Arabic orders once each, matching a hand calculation | RPT-01 | provisional |
 | AC-2 | The figures are the same whichever language the administration is opened in | RPT-01 | provisional |
 | AC-3 | Only staff with access to reports can read it | RPT-01 | provisional |
+| AC-4 | An order counts as a sale on the day it was placed, whatever its payment method, so a cash on delivery order counts that day through every status to Delivered; Pending Payment, Payment Failed, Cancelled and Delivery Failed / Returned to Origin are not sales | RPT-01 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -53,6 +54,10 @@ RPT-03).
 
 - A refund on the day: lowers net sales and revenue by its amount.
 - The administration switched to Arabic: the same figures.
+- A cash on delivery order: counted on the day it was placed, from Confirmed on, although it is marked paid only when
+  it reaches Delivered after the remittance (specs/010); it is never counted again on the day it is delivered.
+- Delivery Failed / Returned to Origin, prepaid or cash: not a sale. A prepaid order then refunded in full reaches
+  Refunded and is counted with its refund, as any refunded order is.
 
 ## Native coverage
 
@@ -62,6 +67,7 @@ RPT-03).
 | Orders, units (items sold), average order value | WooCommerce Analytics, Orders report | Native, verified |
 | Every order counted once in both languages | Analytics reads order-level statistics (`wc_order_stats`), which WPML does not split | Native, verified (the product split P-019 measured does not apply) |
 | Access | WooCommerce's `view_woocommerce_reports` | Native |
+| Which date and which statuses count | Analytics' own settings: date type, excluded statuses, actionable statuses (WooCommerce, Settings, Analytics). The default date type is the paid date, which a cash order receives only at Delivered | Native settings, set once by Mizzey (`SalesReport`) to the order's date and with Delivery Failed excluded; the owner can change them there |
 | The Analytics screen opened in Arabic on an Apache host | WordPress writes `.htaccess` from the language-prefixed home address when a queued rewrite flush runs on an Arabic admin page (`RewriteBase /ar/`), and every Arabic address then loops (HTTP 500) | Gap, measured on 2 November 2026 (t26 and t74 failed with it): the rules always name the site root |
 
 ## Requirements
@@ -75,6 +81,10 @@ RPT-03).
 - **FR-003**: A failure of either check MUST be fixed in Mizzey's code at its cause, not by a parallel report.
 - **FR-004**: The web server's rewrite rules MUST name the site's root whatever language the page that writes them is
   in, so the Arabic screens answer (AC-2).
+- **FR-005**: The report MUST count an order by the date it was placed (Analytics' date type `date_created`) and MUST
+  leave out Pending Payment, Payment Failed, Cancelled and Delivery Failed / Returned to Origin (Analytics' excluded
+  statuses). Both are written once into Analytics' own settings, keeping any status the store already excluded, and
+  a later change there is kept. Analytics' actionable statuses are the dashboard's orders requiring action (AC-4).
 
 ## Optional safeguards (not owed)
 
@@ -94,5 +104,9 @@ Contractual stage: S1. Engineering timing: November 2026 (D-22, D-27).
 
 ## Assumptions
 
+- What counts as a sale (AC-4, FR-005) is the owner's working reading of 2 November 2026, not yet confirmed: the
+  order's date, because the register keeps the cash position apart from revenue ("your dashboard revenue is not your
+  cash position"; collected and remitted are tracked by SHIP-16), so revenue is recognised when the order is taken,
+  the same for cash and card orders.
 - "Revenue" is Analytics' total sales (net sales plus shipping and taxes), "net sales" its net sales after discounts
   and refunds, "discounts" its coupons, "units" its items sold.

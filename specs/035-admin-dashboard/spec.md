@@ -69,6 +69,9 @@ in the admin set that needs no client input; the stock figures use the adapter t
 - The stock source cannot answer for an item: counted as unknown, never as in stock.
 - A product in two languages: one line in top products, one item in the stock counts.
 - A customer reaching the dashboard: sees nothing of it.
+- Many orders: the action counts are made by the database; each refund list holds the newest 500 orders and its
+  count then reads "500 or more".
+- Which orders are sales, and by which date: the sales report's settings (specs/034 AC-4).
 
 ## Native coverage
 
