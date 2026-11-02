@@ -56,6 +56,9 @@ run(
 			}
 			$setup = two_factor_http( 'GET', admin_url( 'profile.php?show=wp-2fa-setup' ), array(), $cookies );
 			$check( 200 === $setup['status'] && false !== strpos( $setup['body'], 'totpKey' ), "AC-3 [{$label}] the set-up screen opens (status {$setup['status']})" );
+			// WooCommerce saves its settings on wp_loaded, before admin_init: refused there too, before any save.
+			$early = two_factor_http( 'POST', admin_url( 'admin.php?page=wc-settings&tab=general' ), array( 'save' => 'Save changes', 'woocommerce_store_city' => 't44-early' ), $cookies );
+			$check( 403 === $early['status'] && false !== strpos( $early['body'], 'Set up two-factor sign-in before using this.' ) && 't44-early' !== get_option( 'woocommerce_store_city' ), "AC-3 [{$label}] a form sent to an administration screen that saves before admin_init is refused by the guard, not only by the form's nonce (status {$early['status']})" );
 			$post = two_factor_http( 'POST', admin_url( 'admin-post.php' ), array( 'action' => 'mizzey_t44_probe' ), $cookies );
 			// Refused outright, or sent to set-up before WordPress dispatches the action: either way it never runs.
 			$check( 403 === $post['status'] || ( 302 === $post['status'] && false !== strpos( $post['location'], 'show=wp-2fa-setup' ) ), "AC-3 [{$label}] an administration action is refused (status {$post['status']}, location '{$post['location']}')" );
