@@ -38,7 +38,7 @@ all mail.
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | Every email the store sends leaves through the provider's relay, behind an adapter, with the store's sender | INT-05 | pending I-10 |
+| AC-1 | Every email the store sends leaves through the provider's relay, behind an adapter, with the store's sender | INT-05 | provisional |
 | AC-2 | A message the relay refuses is logged and raised to operations | INT-05 | provisional |
 | AC-3 | Staff can send a test message to check delivery | INT-05 | provisional |
 
