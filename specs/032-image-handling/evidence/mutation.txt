@@ -1,0 +1,18 @@
+Mutation check for specs/032-image-handling, t72-image-handling, 2 November 2026 (local runtime: WordPress 7.1.4, GD with WebP).
+Each deliberate defect was applied alone, t72 run, the file restored.
+
+CAUGHT    M1 sizes stay JPEG  <- AC-2 a 4000x3000 JPEG: every generated size is WebP (9 sizes, not: t72-phone-photo-1-300x225.jpg,t72-phone-photo-1-1024x768.jpg,t72-ph
+CAUGHT    M2 PNG sizes stay PNG  <- AC-2 a PNG's sizes are WebP too
+CAUGHT    M3 no size limit  <- AC-1 an image over 20 MB is refused with a message: 0
+CAUGHT    M4 no pixel limit  <- AC-1 a 42-megapixel image is refused on sideload (the catalogue migration's route), though its file is small (5 KB): stored
+CAUGHT    M5 sideloads are not guarded  <- AC-1 a 42-megapixel image is refused on sideload (the catalogue migration's route), though its file is small (5 KB): stored
+CAUGHT    M6 every file is measured as an image  <- AC-1 an ordinary photo passes; a file that is not an image is left to WordPress's own checks
+6 of 6 caught
+
+After Codex's review (palette PNG, edited images, BMP, TIFF, HEIC):
+CAUGHT    M8 a palette PNG is converted to WebP  <- AC-2 a transparent palette PNG is stored with all its sizes, without an error
+CAUGHT    M9 BMP is not measured  <- AC-1 a BMP over 20 MB is refused too, like every image type WordPress accepts
+CAUGHT    M7 an edit of a JPEG-stored image is written as WebP  <- AC-2 an image stored as JPEG before this change, rotated in the editor, stays a JPEG its attachment can find
+CAUGHT    M7b no edit is ever written as WebP  <- AC-2 an image rotated in the media library's editor still points at a file that exists
+
+10 of 10 caught.
