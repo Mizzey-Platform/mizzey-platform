@@ -15,7 +15,7 @@
 
 namespace MizzeySite\Tests\Integration;
 
-use Automattic\WooCommerce\Admin\API\Reports\Orders\Stats\DataStore as OrderStats;
+use Automattic\WooCommerce\Internal\Admin\Schedulers\OrdersScheduler;
 use MizzeySite\Reporting\StoreDashboard;
 use MizzeySite\Stock\StockItem;
 use MizzeySite\Stock\StockSource;
@@ -65,7 +65,7 @@ run(
 			$o->save();
 			$s->track_order( $o->get_id() );
 			$o->payment_complete();
-			OrderStats::sync_order( $o->get_id() );
+			OrdersScheduler::import( $o->get_id() );
 			return wc_get_order( $o->get_id() );
 		};
 		$o1 = $order( $en, 7, 'en' );
