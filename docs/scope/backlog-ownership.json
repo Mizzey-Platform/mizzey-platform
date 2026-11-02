@@ -607,13 +607,13 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 13,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered: the only development blocker",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#241",
@@ -629,11 +629,6 @@
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
@@ -682,18 +677,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 14,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#241",
@@ -704,11 +699,6 @@
    "erp_blocked": "partial",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
@@ -1827,7 +1817,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "Verified",
    "delivery_order": 33,
    "depends_on": [
     {
@@ -1876,7 +1866,7 @@
     }
    ],
    "data_integrity": "B8 not yet tested (failed payment, both languages); F3 not yet tested multilingually",
-   "acceptance_evidence": "AC-06, AC-07, AC-08 and AC-10 against the Paymob sandbox; automated tests on the payment, refund and duplicate-protection paths (M-7); a forged or unsigned callback is rejected; no card data in the database or the logs; the settlement note of PAY-19 written.",
+   "acceptance_evidence": "AC-06, AC-07, AC-08 and AC-10 against the Paymob sandbox; automated tests on the payment, refund and duplicate-protection paths (M-7); a forged or unsigned callback is rejected; no card data in the database or the logs; the settlement note of PAY-19 written. Verified on staging 1 November 2026 against Paymob's sandbox (releases v0.1.12 and v0.1.13, recorded on the issue): a 3-D Secure card payment confirmed from the signed notice, a partial refund through Paymob, a refund made at Paymob recorded once. Verified, not Accepted: CR-01, OD-05, OD-19, DOD-04 and DOD-09 remain.",
    "not_in_slice": [
     "PAY-10 (P2)",
     "PAY-20 (P2)",
@@ -2384,23 +2374,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 42,
    "depends_on": [
     {
      "ref": "#283",
-     "reason": "The gateway route of the refund, and the fallback where the integration does not support it",
+     "reason": "The gateway route of the refund, and the fallback where the integration does not support it. Satisfied: verified on staging 1 November 2026 (v0.1.12, v0.1.13)",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #283"
-    },
     {
      "id": "OD-08",
      "class": "Content or client input",
@@ -2442,23 +2427,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 43,
    "depends_on": [
     {
      "ref": "#283",
-     "reason": "The payment reference (PAY-06) and the gateway refund route",
+     "reason": "The payment reference (PAY-06) and the gateway refund route. Satisfied: verified on staging 1 November 2026 (v0.1.12, v0.1.13)",
      "blocking": true
     }
    ],
    "erp_blocked": "no",
    "design_dependency": "none",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #283"
-    },
     {
      "id": "DOD-04, DOD-09",
      "class": "Blocks final acceptance",
@@ -2993,18 +2973,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 52,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#311",
@@ -3020,11 +3000,6 @@
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
@@ -3088,18 +3063,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 53,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#245",
@@ -3110,11 +3085,6 @@
    "erp_blocked": "partial",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",
@@ -3171,13 +3141,13 @@
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#303",
@@ -3191,7 +3161,7 @@
     {
      "id": "Predecessor PBIs",
      "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253, #303"
+     "note": "Not yet delivered: #303"
     },
     {
      "id": "OD-01",
@@ -3660,18 +3630,18 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 60,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "Design system, not yet delivered",
-     "blocking": true
+     "reason": "Design system, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
-     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered",
-     "blocking": true
+     "reason": "Header and navigation, the frame every storefront page sits in, not yet delivered. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#242",
@@ -3687,11 +3657,6 @@
    "erp_blocked": "no",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250, #253"
-    },
     {
      "id": "CR-04",
      "class": "Blocks production or launch only",
@@ -3772,13 +3737,13 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Blocked",
+   "status": "Ready",
    "delivery_order": 61,
    "depends_on": [
     {
      "ref": "#250",
-     "reason": "The curated section library is derived from the approved Interface Design",
-     "blocking": true
+     "reason": "The curated section library is derived from the approved Interface Design. D-27 (2 November 2026): blocks the presentation layer only, not the function layer built now.",
+     "blocking": false
     },
     {
      "ref": "#253",
@@ -3789,11 +3754,6 @@
    "erp_blocked": "partial",
    "design_dependency": "needs design",
    "inputs": [
-    {
-     "id": "Predecessor PBIs",
-     "class": "Blocks development now",
-     "note": "Not yet delivered: #250"
-    },
     {
      "id": "OD-01",
      "class": "Blocks final acceptance",

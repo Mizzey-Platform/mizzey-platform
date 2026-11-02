@@ -2220,3 +2220,43 @@ preview's data loaded only when it is opened. It must absorb the real catalogue 
 shown whole.
 
 **4. Where it is built.** With the storefront, after PRE-03b, beside the product card (PLP-04, PLP-05).
+
+
+## 2026-11-02 - D-27: the storefront function layer is built now, and search is our own
+
+**Status: the owner's rulings of 2 November 2026, in his words (translated from Arabic): "The storefront function
+layer proposal: if you recommend approving it, it is approved. Search decision: we won't buy plugins or licences for
+it, we build our own, the professional way."** Internal record: not a client confirmation, adds no scope, changes no
+register row, fee, stage or signed document, and is not a Change Request.
+
+**1. The storefront function layer is built now.** D-22 item 2 is extended to #253 (header and navigation), #254
+(product page), #302 (home page sections), #303 (listing, filters, sorting and pagination), #304 (search), #310
+(trust and support pages), #311 (self-service storefront control), #277 (categories, brands and collections admin)
+and #282 (badges, featured products, manual ordering), exactly as it was applied to Stage 3:
+
+- **Built now, the function layer:** server-side behaviour, data, validation, admin settings, Store API and REST
+  data, and their tests. Customer screens run on WooCommerce's and WordPress's native blocks with neutral tokens.
+- **After PRE-03b, the presentation layer:** the designed screens, built from the approved design (D-14), with D-26's
+  Quick Look among them. The D-21 performance and accessibility gates apply to every customer screen a slice ships,
+  native ones included.
+- **Dependencies.** For the function layer only, the design system (#250), the header and navigation (#253) and the
+  product page (#254) stop being blocking predecessors of these slices. They stay blocking for the presentation
+  layer, and every other recorded dependency stands: #304 still follows #303.
+- **Delivery order is unchanged.** These are Stage 2 slices. Building them early shortens the work after the design
+  arrives; it does not move Stage 2's acceptance or payment, and Stage 3 and later are still not demonstrated,
+  offered for acceptance or invoiced before Stage 2 is accepted (D-22 item 1).
+
+**2. Search is built in-house, with no licensed component or plugin.** The search component decision left open in
+the Statement of Work (section 8, "confirmed at technical design") is closed: Mizzey's own search, as D-20 row B13
+directed, with the curated Arabic synonym and correction list managed by staff in the admin (SRCH-06, SRCH-06a,
+SRCH-07). SRCH-06 is P1-L, so the launch boundary in the Feature Register section 1.2 holds: a curated synonym and
+correction list across the main categories and brands, common Franco-Arabic spellings included, and not full
+automatic typo tolerance across the whole catalogue, an external search engine or a licensed linguistic component. Nothing is bought, and the client is asked to buy nothing
+for search. The initial entries of the list stay a content input from the client.
+
+**3. PR #443 is approved** ("PR #443: fine, approve"): #249 Verified, and #247, #295 and #296 Ready.
+
+**4. Status synchronised with this record.** #283 was verified on staging against Paymob's sandbox on 1 November 2026
+(v0.1.12 and v0.1.13, recorded on the issue), so it is Verified, not Accepted, and its dependants #292 and #293 are
+Ready by the status rule (D-10, D-12). #253, #254, #302, #303, #310 and #311 move from Blocked to Ready under item 1;
+#304 stays Blocked until #303 is verified.
