@@ -23,10 +23,17 @@ use WC_Product_Variation;
  * t20 (REST, CRUD under WP-CLI and in a front-end request: stale Arabic price) and t18 (nine of fourteen fields).
  * D-07 sets the rule this applies: code that writes a product price synchronises the translation explicitly.
  *
- * What it does. After WooCommerce has saved a source-language product or variation outside save_post, WPML's own copy
- * (SitePress::copy_custom_fields, the call WPML makes on save_post) runs onto each translation, then the translation's
- * lookup row and caches are refreshed. Inside save_post (the product screen, quick and bulk edit) it stands aside:
- * WPML and WooCommerce Multilingual run after it there, on the finished save.
+ * What it does. Before WooCommerce saves a source-language product or variation, it notes the fields the save changes
+ * (its changed properties, mapped to their stored fields, and its changed custom fields). After the save, each of them
+ * that WPML is set to copy is copied onto each translation with WPML's own per-field copy (the one save_post uses),
+ * then the translation's lookup row and caches are refreshed. Only the fields of the change are written: a field the
+ * save did not touch (WooCommerce's sales counter, say) stays as each record has it. The cost is left to
+ * CostTranslationSync, which owns it. It runs inside save_post too (the product screen, quick and bulk edit), where
+ * WPML copies the same values again afterwards; the copy compares first, so nothing changes twice.
+ *
+ * The translation group is read from WPML's table, not through its in-process caches, so a translation made earlier in
+ * the same process (the translation editor, then a save by code) is always seen; WPML's field settings are read from
+ * its stored settings for the same reason. (t76 found the Arabic record not following in such a process.)
  *
  * product() is the full synchronisation WooCommerce Multilingual runs when a product is saved on its screen: the copy
  * above plus attributes, taxonomies, images and the variations, creating the Arabic variation of a new one. The
@@ -48,42 +55,106 @@ final class TranslationSync
         'WCML\Synchronization\Component\VariationTaxonomies',
     ];
 
+    /** Product properties and the stored fields a change to each one writes. */
+    private const PROPERTY_FIELDS = [
+        'regular_price'     => ['_regular_price', '_price'],
+        'sale_price'        => ['_sale_price', '_price'],
+        'date_on_sale_from' => ['_sale_price_dates_from', '_price'],
+        'date_on_sale_to'   => ['_sale_price_dates_to', '_price'],
+        'sku'               => ['_sku'],
+        'global_unique_id'  => ['_global_unique_id'],
+        'weight'            => ['_weight'],
+        'length'            => ['_length'],
+        'width'             => ['_width'],
+        'height'            => ['_height'],
+        'tax_status'        => ['_tax_status'],
+        'tax_class'         => ['_tax_class'],
+        'manage_stock'      => ['_manage_stock'],
+        'backorders'        => ['_backorders'],
+        'low_stock_amount'  => ['_low_stock_amount'],
+        'stock_status'      => ['_stock_status'],
+        'sold_individually' => ['_sold_individually'],
+        'virtual'           => ['_virtual'],
+        'downloadable'      => ['_downloadable'],
+        'download_limit'    => ['_download_limit'],
+        'download_expiry'   => ['_download_expiry'],
+        'total_sales'       => ['total_sales'],
+    ];
+
+    /** Copied fields another class owns: the cost is CostTranslationSync's, written through WooCommerce. */
+    private const OWNED_ELSEWHERE = ['_cogs_total_value'];
+
     private static bool $running = false;
+
+    /** @var array<int,list<string>> The fields each save in progress changes, by product id. */
+    private static array $changed = [];
 
     public static function register(): void
     {
+        add_action('woocommerce_before_product_object_save', [self::class, 'noteChanges'], 99, 1);
+        add_action('woocommerce_before_product_variation_object_save', [self::class, 'noteChanges'], 99, 1);
         add_action('woocommerce_update_product', [self::class, 'afterSave'], 30, 1);
         add_action('woocommerce_update_product_variation', [self::class, 'afterSave'], 30, 1);
+    }
+
+    /** @param mixed $product The product about to be saved. */
+    public static function noteChanges($product): void
+    {
+        if (! $product instanceof \WC_Product || $product->get_id() <= 0) {
+            return;
+        }
+        $fields = [];
+        foreach (array_keys($product->get_changes()) as $property) {
+            $fields = array_merge($fields, self::PROPERTY_FIELDS[$property] ?? []);
+        }
+        foreach ($product->get_meta_data() as $meta) {
+            if ($meta instanceof \WC_Meta_Data && (empty($meta->id) || $meta->get_changes() !== [])) {
+                $fields[] = (string) $meta->key;
+            }
+        }
+        $id                 = $product->get_id();
+        self::$changed[$id] = array_values(array_unique(array_merge(self::$changed[$id] ?? [], $fields)));
     }
 
     /** @param mixed $productId */
     public static function afterSave($productId): void
     {
-        // Inside save_post WPML and WooCommerce Multilingual run after this save, on its finished fields.
-        if (self::$running || doing_action('save_post')) {
+        $id     = (int) $productId;
+        $fields = self::$changed[$id] ?? [];
+        unset(self::$changed[$id]);
+        if (self::$running || $fields === []) {
             return;
         }
-        self::copyFields((int) $productId);
+        self::copyFields($id, $fields);
     }
 
     /**
-     * WPML's copy of the copied fields from a source-language product or variation onto its translations.
+     * WPML's per-field copy, from a source-language product or variation onto its translations, of the given fields
+     * WPML is set to copy, or of all of them.
      *
+     * @param list<string>|null $fields Null for every copied field.
      * @return list<int> The translations written to.
      */
-    public static function copyFields(int $id): array
+    public static function copyFields(int $id, ?array $fields = null): array
     {
         global $sitepress;
         $translations = self::translationsOf($id);
-        if ($translations === [] || ! is_object($sitepress) || ! method_exists($sitepress, 'copy_custom_fields')) {
+        if ($translations === [] || ! is_object($sitepress) || ! method_exists($sitepress, 'sync_custom_field')) {
             return [];
+        }
+        $copied = array_diff(self::copiedFields(), self::OWNED_ELSEWHERE);
+        $fields = $fields === null ? $copied : array_intersect($fields, $copied);
+        if ($fields === []) {
+            return array_keys($translations);
         }
         $was           = self::$running;
         self::$running = true;
         try {
             foreach (array_keys($translations) as $translationId) {
                 try {
-                    $sitepress->copy_custom_fields($id, $translationId);
+                    foreach ($fields as $field) {
+                        $sitepress->sync_custom_field($id, $translationId, $field);
+                    }
                     self::refresh($translationId);
                 } catch (Throwable $e) {
                     self::log(sprintf('Could not copy the fields of product %d to its translation %d: %s', $id, $translationId, $e->getMessage()));
@@ -137,35 +208,43 @@ final class TranslationSync
         return $translations;
     }
 
+    /** The custom fields WPML is set to copy, from its stored settings. @return list<string> */
+    private static function copiedFields(): array
+    {
+        $settings = get_option('icl_sitepress_settings');
+        $fields   = is_array($settings) ? (array) ($settings['translation-management']['custom_fields_translation'] ?? []) : [];
+        $copy     = defined('WPML_COPY_CUSTOM_FIELD') ? (int) WPML_COPY_CUSTOM_FIELD : 1;
+
+        return array_values(array_map('strval', array_keys(array_filter($fields, static fn ($mode): bool => (int) $mode === $copy))));
+    }
+
     /**
      * The other language versions of a source-language product or variation, by id with their language. Empty when the
-     * item is a translation itself, is not translated, or WPML cannot say: only a definite original is copied from.
+     * item is a translation itself, is not translated, or WPML is not running: only a definite original is copied from.
      *
      * @return array<int,string>
      */
     public static function translationsOf(int $id): array
     {
+        global $wpdb;
         $type = $id > 0 ? (self::ELEMENT_TYPES[get_post_type($id)] ?? null) : null;
-        if ($type === null) {
+        if ($type === null || ! defined('ICL_SITEPRESS_VERSION')) {
             return [];
         }
-        $trid = apply_filters('wpml_element_trid', null, $id, $type);
-        if (! $trid) {
-            return [];
-        }
+        $rows = $wpdb->get_results($wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT t.element_id, t.language_code, t.source_language_code FROM {$wpdb->prefix}icl_translations s JOIN {$wpdb->prefix}icl_translations t ON t.trid = s.trid AND t.element_type = s.element_type WHERE s.element_id = %d AND s.element_type = %s",
+            $id,
+            $type,
+        ));
         $self   = null;
         $others = [];
-        foreach ((array) apply_filters('wpml_get_element_translations', null, $trid, $type) as $row) {
-            $row       = (object) $row;
-            $elementId = (int) ($row->element_id ?? 0);
-            if ($elementId <= 0) {
-                continue;
-            }
-            $original = isset($row->original) ? (bool) (int) $row->original : empty($row->source_language_code);
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            $elementId = (int) $row->element_id;
+            $original  = $row->source_language_code === null || $row->source_language_code === '';
             if ($elementId === $id) {
                 $self = $original;
-            } elseif (! $original) {
-                $others[$elementId] = (string) ($row->language_code ?? '');
+            } elseif (! $original && $elementId > 0) {
+                $others[$elementId] = (string) $row->language_code;
             }
         }
 
