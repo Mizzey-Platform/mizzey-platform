@@ -57,7 +57,7 @@ container is named.
 | AC-1 | The page events fire as the plan defines, in both languages: home, lists, search and zero-result search, product | EVT-01, EVT-02, EVT-03, EVT-04, EVT-18 | provisional |
 | AC-2 | The cart, coupon, wishlist, checkout, sign-up and sign-in events fire once each, with the plan's parameters | EVT-05, EVT-06, EVT-07, EVT-08, EVT-09, EVT-10, EVT-11, EVT-12, EVT-13, EVT-16 | provisional |
 | AC-3 | Purchase fires once per order, on confirmation, with its value, tax, shipping, coupon and items | EVT-14 | provisional |
-| AC-4 | A refund is sent to Analytics when it is made | EVT-15 | pending I-09 |
+| AC-4 | A refund is sent to Analytics when it is made | EVT-15 | provisional |
 
 ## User Scenarios & Testing *(mandatory)*
 
