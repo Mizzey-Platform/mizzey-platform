@@ -54,6 +54,12 @@ final class AdminEnglish
      */
     public static function locale($locale)
     {
+        // An explicit switch (an order's language for its email, invoice or packing slip) always wins.
+        // WordPress asks for the locale before its switcher exists; is_locale_switched() would then fail.
+        if (($GLOBALS['wp_locale_switcher'] ?? null) instanceof \WP_Locale_Switcher && is_locale_switched()) {
+            return $locale;
+        }
+
         return self::adminScreen() ? self::LOCALE : $locale;
     }
 }

@@ -142,6 +142,19 @@ run(
 		$tag = (string) ( $html_tag[0] ?? '' );
 		$check( 1 === preg_match( '/lang="en/', $tag ) && ! str_contains( $tag, 'dir="rtl"' ) && str_contains( $screen, 'Products' ), 'AC-5 the administration stays in English for a staff member who chose Arabic (' . esc_html( preg_replace( '/\\s+/', ' ', $tag ) ) . ')' );
 
+		// An admin action that switches to an order's language (its email, invoice or packing slip) keeps that language.
+		require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+		set_current_screen( 'edit-shop_order' );
+		$in_admin = is_admin() && \MizzeySite\I18n\AdminEnglish::adminScreen();
+		$plain    = determine_locale();
+		switch_to_locale( 'ar' );
+		$switched = determine_locale();
+		$label    = __( 'Order number', 'mizzey-site' );
+		restore_previous_locale();
+		set_current_screen( 'front' );
+		$check( $in_admin && 'en_US' === $plain && 'ar' === $switched && 'Order number' !== $label, 'AC-5 an admin screen is English, but a switch to the language of an order (its email or document) is kept (' . $switched . ', ' . $label . ')' );
+
 		return $ok;
 	}
 );
