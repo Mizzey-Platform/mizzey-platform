@@ -66,6 +66,7 @@ now. ADM-28 (scheduled price changes) is P2 in the register, not S2, and is not 
 ### Edge Cases
 
 - A staff member's account: never deleted by a request.
+- An erasure request staff create in WordPress's own Tools, Erase Personal Data: the data is erased, the account kept.
 - An export prepared by staff: downloaded from Tools, not emailed to the customer.
 - Order emails: always sent, whatever the preferences.
 
@@ -88,7 +89,8 @@ now. ADM-28 (scheduled price changes) is P2 in the register, not S2, and is not 
 - **FR-002**: "Order again" MUST be offered on a Delivered or COD Collected order (AC-2).
 - **FR-003**: The customer's request MUST be a WordPress privacy request confirmed by email; once confirmed, the
   export or the erasure MUST run in the background with the registered exporters and erasers; an erased customer's
-  account MUST then be deleted, never a staff account (AC-3).
+  account MUST then be deleted, never a staff account, and only for a request the customer made from My Account; an
+  erasure request staff create in Tools, Erase Personal Data MUST erase the data and keep the account (AC-3).
 - **FR-004**: Staff with `export_others_personal_data` MUST be able to prepare a customer's export from the record; it
   is downloaded from Tools, Export Personal Data, not emailed (AC-3).
 - **FR-005**: The customer MUST be able to turn off review invitations and turn offers on or off; order emails MUST
