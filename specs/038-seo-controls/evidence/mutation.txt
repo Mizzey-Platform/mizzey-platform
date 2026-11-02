@@ -1,0 +1,30 @@
+Mutation check for specs/038-seo-controls, t78-seo-controls, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7). Each defect is applied alone, the scenario run over the real request, the file restored.
+
+CAUGHT    M1 a page's own title is ignored  <- FAIL  AC-1 a page carries its edited title, description and canonical
+CAUGHT    M2 a category's canonical is ignored  <- FAIL  AC-1 a category carries its edited title, description and canonical
+CAUGHT    M3 redirects are not followed  <- FAIL  AC-2 the old path answers 301 to the new address (404 )
+CAUGHT    M4 a redirect to itself is accepted  <- FAIL  AC-2 a redirect is saved; one from a page to itself is refused
+CAUGHT    M5 redirects are not counted  <- FAIL  AC-2 each redirect counts its use
+CAUGHT    M6 missing pages are not logged  <- FAIL  AC-3 a missing page is logged by path with where it came from, and no visitor address
+SURVIVED  M7 the visitor address is logged
+CAUGHT    M8 a do-not-index item stays in the sitemap  <- FAIL  AC-4 the sitemap lists a product and leaves out one marked "do not index"
+SURVIVED  M9 a kind switched off stays in the sitemap
+CAUGHT    M10 robots lines are not checked  <- FAIL  AC-4 robots.txt carries the extra line, refuses what is not a directive, and keeps the sitemap line
+CAUGHT    M11 verification codes are not printed  <- FAIL  AC-5 the Google and Bing verification codes are on the home page, cleaned
+CAUGHT    M12 verification codes are not cleaned  <- FAIL  AC-5 the Google and Bing verification codes are on the home page, cleaned
+CAUGHT    M13 no organisation structured data  <- FAIL  AC-5 the home page carries the organisation's structured data
+
+M7 and M9 survived the first run: the check looked for one loopback address and an excluded kind that had no entries. Both checks were tightened (the logged fields are exactly path count, time and referrer; the excluded kind is listed before and gone after):
+CAUGHT    M7 the visitor address is logged  <- FAIL  AC-3 a missing page is logged by path with where it came from, and no visitor address
+CAUGHT    M9 a kind switched off stays in the sitemap  <- FAIL  AC-4 a kind of content switched off is not in the sitemap index
+
+13 of 13 caught on the first set.
+
+After Codex's review (the Shop page, query-only targets, path targets in Arabic, the store address):
+CAUGHT    M14 the Shop page's fields are ignored  <- FAIL  AC-1 the Shop page carries its edited title
+CAUGHT    M15 a bare query is accepted as a target  <- FAIL  AC-2 a target with no address of its own (a bare query or fragment) is refused
+SURVIVED  M16 a path target goes through the language-filtered home address
+CAUGHT    M17 the store address is left out  <- FAIL  AC-5 the home page carries the organisation's structured data
+M16 is equivalent in this runtime: with WPML 4.9.7, home_url() keeps the "/ar/" of a given path whether the current language is English or Arabic (checked both ways in t78), so the language-filtered address and the site's own root give the same target here. The raw root is kept because it does not depend on WPML's filter.
+
+16 of 17 caught, 1 equivalent.
