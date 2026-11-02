@@ -378,6 +378,7 @@ final class StoreDashboard
             esc_url(self::ordersUrl(['status' => 'wc-processing'])),
             esc_html__('View pending orders', 'mizzey-site')
         );
+        do_action('mizzey_dashboard_widget_end');
         echo '</div>';
     }
 }

@@ -136,6 +136,7 @@ final class CustomerRecords
             echo '</ul>';
         }
         echo '</td></tr></table>';
+        do_action('mizzey_customer_record_panel', $user);
     }
 
     /** @param mixed $userId */
