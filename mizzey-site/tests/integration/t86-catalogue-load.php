@@ -152,9 +152,19 @@ run(
 			CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/run", true );
 			$reused = false;
 		} catch ( \RuntimeException $e ) {
-			$reused = str_contains( $e->getMessage(), 'no earlier plan' );
+			$reused = str_contains( $e->getMessage(), 'no earlier run' );
 		}
 		$check( $reused, 'AC-1 B-13 a run directory that holds an earlier run is refused, so each run keeps its plan and reports' );
+		// The same for a directory a validation wrote: its run copy is not overwritten by a load's reports.
+		wp_mkdir_p( "{$dir}/validated" );
+		file_put_contents( "{$dir}/validated/run.json", '{"outcome":"completed"}' );
+		try {
+			CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/validated", true );
+			$validated = false;
+		} catch ( \RuntimeException $e ) {
+			$validated = str_contains( $e->getMessage(), 'no earlier run' );
+		}
+		$check( $validated && ! file_exists( "{$dir}/validated/plan.json" ) && ! file_exists( "{$dir}/validated/" . ReportWriter::ISSUES ) && '{"outcome":"completed"}' === file_get_contents( "{$dir}/validated/run.json" ), 'AC-1 B-13 a directory holding a validation\'s run record is refused, and its evidence is left as it was' );
 		$problems = (array) ( $state['problems'] ?? array() );
 		$on_amp   = array_filter( $problems, static fn ( $p ) => "{$tag}-AMP" === $p['sku'] );
 		$check( 'done' === ( $state['status'] ?? '' ) && 2 === count( $problems ) && 2 === count( $on_amp ), 'AC-1 the load ran in the background to the end; its only problems are the two image addresses it did not download (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( $problems ) . ')' );
@@ -233,14 +243,31 @@ run(
 		$expect  = array( "{$tag}-ROSE", "{$tag}-MASK", "{$tag}-MASK-S", "{$tag}-MASK-L", "{$tag}-PLAIN", "{$tag}-AMP" );
 		$check( array() === array_diff( $expect, array_keys( $english ) ) && array( 1 ) === array_values( array_unique( array_values( $english ) ) ), 'AC-6 MIG-25 the export screen\'s query, in English, lists every loaded product and variation once (' . wp_json_encode( $english ) . ')' );
 
+		// A category with an Arabic translation, for an update that renames a product and moves it there.
+		$serum    = wp_insert_term( "{$tag} Serums", 'product_cat' );
+		$serum_ar = wp_insert_term( "{$tag} سيروم", 'product_cat', array( 'slug' => strtolower( $tag ) . '-serums-ar' ) );
+		$s->on_finish(
+			static function () use ( $serum, $serum_ar ): void {
+				foreach ( array( $serum, $serum_ar ) as $made ) {
+					if ( ! is_wp_error( $made ) ) {
+						wp_delete_term( (int) $made['term_id'], 'product_cat' );
+					}
+				}
+			}
+		);
+		$serum_tt = is_wp_error( $serum ) ? 0 : (int) $serum['term_taxonomy_id'];
+		$serum_ar_id = is_wp_error( $serum_ar ) ? 0 : (int) $serum_ar['term_id'];
+		do_action( 'wpml_set_element_language_details', array( 'element_id' => is_wp_error( $serum_ar ) ? 0 : (int) $serum_ar['term_taxonomy_id'], 'element_type' => 'tax_product_cat', 'trid' => apply_filters( 'wpml_element_trid', null, $serum_tt, 'tax_product_cat' ), 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+
 		// An update run, as the client's corrected file comes back (MIG-19): new prices with blank cells everywhere else,
-		// and a size added to the translated variable product.
+		// a size added to the translated variable product, and a product renamed and moved to another category.
 		$rose_trid = $rose ? $trid( $rose->get_id(), 'post_product' ) : 0;
 		$update    = implode( "\t", $cols ) . "\n"
 			. implode( "\t", array( "{$tag}-ROSE", '', '', '', '', '260.00', '', '', '', '', '', '', '', '', '', '', '' ) ) . "\n"
 			. implode( "\t", array( "{$tag}-MASK-S", '', '', '', '', '155.00', '', '', 'child', "{$tag}-MASK", '', '', '', '', '', '', '' ) ) . "\n"
 			. implode( "\t", array( "{$tag}-MASK-M", '', '', '', '', '180.00', '', '70.00', 'child', "{$tag}-MASK", 'Medium', '', '', '', '', '', '' ) ) . "\n"
-			. implode( "\t", array( "{$tag}-PLAIN", '', '', '', '', '', '150.00', '', '', '', '', '', '', '', '', '', '' ) ) . "\n";
+			. implode( "\t", array( "{$tag}-PLAIN", '', '', '', '', '', '150.00', '', '', '', '', '', '', '', '', '', '' ) ) . "\n"
+			. implode( "\t", array( "{$tag}-AMP", 'Soap & Oil Bar', '', '', '', '', '', '', '', '', '', "{$tag} Serums", '', '', '', '', '' ) ) . "\n";
 		file_put_contents( "{$dir}/update.tsv", $update );
 		$upd = CatalogueLoad::start( "{$dir}/update.tsv", $mapping, "{$dir}/run-update", false );
 		$finish();
@@ -252,7 +279,7 @@ run(
 		$upd_issues = array_map( 'str_getcsv', array_slice( (array) file( "{$dir}/run-update/" . ReportWriter::ISSUES, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ), 1 ) );
 		$w5         = array_filter( $upd_issues, static fn ( $r ) => "{$tag}-PLAIN" === ( $r[1] ?? '' ) && 'W5' === ( $r[5] ?? '' ) );
 		$check( 1 === count( $w5 ), 'B-15 a sale price given alone on an update, at or above the price the store holds (150 against 99), is a client issue before the load (' . count( $w5 ) . ' W5)' );
-		$check( 3 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were (' . wp_json_encode( array( $upd['counts'] ?? null, $after->get_regular_price(), $after->get_sale_price(), $after->get_name(), $after->get_cogs_value() ) ) . ')' );
+		$check( 4 === (int) $upd['counts']['update'] && '260' === (string) (float) $after->get_regular_price() && '199' === (string) (float) $after->get_sale_price() && 'Rose Water Toner 200 ml' === $after->get_name() && 120.0 === (float) $after->get_cogs_value(), 'AC-2 an update writes the new price; blank cells leave the sale price, name and cost as they were (' . wp_json_encode( array( $upd['counts'] ?? null, $after->get_regular_price(), $after->get_sale_price(), $after->get_name(), $after->get_cogs_value() ) ) . ')' );
 		$check( $rose_trid > 0 && $rose_trid === $trid( $rose->get_id(), 'post_product' ) && $ar_now === $rose_ar && 'تونر ماء الورد ٢٠٠ مل' === get_post_field( 'post_title', $ar_now ), 'AC-4 the update keeps the product and its Arabic record in one translation group, the Arabic text unchanged' );
 
 		// B-01: the Arabic records carry the new prices, and an Arabic order is charged them.
@@ -264,6 +291,12 @@ run(
 		$charged = $sv_now ? (float) $s->order_for( $sv_now, 1 )->get_subtotal() : 0.0;
 		do_action( 'wpml_switch_language', 'en' );
 		$check( $sv_now && '155' === (string) (float) $sv_now->get_regular_price() && 155.0 === $charged && '155' === (string) (float) wc_get_product( $small->get_id() )->get_regular_price(), 'AC-3 B-01 a variation\'s new price reaches its Arabic variation, and an Arabic order is charged it (' . wp_json_encode( array( $sv_now ? $sv_now->get_regular_price() : null, $charged ) ) . ')' );
+
+		// Second review, 1: the renamed product's new category reaches its Arabic record as the Arabic category. WCML had
+		// read the old terms on the rename's save_post in the same process; a stale read would leave the Arabic record
+		// without it.
+		$amp_ar_cats = $amp_ar > 0 ? array_map( 'intval', (array) $wpdb->get_col( $wpdb->prepare( "SELECT tt.term_id FROM {$wpdb->term_relationships} tr JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id WHERE tr.object_id = %d AND tt.taxonomy = 'product_cat'", $amp_ar ) ) ) : array(); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$check( $serum_ar_id > 0 && in_array( $serum_ar_id, $amp_ar_cats, true ), 'AC-2 a product moved to a translated category on an update shows the Arabic category on its Arabic record (' . wp_json_encode( $amp_ar_cats ) . ')' );
 
 		// B-02: the added size reaches the Arabic product, buyable at its price.
 		$medium    = (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( "{$tag}-MASK-M" ), 'product_variation', true, 'en' );
@@ -278,15 +311,44 @@ run(
 		// and a product tried twice without finishing is given up and reported instead of being tried for ever.
 		$stranded = wp_generate_uuid4();
 		update_option( CatalogueLoad::RUN, array_merge( $state, array( 'id' => $stranded, 'status' => 'images', 'done' => array( 'sources' => 6, 'translations' => 6, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'image_tries' => array( 0 => 2 ), 'updated' => time() ) ), false );
-		CatalogueLoad::images( $stranded, 'resume' );
+		// A live worker of this run holds its lock (another database connection stands for it): an images action that
+		// starts now takes nothing and only leaves the watchdog queued.
+		$other = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$held  = 1 === (int) $other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 0)', CatalogueLoad::imageLock( $stranded ) ) );
+		CatalogueLoad::images( $stranded, 0 );
+		$deferred = CatalogueLoad::state();
+		$check( $held && 0 === (int) $deferred['done']['images'] && CatalogueLoad::watchdogPending( $stranded ), 'AC-5 B-10 while a live worker holds the run, another images action takes nothing and leaves the watchdog queued' );
+		$other->get_var( $other->prepare( 'SELECT RELEASE_LOCK(%s)', CatalogueLoad::imageLock( $stranded ) ) );
+		$other->close();
+		// The worker has died: Action Scheduler runs the queued watchdog, which resumes; while it works, its own
+		// watchdog is queued in turn, and a normal end removes it.
+		$queued_during = false;
+		$observe       = static function ( $option ) use ( &$queued_during, $stranded ): void {
+			if ( CatalogueLoad::RUN === $option ) {
+				$queued_during = $queued_during || CatalogueLoad::watchdogPending( $stranded );
+			}
+		};
+		add_action( 'updated_option', $observe );
+		$watchdogs = as_get_scheduled_actions( array( 'hook' => CatalogueLoad::IMAGES, 'args' => array( $stranded, 'resume' ), 'group' => CatalogueLoad::GROUP, 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		foreach ( $watchdogs as $action_id ) {
+			\ActionScheduler::runner()->process_action( (int) $action_id, 't86' );
+		}
+		remove_action( 'updated_option', $observe );
+		$check( 1 === count( $watchdogs ) && $queued_during, 'AC-5 B-10 the watchdog is a real queued action, and the worker it starts queues its own while it works (' . count( $watchdogs ) . ')' );
 		$resumed = CatalogueLoad::state();
 		$gave_up = array_filter( (array) $resumed['problems'], static fn ( $p ) => "{$tag}-ROSE" === $p['sku'] && str_contains( $p['problem'], 'two tries' ) );
-		$check( 'done' === $resumed['status'] && 2 === (int) $resumed['done']['images'] && 1 === count( $gave_up ) && false === as_has_scheduled_action( CatalogueLoad::IMAGES, array( $stranded, 'resume' ), CatalogueLoad::GROUP ), 'AC-5 B-10 a stranded images phase resumes from its saved progress, gives up a product after two tries with the reason, and leaves no watchdog behind (' . wp_json_encode( array( $resumed['status'], $resumed['done'], array_column( (array) $resumed['problems'], 'problem' ) ) ) . ')' );
+		$check( 'done' === $resumed['status'] && 2 === (int) $resumed['done']['images'] && 1 === count( $gave_up ) && ! CatalogueLoad::watchdogPending( $stranded ), 'AC-5 B-10 a stranded images phase resumes from its saved progress, gives up a product after two tries with the reason, and leaves no watchdog behind (' . wp_json_encode( array( $resumed['status'], $resumed['done'], array_column( (array) $resumed['problems'], 'problem' ) ) ) . ')' );
 
 		// Images only with the rights confirmed: a second plan without the flag downloads nothing.
-		update_option( CatalogueLoad::RUN, array( 'status' => 'done' ), false );
+		// A run that stopped moving more than half an hour ago is replaced; its record is finalised, not left running.
+		$stale = wp_generate_uuid4();
+		( new ImportRunLog() )->record( array( 'id' => $stale, 'kind' => 'load', 'outcome' => 'running', 'finished_at' => null ) );
+		update_option( CatalogueLoad::RUN, array( 'id' => $stale, 'status' => 'sources', 'done' => array( 'sources' => 1, 'translations' => 0, 'images' => 0 ), 'problems' => array(), 'warnings' => array(), 'updated' => time() - CatalogueLoad::STALE - 5 ), false );
 		$no = CatalogueLoad::start( "{$dir}/export.tsv", $mapping, "{$dir}/run2", false );
 		$check( false === $no['images'], 'AC-5 without the rights confirmed, the run plans no image download' );
+		wp_cache_delete( ImportRunLog::PREFIX . $stale, 'options' );
+		$superseded = ImportRunLog::get( $stale );
+		$check( is_array( $superseded ) && 'superseded' === $superseded['outcome'] && null !== $superseded['finished_at'] && 1 === (int) ( $superseded['written']['sources'] ?? 0 ), 'A-273-1 ENT-19 a run replaced after it stopped is recorded as superseded, with its finish time and what it wrote (' . wp_json_encode( $superseded ) . ')' );
 		// B-12, last: the export with all languages, as WooCommerce Multilingual runs it when the export screen is shown
 		// in "All languages" (its flag in the submitted form, its own hooks lifting WPML's language filters for the
 		// query). One row per language record: twice for each product and variation with an Arabic record, once for
@@ -305,7 +367,7 @@ run(
 			as_unschedule_all_actions( $hook, array(), CatalogueLoad::GROUP );
 		}
 		delete_option( CatalogueLoad::RUN );
-		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded ) as $run_id ) {
+		foreach ( array( $state['id'], $upd['id'], $no['id'], $stranded, $stale ) as $run_id ) {
 			delete_option( ImportRunLog::PREFIX . $run_id ); // This scenario's records only.
 		}
 

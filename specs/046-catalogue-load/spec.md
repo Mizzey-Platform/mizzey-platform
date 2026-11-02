@@ -93,13 +93,18 @@ SSC-21 is marked [key] in the register.
 - Cost in the mapping while WooCommerce's cost of goods is off: the load refuses to start, so no cost is lost.
 - A run directory under WordPress, the uploads folder, the site's folder when WordPress sits in a subfolder of it (the
   site address ends in that subfolder, as `/wp` does), or the request's document root, or one that holds an earlier
-  plan: refused, and nothing is created there. Under WP-CLI the document root is WordPress's own folder, so a web root
+  run's plan, run record copy or reports (a validation's included): refused, and nothing is created or overwritten
+  there. Under WP-CLI the document root is WordPress's own folder, so a web root
   set higher than the site address shows is not known to the load: the runbook keeps run directories outside the web
   server's folders (a home or temporary folder).
 - A web runner rather than WP-CLI: an images action takes at most five products and hands over once half the PHP time
   limit is spent; it queues a watchdog first, which resumes from the saved progress if the action dies at the limit,
-  and a product tried twice without finishing is given up and reported. The load is run with
-  `wp action-scheduler run` where the host allows it.
+  and a product tried twice without finishing is given up and reported. One worker per run works at a time, under a
+  lock its database connection holds, so a watchdog that fires while a slow worker is alive does nothing but wait
+  again. The load is run with `wp action-scheduler run` where the host allows it.
+- A run that stopped moving for half an hour and is replaced by a new one: its Import Run record is finalised as
+  superseded, with its finish time and what it had written.
+- An update that renames a product and moves it to a translated category: the Arabic record gets the Arabic category.
 
 ## Native coverage
 

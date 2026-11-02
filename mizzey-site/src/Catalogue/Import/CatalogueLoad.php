@@ -97,8 +97,11 @@ final class CatalogueLoad
                 throw new \RuntimeException(__('Another catalogue load is still running.', 'mizzey-site'));
             }
             $directory = self::directory($directory);
-            if (file_exists($directory . '/plan.json')) {
-                throw new \RuntimeException(__('Use a run directory with no earlier plan in it: each run keeps its own.', 'mizzey-site'));
+            // An earlier run's evidence is never overwritten: its plan, its run copy or its reports.
+            foreach (['plan.json', FileImportRunRecorder::FILE, ReportWriter::REPORT, ReportWriter::ISSUES] as $earlier) {
+                if (file_exists($directory . '/' . $earlier)) {
+                    throw new \RuntimeException(__('Use a run directory with no earlier run in it: each run keeps its own plan and reports.', 'mizzey-site'));
+                }
             }
             if ($mapping->columnFor('cost') !== null && ! self::costsOn()) {
                 throw new \RuntimeException(__('Cost of goods is switched off in WooCommerce and the mapping fills the cost: switch it on before the load, or no cost is written.', 'mizzey-site'));
@@ -133,6 +136,16 @@ final class CatalogueLoad
             $planFile = $directory . '/plan.json';
             if (file_put_contents($planFile, (string) wp_json_encode($plan, JSON_UNESCAPED_UNICODE)) === false) {
                 throw new \RuntimeException(__('The plan cannot be written.', 'mizzey-site'));
+            }
+            if (($current['id'] ?? '') !== '' && in_array($current['status'] ?? '', ['sources', 'translations', 'images'], true)) {
+                // A run that stopped moving is replaced: its record says so, with what it had written.
+                ImportRunLog::update((string) $current['id'], [
+                    'finished_at' => gmdate('c'),
+                    'outcome'     => 'superseded',
+                    'written'     => $current['done'] ?? [],
+                    'problems'    => $current['problems'] ?? [],
+                    'warnings'    => array_values((array) ($current['warnings'] ?? [])),
+                ]);
             }
             $runId = wp_generate_uuid4();
             (new ImportRunLog())->record([
@@ -300,7 +313,11 @@ final class CatalogueLoad
 
     private static function problem(array &$state, array $entry, string $why): void
     {
-        $state['problems'][] = ['row' => $entry['row'], 'sku' => $entry['sku'], 'problem' => $why];
+        $problem = ['row' => $entry['row'], 'sku' => $entry['sku'], 'problem' => $why];
+        if (in_array($problem, (array) ($state['problems'] ?? []), true)) {
+            return; // A product taken up again (a resumed images action) reports the same problem once.
+        }
+        $state['problems'][] = $problem;
     }
 
     // ---- Phase one: the English records ------------------------------------------------------------------
@@ -744,35 +761,83 @@ final class CatalogueLoad
         $plan = array_values(array_filter($all, static fn (array $e): bool => trim((string) ($e['fields']['images'] ?? '')) !== ''));
         // Downloads can outlast a web runner's time limit, which ends the action before it queues the next one. So a
         // watchdog is queued first, to resume from the saved progress if this action dies, and is removed when it
-        // ends normally; the action stops early once half the time limit is spent; a product tried twice without
-        // finishing is given up and reported, so a resume never loops on it. Progress, not the queued offset, says
-        // where to start, which makes a resumed and a queued action agree.
+        // ends normally; the action hands over once half the time limit is spent, checked between downloads; a
+        // product tried twice without finishing is given up and reported, so a resume never loops on it. Progress,
+        // not the queued offset, says where to start. One worker per run works at a time, under a lock its database
+        // connection holds, so a worker that dies releases it; an action that finds it held (the watchdog firing
+        // while a slow worker is still downloading) only puts the watchdog back.
+        global $wpdb;
         $watchdog = [$state['id'], 'resume'];
-        as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
-        as_schedule_single_action(time() + self::WATCHDOG, self::IMAGES, $watchdog, self::GROUP);
-        $from    = max(0, (int) ($state['done']['images'] ?? 0));
-        $started = microtime(true);
-        $budget  = self::timeBudget();
-        $limit   = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
+        $worker   = self::imageLock((string) $state['id']);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', $worker)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            if (! self::watchdogPending((string) $state['id'])) {
+                as_schedule_single_action(time() + self::WATCHDOG, self::IMAGES, $watchdog, self::GROUP);
+            }
+            return;
+        }
+        try {
+            as_unschedule_all_actions(self::IMAGES, $watchdog, self::GROUP);
+            as_schedule_single_action(time() + self::WATCHDOG, self::IMAGES, $watchdog, self::GROUP);
+            self::imageBatch($state, $plan);
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $worker)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
+    /** Whether a watchdog of this run waits in the queue; the one running now does not count. */
+    public static function watchdogPending(string $runId): bool
+    {
+        return as_get_scheduled_actions(['hook' => self::IMAGES, 'args' => [$runId, 'resume'], 'group' => self::GROUP, 'status' => \ActionScheduler_Store::STATUS_PENDING, 'per_page' => 1], 'ids') !== [];
+    }
+
+    /** The lock an images worker of this run holds while it works. */
+    public static function imageLock(string $runId): string
+    {
+        global $wpdb;
+
+        return substr('mz_' . $wpdb->prefix . 'img_' . md5($runId), 0, 64);
+    }
+
+    /**
+     * One images action's work, under the worker lock: products from the saved progress until five are done or half
+     * the time limit is spent, checked between downloads too; then the next action, or the end of the run.
+     *
+     * @param array<string,mixed>       $state
+     * @param list<array<string,mixed>> $plan
+     */
+    private static function imageBatch(array $state, array $plan): void
+    {
+        $watchdog = [$state['id'], 'resume'];
+        $from     = max(0, (int) ($state['done']['images'] ?? 0));
+        $deadline = microtime(true) + self::timeBudget();
+        $limit    = static fn (array $args): array => ['limit_response_size' => self::IMAGE_BYTES] + $args;
         add_filter('http_request_args', $limit, 99);
         try {
             foreach (array_slice($plan, $from, self::IMAGE_BATCH, true) as $index => $entry) {
                 $tries = (int) ($state['image_tries'][$index] ?? 0) + 1;
                 $state['image_tries'][$index] = $tries;
                 self::save($state); // Saved before the downloads, so a try that dies is counted.
-                $id = (int) ($state['ids'][$entry['sku']] ?? 0);
+                $id       = (int) ($state['ids'][$entry['sku']] ?? 0);
+                $finished = true;
                 try {
                     if ($tries > self::IMAGE_TRIES) {
                         self::problem($state, $entry, __('The images did not finish downloading in two tries (a time limit); they were not attached.', 'mizzey-site'));
                     } elseif ($id > 0) {
-                        self::attach($id, $entry, $state);
+                        $finished = self::attach($id, $entry, $state, $deadline);
                     }
                 } catch (\Throwable $e) {
                     self::problem($state, $entry, $e->getMessage());
                 }
+                if (! $finished) {
+                    // Handed over between two downloads: not a failed try; the next action takes the product up again,
+                    // reusing the images already stored.
+                    $state['image_tries'][$index] = $tries - 1;
+                    self::save($state);
+                    break;
+                }
                 ++$state['done']['images'];
                 self::save($state);
-                if (microtime(true) - $started > $budget) {
+                if (microtime(true) > $deadline) {
                     break;
                 }
             }
@@ -800,8 +865,9 @@ final class CatalogueLoad
      * address after the tenth, is reported, never dropped quietly.
      *
      * @param array<string,mixed> $entry @param array<string,mixed> $state
+     * @return bool False when the time was spent before the next download: nothing is set yet, the product is resumed.
      */
-    private static function attach(int $id, array $entry, array &$state): void
+    private static function attach(int $id, array $entry, array &$state, float $deadline = INF): bool
     {
         $f     = $entry['fields'];
         $title = wp_strip_all_tags((string) get_the_title($id));
@@ -822,6 +888,9 @@ final class CatalogueLoad
         $ids   = [];
         foreach (array_slice($urls, 0, self::IMAGES_MAX) as $url) {
             $known = get_posts(['post_type' => 'attachment', 'post_status' => 'inherit', 'fields' => 'ids', 'numberposts' => 1, 'orderby' => 'ID', 'order' => 'ASC', 'meta_key' => self::SOURCE_META, 'meta_value' => $url]); // phpcs:ignore WordPress.DB.SlowDBQuery
+            if ($known === [] && microtime(true) > $deadline) {
+                return false;
+            }
             $media = $known !== [] ? (int) $known[0] : media_sideload_image($url, $id, $alt, 'id');
             if (is_wp_error($media)) {
                 throw new \RuntimeException($media->get_error_message());
@@ -833,7 +902,7 @@ final class CatalogueLoad
             $ids[] = (int) $media;
         }
         if ($ids === []) {
-            return;
+            return true;
         }
         // The same images on each language record: one shared attachment, as WooCommerce Multilingual shows them.
         foreach (array_merge([$id], array_keys(TranslationSync::translationsOf($id))) as $record) {
@@ -841,5 +910,7 @@ final class CatalogueLoad
             update_post_meta($record, '_product_image_gallery', implode(',', array_slice($ids, 1)));
             wc_delete_product_transients($record);
         }
+
+        return true;
     }
 }

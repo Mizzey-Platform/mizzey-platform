@@ -42,6 +42,12 @@ final class TranslationSync
         'product_variation' => 'post_product_variation',
     ];
 
+    /** WCML's in-process caches of a product's and a variation's terms (its Taxonomies components' groups). */
+    private const TERM_CACHES = [
+        'WCML\Synchronization\Component\Taxonomies',
+        'WCML\Synchronization\Component\VariationTaxonomies',
+    ];
+
     private static bool $running = false;
 
     public static function register(): void
@@ -108,6 +114,11 @@ final class TranslationSync
         }
         self::$running = true;
         try {
+            // WCML keeps each product's terms for the rest of the process once read (on an earlier save_post of this
+            // product, before its new category was written): forget them, so the terms synchronised are today's.
+            if (class_exists('\WPML_Non_Persistent_Cache')) {
+                \WPML_Non_Persistent_Cache::flush_group(self::TERM_CACHES);
+            }
             do_action('wcml_synchronize_product_translations', $post, [], []);
             // The variations' own copied fields, and each translated parent's price range from its variations.
             foreach (get_children(['post_parent' => $id, 'post_type' => 'product_variation', 'fields' => 'ids', 'post_status' => ['publish', 'private']]) as $variation) {
