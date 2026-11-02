@@ -55,6 +55,10 @@ final class OrderStock
     public const RECORD     = '_mizzey_stock_reservation';
     /** When a paid order could not be reserved, for staff to check before fulfilling it. */
     public const UNRESERVED = '_mizzey_stock_unreserved';
+    /** When a cancelled or failed order's stock could not be given back, after one retry: for staff to reconcile. */
+    public const UNRELEASED = '_mizzey_stock_unreleased';
+    /** The background retry of a release that could not run (its order's lock was busy). */
+    public const RETRY_RELEASE = 'mizzey_order_stock_release';
 
     /** Paid or fulfilled statuses: an order there should hold a reservation. */
     private const HOLDING = ['processing', 'on-hold', 'preparing', 'shipped', 'out-for-delivery', 'cod-collected', 'completed'];
@@ -74,6 +78,7 @@ final class OrderStock
         add_action('woocommerce_before_delete_order', [self::class, 'beforeRemoval'], 10, 1);
         add_action('untrashed_post', [self::class, 'restored'], 20, 1);
         add_filter('mizzey_cart_stock_held', [self::class, 'heldByVisitor'], 10, 1);
+        add_action(self::RETRY_RELEASE, [self::class, 'retryRelease'], 10, 1);
     }
 
     public static function message(): string
@@ -136,12 +141,40 @@ final class OrderStock
         }
         $to = (string) $to;
         if (in_array($to, ['cancelled', 'failed'], true)) {
-            self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), ['cancelled', 'failed'], true) || self::releaseLocked($fresh, StockGateway::make()));
+            if (! self::releaseCancelled($order) && function_exists('as_schedule_single_action')) {
+                // The lock was busy or the release did not finish: tried again shortly, in the background (audit F-15).
+                as_schedule_single_action(time() + 5 * MINUTE_IN_SECONDS, self::RETRY_RELEASE, [(int) $order->get_id()], 'mizzey');
+            }
 
             return;
         }
         if (in_array($to, self::HOLDING, true)) {
             self::hold($order);
+        }
+    }
+
+    /** Gives back a cancelled or failed order's stock under its lock. False when the lock or the release failed. */
+    private static function releaseCancelled(\WC_Order $order): bool
+    {
+        return self::locked($order, static fn (\WC_Order $fresh): bool => ! in_array($fresh->get_status(), ['cancelled', 'failed'], true) || self::releaseLocked($fresh, StockGateway::make()));
+    }
+
+    /**
+     * The retry: once more, then the order is marked, with a note, for staff to reconcile with the stock source.
+     *
+     * @param mixed $orderId
+     */
+    public static function retryRelease($orderId): void
+    {
+        $order = wc_get_order((int) $orderId);
+        if (! $order instanceof \WC_Order || self::releaseCancelled($order)) {
+            return;
+        }
+        $order = wc_get_order((int) $orderId);
+        if ($order instanceof \WC_Order && $order->get_meta(self::UNRELEASED) === '') {
+            $order->update_meta_data(self::UNRELEASED, (string) time());
+            $order->save_meta_data();
+            $order->add_order_note(__('The stock of this cancelled order could not be given back to the stock source. Check it with the stock source.', 'mizzey-site'));
         }
     }
 

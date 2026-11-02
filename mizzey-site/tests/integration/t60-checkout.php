@@ -416,6 +416,26 @@ run(
 		$gone_held = $late_source->levels[ $five->get_id() ];
 		wc_get_order( $gone->get_id() )->delete( false );
 		$check( $dup_trashed === $dup_held + 2 && $dup_restored === $dup_held && $restored_ok && $late_source->levels[ $five->get_id() ] === $gone_held, 'CHK-12 a Confirmed order trashed gives its stock back and, restored, holds it again; a Shipped order trashed gives nothing back (' . wp_json_encode( array( $dup_held, $dup_trashed, $dup_restored, $gone_held, $late_source->levels[ $five->get_id() ] ) ) . ')' );
+		// A cancellation whose order is locked elsewhere is retried in the background, and gives the stock back then.
+		global $wpdb;
+		$busy = t60_order( $s, array( $five->get_id() => 1 ) );
+		OrderStock::reserve( $busy, StockGateway::make() );
+		$busy_held = $late_source->levels[ $five->get_id() ];
+		$other     = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$lock_name = substr( 'mz_' . $wpdb->prefix . 'order_stock_' . $busy->get_id(), 0, 64 );
+		$other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 0)', $lock_name ) );
+		$busy_fresh = wc_get_order( $busy->get_id() );
+		$busy_fresh->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't60 locked elsewhere' );
+		$busy_fresh->update_status( 'cancelled', 't60' );
+		$busy_waiting   = $late_source->levels[ $five->get_id() ];
+		$busy_scheduled = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
+		$other->get_var( $other->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
+		$other->close();
+		OrderStock::retryRelease( $busy->get_id() );
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $busy->get_id() ), 'mizzey' );
+		}
+		$check( $busy_waiting === $busy_held && $busy_scheduled && $late_source->levels[ $five->get_id() ] === $busy_held + 1 && '' === wc_get_order( $busy->get_id() )->get_meta( OrderStock::UNRELEASED ), 'CHK-12 a cancellation that finds its order locked elsewhere is retried in the background, and the retry gives the stock back (' . wp_json_encode( array( $busy_held, $busy_waiting, $late_source->levels[ $five->get_id() ] ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );
