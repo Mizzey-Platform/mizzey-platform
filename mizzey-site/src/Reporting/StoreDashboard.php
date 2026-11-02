@@ -47,6 +47,10 @@ final class StoreDashboard
     /** The most orders a refund list holds, newest first; the count then reads "or more". */
     public const REFUND_LIMIT = 500;
 
+    /** The latest payment flag's time on an order (PaymentRecord::flag() writes it), and the one-time backfill's mark. */
+    public const ATTENTION_AT     = PaymentRecord::ATTENTION . '_at';
+    public const ATTENTION_FILLED = 'mizzey_payment_attention_at_filled';
+
     /** The statuses whose orders wait for staff, in the order work is done. */
     public const ACTION_STATUSES = ['on-hold', 'processing', 'preparing', 'delivery-failed'];
 
@@ -203,46 +207,72 @@ final class StoreDashboard
     }
 
     /**
-     * Flagged orders still open, newest first, in one bounded query: the flag list is stored in order (PaymentRecord
-     * appends), so its last `at` is the latest flag; an order counts while that is later than its latest refund. Times
-     * are compared as seconds since 1970 in UTC, whatever the database session's time zone.
+     * Flagged orders still open, newest first, in one bounded query: an order counts while the time of its latest flag
+     * (`ATTENTION_AT`, an integer PaymentRecord::flag() writes) is later than its latest refund. Times are compared as
+     * seconds since 1970 in UTC, whatever the database session's time zone; one row per order, then the limit.
      *
      * @return list<int>
      */
     private static function flagged(): array
     {
         global $wpdb;
+        self::backfillAttention();
         $open = array_values(array_diff(array_keys(wc_get_order_statuses()), ['wc-completed', 'wc-cod-collected', 'wc-refunded']));
         $in   = implode("','", array_map('esc_sql', $open));
-        // How PHP stores each flag's time inside the list: `s:2:"at";i:` and the number.
-        $at = serialize('at') . 'i:'; // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
         $ids  = OrderUtil::custom_orders_table_usage_is_enabled()
             ? $wpdb->get_col($wpdb->prepare(
                 "SELECT o.id FROM {$wpdb->prefix}wc_orders o
                  JOIN {$wpdb->prefix}wc_orders_meta m ON m.order_id = o.id AND m.meta_key = %s
                  WHERE o.type = 'shop_order' AND o.status IN ('{$in}')
-                 AND CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(m.meta_value, %s, -1), ';', 1) AS UNSIGNED) > COALESCE((
+                 AND CAST(m.meta_value AS UNSIGNED) > COALESCE((
                      SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.date_created_gmt)) FROM {$wpdb->prefix}wc_orders r
                      WHERE r.type = 'shop_order_refund' AND r.parent_order_id = o.id), 0)
-                 ORDER BY o.date_created_gmt DESC, o.id DESC LIMIT %d",
-                PaymentRecord::ATTENTION,
-                $at,
+                 GROUP BY o.id ORDER BY MAX(o.date_created_gmt) DESC, o.id DESC LIMIT %d",
+                self::ATTENTION_AT,
                 self::limit()
             )) // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             : $wpdb->get_col($wpdb->prepare(
                 "SELECT p.ID FROM {$wpdb->posts} p
                  JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = %s
                  WHERE p.post_type = 'shop_order' AND p.post_status IN ('{$in}')
-                 AND CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(m.meta_value, %s, -1), ';', 1) AS UNSIGNED) > COALESCE((
+                 AND CAST(m.meta_value AS UNSIGNED) > COALESCE((
                      SELECT TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', MAX(r.post_date_gmt)) FROM {$wpdb->posts} r
                      WHERE r.post_type = 'shop_order_refund' AND r.post_parent = p.ID), 0)
-                 ORDER BY p.post_date_gmt DESC, p.ID DESC LIMIT %d",
-                PaymentRecord::ATTENTION,
-                $at,
+                 GROUP BY p.ID ORDER BY MAX(p.post_date_gmt) DESC, p.ID DESC LIMIT %d",
+                self::ATTENTION_AT,
                 self::limit()
             )); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        return array_values(array_unique(array_map('intval', (array) $ids)));
+        return array_values(array_map('intval', (array) $ids));
+    }
+
+    /**
+     * Once: an order flagged before `ATTENTION_AT` existed gets it from its stored flag list, a batch at a time.
+     */
+    private static function backfillAttention(): void
+    {
+        if (get_option(self::ATTENTION_FILLED) === '1') {
+            return;
+        }
+        $rounds = 0;
+        do {
+            $orders = wc_get_orders([
+                'limit'      => 100,
+                'type'       => 'shop_order',
+                'status'     => array_keys(wc_get_order_statuses()),
+                'meta_query' => [['key' => PaymentRecord::ATTENTION, 'compare' => 'EXISTS'], ['key' => self::ATTENTION_AT, 'compare' => 'not exists']], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+            ]);
+            foreach ($orders as $order) {
+                if (! $order instanceof \WC_Order) {
+                    continue;
+                }
+                $flags = PaymentRecord::attention($order);
+                $last  = $flags === [] ? 0 : max(array_map(static fn ($f): int => is_array($f) ? (int) ($f['at'] ?? 0) : 0, $flags));
+                $order->update_meta_data(self::ATTENTION_AT, $last);
+                $order->save_meta_data();
+            }
+        } while (count($orders) === 100 && ++$rounds < 1000);
+        update_option(self::ATTENTION_FILLED, '1', true);
     }
 
     /**

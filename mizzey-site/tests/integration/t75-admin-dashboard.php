@@ -179,6 +179,26 @@ run(
 		remove_filter( 'mizzey_dashboard_refund_limit', $one );
 		$unlimited = StoreDashboard::pendingRefunds()['flagged'];
 		$check( 1 === count( $limited ) && ! in_array( $newer->get_id(), $limited, true ) && array() === array_diff( $olders, $unlimited ) && ! in_array( $newer->get_id(), $unlimited, true ), 'AC-4 a flagged list limited to one holds exactly one open order when the newest flagged one was refunded since; unlimited, both open ones (' . wp_json_encode( array( $limited, $olders, $newer->get_id() ) ) . ')' );
+		// The flag's time is its own number, not read from the messages: a message that mimics the stored time does not
+		// keep a refunded order listed. Two time rows on one order are one line, not two places in the limit.
+		$crafted = $order( $en, 1, 'en' );
+		\MizzeySite\Payments\PaymentRecord::flag( $crafted, 'ref s:2:"at";i:9999999999; s:2:"at";i:9999999999;' );
+		wc_create_refund( array( 'order_id' => $crafted->get_id(), 'amount' => '1' ) );
+		$twice = wc_get_order( $olders[1] );
+		$twice->add_meta_data( StoreDashboard::ATTENTION_AT, time(), false );
+		$twice->save_meta_data();
+		$two = static fn () => 2;
+		add_filter( 'mizzey_dashboard_refund_limit', $two );
+		$two_listed = StoreDashboard::pendingRefunds()['flagged'];
+		remove_filter( 'mizzey_dashboard_refund_limit', $two );
+		$check( ! in_array( $crafted->get_id(), StoreDashboard::pendingRefunds()['flagged'], true ) && 2 === count( array_unique( $two_listed ) ) && 2 === count( $two_listed ), 'AC-4 a message that looks like a flag time does not keep a refunded order listed; an order with two time rows takes one place (' . wp_json_encode( $two_listed ) . ')' );
+		// An order flagged before the flag time was stored separately gets it once, and is listed.
+		$legacy = $order( $en, 1, 'en' );
+		$legacy->update_meta_data( \MizzeySite\Payments\PaymentRecord::ATTENTION, array( array( 'at' => time(), 'message' => 't75 flagged before the time key' ) ) );
+		$legacy->save_meta_data();
+		delete_option( StoreDashboard::ATTENTION_FILLED );
+		$legacy_listed = in_array( $legacy->get_id(), StoreDashboard::pendingRefunds()['flagged'], true );
+		$check( $legacy_listed && '' !== (string) wc_get_order( $legacy->get_id() )->get_meta( StoreDashboard::ATTENTION_AT ) && '1' === get_option( StoreDashboard::ATTENTION_FILLED ), 'AC-4 an order flagged before the flag time had its own key gets it once and is listed' );
 		// Every query the counts make for orders by status is bounded: a count, or a list with a limit.
 		$seen    = array();
 		$flagged = 0;

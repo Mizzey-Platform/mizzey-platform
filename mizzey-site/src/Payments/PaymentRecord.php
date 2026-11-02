@@ -104,6 +104,7 @@ final class PaymentRecord
         }
         $items[] = ['at' => time(), 'message' => $message] + ($key !== '' ? ['key' => $key] : []);
         $order->update_meta_data(self::ATTENTION, $items);
+        $order->update_meta_data(self::ATTENTION . '_at', time()); // The latest flag's time, for the dashboard's query.
         $order->save();
         $order->add_order_note($message);
     }
