@@ -47,7 +47,7 @@ every scenario): the site's own code, the scenarios, or third-party code.
 | Source | Where | Done |
 |---|---|---|
 | WPML 4.9.7 `WpmlSavePostHooks::on_product_save` and WPML Media's `woocommerce_extract_media_ids_from_post_content_and_meta` | Both pass the product object to `get_post()`: two PHP 8.2 deprecations per save, then they stop at a post of ID 0 (no effect) | `I18n/WpmlProductSaveHook` removes both, for WPML 4.9.7 only |
-| WooCommerce Multilingual's product editor job, called from code | Undefined keys and a null `parse_str()`: the editor's form (`$_POST['data']`) and translation job were missing | `I18n/ProductTranslationJob` opens the job and supplies the form as the editor does; the catalogue load and the scenarios use it |
+| WooCommerce Multilingual's product editor job, called from code | Undefined keys and a null `parse_str()`: the editor's form (`$_POST['data']`) and translation job were missing | `I18n/ProductTranslationJob` supplies the form as the editor does, reusing the product's open translation job and never creating one (creating one through WPML would cancel a translator's open job and notify translators); the catalogue load and the scenarios use it |
 | WooCommerce Multilingual setting `products_sync_date` | Missing from the stored settings (never saved from its screen): an undefined key on every translation save | `I18n/WcmlSettingsDefaults` supplies its installer's default as the option is read |
 | Scenario fixtures setting a cost with Cost of Goods Sold off | WooCommerce's "called incorrectly" notice | `Scenario::set_cost()` sets a cost only while the feature is on |
 | Scenarios deleting translated products before WooCommerce Multilingual's shutdown update | A fatal `get_id()` on false at shutdown | Fixtures are removed after that update |
@@ -65,7 +65,7 @@ every scenario): the site's own code, the scenarios, or third-party code.
 
 | Need | Native mechanism | Verdict |
 |---|---|---|
-| A product translation saved from code | WooCommerce Multilingual's editor job, which expects its screen's form | Gap: `ProductTranslationJob` supplies the form and the job |
+| A product translation saved from code | WooCommerce Multilingual's editor job, which expects its screen's form | Gap: `ProductTranslationJob` supplies the form, with the open job if any |
 | WPML's product-save handlers without deprecations | None in WPML 4.9.7 | Gap: `WpmlProductSaveHook`, version-pinned |
 
 ## Requirements
