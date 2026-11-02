@@ -561,3 +561,7 @@ msgstr "المخزون من مصدر المخزون: %d"
 #: mizzey-site/src/Payments/PaymentGate.php
 msgid "Your payment was not confirmed. If you paid, your order will be updated shortly; otherwise you can try again."
 msgstr "لم يتم تأكيد الدفع. إذا كنت قد دفعت، فسيتم تحديث طلبك قريبًا؛ وإلا يمكنك المحاولة مرة أخرى."
+
+#: mizzey-site/src/Account/CustomerRecords.php
+msgid "This account is suspended. Please contact customer service."
+msgstr "هذا الحساب موقوف. يرجى التواصل مع خدمة العملاء."
