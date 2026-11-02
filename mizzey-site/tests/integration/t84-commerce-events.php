@@ -156,19 +156,34 @@ run(
 		AutomaticPromotions::forget();
 		WC()->cart->remove_coupons();
 		WC()->cart->calculate_totals();
-		// A customer's own welcome discount is named "welcome", never by its code, which is unique to one person.
+		// A customer's own welcome discount is named "welcome", never by its code, which is unique to one person. The
+		// coupon belongs to a customer, who is the shopper here and the customer of the order below (PromotionRules
+		// refuses a welcome discount to anyone else).
+		$welcomer = (int) wp_insert_user( array( 'user_login' => "{$tag}w", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}w@example.invalid", 'role' => 'customer' ) );
+		$s->track_user( $welcomer );
+		$issued = (int) get_user_meta( $welcomer, WelcomeDiscount::USER_META, true );
+		if ( $issued > 0 ) {
+			$s->on_finish( static function () use ( $issued ) { wp_delete_post( $issued, true ); } );
+			delete_user_meta( $welcomer, WelcomeDiscount::USER_META );
+		}
 		$welcome_code = 'welcome-' . substr( md5( $tag ), 0, 10 );
 		$welcome      = new \WC_Coupon();
 		$welcome->set_code( $welcome_code );
 		$welcome->set_props( array( 'discount_type' => 'fixed_cart', 'amount' => '1' ) );
-		$welcome->update_meta_data( WelcomeDiscount::OWNER, '1' );
+		$welcome->update_meta_data( WelcomeDiscount::OWNER, (string) $welcomer );
 		$welcome->save();
 		$s->track_post( $welcome->get_id() );
-		WC()->cart->apply_coupon( $welcome_code );
+		wp_set_current_user( $welcomer );
+		Events::drain();
+		$welcome_applied = WC()->cart->apply_coupon( $welcome_code );
 		wc_clear_notices();
 		$welcomed = $named( Events::drain(), 'apply_coupon' );
-		$check( 'welcome' === ( $welcomed[0]['params']['coupon'] ?? '' ) && ! str_contains( (string) wp_json_encode( $welcomed ), $welcome_code ) && "{$tag}ten" === Events::couponName( "{$tag}ten" ), 'AC-5 a welcome code is pushed as "welcome", never by its own code; other codes keep theirs' );
 		WC()->cart->remove_coupons();
+		WC()->cart->calculate_totals();
+		wp_set_current_user( 0 );
+		$check( true === $welcome_applied && 1 === count( $welcomed ) && 'welcome' === ( $welcomed[0]['params']['coupon'] ?? '' ) && ! str_contains( (string) wp_json_encode( $welcomed ), $welcome_code ), 'AC-5 a welcome code applied by its customer is pushed as "welcome", never by its own code (' . wp_json_encode( $welcomed[0]['params'] ?? array() ) . ')' );
+		$check( 'welcome' === Events::couponName( $welcome_code ) && "{$tag}ten" === Events::couponName( "{$tag}ten" ), 'AC-5 a welcome code is named "welcome"; other codes keep theirs' );
+		Events::drain();
 		$check( array() === Events::drain() && '' !== (string) ( $added[0]['id'] ?? '' ), 'AC-2 each queued event has an id and is delivered once' );
 		WC()->cart->remove_cart_item( $key );
 		$check( 1 === count( $named( Events::drain(), 'remove_from_cart' ) ), 'AC-2 EVT-08 removing a line pushes remove_from_cart' );
@@ -220,8 +235,9 @@ run(
 		$ship->set_method_title( 'Flat' );
 		$ship->set_total( '45' );
 		$order->add_item( $ship );
+		$order->set_customer_id( $welcomer );
 		$order->calculate_totals();
-		$order->apply_coupon( $welcome_code );
+		$welcome_on_order = $order->apply_coupon( $welcome_code );
 		$order->save();
 		$s->track_order( $order->get_id() );
 		$as_page = static function ( int $page_id ): void {
@@ -253,7 +269,7 @@ run(
 		$check( 'purchase' === ( $bought['event'] ?? '' ) && (string) $order->get_order_number() === ( $data['transaction_id'] ?? '' ) && abs( (float) $order->get_total() - (float) ( $data['value'] ?? 0 ) ) < 0.001 && 45.0 === (float) ( $data['shipping'] ?? 0 ) && 2 === (int) ( $data['items'][0]['quantity'] ?? 0 ), 'AC-3 EVT-14 a confirmed order pushes purchase with its number, total, shipping and items' );
 		$check( null === $receipt( wc_get_order( $order->get_id() ) ), 'AC-3 EVT-14 reloading the confirmation page pushes no second purchase' );
 		$flat = wp_json_encode( $bought );
-		$check( ! str_contains( (string) $flat, "{$tag}buyer@example.invalid" ) && ! str_contains( (string) $flat, '01000000000' ) && 'welcome' === ( $data['coupon'] ?? '' ) && ! str_contains( (string) $flat, $welcome_code ), 'AC-5 the purchase carries no email address, phone number or personal welcome code (coupon: ' . ( $data['coupon'] ?? 'none' ) . ')' );
+		$check( ! str_contains( (string) $flat, "{$tag}buyer@example.invalid" ) && ! str_contains( (string) $flat, '01000000000' ) && true === $welcome_on_order && 'welcome' === ( $data['coupon'] ?? '' ) && ! str_contains( (string) $flat, $welcome_code ), 'AC-5 the purchase carries no email address, phone number or personal welcome code (coupon: ' . ( $data['coupon'] ?? 'none' ) . ')' );
 
 		// ---- AC-4: refund, sent by the store --------------------------------------------------------------------
 		$sent = array();
@@ -285,10 +301,10 @@ run(
 		$fail = static function ( $pre, $args, $url ) {
 			return str_contains( (string) $url, 'google-analytics.com/mp/collect' ) ? new \WP_Error( 'http_request_failed', 't84 unreachable' ) : $pre;
 		};
-		add_filter( 'pre_http_request', $fail, 5, 3 );
+		add_filter( 'pre_http_request', $fail, 20, 3 );
 		Events::sendRefund( $order->get_id(), $rid, 1 );
 		Events::sendRefund( $order->get_id(), $rid, 2 );
-		remove_filter( 'pre_http_request', $fail, 5 );
+		remove_filter( 'pre_http_request', $fail, 20 );
 		$retry = as_get_scheduled_actions( array( 'hook' => Events::REFUND_HOOK, 'args' => array( $order->get_id(), $rid, 2 ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
 		$third = as_get_scheduled_actions( array( 'hook' => Events::REFUND_HOOK, 'args' => array( $order->get_id(), $rid, 3 ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
 		as_unschedule_all_actions( Events::REFUND_HOOK, array( $order->get_id(), $rid, 2 ), 'mizzey' );
