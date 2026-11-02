@@ -1,0 +1,7 @@
+Mutation check for specs/042-event-tracking-plan, t82-tracking-plan, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7). Each defect edits the plan; the scenario run, the file restored.
+
+CAUGHT    M1 the purchase row is missing  <- FAIL  AC-1 each contracted event has its row: name, trigger, parameters and scope (missing: EVT
+CAUGHT    M2 the stock metric has no source of truth  <- FAIL  AC-2 each business metric has its source of truth (missing: Stock)
+CAUGHT    M3 the item is identified by the record id  <- FAIL  AC-3 the plan identifies an item by its SKU, shared by both language records
+
+3 of 3 caught.

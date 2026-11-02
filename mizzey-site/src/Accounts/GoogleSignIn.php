@@ -167,6 +167,7 @@ final class GoogleSignIn
             return self::back(self::accountUrl(), 'refused');
         }
         $claims = self::exchange($code, (string) $saved['verifier'], (string) $saved['nonce']);
+        do_action('mizzey_signed_in_by', 'google', 0);
         $user   = is_wp_error($claims) ? $claims : self::account($claims);
         if (is_wp_error($user)) {
             $why = ['mizzey_google_staff' => 'staff', 'mizzey_google_link' => 'link'][(string) $user->get_error_code()] ?? 'refused';
