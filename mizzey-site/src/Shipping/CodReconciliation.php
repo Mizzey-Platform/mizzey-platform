@@ -38,6 +38,7 @@ final class CodReconciliation
         add_action('woocommerce_process_shop_order_meta', [self::class, 'save'], 30, 2);
         add_action('woocommerce_order_list_table_restrict_manage_orders', [self::class, 'filter'], 30, 2);
         add_filter('woocommerce_order_list_table_prepare_items_query_args', [self::class, 'query'], 30);
+        add_action('woocommerce_order_status_' . StatusModel::COD_COLLECTED, [self::class, 'staffCollected'], 10, 2);
     }
 
     /** The first delivered status of a cash order: the amount and the time, once. */
@@ -48,6 +49,21 @@ final class CodReconciliation
         }
         $order->update_meta_data(self::COLLECTED, wc_format_decimal($order->get_total()));
         $order->update_meta_data(self::COLLECTED_AT, (string) $at);
+    }
+
+    /**
+     * An order moved to COD Collected by staff, not by the carrier, still records what was collected and when.
+     *
+     * @param mixed $orderId
+     * @param mixed $order
+     */
+    public static function staffCollected($orderId, $order = null): void
+    {
+        $order = $order instanceof \WC_Order ? $order : wc_get_order((int) $orderId);
+        if ($order instanceof \WC_Order && (string) $order->get_meta(self::COLLECTED) === '') {
+            self::collected($order, time());
+            $order->save_meta_data();
+        }
     }
 
     /** @return array{collected:string,collected_at:int,remitted:string,remitted_at:string,reference:string} */
@@ -65,11 +81,19 @@ final class CodReconciliation
     /** Record the carrier's remittance for the order; a collected order then moves to Delivered. */
     public static function remit(\WC_Order $order, string $amount, string $date, string $reference): ?string
     {
-        $amount    = wc_format_decimal($amount);
         $reference = mb_substr(sanitize_text_field($reference), 0, 100);
-        if ($amount === '' || (float) $amount <= 0 || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) !== 1) {
+        $amount    = trim($amount);
+        $day       = preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $m) === 1 && checkdate((int) $m[2], (int) $m[3], (int) $m[1]);
+        if (preg_match('/^\d+(\.\d{1,2})?$/', $amount) !== 1 || (float) $amount <= 0 || ! $day) {
             return __('Give the amount remitted and its date.', 'mizzey-site');
         }
+        if ((string) $order->get_meta(CarrierStatus::REVIEW) !== '') {
+            return __('The carrier status of this order needs review first.', 'mizzey-site');
+        }
+        if ((string) $order->get_meta(self::COLLECTED) === '') {
+            return __('The carrier has not reported this cash as collected yet.', 'mizzey-site');
+        }
+        $amount = wc_format_decimal($amount, 2);
         $order->update_meta_data(self::REMITTED, $amount);
         $order->update_meta_data(self::REMITTED_AT, $date);
         $order->update_meta_data(self::REFERENCE, $reference);
@@ -130,7 +154,10 @@ final class CodReconciliation
         if ($amount === (string) $order->get_meta(self::REMITTED) && $date === (string) $order->get_meta(self::REMITTED_AT) && $ref === (string) $order->get_meta(self::REFERENCE)) {
             return;
         }
-        self::remit($order, $amount, $date, $ref);
+        $problem = self::remit($order, $amount, $date, $ref);
+        if ($problem !== null && class_exists('\WC_Admin_Meta_Boxes')) {
+            \WC_Admin_Meta_Boxes::add_error($problem);
+        }
     }
 
     /**

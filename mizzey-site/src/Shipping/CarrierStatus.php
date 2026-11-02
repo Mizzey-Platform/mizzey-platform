@@ -47,6 +47,12 @@ final class CarrierStatus
         'informational'    => null,
     ];
 
+    /** How far along the delivery each state is. An older status never moves an order back. */
+    public const RANK = ['in-transit' => 1, 'out-for-delivery' => 2, 'delivered' => 3, 'returned' => 3];
+
+    public const REACHED = '_mizzey_carrier_rank';
+    public const CLEAR   = 'mizzey_carrier_reviewed';
+
     private static bool $applying = false;
 
     /** @return list<Carrier> */
@@ -65,6 +71,7 @@ final class CarrierStatus
         add_action('woocommerce_settings_shipping', [self::class, 'settings']);
         add_action('woocommerce_settings_save_shipping', [self::class, 'save']);
         add_action('woocommerce_admin_order_data_after_shipping_address', [self::class, 'orderPanel'], 30, 1);
+        add_action('woocommerce_process_shop_order_meta', [self::class, 'reviewed'], 0, 1);
     }
 
     /** @return array<string,string> code => state */
@@ -138,6 +145,12 @@ final class CarrierStatus
             return;
         }
         $target = self::STATES[$state];
+        $rank   = self::RANK[$state] ?? 0;
+        if ($rank > 0 && $rank < (int) $order->get_meta(self::REACHED)) {
+            $order->save();
+            $order->add_order_note(sprintf(__('%1$s status %2$s (%3$s) is older than what the order already reached: not applied.', 'mizzey-site'), $carrier->name(), $status['code'], $label), 0, false);
+            return;
+        }
         if ($target === null || $order->has_status($target)) {
             $order->delete_meta_data(self::REVIEW);
             $order->save();
@@ -158,6 +171,7 @@ final class CarrierStatus
             CodReconciliation::collected($order, $status['at']);
         }
         $order->delete_meta_data(self::REVIEW);
+        $order->update_meta_data(self::REACHED, (string) $rank);
         $order->save();
         $order->update_status($target, sprintf(__('%1$s status %2$s (%3$s).', 'mizzey-site'), $carrier->name(), $status['code'], $label));
     }
@@ -286,10 +300,34 @@ final class CarrierStatus
     /** Orders waiting in review are looked at again once the table changes. */
     public static function recheck(): void
     {
-        $orders = wc_get_orders(['limit' => 200, 'type' => 'shop_order', 'meta_query' => [['key' => self::REVIEW, 'compare' => 'EXISTS']]]); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-        foreach ((array) $orders as $order) {
-            self::apply($order);
+        $ids = wc_get_orders(['limit' => 5000, 'return' => 'ids', 'type' => 'shop_order', 'meta_query' => [['key' => self::REVIEW, 'compare' => 'EXISTS']]]); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+        foreach ((array) $ids as $id) {
+            $order = wc_get_order((int) $id);
+            if ($order instanceof \WC_Order) {
+                self::apply($order);
+            }
         }
+    }
+
+    /**
+     * Staff mark the carrier status reviewed, before the order screen's status change is checked.
+     *
+     * @param mixed $orderId
+     */
+    public static function reviewed($orderId): void
+    {
+        $nonce = isset($_POST[self::CLEAR . '_nonce']) ? sanitize_text_field(wp_unslash((string) $_POST[self::CLEAR . '_nonce'])) : '';
+        if (empty($_POST[self::CLEAR]) || $nonce === '' || ! wp_verify_nonce($nonce, self::CLEAR) || ! current_user_can('edit_shop_orders')) {
+            return;
+        }
+        $order = wc_get_order((int) $orderId);
+        if (! $order instanceof \WC_Order || (string) $order->get_meta(self::REVIEW) === '') {
+            return;
+        }
+        $order->delete_meta_data(self::REVIEW);
+        $order->save_meta_data();
+        $user = wp_get_current_user();
+        $order->add_order_note(sprintf(__('Carrier status marked reviewed by %s.', 'mizzey-site'), $user->exists() ? $user->user_login : '-'), 0, false);
     }
 
     /** @param mixed $order */
@@ -300,7 +338,14 @@ final class CarrierStatus
         }
         $review = (string) $order->get_meta(self::REVIEW);
         if ($review !== '') {
-            printf('<p class="form-field form-field-wide"><strong>%s</strong> %s</p>', esc_html__('Carrier status needs review:', 'mizzey-site'), esc_html($review));
+            wp_nonce_field(self::CLEAR, self::CLEAR . '_nonce');
+            printf(
+                '<p class="form-field form-field-wide"><strong>%s</strong> %s</p><p class="form-field form-field-wide"><label><input type="checkbox" name="%s" value="1" /> %s</label></p>',
+                esc_html__('Carrier status needs review:', 'mizzey-site'),
+                esc_html($review),
+                esc_attr(self::CLEAR),
+                esc_html__('Reviewed: I checked the parcel with the carrier', 'mizzey-site')
+            );
         }
     }
 }

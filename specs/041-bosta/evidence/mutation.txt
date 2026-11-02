@@ -1,0 +1,40 @@
+Mutation check for specs/041-bosta, t81-bosta, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, Bosta WooCommerce 4.5.7). Bosta's calls go through the plugin's own webhook handler. Each defect is applied alone, the scenario run, the file restored.
+
+First set, on the code before the Codex review:
+CAUGHT    M1 carrier statuses are not watched  <- FAIL  AC-4 a code with no mapping leaves the order where it was, marks it for review and lists the code (prepa
+SURVIVED  M2 an unmapped code is taken as delivered
+CAUGHT    M3 a refused move is forced  <- FAIL  AC-4 delivered on an order still Processing is not applied: the order is marked for review
+CAUGHT    M4 returned is recorded as delivered  <- FAIL  AC-5 returned to origin is its own state, never Delivered (completed)
+CAUGHT    M5 a delivered cash order goes straight to Delivered  <- FAIL  AC-6 a delivered cash order is COD Collected, with the amount and time kept (shipped, )
+SURVIVED  M6 the collection is overwritten by a repeat
+CAUGHT    M7 a mapping change does not reach orders in review  <- FAIL  AC-4 once staff map the code the order in review moves (preparing)
+CAUGHT    M8 a code in review is noted again on every save  <- FAIL  AC-4 saving the order again adds nothing while the code is still unmapped
+CAUGHT    M9 the carrier's tracking overrides staff  <- FAIL  AC-3 a tracking number staff typed is kept
+CAUGHT    M10 the carrier's tracking is not shown  <- FAIL  AC-3 the tracking number Bosta returned fills the order's shipment, for the customer and the Shipped
+CAUGHT    M11 the remittance does not move the order  <- FAIL  AC-6 the remittance is kept apart from the collection, and the order is Delivered (cod-collected)
+CAUGHT    M12 a zero remittance is accepted  <- FAIL  AC-6 a remittance with no amount is refused
+CAUGHT    M13 the unremitted list includes remitted orders  <- FAIL  AC-6 a remitted order leaves the unremitted list
+CAUGHT    M14 the mapping takes any state  <- FAIL  AC-4 staff edit the mapping in WooCommerce, Settings, Shipping, Carrier statuses; a code that is not a numbe
+CAUGHT    M15 the mapping is saved without its nonce  <- FAIL  AC-4 a change without the form's nonce is refused
+CAUGHT    M16 the estimate ignores the language  <- FAIL  AC-2 the rate carries its estimate in the customer's language (1 to 2 working days / 1 to 2 working da
+CAUGHT    M17 no estimate is added  <- FAIL  AC-2 the rate the cart offers carries its estimate
+
+After the Codex review (doubtful statuses never reach Delivered, older codes never move an order back, remittance rules, staff collection, the whole review list), new defects:
+CAUGHT    M18 an order in review can be moved to Delivered  <- FAIL  AC-4 an order whose carrier status is in review cannot be moved to Delivered
+CAUGHT    M19 an older code moves the order back  <- FAIL  AC-4 an older code arriving late does not move the order back (shipped)
+CAUGHT    M20 a remittance is taken while in review  <- FAIL  AC-5 an order in review takes no remittance, so it cannot reach Delivered
+CAUGHT    M21 a remittance is taken before collection  <- FAIL  AC-6 a remittance before the carrier reported the cash collected is refused
+CAUGHT    M22 a malformed amount is accepted  <- FAIL  AC-6 a malformed amount or an impossible date is refused
+CAUGHT    M23 an impossible date is accepted  <- FAIL  AC-6 a malformed amount or an impossible date is refused
+CAUGHT    M24 a staff move to COD Collected records nothing  <- FAIL  AC-6 staff moving a cash order to COD Collected records what was collected and when
+CAUGHT    M25 marking reviewed does nothing  <- FAIL  AC-4 once staff mark it reviewed, they decide
+
+M2 and M6 again, after the test gained an unmapped code on a shipped order:
+CAUGHT    M2 an unmapped code is taken as delivered  <- FAIL  AC-4 an unmapped code on a shipped order is never taken as delivered: it stays Shipped, in review
+SURVIVED  M6 the collection is overwritten by a repeat
+
+M6 is equivalent: an order is collected only on its move into COD Collected, by the carrier or by staff, and it cannot move into COD Collected twice, so the guard against a second collection is not reachable through any route the store has. It is kept as a guard.
+
+The first set's other mutations were not re-run on the reviewed code (each run takes about ten minutes); t81 and the order status, order management, refund and checkout scenarios pass on it.
+
+24 of 25 caught, 1 equivalent.

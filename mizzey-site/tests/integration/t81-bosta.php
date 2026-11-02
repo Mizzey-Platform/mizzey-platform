@@ -72,9 +72,15 @@ run(
 			$o->set_payment_method( $method );
 			$o->set_billing_email( "{$tag}@example.invalid" );
 			$o->calculate_totals();
-			$o->set_status( $status );
 			$o->save();
 			$s->track_order( $o->get_id() );
+			// Walked through the status model's allowed moves, as staff would.
+			foreach ( array( 'processing', StatusModel::PREPARING, StatusModel::SHIPPED ) as $step ) {
+				if ( $o->has_status( $status ) ) {
+					break;
+				}
+				$o->update_status( $step );
+			}
 			return $o->get_id();
 		};
 
@@ -100,8 +106,16 @@ run(
 		$notes_before = count( wc_get_order_notes( array( 'order_id' => $card ) ) );
 		$o->save();
 		$check( count( wc_get_order_notes( array( 'order_id' => $card ) ) ) === $notes_before, 'AC-4 saving the order again adds nothing while the code is still unmapped' );
-		update_option( CarrierStatus::MAP, array( '20' => 'in-transit', '41' => 'out-for-delivery', '45' => 'delivered', '46' => 'returned', '11' => 'informational' ), false );
-		CarrierStatus::recheck();
+		// Staff map the codes in WooCommerce, Settings, Shipping, Carrier statuses.
+		$mapper = (int) wp_insert_user( array( 'user_login' => "{$tag}map", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}map@example.invalid", 'role' => 'administrator' ) );
+		$s->track_user( $mapper );
+		wp_set_current_user( $mapper );
+		$_GET  = array( 'section' => 'mizzey_carrier_statuses' );
+		$_POST = array( CarrierStatus::NONCE . '_nonce' => wp_create_nonce( CarrierStatus::NONCE ), 'mizzey_carrier_map' => array( '20' => 'in-transit', '41' => 'out-for-delivery', '45' => 'delivered', '46' => 'returned', '11' => 'informational' ) );
+		CarrierStatus::save();
+		$_GET  = array();
+		$_POST = array();
+		wp_set_current_user( 0 );
 		$o = $fresh( $card );
 		$check( $o->has_status( StatusModel::SHIPPED ) && '' === (string) $o->get_meta( CarrierStatus::REVIEW ), 'AC-4 once staff map the code the order in review moves (' . $o->get_status() . ')' );
 		$o = $bosta( $card, 41, 'Out for delivery' );
@@ -147,6 +161,46 @@ run(
 		$r = CodReconciliation::of( $o );
 		$check( $o->has_status( 'completed' ) && $collected === $r['remitted'] && '2026-11-02' === $r['remitted_at'] && "{$tag}RMT" === $r['reference'] && $collected === $r['collected'], 'AC-6 the remittance is kept apart from the collection, and the order is Delivered (' . $o->get_status() . ')' );
 		$check( ! in_array( $cash, $unremitted(), true ), 'AC-6 a remitted order leaves the unremitted list' );
+
+		// ---- No path from a doubtful carrier status to Delivered ------------------------------------------------------
+		// An unmapped code on a shipped order: it stays shipped, in review.
+		$odd = $make( 'paymob', StatusModel::SHIPPED );
+		$o   = $bosta( $odd, 77, 'Unknown' );
+		$check( $o->has_status( StatusModel::SHIPPED ) && '' !== (string) $o->get_meta( CarrierStatus::REVIEW ), 'AC-4 an unmapped code on a shipped order is never taken as delivered: it stays Shipped, in review' );
+		// Staff cannot move an order in review to Delivered until they mark it reviewed.
+		$o->update_status( 'completed' );
+		$check( ! $fresh( $odd )->has_status( 'completed' ), 'AC-4 an order whose carrier status is in review cannot be moved to Delivered' );
+		$reviewer = (int) wp_insert_user( array( 'user_login' => "{$tag}rev", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}rev@example.invalid", 'role' => 'shop_manager' ) );
+		$s->track_user( $reviewer );
+		wp_set_current_user( $reviewer );
+		$_POST = array( CarrierStatus::CLEAR => '1', CarrierStatus::CLEAR . '_nonce' => wp_create_nonce( CarrierStatus::CLEAR ) );
+		CarrierStatus::reviewed( $odd );
+		$_POST = array();
+		wp_set_current_user( 0 );
+		$o = $fresh( $odd );
+		$o->update_status( 'completed' );
+		$check( '' === (string) $fresh( $odd )->get_meta( CarrierStatus::REVIEW ) && $fresh( $odd )->has_status( 'completed' ), 'AC-4 once staff mark it reviewed, they decide' );
+		// Older statuses never move an order back.
+		$ahead = $make( 'paymob', StatusModel::PREPARING );
+		$bosta( $ahead, 20, 'Picked up' );
+		$bosta( $ahead, 41, 'Out for delivery' );
+		$o = $bosta( $ahead, 20, 'Picked up' );
+		$check( $o->has_status( StatusModel::OUT_FOR_DELIVERY ), 'AC-4 an older code arriving late does not move the order back (' . $o->get_status() . ')' );
+		// Delivered cash, then returned: review, and no remittance until it is resolved.
+		$both = $make( 'cod', StatusModel::SHIPPED );
+		$bosta( $both, 45, 'Delivered' );
+		$o = $bosta( $both, 46, 'Returned to business' );
+		$check( $o->has_status( StatusModel::COD_COLLECTED ) && '' !== (string) $o->get_meta( CarrierStatus::REVIEW ), 'AC-5 returned after delivered cannot be applied: the order is in review' );
+		$check( null !== CodReconciliation::remit( $fresh( $both ), (string) $o->get_total(), '2026-11-02', 'X' ) && ! $fresh( $both )->has_status( 'completed' ), 'AC-5 an order in review takes no remittance, so it cannot reach Delivered' );
+		// Remittance before collection, malformed money, impossible dates.
+		$early_cash = $make( 'cod', StatusModel::SHIPPED );
+		$check( null !== CodReconciliation::remit( $fresh( $early_cash ), '100', '2026-11-02', 'X' ) && '' === (string) $fresh( $early_cash )->get_meta( CodReconciliation::REMITTED ), 'AC-6 a remittance before the carrier reported the cash collected is refused' );
+		$staff_cash = $make( 'cod', StatusModel::SHIPPED );
+		$o          = $fresh( $staff_cash );
+		$o->update_status( StatusModel::COD_COLLECTED );
+		$o = $fresh( $staff_cash );
+		$check( wc_format_decimal( $o->get_total() ) === (string) $o->get_meta( CodReconciliation::COLLECTED ) && (int) $o->get_meta( CodReconciliation::COLLECTED_AT ) > 0, 'AC-6 staff moving a cash order to COD Collected records what was collected and when' );
+		$check( null !== CodReconciliation::remit( $o, '100-50', '2026-11-02', 'X' ) && null !== CodReconciliation::remit( $o, '100', '2026-99-99', 'X' ) && '' === (string) $fresh( $staff_cash )->get_meta( CodReconciliation::REMITTED ), 'AC-6 a malformed amount or an impossible date is refused' );
 
 		// ---- AC-4: the table is in the administration ------------------------------------------------------------
 		$admin = (int) wp_insert_user( array( 'user_login' => "{$tag}adm", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}adm@example.invalid", 'role' => 'administrator' ) );

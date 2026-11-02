@@ -119,6 +119,14 @@ SHIP-14, SHIP-16 and SHIP-17 are marked [key] in the register.
 - **FR-007**: The orders list MUST offer the cash orders collected and not remitted (AC-6).
 - **FR-008**: Each rate MAY carry an English and an Arabic estimate; the customer sees the one of their language (AC-2).
 - **FR-009**: The table and the remittance MUST need `manage_woocommerce` or `edit_shop_orders` and a nonce.
+- **FR-010**: An order whose carrier status is in review MUST NOT reach Delivered or COD Collected by any route
+  (carrier, staff, list, bulk, REST) until staff mark the status reviewed on the order (AC-4, AC-5).
+- **FR-011**: A code that ranks behind what the order already reached (in transit, out for delivery, then delivered
+  or returned) MUST NOT move it back (AC-4).
+- **FR-012**: A remittance MUST be refused before the carrier reported the cash collected, while the status is in
+  review, and with an amount that is not plain digits or a date that does not exist; staff moving a cash order to
+  COD Collected MUST record what was collected and when (AC-6).
+- **FR-013**: Saving the table MUST re-check every order in review, not a first page of them (AC-4).
 
 ## Optional safeguards (not owed)
 
