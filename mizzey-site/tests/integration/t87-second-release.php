@@ -121,10 +121,10 @@ run(
 		$mails = array();
 		$export = PrivacyRequests::request( get_userdata( $customer ), 'export_personal_data', true );
 		// Run as Action Scheduler would: with the arguments the request queued.
-		$queued_export = array_values( array_filter( as_get_scheduled_actions( array( 'hook' => PrivacyRequests::HOOK, 'status' => \ActionScheduler_Store::STATUS_PENDING, 'per_page' => 50 ), ARRAY_A ), static fn ( $a ) => (int) ( $a['args'][0] ?? 0 ) === (int) $export ) );
-		PrivacyRequests::run( ...( $queued_export[0]['args'] ?? array( $export, true ) ) );
+		$queued_export = as_get_scheduled_actions( array( 'hook' => PrivacyRequests::HOOK, 'args' => array( (int) $export, false ), 'status' => \ActionScheduler_Store::STATUS_PENDING ), 'ids' );
+		PrivacyRequests::run( (int) $export, array() === $queued_export );
 		$file = (string) get_post_meta( (int) $export, '_export_file_name', true );
-		$check( ! is_wp_error( $export ) && '' !== $file && array() === array_filter( $mails, static fn ( $m ) => str_contains( (string) $m['to'], "{$tag}c@" ) ), 'AC-3 ADM-105 a copy prepared by staff is built for download and not emailed to the customer' );
+		$check( 1 === count( $queued_export ) && ! is_wp_error( $export ) && '' !== $file && array() === array_filter( $mails, static fn ( $m ) => str_contains( (string) $m['to'], "{$tag}c@" ) ), 'AC-3 ADM-105 a copy prepared by staff is queued to be built for download, not emailed to the customer (' . count( $queued_export ) . ' queued)' );
 
 		// ---- AC-3: the customer's deletion request ----------------------------------------------------------------
 		wp_set_current_user( $customer );
