@@ -22,6 +22,7 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/src/I18n/Localisation.php';
 require_once __DIR__ . '/src/I18n/AdminEnglish.php';
+require_once __DIR__ . '/src/I18n/WpmlConfigSync.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
 require_once __DIR__ . '/src/Catalogue/Brands.php';
@@ -82,6 +83,8 @@ require_once __DIR__ . '/src/Accounts/PhoneSignIn.php';
 require_once __DIR__ . '/src/Accounts/SignInLink.php';
 require_once __DIR__ . '/src/Accounts/GoogleSignIn.php';
 require_once __DIR__ . '/src/Catalogue/CanonicalProduct.php';
+require_once __DIR__ . '/src/Catalogue/ProductFields.php';
+require_once __DIR__ . '/src/Catalogue/PriceHistory.php';
 require_once __DIR__ . '/src/Catalogue/ImageHandling.php';
 require_once __DIR__ . '/src/Stock/StockItem.php';
 require_once __DIR__ . '/src/Stock/StockAnswer.php';
@@ -139,6 +142,8 @@ require_once __DIR__ . '/src/Payments/PaymentGate.php';
 MizzeySite\I18n\Localisation::register();
 // The administration in English for every staff member: ADM-159, specs/037-everyday-admin.
 MizzeySite\I18n\AdminEnglish::register();
+// The site's wpml-config.xml applied as soon as it changes: specs/036-product-management.
+MizzeySite\I18n\WpmlConfigSync::register();
 // .htaccess names the site's root, never a language's: specs/034-sales-report.
 MizzeySite\I18n\RewriteRoot::register();
 
@@ -176,6 +181,10 @@ MizzeySite\Security\StaffActivityScreen::register();
 
 // NFR-02: heavy uploads refused, every generated size written as WebP. See specs/032-image-handling.
 MizzeySite\Catalogue\ImageHandling::register();
+
+// Product fields WooCommerce lacks, and the price history: #276. See specs/036-product-management.
+MizzeySite\Catalogue\ProductFields::register();
+MizzeySite\Catalogue\PriceHistory::register();
 
 // The contracted order status model: the statuses, the allowed moves, the first entry into each status and the
 // cancellation reason. ORD-01 to ORD-14, ADM-86, ADM-87, specs/010-order-status-model.
