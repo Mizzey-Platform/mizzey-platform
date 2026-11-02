@@ -29,8 +29,11 @@ final class RefundCapability
     /** Set once the capability has been given, so it is never given again after the owner removes it. */
     public const GRANTED = 'mizzey_refund_capability_granted';
 
-    /** WooCommerce's REST routes that make or delete a refund (v1 to v3); the preview makes none. */
-    private const REST_ROUTE = '#^/wc/v[0-9]+/orders/[0-9]+/refunds(/[0-9]+)?$#';
+    /**
+     * WooCommerce's REST routes that make or delete a refund: under an order (v1 to v3), and v4's own refunds routes
+     * (behind WooCommerce's `rest-api-v4` flag in 11.1); the preview makes none.
+     */
+    private const REST_ROUTES = ['#^/wc/v[0-9]+/orders/[0-9]+/refunds(/[0-9]+)?$#', '#^/wc/v[0-9]+/refunds(/[0-9]+)?$#'];
 
     public static function register(): void
     {
@@ -42,13 +45,19 @@ final class RefundCapability
 
     public static function grant(): void
     {
+        // The flag is autoloaded, so this check makes no query; one stored earlier without autoload is switched once.
+        if ((wp_load_alloptions()[self::GRANTED] ?? null) === '1') {
+            return;
+        }
         if (get_option(self::GRANTED) === '1') {
+            wp_set_option_autoload(self::GRANTED, true);
+
             return;
         }
         foreach (['administrator', 'shop_manager'] as $name) {
             get_role($name)?->add_cap(self::CAP);
         }
-        update_option(self::GRANTED, '1', false);
+        update_option(self::GRANTED, '1', true);
     }
 
     /** The order screen's refund and delete-refund actions, before WooCommerce's own handlers. */
@@ -70,9 +79,13 @@ final class RefundCapability
         if ($result !== null || ! $request instanceof \WP_REST_Request || ! is_user_logged_in()) {
             return $result;
         }
-        $changes = in_array($request->get_method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true);
-        if ($changes && preg_match(self::REST_ROUTE, $request->get_route()) === 1 && ! current_user_can(self::CAP)) {
-            return new \WP_Error('mizzey_refund_forbidden', self::refusal(), ['status' => rest_authorization_required_code()]);
+        if (! in_array($request->get_method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true) || current_user_can(self::CAP)) {
+            return $result;
+        }
+        foreach (self::REST_ROUTES as $route) {
+            if (preg_match($route, $request->get_route()) === 1) {
+                return new \WP_Error('mizzey_refund_forbidden', self::refusal(), ['status' => rest_authorization_required_code()]);
+            }
         }
 
         return $result;

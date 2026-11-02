@@ -115,6 +115,8 @@ run(
 		$kept = ! get_role( 'shop_manager' )->has_cap( RefundCapability::CAP );
 		get_role( 'shop_manager' )->add_cap( RefundCapability::CAP );
 		$check( $kept && '1' === get_option( RefundCapability::GRANTED ), 'FR-001 the capability is given once; after the owner removes it from Admin it is not given back' );
+		wp_cache_delete( 'alloptions', 'options' );
+		$check( '1' === ( wp_load_alloptions()[ RefundCapability::GRANTED ] ?? null ), 'FR-001 the flag is loaded with the site\'s options, so checking it on each request makes no query of its own' );
 
 		// AC-4: the REST refunds routes.
 		$product = $s->simple_product( 't54 product', '100', null );
@@ -137,6 +139,9 @@ run(
 		$read    = t54_rest( 'GET', $route )->get_status();
 		$preview = t54_rest( 'POST', $route . '/preview', array( 'amount' => '5' ) )->get_status();
 		$check( 200 === $read && 403 !== $preview, "AC-4 [REST] reading refunds ({$read}) and the refund preview ({$preview}), which make no refund, are not refused by the capability" );
+		// WooCommerce's v4 refunds routes (behind its rest-api-v4 flag): the guard's answer before any route runs.
+		$v4 = static fn ( string $method, string $route ) => RefundCapability::guardRest( null, null, new \WP_REST_Request( $method, $route ) );
+		$check( is_wp_error( $v4( 'POST', '/wc/v4/refunds' ) ) && is_wp_error( $v4( 'DELETE', '/wc/v4/refunds/' . $refund ) ) && null === $v4( 'GET', '/wc/v4/refunds' ) && null === $v4( 'POST', '/wc/v4/refunds/preview' ), 'AC-4 [REST] the v4 refunds routes are guarded too: making or deleting a refund is refused without the capability; reading and the preview are not' );
 
 		// AC-4: the order screen's refund and delete-refund actions.
 		$check( 0 === has_action( 'wp_ajax_woocommerce_refund_line_items', array( RefundCapability::class, 'guardAjax' ) ) && 0 === has_action( 'wp_ajax_woocommerce_delete_refund', array( RefundCapability::class, 'guardAjax' ) ), 'AC-4 the guard runs before WooCommerce on the order screen\'s refund and delete-refund actions (priority 0)' );

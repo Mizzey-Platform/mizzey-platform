@@ -102,7 +102,8 @@ What visitors and customers can do on the storefront is delivered and accepted b
 - **FR-001**: The capability `mizzey_refund_orders` MUST exist on the Administrator and Shop manager roles, added
   once and kept, never re-added after the owner removes it from a role (AC-1, AC-2, AC-4).
 - **FR-002**: A refund made or deleted on the order screen, or created or deleted through the REST API, by a signed-in
-  user without the capability MUST be refused before WooCommerce acts (AC-4).
+  user without the capability MUST be refused before WooCommerce acts (AC-4). The REST API means every version's
+  refund routes: under an order (v1 to v3) and v4's own `refunds` routes, which WooCommerce 11.1 ships behind a flag.
 - **FR-003**: Refunds made by the store's own code with nobody signed in MUST NOT be affected (AC-4).
 - **FR-004**: No role MUST be changed otherwise; the standard role set stands (AC-1 to AC-3, AC-5).
 
