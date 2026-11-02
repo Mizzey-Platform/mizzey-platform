@@ -289,7 +289,7 @@ run(
 		foreach ( sign_in_orders_for( $customer->user_email ) as $order_id ) {
 			$s->track_order( $order_id );
 		}
-		$check( 200 === $r['status'], "AC-2 [checkout] a signed-in customer's checkout needs no check (status {$r['status']})" );
+		$check( 200 === $r['status'], "AC-2 [checkout] a signed-in customer's checkout needs no check (status {$r['status']} " . ( $r['data']['code'] ?? '' ) . ' ' . wp_strip_all_tags( (string) ( $r['data']['message'] ?? '' ) ) . ')' );
 
 		// The predicate follows WooCommerce's filtered checkout settings, not the raw options.
 		add_filter( 'woocommerce_checkout_registration_enabled', '__return_false' );
