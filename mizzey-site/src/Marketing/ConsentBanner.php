@@ -16,8 +16,9 @@ defined('ABSPATH') || exit;
  * The banner asks once, in the visitor's language, and the choice is kept 180 days in the `mizzey_consent` cookie;
  * any link with `data-mizzey-consent-open` reopens it (the footer's "Cookie settings"). Until the visitor accepts,
  * Google's consent mode stays denied (`TagManager`) and WooCommerce's order attribution (MKT-09) sets no cookie.
- * The banner is printed hidden and shown by its script, so a cached page serves every visitor correctly. Its look is
- * neutral until the interface design (PRE-03b).
+ * Nothing that depends on the choice is decided on the server: the banner is printed hidden and shown by its script,
+ * and order attribution is printed off and switched on in the browser from the cookie, so a cached page serves every
+ * visitor correctly. Its look is neutral until the interface design (PRE-03b).
  *
  * Register ids: MKT-10. See specs/043-measurement-tools.
  */
@@ -31,6 +32,7 @@ final class ConsentBanner
         add_action('wp_footer', [self::class, 'banner'], 5);
         add_action('wp_footer', [self::class, 'settingsLink'], 4);
         add_action('wp_enqueue_scripts', [self::class, 'enqueue']);
+        add_action('wp_enqueue_scripts', [self::class, 'attributionFromCookie'], 20);
         add_filter('wc_order_attribution_allow_tracking', [self::class, 'attribution']);
     }
 
@@ -40,14 +42,28 @@ final class ConsentBanner
     }
 
     /**
-     * Campaign attribution on the order sets cookies: only with consent.
+     * Campaign attribution on the order sets cookies: only with consent. The page is always printed with it off, so a
+     * page cached for one visitor never switches it on for another; `attributionFromCookie()` switches it on in the
+     * browser of a visitor who accepted.
      *
      * @param mixed $allow
-     * @return mixed
      */
-    public static function attribution($allow)
+    public static function attribution($allow): bool
     {
-        return self::granted() ? $allow : false;
+        return false;
+    }
+
+    /** Before WooCommerce's attribution script starts: on when this browser's choice is "granted". */
+    public static function attributionFromCookie(): void
+    {
+        if (is_admin() || ! wp_script_is('wc-order-attribution', 'enqueued')) {
+            return;
+        }
+        wp_add_inline_script(
+            'wc-order-attribution',
+            'if(window.wc_order_attribution&&window.wc_order_attribution.params&&/(?:^|; )mizzey_consent=granted(?:;|$)/.test(document.cookie)){window.wc_order_attribution.params.allowTracking=true;}',
+            'before'
+        );
     }
 
     public static function enqueue(): void

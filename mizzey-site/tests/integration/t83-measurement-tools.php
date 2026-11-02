@@ -5,8 +5,9 @@
  *
  * AC-1: with a container named, every storefront page loads Tag Manager after consent defaults of "denied"; with
  *       none, nothing is loaded; the data layer names the language; the admin is untouched.
- * AC-2: the consent banner is on every storefront page, in the visitor's language; campaign attribution on the order
- *       (WooCommerce's) runs only with consent.
+ * AC-2: the consent banner is on every storefront page, in the visitor's language; the standing choice is pushed as the
+ *       mizzey_consent event on every page; campaign attribution on the order (WooCommerce's) runs only with consent,
+ *       decided in the browser, never in the cached page.
  * AC-3: one product feed per language, in Google's product format: the SKU as the id, the price in EGP, the
  *       language's link, variations grouped; a hidden or draft product is not in it.
  *
@@ -60,6 +61,10 @@ run(
 		$check( false !== $consent_at && false !== $gtm_at && $consent_at < $gtm_at && str_contains( $home, "'GTM-T83TEST'" ) , 'AC-1 Tag Manager loads on the storefront, after the consent defaults' );
 		$check( ! str_contains( $home, 'ns.html?id=' ), 'AC-1 no no-script container: without the script no consent can be given, so nothing loads' );
 		$check( str_contains( $home, "value = match && match[1] === 'granted' ? 'granted' : 'denied'" ) && str_contains( $home, 'window.mizzeyLanguage="en"' ), 'AC-1 consent is denied until the visitor accepts; the data layer names the language (en)' );
+		// E-288-1: the standing choice is pushed as an event on every page, before the container, so a pixel that does not
+		// read Google's consent mode can wait for it.
+		$event_at = strpos( $home, "window.dataLayer.push({ event: 'mizzey_consent', consent: value });" );
+		$check( false !== $event_at && false !== $gtm_at && $event_at < $gtm_at, 'AC-2 every page pushes the standing choice of the visitor (mizzey_consent) before Tag Manager loads' );
 		[ , $ar ] = $page( $ar_home );
 		$check( str_contains( $ar, 'window.mizzeyLanguage="ar"' ) && str_contains( $ar, "'GTM-T83TEST'" ), 'AC-1 the Arabic storefront loads the same container, with the language ar' );
 		update_option( TagManager::CONTAINER, '"><script>alert(1)</script>' );
@@ -78,7 +83,14 @@ run(
 		$_COOKIE[ ConsentBanner::COOKIE ] = 'granted';
 		$granted = apply_filters( 'wc_order_attribution_allow_tracking', true );
 		unset( $_COOKIE[ ConsentBanner::COOKIE ] );
-		$check( false === $denied && false === $refused && true === $granted && 'yes' === get_option( 'woocommerce_feature_order_attribution_enabled' ), 'AC-2 the campaign is recorded on the order (WooCommerce order attribution) only once the visitor accepts' );
+		// E-288-2: the server never prints attribution on, whatever the cookie, so a cached page cannot carry one visitor's
+		// consent to another; the browser switches it on from its own cookie, before WooCommerce's script starts.
+		$switch    = 'mizzey_consent=granted(?:;|$)/.test(document.cookie)){window.wc_order_attribution.params.allowTracking=true;}';
+		$switch_at = strpos( $home, $switch );
+		$wc_at     = strpos( $home, 'order-attribution' );
+		$script_at = false === $switch_at ? false : strpos( $home, 'js/frontend/order-attribution', $switch_at );
+		$check( false === $denied && false === $refused && false === $granted && 'yes' === get_option( 'woocommerce_feature_order_attribution_enabled' ), 'AC-2 the page is always printed with campaign attribution off, whatever the cookie of the visitor' );
+		$check( false !== $switch_at && false !== $wc_at && false !== $script_at, 'AC-2 the campaign is recorded on the order (WooCommerce order attribution) only once the visitor accepts: switched on in the browser from the consent cookie, before the WooCommerce script' );
 
 		// ---- AC-3: the product feeds --------------------------------------------------------------------------------
 		$w     = new Workflows( $s );
