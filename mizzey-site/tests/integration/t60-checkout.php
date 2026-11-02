@@ -489,6 +489,16 @@ run(
 		$refusal_fresh->update_meta_data( \MizzeySite\Orders\StatusModel::REASON_META, 't60 refused release' );
 		$refusal_fresh->update_status( 'cancelled', 't60' );
 		$refusal_queued = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		// A retry that finds the order locked elsewhere does not mark it: it is queued again.
+		as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		$holder      = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$refusal_key = substr( 'mz_' . $wpdb->prefix . 'order_stock_' . $refusal->get_id(), 0, 64 );
+		$holder->get_var( $holder->prepare( 'SELECT GET_LOCK(%s, 0)', $refusal_key ) );
+		OrderStock::retryRelease( $refusal->get_id() );
+		$busy_unmarked = '' === wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$busy_requeued = false !== as_next_scheduled_action( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
+		$holder->get_var( $holder->prepare( 'SELECT RELEASE_LOCK(%s)', $refusal_key ) );
+		$holder->close();
 		OrderStock::retryRelease( $refusal->get_id() );
 		$refusal_marked      = '' !== wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
 		$refusal_still       = $late_source->levels[ $five->get_id() ];
@@ -497,8 +507,9 @@ run(
 		if ( function_exists( 'as_unschedule_all_actions' ) ) {
 			as_unschedule_all_actions( OrderStock::RETRY_RELEASE, array( $refusal->get_id() ), 'mizzey' );
 		}
-		$refusal_states = array_column( OrderStock::record( wc_get_order( $refusal->get_id() ) ), 'state' );
-		$check( $refusal_queued && $refusal_marked && $refusal_still === $refusal_held && $late_source->levels[ $five->get_id() ] === $refusal_held + 1 && array( 'released' ) === $refusal_states, 'CHK-12 a refused release is retried in the background, sent again, and the order marked for staff while the source still refuses; a later retry gives the stock back (' . wp_json_encode( array( $refusal_held, $refusal_still, $late_source->levels[ $five->get_id() ], $refusal_states ) ) . ')' );
+		$refusal_states  = array_column( OrderStock::record( wc_get_order( $refusal->get_id() ) ), 'state' );
+		$refusal_cleared = '' === wc_get_order( $refusal->get_id() )->get_meta( OrderStock::UNRELEASED );
+		$check( $refusal_queued && $busy_unmarked && $busy_requeued && $refusal_marked && $refusal_still === $refusal_held && $late_source->levels[ $five->get_id() ] === $refusal_held + 1 && array( 'released' ) === $refusal_states && $refusal_cleared, 'CHK-12 a refused release is retried in the background; a retry that finds the order locked is queued again, unmarked; refused again, the order is marked for staff; a later retry gives the stock back and clears the mark (' . wp_json_encode( array( $busy_unmarked, $busy_requeued, $refusal_held, $refusal_still, $late_source->levels[ $five->get_id() ], $refusal_states, $refusal_cleared ) ) . ')' );
 		// What the visitor's own unpaid order holds is theirs at the cart check.
 		$mine = t60_order( $s, array( $five->get_id() => 1 ) );
 		OrderStock::reserve( $mine, StockGateway::make() );

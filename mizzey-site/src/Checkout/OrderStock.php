@@ -149,9 +149,9 @@ final class OrderStock
         }
         $to = (string) $to;
         if (in_array($to, ['cancelled', 'failed'], true)) {
-            if (! self::releaseCancelled($order) && function_exists('as_schedule_single_action')) {
+            if (! self::releaseCancelled($order)) {
                 // The lock was busy or the release did not finish: tried again shortly, in the background (audit F-15).
-                as_schedule_single_action(time() + 5 * MINUTE_IN_SECONDS, self::RETRY_RELEASE, [(int) $order->get_id()], 'mizzey');
+                self::queueRetry((int) $order->get_id());
             }
 
             return;
@@ -178,21 +178,33 @@ final class OrderStock
         if (! $order instanceof \WC_Order) {
             return;
         }
-        if (self::releaseCancelled($order)) {
-            // Given back at last: a mark left by an earlier retry no longer applies.
-            $order = wc_get_order((int) $orderId);
-            if ($order instanceof \WC_Order && $order->get_meta(self::UNRELEASED) !== '') {
-                $order->delete_meta_data(self::UNRELEASED);
-                $order->save_meta_data();
+        // The release and the mark happen under the order's lock, on the order as stored, so two retries at once
+        // cannot leave a released order marked.
+        $ran = self::locked($order, static function (\WC_Order $fresh): bool {
+            $released = ! in_array($fresh->get_status(), ['cancelled', 'failed'], true) || self::releaseLocked($fresh, StockGateway::make());
+            $marked   = $fresh->get_meta(self::UNRELEASED) !== '';
+            if ($released && $marked) {
+                // Given back at last: a mark left by an earlier retry no longer applies.
+                $fresh->delete_meta_data(self::UNRELEASED);
+                $fresh->save_meta_data();
+            } elseif (! $released && ! $marked) {
+                $fresh->update_meta_data(self::UNRELEASED, (string) time());
+                $fresh->save_meta_data();
+                $fresh->add_order_note(__('The stock of this cancelled order could not be given back to the stock source. Check it with the stock source.', 'mizzey-site'));
             }
 
-            return;
+            return true;
+        });
+        if (! $ran) {
+            // Only the lock was busy (another request is working on the order): the next retry tries again.
+            self::queueRetry((int) $order->get_id());
         }
-        $order = wc_get_order((int) $orderId);
-        if ($order instanceof \WC_Order && $order->get_meta(self::UNRELEASED) === '') {
-            $order->update_meta_data(self::UNRELEASED, (string) time());
-            $order->save_meta_data();
-            $order->add_order_note(__('The stock of this cancelled order could not be given back to the stock source. Check it with the stock source.', 'mizzey-site'));
+    }
+
+    private static function queueRetry(int $orderId): void
+    {
+        if (function_exists('as_schedule_single_action')) {
+            as_schedule_single_action(time() + 5 * MINUTE_IN_SECONDS, self::RETRY_RELEASE, [$orderId], 'mizzey');
         }
     }
 
