@@ -1,0 +1,22 @@
+Mutation check for specs/047-second-release, t87-second-release, 2 November 2026 (local runtime: WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7, WCML 5.5.7), on the code after the Codex review. Each defect is applied alone, the scenario run, the file restored.
+
+CAUGHT    M1 the switch is on by default  <- FAIL  AC-1 with the switch off, which is the default, nothing of the second release is offered
+CAUGHT    M2 reorder ignores the switch  <- FAIL  AC-1 with the switch off, which is the default, nothing of the second release is offered
+CAUGHT    M3 no reorder on COD Collected  <- FAIL  AC-2 JRN-11, ACCT-09 a delivered order offers "Order again"
+CAUGHT    M4 a confirmed request is not handled  <- FAIL  AC-3 NFR-12a once confirmed it is handled in the background: the data erased and the account deleted
+CAUGHT    M5 the account is not deleted  <- FAIL  AC-3 NFR-12a once confirmed it is handled in the background: the data erased and the account deleted
+CAUGHT    M6 a staff account is deleted  <- FAIL  AC-3 a staff account is never deleted this way
+SURVIVED  M7 a staff export is emailed to the customer
+CAUGHT    M8 no confirmation email  <- FAIL  AC-3 ACCT-13 the request is pending until the customer confirms it from the email
+CAUGHT    M9 the review preference is ignored  <- FAIL  AC-4 IA-23, ACCT-11 the customer turns the review invitation off and offers on
+CAUGHT    M10 offers are not recorded  <- FAIL  AC-4 IA-23, ACCT-11 the customer turns the review invitation off and offers on
+CAUGHT    M11 spend ignores refunds  <- FAIL  AC-5 ADM-101 total spend net of refunds, paid orders, average order value, refunded orders ({"spend":600,"orders":3,"average
+CAUGHT    M12 refunds are not counted  <- FAIL  AC-5 ADM-101 total spend net of refunds, paid orders, average order value, refunded orders ({"spend":550,"orders":3,"avera
+SURVIVED  M13 no figures on the record
+CAUGHT    M14 the review invitation ignores the preference  <- FAIL  AC-4 an order delivered after the customer turned invitations off sends no review invitation
+
+M7 and M13 survived because the test called the functions directly instead of through their hooks and the arguments the request queued; it now goes through both:
+CAUGHT    M13 no figures on the record  <- FAIL  AC-5 ADM-07, ADM-105 the record shows the figures and the export button; the dashboard names where the conversion rate is
+CAUGHT    M7 a staff export is emailed to the customer  <- FAIL  AC-3 ADM-105 a copy prepared by staff is queued to be built for download, not emailed to the customer (0 
+
+14 of 14 caught.

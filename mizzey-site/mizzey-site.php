@@ -112,6 +112,11 @@ require_once __DIR__ . '/src/Reviews/ReviewEligibility.php';
 require_once __DIR__ . '/src/Reviews/ReviewModeration.php';
 require_once __DIR__ . '/src/Reviews/StoredOrderMeta.php';
 require_once __DIR__ . '/src/Reviews/ReviewInvitation.php';
+require_once __DIR__ . '/src/SecondRelease/ReleaseSwitch.php';
+require_once __DIR__ . '/src/SecondRelease/Reorder.php';
+require_once __DIR__ . '/src/SecondRelease/PrivacyRequests.php';
+require_once __DIR__ . '/src/SecondRelease/NotificationPreferences.php';
+require_once __DIR__ . '/src/SecondRelease/CustomerMetrics.php';
 require_once __DIR__ . '/src/Reviews/ReviewPhotos.php';
 require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
 require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
@@ -281,6 +286,11 @@ if (defined('WP_CLI') && WP_CLI) {
 MizzeySite\Reviews\ReviewEligibility::register();
 MizzeySite\Reviews\ReviewModeration::register();
 MizzeySite\Reviews\ReviewInvitation::register();
+MizzeySite\SecondRelease\ReleaseSwitch::register();
+MizzeySite\SecondRelease\Reorder::register();
+MizzeySite\SecondRelease\PrivacyRequests::register();
+MizzeySite\SecondRelease\NotificationPreferences::register();
+MizzeySite\SecondRelease\CustomerMetrics::register();
 // Photos in reviews, a recorded gift (D-23). See specs/025-review-photos.
 MizzeySite\Reviews\ReviewPhotos::register();
 

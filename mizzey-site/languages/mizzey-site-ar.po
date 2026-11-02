@@ -616,6 +616,33 @@ msgstr[3] "كل طلبات هذا العميل (%s)"
 msgstr[4] "كل طلبات هذا العميل (%s)"
 msgstr[5] "كل طلبات هذا العميل (%s)"
 
+msgid "Your data"
+msgstr "بياناتك"
+
+msgid "We email you a link to confirm. A copy of your data arrives by email; a deleted account cannot be restored."
+msgstr "نرسل إليك رابطًا للتأكيد. تصلك نسخة من بياناتك بالبريد الإلكتروني، ولا يمكن استعادة الحساب بعد حذفه."
+
+msgid "Email me a copy of my data"
+msgstr "أرسلوا إليّ نسخة من بياناتي"
+
+msgid "Delete my account"
+msgstr "احذف حسابي"
+
+msgid "Check your email to confirm the request."
+msgstr "تحقق من بريدك الإلكتروني لتأكيد الطلب."
+
+msgid "Emails we send you"
+msgstr "الرسائل التي نرسلها إليك"
+
+msgid "Emails about your orders always arrive. Choose the others:"
+msgstr "تصلك دائمًا الرسائل الخاصة بطلباتك. اختر غيرها:"
+
+msgid "Ask me to review a product after it arrives"
+msgstr "اطلبوا مني تقييم المنتج بعد وصوله"
+
+msgid "Offers and news"
+msgstr "العروض والأخبار"
+
 msgid "Cookie choices"
 msgstr "خيارات ملفات تعريف الارتباط"
 

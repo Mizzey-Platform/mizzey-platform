@@ -78,6 +78,9 @@ final class ReviewInvitation
         if (! $order instanceof \WC_Order || $order->get_meta(self::SENT) !== '') {
             return;
         }
+        if (apply_filters('mizzey_review_invitation_allowed', true, $order) === false) {
+            return; // The customer asked not to be invited (specs/047).
+        }
         $email = WC()->mailer()->get_emails()['MizzeySite_Review_Invitation'] ?? null;
         if (! $email instanceof ReviewInvitationEmail) {
             return;
