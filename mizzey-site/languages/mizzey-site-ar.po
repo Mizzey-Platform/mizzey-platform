@@ -678,3 +678,19 @@ msgstr "إعدادات ملفات تعريف الارتباط"
 
 msgid "EGP"
 msgstr "ج.م"
+
+#: mizzey-site/src/Stock/StockWriteGuard.php
+msgid "Being read, reload the page in a moment"
+msgstr "جارٍ القراءة، أعد تحميل الصفحة بعد لحظة"
+
+#: mizzey-site/src/Stock/StockWriteGuard.php
+msgid "Stock not known"
+msgstr "المخزون غير معروف"
+
+#: mizzey-site/src/Stock/StockWriteGuard.php
+msgid "Own stock"
+msgstr "مخزون المتجر"
+
+#: mizzey-site/src/Stock/StockWriteGuard.php
+msgid "From the ERP"
+msgstr "من نظام ERP"

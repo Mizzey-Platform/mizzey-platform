@@ -279,7 +279,7 @@ run(
 		$locked = $locked && wp_script_is( 'mizzey-admin-stock', 'enqueued' );
 		set_current_screen( 'front' );
 		unset( $GLOBALS['product_object'] );
-		$check( false !== strpos( $list_html, 'Stock from the stock source: 7' ) && false === strpos( $list_html, '(12)' ) && false !== strpos( $again, ': 7' ) && 2 === $source->reads && false !== strpos( $editor, 'Stock from the stock source: 7' ) && false !== strpos( $var_editor, 'Stock from the stock source: 7' ) && false !== strpos( $unknown, 'not known' ) && $locked, 'ADM-70, ADM-72 the products list and the product and variation editors show the figure from the stock source (7, not the stored 12), read once per product, or that it is not known; the stock fields\' lock is loaded on the product screen (' . $source->reads . ' reads)' );
+		$check( false !== strpos( $list_html, '<mark class="instock">In stock</mark> (7)' ) && false === strpos( $list_html, '(12)' ) && false === strpos( $list_html, '<mark>' ) && false !== strpos( $list_html, 'From the ERP' ) && false !== strpos( $again, '(7)' ) && 2 === $source->reads && false !== strpos( $editor, 'Stock from the stock source: 7' ) && false !== strpos( $var_editor, 'Stock from the stock source: 7' ) && false !== strpos( $unknown, 'not known' ) && $locked, 'ADM-70, ADM-72 the products list and the product and variation editors show the figure from the stock source (7, not the stored 12), read once per product, or that it is not known; the stock fields\' lock is loaded on the product screen (' . $source->reads . ' reads)' );
 
 		// A slow source: past the list's time budget a row does not wait; its figure is read in the background.
 		$slow     = new T67Source( 9 );
@@ -298,7 +298,7 @@ run(
 		remove_filter( StockGateway::SOURCE_FILTER, $bind_slow );
 		delete_transient( StockWriteGuard::FIGURE . $id );
 		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
-		$check( 0 === $reads_waiting && str_contains( $deferred, 'being read' ) && $queued_fill && str_contains( $filled, 'Stock from the stock source: 9' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
+		$check( 0 === $reads_waiting && str_contains( $deferred, 'Being read' ) && $queued_fill && str_contains( $filled, 'In stock</mark> (9)' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
 
 		// The budget counts the time the list has spent (the budget itself, kept from its first version): with reads of
 		// 0.1 s and a 0.15 s budget, two rows are read and the third waits for the background. Then the slow mark (the
@@ -337,8 +337,8 @@ run(
 			delete_transient( StockWriteGuard::FIGURE . $row );
 		}
 		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
-		$check( 2 === $reads_three && str_contains( $first_three[1], ': 4' ) && str_contains( $first_three[2], 'being read' ) && ! $slow_after_three, 'ADM-70 the list\'s budget counts the time it has spent asking: two reads of 0.1 s fit 0.15 s, the third row waits (' . $reads_three . ' reads)' );
-		$check( str_contains( $fourth, ': 4' ) && $slow_set && str_contains( $fifth, 'being read' ) && 3 === $reads_five, 'ADM-70 one read longer than the budget makes the next lists read in the background only, whatever their budget (' . $reads_five . ' reads)' );
+		$check( 2 === $reads_three && str_contains( $first_three[1], '(4)' ) && str_contains( $first_three[2], 'Being read' ) && ! $slow_after_three, 'ADM-70 the list\'s budget counts the time it has spent asking: two reads of 0.1 s fit 0.15 s, the third row waits (' . $reads_three . ' reads)' );
+		$check( str_contains( $fourth, '(4)' ) && $slow_set && str_contains( $fifth, 'Being read' ) && 3 === $reads_five, 'ADM-70 one read longer than the budget makes the next lists read in the background only, whatever their budget (' . $reads_five . ' reads)' );
 
 		return $ok;
 	}

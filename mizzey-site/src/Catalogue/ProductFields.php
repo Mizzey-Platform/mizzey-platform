@@ -84,16 +84,17 @@ final class ProductFields
         }
         wp_nonce_field(self::NONCE, self::NONCE . '_nonce');
         echo '<div class="options_group mizzey-product-fields">';
-        woocommerce_wp_text_input(['id' => 'mizzey_video', 'label' => __('Video address', 'mizzey-site'), 'type' => 'url', 'value' => (string) $p->get_meta(self::VIDEO), 'desc_tip' => true, 'description' => __('An uploaded video, or a YouTube or Vimeo page.', 'mizzey-site')]);
-        echo '<p class="form-field"><label>' . esc_html__('Badges', 'mizzey-site') . '</label>';
+        woocommerce_wp_text_input(['id' => 'mizzey_video', 'label' => __('Video address', 'mizzey-site'), 'type' => 'text', 'custom_attributes' => ['inputmode' => 'url'], 'value' => (string) $p->get_meta(self::VIDEO), 'desc_tip' => true, 'description' => __('An uploaded video, or a YouTube or Vimeo page.', 'mizzey-site')]);
+        // WooCommerce's own markup for a list of choices: a legend in the label column, the choices stacked beside it.
+        echo '<fieldset class="form-field mizzey_badges_field"><legend>' . esc_html__('Badges', 'mizzey-site') . '</legend><ul class="wc-radios">';
         $set = (array) $p->get_meta(self::BADGES);
         foreach (self::badges() as $key => $label) {
-            printf('<label style="margin-inline-end:12px"><input type="checkbox" name="mizzey_badges[]" value="%s"%s /> %s</label>', esc_attr($key), checked(in_array($key, $set, true), true, false), esc_html($label));
+            printf('<li><label><input type="checkbox" name="mizzey_badges[]" value="%s"%s /> %s</label></li>', esc_attr($key), checked(in_array($key, $set, true), true, false), esc_html($label));
         }
-        echo '</p></div><div class="options_group mizzey-product-seo">';
+        echo '</ul></fieldset></div><div class="options_group mizzey-product-seo">';
         woocommerce_wp_text_input(['id' => 'mizzey_seo_title', 'label' => __('SEO title', 'mizzey-site'), 'value' => (string) $p->get_meta(self::SEO_TITLE), 'custom_attributes' => ['maxlength' => '120']]);
         woocommerce_wp_textarea_input(['id' => 'mizzey_seo_description', 'label' => __('Meta description', 'mizzey-site'), 'value' => (string) $p->get_meta(self::SEO_DESC), 'custom_attributes' => ['maxlength' => '320']]);
-        woocommerce_wp_text_input(['id' => 'mizzey_seo_canonical', 'label' => __('Canonical address (override)', 'mizzey-site'), 'type' => 'url', 'value' => (string) $p->get_meta(self::CANONICAL)]);
+        woocommerce_wp_text_input(['id' => 'mizzey_seo_canonical', 'label' => __('Canonical address (override)', 'mizzey-site'), 'type' => 'text', 'custom_attributes' => ['inputmode' => 'url'], 'value' => (string) $p->get_meta(self::CANONICAL)]);
         woocommerce_wp_select(['id' => 'mizzey_seo_robots', 'label' => __('Search engines', 'mizzey-site'), 'value' => (string) $p->get_meta(self::ROBOTS), 'options' => [
             ''                 => __('Index and follow (default)', 'mizzey-site'),
             'noindex'          => __('Do not index', 'mizzey-site'),
