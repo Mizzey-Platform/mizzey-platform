@@ -167,15 +167,14 @@ final class EgyptianAddress
         // of a flat or an office, not of a villa.
         $egypt      = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['const' => 'EG']]]]]];
         $other      = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['not' => ['const' => 'EG']]]]]]];
-        $stacked    = ['customer' => ['properties' => ['address' => [
+        // A rule's top-level keys are the document's properties, so the condition on two address fields sits on the
+        // address itself: in Egypt, and a flat or an office.
+        $isStacked  = [
             'properties' => ['country' => ['const' => 'EG'], self::PLACE => ['enum' => [self::APARTMENTS, self::OFFICE]]],
             'required'   => [self::PLACE],
-        ]]]];
-        $villa      = ['customer' => ['properties' => ['address' => [
-            'properties' => [self::PLACE => ['const' => self::VILLA]],
-            'required'   => [self::PLACE],
-        ]]]];
-        $notStacked = ['anyOf' => [$other, $villa]];
+        ];
+        $stacked    = ['customer' => ['properties' => ['address' => $isStacked]]];
+        $notStacked = ['customer' => ['properties' => ['address' => ['not' => $isStacked]]]];
         woocommerce_register_additional_checkout_field([
             'id'         => self::DISTRICT,
             'label'      => __('District or neighbourhood', 'mizzey-site'),
