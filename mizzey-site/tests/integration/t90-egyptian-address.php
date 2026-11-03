@@ -13,7 +13,6 @@
  * Run: python mizzey-site/tests/integration/run.py --wp ../app/wp --only t90
  */
 
-declare(strict_types=1);
 
 namespace MizzeySite\Tests\Integration;
 
