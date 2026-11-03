@@ -65,6 +65,10 @@ run(
 		$options = wp_list_pluck( (array) ( $fields[ EgyptianAddress::PLACE ]['options'] ?? array() ), 'value' );
 		$check( true === ( $locale['phone']['required'] ?? null ) && 'select' === ( $fields[ EgyptianAddress::PLACE ]['type'] ?? '' ) && array( 'apartment', 'villa', 'office' ) === $options && 'Street or compound' === ( $locale['address_1']['label'] ?? '' ), 'AC-1 the phone is required for Egypt, the kind of place is apartment, villa or office, and the street line names a compound too' );
 
+		// The form marks them required as the server does: building for Egypt; floor and number for a flat or an office.
+		$rule = static fn ( string $key ): string => (string) wp_json_encode( $fields[ $key ]['required'] ?? false );
+		$check( str_contains( $rule( EgyptianAddress::BUILDING ), '"EG"' ) && str_contains( $rule( EgyptianAddress::FLOOR ), '"office"' ) && str_contains( $rule( EgyptianAddress::APARTMENT ), '"office"' ) && ! str_contains( $rule( EgyptianAddress::FLOOR ), '"villa"' ), 'AC-2 the form marks the building required in Egypt, and the floor and number for a flat or an office only' );
+
 		// ---- AC-3: one address --------------------------------------------------------------------------------------
 		$check( wc_ship_to_billing_address_only() && 'billing_only' === get_option( 'woocommerce_ship_to_destination' ), 'AC-3 the checkout asks for one address, the one the order is delivered to' );
 

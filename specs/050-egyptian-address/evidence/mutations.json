@@ -32,8 +32,8 @@
  {
   "name": "M6 line not written",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "            if ($current !== $line) {",
-  "new": "            if (false) {"
+  "old": "        if ($current !== $line) {",
+  "new": "        if (false) {"
  },
  {
   "name": "M7 line not in the order's language",
@@ -86,13 +86,13 @@
  {
   "name": "M15 a line staff typed is overwritten",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "            if ($current !== '' && $current !== $previous) {\n                continue; // typed by staff, or an older order's own line\n            }",
+  "old": "        if ($current !== '' && $current !== $previous) {\n            return; // typed by staff, or an older order's own line\n        }",
   "new": ""
  },
  {
   "name": "M16 delivery copy not mirrored",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "        if ($one) {\n            self::mirror($order);\n        }",
+  "old": "        self::mirror($order, $from, $from === 'billing' ? 'shipping' : 'billing');",
   "new": ""
  },
  {
@@ -112,5 +112,23 @@
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
   "old": "            'label'                      => __('Apartment or office number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => $stacked,",
   "new": "            'label'                      => __('Apartment or office number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => false,"
+ },
+ {
+  "name": "M20 paying an order resets its line",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "|| preg_match('#^/wc/store(/v\\d+)?/checkout$#', $request->get_route()) !== 1) {",
+  "new": ") {"
+ },
+ {
+  "name": "M21 refused payment keeps the parts",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "                    throw new \\Automattic\\WooCommerce\\StoreApi\\Exceptions\\RouteException('mizzey_address_part_missing',",
+  "new": "                    if (false) throw new \\Automattic\\WooCommerce\\StoreApi\\Exceptions\\RouteException('mizzey_address_part_missing',"
+ },
+ {
+  "name": "M22 shipping correction ignored",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "$from = self::edited($order, 'shipping') && ! self::edited($order, 'billing') ? 'shipping' : 'billing';",
+  "new": "$from = 'billing';"
  }
 ]
