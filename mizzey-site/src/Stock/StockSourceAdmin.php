@@ -84,6 +84,7 @@ final class StockSourceAdmin
     {
         if ((string) $old !== (string) $value) {
             self::log(sprintf('setting %s changed from "%s" to "%s"', (string) $option, (string) $old, (string) $value));
+            StockWriteGuard::forgetFigures();
         }
     }
 
@@ -94,6 +95,7 @@ final class StockSourceAdmin
     public static function settingAdded($option, $value): void
     {
         self::log(sprintf('setting %s set to "%s"', (string) $option, (string) $value));
+        StockWriteGuard::forgetFigures();
     }
 
     public static function productPanel(): void
@@ -239,14 +241,16 @@ final class StockSourceAdmin
         }
         $error = '';
         if ($source !== null && in_array($source, ['', StockMode::ERP, StockMode::STORE], true) && $source !== StockMode::choice($item->id)) {
-            $was    = StockMode::choice($item->id);
-            $fromErp = StockMode::sourceFor($item) === StockMode::ERP;
-            // The figure the store last showed, read while the item is still on the ERP.
-            $seed = $fromErp ? StockWriteGuard::figure($item->id) : null;
-            StockMode::choose($item, $source);
-            self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
-            if ($fromErp && StockMode::sourceFor($item) === StockMode::STORE) {
-                $error = self::seed($item, $seed);
+            $was  = StockMode::choice($item->id);
+            $will = StockMode::erpOff() ? StockMode::STORE : ($source !== '' ? $source : StockMode::storeDefault());
+            if (StockMode::sourceFor($item) === StockMode::ERP && $will === StockMode::STORE) {
+                // The starting figure is set while the item still reads the ERP, so no sale can reach the store's
+                // figure before it is there; if it cannot be set, the item stays on the ERP.
+                $error = self::seed($item, StockWriteGuard::figure($item->id));
+            }
+            if ($error === '') {
+                StockMode::choose($item, $source);
+                self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
             }
         }
         if ($figure === '') {
@@ -292,7 +296,7 @@ final class StockSourceAdmin
             (new StoreStockSource())->set($item, max(0, (int) $figure), 'switch-' . get_current_user_id() . '-' . wp_generate_uuid4(), StoreStockSource::STAFF, $reason, get_current_user_id());
         } catch (StockSourceRefused | StockSourceUnavailable $e) {
             /* translators: %s: why the stock source refused the change. */
-            return sprintf(__('The product now reads its own stock, but its starting figure was not set: %s. Set it below.', 'mizzey-site'), $e->getMessage());
+            return sprintf(__('The product still reads the ERP: its starting own stock figure could not be set (%s).', 'mizzey-site'), $e->getMessage());
         }
 
         return '';

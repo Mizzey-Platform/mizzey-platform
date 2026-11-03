@@ -634,14 +634,14 @@ final class OrderStock
     private static function settle(\WC_Order $order, StockGateway $gateway, int $itemId, array &$line): bool
     {
         if ($line['state'] === 'reserving' || $line['state'] === 'unsure') {
-            $answer        = $gateway->adjust($line['record'], -$line['qty'], self::key($order, $itemId, $line['gen'], 'reserve'), (string) ($line['source'] ?? ''));
+            $answer        = $gateway->adjust($line['record'], -$line['qty'], self::key($order, $itemId, $line['gen'], 'reserve'), self::sourceOf($line));
             $line['state'] = $answer->isKnown() ? 'reserved' : (self::refused($answer) ? 'refused' : 'unsure');
 
             return $answer->isKnown();
         }
         if ($line['state'] === 'undoing' || $line['state'] === 'releasing') {
             $step          = $line['state'] === 'undoing' ? 'undo' : 'release';
-            $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step), (string) ($line['source'] ?? ''))->isKnown();
+            $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step), self::sourceOf($line))->isKnown();
             $line['state'] = $done ? ($step === 'undo' ? 'undone' : 'released') : 'unsettled';
             // Which change went unanswered, so a later release sends it again under the same key.
             if ($done) {
@@ -656,7 +656,7 @@ final class OrderStock
             return true;
         }
         $to     = (int) $line['resize']['to'];
-        $answer = $gateway->adjust($line['record'], $line['qty'] - $to, self::key($order, $itemId, $line['gen'], 'resize' . (int) $line['resize']['op']), (string) ($line['source'] ?? ''));
+        $answer = $gateway->adjust($line['record'], $line['qty'] - $to, self::key($order, $itemId, $line['gen'], 'resize' . (int) $line['resize']['op']), self::sourceOf($line));
         if ($answer->isKnown()) {
             $line['qty'] = $to;
         }
@@ -665,6 +665,17 @@ final class OrderStock
         }
 
         return $answer->isKnown();
+    }
+
+    /**
+     * The source a line's changes go to. A line reserved before the stock source switch (D-28) has none recorded: the
+     * ERP was then the only source.
+     *
+     * @param array<string,mixed> $line
+     */
+    private static function sourceOf(array $line): string
+    {
+        return isset($line['source']) ? (string) $line['source'] : \MizzeySite\Stock\StockMode::ERP;
     }
 
     private static function refused(StockAnswer $answer): bool

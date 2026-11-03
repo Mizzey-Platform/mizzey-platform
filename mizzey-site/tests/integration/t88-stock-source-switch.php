@@ -165,14 +165,25 @@ run(
 			throw new \RuntimeException( 't88 write failure' );
 		};
 		add_action( 'woocommerce_product_set_stock', $fail );
+		// Without the fixtures' permit, as on the live site: the undo itself must get past the stock guard.
+		remove_filter( 'mizzey_stock_write_permitted', '__return_true' );
 		$thrown = '';
 		try {
 			$store->set( $item( $a ), 1, "{$tag}-fail", StoreStockSource::STAFF, 'counted', 0 );
 		} catch ( \Throwable $e ) {
 			$thrown = get_class( $e );
 		}
+		add_filter( 'mizzey_stock_write_permitted', '__return_true' );
 		remove_action( 'woocommerce_product_set_stock', $fail );
-		$check( StockSourceUnavailable::class === $thrown && 5 === $level( $a ) && 5 === $level( $a_ar ) && ! StoreStockSource::applied( "{$tag}-fail" ) && 5 === (int) wc_get_product( $a_ar )->get_stock_quantity(), 'S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (' . $thrown . ', ' . $level( $a ) . ', ' . $level( $a_ar ) . ')' );
+		$stored_en = (int) $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock'", $a ) );
+		$check( StockSourceUnavailable::class === $thrown && 5 === $stored_en && 5 === $level( $a ) && 5 === $level( $a_ar ) && ! StoreStockSource::applied( "{$tag}-fail" ) && 5 === (int) wc_get_product( $a_ar )->get_stock_quantity(), 'S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (' . $thrown . ', stored ' . $stored_en . ', ' . $level( $a ) . ', ' . $level( $a_ar ) . ')' );
+		// A request that died part way: its change is recorded as pending, the figure not yet written. The next change
+		// of the item completes it first; sent again, its key changes nothing.
+		$wpdb->insert( StoreStockSource::table(), array( 'item_id' => $a, 'operation_key' => "{$tag}-crash", 'delta' => 2, 'level_after' => 7, 'origin' => StoreStockSource::ORDER, 'reason' => '', 'user_id' => 0, 'state' => StoreStockSource::PENDING, 'created_at' => current_time( 'mysql', true ) ) );
+		$next  = StockGateway::make()->adjust( $a, -1, "{$tag}-next" )->quantity;
+		$again = StockGateway::make()->adjust( $a, 2, "{$tag}-crash" )->quantity;
+		$check( 6 === $next && 6 === $again && 6 === $level( $a_ar ) && 'done' === $wpdb->get_var( $wpdb->prepare( 'SELECT state FROM ' . StoreStockSource::table() . ' WHERE operation_key = %s', "{$tag}-crash" ) ), 'S-3 a change left pending by a request that died is completed before the next one, and never applied twice (' . $next . ', ' . $again . ')' );
+		$store->set( $item( $a ), 5, "{$tag}-back", StoreStockSource::STAFF, 'counted', 0 );
 
 		// ---- The checkout's reservation on the store's own stock ---------------------------------------------------
 		$order = wc_create_order();
@@ -211,6 +222,10 @@ run(
 		$bad       = StockSourceAdmin::save( $a, null, '-1', 'stock count' );
 		$last      = StoreStockSource::history( $a )[0] ?? null;
 		$check( '' !== $no_reason && '' === $saved && '' !== $on_erp && '' !== $bad && 12 === $level( $a ) && 40 === $level( $b ) && $last && StoreStockSource::STAFF === $last->origin && 'stock count' === $last->reason && $mgr === (int) $last->user_id && 7 === (int) $last->delta, 'AC-2 staff set own stock from either language with a reason, recorded with the user; no reason, a negative figure or an ERP item changes nothing' );
+		add_action( 'woocommerce_product_set_stock', $fail );
+		$unseeded = StockSourceAdmin::save( $b, StockMode::STORE, '', '' );
+		remove_action( 'woocommerce_product_set_stock', $fail );
+		$check( '' !== $unseeded && '' === StockMode::choice( $item( $b )->id ) && StockMode::ERP === StockMode::sourceFor( $item( $b ) ) && 40 === $level( $b ), 'FR-004 a switch whose starting figure cannot be set leaves the item on the ERP' );
 		$switched = StockSourceAdmin::save( $b, StockMode::STORE, '', '' );
 		$seeded   = StoreStockSource::history( $b )[0] ?? null;
 		$check( '' === $switched && StockMode::STORE === StockMode::choice( $item( $b )->id ) && 40 === $level( $b ) && $seeded && 'switched to own stock' === $seeded->reason && $mgr === (int) $seeded->user_id, 'FR-004 staff who may edit the product choose its source; switched from the ERP it starts from the ERP\'s figure, recorded (' . $level( $b ) . ')' );
