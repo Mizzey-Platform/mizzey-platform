@@ -641,10 +641,14 @@ run(
 		);
 		// The Requests library alone skips WordPress's http_api_curl hook; it is run here as WordPress runs it, so a host
 		// that routes its own requests there (staging sends them to its web server inside its network) does so for these.
-		$hooks = new \WpOrg\Requests\Hooks();
-		$hooks->register( 'curl.before_send', static function ( &$handle ) use ( $one_press ): void {
+		// Requests announces a simultaneous request's handle as curl.before_multi_add, and a followed redirect's as
+		// curl.before_send, so the bridge listens to both.
+		$hooks  = new \WpOrg\Requests\Hooks();
+		$bridge = static function ( &$handle ) use ( $one_press ): void {
 			do_action_ref_array( 'http_api_curl', array( &$handle, array( 'method' => 'POST' ), $one_press['url'] ) );
-		} );
+		};
+		$hooks->register( 'curl.before_multi_add', $bridge );
+		$hooks->register( 'curl.before_send', $bridge );
 		$presses = \WpOrg\Requests\Requests::request_multiple( array( $one_press, $one_press ), array( 'timeout' => 60, 'hooks' => $hooks ) );
 		$again   = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( $twice_email, 'Dokki' ), $auth4, $cart4['cookies'] );
 		wp_cache_flush();
