@@ -78,6 +78,8 @@ run(
 		$raised = array();
 		Monitoring::$sink = static function ( array $entry ) use ( &$raised ) { $raised[] = $entry; };
 		$s->on_finish( static function () { Monitoring::$sink = null; } );
+		// An email failure raised by an earlier scenario within the hour would keep this one quiet (Monitoring::QUIET).
+		delete_transient( 'mizzey_monitor_' . md5( 'integration|' . Transport::SOURCE ) );
 		do_action( 'wp_mail_failed', new \WP_Error( 'wp_mail_failed', "SMTP Error: The following recipients failed: {$tag}customer@example.com, jane.doe!{$tag}@example.com" ) );
 		$dir   = defined( 'WC_LOG_DIR' ) ? WC_LOG_DIR : trailingslashit( wp_upload_dir()['basedir'] ) . 'wc-logs/';
 		$lines = '';
