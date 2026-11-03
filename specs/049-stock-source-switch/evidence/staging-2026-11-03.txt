@@ -1,0 +1,7 @@
+Staging, 3 November 2026, release v0.1.18 (c5d4489), backup 20261103-132955-manual taken first.
+staging.py build: no problems. staging.py check: 6 of 6. wp mizzey security check: every baseline passes.
+Stock ledger: schema 3, mzs_mizzey_stock_moves on InnoDB, the same engine as mzs_postmeta.
+t88-stock-source-switch, run in the staging PHP container (~/mizzey-staging/staging-run.sh): pass.
+  It covers the switch (store default, product choice, ERP off), sales on own stock, the staff switch with its
+  starting figure, and the feed route over HTTP with the feed account's application password, through Caddy.
+Evidence folder on the server: ~/mizzey-staging/evidence/scenarios-20261103-133040/t88.out
