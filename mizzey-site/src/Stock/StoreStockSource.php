@@ -11,16 +11,18 @@ namespace MizzeySite\Stock;
 defined('ABSPATH') || exit;
 
 /**
- * The store's own stock (D-28): the figure is WooCommerce's own stock quantity on the stock identity record, kept in
- * step across the languages by WooCommerce Multilingual; what WooCommerce lacks is added here. Every change is applied
- * once per operation key and recorded with its reason, its origin and its user in a ledger table, under a lock per
- * item, inside one database transaction with the figure, so a change is either applied and recorded or neither.
+ * The store's own stock (D-28): the figure is WooCommerce's own stock quantity on the record that holds the item's
+ * stock (the item itself, or the product when a variation's stock is kept on its product), written to each language
+ * record of it. Every change is applied once per operation key and recorded with its reason, its origin and its user in
+ * a ledger table, under a lock on that record, inside one database transaction with the figure, so a change is either
+ * applied and recorded or neither. Inside the lock the record is read as stored, past every cache, and after the write
+ * each language's stored figure is read back: a write that did not land fails the change.
  *
  * The figure is written only through `StockWriteGuard::projection()`: no other local writer may change stock, on
  * either source (D-19 item 5, specs/026).
  *
- * An item whose stock WooCommerce does not count (stock management off) is unlimited while it is in stock, as in
- * WooCommerce, and changes to it are recorded without a figure.
+ * An item whose stock WooCommerce does not count has no figure on the store's side yet: it holds nothing and sells
+ * nothing until one is given (by staff, the feed, or the switch to own stock), which also turns counting on.
  *
  * See specs/049-stock-source-switch, FR-002 and FR-003.
  */
@@ -29,9 +31,6 @@ final class StoreStockSource implements StockSource
     public const TABLE   = 'mizzey_stock_moves';
     public const VERSION = '1';
     public const VERSION_OPTION = 'mizzey_stock_moves_schema';
-
-    /** What an item whose stock is not counted holds while in stock. */
-    public const UNLIMITED = 1000000;
 
     /** Where a change came from. */
     public const ORDER  = 'order';
@@ -89,7 +88,7 @@ final class StoreStockSource implements StockSource
 
     public function level(StockItem $item): int
     {
-        return self::figureOf(self::product($item));
+        return self::figureOf(StockMode::holder($item));
     }
 
     /** A sale or its return: the StockSource contract, recorded as an order change. */
@@ -131,7 +130,7 @@ final class StoreStockSource implements StockSource
     }
 
     /**
-     * The item's recorded changes, newest first.
+     * The recorded changes of the record holding an item's stock, newest first.
      *
      * @return list<object{delta:string,level_after:string,origin:string,reason:string,user_id:string,created_at:string}>
      */
@@ -156,29 +155,32 @@ final class StoreStockSource implements StockSource
         if (get_option(self::VERSION_OPTION) !== self::VERSION) {
             throw new StockSourceUnavailable('the stock ledger is not installed');
         }
-        $lock = substr('mz_' . $wpdb->prefix . 'stock_' . $item->id, 0, 64);
+        $holder = StockMode::holder($item);
+        $lock   = substr('mz_' . $wpdb->prefix . 'stock_' . $holder->id, 0, 64);
         if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             throw new StockSourceUnavailable('stock busy');
         }
         try {
-            $product = self::product($item, true);
             if (self::applied($operationKey)) {
-                return self::figureOf($product);
+                return self::figureOf($holder, true);
             }
-            $counted = $product->managing_stock();
-            $current = self::figureOf($product);
-            $change  = $target !== null ? $target - ($counted ? $current : 0) : (int) $delta;
-            $after   = $counted || $target !== null ? ($target ?? $current + $change) : $current;
+            $current = self::figureOf($holder, true);
+            $change  = $target !== null ? $target - $current : (int) $delta;
+            $after   = $current + $change;
             if ($after < 0 && $change < 0) {
                 throw new StockSourceRefused('not enough stock');
             }
-            $wpdb->query('START TRANSACTION'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $records = self::records(self::product($holder->id));
+            $ids     = array_map(static fn (\WC_Product $record): int => $record->get_id(), $records);
+            if ($wpdb->query('START TRANSACTION') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                throw new StockSourceUnavailable('the change could not be started');
+            }
             try {
                 $stored = $wpdb->insert(self::table(), [
-                    'item_id'       => $item->id,
+                    'item_id'       => $holder->id,
                     'operation_key' => $operationKey,
                     'delta'         => $change,
-                    'level_after'   => min($after, self::UNLIMITED),
+                    'level_after'   => $after,
                     'origin'        => substr($origin, 0, 20),
                     'reason'        => mb_substr(sanitize_text_field($reason), 0, self::REASON_MAX),
                     'user_id'       => max(0, $userId),
@@ -187,50 +189,68 @@ final class StoreStockSource implements StockSource
                 if ($stored !== 1) {
                     throw new StockSourceUnavailable('the change was not recorded');
                 }
-                if ($counted || $target !== null) {
-                    StockWriteGuard::projection(static function () use ($product, $after): void {
-                        // The item's figure, and each language record's: the language records share the one stock
-                        // identity, and WooCommerce Multilingual does not follow a direct stock update.
-                        foreach (self::records($product) as $record) {
-                            if (! $record->managing_stock()) {
-                                $record->set_manage_stock(true);
-                                $record->save();
-                            }
-                            wc_update_product_stock($record, $after, 'set');
+                StockWriteGuard::projection(static function () use ($records, $after): void {
+                    // The figure on each language record: they share the one stock, and WooCommerce Multilingual does
+                    // not follow a direct stock update.
+                    foreach ($records as $record) {
+                        if ($record->get_manage_stock() !== true) {
+                            $record->set_manage_stock(true);
+                            $record->save();
                         }
-                    });
+                        wc_update_product_stock($record, $after, 'set');
+                    }
+                });
+                // WooCommerce does not report a stock update that failed: what landed is read back.
+                foreach ($ids as $id) {
+                    if (self::stored($id) !== $after) {
+                        throw new StockSourceUnavailable('the figure was not written');
+                    }
                 }
-                $wpdb->query('COMMIT'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                if ($wpdb->query('COMMIT') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    throw new StockSourceUnavailable('the change was not committed');
+                }
             } catch (\Throwable $e) {
                 $wpdb->query('ROLLBACK'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                // What this request cached while writing is not what is stored.
+                self::evict($ids);
                 throw $e instanceof StockSourceRefused || $e instanceof StockSourceUnavailable ? $e : new StockSourceUnavailable($e->getMessage());
             }
-            self::forget($item->id);
+            self::evict($ids);
+            self::forget($holder->id);
 
-            return self::figureOf(self::product($item, true));
+            return self::figureOf($holder, true);
         } finally {
             $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         }
     }
 
-    /** The figure WooCommerce holds for the item: its count, or unlimited or nothing when it is not counted. */
-    private static function figureOf(\WC_Product $product): int
+    /** The figure the store holds for the item: its count, or nothing when WooCommerce does not count its stock. */
+    private static function figureOf(StockItem $holder, bool $fresh = false): int
     {
-        if ($product->managing_stock()) {
-            return (int) $product->get_stock_quantity();
+        $product = self::product($holder->id, $fresh);
+        if ($product->get_manage_stock() !== true) {
+            return 0;
         }
 
-        return $product->is_in_stock() ? self::UNLIMITED : 0;
+        return $fresh ? (int) self::stored($holder->id) : (int) $product->get_stock_quantity();
+    }
+
+    /** The stored figure, read from the database past every cache; null when the record has none. */
+    private static function stored(int $id): ?int
+    {
+        global $wpdb;
+        $value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock' LIMIT 1", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+        return $value === null || $value === '' ? null : (int) round((float) $value);
     }
 
     /** @throws StockSourceRefused */
-    private static function product(StockItem $item, bool $fresh = false): \WC_Product
+    private static function product(int $id, bool $fresh = false): \WC_Product
     {
         if ($fresh) {
-            wp_cache_delete($item->id, 'post_meta');
-            wp_cache_delete($item->id, 'posts');
+            self::evict([$id]);
         }
-        $product = wc_get_product($item->id);
+        $product = wc_get_product($id);
         if (! $product instanceof \WC_Product) {
             throw new StockSourceRefused('unknown item');
         }
@@ -239,7 +259,25 @@ final class StoreStockSource implements StockSource
     }
 
     /**
-     * The stock identity record and its translations, as products.
+     * Drops what this request holds of the records in memory: WooCommerce's product objects, the post and its fields.
+     *
+     * @param list<int> $ids
+     */
+    private static function evict(array $ids): void
+    {
+        $cache = class_exists(\Automattic\WooCommerce\Internal\Caches\ProductCache::class)
+            ? wc_get_container()->get(\Automattic\WooCommerce\Internal\Caches\ProductCache::class)
+            : null;
+        foreach ($ids as $id) {
+            $cache?->remove($id);
+            wp_cache_delete($id, 'post_meta');
+            wp_cache_delete($id, 'posts');
+            wp_cache_delete('product-' . $id, 'products');
+        }
+    }
+
+    /**
+     * The record and its translations, as products.
      *
      * @return list<\WC_Product>
      */
@@ -252,10 +290,8 @@ final class StoreStockSource implements StockSource
             foreach ((array) apply_filters('wpml_get_element_translations', [], $trid, $type) as $translation) {
                 $id = (int) ($translation->element_id ?? 0);
                 if ($id > 0 && $id !== $product->get_id()) {
-                    $record = wc_get_product($id);
-                    if ($record instanceof \WC_Product) {
-                        $records[] = $record;
-                    }
+                    $record = self::product($id, true);
+                    $records[] = $record;
                 }
             }
         }
@@ -267,7 +303,8 @@ final class StoreStockSource implements StockSource
     private static function forget(int $itemId): void
     {
         $type = get_post_type($itemId) === 'product_variation' ? 'product_variation' : 'product';
-        $ids  = [$itemId];
+        // A product's variations whose stock it keeps show its figure too.
+        $ids  = array_merge([$itemId], array_map('intval', get_children(['post_parent' => $itemId, 'post_type' => 'product_variation', 'fields' => 'ids'])));
         $trid = apply_filters('wpml_element_trid', null, $itemId, 'post_' . $type);
         if ($trid) {
             foreach ((array) apply_filters('wpml_get_element_translations', [], $trid, 'post_' . $type) as $translation) {

@@ -30,6 +30,8 @@ final class StockFeedRoute
 {
     public const CAP       = 'mizzey_feed_stock';
     public const ROLE      = 'mizzey_stock_feed';
+    /** The route's path, as the REST server names it. */
+    public const ROUTE     = '/mizzey/v1/stock';
     public const GRANTED   = 'mizzey_feed_stock_granted';
     public const MAX_ITEMS = 100;
     public const KEY_PREFIX = 'feed' . ':';

@@ -50,12 +50,30 @@ final class StockMode
         return in_array($value, [self::ERP, self::STORE], true) ? $value : '';
     }
 
+    /**
+     * The stock item that holds this item's stock: the item, or, for a variation whose stock WooCommerce keeps on its
+     * product, the product. Its choice routes the variation, so a product and its variations never read two sources
+     * for one figure.
+     */
+    public static function holder(StockItem $item): StockItem
+    {
+        $product = wc_get_product($item->id);
+        if ($product instanceof \WC_Product_Variation && $product->get_manage_stock() === 'parent') {
+            $parent = StockIdentity::resolve((int) $product->get_stock_managed_by_id());
+            if ($parent !== null) {
+                return $parent;
+            }
+        }
+
+        return $item;
+    }
+
     public static function sourceFor(StockItem $item): string
     {
         if (self::erpOff()) {
             return self::STORE;
         }
-        $choice = self::choice($item->id);
+        $choice = self::choice(self::holder($item)->id);
 
         return $choice !== '' ? $choice : self::storeDefault();
     }
@@ -76,5 +94,7 @@ final class StockMode
         } elseif (in_array($choice, [self::ERP, self::STORE], true)) {
             update_post_meta($item->id, self::ITEM_META, $choice);
         }
+        // The admin's kept figure came from the source the item read before.
+        delete_transient(StockWriteGuard::FIGURE . $item->id);
     }
 }

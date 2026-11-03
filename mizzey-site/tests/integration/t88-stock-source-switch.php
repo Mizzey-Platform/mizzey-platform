@@ -76,7 +76,10 @@ run(
 		$a = $w->simple( "{$tag}-A", null );
 		$b = $w->simple( "{$tag}-B", null );
 		list( $parent, $vars ) = $w->variable( "{$tag}-V", array( 'S' => null, 'L' => null ) );
-		$items = array( $a, $b, $parent, $vars[0], $vars[1] );
+		// A product that keeps its variations' stock itself, and a product whose stock WooCommerce does not count.
+		list( $pooled, $pooled_vars ) = $w->variable( "{$tag}-P", array( 'S' => null, 'L' => null ) );
+		$uncounted = $w->simple( "{$tag}-U", null );
+		$items = array( $a, $b, $parent, $vars[0], $vars[1], $pooled, $pooled_vars[0], $pooled_vars[1], $uncounted );
 		$s->on_finish( static function () use ( $items, $wpdb ) {
 			foreach ( $items as $id ) {
 				$wpdb->delete( StoreStockSource::table(), array( 'item_id' => $id ), array( '%d' ) );
@@ -88,6 +91,19 @@ run(
 			$p->set_stock_quantity( $qty );
 			$p->save();
 		}
+		foreach ( $pooled_vars as $id ) {
+			$p = wc_get_product( $id );
+			$p->set_manage_stock( false );
+			$p->save();
+		}
+		$p = wc_get_product( $pooled );
+		$p->set_manage_stock( true );
+		$p->set_stock_quantity( 5 );
+		$p->save();
+		$p = wc_get_product( $uncounted );
+		$p->set_manage_stock( false );
+		$p->set_stock_status( 'instock' );
+		$p->save();
 		$a_ar = $w->translate( 'duplicate', $a );
 
 		$erp  = new T88Erp( array( $a => 50, $b => 40, $vars[0] => 30, $vars[1] => 20 ) );
@@ -116,6 +132,15 @@ run(
 		$check( 40 === $level( $b ) && StockMode::ERP === StockMode::choice( $item( $b )->id ), 'S-2 turned back on, each item\'s own choice applies again' );
 		update_option( StockMode::DEFAULT_OPTION, StockMode::ERP );
 
+		// ---- Items the store does not count yet, and variations whose product keeps their stock -------------------
+		StockMode::choose( $item( $uncounted ), StockMode::STORE );
+		$sale = StockGateway::make()->adjust( $uncounted, -1, "{$tag}-u1" );
+		$check( 0 === $level( $uncounted ) && ! $sale->isKnown(), 'FR-002 an own-stock item whose stock WooCommerce does not count holds nothing and refuses a sale until it is given a figure' );
+		StockMode::choose( $item( $pooled ), StockMode::STORE );
+		StockMode::choose( $item( $pooled_vars[0] ), StockMode::ERP );
+		$took = StockGateway::make()->adjust( $pooled_vars[0], -2, "{$tag}-p1" )->quantity;
+		$check( 3 === $took && 3 === $level( $pooled_vars[1] ) && 3 === $level( $pooled ) && StockMode::STORE === StockMode::sourceFor( $item( $pooled_vars[0] ) ), 'FR-002 a variation whose product keeps its stock follows the product\'s source, and a sale takes from the product\'s one figure (' . wp_json_encode( array( $took, $level( $pooled_vars[1] ), $level( $pooled ) ) ) . ')' );
+
 		// ---- S-3: the store's own stock --------------------------------------------------------------------------
 		$store = new StoreStockSource();
 		$k1    = "{$tag}-k1";
@@ -135,6 +160,19 @@ run(
 		$blocked = update_post_meta( $a, '_stock', '99' );
 		add_filter( 'mizzey_stock_write_permitted', '__return_true' );
 		$check( 5 === $level( $a ) && 'instock' === wc_get_product( $vars[0] )->get_stock_status(), 'D-19 a direct write to the stock field of an own-stock item is still refused (' . var_export( $blocked, true ) . ')' );
+		// A write that fails half way: the Arabic record is never reached, and nothing of the change stays.
+		$fail = static function () {
+			throw new \RuntimeException( 't88 write failure' );
+		};
+		add_action( 'woocommerce_product_set_stock', $fail );
+		$thrown = '';
+		try {
+			$store->set( $item( $a ), 1, "{$tag}-fail", StoreStockSource::STAFF, 'counted', 0 );
+		} catch ( \Throwable $e ) {
+			$thrown = get_class( $e );
+		}
+		remove_action( 'woocommerce_product_set_stock', $fail );
+		$check( StockSourceUnavailable::class === $thrown && 5 === $level( $a ) && 5 === $level( $a_ar ) && ! StoreStockSource::applied( "{$tag}-fail" ) && 5 === (int) wc_get_product( $a_ar )->get_stock_quantity(), 'S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (' . $thrown . ', ' . $level( $a ) . ', ' . $level( $a_ar ) . ')' );
 
 		// ---- The checkout's reservation on the store's own stock ---------------------------------------------------
 		$order = wc_create_order();
@@ -147,6 +185,19 @@ run(
 		$mid      = $level( $a );
 		$released = OrderStock::release( wc_get_order( $order->get_id() ), StockGateway::make() );
 		$check( $reserved && $twice && 3 === $mid && $released && 5 === $level( $a ) && empty( $erp->applied ), 'CHK-12 on own stock an order reserves each line once and a cancellation gives it back; the ERP is not asked (' . $mid . ', ' . $level( $a ) . ')' );
+		// A line reserved on the ERP is given back to the ERP, even after its item moved to its own stock.
+		$order2 = wc_create_order();
+		$order2->add_product( wc_get_product( $b ), 2 );
+		$order2->calculate_totals();
+		$order2->save();
+		$s->track_order( $order2->get_id() );
+		$held  = OrderStock::reserve( $order2, StockGateway::make() );
+		$taken = $erp->levels[ $b ];
+		StockMode::choose( $item( $b ), StockMode::STORE );
+		$back  = OrderStock::release( wc_get_order( $order2->get_id() ), StockGateway::make() );
+		$lines = OrderStock::record( wc_get_order( $order2->get_id() ) );
+		StockMode::choose( $item( $b ), '' );
+		$check( $held && 38 === $taken && $back && 40 === $erp->levels[ $b ] && 4 === ( new StoreStockSource() )->level( $item( $b ) ) && StockMode::ERP === ( reset( $lines )['source'] ?? '' ), 'CHK-12 a line reserved on the ERP is given back to the ERP after its item is switched to its own stock; the store\'s figure is untouched (' . $taken . ', ' . $erp->levels[ $b ] . ')' );
 
 		// ---- AC-2: staff set own stock with a reason --------------------------------------------------------------
 		$mgr = (int) wp_insert_user( array( 'user_login' => "{$tag}mgr", 'user_pass' => wp_generate_password( 24 ), 'user_email' => "{$tag}mgr@example.invalid", 'role' => 'shop_manager' ) );
@@ -160,11 +211,13 @@ run(
 		$bad       = StockSourceAdmin::save( $a, null, '-1', 'stock count' );
 		$last      = StoreStockSource::history( $a )[0] ?? null;
 		$check( '' !== $no_reason && '' === $saved && '' !== $on_erp && '' !== $bad && 12 === $level( $a ) && 40 === $level( $b ) && $last && StoreStockSource::STAFF === $last->origin && 'stock count' === $last->reason && $mgr === (int) $last->user_id && 7 === (int) $last->delta, 'AC-2 staff set own stock from either language with a reason, recorded with the user; no reason, a negative figure or an ERP item changes nothing' );
-		StockSourceAdmin::save( $b, StockMode::STORE, '', '' );
-		$check( StockMode::STORE === StockMode::choice( $item( $b )->id ), 'FR-004 staff who may edit the product choose its source' );
+		$switched = StockSourceAdmin::save( $b, StockMode::STORE, '', '' );
+		$seeded   = StoreStockSource::history( $b )[0] ?? null;
+		$check( '' === $switched && StockMode::STORE === StockMode::choice( $item( $b )->id ) && 40 === $level( $b ) && $seeded && 'switched to own stock' === $seeded->reason && $mgr === (int) $seeded->user_id, 'FR-004 staff who may edit the product choose its source; switched from the ERP it starts from the ERP\'s figure, recorded (' . $level( $b ) . ')' );
 		wp_set_current_user( $cust );
 		StockSourceAdmin::save( $b, StockMode::ERP, '1', 'x' );
-		$check( StockMode::STORE === StockMode::choice( $item( $b )->id ) && 4 === $level( $b ), 'FR-004 a customer changes neither the source nor the figure' );
+		$check( StockMode::STORE === StockMode::choice( $item( $b )->id ) && 40 === $level( $b ), 'FR-004 a customer changes neither the source nor the figure' );
+		$check( false !== has_action( 'woocommerce_product_after_variable_attributes', array( StockSourceAdmin::class, 'variationPanel' ) ) && false === has_action( 'woocommerce_variation_options_inventory', array( StockSourceAdmin::class, 'variationPanel' ) ), 'FR-003 the variation panel sits outside WooCommerce\'s stock fields, which the stock lock hides' );
 		wp_set_current_user( $mgr );
 		StockSourceAdmin::save( $b, StockMode::ERP, '', '' );
 		wp_set_current_user( 0 );
@@ -217,6 +270,13 @@ run(
 		wp_cache_flush();
 		$h_status = (string) ( $authed['data']['items'][0]['status'] ?? wp_json_encode( $authed['data'] ) );
 		$check( 401 === $anon['status'] && 200 === $authed['status'] && 'applied' === $h_status && 9 === $level( $a ), 'S-4 over HTTP the route refuses an unauthenticated call (401) and takes one from the feeding account\'s application password (' . $anon['status'] . ', ' . $authed['status'] . ', ' . $h_status . ', ' . $level( $a ) . ')' );
+
+		$basic   = array( 'Authorization' => 'Basic ' . base64_encode( "{$tag}feed:{$password}" ) );
+		$me      = sign_in_json( 'GET', add_query_arg( 'rest_route', '/wp/v2/users/me', home_url( '/' ) ), null, $basic );
+		$rename  = sign_in_json( 'POST', add_query_arg( 'rest_route', '/wp/v2/users/me', home_url( '/' ) ), array( 'email' => "{$tag}taken@example.invalid" ), $basic );
+		$batched = sign_in_json( 'POST', add_query_arg( 'rest_route', '/batch/v1', home_url( '/' ) ), array( 'requests' => array( array( 'method' => 'POST', 'path' => '/wp/v2/users/me', 'body' => array( 'email' => "{$tag}taken@example.invalid" ) ) ) ), $basic );
+		clean_user_cache( $feeder );
+		$check( 403 === $me['status'] && 403 === $rename['status'] && 403 === $batched['status'] && "{$tag}feed@example.invalid" === get_userdata( $feeder )->user_email, 'S-4 the feeding account\'s application password opens the stock route only: its profile, its email and a batch are refused (' . $me['status'] . ', ' . $rename['status'] . ', ' . $batched['status'] . ')' );
 
 		// ---- S-5: no silent fail-over ----------------------------------------------------------------------------
 		$erp->down = true;

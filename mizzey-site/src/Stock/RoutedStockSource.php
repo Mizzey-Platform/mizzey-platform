@@ -60,6 +60,16 @@ final class RoutedStockSource implements StockSource
         return StockMode::sourceFor($item) === StockMode::STORE ? $this->store : $this->erp;
     }
 
+    /** The source of that name, `erp` or `store`: where an earlier change to an item went. */
+    public function named(string $source): ?StockSource
+    {
+        return match ($source) {
+            StockMode::ERP   => $this->erp,
+            StockMode::STORE => $this->store,
+            default          => null,
+        };
+    }
+
     public function name(): string
     {
         return 'routed';

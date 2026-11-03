@@ -82,8 +82,11 @@ final class StockGateway
     /**
      * Changes stock by `$delta` units, once for `$operationKey`: the caller's name for this one change (an order line,
      * a cancellation), kept on every retry so the source applies it once (the StockSource contract).
+     *
+     * `$source` names the source an earlier change of the same reservation went to (`sourceName()` at the time), so a
+     * release, a retry or a resize goes back to it even when the item has been switched since; '' uses today's choice.
      */
-    public function adjust(int $productId, int $delta, string $operationKey): StockAnswer
+    public function adjust(int $productId, int $delta, string $operationKey, string $source = ''): StockAnswer
     {
         $item = StockIdentity::resolve($productId);
         if ($item === null || $delta === 0 || trim($operationKey) === '') {
@@ -93,9 +96,10 @@ final class StockGateway
             return StockAnswer::unknown($item, $reason);
         }
 
-        $source = $this->sourceFor($item);
+        $named = $source !== '' && $this->source instanceof RoutedStockSource ? $this->source->named($source) : null;
+        $to    = $named ?? $this->sourceFor($item);
 
-        return $this->attempt('adjust', $item, $operationKey, fn (): int => $source->adjust($item, $delta, $operationKey), $source);
+        return $this->attempt('adjust', $item, $operationKey, fn (): int => $to->adjust($item, $delta, $operationKey), $to);
     }
 
     /**
@@ -104,6 +108,14 @@ final class StockGateway
     public function sourceFor(StockItem $item): StockSource
     {
         return $this->source instanceof RoutedStockSource ? $this->source->for($item) : $this->source;
+    }
+
+    /** The name of the source that holds the record's item now, `erp` or `store`; '' when stock is not routed. */
+    public function sourceName(int $productId): string
+    {
+        $item = StockIdentity::resolve($productId);
+
+        return $item !== null && $this->source instanceof RoutedStockSource ? StockMode::sourceFor($item) : '';
     }
 
     /** @param callable(): int $call */

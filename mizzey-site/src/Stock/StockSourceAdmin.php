@@ -39,7 +39,8 @@ final class StockSourceAdmin
         add_action('add_option_' . StockMode::DEFAULT_OPTION, [self::class, 'settingAdded'], 10, 2);
         add_action('add_option_' . StockMode::ERP_OFF_OPTION, [self::class, 'settingAdded'], 10, 2);
         add_action('woocommerce_product_options_stock_status', [self::class, 'productPanel'], 20);
-        add_action('woocommerce_variation_options_inventory', [self::class, 'variationPanel'], 20, 3);
+        // After the variation's fields, outside WooCommerce's stock fields, which the stock lock hides (specs/026).
+        add_action('woocommerce_product_after_variable_attributes', [self::class, 'variationPanel'], 20, 3);
         add_action('woocommerce_process_product_meta', [self::class, 'saveProduct'], 30, 1);
         add_action('woocommerce_save_product_variation', [self::class, 'saveVariation'], 30, 2);
     }
@@ -122,6 +123,11 @@ final class StockSourceAdmin
         if ($item === null) {
             return;
         }
+        if (StockMode::holder($item)->id !== $item->id) {
+            printf('<div class="mizzey-stock-switch"><p class="%s"><em>%s</em></p></div>', esc_attr($class), esc_html__('This variation\'s stock is kept on its product: its stock source and figure are set there.', 'mizzey-site'));
+
+            return;
+        }
         $choice  = StockMode::choice($item->id);
         $options = [
             ''               => sprintf(
@@ -148,7 +154,7 @@ final class StockSourceAdmin
                 esc_attr($class),
                 esc_html__('Set own stock to', 'mizzey-site'),
                 esc_attr($figureName),
-                esc_attr($level >= StoreStockSource::UNLIMITED ? __('not counted', 'mizzey-site') : (string) $level)
+                esc_attr((string) $level)
             );
             printf(
                 '<p class="%1$s"><label>%2$s</label><input type="text" maxlength="%3$d" name="%4$s" value=""></p>',
@@ -227,18 +233,29 @@ final class StockSourceAdmin
             return '';
         }
         $item = StockIdentity::resolve($productId);
-        if ($item === null) {
-            return '';
-        }
-        if ($source !== null && in_array($source, ['', StockMode::ERP, StockMode::STORE], true) && $source !== StockMode::choice($item->id)) {
-            $was = StockMode::choice($item->id);
-            StockMode::choose($item, $source);
-            self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
-        }
-        if ($figure === '') {
+        if ($item === null || StockMode::holder($item)->id !== $item->id) {
+            // A variation whose stock its product keeps is set on the product.
             return '';
         }
         $error = '';
+        if ($source !== null && in_array($source, ['', StockMode::ERP, StockMode::STORE], true) && $source !== StockMode::choice($item->id)) {
+            $was    = StockMode::choice($item->id);
+            $fromErp = StockMode::sourceFor($item) === StockMode::ERP;
+            // The figure the store last showed, read while the item is still on the ERP.
+            $seed = $fromErp ? StockWriteGuard::figure($item->id) : null;
+            StockMode::choose($item, $source);
+            self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
+            if ($fromErp && StockMode::sourceFor($item) === StockMode::STORE) {
+                $error = self::seed($item, $seed);
+            }
+        }
+        if ($figure === '') {
+            if ($error !== '' && class_exists(\WC_Admin_Meta_Boxes::class)) {
+                \WC_Admin_Meta_Boxes::add_error($error);
+            }
+
+            return $error;
+        }
         if (StockMode::sourceFor($item) !== StockMode::STORE) {
             $error = __('Stock was not changed: this product reads the ERP\'s stock.', 'mizzey-site');
         } elseif (! preg_match('/^\d{1,6}$/', $figure)) {
@@ -248,6 +265,7 @@ final class StockSourceAdmin
         } else {
             try {
                 (new StoreStockSource())->set($item, (int) $figure, 'staff-' . get_current_user_id() . '-' . wp_generate_uuid4(), StoreStockSource::STAFF, $reason, get_current_user_id());
+                $error = ''; // The figure given replaces a starting figure that could not be set.
             } catch (StockSourceRefused | StockSourceUnavailable $e) {
                 /* translators: %s: why the stock source refused the change. */
                 $error = sprintf(__('Stock was not changed: %s.', 'mizzey-site'), $e->getMessage());
@@ -258,6 +276,26 @@ final class StockSourceAdmin
         }
 
         return $error;
+    }
+
+    /**
+     * An item switched from the ERP to its own stock starts from the figure the store last showed for it, recorded as
+     * a change; when that figure is not known it starts from nothing, and is not sellable until staff or the feed give
+     * one. Returns the error shown to staff, or ''.
+     */
+    private static function seed(StockItem $item, ?int $figure): string
+    {
+        $reason = $figure === null
+            ? 'switched to own stock (the ERP figure was not known)'
+            : 'switched to own stock';
+        try {
+            (new StoreStockSource())->set($item, max(0, (int) $figure), 'switch-' . get_current_user_id() . '-' . wp_generate_uuid4(), StoreStockSource::STAFF, $reason, get_current_user_id());
+        } catch (StockSourceRefused | StockSourceUnavailable $e) {
+            /* translators: %s: why the stock source refused the change. */
+            return sprintf(__('The product now reads its own stock, but its starting figure was not set: %s. Set it below.', 'mizzey-site'), $e->getMessage());
+        }
+
+        return '';
     }
 
     private static function log(string $line): void
