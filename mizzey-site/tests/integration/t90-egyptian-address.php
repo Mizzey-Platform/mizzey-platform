@@ -127,7 +127,7 @@ run(
 		[ $no_building ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::FLOOR => '4', EgyptianAddress::APARTMENT => '18' ), "{$tag}-b@example.invalid" );
 		$check( 400 === $no_floor['status'] && 400 === $no_building['status'] && 200 === $villa_res['status'] && $villa && 'Villa 12' === $villa->get_billing_address_2(), 'AC-2 a flat without its floor and apartment is refused, and an address without its building; a villa is placed without them (' . $no_floor['status'] . ', ' . $no_building['status'] . ', ' . $villa_res['status'] . ')' );
 		[ $flat_res, $flat ] = $place( $flat_parts, "{$tag}-f@example.invalid" );
-		$check( 200 === $flat_res['status'] && $flat && 'Building 5, floor 4, apartment 18' === $flat->get_billing_address_2() && 'Dar Misr Al Andalus, 70 Building' === $flat->get_billing_address_1() && '18' === (string) $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) && ! $flat->needs_shipping_address(), '[HTTP] AC-3, AC-4 an order placed with a flat keeps each part and carries them as its second line, with one address (' . ( $flat ? $flat->get_billing_address_2() : $flat_res['status'] ) . ')' );
+		$check( 200 === $flat_res['status'] && $flat && 'Building 5, floor 4, apartment 18' === $flat->get_billing_address_2() && 'Dar Misr Al Andalus, 70 Building' === $flat->get_billing_address_1() && '18' === (string) $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) && ( '' === $flat->get_shipping_address_1() || $flat->get_billing_address_1() === $flat->get_shipping_address_1() ), '[HTTP] AC-3, AC-4 an order placed with a flat keeps each part and carries them as its second line, and is delivered to the one address given (' . wp_json_encode( $flat ? array( $flat->get_billing_address_1(), $flat->get_billing_address_2(), $flat->get_shipping_address_1(), $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) ) : $flat_res['status'] ) . ')' );
 		$courier = $flat && function_exists( 'bosta_format_address_details' ) ? bosta_format_address_details( $flat ) : null;
 		$slip    = $flat ? ( function () use ( $flat ) { return ( new \ReflectionMethod( \MizzeySite\Orders\PackingSlip::class, 'recipient' ) )->invoke( null, $flat ); } )() : array();
 		$check( ( null === $courier || 'Building 5, floor 4, apartment 18' === $courier->secondLine ) && in_array( 'Building 5, floor 4, apartment 18', $slip, true ) && in_array( 'Behind the club', $slip, true ), 'AC-4 the courier\'s address (Bosta secondLine' . ( null === $courier ? ', plugin not active here' : '' ) . ') and the packing slip carry the line and the landmark' );
@@ -137,8 +137,18 @@ run(
 			wp_cache_flush();
 		}
 		$check( $flat && 'Building 5, floor 6, apartment 18' === wc_get_order( $flat->get_id() )->get_billing_address_2(), 'AC-4 a change staff make on the order screen is carried to the line' );
-		[ $ar_res, $ar_order ] = $place( $flat_parts, "{$tag}-r@example.invalid", 'ar' );
-		$check( 200 === $ar_res['status'] && $ar_order && str_contains( $ar_order->get_billing_address_2(), 'عمارة' ), '[HTTP] AC-4 an Arabic order\'s line is in Arabic (' . ( $ar_order ? $ar_order->get_billing_address_2() : $ar_res['status'] ) . ')' );
+		// An Arabic order (WPML's order language): its line is composed in Arabic, whoever saves it.
+		$ar_order = wc_create_order();
+		$s->track_order( $ar_order->get_id() );
+		$ar_order->set_billing_country( 'EG' );
+		$ar_order->update_meta_data( 'wpml_language', 'ar' );
+		foreach ( $flat_parts as $key => $value ) {
+			$ar_order->update_meta_data( '_wc_billing/' . $key, $value );
+		}
+		$ar_order->save();
+		wp_cache_flush();
+		$ar_saved = wc_get_order( $ar_order->get_id() )->get_billing_address_2();
+		$check( str_contains( $ar_saved, 'عمارة' ) && str_contains( $ar_saved, 'شقة' ), 'AC-4 an Arabic order\'s line is in Arabic though it is saved in English (' . $ar_saved . ')' );
 
 		// ---- AC-5: the address book ---------------------------------------------------------------------------------
 		$customer = (int) wp_insert_user( array( 'user_login' => "{$tag}c", 'user_pass' => wp_generate_password( 24 ), 'role' => 'customer', 'user_email' => "{$tag}c@example.invalid" ) );
