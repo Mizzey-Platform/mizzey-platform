@@ -187,7 +187,7 @@ add_action(
 		}
 		$host = (string) wp_parse_url( $current, PHP_URL_HOST );
 		// Plain HTTP on port 80 inside the network, so an explicit :443 goes with the https.
-		curl_setopt( $handle, CURLOPT_URL, preg_replace( '#^https://([^/?\#:]+)(?::443)?(?=[/?\#]|$)#i', 'http://$1', $current ) );
+		curl_setopt( $handle, CURLOPT_URL, preg_replace( '#^https://((?:[^/?\#@]*@)?[^/?\#:@]+)(?::443)?(?=[/?\#]|$)#i', 'http://$1', $current ) );
 		curl_setopt( $handle, CURLOPT_CONNECT_TO, array( $host . ':80:' . MIZZEY_STAGING_WEB_SERVER . ':80' ) );
 	},
 	10,
