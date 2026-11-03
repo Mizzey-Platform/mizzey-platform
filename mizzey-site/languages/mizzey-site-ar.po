@@ -764,3 +764,7 @@ msgstr "مكتب %s"
 msgctxt "address parts"
 msgid ", "
 msgstr "، "
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Ground"
+msgstr "أرضي"

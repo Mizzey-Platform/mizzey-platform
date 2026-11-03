@@ -253,6 +253,7 @@ final class AddressBook
             $address['place'] = '';
         }
         $required = $address['place'] === EgyptianAddress::VILLA ? self::REQUIRED : array_merge(self::REQUIRED, self::STACKED);
+        $address['floor'] = EgyptianAddress::floor($address['floor']);
         if ($address['place'] === EgyptianAddress::VILLA) {
             $address['floor']     = '';
             $address['apartment'] = '';

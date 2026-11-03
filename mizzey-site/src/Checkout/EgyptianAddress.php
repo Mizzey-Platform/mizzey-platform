@@ -43,6 +43,10 @@ final class EgyptianAddress
     public const APARTMENTS = 'apartment';
     public const VILLA      = 'villa';
     public const OFFICE     = 'office';
+    /** Set on an order placed while the checkout asks for one address: its billing address is the delivery address. */
+    public const ONE_ADDRESS = '_mizzey_one_address';
+    /** The second line last composed for an address type, so a line staff typed themselves is not overwritten. */
+    public const LINE = '_mizzey_address_line_';
     /** The address's own fields, in the order a person reads an Egyptian address: largest place first. */
     public const FIELDS = [self::DISTRICT, self::PLACE, self::BUILDING, self::FLOOR, self::APARTMENT, self::LANDMARK];
 
@@ -54,6 +58,7 @@ final class EgyptianAddress
         add_filter('pre_option_woocommerce_ship_to_destination', [self::class, 'oneAddress']);
         add_action('woocommerce_before_order_object_save', [self::class, 'composeOrder'], 10, 1);
         add_action('woocommerce_checkout_validate_order_before_payment', [self::class, 'beforePayment'], 10, 2);
+        add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'fromCheckout'], 5, 2);
         add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'payingOrder'], 10, 2);
         add_filter('woocommerce_validate_phone', [self::class, 'validPhone'], 10, 3);
     }
@@ -122,6 +127,22 @@ final class EgyptianAddress
                 break;
             }
         }
+        // The parts of the one address, checked here too, as paying an existing order (`/checkout/{id}`) does not run the
+        // checkout's own field rules.
+        if ($order->get_billing_country() === 'EG') {
+            $value = static fn (string $key): string => trim((string) $order->get_meta('_wc_billing/' . $key));
+            $place = $value(self::PLACE);
+            $parts = [self::PLACE => __('Type of place', 'mizzey-site'), self::BUILDING => __('Building or villa number', 'mizzey-site')];
+            if ($place !== self::VILLA) {
+                $parts += [self::FLOOR => __('Floor', 'mizzey-site'), self::APARTMENT => __('Apartment or office number', 'mizzey-site')];
+            }
+            foreach ($parts as $key => $label) {
+                if ($value($key) === '') {
+                    /* translators: %s: the field's name. */
+                    $errors->add('mizzey_address_part_missing', sprintf(__('%s is required.', 'mizzey-site'), $label));
+                }
+            }
+        }
         foreach (['billing', 'shipping'] as $type) {
             $country = $type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
             if ($country === 'EG' && trim((string) $order->get_meta("_wc_{$type}/" . self::DISTRICT)) === '' && ($type === 'billing' || $order->needs_shipping_address())) {
@@ -131,6 +152,42 @@ final class EgyptianAddress
                 return;
             }
         }
+    }
+
+    /**
+     * A Store API checkout or payment of an order: the second line of an Egyptian address is the checkout's to compose (the
+     * form does not show it, so what arrives is a copy from the customer's saved address), and an order placed while the
+     * checkout asks for one address is marked so.
+     *
+     * @param mixed $order
+     * @param mixed $request
+     */
+    public static function fromCheckout($order, $request): void
+    {
+        if (! $order instanceof \WC_Order) {
+            return;
+        }
+        foreach (['billing', 'shipping'] as $type) {
+            $order->delete_meta_data(self::LINE . $type);
+            if (($type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country()) === 'EG') {
+                $type === 'billing' ? $order->set_billing_address_2('') : $order->set_shipping_address_2('');
+            }
+        }
+        if (wc_ship_to_billing_address_only()) {
+            $order->update_meta_data(self::ONE_ADDRESS, 'yes');
+        }
+    }
+
+    /**
+     * The floor as typed; a lone zero is the ground floor, written so (WooCommerce takes "0" for an empty field).
+     *
+     * @param mixed $value
+     */
+    public static function floor($value): string
+    {
+        $floor = trim(sanitize_text_field(is_scalar($value) ? (string) $value : ''));
+
+        return in_array($floor, ['0', '٠'], true) ? __('Ground', 'mizzey-site') : $floor;
     }
 
     /** One address for the order: WooCommerce's setting that delivers to the billing address, with no second form. */
@@ -222,6 +279,7 @@ final class EgyptianAddress
             'label'                      => __('Floor', 'mizzey-site'),
             'location'                   => 'address',
             'type'                       => 'text',
+            'sanitize_callback'          => [self::class, 'floor'],
             'required'                   => $stacked,
             'hidden'                     => $notStacked,
             'index'                      => 47,
@@ -252,8 +310,10 @@ final class EgyptianAddress
     /**
      * The building, floor and apartment as one line, in the order's language, kept as the address's second line, which
      * the order screens, the emails, the packing slip and the courier (Bosta sends it as `secondLine`) already show.
-     * Written on every save, so a change made by staff on the order screen is carried too. An address without them (an
-     * older order, another country) keeps its second line.
+     * Written on every save, so a change staff make to the parts on the order screen is carried; a second line staff
+     * typed themselves (it is not the line last composed) is kept. An address without the parts (an older order, another
+     * country) keeps its second line. On an order placed with one address, the delivery copy follows the billing address,
+     * so every reader shows the same one.
      *
      * @param mixed $order
      */
@@ -262,20 +322,37 @@ final class EgyptianAddress
         if (! $order instanceof \WC_Order) {
             return;
         }
-        foreach (['billing', 'shipping'] as $type) {
+        $one = $order->get_meta(self::ONE_ADDRESS, true, 'edit') === 'yes';
+        foreach ($one ? ['billing'] : ['billing', 'shipping'] as $type) {
             $country = $type === 'billing' ? $order->get_billing_country('edit') : $order->get_shipping_country('edit');
             if ($country !== 'EG') {
                 continue;
             }
-            $value = static fn (string $key): string => trim((string) $order->get_meta("_wc_{$type}/{$key}", true, 'edit'));
-            $line  = OrderLanguage::during($order, static fn (): string => self::line($value(self::PLACE), $value(self::BUILDING), $value(self::FLOOR), $value(self::APARTMENT)));
-            if ($line === '') {
-                continue;
+            $value    = static fn (string $key): string => trim((string) $order->get_meta("_wc_{$type}/{$key}", true, 'edit'));
+            $line     = OrderLanguage::during($order, static fn (): string => self::line($value(self::PLACE), $value(self::BUILDING), $value(self::FLOOR), $value(self::APARTMENT)));
+            $current  = $type === 'billing' ? $order->get_billing_address_2('edit') : $order->get_shipping_address_2('edit');
+            $previous = (string) $order->get_meta(self::LINE . $type, true, 'edit');
+            if ($current !== '' && $current !== $previous) {
+                continue; // typed by staff, or an older order's own line
             }
-            $current = $type === 'billing' ? $order->get_billing_address_2('edit') : $order->get_shipping_address_2('edit');
             if ($current !== $line) {
                 $type === 'billing' ? $order->set_billing_address_2($line) : $order->set_shipping_address_2($line);
             }
+            $line === '' ? $order->delete_meta_data(self::LINE . $type) : $order->update_meta_data(self::LINE . $type, $line);
+        }
+        if ($one) {
+            self::mirror($order);
+        }
+    }
+
+    /** The delivery copy of a one-address order: the billing address and its parts. */
+    private static function mirror(\WC_Order $order): void
+    {
+        foreach (['first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country', 'phone'] as $field) {
+            $order->{"set_shipping_{$field}"}((string) $order->{"get_billing_{$field}"}('edit'));
+        }
+        foreach (self::FIELDS as $key) {
+            $order->update_meta_data("_wc_shipping/{$key}", (string) $order->get_meta("_wc_billing/{$key}", true, 'edit'));
         }
     }
 

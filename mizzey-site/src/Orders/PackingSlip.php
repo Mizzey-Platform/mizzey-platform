@@ -148,7 +148,7 @@ final class PackingSlip
     /** @return list<string> The delivery name, address in the Egyptian structure, and phone; the billing ones when there is no shipping address. */
     private static function recipient(\WC_Order $order): array
     {
-        $type     = $order->has_shipping_address() ? 'shipping' : 'billing';
+        $type     = $order->get_meta(EgyptianAddress::ONE_ADDRESS) !== 'yes' && $order->has_shipping_address() ? 'shipping' : 'billing';
         $get      = static fn (string $field): string => (string) $order->{"get_{$type}_{$field}"}();
         $district = (string) $order->get_meta('_wc_' . $type . '/' . EgyptianAddress::DISTRICT);
         $states   = (array) WC()->countries->get_states($get('country'));

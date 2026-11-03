@@ -125,6 +125,9 @@ run(
 		[ $no_floor ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::BUILDING => '5', EgyptianAddress::APARTMENT => '18' ), "{$tag}-a@example.invalid" );
 		[ $villa_res, $villa ] = $place( array( EgyptianAddress::PLACE => 'villa', EgyptianAddress::BUILDING => '12' ), "{$tag}-v@example.invalid" );
 		[ $no_building ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::FLOOR => '4', EgyptianAddress::APARTMENT => '18' ), "{$tag}-b@example.invalid" );
+		[ $no_apartment ] = $place( array( EgyptianAddress::PLACE => 'office', EgyptianAddress::BUILDING => '5', EgyptianAddress::FLOOR => '4' ), "{$tag}-o@example.invalid" );
+		[ $ground_res, $ground ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::BUILDING => '5', EgyptianAddress::FLOOR => '0', EgyptianAddress::APARTMENT => '1' ), "{$tag}-g@example.invalid" );
+		$check( 400 === $no_apartment['status'] && 200 === $ground_res['status'] && $ground && 'Building 5, floor Ground, apartment 1' === $ground->get_billing_address_2(), 'AC-2 an office without its number is refused; a ground floor typed as 0 is taken as the ground floor (' . $no_apartment['status'] . ', ' . $ground_res['status'] . ( $ground ? ', ' . $ground->get_billing_address_2() : '' ) . ')' );
 		$check( 400 === $no_floor['status'] && 400 === $no_building['status'] && 200 === $villa_res['status'] && $villa && 'Villa 12' === $villa->get_billing_address_2(), 'AC-2 a flat without its floor is refused, and an address without its building; a villa is placed without them (' . $no_floor['status'] . ', ' . $no_building['status'] . ', ' . $villa_res['status'] . ')' );
 		[ $flat_res, $flat ] = $place( $flat_parts, "{$tag}-f@example.invalid" );
 		$check( 200 === $flat_res['status'] && $flat && 'Building 5, floor 4, apartment 18' === $flat->get_billing_address_2() && 'Dar Misr Al Andalus, 70 Building' === $flat->get_billing_address_1() && '18' === (string) $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) && ( '' === $flat->get_shipping_address_1() || $flat->get_billing_address_1() === $flat->get_shipping_address_1() ), '[HTTP] AC-3, AC-4 an order placed with a flat keeps each part and carries them as its second line, and is delivered to the one address given (' . wp_json_encode( $flat ? array( $flat->get_billing_address_1(), $flat->get_billing_address_2(), $flat->get_shipping_address_1(), $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) ) : $flat_res['status'] ) . ')' );
@@ -136,7 +139,41 @@ run(
 			$flat->save();
 			wp_cache_flush();
 		}
-		$check( $flat && 'Building 5, floor 6, apartment 18' === wc_get_order( $flat->get_id() )->get_billing_address_2(), 'AC-4 a change staff make on the order screen is carried to the line' );
+		$edited  = $flat ? wc_get_order( $flat->get_id() ) : null;
+		$slip2   = $edited ? ( new \ReflectionMethod( \MizzeySite\Orders\PackingSlip::class, 'recipient' ) )->invoke( null, $edited ) : array();
+		$invoice = $edited ? implode( ' | ', ( new \ReflectionMethod( \MizzeySite\Invoices\InvoiceDocument::class, 'customer' ) )->invoke( null, $edited ) ) : '';
+		$courier2 = $edited && function_exists( 'bosta_format_address_details' ) ? bosta_format_address_details( $edited ) : null;
+		$check( $edited && 'Building 5, floor 6, apartment 18' === $edited->get_billing_address_2() && 'Building 5, floor 6, apartment 18' === $edited->get_shipping_address_2() && '6' === (string) $edited->get_meta( '_wc_shipping/' . EgyptianAddress::FLOOR ) && in_array( 'Building 5, floor 6, apartment 18', $slip2, true ) && str_contains( $invoice, 'Building 5, floor 6, apartment 18' ) && ( null === $courier2 || 'Building 5, floor 6, apartment 18' === $courier2->secondLine ), 'AC-3, AC-4 a change staff make on the order screen is carried to the line, and the one address\'s delivery copy, packing slip, invoice and courier all show it (' . $invoice . ')' );
+		if ( $edited ) {
+			$edited->set_billing_address_2( 'Back entrance, ask the guard' );
+			$edited->save();
+			$edited = wc_get_order( $edited->get_id() );
+			$edited->update_meta_data( '_wc_billing/' . EgyptianAddress::FLOOR, '7' );
+			$edited->save();
+			wp_cache_flush();
+		}
+		$check( $edited && 'Back entrance, ask the guard' === wc_get_order( $edited->get_id() )->get_billing_address_2(), 'AC-4 a second line staff typed themselves is kept, also when a part changes afterwards' );
+		// [HTTP] Paying an existing order: the parts are checked there too.
+		$unpaid = wc_create_order();
+		$unpaid->add_product( wc_get_product( $product->get_id() ), 1 );
+		$unpaid->set_billing_email( "{$tag}-u@example.invalid" );
+		$unpaid->set_billing_country( 'EG' );
+		$unpaid->calculate_totals();
+		$unpaid->set_status( 'pending' );
+		$unpaid->save();
+		$s->track_order( $unpaid->get_id() );
+		$pay = static function ( array $parts ) use ( $unpaid, $tag ): array {
+			$store = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
+			$auth  = array( 'Cart-Token' => sign_in_header( $store, 'cart-token' ), 'Nonce' => sign_in_header( $store, 'nonce' ) );
+			$body  = array_merge( t90_body( "{$tag}-u@example.invalid", $parts ), array( 'key' => $unpaid->get_order_key(), 'billing_email' => "{$tag}-u@example.invalid" ) );
+			return sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout/' . $unpaid->get_id() ), $body, $auth, $store['cookies'] );
+		};
+		$pay_short = $pay( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::FLOOR => '4', EgyptianAddress::APARTMENT => '18' ) );
+		$pay_full  = $pay( $flat_parts );
+		wp_cache_flush();
+		$paid = wc_get_order( $unpaid->get_id() );
+		$check( 200 !== $pay_short['status'] && 200 === $pay_full['status'] && $paid && 'Building 5, floor 4, apartment 18' === $paid->get_billing_address_2(), '[HTTP] AC-2 paying an existing order is refused without the building, and with it the order carries its line (' . $pay_short['status'] . ', ' . $pay_full['status'] . ')' );
+
 		// An Arabic order (WPML's order language): its line is composed in Arabic, whoever saves it.
 		$ar_order = wc_create_order();
 		$s->track_order( $ar_order->get_id() );
