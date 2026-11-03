@@ -20,8 +20,8 @@
  {
   "name": "M4 floor never required",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "            'label'                      => __('Floor', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => $stacked,",
-  "new": "            'label'                      => __('Floor', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => false,"
+  "old": "            'sanitize_callback'          => [self::class, 'floor'],\n            'required'                   => $stacked,",
+  "new": "            'sanitize_callback'          => [self::class, 'floor'],\n            'required'                   => false,"
  },
  {
   "name": "M5 villa asked for floor",
@@ -38,8 +38,8 @@
  {
   "name": "M7 line not in the order's language",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "$line  = OrderLanguage::during($order, static fn (): string =>",
-  "new": "$line  = (static fn ($o, $f) => $f())($order, static fn (): string =>"
+  "old": "$line     = OrderLanguage::during($order, static fn (): string =>",
+  "new": "$line     = (static fn ($o, $f) => $f())($order, static fn (): string =>"
  },
  {
   "name": "M8 villa keeps floor in line",
@@ -82,5 +82,35 @@
   "file": "mizzey-site/src/Account/AddressBook.php",
   "old": "            $address['floor']     = '';",
   "new": "            $address['floor']     = $address['floor'];"
+ },
+ {
+  "name": "M15 a line staff typed is overwritten",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            if ($current !== '' && $current !== $previous) {\n                continue; // typed by staff, or an older order's own line\n            }",
+  "new": ""
+ },
+ {
+  "name": "M16 delivery copy not mirrored",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "        if ($one) {\n            self::mirror($order);\n        }",
+  "new": ""
+ },
+ {
+  "name": "M17 parts not checked before payment",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "        if ($order->get_billing_country() === 'EG') {\n            $value = static fn",
+  "new": "        if (false) {\n            $value = static fn"
+ },
+ {
+  "name": "M18 ground floor 0 not taken",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "return in_array($floor, ['0', '٠'], true) ? __('Ground', 'mizzey-site') : $floor;",
+  "new": "return $floor;"
+ },
+ {
+  "name": "M19 apartment never required",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            'label'                      => __('Apartment or office number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => $stacked,",
+  "new": "            'label'                      => __('Apartment or office number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => false,"
  }
 ]
