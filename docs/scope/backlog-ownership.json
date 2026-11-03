@@ -1310,7 +1310,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In review",
+   "status": "Verified",
    "delivery_order": 25,
    "depends_on": [
     {
@@ -1391,7 +1391,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In review",
+   "status": "Verified",
    "delivery_order": 26,
    "depends_on": [
     {
@@ -1532,7 +1532,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In review",
+   "status": "Verified",
    "delivery_order": 28,
    "depends_on": [
     {
@@ -2028,7 +2028,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "In review",
+   "status": "Verified",
    "delivery_order": 36,
    "depends_on": [],
    "erp_blocked": "no",

@@ -60,3 +60,23 @@ does on the server; and t81's zone order was stored unsigned (#497). Both fixed,
 **Seen, not ours.** The Paymob plugin tries to write gateway files into the read-only release folder on every
 WP-CLI load (warnings only). WooCommerce Multilingual's attribute lookup table raises an error at shutdown after a
 scenario deletes its products, after the verdict, as recorded on 31 October.
+
+## 3 November 2026: the staff screens on staging
+
+The scenarios that could not reach a verdict on staging were fixed as tests, not as site code: staff test accounts
+are now enrolled in two-factor sign-in where it is enforced, admin requests carry the secure sign-in cookie (#512),
+the staging plugin's self-request routing keeps curl's own address on a redirect or a space, and the importer is
+given the path the web process sees (#514). Release v0.1.19 (1e11d25, through #514), backup 20261103-162856-manual
+before it, `staging.py build` no problems, `staging.py check` 6 of 6, security baseline passes.
+
+| Slice | Issue | Spec | Scenario | On staging |
+|---|---|---|---|---|
+| Staff activity log | #275 | 031 | t71 | Pass (v0.1.19; also v0.1.18) |
+| Sales report | #286 | 034 | t74 | Pass (v0.1.19; also v0.1.18) |
+| Product management | #276 | 036 | t76 | Pass, AC-7 included (v0.1.19) |
+| Everyday admin tasks | #278 | 037 | t77 | Pass, AC-3 included (v0.1.19) |
+| Commerce events | #312 | 044 | t84 | Pass (v0.1.18); the issue's status is held by its own inputs |
+
+Evidence on the server: `~/mizzey-staging/evidence/scenarios-20261103-133040` (t71, t84 on v0.1.18),
+`scenarios-20261103-163218` (t76, t77) and `scenarios-20261103-163706` (t71, t74). #275, #276, #278 and #286 move
+from In review to Verified. Verified is technical; none of them is accepted by the client (constitution M-7).
