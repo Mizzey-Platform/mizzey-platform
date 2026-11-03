@@ -694,3 +694,73 @@ msgstr "مخزون المتجر"
 #: mizzey-site/src/Stock/StockWriteGuard.php
 msgid "From the ERP"
 msgstr "من نظام ERP"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "City or area"
+msgstr "المدينة أو المنطقة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Street or compound"
+msgstr "الشارع أو الكمبوند"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "District or neighbourhood"
+msgstr "الحي أو المنطقة السكنية"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Type of place"
+msgstr "نوع المكان"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Apartment"
+msgstr "شقة"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Villa or house"
+msgstr "فيلا أو منزل"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Office"
+msgstr "مكتب"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Building or villa number"
+msgstr "رقم العمارة أو الفيلا"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Floor"
+msgstr "الدور"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgid "Apartment or office number"
+msgstr "رقم الشقة أو المكتب"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#, php-format
+msgid "Villa %s"
+msgstr "فيلا %s"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#, php-format
+msgid "Building %s"
+msgstr "عمارة %s"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#, php-format
+msgid "floor %s"
+msgstr "الدور %s"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#, php-format
+msgid "apartment %s"
+msgstr "شقة %s"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+#, php-format
+msgid "office %s"
+msgstr "مكتب %s"
+
+#: mizzey-site/src/Checkout/EgyptianAddress.php
+msgctxt "address parts"
+msgid ", "
+msgstr "، "
