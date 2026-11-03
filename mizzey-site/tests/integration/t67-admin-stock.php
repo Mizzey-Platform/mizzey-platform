@@ -301,7 +301,7 @@ run(
 		$check( 0 === $reads_waiting && str_contains( $deferred, 'Being read' ) && $queued_fill && str_contains( $filled, 'In stock</mark> (9)' ) && 1 === $slow->reads, 'ADM-70 past its time budget the products list does not ask the source in the page; the figure is read in the background and shown on the next load (' . $slow->reads . ' reads)' );
 
 		// The budget counts the time the list has spent (the budget itself, kept from its first version): with reads of
-		// 0.1 s and a 0.15 s budget, two rows are read and the third waits for the background. Then the slow mark (the
+		// 0.2 s and a 0.3 s budget (0.1 s left over per read, for a slow host), two rows are read and the third waits for the background. Then the slow mark (the
 		// later fix, which the second check guards): a single read longer than the budget makes lists read only in the
 		// background for five minutes, whatever their budget. How long one read may take is the adapter's timeout.
 		$rows = array( $id, $variation->get_id() );
@@ -313,9 +313,9 @@ run(
 		}
 		delete_transient( StockWriteGuard::SLOW );
 		$timed        = new T67Source( 4 );
-		$timed->delay = 100;
+		$timed->delay = 200;
 		$bind_timed   = static fn () => $timed;
-		$budget       = 0.15;
+		$budget       = 0.3;
 		$budget_of    = static function () use ( &$budget ) { return $budget; };
 		add_filter( StockGateway::SOURCE_FILTER, $bind_timed );
 		add_filter( StockWriteGuard::LIST_BUDGET, $budget_of );
@@ -323,8 +323,8 @@ run(
 		$first_three = array( $column( $rows[0] ), $column( $rows[1] ), $column( $rows[2] ) );
 		$reads_three = $timed->reads;
 		$slow_after_three = false !== get_transient( StockWriteGuard::SLOW );
-		$budget       = 0.3;
-		$timed->delay = 350;
+		$budget       = 0.6;
+		$timed->delay = 700;
 		$fourth       = $column( $rows[3] );
 		$slow_set     = false !== get_transient( StockWriteGuard::SLOW );
 		$budget       = 100.0;
@@ -337,7 +337,7 @@ run(
 			delete_transient( StockWriteGuard::FIGURE . $row );
 		}
 		as_unschedule_all_actions( StockWriteGuard::FILL_HOOK, null, 'mizzey' );
-		$check( 2 === $reads_three && str_contains( $first_three[1], '(4)' ) && str_contains( $first_three[2], 'Being read' ) && ! $slow_after_three, 'ADM-70 the list\'s budget counts the time it has spent asking: two reads of 0.1 s fit 0.15 s, the third row waits (' . $reads_three . ' reads)' );
+		$check( 2 === $reads_three && str_contains( $first_three[1], '(4)' ) && str_contains( $first_three[2], 'Being read' ) && ! $slow_after_three, 'ADM-70 the list\'s budget counts the time it has spent asking: two reads of 0.2 s fit 0.3 s, the third row waits (' . $reads_three . ' reads)' );
 		$check( str_contains( $fourth, '(4)' ) && $slow_set && str_contains( $fifth, 'Being read' ) && 3 === $reads_five, 'ADM-70 one read longer than the budget makes the next lists read in the background only, whatever their budget (' . $reads_five . ' reads)' );
 
 		return $ok;

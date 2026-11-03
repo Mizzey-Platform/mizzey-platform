@@ -177,7 +177,12 @@ run(
 		$default = new StockGateway( new UnconfiguredStockSource(), 3, $log, 0 );
 		$answer  = $default->level( $ar );
 		$check( ! $answer->isKnown() && ! $answer->sellable( 1 ) && 'refused' === $answer->reason && 1 === count( $log->lines ), "AC-1, AC-3 with no adapter configured the answer is unknown ({$answer->reason}), not sellable, and the refusal is not retried (" . count( $log->lines ) . ' attempt)' );
-		$check( ! StockGateway::make()->sellable( $en, 1 ), 'AC-3 the gateway the store builds, with no adapter bound, sells nothing' );
+		// Development and staging may bind the stock fixture by option: it is switched off for this check, and back after.
+		$fixture = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION, null );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'no' );
+		$sells = StockGateway::make()->sellable( $en, 1 );
+		null === $fixture ? delete_option( \MizzeySite\Stock\FixtureStockSource::OPTION ) : update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture );
+		$check( ! $sells, 'AC-3 the gateway the store builds, with no adapter bound, sells nothing' );
 
 		// AC-1: the adapter comes from one filter; the caller names any language record.
 		$mock                = new T53MockSource();

@@ -45,11 +45,17 @@ final class Workflows {
 		$this->admin_login = 't11_admin_' . wp_rand();
 		$id = wp_insert_user( array( 'user_login' => $this->admin_login, 'user_pass' => wp_generate_password( 32 ), 'role' => 'administrator', 'user_email' => 't11-' . wp_rand() . '@example.invalid' ) );
 		$this->s->track_user( $id );
+		// Where two-factor sign-in is enforced (staging, production: D-21) staff are enrolled, as they would be;
+		// otherwise every privileged request this administrator makes is refused until they enrol (ADM-131).
+		if ( class_exists( '\WP2FA\Methods\TOTP' ) ) {
+			require_once __DIR__ . '/_two_factor.php';
+			two_factor_enrol( get_userdata( $id ) );
+		}
 		$expiry      = time() + HOUR_IN_SECONDS;
 		$token       = \WP_Session_Tokens::get_instance( $id )->create( $expiry );
 		$this->token = $token;
 		list( $this->app_password ) = \WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 't11' ) );
-		foreach ( array( AUTH_COOKIE => 'auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
+		foreach ( array( AUTH_COOKIE => 'auth', SECURE_AUTH_COOKIE => 'secure_auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
 			$this->cookies[] = new \WP_Http_Cookie( array( 'name' => $name, 'value' => wp_generate_auth_cookie( $id, $expiry, $scheme, $token ) ) );
 		}
 		return $id;

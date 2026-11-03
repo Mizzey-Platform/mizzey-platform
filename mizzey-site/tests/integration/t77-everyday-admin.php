@@ -38,7 +38,7 @@ run(
 		$expiry  = time() + HOUR_IN_SECONDS;
 		$token   = \WP_Session_Tokens::get_instance( $admin )->create( $expiry );
 		$cookies = array();
-		foreach ( array( AUTH_COOKIE => 'auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
+		foreach ( array( AUTH_COOKIE => 'auth', SECURE_AUTH_COOKIE => 'secure_auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
 			$cookies[] = new \WP_Http_Cookie( array( 'name' => $name, 'value' => wp_generate_auth_cookie( $admin, $expiry, $scheme, $token ) ) );
 		}
 		$get = static function ( string $url ) use ( $cookies ): array {
