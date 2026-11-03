@@ -172,23 +172,11 @@ final class StoreStockSource implements StockSource
             }
             $records = self::records(self::product($holder->id));
             $ids     = array_map(static fn (\WC_Product $record): int => $record->get_id(), $records);
+            $before  = self::snapshot($ids);
             if ($wpdb->query('START TRANSACTION') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 throw new StockSourceUnavailable('the change could not be started');
             }
             try {
-                $stored = $wpdb->insert(self::table(), [
-                    'item_id'       => $holder->id,
-                    'operation_key' => $operationKey,
-                    'delta'         => $change,
-                    'level_after'   => $after,
-                    'origin'        => substr($origin, 0, 20),
-                    'reason'        => mb_substr(sanitize_text_field($reason), 0, self::REASON_MAX),
-                    'user_id'       => max(0, $userId),
-                    'created_at'    => current_time('mysql', true),
-                ], ['%d', '%s', '%d', '%d', '%s', '%s', '%d', '%s']); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                if ($stored !== 1) {
-                    throw new StockSourceUnavailable('the change was not recorded');
-                }
                 StockWriteGuard::projection(static function () use ($records, $after): void {
                     // The figure on each language record: they share the one stock, and WooCommerce Multilingual does
                     // not follow a direct stock update.
@@ -206,11 +194,27 @@ final class StoreStockSource implements StockSource
                         throw new StockSourceUnavailable('the figure was not written');
                     }
                 }
+                // Recorded last, so a change that failed above leaves its key unused.
+                $stored = $wpdb->insert(self::table(), [
+                    'item_id'       => $holder->id,
+                    'operation_key' => $operationKey,
+                    'delta'         => $change,
+                    'level_after'   => $after,
+                    'origin'        => substr($origin, 0, 20),
+                    'reason'        => mb_substr(sanitize_text_field($reason), 0, self::REASON_MAX),
+                    'user_id'       => max(0, $userId),
+                    'created_at'    => current_time('mysql', true),
+                ], ['%d', '%s', '%d', '%d', '%s', '%s', '%d', '%s']); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                if ($stored !== 1) {
+                    throw new StockSourceUnavailable('the change was not recorded');
+                }
                 if ($wpdb->query('COMMIT') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                     throw new StockSourceUnavailable('the change was not committed');
                 }
             } catch (\Throwable $e) {
                 $wpdb->query('ROLLBACK'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                // A table that does not take part in transactions keeps what was written: it is put back as it was.
+                self::restore($before);
                 // What this request cached while writing is not what is stored.
                 self::evict($ids);
                 throw $e instanceof StockSourceRefused || $e instanceof StockSourceUnavailable ? $e : new StockSourceUnavailable($e->getMessage());
@@ -242,6 +246,65 @@ final class StoreStockSource implements StockSource
         $value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock' LIMIT 1", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 
         return $value === null || $value === '' ? null : (int) round((float) $value);
+    }
+
+    /** The stock fields a change writes, and the lookup row WooCommerce keeps of them. */
+    private const FIELDS = ['_stock', '_stock_status', '_manage_stock'];
+
+    /**
+     * The stock fields of each record as stored, null where a field is absent.
+     *
+     * @param list<int> $ids
+     * @return array<int,array<string,string|null>>
+     */
+    private static function snapshot(array $ids): array
+    {
+        global $wpdb;
+        $snapshot = [];
+        foreach ($ids as $id) {
+            foreach (self::FIELDS as $field) {
+                $value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1", $id, $field)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $snapshot[$id][$field] = $value === null ? null : (string) $value;
+            }
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * Puts the stock fields, and WooCommerce's lookup row, back as the snapshot holds them. Written directly: the
+     * failure being undone may come from WooCommerce's own save.
+     *
+     * @param array<int,array<string,string|null>> $snapshot
+     */
+    private static function restore(array $snapshot): void
+    {
+        global $wpdb;
+        foreach ($snapshot as $id => $fields) {
+            foreach ($fields as $field => $value) {
+                $now = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1", $id, $field)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                if ($now === $value) {
+                    continue;
+                }
+                if ($value === null) {
+                    $wpdb->delete($wpdb->postmeta, ['post_id' => $id, 'meta_key' => $field], ['%d', '%s']); // phpcs:ignore WordPress.DB
+                } elseif ($now === null) {
+                    $wpdb->insert($wpdb->postmeta, ['post_id' => $id, 'meta_key' => $field, 'meta_value' => $value], ['%d', '%s', '%s']); // phpcs:ignore WordPress.DB
+                } else {
+                    $wpdb->update($wpdb->postmeta, ['meta_value' => $value], ['post_id' => $id, 'meta_key' => $field], ['%s'], ['%d', '%s']); // phpcs:ignore WordPress.DB
+                }
+            }
+            $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->prefix . 'wc_product_meta_lookup',
+                [
+                    'stock_quantity' => $fields['_stock'] === null || $fields['_manage_stock'] !== 'yes' ? null : (float) $fields['_stock'],
+                    'stock_status'   => (string) ($fields['_stock_status'] ?? 'instock'),
+                ],
+                ['product_id' => $id],
+                ['%f', '%s'],
+                ['%d']
+            );
+        }
     }
 
     /** @throws StockSourceRefused */
