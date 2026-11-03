@@ -290,7 +290,7 @@ final class StockSourceAdmin
     private static function seed(StockItem $item, ?int $figure): string
     {
         $reason = $figure === null
-            ? 'switched to own stock (the ERP figure was not known)'
+            ? 'switched to own stock with no known figure'
             : 'switched to own stock';
         try {
             (new StoreStockSource())->set($item, max(0, (int) $figure), 'switch-' . get_current_user_id() . '-' . wp_generate_uuid4(), StoreStockSource::STAFF, $reason, get_current_user_id());
