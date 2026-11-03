@@ -102,6 +102,7 @@ run(
 		// label per badge in a form-field row is placed over the row's label), the addresses as text inputs (only
 		// those are floated, so a help tip stays after its field).
 		$GLOBALS['product_object'] = $p;
+		require_once WC_ABSPATH . 'includes/admin/wc-meta-box-functions.php';
 		ob_start();
 		ProductFields::fields();
 		$panel = (string) ob_get_clean();
