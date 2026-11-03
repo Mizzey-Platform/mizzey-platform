@@ -240,17 +240,14 @@ final class StockSourceAdmin
             return '';
         }
         $error = '';
-        if ($source !== null && in_array($source, ['', StockMode::ERP, StockMode::STORE], true) && $source !== StockMode::choice($item->id)) {
-            $was  = StockMode::choice($item->id);
-            $will = StockMode::erpOff() ? StockMode::STORE : ($source !== '' ? $source : StockMode::storeDefault());
-            if (StockMode::sourceFor($item) === StockMode::ERP && $will === StockMode::STORE) {
-                // The starting figure is set while the item still reads the ERP, so no sale can reach the store's
-                // figure before it is there; if it cannot be set, the item stays on the ERP.
-                $error = self::seed($item, StockWriteGuard::figure($item->id));
-            }
-            if ($error === '') {
-                StockMode::choose($item, $source);
-                self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
+        if ($source !== null && in_array($source, ['', StockMode::ERP, StockMode::STORE], true)) {
+            try {
+                // Decided and done under the lock every stock change of the item takes, on the choice as stored, so two
+                // switches at once, or a sale between the starting figure and the switch, cannot interleave.
+                $error = StoreStockSource::exclusive($item, static fn (): string => self::switchSource($item, $source));
+            } catch (StockSourceUnavailable $e) {
+                /* translators: %s: why the stock source refused the change. */
+                $error = sprintf(__('The stock source was not changed: %s.', 'mizzey-site'), $e->getMessage());
             }
         }
         if ($figure === '') {
@@ -280,6 +277,31 @@ final class StockSourceAdmin
         }
 
         return $error;
+    }
+
+    /**
+     * Switches an item's source, under its stock lock. Switched from the ERP to its own stock, its starting figure is
+     * set first, while it still reads the ERP, so no sale reaches the store's figure before it is there; if it cannot
+     * be set, the item stays on the ERP. Returns the error shown to staff, or ''.
+     */
+    private static function switchSource(StockItem $item, string $source): string
+    {
+        wp_cache_delete($item->id, 'post_meta');
+        $was = StockMode::choice($item->id);
+        if ($source === $was) {
+            return '';
+        }
+        $will = StockMode::erpOff() ? StockMode::STORE : ($source !== '' ? $source : StockMode::storeDefault());
+        if (StockMode::sourceFor($item) === StockMode::ERP && $will === StockMode::STORE) {
+            $error = self::seed($item, StockWriteGuard::figure($item->id));
+            if ($error !== '') {
+                return $error;
+            }
+        }
+        StockMode::choose($item, $source);
+        self::log(sprintf('%s source changed from "%s" to "%s" by user %d', $item->label(), $was === '' ? 'default' : $was, $source === '' ? 'default' : $source, get_current_user_id()));
+
+        return '';
     }
 
     /**

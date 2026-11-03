@@ -32,7 +32,7 @@ defined('ABSPATH') || exit;
 final class StoreStockSource implements StockSource
 {
     public const TABLE   = 'mizzey_stock_moves';
-    public const VERSION = '2';
+    public const VERSION = '3';
 
     /** A change's state in the ledger: begun and not yet written to the figure, or done. */
     public const PENDING = 'pending';
@@ -84,9 +84,17 @@ final class StoreStockSource implements StockSource
   UNIQUE KEY operation_key (operation_key),
   KEY item_created (item_id,created_at)
 ) {$charset};");
-        if (self::table() === $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table)))) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            update_option(self::VERSION_OPTION, self::VERSION, true);
+        if (self::table() !== $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table)))) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            return;
         }
+        // The ledger lives on the stock fields' own table engine: a transaction that held one and not the other could
+        // keep a figure and lose its pending record if the request died.
+        $engines = $wpdb->get_results($wpdb->prepare('SELECT TABLE_NAME AS name, ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (%s, %s)', $wpdb->postmeta, $table), OBJECT_K); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $wanted  = (string) ($engines[$wpdb->postmeta]->engine ?? '');
+        if (in_array($wanted, ['InnoDB', 'MyISAM', 'Aria'], true) && $wanted !== (string) ($engines[$table]->engine ?? '')) {
+            $wpdb->query("ALTER TABLE {$table} ENGINE = {$wanted}"); // phpcs:ignore WordPress.DB
+        }
+        update_option(self::VERSION_OPTION, self::VERSION, true);
     }
 
     public function name(): string
@@ -129,12 +137,45 @@ final class StoreStockSource implements StockSource
         return $this->change($item, $delta, null, $operationKey, $origin, $reason, $userId);
     }
 
-    /** Whether a change under this key was already applied. */
+    /**
+     * Whether a change under this key was applied and finished. A pending one is not: sent again, it goes through
+     * the change, which completes it first.
+     */
     public static function applied(string $operationKey): bool
     {
         global $wpdb;
 
-        return (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . self::table() . ' WHERE operation_key = %s', $operationKey)) > 0; // phpcs:ignore WordPress.DB
+        return (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . self::table() . ' WHERE operation_key = %s AND state = %s', $operationKey, self::DONE)) > 0; // phpcs:ignore WordPress.DB
+    }
+
+    /**
+     * Runs `$work` holding the lock every change of the item's stock takes, so a decision and the changes it makes
+     * (switching an item to its own stock and setting its starting figure) cannot interleave with a sale.
+     *
+     * @template T
+     * @param callable(): T $work
+     * @return T
+     * @throws StockSourceUnavailable When the lock cannot be taken.
+     */
+    public static function exclusive(StockItem $item, callable $work)
+    {
+        global $wpdb;
+        $lock = self::lockName(StockMode::holder($item)->id);
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            throw new StockSourceUnavailable('stock busy');
+        }
+        try {
+            return $work();
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        }
+    }
+
+    private static function lockName(int $holderId): string
+    {
+        global $wpdb;
+
+        return substr('mz_' . $wpdb->prefix . 'stock_' . $holderId, 0, 64);
     }
 
     /**
@@ -155,7 +196,6 @@ final class StoreStockSource implements StockSource
      */
     private function change(StockItem $item, ?int $delta, ?int $target, string $operationKey, string $origin, string $reason, int $userId): int
     {
-        global $wpdb;
         $operationKey = trim($operationKey);
         if ($operationKey === '' || strlen($operationKey) > self::KEY_MAX) {
             throw new StockSourceRefused('the operation key is missing or too long');
@@ -163,12 +203,10 @@ final class StoreStockSource implements StockSource
         if (get_option(self::VERSION_OPTION) !== self::VERSION) {
             throw new StockSourceUnavailable('the stock ledger is not installed');
         }
-        $holder = StockMode::holder($item);
-        $lock   = substr('mz_' . $wpdb->prefix . 'stock_' . $holder->id, 0, 64);
-        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock)) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            throw new StockSourceUnavailable('stock busy');
-        }
-        try {
+
+        return self::exclusive($item, function () use ($item, $delta, $target, $operationKey, $origin, $reason, $userId): int {
+            global $wpdb;
+            $holder = StockMode::holder($item);
             // A change of this record that a request began and never finished (it died part way) is completed first.
             self::rollForward($holder);
             if (self::applied($operationKey)) {
@@ -209,16 +247,17 @@ final class StoreStockSource implements StockSource
                 if ($wpdb->update(self::table(), ['state' => self::DONE], ['id' => $rowId], ['%s'], ['%d']) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                     throw new StockSourceUnavailable('the change was not recorded as done');
                 }
-                if ($wpdb->query('COMMIT') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                // A commit that reports failure may still have landed: what is stored decides.
+                if ($wpdb->query('COMMIT') === false && ! self::landed($rowId, $ids, $after)) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                     throw new StockSourceUnavailable('the change was not committed');
                 }
             } catch (\Throwable $e) {
                 $wpdb->query('ROLLBACK'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 // A table that does not take part in transactions keeps what was written: it is put back as it was,
-                // and the pending record withdrawn, so the key stays unused.
+                // and the record of the change withdrawn, so the key stays unused.
                 StockWriteGuard::projection(static fn () => self::restore($before));
                 if ($rowId > 0) {
-                    $wpdb->delete(self::table(), ['id' => $rowId, 'state' => self::PENDING], ['%d', '%s']); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    $wpdb->delete(self::table(), ['id' => $rowId], ['%d']); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 }
                 // What this request cached while writing is not what is stored.
                 self::evict($ids);
@@ -228,14 +267,33 @@ final class StoreStockSource implements StockSource
             self::forget($holder->id);
 
             return self::figureOf($holder, true);
-        } finally {
-            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        });
+    }
+
+    /**
+     * Whether a change is stored whole: its record done, and its figure on every language record.
+     *
+     * @param list<int> $ids
+     */
+    private static function landed(int $rowId, array $ids, int $after): bool
+    {
+        global $wpdb;
+        if ($wpdb->get_var($wpdb->prepare('SELECT state FROM ' . self::table() . ' WHERE id = %d', $rowId)) !== self::DONE) { // phpcs:ignore WordPress.DB
+            return false;
         }
+        foreach ($ids as $id) {
+            if (self::stored($id) !== $after) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
      * Writes the figure to each language record through the guard's projection, then reads back what landed: the
-     * figure, counting turned on, and WooCommerce's lookup row. WooCommerce does not report a write that failed.
+     * figure, counting turned on, the stock status WooCommerce derives from them, and WooCommerce's lookup row.
+     * WooCommerce does not report a write that failed.
      *
      * @param list<\WC_Product> $records
      * @throws StockSourceUnavailable
@@ -253,11 +311,17 @@ final class StoreStockSource implements StockSource
                 wc_update_product_stock($record, $after, 'set');
             }
         });
+        // WooCommerce's rule for a counted item: in stock above the out-of-stock threshold, else on backorder when
+        // backorders are allowed, else out of stock.
+        $threshold = absint(get_option('woocommerce_notify_no_stock_amount', 0));
         foreach ($records as $record) {
             $id     = $record->get_id();
+            $status = $after > $threshold ? 'instock' : ($record->get_backorders() !== 'no' ? 'onbackorder' : 'outofstock');
             $manage = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_manage_stock' LIMIT 1", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            $lookup = $wpdb->get_var($wpdb->prepare("SELECT stock_quantity FROM {$wpdb->prefix}wc_product_meta_lookup WHERE product_id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            if (self::stored($id) !== $after || $manage !== 'yes' || ($lookup !== null && (int) round((float) $lookup) !== $after)) {
+            $stock  = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock_status' LIMIT 1", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $lookup = $wpdb->get_row($wpdb->prepare("SELECT stock_quantity, stock_status FROM {$wpdb->prefix}wc_product_meta_lookup WHERE product_id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            if (self::stored($id) !== $after || $manage !== 'yes' || $stock !== $status
+                || ! is_object($lookup) || $lookup->stock_quantity === null || (int) round((float) $lookup->stock_quantity) !== $after || $lookup->stock_status !== $status) {
                 throw new StockSourceUnavailable('the figure was not written');
             }
         }
@@ -265,15 +329,19 @@ final class StoreStockSource implements StockSource
 
     /**
      * Completes a change of the record that was recorded as pending and never finished: its figure is written, and it
-     * is marked done. Under the record's lock, before any new change.
+     * is marked done. Under the record's lock, before any new change. Fails closed: until it is complete, the record
+     * takes no change.
      *
-     * @throws StockSourceUnavailable When the figure still cannot be written: the record takes no change until it can.
+     * @throws StockSourceUnavailable
      */
     private static function rollForward(StockItem $holder): void
     {
         global $wpdb;
         $rows = $wpdb->get_results($wpdb->prepare('SELECT id, level_after FROM ' . self::table() . ' WHERE item_id = %d AND state = %s ORDER BY id DESC', $holder->id, self::PENDING)); // phpcs:ignore WordPress.DB
-        if (! is_array($rows) || $rows === []) {
+        if (! is_array($rows) || $wpdb->last_error !== '') {
+            throw new StockSourceUnavailable('unfinished changes could not be read');
+        }
+        if ($rows === []) {
             return;
         }
         $records = self::records(self::product($holder->id, true));
@@ -283,7 +351,9 @@ final class StoreStockSource implements StockSource
             self::evict(array_map(static fn (\WC_Product $record): int => $record->get_id(), $records));
         }
         foreach ($rows as $row) {
-            $wpdb->update(self::table(), ['state' => self::DONE], ['id' => (int) $row->id], ['%s'], ['%d']); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            if ($wpdb->update(self::table(), ['state' => self::DONE], ['id' => (int) $row->id], ['%s'], ['%d']) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                throw new StockSourceUnavailable('an unfinished change could not be marked done');
+            }
         }
         self::forget($holder->id);
         if (function_exists('wc_get_logger')) {
