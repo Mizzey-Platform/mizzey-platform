@@ -18,13 +18,19 @@ defined('ABSPATH') || exit;
  *
  * WooCommerce has Egypt's governorates as its states and no address format for Egypt. Its country locale for Egypt is
  * set here (`woocommerce_get_country_locale`), which both checkouts and the account's address forms read: the
- * governorate (the state field) required, the city, the street and building (the first address line), the second line
- * and the postcode hidden, as Egyptian addresses do not use them. The district (required) and a landmark (optional)
+ * governorate (the state field) required, the city, the street or compound (the first address line), the second line
+ * and the postcode hidden from the form, as Egyptian addresses do not use them. The district (required) and a landmark (optional)
  * are WooCommerce additional checkout fields in the address (`woocommerce_register_additional_checkout_field`), for an
  * Egyptian address only, kept with the order and the customer's address. They show on the block checkout, which the
  * storefront uses; the designed form is PRE-03b's.
  *
- * Register ids: CHK-01. See specs/019-checkout.
+ * One address (specs/050): WooCommerce asks for the billing address only and delivers to it. The address reads largest
+ * place first, as Egyptians give it: the kind of place (apartment, villa, office), the street or compound, the building,
+ * and for an apartment or an office the floor and the number, all address fields too; the mobile number is required.
+ * The building, floor and apartment are written as the address's second line on every save, in the order's language,
+ * so the order screens, the emails, the packing slip and the courier (Bosta's plugin sends that line) carry them.
+ *
+ * Register ids: CHK-01, CHK-11. See specs/019-checkout and specs/050-egyptian-address.
  */
 final class EgyptianAddress
 {
