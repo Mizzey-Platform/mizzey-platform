@@ -662,17 +662,35 @@ final class StockWriteGuard
                 as_enqueue_async_action(self::FILL_HOOK, [$id], 'mizzey');
             }
 
-            return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html__('Stock from the stock source: being read, reload the page in a moment', 'mizzey-site'));
+            return sprintf('<span class="mizzey-stock-source">%s</span>', esc_html__('Being read, reload the page in a moment', 'mizzey-site'));
         }
         $started = microtime(true);
-        $label   = self::label($id);
+        $figure  = self::figure($id);
         $took    = microtime(true) - $started;
         self::$listSpent += $took;
         if ($took >= $budget) {
             set_transient(self::SLOW, 1, 5 * MINUTE_IN_SECONDS);
         }
 
-        return sprintf('<mark class="mizzey-stock-source">%s</mark>', esc_html($label));
+        return self::cell($figure, StockMode::onStore($id));
+    }
+
+    /**
+     * The stock column's cell in WooCommerce's own look (its in-stock and out-of-stock marks, which its list styles
+     * without a background), with the source the figure came from beneath it.
+     */
+    private static function cell(?int $figure, bool $onStore): string
+    {
+        if ($figure === null) {
+            $state = '<mark class="onbackorder">' . esc_html__('Stock not known', 'mizzey-site') . '</mark>';
+        } elseif ($figure > 0) {
+            $state = '<mark class="instock">' . esc_html__('In stock', 'woocommerce') . '</mark> (' . esc_html((string) $figure) . ')';
+        } else {
+            $state = '<mark class="outofstock">' . esc_html__('Out of stock', 'woocommerce') . '</mark>';
+        }
+        $source = $onStore ? __('Own stock', 'mizzey-site') : __('From the ERP', 'mizzey-site');
+
+        return $state . '<br><small class="mizzey-stock-source">' . esc_html($source) . '</small>';
     }
 
     public static function editor(): void

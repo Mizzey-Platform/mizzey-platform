@@ -98,6 +98,16 @@ run(
 		$ar = $w->translate( 'editor', $en );
 		$p = $fresh( $en );
 		$check( 'ok' === $done && 'https://www.youtube.com/watch?v=t76video' === $p->get_meta( ProductFields::VIDEO ) && "{$tag} serum SEO title" === $p->get_meta( ProductFields::SEO_TITLE ) && 'noindex' === $p->get_meta( ProductFields::ROBOTS ) && array( 'trending' ) === $p->get_meta( ProductFields::BADGES ), 'AC-2 the product screen\'s save keeps the video, the SEO fields and a badge' );
+		// The panel in WooCommerce's own markup, so its styles lay it out: the badges as a list beside one legend (a
+		// label per badge in a form-field row is placed over the row's label), the addresses as text inputs (only
+		// those are floated, so a help tip stays after its field).
+		$GLOBALS['product_object'] = $p;
+		require_once WC_ABSPATH . 'includes/admin/wc-meta-box-functions.php';
+		ob_start();
+		ProductFields::fields();
+		$panel = (string) ob_get_clean();
+		unset( $GLOBALS['product_object'] );
+		$check( str_contains( $panel, '<fieldset class="form-field mizzey_badges_field"><legend>' ) && 4 === substr_count( $panel, '<li><label><input type="checkbox" name="mizzey_badges[]"' ) && ! str_contains( $panel, 'type="url"' ) && str_contains( $panel, 'value="https://www.youtube.com/watch?v=t76video"' ), 'AC-2 the panel uses WooCommerce\'s markup: the badges listed under one legend, the addresses as text fields' );
 		$url  = get_permalink( $en );
 		$page = wp_remote_get( $url, array( 'timeout' => 30 ) );
 		$body = (string) wp_remote_retrieve_body( $page );
