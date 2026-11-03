@@ -1,0 +1,86 @@
+[
+ {
+  "name": "M1 one address off",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "        return 'billing_only';",
+  "new": "        return 'shipping';"
+ },
+ {
+  "name": "M2 phone optional",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "'phone'     => ['required' => true, 'hidden' => false],",
+  "new": "'phone'     => ['required' => false, 'hidden' => false],"
+ },
+ {
+  "name": "M3 building optional",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            'label'                      => __('Building or villa number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => $egypt,",
+  "new": "            'label'                      => __('Building or villa number', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => false,"
+ },
+ {
+  "name": "M4 floor never required",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            'label'                      => __('Floor', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => $stacked,",
+  "new": "            'label'                      => __('Floor', 'mizzey-site'),\n            'location'                   => 'address',\n            'type'                       => 'text',\n            'required'                   => false,"
+ },
+ {
+  "name": "M5 villa asked for floor",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "self::PLACE => ['enum' => [self::APARTMENTS, self::OFFICE]]",
+  "new": "self::PLACE => ['enum' => [self::APARTMENTS, self::OFFICE, self::VILLA]]"
+ },
+ {
+  "name": "M6 line not written",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            if ($current !== $line) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M7 line not in the order's language",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "$line  = OrderLanguage::during($order, static fn (): string =>",
+  "new": "$line  = (static fn ($o, $f) => $f())($order, static fn (): string =>"
+ },
+ {
+  "name": "M8 villa keeps floor in line",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "        if ($place !== self::VILLA) {\n            if ($floor !== '') {",
+  "new": "        if (true) {\n            if ($floor !== '') {"
+ },
+ {
+  "name": "M9 reading order broken",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "            'index'      => 43,",
+  "new": "            'index'      => 50,"
+ },
+ {
+  "name": "M10 book keeps no apartment",
+  "file": "mizzey-site/src/Account/AddressBook.php",
+  "old": "'district', 'place', 'address_1', 'building', 'floor', 'apartment', 'landmark'];",
+  "new": "'district', 'place', 'address_1', 'building', 'floor', 'landmark'];"
+ },
+ {
+  "name": "M11 book accepts a flat without floor",
+  "file": "mizzey-site/src/Account/AddressBook.php",
+  "old": "$required = $address['place'] === EgyptianAddress::VILLA ? self::REQUIRED : array_merge(self::REQUIRED, self::STACKED);",
+  "new": "$required = self::REQUIRED;"
+ },
+ {
+  "name": "M12 book default copies no line",
+  "file": "mizzey-site/src/Account/AddressBook.php",
+  "old": "        $customer->set_billing_address_2($line);",
+  "new": "        $customer->set_billing_address_2('');"
+ },
+ {
+  "name": "M13 slip drops landmark",
+  "file": "mizzey-site/src/Orders/PackingSlip.php",
+  "old": "            (string) $order->get_meta('_wc_' . $type . '/' . EgyptianAddress::LANDMARK),\n",
+  "new": ""
+ },
+ {
+  "name": "M14 book keeps villa floor",
+  "file": "mizzey-site/src/Account/AddressBook.php",
+  "old": "            $address['floor']     = '';",
+  "new": "            $address['floor']     = $address['floor'];"
+ }
+]
