@@ -175,11 +175,19 @@ add_filter(
 add_action(
 	'http_api_curl',
 	static function ( $handle, $args, $url ) {
-		if ( ! mizzey_staging_to_self( (string) $url ) ) {
+		// The address this request is for is the one Requests has set on the handle: encoded, and the redirect's
+		// target on a followed redirect. WordPress passes $url, the first address as the caller wrote it, on every
+		// hop, so setting that back loops on any redirect and fails on a space (curl refuses one).
+		$current = (string) curl_getinfo( $handle, CURLINFO_EFFECTIVE_URL );
+		if ( '' === $current ) {
+			$current = preg_replace_callback( '/[^\x21-\x7E]/', static fn ( $m ) => rawurlencode( $m[0] ), (string) $url );
+		}
+		if ( ! mizzey_staging_to_self( $current ) ) {
 			return;
 		}
-		$host = (string) wp_parse_url( $url, PHP_URL_HOST );
-		curl_setopt( $handle, CURLOPT_URL, preg_replace( '#^https://#', 'http://', (string) $url ) );
+		$host = (string) wp_parse_url( $current, PHP_URL_HOST );
+		// Plain HTTP on port 80 inside the network, so an explicit :443 goes with the https.
+		curl_setopt( $handle, CURLOPT_URL, preg_replace( '#^https://((?:[^/?\#@]*@)?[^/?\#:@]+)(?::443)?(?=[/?\#]|$)#i', 'http://$1', $current ) );
 		curl_setopt( $handle, CURLOPT_CONNECT_TO, array( $host . ':80:' . MIZZEY_STAGING_WEB_SERVER . ':80' ) );
 	},
 	10,

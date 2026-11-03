@@ -196,6 +196,22 @@ final class Workflows {
 		return 'unknown channel';
 	}
 
+	/**
+	 * A file's path as the web process names it. WooCommerce's importer accepts only a path that starts, as text,
+	 * with the site's folder or the uploads folder as the web process sees them. On the server this process reaches
+	 * the site through the release link (current) and the web process through the release folder itself, so the
+	 * site's folder part is replaced by its resolved form. Where the two agree (a plain folder) nothing changes.
+	 */
+	private static function web_path( string $file ): string {
+		$root = wp_normalize_path( ABSPATH );
+		$real = realpath( ABSPATH );
+		$file = wp_normalize_path( $file );
+		if ( false === $real || ! str_starts_with( $file, $root ) ) {
+			return $file;
+		}
+		return trailingslashit( wp_normalize_path( $real ) ) . substr( $file, strlen( $root ) );
+	}
+
 	/** A nonce for the test admin's HTTP session, computed exactly as wp_create_nonce() does inside that session. */
 	private function session_nonce( string $action ): string {
 		$i = wp_nonce_tick( $action );
@@ -255,7 +271,7 @@ final class Workflows {
 		$r = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 120, 'body' => array(
 			'action'          => 'woocommerce_do_ajax_product_import',
 			'security'        => $this->session_nonce( 'wc-product-import' ),
-			'file'            => $file,
+			'file'            => self::web_path( $file ),
 			'position'        => 0,
 			'update_existing' => 1,
 			'mapping'         => array( 'from' => array( 'SKU', 'Type', $column ), 'to' => array( 'sku', 'type', $field ) ),
@@ -358,7 +374,7 @@ final class Workflows {
 		$r = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 120, 'body' => array(
 			'action'          => 'woocommerce_do_ajax_product_import',
 			'security'        => $this->session_nonce( 'wc-product-import' ),
-			'file'            => $file,
+			'file'            => self::web_path( $file ),
 			'position'        => 0,
 			'update_existing' => 1,
 			'mapping'         => array( 'from' => array( 'SKU', 'Type', 'Cost of goods' ), 'to' => array( 'sku', 'type', 'cogs_value' ) ),
@@ -395,7 +411,7 @@ final class Workflows {
 		$r = wp_remote_post( admin_url( 'admin-ajax.php' ), array( 'cookies' => $this->cookies, 'timeout' => 120, 'body' => array(
 			'action'          => 'woocommerce_do_ajax_product_import',
 			'security'        => $this->session_nonce( 'wc-product-import' ),
-			'file'            => $file,
+			'file'            => self::web_path( $file ),
 			'position'        => 0,
 			'update_existing' => 0,
 			'mapping'         => array(
