@@ -161,6 +161,7 @@ final class PackingSlip
             $get('address_1'),
             $get('address_2'),
             implode(', ', array_filter([$district, $get('city'), $state])),
+            (string) $order->get_meta('_wc_' . $type . '/' . EgyptianAddress::LANDMARK),
             $phone,
         ], static fn ($line): bool => is_string($line) && trim($line) !== ''));
     }

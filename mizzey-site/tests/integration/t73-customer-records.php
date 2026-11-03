@@ -69,12 +69,12 @@ run(
 		$html = $panel( $customer );
 		$check( str_contains( $html, 'All 2 orders of this customer' ) && str_contains( $html, '_customer_user=' . $customer ), 'AC-1 the profile links to all of the customer\'s orders in the orders list' );
 		$check( str_contains( $html, '#' . $orders[0] ) && str_contains( $html, '#' . $orders[1] ) && strpos( $html, '#' . $orders[1] ) < strpos( $html, '#' . $orders[0] ), 'AC-1 the profile lists the customer\'s orders, newest first, linked to each order' );
-		$saved = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-01', 'city' => 'Cairo', 'district' => "{$tag} Heliopolis", 'address_1' => '9 Baghdad Street', 'landmark' => '' ) );
-		$extra = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-02', 'city' => 'Alexandria', 'district' => "{$tag} Smouha", 'address_1' => '3 Victor Emmanuel Street', 'landmark' => '' ) );
+		$saved = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-01', 'city' => 'Cairo', 'district' => "{$tag} Heliopolis", 'place' => 'villa', 'address_1' => 'Baghdad Street', 'building' => '9', 'landmark' => '' ) );
+		$extra = AddressBook::add( $customer, array( 'first_name' => 'Rana', 'last_name' => 'Kamel', 'phone' => '01001234567', 'state' => 'EG-02', 'city' => 'Alexandria', 'district' => "{$tag} Smouha", 'place' => 'apartment', 'address_1' => 'Victor Emmanuel Street', 'building' => '3', 'floor' => '1', 'apartment' => '2', 'landmark' => '' ) );
 		wc_get_order( $orders[1] )->update_status( 'processing' );
 		$refund = wc_create_refund( array( 'order_id' => $orders[1], 'amount' => '10.00', 'reason' => 't73' ) );
 		$html   = $panel( $customer );
-		$check( is_string( $saved ) && is_string( $extra ) && str_contains( $html, "{$tag} Heliopolis" ) && str_contains( $html, "{$tag} Smouha" ) && str_contains( $html, '3 Victor Emmanuel Street' ), 'AC-1 the profile lists the customer\'s address book, a saved address that is not the default included' );
+		$check( is_string( $saved ) && is_string( $extra ) && str_contains( $html, "{$tag} Heliopolis" ) && str_contains( $html, "{$tag} Smouha" ) && str_contains( $html, 'Victor Emmanuel Street' ), 'AC-1 the profile lists the customer\'s address book, a saved address that is not the default included' );
 		$check( ! is_wp_error( $refund ) && str_contains( $html, '<del' ), 'AC-1, US-19-01 a refund against the customer shows on the profile (the order\'s total struck through with what is left)' );
 
 		// ---- AC-2: internal notes ------------------------------------------------------------------------

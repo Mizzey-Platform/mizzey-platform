@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace MizzeySite\Account;
 
+use MizzeySite\Checkout\EgyptianAddress;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -122,6 +124,7 @@ final class CustomerRecords
                     trim((string) ($address['first_name'] ?? '') . ' ' . (string) ($address['last_name'] ?? '')),
                     (string) ($address['phone'] ?? ''),
                     (string) ($address['address_1'] ?? ''),
+                    EgyptianAddress::line((string) ($address['place'] ?? ''), (string) ($address['building'] ?? ''), (string) ($address['floor'] ?? ''), (string) ($address['apartment'] ?? '')),
                     (string) ($address['district'] ?? ''),
                     (string) ($address['city'] ?? ''),
                     (string) ($states[(string) ($address['state'] ?? '')] ?? ($address['state'] ?? '')),

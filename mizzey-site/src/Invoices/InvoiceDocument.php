@@ -139,7 +139,7 @@ final class InvoiceDocument
         $district = (string) $order->get_meta('_wc_billing/' . EgyptianAddress::DISTRICT);
         $states   = (array) WC()->countries->get_states($order->get_billing_country());
         $state    = (string) ($states[$order->get_billing_state()] ?? $order->get_billing_state());
-        $place    = array_filter([$order->get_billing_address_1(), $district, $order->get_billing_city(), $state]);
+        $place    = array_filter([$order->get_billing_address_1(), $order->get_billing_address_2(), $district, $order->get_billing_city(), $state]);
 
         return array_values(array_filter([
             trim($order->get_formatted_billing_full_name()),
