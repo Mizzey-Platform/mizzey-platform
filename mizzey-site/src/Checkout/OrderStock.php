@@ -11,6 +11,10 @@ namespace MizzeySite\Checkout;
 use Automattic\WooCommerce\StoreApi\Exceptions\RouteException;
 use MizzeySite\Stock\StockAnswer;
 use MizzeySite\Stock\StockGateway;
+use MizzeySite\Stock\StockIdentity;
+use MizzeySite\Stock\StockMode;
+use MizzeySite\Stock\StockSourceUnavailable;
+use MizzeySite\Stock\StoreStockSource;
 
 defined('ABSPATH') || exit;
 
@@ -474,16 +478,11 @@ final class OrderStock
         $sending = [];
         foreach ($record as $itemId => $line) {
             if ($line['state'] !== 'reserved' && isset($current[$itemId])) {
-                $record[$itemId]['state'] = 'reserving';
-                // The source the reserve goes to, written before it is sent: its retry, undo, release and resizes go
-                // there too, even if the item is switched to the other source meanwhile (D-28, specs/049).
-                $record[$itemId]['source'] ??= $gateway->sourceName($line['record']);
-                $sending[]                = $itemId;
+                $sending[] = $itemId;
             }
         }
-        self::save($order, $record);
         foreach ($sending as $index => $itemId) {
-            if (self::settle($order, $gateway, $itemId, $record[$itemId])) {
+            if (self::reserveLine($order, $gateway, $itemId, $record)) {
                 $taken[] = $itemId;
                 continue;
             }
@@ -506,6 +505,41 @@ final class OrderStock
         self::save($order, $record);
 
         return $ok;
+    }
+
+    /**
+     * Sends one line's reserve. Under the item's stock lock (the one a switch of its source takes), the source is
+     * chosen from the routing as stored and written to the record with the line marked reserving, before the reserve
+     * is sent: its retry, undo, release and resizes go there too, even if the item is switched meanwhile (D-28,
+     * specs/049). A line already holding a source (a reserve left unanswered) keeps it, so its key goes where it went.
+     * False when the line was not reserved, or the lock could not be taken (the line is then left as it was).
+     *
+     * @param array<int,array<string,mixed>> $record
+     */
+    private static function reserveLine(\WC_Order $order, StockGateway $gateway, int $itemId, array &$record): bool
+    {
+        $send = static function () use ($order, $gateway, $itemId, &$record): bool {
+            if (! isset($record[$itemId]['source'])) {
+                $item = StockIdentity::resolve((int) $record[$itemId]['record']);
+                if ($item !== null) {
+                    wp_cache_delete(StockMode::holder($item)->id, 'post_meta');
+                }
+                $record[$itemId]['source'] = $gateway->sourceName((int) $record[$itemId]['record']);
+            }
+            $record[$itemId]['state'] = 'reserving';
+            self::save($order, $record);
+
+            return self::settle($order, $gateway, $itemId, $record[$itemId]);
+        };
+        $item = StockIdentity::resolve((int) $record[$itemId]['record']);
+        if ($item === null) {
+            return $send();
+        }
+        try {
+            return StoreStockSource::exclusive($item, $send);
+        } catch (StockSourceUnavailable) {
+            return false;
+        }
     }
 
     private static function releaseLocked(\WC_Order $order, StockGateway $gateway): bool
@@ -675,7 +709,7 @@ final class OrderStock
      */
     private static function sourceOf(array $line): string
     {
-        return isset($line['source']) ? (string) $line['source'] : \MizzeySite\Stock\StockMode::ERP;
+        return isset($line['source']) ? (string) $line['source'] : StockMode::ERP;
     }
 
     private static function refused(StockAnswer $answer): bool
