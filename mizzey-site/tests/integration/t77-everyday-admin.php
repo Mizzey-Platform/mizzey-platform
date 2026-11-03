@@ -113,7 +113,7 @@ run(
 			return 1 === preg_match( '/id="post-' . $a . '"/', $html );
 		};
 		$check( $found( "{$tag}-A" ), 'AC-3 found by SKU' );
-		$check( $found( get_the_title( $a ) ), 'AC-3 found by title' );
+		$check( $found( get_the_title( $a ) ), 'AC-3 found by title (' . get_the_title( $a ) . ')' );
 		$check( $found( $gtin ), 'AC-3 found by barcode (' . $gtin . ')' );
 		$order = wc_create_order();
 		$order->set_billing_phone( '01112223334' );

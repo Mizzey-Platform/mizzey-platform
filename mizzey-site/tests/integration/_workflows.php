@@ -265,7 +265,7 @@ final class Workflows {
 		}
 		$json = is_wp_error( $r ) ? null : json_decode( wp_remote_retrieve_body( $r ), true );
 		if ( empty( $json['success'] ) ) {
-			return 'import HTTP ' . ( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r ) );
+			return 'import HTTP ' . ( is_wp_error( $r ) ? $r->get_error_message() : wp_remote_retrieve_response_code( $r ) . ' ' . substr( wp_strip_all_tags( wp_remote_retrieve_body( $r ) ), 0, 160 ) );
 		}
 		return ( (int) ( $json['data']['updated'] ?? 0 ) ) > 0 ? 'ok' : 'import updated 0';
 	}
