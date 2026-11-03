@@ -84,10 +84,21 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
 
 ### Edge Cases
 
-- A product switched from ERP to its own stock starts from the figure the store last showed for it, recorded as a
-  change with reason "switched to own stock"; it is not sellable until that figure is above zero.
+- A product switched by staff from ERP to its own stock starts from the figure the store last showed for it (the ERP's,
+  read just before the switch), recorded as a change with reason "switched to own stock"; when the ERP's figure is not
+  known it starts from 0. It is not sellable until that figure is above zero.
+- An item on its own stock whose stock WooCommerce does not count has no figure yet: it holds 0 and sells nothing until
+  staff, the feed or the switch give it one (which turns counting on). Nothing on own stock is unlimited. This is how an
+  item reached by the store default or the master switch, never given a figure, stays unsellable.
+- A variation whose stock WooCommerce keeps on its product is routed by the product's choice and reads and changes the
+  product's one figure; its own editor panel says so and offers no controls.
+- An order line keeps the source its reserve went to: its retry, undo, release and resizes go there, even after the
+  item is switched to the other source.
 - Two changes to one item at the same moment (two orders, an order and the feed) are applied one after the other,
-  under a lock per item, never from a stale figure.
+  under a lock on the record holding its stock, from the figure as stored (past every cache), never from a stale one.
+- A change that fails part way (one language written, the next refused) leaves nothing: the figure each language had,
+  its stock status and WooCommerce's lookup row are put back, and the change is not recorded, so its key stays unused.
+  This holds on a table engine without transactions too (the development database is MyISAM).
 - A translated product's choice is held on the stock identity record, so both languages always agree.
 
 ## Native coverage
@@ -105,14 +116,18 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
 
 - **FR-001**: `StockGateway` MUST route each stock item to the ERP adapter or the store's own stock by the master
   switch, then the item's choice, then the store default (S-1, S-2, AC-1).
-- **FR-002**: The store's own stock MUST apply a change once per operation key, under a lock per item, refuse a
-  result below zero, write WooCommerce's figure through the guard's projection, and record the change (S-3, AC-2).
+- **FR-002**: The store's own stock MUST apply a change once per operation key, under a lock on the record holding the
+  item's stock, refuse a result below zero, write WooCommerce's figure to each language record through the guard's
+  projection, read it back, and only then record the change; a change that fails MUST leave the stock fields as they
+  were. An item whose stock is not counted MUST hold 0 (S-3, AC-2).
 - **FR-003**: Staff holding `manage_woocommerce` or `edit_products` MUST be able to set an item's own stock with a reason
   from the product and variation editors; the history MUST show figure, change, reason, user, source and time (AC-2).
 - **FR-004**: The setting, the master switch and each product's choice MUST be changed only by staff holding
   `manage_woocommerce` (product choice: `edit_products`), with a nonce, and each change MUST be logged (S-1, S-2).
 - **FR-005**: `POST /mizzey/v1/stock` and `GET /mizzey/v1/stock` MUST require the `mizzey_feed_stock` capability, take at
   most 100 items, and answer per item (S-4). The integration signs its calls with an application password on its own
-  account, given the "Stock feed" role (read, and the feed permission only), so a leaked password can change stock and
-  nothing else. That account is the one exception to specs/007 AC-4 (application passwords for administrators only).
+  account, given the "Stock feed" role (read, and the feed permission only). A non-administrator's application password
+  MUST open this route only (its own profile, email or password, and a batch, are refused), so a leaked one can change
+  stock and nothing else. That account is the one exception to specs/007 AC-4 (application passwords for
+  administrators only).
 - **FR-006**: An ERP that does not answer MUST never switch an item to the store's own stock (S-5, OD-41).
