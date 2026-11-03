@@ -104,6 +104,8 @@ run(
 		$p->set_manage_stock( false );
 		$p->set_stock_status( 'instock' );
 		$p->save();
+		// A count left over from before counting was turned off: it is not the store's figure.
+		update_post_meta( $uncounted, '_stock', '9' );
 		$a_ar = $w->translate( 'duplicate', $a );
 
 		$erp  = new T88Erp( array( $a => 50, $b => 40, $vars[0] => 30, $vars[1] => 20 ) );
@@ -177,6 +179,20 @@ run(
 		remove_action( 'woocommerce_product_set_stock', $fail );
 		$stored_en = (int) $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock'", $a ) );
 		$check( StockSourceUnavailable::class === $thrown && 5 === $stored_en && 5 === $level( $a ) && 5 === $level( $a_ar ) && ! StoreStockSource::applied( "{$tag}-fail" ) && 5 === (int) wc_get_product( $a_ar )->get_stock_quantity(), 'S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (' . $thrown . ', stored ' . $stored_en . ', ' . $level( $a ) . ', ' . $level( $a_ar ) . ')' );
+		// A write that does not land and says nothing: the Arabic record's stock update is swallowed.
+		$silent = static function ( $sql ) use ( $wpdb, $a_ar ) {
+			// WooCommerce writes it by post_id =, WooCommerce Multilingual by post_id IN (...).
+			return is_string( $sql ) && preg_match( '/^\s*UPDATE\s+`?' . preg_quote( $wpdb->postmeta, '/' ) . '`?\s/i', $sql ) && false !== strpos( $sql, "'_stock'" ) && preg_match( '/\b' . $a_ar . '\b/', $sql ) ? 'SELECT 0' : $sql;
+		};
+		add_filter( 'query', $silent, 1000 );
+		$quiet = '';
+		try {
+			$store->set( $item( $a ), 2, "{$tag}-quiet", StoreStockSource::STAFF, 'counted', 0 );
+		} catch ( \Throwable $e ) {
+			$quiet = get_class( $e );
+		}
+		remove_filter( 'query', $silent, 1000 );
+		$check( StockSourceUnavailable::class === $quiet && 5 === $level( $a ) && 5 === $level( $a_ar ) && ! StoreStockSource::applied( "{$tag}-quiet" ), 'S-3 a write that silently does not land on one language is caught, and the change undone (' . $quiet . ', ' . $level( $a ) . ', ' . $level( $a_ar ) . ')' );
 		// A request that died part way: its change is recorded as pending, the figure not yet written. The next change
 		// of the item completes it first; sent again, its key changes nothing.
 		$wpdb->insert( StoreStockSource::table(), array( 'item_id' => $a, 'operation_key' => "{$tag}-crash", 'delta' => 2, 'level_after' => 7, 'origin' => StoreStockSource::ORDER, 'reason' => '', 'user_id' => 0, 'state' => StoreStockSource::PENDING, 'created_at' => current_time( 'mysql', true ) ) );
