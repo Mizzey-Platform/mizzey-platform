@@ -78,7 +78,9 @@ staging and the client's approval.
   as WooCommerce Multilingual's synchronisation makes. Writes to other keys MUST go through unchanged (AC-1).
 - **FR-003**: The REST API MUST refuse a stock change with a 403 (AC-1).
 - **FR-004**: The products list, the product editor and the variation editor MUST show the stock source's figure, or
-  that it is not known, with the stock fields shown locked (AC-2). The figure is kept five minutes per stock identity
+  that it is not known, with the stock fields shown locked (AC-2). The products list shows it in WooCommerce's own
+  look (in stock with the figure, out of stock, or not known, without a highlight) and names the source it came from,
+  the ERP or the store's own stock (specs/049). The figure is kept five minutes per stock identity
   (one answer for both languages); a products list asks the source only while the time it has spent asking stays
   within a two-second budget, and a row past it says the figure is being read, which a background job then reads
   for the next load. The budget is checked before each read, so the read that crosses it still runs to its end:
