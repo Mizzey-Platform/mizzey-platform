@@ -117,7 +117,7 @@ run(
 		$ar_page = wp_remote_get( $ar_url, array( 'timeout' => 30 ) );
 		$ar_body = (string) wp_remote_retrieve_body( $ar_page );
 		storefront_refuse_shell( $ar_url, (int) wp_remote_retrieve_response_code( $ar_page ), $ar_body );
-		$check( ! str_contains( $ar_body, "{$tag} serum SEO title" ) && ! str_contains( $ar_body, 'canonical-' . $tag ), 'AC-2 the Arabic record keeps its own SEO words and address: the English ones are not carried to it' );
+		$check( 200 === (int) wp_remote_retrieve_response_code( $ar_page ) && ! str_contains( $ar_body, "{$tag} serum SEO title" ) && ! str_contains( $ar_body, 'canonical-' . $tag ), 'AC-2 the Arabic record keeps its own SEO words and address: the English ones are not carried to it (Arabic page ' . ( is_wp_error( $ar_page ) ? $ar_page->get_error_message() : wp_remote_retrieve_response_code( $ar_page ) ) . ')' );
 		// The Arabic record's own SEO words, as the translation editor stores them on it (B-19), on its page only.
 		update_post_meta( $ar, ProductFields::SEO_TITLE, "{$tag} عنوان السيروم" );
 		update_post_meta( $ar, ProductFields::SEO_DESC, "{$tag} وصف محركات البحث" );
@@ -128,7 +128,7 @@ run(
 		$en_res  = wp_remote_get( $url, array( 'timeout' => 30 ) );
 		$en_back = (string) wp_remote_retrieve_body( $en_res );
 		storefront_refuse_shell( $url, is_wp_error( $en_res ) ? 0 : (int) wp_remote_retrieve_response_code( $en_res ), $en_back );
-		$check( 1 === preg_match( '#<title>[^<]*' . preg_quote( "{$tag} عنوان السيروم", '#' ) . '#u', $ar_own ) && str_contains( $ar_own, "{$tag} وصف محركات البحث" ) && str_contains( $ar_own, 'rel="canonical" href="https://example.com/ar-canonical-' . $tag ) && ! str_contains( $en_back, 'ar-canonical-' . $tag ) && str_contains( $en_back, "{$tag} serum SEO title" ), 'AC-2 B-19 the Arabic record\'s own SEO title, description and canonical are on the Arabic page, and only there (' . wp_json_encode( array( 'ar_status' => is_wp_error( $ar_res ) ? 0 : wp_remote_retrieve_response_code( $ar_res ), 'ar_title' => preg_match( '#<title>([^<]*)#u', $ar_own, $tm ) ? $tm[1] : '', 'ar_desc' => str_contains( $ar_own, "{$tag} وصف محركات البحث" ), 'ar_canonical' => str_contains( $ar_own, 'ar-canonical-' . $tag ), 'en_clean' => ! str_contains( $en_back, 'ar-canonical-' . $tag ), 'en_title' => str_contains( $en_back, "{$tag} serum SEO title" ) ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( 1 === preg_match( '#<title>[^<]*' . preg_quote( "{$tag} عنوان السيروم", '#' ) . '#u', $ar_own ) && str_contains( $ar_own, "{$tag} وصف محركات البحث" ) && str_contains( $ar_own, 'rel="canonical" href="https://example.com/ar-canonical-' . $tag ) && ! str_contains( $en_back, 'ar-canonical-' . $tag ) && str_contains( $en_back, "{$tag} serum SEO title" ), 'AC-2 B-19 the Arabic record\'s own SEO title, description and canonical are on the Arabic page, and only there (' . wp_json_encode( array( 'ar_status' => is_wp_error( $ar_res ) ? $ar_res->get_error_message() : wp_remote_retrieve_response_code( $ar_res ), 'ar_title' => preg_match( '#<title>([^<]*)#u', $ar_own, $tm ) ? $tm[1] : '', 'ar_desc' => str_contains( $ar_own, "{$tag} وصف محركات البحث" ), 'ar_canonical' => str_contains( $ar_own, 'ar-canonical-' . $tag ), 'en_clean' => ! str_contains( $en_back, 'ar-canonical-' . $tag ), 'en_title' => str_contains( $en_back, "{$tag} serum SEO title" ) ), JSON_UNESCAPED_UNICODE ) . ')' );
 		wp_set_current_user( $staff );
 		$_POST = array( ProductFields::NONCE . '_nonce' => 'bad', 'mizzey_video' => 'https://evil.example/x' );
 		$forged = $fresh( $en );
