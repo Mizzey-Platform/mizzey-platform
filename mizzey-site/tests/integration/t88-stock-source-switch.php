@@ -70,6 +70,12 @@ run(
 		$s->on_finish( static function () use ( $previous ) { wp_set_current_user( $previous ); } );
 		sign_in_options( $s, array( FixtureStockSource::OPTION => 'no', 'woocommerce_manage_stock' => 'yes', StockMode::DEFAULT_OPTION => StockMode::ERP, StockMode::ERP_OFF_OPTION => 'no' ) );
 		StoreStockSource::install();
+		// The ledger sits on the stock fields' table engine: moved off it, the next install moves it back.
+		$engine_of = static fn ( string $table ) => (string) $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $table ) );
+		$wanted    = $engine_of( $wpdb->postmeta );
+		$wpdb->query( 'ALTER TABLE ' . StoreStockSource::table() . ' ENGINE = ' . ( 'InnoDB' === $wanted ? 'MyISAM' : 'InnoDB' ) );
+		delete_option( StoreStockSource::VERSION_OPTION );
+		StoreStockSource::install();
 		$tag = 't88' . wp_rand( 1000, 9999 );
 		$w   = new Workflows( $s );
 
@@ -114,6 +120,8 @@ run(
 		$s->on_finish( static function () use ( $bind ) { remove_filter( StockGateway::SOURCE_FILTER, $bind, 10 ); } );
 		$level = static fn ( int $id ) => StockGateway::make()->level( $id )->quantity;
 		$item  = static fn ( int $id ) => StockIdentity::resolve( $id );
+
+		$check( $wanted === $engine_of( StoreStockSource::table() ) && StoreStockSource::VERSION === get_option( StoreStockSource::VERSION_OPTION ), 'FR-002 the stock ledger is installed on the stock fields\' own table engine (' . $wanted . ')' );
 
 		// ---- S-1: the store default and each item's own choice --------------------------------------------------
 		$check( apply_filters( StockGateway::SOURCE_FILTER, null ) instanceof RoutedStockSource, 'FR-001 the store\'s stock source is the router, wrapping the bound ERP adapter' );
