@@ -86,7 +86,8 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
 
 - A product switched by staff from ERP to its own stock starts from the figure the store last showed for it (the ERP's,
   read just before the switch), recorded as a change with reason "switched to own stock"; when the ERP's figure is not
-  known it starts from 0. It is not sellable until that figure is above zero.
+  known it starts from 0. The figure is set before the item is routed to its own stock, so no sale reaches it first; if
+  it cannot be set, the item stays on the ERP. It is not sellable until that figure is above zero.
 - An item on its own stock whose stock WooCommerce does not count has no figure yet: it holds 0 and sells nothing until
   staff, the feed or the switch give it one (which turns counting on). Nothing on own stock is unlimited. This is how an
   item reached by the store default or the master switch, never given a figure, stays unsellable.
@@ -98,7 +99,9 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
   under a lock on the record holding its stock, from the figure as stored (past every cache), never from a stale one.
 - A change that fails part way (one language written, the next refused) leaves nothing: the figure each language had,
   its stock status and WooCommerce's lookup row are put back, and the change is not recorded, so its key stays unused.
-  This holds on a table engine without transactions too (the development database is MyISAM).
+  This holds on a table engine without transactions too (the development database is MyISAM). A request that dies
+  part way leaves its change recorded as pending with the figure it leads to; the next change of the item completes it
+  first, so it is neither lost nor applied twice.
 - A translated product's choice is held on the stock identity record, so both languages always agree.
 
 ## Native coverage
