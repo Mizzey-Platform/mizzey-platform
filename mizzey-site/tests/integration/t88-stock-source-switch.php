@@ -272,6 +272,11 @@ run(
 		$check( array( 'applied', 'applied', 'erp-item', 'unknown-sku', 'invalid', 'refused', 'invalid' ) === $st && 20 === $level( $a ) && 5 === $level( $vars[0] ) && 40 === $level( $b ), 'S-4 the feed sets and changes own stock by SKU, and answers each item: an ERP item, an unknown SKU, a bad value or key, and a change below zero are refused alone (' . wp_json_encode( $st ) . ')' );
 		$check( 'already-applied' === ( $repeat->get_data()['items'][0]['status'] ?? '' ) && 20 === $level( $a ) && 400 === $big->get_status() && 400 === $read->get_status(), 'S-4 a key sent again changes nothing; more than 100 items, or a read without SKUs, is refused whole' );
 		$check( 'store' === ( $got[0]['source'] ?? '' ) && 20 === ( $got[0]['level'] ?? null ) && 'erp' === ( $got[1]['source'] ?? '' ) && ! isset( $got[1]['level'] ), 'S-4 a read gives each SKU\'s source, and the store\'s figure only where it is the one in use' );
+		// A fed change whose request died part way: sent again, it is completed once, not skipped as already applied.
+		$wpdb->insert( StoreStockSource::table(), array( 'item_id' => $a, 'operation_key' => StockFeedRoute::KEY_PREFIX . "{$tag}-pend", 'delta' => -5, 'level_after' => 15, 'origin' => StoreStockSource::FEED, 'reason' => 'stock feed', 'user_id' => $feeder, 'state' => StoreStockSource::PENDING, 'created_at' => current_time( 'mysql', true ) ) );
+		$resent = $post( array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 15, 'key' => "{$tag}-pend" ) ) ) );
+		$check( 15 === $level( $a ) && 15 === ( $resent->get_data()['items'][0]['level'] ?? null ) && StoreStockSource::applied( StockFeedRoute::KEY_PREFIX . "{$tag}-pend" ), 'S-4 a fed change left pending is completed when the feed sends it again (' . wp_json_encode( $resent->get_data()['items'][0] ?? null ) . ')' );
+		$post( array( 'items' => array( array( 'sku' => $sku( $a ), 'set' => 20, 'key' => "{$tag}-back20" ) ) ) );
 		$feed_row = StoreStockSource::history( $a )[0] ?? null;
 		$check( $feed_row && StoreStockSource::FEED === $feed_row->origin && $feeder === (int) $feed_row->user_id, 'ADM-73 a fed change is recorded with the feeding account' );
 		wp_set_current_user( 0 );
