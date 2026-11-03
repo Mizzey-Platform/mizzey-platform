@@ -1,0 +1,19 @@
+Mutation run, 3 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0), scenario t90.
+Each deliberate defect in mutations.json applied alone, t90 run, file restored.
+
+CAUGHT    M1 one address off  <- FAIL  AC-3 the checkout asks for one address, the one the order is delivered to
+CAUGHT    M2 phone optional  <- FAIL  AC-1 the phone is required for Egypt, the kind of place is apartment, villa or office, and the street line names a compound too
+CAUGHT    M3 building optional  <- FAIL  AC-2 a flat without its floor and apartment is refused, and an address without its building; a villa is placed without them (400, 200,
+CAUGHT    M4 floor never required  <- after t90 was given a flat with its apartment but no floor (first run: survived, as the case also left out the apartment)
+CAUGHT    M5 villa asked for floor  <- FAIL  AC-2 a flat without its floor and apartment is refused, and an address without its building; a villa is placed without them (400, 400,
+CAUGHT    M6 line not written  <- FAIL  AC-2 a flat without its floor and apartment is refused, and an address without its building; a villa is placed without them (400, 400,
+CAUGHT    M7 line not in the order's language  <- FAIL  AC-4 an Arabic order's line is in Arabic though it is saved in English (Building 5, floor 4, apartment 18)
+CAUGHT    M8 villa keeps floor in line  <- FAIL  AC-4 the building, floor and apartment as one line; a villa has no floor or apartment (["Building 5, floor 4, apartment 18","Villa 12,
+CAUGHT    M9 reading order broken  <- FAIL  AC-1 the address reads largest place first: governorate, city, district, kind of place, street or compound, building, floor, apartment
+CAUGHT    M10 book keeps no apartment  <- FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a vi
+CAUGHT    M11 book accepts a flat without floor  <- FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a vi
+CAUGHT    M12 book default copies no line  <- FAIL  AC-5 the default address prefills the checkout with every part (CHK-02)
+CAUGHT    M13 slip drops landmark  <- FAIL  AC-4 the courier's address (Bosta secondLine) and the packing slip carry the line and the landmark
+CAUGHT    M14 book keeps villa floor  <- FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a vi
+
+14 of 14 caught.
