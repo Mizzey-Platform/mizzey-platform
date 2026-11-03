@@ -38,7 +38,7 @@ run(
 		$expiry  = time() + HOUR_IN_SECONDS;
 		$token   = \WP_Session_Tokens::get_instance( $admin )->create( $expiry );
 		$cookies = array();
-		foreach ( array( AUTH_COOKIE => 'auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
+		foreach ( array( AUTH_COOKIE => 'auth', SECURE_AUTH_COOKIE => 'secure_auth', LOGGED_IN_COOKIE => 'logged_in' ) as $name => $scheme ) {
 			$cookies[] = new \WP_Http_Cookie( array( 'name' => $name, 'value' => wp_generate_auth_cookie( $admin, $expiry, $scheme, $token ) ) );
 		}
 		$get = static function ( string $url ) use ( $cookies ): array {
@@ -113,7 +113,7 @@ run(
 			return 1 === preg_match( '/id="post-' . $a . '"/', $html );
 		};
 		$check( $found( "{$tag}-A" ), 'AC-3 found by SKU' );
-		$check( $found( get_the_title( $a ) ), 'AC-3 found by title' );
+		$check( $found( get_the_title( $a ) ), 'AC-3 found by title (' . get_the_title( $a ) . ')' );
 		$check( $found( $gtin ), 'AC-3 found by barcode (' . $gtin . ')' );
 		$order = wc_create_order();
 		$order->set_billing_phone( '01112223334' );

@@ -639,7 +639,13 @@ run(
 			'data'    => (string) wp_json_encode( t60_body( $twice_email, 'Dokki' ) ),
 			'cookies' => $jar,
 		);
-		$presses = \WpOrg\Requests\Requests::request_multiple( array( $one_press, $one_press ), array( 'timeout' => 60 ) );
+		// The Requests library alone skips WordPress's http_api_curl hook; it is run here as WordPress runs it, so a host
+		// that routes its own requests there (staging sends them to its web server inside its network) does so for these.
+		$hooks = new \WpOrg\Requests\Hooks();
+		$hooks->register( 'curl.before_send', static function ( &$handle ) use ( $one_press ): void {
+			do_action_ref_array( 'http_api_curl', array( &$handle, array( 'method' => 'POST' ), $one_press['url'] ) );
+		} );
+		$presses = \WpOrg\Requests\Requests::request_multiple( array( $one_press, $one_press ), array( 'timeout' => 60, 'hooks' => $hooks ) );
 		$again   = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout' ), t60_body( $twice_email, 'Dokki' ), $auth4, $cart4['cookies'] );
 		wp_cache_flush();
 		$twice_orders = wc_get_orders( array( 'billing_email' => $twice_email, 'status' => array_diff( array_keys( wc_get_order_statuses() ), array( 'wc-checkout-draft' ) ), 'limit' => 10, 'return' => 'ids' ) );

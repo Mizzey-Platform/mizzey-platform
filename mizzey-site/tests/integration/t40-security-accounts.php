@@ -105,6 +105,12 @@ run(
 		$customer = t40_user( $s, 'customer' );
 		$manager  = t40_user( $s, 'shop_manager' );
 		$admin    = t40_user( $s, 'administrator' );
+		// Where two-factor sign-in is enforced (staging, production: D-21) an administrator is enrolled, as they would
+		// be; until then every privileged request is refused (ADM-131), which is not what AC-4 checks.
+		if ( class_exists( '\WP2FA\Methods\TOTP' ) ) {
+			require_once __DIR__ . '/_two_factor.php';
+			two_factor_enrol( $admin );
+		}
 		$check( ! wp_is_application_passwords_available_for_user( $customer ), 'AC-4: not available to a customer' );
 		$check( ! wp_is_application_passwords_available_for_user( $manager ), 'AC-4: not available to a shop manager' );
 		$check( wp_is_application_passwords_available_for_user( $admin ), 'AC-4: available to an administrator' );
