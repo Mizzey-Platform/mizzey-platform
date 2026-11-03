@@ -217,7 +217,14 @@ run(
 
 		// ---- The whole report, with no stock filter, follows the same rule ---------------------------------
 		do_action( 'wpml_switch_language', 'en' );
-		$all_types = t24_report( array() );
+		// Every page: unfiltered, the report holds the whole store, which on a working database is more than one page.
+		$all_types = array( 'ids' => array() );
+		$page      = 1;
+		do {
+			$one               = t24_report( array( 'page' => $page ) );
+			$all_types['ids']  = array_merge( $all_types['ids'], $one['ids'] );
+			++$page;
+		} while ( $page <= $one['pages'] && $page <= 50 );
 		$check( $sorted( $mine( $all_types['ids'] ) ) === $sorted( array( $pair_en, $english, $arabic, $orphan_ar, $out_en, $variable_en, $size_en, $roomy_en ) ), 'with no stock filter, each fixture item is still one line: ' . $named( $mine( $all_types['ids'] ) ) );
 
 		// ---- FR-010: nothing is changed, and nothing outside the report is touched ------------------------
