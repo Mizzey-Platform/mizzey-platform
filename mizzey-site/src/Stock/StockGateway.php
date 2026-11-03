@@ -96,10 +96,24 @@ final class StockGateway
             return StockAnswer::unknown($item, $reason);
         }
 
-        $named = $source !== '' && $this->source instanceof RoutedStockSource ? $this->source->named($source) : null;
-        $to    = $named ?? $this->sourceFor($item);
+        $send = function () use ($item, $delta, $operationKey, $source): StockAnswer {
+            $named = $source !== '' && $this->source instanceof RoutedStockSource ? $this->source->named($source) : null;
+            $to    = $named ?? $this->sourceFor($item);
 
-        return $this->attempt('adjust', $item, $operationKey, fn (): int => $to->adjust($item, $delta, $operationKey), $to);
+            return $this->attempt('adjust', $item, $operationKey, fn (): int => $to->adjust($item, $delta, $operationKey), $to);
+        };
+        if (! $this->source instanceof RoutedStockSource) {
+            return $send();
+        }
+        try {
+            // Under the item's stock lock, whichever source it goes to: a switch to own stock sets its starting figure
+            // from the ERP under the same lock, so no ERP change can fall between that figure and the switch.
+            return StoreStockSource::exclusive($item, $send);
+        } catch (StockSourceUnavailable $e) {
+            $this->log('warning', 'adjust', $item, 0, 'unavailable: ' . $e->getMessage(), $operationKey);
+
+            return StockAnswer::unknown($item, 'busy');
+        }
     }
 
     /**

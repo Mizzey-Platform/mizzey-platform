@@ -89,12 +89,38 @@ final class StoreStockSource implements StockSource
         }
         // The ledger lives on the stock fields' own table engine: a transaction that held one and not the other could
         // keep a figure and lose its pending record if the request died.
-        $engines = $wpdb->get_results($wpdb->prepare('SELECT TABLE_NAME AS name, ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (%s, %s)', $wpdb->postmeta, $table), OBJECT_K); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-        $wanted  = (string) ($engines[$wpdb->postmeta]->engine ?? '');
-        if (in_array($wanted, ['InnoDB', 'MyISAM', 'Aria'], true) && $wanted !== (string) ($engines[$table]->engine ?? '')) {
+        // Until they match, the version is not saved and the store's own stock takes no change (change() refuses).
+        $engines = self::engines($table);
+        $wanted  = $engines[$wpdb->postmeta] ?? '';
+        if (in_array($wanted, ['InnoDB', 'MyISAM', 'Aria'], true) && $wanted !== ($engines[$table] ?? '')) {
             $wpdb->query("ALTER TABLE {$table} ENGINE = {$wanted}"); // phpcs:ignore WordPress.DB
+            $engines = self::engines($table);
+        }
+        if ($wanted === '' || $wanted !== ($engines[$table] ?? '')) {
+            if (function_exists('wc_get_logger')) {
+                wc_get_logger()->error(sprintf('stock ledger %s is on engine "%s", the stock fields on "%s": own stock takes no change until they match', $table, $engines[$table] ?? '', $wanted), ['source' => StockGateway::LOG_SOURCE]);
+            }
+
+            return;
         }
         update_option(self::VERSION_OPTION, self::VERSION, true);
+    }
+
+    /**
+     * The table engine of the stock fields' table and of the ledger, by table name.
+     *
+     * @return array<string,string>
+     */
+    private static function engines(string $table): array
+    {
+        global $wpdb;
+        $rows    = $wpdb->get_results($wpdb->prepare('SELECT TABLE_NAME AS name, ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (%s, %s)', $wpdb->postmeta, $table)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $engines = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            $engines[(string) $row->name] = (string) $row->engine;
+        }
+
+        return $engines;
     }
 
     public function name(): string
@@ -247,9 +273,13 @@ final class StoreStockSource implements StockSource
                 if ($wpdb->update(self::table(), ['state' => self::DONE], ['id' => $rowId], ['%s'], ['%d']) !== 1) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                     throw new StockSourceUnavailable('the change was not recorded as done');
                 }
-                // A commit that reports failure may still have landed: what is stored decides.
-                if ($wpdb->query('COMMIT') === false && ! self::landed($rowId, $ids, $after)) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                    throw new StockSourceUnavailable('the change was not committed');
+                // A commit that reports failure may still have landed. The transaction is ended first, so what is read
+                // next is what was committed, not this connection's own uncommitted writes; that decides.
+                if ($wpdb->query('COMMIT') === false) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    $wpdb->query('ROLLBACK'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    if (! self::landed($rowId, $ids, $after)) {
+                        throw new StockSourceUnavailable('the change was not committed');
+                    }
                 }
             } catch (\Throwable $e) {
                 $wpdb->query('ROLLBACK'); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
