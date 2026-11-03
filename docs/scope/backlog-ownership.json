@@ -973,7 +973,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Verified",
+   "status": "In progress",
    "delivery_order": 19,
    "depends_on": [
     {
@@ -1002,7 +1002,7 @@
     }
    ],
    "data_integrity": "A7 verified working; A12 measured (nine of fourteen fields do not follow a code-level save); B6 not yet tested (needs staging)",
-   "acceptance_evidence": "A non-functional verification record: mobile-first test runs, performance measurements on staging, locale formatting in both languages, a security checklist, the data-integrity probes, an accessibility check, and the consent and privacy flow.",
+   "acceptance_evidence": "A non-functional verification record: mobile-first test runs, performance measurements on staging, locale formatting in both languages, a security checklist, the data-integrity probes, an accessibility check, and the consent and privacy flow. Reopened 3 November 2026 (audit A-269-4): verified so far are NFR-02's images and lazy loading (specs/032, t72), NFR-04b (specs/032, t72) and NFR-05 (specs/007 to 009, 031, 039; t39 to t50, t71, t79). Still to record: NFR-06, NFR-07 and NFR-12, which can be written now from built work; NFR-01 and NFR-11 wait for the designed storefront; NFR-02's caching and CDN and NFR-13's load test wait for the production host.",
    "not_in_slice": [
     "NFR-12a (P1-L, stage S2, owned by E-NFR-1b)",
     "NFR-03 (P1, owned by #242)",
@@ -1671,7 +1671,7 @@
     }
    ],
    "data_integrity": "B7 measured working on the WooCommerce side; D7, F1, F3 not yet tested",
-   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order. ADM-92's invoice, with ACCT-12's download, is specs/023-invoice (our own code, D-24). ADM-92's invoice, with ACCT-12's download, merged 31 October 2026 as 39d13b3 (PR #456), the wave-3 part the Stage 3 plan names; the rest of #280's rows stay to build. ADM-92's invoice with ACCT-12's download verified on staging 31 October 2026 (release v0.1.9, PR #464); the rest of #280's rows stay to build.",
+   "acceptance_evidence": "Orders found by number, customer, phone, email, status, payment, date and carrier; a note added; an order cancelled and refunded with a permission test (AC-11); an invoice and a packing slip printed for one order. ADM-92's invoice, with ACCT-12's download, is specs/023-invoice (our own code, D-24). ADM-92's invoice, with ACCT-12's download, merged 31 October 2026 as 39d13b3 (PR #456), the wave-3 part the Stage 3 plan names. ADM-92's invoice with ACCT-12's download verified on staging 31 October 2026 (release v0.1.9, PR #464). The rest of #280's rows merged as PR #479 and verified with t70 (2 November 2026).",
    "not_in_slice": [
     "ADM-86 (P1, owned by #248)",
     "ADM-87 (P1, owned by #248)",
@@ -4122,7 +4122,7 @@
     }
    ],
    "data_integrity": "C12 requires ERP clarification",
-   "acceptance_evidence": "Pending PRE-09. The function layer, specs/026-admin-stock (D-19 item 5: every local stock writer refused on the server, the admin's stock fields locked, the adapter's projection the only way in), merged 31 October 2026 as ed8bfb0 (PR #461), technically verified; the ERP mechanism, staging verification and acceptance pending. The function layer verified on staging 31 October 2026 (release v0.1.9, PR #464).",
+   "acceptance_evidence": "Pending PRE-09. The function layer, specs/026-admin-stock (D-19 item 5: every local stock writer refused on the server, the admin's stock fields locked, the adapter's projection the only way in), merged 31 October 2026 as ed8bfb0 (PR #461), technically verified; the ERP mechanism, staging verification and acceptance pending. The function layer verified on staging 31 October 2026 (release v0.1.9, PR #464). The store's own stock beside the ERP (D-28, specs/049-stock-source-switch) merged 3 November 2026 as 93c33ac (PR #508): an item on its own stock is changed in the admin with a reason and recorded; ERP items stay pending PRE-09.",
    "not_in_slice": [
     "ADM-76 (P2)",
     "ADM-78 (P3)",
@@ -4250,7 +4250,7 @@
     }
    ],
    "data_integrity": "C7, C12 require ERP clarification",
-   "acceptance_evidence": "Pending PRE-09.",
+   "acceptance_evidence": "Pending PRE-09 for items on the ERP. For items on the store's own stock (D-28), ADM-73's adjustments with reason and user are built: 93c33ac (PR #508, specs/049, t88).",
    "not_in_slice": [
     "ADM-76 (P2)",
     "ADM-78 (P3)",

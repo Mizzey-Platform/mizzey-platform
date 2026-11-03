@@ -111,7 +111,7 @@ Neither template invents acceptance criteria. Criteria come from the spec, which
 ## The 74 PBIs, as the live board holds them
 
 **Read from the live Project, which is the operational state; this document records it, never the reverse.**
-Regenerated 2 November 2026, by `tools/gen_backlog_docs.py` from the live Project.
+Regenerated 3 November 2026, by `tools/gen_backlog_docs.py` from the live Project.
 
 | Order | Issue | Title | Epic | Register ids | Scope class | Stage | Status | ERP blocked | Design dependency | Data-integrity dependency | Client decision | Depends on |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -133,7 +133,7 @@ Regenerated 2 November 2026, by `tools/gen_backlog_docs.py` from the live Projec
 | 16 | #266 | Pre-development documents delivered and approved | E-PRE | 7 ids, listed in the issue | **DLV** | **S1** | **Verified** | **no** | none | - | Blocks final acceptance: the Stage 1 Approval Record, blank. PRE-08 approval pending / sent date not evidenced: the deemed-approval rule is not applied (D-12) | - |
 | 17 | #267 | Store operations walkthrough held on the live admin, with the Section G10 list confirmed | E-PRE | PRE-07 | **DLV** | **S1** | **Ready** | **no** | none | - | Blocks final acceptance: client attendance and written confirmation of the G10 list. Overdue in its literal timing, prepared, not held (D-12) | #244: staging exists since 5 October 2026; context, not a blocker |
 | 18 | #268 | Definition of done applied to every Stage 1 PBI, with the evidence recorded | E-DOD | 9 ids, listed in the issue | **mixed** | **S1** | **Ready** | **no** | none | - | Blocks final acceptance: #244 staging environment | - |
-| 19 | #269 | Cross-cutting standards met: mobile first, performance, locale formatting, security, data integrity, accessibility, privacy, scalability | E-NFR | 9 ids, listed in the issue | **mixed** | **S1** | **Verified** | **no** | none | A7 verified working; A12 measured (nine of fourteen fields do not follow a code-level save); B6 not yet tested (needs staging) | Configurable working default: OD-15; Blocks production or launch only: OD-27, OD-14 | #244: context, not a blocker |
+| 19 | #269 | Cross-cutting standards met: mobile first, performance, locale formatting, security, data integrity, accessibility, privacy, scalability | E-NFR | 9 ids, listed in the issue | **mixed** | **S1** | **In progress** | **no** | none | A7 verified working; A12 measured (nine of fourteen fields do not follow a code-level save); B6 not yet tested (needs staging) | Configurable working default: OD-15; Blocks production or launch only: OD-27, OD-14 | #244: context, not a blocker |
 | 20 | #270 | Observability: application logs, error monitoring, integration logs and admin audit logs | E-NFR | NFR-10 | **P1-L** | **S1** | **Verified** | **no** | none | - | Blocks production or launch only: OD-14 | #244: context, not a blocker |
 | 21 | #271 | The remaining fixed core decisions hold across the build | E-FND | 9 ids, listed in the issue | **mixed** | **S1** | **Ready** | **no** | none | - | - | #290: context, not a blocker; #281: context, not a blocker; #305: context, not a blocker |
 | 22 | #272 | Vision, objectives and platform-type guardrails are met by the delivered store | E-FND | 15 ids, listed in the issue | **mixed** | **S1** | **Ready** | **no** | none | - | - | #278: context, not a blocker; #311: context, not a blocker |
