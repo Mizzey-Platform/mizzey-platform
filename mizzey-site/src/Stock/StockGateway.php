@@ -48,12 +48,15 @@ final class StockGateway
         );
     }
 
-    /** The gateway for a display: one attempt, no pause, so a slow or absent source does not hold a page. */
+    /**
+     * The gateway for a display: one attempt, no pause, so a slow or absent source does not hold a page. Logged like
+     * every other attempt (specs/012 AC-6), so an outage first seen in the admin is in the log too.
+     */
     public static function quick(): self
     {
         $source = apply_filters(self::SOURCE_FILTER, null);
 
-        return new self($source instanceof StockSource ? $source : new UnconfiguredStockSource(), 1, null, 0);
+        return new self($source instanceof StockSource ? $source : new UnconfiguredStockSource(), 1, function_exists('wc_get_logger') ? wc_get_logger() : null, 0);
     }
 
     public function level(int $productId): StockAnswer
@@ -65,7 +68,9 @@ final class StockGateway
             return StockAnswer::unknown(null, 'no stock identity');
         }
 
-        return $this->attempt('level', $item, '', fn (): int => $this->source->level($item));
+        $source = $this->sourceFor($item);
+
+        return $this->attempt('level', $item, '', fn (): int => $source->level($item), $source);
     }
 
     /** Whether `$quantity` units can be sold: only when the source answered, and holds enough. */
@@ -77,8 +82,11 @@ final class StockGateway
     /**
      * Changes stock by `$delta` units, once for `$operationKey`: the caller's name for this one change (an order line,
      * a cancellation), kept on every retry so the source applies it once (the StockSource contract).
+     *
+     * `$source` names the source an earlier change of the same reservation went to (`sourceName()` at the time), so a
+     * release, a retry or a resize goes back to it even when the item has been switched since; '' uses today's choice.
      */
-    public function adjust(int $productId, int $delta, string $operationKey): StockAnswer
+    public function adjust(int $productId, int $delta, string $operationKey, string $source = ''): StockAnswer
     {
         $item = StockIdentity::resolve($productId);
         if ($item === null || $delta === 0 || trim($operationKey) === '') {
@@ -88,48 +96,83 @@ final class StockGateway
             return StockAnswer::unknown($item, $reason);
         }
 
-        return $this->attempt('adjust', $item, $operationKey, fn (): int => $this->source->adjust($item, $delta, $operationKey));
+        $send = function () use ($item, $delta, $operationKey, $source): StockAnswer {
+            $named = $source !== '' && $this->source instanceof RoutedStockSource ? $this->source->named($source) : null;
+            $to    = $named ?? $this->sourceFor($item);
+
+            return $this->attempt('adjust', $item, $operationKey, fn (): int => $to->adjust($item, $delta, $operationKey), $to);
+        };
+        if (! $this->source instanceof RoutedStockSource) {
+            return $send();
+        }
+        try {
+            // Under the item's stock lock, whichever source it goes to: a switch to own stock sets its starting figure
+            // from the ERP under the same lock, so no ERP change can fall between that figure and the switch.
+            return StoreStockSource::exclusive($item, $send);
+        } catch (StockSourceUnavailable $e) {
+            $this->log('warning', 'adjust', $item, 0, 'unavailable: ' . $e->getMessage(), $operationKey);
+
+            return StockAnswer::unknown($item, 'busy');
+        }
+    }
+
+    /**
+     * The source that holds the item: the router's choice for it (D-28, specs/049), or the bound source itself.
+     */
+    public function sourceFor(StockItem $item): StockSource
+    {
+        return $this->source instanceof RoutedStockSource ? $this->source->for($item) : $this->source;
+    }
+
+    /** The name of the source that holds the record's item now, `erp` or `store`; '' when stock is not routed. */
+    public function sourceName(int $productId): string
+    {
+        $item = StockIdentity::resolve($productId);
+
+        return $item !== null && $this->source instanceof RoutedStockSource ? StockMode::sourceFor($item) : '';
     }
 
     /** @param callable(): int $call */
-    private function attempt(string $operation, StockItem $item, string $key, callable $call): StockAnswer
+    private function attempt(string $operation, StockItem $item, string $key, callable $call, ?StockSource $source = null): StockAnswer
     {
+        $source ??= $this->source;
         for ($attempt = 1; $attempt <= $this->attempts; $attempt++) {
             try {
                 $quantity = $call();
-                $this->log($operation === 'adjust' ? 'info' : 'debug', $operation, $item, $attempt, 'answered ' . $quantity, $key);
+                $this->log($operation === 'adjust' ? 'info' : 'debug', $operation, $item, $attempt, 'answered ' . $quantity, $key, $source);
 
                 return StockAnswer::known($item, $quantity);
             } catch (StockSourceRefused $e) {
-                $this->log('warning', $operation, $item, $attempt, 'refused: ' . $e->getMessage(), $key);
+                $this->log('warning', $operation, $item, $attempt, 'refused: ' . $e->getMessage(), $key, $source);
 
                 return StockAnswer::unknown($item, 'refused');
             } catch (StockSourceUnavailable $e) {
-                $this->log('warning', $operation, $item, $attempt, 'unavailable: ' . $e->getMessage(), $key);
+                $this->log('warning', $operation, $item, $attempt, 'unavailable: ' . $e->getMessage(), $key, $source);
                 if ($attempt < $this->attempts && $this->pauseMs > 0) {
                     usleep($this->pauseMs * 1000);
                 }
             } catch (\Throwable $e) {
                 // An adapter that breaks its contract is not trusted to answer again: fail closed at once.
-                $this->log('error', $operation, $item, $attempt, get_class($e) . ': ' . $e->getMessage(), $key);
+                $this->log('error', $operation, $item, $attempt, get_class($e) . ': ' . $e->getMessage(), $key, $source);
 
                 return StockAnswer::unknown($item, 'adapter error');
             }
         }
         // Every attempt found the source unavailable: an outage, logged as an error so operations hear of it.
-        $this->log('error', $operation, $item, $this->attempts, 'unavailable after every attempt', $key);
+        $this->log('error', $operation, $item, $this->attempts, 'unavailable after every attempt', $key, $source);
 
         return StockAnswer::unknown($item, 'exhausted');
     }
 
     /** Diagnostics never change the stock answer: a failing logger, or an adapter whose name() fails, is ignored. */
-    private function log(string $level, string $operation, ?StockItem $item, int $attempt, string $outcome, string $key = ''): void
+    private function log(string $level, string $operation, ?StockItem $item, int $attempt, string $outcome, string $key = '', ?StockSource $source = null): void
     {
+        $source ??= $this->source;
         try {
             try {
-                $name = $this->source->name();
+                $name = $source->name();
             } catch (\Throwable) {
-                $name = get_class($this->source);
+                $name = get_class($source);
             }
             $this->logger?->log($level, sprintf('stock %s %s, attempt %d, %s: %s', $operation, $item ? $item->label() : '-', $attempt, $name, $outcome), [
                 'source'    => self::LOG_SOURCE,

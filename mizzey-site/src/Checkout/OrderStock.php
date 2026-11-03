@@ -11,6 +11,10 @@ namespace MizzeySite\Checkout;
 use Automattic\WooCommerce\StoreApi\Exceptions\RouteException;
 use MizzeySite\Stock\StockAnswer;
 use MizzeySite\Stock\StockGateway;
+use MizzeySite\Stock\StockIdentity;
+use MizzeySite\Stock\StockMode;
+use MizzeySite\Stock\StockSourceUnavailable;
+use MizzeySite\Stock\StoreStockSource;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +37,8 @@ defined('ABSPATH') || exit;
  * arriving together, cannot work from a stale copy: a release happens only while the order is still cancelled, failed
  * or unpaid, and a paid status reserves only while the order is still there and holds no reservation.
  * Releases use the record, not the order's current lines, so an order edited after placement releases what was taken.
+ * Each line also keeps the source its reserve was sent to (the ERP or the store's own stock, D-28): its retry, undo,
+ * release and resizes go to that source, even when the item has been switched to the other one since.
  *
  * - Placement, on the block checkout, the classic checkout and pay-for-order: each line not already reserved is
  *   reserved with key `order-{id}-item-{item}-g{generation}-reserve`. A retried placement re-sends the same keys, so the
@@ -472,13 +478,11 @@ final class OrderStock
         $sending = [];
         foreach ($record as $itemId => $line) {
             if ($line['state'] !== 'reserved' && isset($current[$itemId])) {
-                $record[$itemId]['state'] = 'reserving';
-                $sending[]                = $itemId;
+                $sending[] = $itemId;
             }
         }
-        self::save($order, $record);
         foreach ($sending as $index => $itemId) {
-            if (self::settle($order, $gateway, $itemId, $record[$itemId])) {
+            if (self::reserveLine($order, $gateway, $itemId, $record)) {
                 $taken[] = $itemId;
                 continue;
             }
@@ -501,6 +505,41 @@ final class OrderStock
         self::save($order, $record);
 
         return $ok;
+    }
+
+    /**
+     * Sends one line's reserve. Under the item's stock lock (the one a switch of its source takes), the source is
+     * chosen from the routing as stored and written to the record with the line marked reserving, before the reserve
+     * is sent: its retry, undo, release and resizes go there too, even if the item is switched meanwhile (D-28,
+     * specs/049). A line already holding a source (a reserve left unanswered) keeps it, so its key goes where it went.
+     * False when the line was not reserved, or the lock could not be taken (the line is then left as it was).
+     *
+     * @param array<int,array<string,mixed>> $record
+     */
+    private static function reserveLine(\WC_Order $order, StockGateway $gateway, int $itemId, array &$record): bool
+    {
+        $send = static function () use ($order, $gateway, $itemId, &$record): bool {
+            if (! isset($record[$itemId]['source'])) {
+                $item = StockIdentity::resolve((int) $record[$itemId]['record']);
+                if ($item !== null) {
+                    wp_cache_delete(StockMode::holder($item)->id, 'post_meta');
+                }
+                $record[$itemId]['source'] = $gateway->sourceName((int) $record[$itemId]['record']);
+            }
+            $record[$itemId]['state'] = 'reserving';
+            self::save($order, $record);
+
+            return self::settle($order, $gateway, $itemId, $record[$itemId]);
+        };
+        $item = StockIdentity::resolve((int) $record[$itemId]['record']);
+        if ($item === null) {
+            return $send();
+        }
+        try {
+            return StoreStockSource::exclusive($item, $send);
+        } catch (StockSourceUnavailable) {
+            return false;
+        }
     }
 
     private static function releaseLocked(\WC_Order $order, StockGateway $gateway): bool
@@ -603,6 +642,10 @@ final class OrderStock
                 $gen++;
             }
             $plan[$itemId] = ['record' => $record, 'qty' => $qty, 'gen' => $gen, 'state' => $state, 'op' => (int) ($old['op'] ?? 0)];
+            if ($old !== null && $gen === $old['gen'] && isset($old['source'])) {
+                // The same keys go to the same source.
+                $plan[$itemId]['source'] = $old['source'];
+            }
         }
         // A line no longer on the order keeps its record, so an unsettled one stays for reconciliation.
         foreach ($before as $itemId => $old) {
@@ -625,14 +668,14 @@ final class OrderStock
     private static function settle(\WC_Order $order, StockGateway $gateway, int $itemId, array &$line): bool
     {
         if ($line['state'] === 'reserving' || $line['state'] === 'unsure') {
-            $answer        = $gateway->adjust($line['record'], -$line['qty'], self::key($order, $itemId, $line['gen'], 'reserve'));
+            $answer        = $gateway->adjust($line['record'], -$line['qty'], self::key($order, $itemId, $line['gen'], 'reserve'), self::sourceOf($line));
             $line['state'] = $answer->isKnown() ? 'reserved' : (self::refused($answer) ? 'refused' : 'unsure');
 
             return $answer->isKnown();
         }
         if ($line['state'] === 'undoing' || $line['state'] === 'releasing') {
             $step          = $line['state'] === 'undoing' ? 'undo' : 'release';
-            $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step))->isKnown();
+            $done          = $gateway->adjust($line['record'], $line['qty'], self::key($order, $itemId, $line['gen'], $step), self::sourceOf($line))->isKnown();
             $line['state'] = $done ? ($step === 'undo' ? 'undone' : 'released') : 'unsettled';
             // Which change went unanswered, so a later release sends it again under the same key.
             if ($done) {
@@ -647,7 +690,7 @@ final class OrderStock
             return true;
         }
         $to     = (int) $line['resize']['to'];
-        $answer = $gateway->adjust($line['record'], $line['qty'] - $to, self::key($order, $itemId, $line['gen'], 'resize' . (int) $line['resize']['op']));
+        $answer = $gateway->adjust($line['record'], $line['qty'] - $to, self::key($order, $itemId, $line['gen'], 'resize' . (int) $line['resize']['op']), self::sourceOf($line));
         if ($answer->isKnown()) {
             $line['qty'] = $to;
         }
@@ -656,6 +699,17 @@ final class OrderStock
         }
 
         return $answer->isKnown();
+    }
+
+    /**
+     * The source a line's changes go to. A line reserved before the stock source switch (D-28) has none recorded: the
+     * ERP was then the only source.
+     *
+     * @param array<string,mixed> $line
+     */
+    private static function sourceOf(array $line): string
+    {
+        return isset($line['source']) ? (string) $line['source'] : StockMode::ERP;
     }
 
     private static function refused(StockAnswer $answer): bool

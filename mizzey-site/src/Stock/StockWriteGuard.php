@@ -45,6 +45,8 @@ final class StockWriteGuard
     public const PERMIT    = 'mizzey_stock_write_permitted';
     public const KEYS      = ['_stock', '_stock_status', '_manage_stock', '_backorders'];
     public const FIGURE    = 'mizzey_stock_figure_';
+    /** Raised to forget every kept figure at once. */
+    public const GENERATION = 'mizzey_stock_figure_generation';
     /** The background job that reads a figure the products list did not wait for. */
     public const FILL_HOOK = 'mizzey_stock_figure_fill';
     /** Seconds one products list may spend asking the stock source; the rest is read in the background. */
@@ -585,9 +587,20 @@ final class StockWriteGuard
         }
         $answer = StockGateway::quick()->level($productId);
         $figure = $answer->isKnown() ? (int) $answer->quantity : null;
-        set_transient(self::key($productId), ['q' => $figure], 5 * MINUTE_IN_SECONDS);
+        set_transient(self::key($productId), ['q' => $figure, 'g' => self::generation()], 5 * MINUTE_IN_SECONDS);
 
         return $figure;
+    }
+
+    /** Forgets every kept figure at once: the stock source of many items changed (specs/049). */
+    public static function forgetFigures(): void
+    {
+        update_option(self::GENERATION, self::generation() + 1, false);
+    }
+
+    private static function generation(): int
+    {
+        return (int) get_option(self::GENERATION, 0);
     }
 
     /** @return array{q:int|null}|null The kept answer, or null when none is kept. */
@@ -595,7 +608,7 @@ final class StockWriteGuard
     {
         $kept = get_transient(self::key($productId));
 
-        return is_array($kept) && array_key_exists('q', $kept) ? $kept : null;
+        return is_array($kept) && array_key_exists('q', $kept) && ($kept['g'] ?? 0) === self::generation() ? $kept : null;
     }
 
     private static function key(int $productId): string

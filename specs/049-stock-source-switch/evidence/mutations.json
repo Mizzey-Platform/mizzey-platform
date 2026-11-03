@@ -1,0 +1,152 @@
+[
+ {
+  "name": "M1 master switch ignored",
+  "file": "mizzey-site/src/Stock/StockMode.php",
+  "old": "        if (self::erpOff()) {\n            return self::STORE;\n        }",
+  "new": "        if (false) {\n            return self::STORE;\n        }"
+ },
+ {
+  "name": "M2 item choice ignored",
+  "file": "mizzey-site/src/Stock/StockMode.php",
+  "old": "return $choice !== '' ? $choice : self::storeDefault();",
+  "new": "return self::storeDefault();"
+ },
+ {
+  "name": "M3 router always ERP",
+  "file": "mizzey-site/src/Stock/RoutedStockSource.php",
+  "old": "return StockMode::sourceFor($item) === StockMode::STORE ? $this->store : $this->erp;",
+  "new": "return $this->erp;"
+ },
+ {
+  "name": "M4 key applied twice",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "            if (self::applied($operationKey)) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M5 sale below zero allowed",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "if ($after < 0 && $change < 0) {",
+  "new": "if (false) {"
+ },
+ {
+  "name": "M7 feed open to any signed-in account",
+  "file": "mizzey-site/src/Stock/StockFeedRoute.php",
+  "old": "return current_user_can(self::CAP) ? true :",
+  "new": "return true ? true :"
+ },
+ {
+  "name": "M8 batch size unchecked",
+  "file": "mizzey-site/src/Stock/StockFeedRoute.php",
+  "old": "if (count($items) > self::MAX_ITEMS) {",
+  "new": "if (false) {"
+ },
+ {
+  "name": "M9 ERP items changed by the feed",
+  "file": "mizzey-site/src/Stock/StockFeedRoute.php",
+  "old": "return $out + ['status' => 'erp-item', 'source' => StockMode::ERP];",
+  "new": "$out += [];"
+ },
+ {
+  "name": "M10 feed account refused an application password",
+  "file": "mizzey-site/src/Security/ApplicationPasswords.php",
+  "old": " || user_can($user, \\MizzeySite\\Stock\\StockFeedRoute::CAP)",
+  "new": ""
+ },
+ {
+  "name": "M6 only the first language written",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "$records = self::records(self::product($holder->id));",
+  "new": "$records = [self::product($holder->id)];"
+ },
+ {
+  "name": "M12 reservation source not kept",
+  "file": "mizzey-site/src/Checkout/OrderStock.php",
+  "old": "$record[$itemId]['source'] = $gateway->sourceName((int) $record[$itemId]['record']);",
+  "new": "$record[$itemId]['source'] = '';"
+ },
+ {
+  "name": "M13 gateway ignores the named source",
+  "file": "mizzey-site/src/Stock/StockGateway.php",
+  "old": "$to    = $named ?? $this->sourceFor($item);",
+  "new": "$to    = $this->sourceFor($item);"
+ },
+ {
+  "name": "M14 variation not routed by its product",
+  "file": "mizzey-site/src/Stock/StockMode.php",
+  "old": "$choice = self::choice(self::holder($item)->id);",
+  "new": "$choice = self::choice($item->id);"
+ },
+ {
+  "name": "M15 holder ignored by the store",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "            $holder = StockMode::holder($item);\n            // A change of this record",
+  "new": "            $holder = $item;\n            // A change of this record"
+ },
+ {
+  "name": "M16 uncounted item reads its stale count",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "        if ($product->get_manage_stock() !== true) {\n            return 0;\n        }",
+  "new": "        if (false) {\n            return 0;\n        }"
+ },
+ {
+  "name": "M17 no undo on failure",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "StockWriteGuard::projection(static fn () => self::restore($before));",
+  "new": "null;"
+ },
+ {
+  "name": "M18 undo outside the guard",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "StockWriteGuard::projection(static fn () => self::restore($before));",
+  "new": "self::restore($before);"
+ },
+ {
+  "name": "M19 pending change not completed",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "            self::rollForward($holder);\n            if (self::applied",
+  "new": "            if (self::applied"
+ },
+ {
+  "name": "M20 switch not seeded",
+  "file": "mizzey-site/src/Stock/StockSourceAdmin.php",
+  "old": "$error = self::seed($item, StockWriteGuard::figure($item->id));",
+  "new": "$error = '';"
+ },
+ {
+  "name": "M21 switch kept after a failed seed",
+  "file": "mizzey-site/src/Stock/StockSourceAdmin.php",
+  "old": "            if ($error !== '') {\n                return $error;\n            }",
+  "new": ""
+ },
+ {
+  "name": "M22 variation panel back in the hidden stock fields",
+  "file": "mizzey-site/src/Stock/StockSourceAdmin.php",
+  "old": "add_action('woocommerce_product_after_variable_attributes', [self::class, 'variationPanel'], 20, 3);",
+  "new": "add_action('woocommerce_variation_options_inventory', [self::class, 'variationPanel'], 20, 3);"
+ },
+ {
+  "name": "M23 feed password opens every route",
+  "file": "mizzey-site/src/Security/ApplicationPasswords.php",
+  "old": "add_filter('rest_pre_dispatch', [self::class, 'feedOnly'], 5, 3);",
+  "new": ""
+ },
+ {
+  "name": "M24 written figure not read back",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "                throw new StockSourceUnavailable('the figure was not written');",
+  "new": ""
+ },
+ {
+  "name": "M25 a pending key counts as applied",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "WHERE operation_key = %s AND state = %s', $operationKey, self::DONE)",
+  "new": "WHERE operation_key = %s AND state <> %s', $operationKey, 'none')"
+ },
+ {
+  "name": "M26 ledger left on another engine",
+  "file": "mizzey-site/src/Stock/StoreStockSource.php",
+  "old": "            $wpdb->query(\"ALTER TABLE {$table} ENGINE = {$wanted}\"); // phpcs:ignore WordPress.DB",
+  "new": ""
+ }
+]

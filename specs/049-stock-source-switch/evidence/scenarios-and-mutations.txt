@@ -1,0 +1,46 @@
+ed3b1f5 fix(checkout): a line's reserve chooses, records and sends its source under the item's stock lock
+PASS  t88-stock-source-switch      INT-16, ERP-07, ADM-73, D-28: the stock source switch
+PASS  t53-erp-adapter-seam         ERP-01, ERP-02, INT-16: the ERP adapter seam
+PASS  t56-wishlist                 WISH-01 to WISH-04, WISH-07: the wishlist and recently viewed
+PASS  t59-cart                     CART-01 to CART-18: the cart
+PASS  t60-checkout                 CHK-01 to CHK-12, BR-005, ENT-08: checkout
+PASS  t67-admin-stock              ERP-07, ADM-70, ADM-72: stock is the stock source's
+PASS  t75-admin-dashboard          ADM-01 to ADM-15: the store at a glance
+PASS  t40-security-accounts        NFR-05: application passwords, sign-in messages and recovery limits
+PASS  t44-two-factor-enrolment-guard ADM-131: a staff member who must enrol can do nothing privileged first
+PASS  t71-staff-activity-log       ADM-130, ADM-132 to ADM-134: the staff log
+PASS  t89-clean-log                NFR-10: a clean application log
+PASS  t76-product-management       #276: product management
+PASS  t62-emails                   NOTF-01 to NOTF-13: customer emails
+PASS  t63-my-account               ACCT-01 to ACCT-08: the account area
+PASS  t68-payments                 PAY-01 to PAY-08, PAY-13 to PAY-17, PAY-19, INT-01: the payment layer
+PASS  t70-order-management         ADM-85, ADM-88 to ADM-91, ADM-93: order management in admin
+--- mutations
+CAUGHT    M1 master switch ignored  <- FAIL  S-2 "ERP off" sends even an item that names the ERP to the store's own stock
+CAUGHT    M2 item choice ignored  <- FAIL  S-1 a product set to its own stock reads it, in both languages; the others still read the ERP ([50,50,40])
+CAUGHT    M3 router always ERP  <- FAIL  S-1 a product set to its own stock reads it, in both languages; the others still read the ERP ([50,50,40])
+CAUGHT    M4 key applied twice  <- FAIL  S-3 a change is applied once per key, and WooCommerce's figure follows in both languages ([5,null,5,5])
+CAUGHT    M5 sale below zero allowed  <- FAIL  FR-002 an own-stock item whose stock WooCommerce does not count holds nothing and refuses a sale until it is given a figure
+CAUGHT    M7 feed open to any signed-in account  <- FAIL  S-4 an account without the feed permission is refused (200)
+CAUGHT    M8 batch size unchecked  <- FAIL  S-4 the feed sets and changes own stock by SKU, and answers each item: an ERP item, an unknown SKU, a bad value or key, and a change b
+CAUGHT    M9 ERP items changed by the feed  <- FAIL  S-4 the feed sets and changes own stock by SKU, and answers each item: an ERP item, an unknown SKU, a bad value or key, and a change b
+CAUGHT    M10 feed account refused an application password  <- FAIL  S-4 over HTTP the route refuses an unauthenticated call (401) and takes one from the feeding account's application password (401, 401,
+CAUGHT    M6 only the first language written  <- FAIL  S-3 a change is applied once per key, and WooCommerce's figure follows in both languages ([5,5,5,7])
+CAUGHT    M12 reservation source not kept  <- FAIL  CHK-12 a line reserved on the ERP is given back to the ERP after its item is switched to its own stock; the store's figure is untouche
+CAUGHT    M13 gateway ignores the named source  <- FAIL  CHK-12 a line reserved on the ERP is given back to the ERP after its item is switched to its own stock; the store's figure is untouche
+CAUGHT    M14 variation not routed by its product  <- FAIL  FR-002 a variation whose product keeps its stock follows the product's source, and a sale takes from the product's one figure ([-2,0,5
+CAUGHT    M15 holder ignored by the store  <- FAIL  FR-002 a variation whose product keeps its stock follows the product's source, and a sale takes from the product's one figure ([null,5
+CAUGHT    M16 uncounted item reads its stale count  <- FAIL  FR-002 an own-stock item whose stock WooCommerce does not count holds nothing and refuses a sale until it is given a figure
+CAUGHT    M17 no undo on failure  <- FAIL  S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (MizzeySite\Stock\StockSourceUnavailable, 
+CAUGHT    M18 undo outside the guard  <- FAIL  S-3 a change whose write fails is undone whole, in both languages, and its key stays unused (MizzeySite\Stock\StockSourceUnavailable, 
+CAUGHT    M19 pending change not completed  <- FAIL  S-3 a change left pending by a request that died is completed before the next one, and never applied twice (4, )
+CAUGHT    M20 switch not seeded  <- FAIL  FR-004 a switch whose starting figure cannot be set leaves the item on the ERP
+CAUGHT    M21 switch kept after a failed seed  <- FAIL  FR-004 a switch whose starting figure cannot be set leaves the item on the ERP
+CAUGHT    M22 variation panel back in the hidden stock fields  <- FAIL  FR-003 the variation panel sits outside WooCommerce's stock fields, which the stock lock hides
+CAUGHT    M23 feed password opens every route  <- FAIL  S-4 the feeding account's application password opens the stock route only: its profile, its email and a batch are refused (200, 200, 2
+CAUGHT    M24 written figure not read back  <- FAIL  S-3 a write that silently does not land on one language is caught, and the change undone (, 5, 5)
+CAUGHT    M25 a pending key counts as applied  <- FAIL  S-4 a fed change left pending is completed when the feed sends it again ({"sku":"t886426-A","key":"t886426-pend","status":"already-app
+CAUGHT    M26 ledger left on another engine  <- FAIL  FR-002 the stock ledger is installed on the stock fields' own table engine (MyISAM)
+25 of 25 caught
+ed3b1f5 fix(checkout): a line's reserve chooses, records and sends its source under the item's stock lock
+

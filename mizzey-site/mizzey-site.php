@@ -129,6 +129,11 @@ require_once __DIR__ . '/src/SecondRelease/NotificationPreferences.php';
 require_once __DIR__ . '/src/SecondRelease/CustomerMetrics.php';
 require_once __DIR__ . '/src/Reviews/ReviewPhotos.php';
 require_once __DIR__ . '/src/Stock/FixtureStockSource.php';
+require_once __DIR__ . '/src/Stock/StockMode.php';
+require_once __DIR__ . '/src/Stock/StoreStockSource.php';
+require_once __DIR__ . '/src/Stock/RoutedStockSource.php';
+require_once __DIR__ . '/src/Stock/StockSourceAdmin.php';
+require_once __DIR__ . '/src/Stock/StockFeedRoute.php';
 require_once __DIR__ . '/src/Stock/LocalStockWriters.php';
 require_once __DIR__ . '/src/Stock/StockWriteGuard.php';
 require_once __DIR__ . '/src/Cart/CartStock.php';
@@ -247,6 +252,11 @@ MizzeySite\Orders\TransitionGuard::register();
 MizzeySite\Roles\RefundCapability::register();
 // The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
 MizzeySite\Stock\FixtureStockSource::register();
+// The store's own stock beside the ERP's, switchable per product, and the route that feeds it: D-28, specs/049.
+MizzeySite\Stock\StoreStockSource::register();
+MizzeySite\Stock\RoutedStockSource::register();
+MizzeySite\Stock\StockSourceAdmin::register();
+MizzeySite\Stock\StockFeedRoute::register();
 MizzeySite\Stock\LocalStockWriters::register();
 MizzeySite\Stock\StockWriteGuard::register();
 MizzeySite\Cart\CartStock::register();
