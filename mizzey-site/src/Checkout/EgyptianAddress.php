@@ -152,6 +152,8 @@ final class EgyptianAddress
             'address_1' => ['label' => __('Street or compound', 'mizzey-site'), 'required' => true, 'priority' => 45, 'index' => 45],
             'address_2' => ['required' => false, 'hidden' => true],
             'postcode'  => ['required' => false, 'hidden' => true],
+            // The courier calls before delivering: an Egyptian address carries a mobile number.
+            'phone'     => ['required' => true, 'hidden' => false],
         ]);
 
         return $locale;
