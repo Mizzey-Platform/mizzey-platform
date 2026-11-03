@@ -19,7 +19,7 @@ system (the ERP) can call to feed the store's own stock. Built on the adapter se
 |---|---|---|---|
 | INT-16 | P1 | S1 | Every integration behind an adapter with retries, logging and webhook handling |
 | ERP-07 | P1-E | S1 | How stock appears in, and is changed through, the store admin (Part One 1.7) |
-| ADM-73 | P1-E | S1 | Stock adjustments with reason and user recorded |
+| ADM-73 | P1-E | - | Stock adjustments with reason and user recorded |
 
 ## Context rows (no obligation here)
 
