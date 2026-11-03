@@ -153,6 +153,14 @@ run(
 			wp_cache_flush();
 		}
 		$check( $edited && 'Back entrance, ask the guard' === wc_get_order( $edited->get_id() )->get_billing_address_2(), 'AC-4 a second line staff typed themselves is kept, also when a part changes afterwards' );
+		if ( $edited ) {
+			$edited = wc_get_order( $edited->get_id() );
+			$edited->set_shipping_address_1( 'Dar Misr Al Andalus, 72 Building' );
+			$edited->save();
+			wp_cache_flush();
+		}
+		$moved = $edited ? wc_get_order( $edited->get_id() ) : null;
+		$check( $moved && 'Dar Misr Al Andalus, 72 Building' === $moved->get_billing_address_1() && 'Dar Misr Al Andalus, 72 Building' === $moved->get_shipping_address_1(), 'AC-3 a correction staff make in the delivery column of a one-address order becomes the address, so every reader shows it' );
 		// [HTTP] Paying an existing order: the parts are checked there too.
 		$unpaid = wc_create_order();
 		$unpaid->add_product( wc_get_product( $product->get_id() ), 1 );
@@ -169,10 +177,30 @@ run(
 			return sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout/' . $unpaid->get_id() ), $body, $auth, $store['cookies'] );
 		};
 		$pay_short = $pay( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::FLOOR => '4', EgyptianAddress::APARTMENT => '18' ) );
+		wp_cache_flush();
+		$after_short = (string) wc_get_order( $unpaid->get_id() )->get_meta( '_wc_billing/' . EgyptianAddress::PLACE );
 		$pay_full  = $pay( $flat_parts );
 		wp_cache_flush();
 		$paid = wc_get_order( $unpaid->get_id() );
-		$check( 200 !== $pay_short['status'] && 200 === $pay_full['status'] && $paid && 'Building 5, floor 4, apartment 18' === $paid->get_billing_address_2(), '[HTTP] AC-2 paying an existing order is refused without the building, and with it the order carries its line (' . $pay_short['status'] . ', ' . $pay_full['status'] . ')' );
+		$check( 200 !== $pay_short['status'] && '' === $after_short && 200 === $pay_full['status'] && $paid && 'Building 5, floor 4, apartment 18' === $paid->get_billing_address_2() && 'yes' !== $paid->get_meta( EgyptianAddress::ONE_ADDRESS ), '[HTTP] AC-2 paying an existing order is refused without the building and keeps none of the refused parts; with them the order carries its line, and keeps its own address policy (' . $pay_short['status'] . ', ' . $pay_full['status'] . ')' );
+		// A line staff typed on an unpaid order stays when the customer pays it from the form, which sends it back.
+		$typed = wc_create_order();
+		$typed->add_product( wc_get_product( $product->get_id() ), 1 );
+		$typed->set_billing_email( "{$tag}-t@example.invalid" );
+		$typed->set_billing_country( 'EG' );
+		$typed->set_billing_address_2( 'Side gate, call first' );
+		$typed->calculate_totals();
+		$typed->set_status( 'pending' );
+		$typed->save();
+		$s->track_order( $typed->get_id() );
+		$store_t = sign_in_json( 'GET', rest_url( 'wc/store/v1/cart' ), null );
+		$auth_t  = array( 'Cart-Token' => sign_in_header( $store_t, 'cart-token' ), 'Nonce' => sign_in_header( $store_t, 'nonce' ) );
+		$body_t  = array_merge( t90_body( "{$tag}-t@example.invalid", $flat_parts ), array( 'key' => $typed->get_order_key(), 'billing_email' => "{$tag}-t@example.invalid" ) );
+		$body_t['billing_address']['address_2']  = 'Side gate, call first';
+		$body_t['shipping_address']['address_2'] = 'Side gate, call first';
+		$paid_t = sign_in_json( 'POST', rest_url( 'wc/store/v1/checkout/' . $typed->get_id() ), $body_t, $auth_t, $store_t['cookies'] );
+		wp_cache_flush();
+		$check( 200 === $paid_t['status'] && 'Side gate, call first' === wc_get_order( $typed->get_id() )->get_billing_address_2(), '[HTTP] AC-4 a line staff typed on an unpaid order is kept when the customer pays it (' . $paid_t['status'] . ', ' . wc_get_order( $typed->get_id() )->get_billing_address_2() . ')' );
 
 		// An Arabic order (WPML's order language): its line is composed in Arabic, whoever saves it.
 		$ar_order = wc_create_order();
