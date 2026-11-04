@@ -1,0 +1,86 @@
+[
+ {
+  "name": "M1 only the first tab read",
+  "file": "mizzey-site/src/Catalogue/Import/Workbook.php",
+  "old": "            foreach (self::tabs($zip) as $name => $file) {",
+  "new": "            foreach (array_slice(self::tabs($zip), 0, 1, true) as $name => $file) {"
+ },
+ {
+  "name": "M2 a reordered tab read by position",
+  "file": "mizzey-site/src/Catalogue/Import/Workbook.php",
+  "old": "                        $byName[] = (string) ($cells[$order[$column]] ?? '');",
+  "new": "                        $byName[] = (string) ($cells[(int) array_search($column, $header, true)] ?? '');"
+ },
+ {
+  "name": "M3 a mismatched tab accepted",
+  "file": "mizzey-site/src/Catalogue/Import/Workbook.php",
+  "old": "                    if ($missing !== [] || $extra !== [] || count($names) !== count($header)) {",
+  "new": "                    if (false) {"
+ },
+ {
+  "name": "M4 numbers read as stored",
+  "file": "mizzey-site/src/Catalogue/Import/Workbook.php",
+  "old": "            return preg_match('/^-?\\d+$/', $raw) === 1 ? $raw : rtrim(rtrim(sprintf('%.10F', (float) $raw), '0'), '.');",
+  "new": "            return $raw;"
+ },
+ {
+  "name": "M5 the tab not carried",
+  "file": "mizzey-site/src/Catalogue/Import/RowInterpreter.php",
+  "old": "            'tab'               => (string) ($raw['tab'] ?? ''),",
+  "new": "            'tab'               => '',"
+ },
+ {
+  "name": "M6 Arabic category levels not made",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "            $arParent = self::arabicTerm($leaf, 'product_cat', (string) ($ar[$level] ?? ''), $arParent);",
+  "new": "            $arParent = 0;"
+ },
+ {
+  "name": "M7 a store translation overwritten",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "        if ($existing > 0 && $existing !== $termId) {\n            return $existing;",
+  "new": "        if (false) {\n            return $existing;"
+ },
+ {
+  "name": "M8 Arabic option values ignored",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "            self::arabicTerm($termId, $taxonomy, $arabic !== '' ? self::text($arabic) : self::text((string) $value), 0);",
+  "new": "            self::arabicTerm($termId, $taxonomy, self::text((string) $value), 0);"
+ },
+ {
+  "name": "M9 option names not translated",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "        if ($id > 0) {\n            icl_add_string_translation",
+  "new": "        if (false) {\n            icl_add_string_translation"
+ },
+ {
+  "name": "M10 W11 never raised",
+  "file": "mizzey-site/src/Catalogue/Import/RowInterpreter.php",
+  "old": "        if ($category !== '' && $arabic !== '' && $levels($category) !== $levels($arabic)) {",
+  "new": "        if (false) {"
+ },
+ {
+  "name": "M11 an Arabic column without its option taken",
+  "file": "mizzey-site/src/Catalogue/Import/Mapping.php",
+  "old": "            if (str_starts_with($to, 'ar_attribute_') && ! isset($this->data['columns'][$name]) && ! in_array(substr($to, 3), $filled, true)) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M12 an optional column required",
+  "file": "mizzey-site/src/Catalogue/Import/HeaderCheck.php",
+  "old": "            if (isset($entry['to']) && ! $mapping->isOptional((string) $name)) {",
+  "new": "            if (isset($entry['to'])) {"
+ },
+ {
+  "name": "M13 the brand's Arabic not set",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "                self::arabicTerm($brand, 'product_brand', self::text((string) ($f['brand_ar'] ?? '')), 0);",
+  "new": "                // dropped"
+ },
+ {
+  "name": "M14 options left product attributes",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "            $taxonomy = self::storeAttribute((string) $slug);",
+  "new": "            $taxonomy = sanitize_title((string) $slug);"
+ }
+]
