@@ -234,9 +234,15 @@ final class CatalogueLoad
     {
         $wordpress = rtrim(wp_normalize_path((string) realpath(ABSPATH)), '/');
         $subfolder = trim((string) wp_parse_url(site_url(), PHP_URL_PATH), '/');
-        $siteRoot  = $subfolder !== '' && str_ends_with(strtolower($wordpress), '/' . strtolower($subfolder))
-            ? substr($wordpress, 0, -strlen('/' . $subfolder))
-            : '';
+        // The subfolder is named in WordPress's path as configured: a release served through a link (`current` to
+        // `releases/<tag>`) resolves to another name, so the resolved path is checked as well, not instead.
+        $siteRoot = '';
+        foreach ([rtrim(wp_normalize_path(ABSPATH), '/'), $wordpress] as $path) {
+            if ($subfolder !== '' && str_ends_with(strtolower($path), '/' . strtolower($subfolder))) {
+                $siteRoot = substr($path, 0, -strlen('/' . $subfolder));
+                break;
+            }
+        }
         $documentRoot = isset($_SERVER['DOCUMENT_ROOT']) ? sanitize_text_field(wp_unslash((string) $_SERVER['DOCUMENT_ROOT'])) : '';
 
         return array_values(array_filter(array_map(
