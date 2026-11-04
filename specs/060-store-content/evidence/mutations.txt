@@ -1,0 +1,15 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t100.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 a banner shown before its start  <- t100: FAIL  AC-1 SSC-09 the targeted page shows the banner in its dates and the one for every page; not the one not yet started, nor the one ended
+CAUGHT    M2 a banner shown after its end  <- t100: FAIL  AC-1 SSC-09 the targeted page shows the banner in its dates and the one for every page; not the one not yet started, nor the one ended
+CAUGHT    M3 targets ignored  <- t100: FAIL  AC-1 another page shows only the banner for every page
+CAUGHT    M4 the page not in its context  <- t100: FAIL  AC-1 SSC-09 the targeted page shows the banner in its dates and the one for every page; not the one not yet started, nor the one ended
+CAUGHT    M5 the Arabic page reads its own targets  <- t100: FAIL  AC-1 SSC-12 the Arabic page shows the banner's Arabic version, on the original's dates and targets ([266037,266038,"Mizzey T1004118 page body إعدادات ملفا
+CAUGHT    M6 the targets never saved  <- t100: FAIL  AC-2 SSC-09 the dates and targets are kept as staff set them on the banner's screen
+CAUGHT    M7 the banner block renders nothing  <- t100: FAIL  AC-1 SSC-09 the targeted page shows the banner in its dates and the one for every page; not the one not yet started, nor the one ended
+CAUGHT    M8 the term banner not saved  <- t100: FAIL  AC-3 SSC-04, SSC-06 a category's banner (image, alternative text, link) and description, and a collection's image, set on their screens; a request without
+CAUGHT    M9 the Arabic term not given the shared banner  <- t100: FAIL  AC-3 SSC-12 the Arabic category answers with its own name and description and the shared banner ({"name":"T1001878 المطبخ","url":"http:\/\/mizzey.local\/a
+CAUGHT    M10 term fields saved without the nonce  <- t100: FAIL  AC-3 SSC-04, SSC-06 a category's banner (image, alternative text, link) and description, and a collection's image, set on their screens; a request without
+
+10 of 10 caught.
