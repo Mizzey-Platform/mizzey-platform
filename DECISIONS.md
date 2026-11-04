@@ -2297,3 +2297,72 @@ stock, because the store's figure may be stale; switching is a person's decision
 **5. Not changed.** D-19 item 5 holds for items on the ERP source: no local writer alters their stock. The ERP
 adapter, its mechanism and its reconciliation still wait on PRE-09; the route is offered to PRE-09, not chosen (M-3).
 With nothing set, every item reads the ERP, as before this record. Built in specs/049-stock-source-switch.
+
+
+## 2026-11-04 - D-29: the store's own stock and the per-product switch (D-28), a recorded gift
+
+**Status: the owner's decision of 4 November 2026, in his words: "Yes, a gift".** Internal record. It adds no
+register row, changes no fee and is not a Change Request.
+
+**1. What is given.** D-28's resilience around the contracted ERP integration: the store's own stock, held in the
+store's database behind the same stock contract, and the switch that sets, for the whole store or for each product,
+whether stock is read from the ERP or from the store's own stock, or that the ERP is switched off. It lets the store
+keep selling when the ERP is missing, partly unreliable or down.
+
+**2. Why it is a gift and not owed.** The register contracts the ERP integration (ERP-01 to ERP-07, INT-16) and
+expressly excludes an interim operation on a separately maintained stock balance (ERP-09, OD-42, OUT). The switch is
+built and given; trading on the store's own stock for a period still needs the separate written agreement that ERP-09
+and OD-42 require. It is recorded so it is never read as owed: it does not make the ERP integration optional, it does
+not deliver ERP-09, and no P2 or OUT row is owed because it was given. The client is told in writing that it is
+included at no charge beyond the contracted scope. Defects in it are fixed like any delivered code; extensions to it
+are not owed.
+
+**3. Where it is.** Built in specs/049-stock-source-switch (D-28) and on staging. Nothing in D-28 changes.
+
+
+## 2026-11-04 - D-30: the assistant connection for the Mizzey team, a recorded gift
+
+**Status: the owner's decision of 4 November 2026, in his words: "Run the store by asking Claude or ChatGPT is a
+gift".** Internal record. It adds no register row, changes no fee and is not a Change Request.
+
+**1. What is given.** An MCP server that connects the store to an assistant the Mizzey team already uses, Claude or
+ChatGPT, so staff can ask in plain words, in English or Arabic, and the assistant answers with the store's figures or
+carries out the request. It works only through a fixed list of tasks set by the developer: reports (sales, best
+sellers, orders, customers), finding and updating orders, adding and editing products, a daily summary, and a
+description of what it is allowed to do. It cannot do anything outside that list: no design, layout, block,
+template or code changes, and no change to stock that comes from the ERP. Every request and every action is
+recorded.
+
+**2. Why it is a gift and not owed.** No register row names an assistant, a chat interface or an MCP connection.
+EX-06 and HOME-13 (AI and personalised recommendations, a personalised home page) stay excluded: this does not
+deliver them, and nothing in them is owed because this was given. Mizzey's own Claude or ChatGPT subscription is a
+third-party cost, not part of the gift. Defects in it are fixed like any delivered code; new tasks or extensions are
+not owed. The client is told in writing that it is included at no charge beyond the contracted scope.
+
+**3. How it is built.** Through the same code paths, permissions and checks as the store's admin, under a
+restricted role, and inside the ERP rules: no stock edits once the ERP is live, product edits only on the fields
+the website owns, and SKUs never changed. Before go-live.
+
+**4. Every action is traceable** (the owner's instruction of 4 November 2026: anything done through the MCP server
+must be logged and tracked, so the source of a problem can be found).
+
+- **A named person behind every action.** Each staff member connects with a personal key tied to their own staff
+  account. There is no shared key, and a key can be revoked on its own.
+- **One reference per action.** Every call the assistant makes gets a reference (for example `A-20261204-0012`), and
+  everything it touches carries that reference.
+- **The assistant log.** Each call is written to the staff log (specs/031, CoreX Activity) with source "assistant":
+  the time, the staff account, the assistant app (Claude or ChatGPT), the task, its inputs, the products and orders
+  touched, the value before and after for every field changed, and the outcome (done, refused as outside its tasks,
+  or failed). Reads are recorded as the task and its filters, not the data returned. The log is searchable by
+  source, person, task, product, order, outcome and date, cannot be changed or deleted from the interface (ADM-133),
+  and is kept for a year like the rest of the staff log.
+- **On the record itself.** A change to an order adds an order note, and a change to a product adds an entry to the
+  product's change history, each naming the assistant, the person and the reference, so the trail is visible where
+  a problem shows. An update this causes towards the ERP carries the same reference.
+- **Watching it.** The daily summary lists what the assistant changed the day before. Repeated refusals or an
+  unusual number of changes alert the website operations contact. An off switch in the admin stops the connection
+  and all its keys at once.
+- **Putting a change back.** The value before each change is kept, so any assistant change can be reversed by hand.
+
+This covers what the assistant does. It does not deliver ROLE-10 (the audit trail of sensitive operations done by
+hand in the admin), which stays DEF.
