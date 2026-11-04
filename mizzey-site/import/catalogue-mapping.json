@@ -1,66 +1,72 @@
 {
-  "version": "0.1.0-fixture",
+  "version": "1.0.0-product-sheet",
   "rules_version": 1,
-  "note": "Fixture mapping for the illustrative export in tests/integration/fixtures/catalogue. The real export (CR-06) replaces the headers; bump the version when it does.",
+  "note": "The mapping for Mizzey's product sheet (Mizzey-Product-Sheet.csv), the one initial migration (MIG-04). Any column named option_<name> fills the attribute <name>, so the sheet may carry any option. Bump the version when the sheet's columns change. See specs/051-product-sheet-import.",
   "source": {
-    "format": "tsv",
+    "format": "csv",
     "encoding": "UTF-8"
   },
   "columns": {
-    "seller-sku": {
+    "row_type": {
+      "to": "row_type"
+    },
+    "sku": {
       "to": "sku"
     },
-    "item-name": {
+    "parent_sku": {
+      "to": "parent_sku"
+    },
+    "name_en": {
       "to": "name"
     },
-    "item-name-ar": {
+    "name_ar": {
       "to": "name_ar"
     },
-    "item-description": {
+    "description_en": {
       "to": "description"
     },
-    "item-description-ar": {
+    "description_ar": {
       "to": "description_ar"
     },
     "price": {
       "to": "regular_price"
     },
-    "parent-child": {
-      "to": "row_type"
+    "sale_price": {
+      "to": "sale_price"
     },
-    "parent-sku": {
-      "to": "parent_sku"
+    "cost": {
+      "to": "cost"
     },
-    "size-name": {
-      "to": "attribute_size"
+    "category": {
+      "to": "category"
     },
-    "color-name": {
-      "to": "attribute_shade"
+    "brand": {
+      "to": "brand"
     },
-    "flavor-name": {
-      "to": "attribute_flavour"
+    "image_urls": {
+      "to": "images"
     },
-    "quantity": {
-      "ignore": "Stock comes from the ERP; the stock rows are P1-E and wait for PRE-09"
+    "seo_title": {
+      "to": "seo_title"
     },
-    "variation-theme": {
-      "ignore": "Names the varying attributes only; their values are read from their own columns"
+    "seo_description": {
+      "to": "seo_description"
     },
-    "asin1": {
+    "amazon_asin": {
       "to": "source_asin"
-    },
-    "image-url": {
-      "ignore": "Images are migrated by #296 (MIG-16), subject to CR-08"
-    },
-    "open-date": {
-      "ignore": "Amazon's listing date; the store has no field for it"
+    }
+  },
+  "prefixes": {
+    "option_": {
+      "to": "attribute_",
+      "note": "One column per option, named by the client: option_size, option_colour, option_capacity, option_scent"
     }
   },
   "row_type": {
     "values": {
-      "": "simple",
+      "simple": "simple",
       "parent": "variable",
-      "child": "variation"
+      "variation": "variation"
     }
   }
 }

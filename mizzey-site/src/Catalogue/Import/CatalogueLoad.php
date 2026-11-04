@@ -107,6 +107,7 @@ final class CatalogueLoad
                 throw new \RuntimeException(__('Cost of goods is switched off in WooCommerce and the mapping fills the cost: switch it on before the load, or no cost is written.', 'mizzey-site'));
             }
             $read      = ExportReader::read($file, $mapping->source());
+            $mapping   = $mapping->forHeader($read['header']); // Each option column of the file (specs/051).
             $header    = HeaderCheck::check($read['header'], $mapping);
             if ($header['failures'] !== []) {
                 throw new \RuntimeException(implode(' ', array_column($header['failures'], 'detail')));
@@ -532,7 +533,7 @@ final class CatalogueLoad
             $attribute = isset($current[$key]) && $current[$key] instanceof \WC_Product_Attribute ? clone $current[$key] : null;
             if (! $attribute instanceof \WC_Product_Attribute) {
                 $attribute = new \WC_Product_Attribute();
-                $attribute->set_name(ucfirst((string) $name));
+                $attribute->set_name(ucfirst(str_replace('-', ' ', (string) $name))); // pack-size reads "Pack size"; its key stays pack-size.
                 $attribute->set_options([]);
                 $attribute->set_visible(true);
             }

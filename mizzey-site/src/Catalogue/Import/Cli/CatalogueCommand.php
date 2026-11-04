@@ -66,6 +66,7 @@ final class CatalogueCommand
         CatalogueWriteGuard::install();
         try {
             $read   = ExportReader::read($file, $mapping->source(), max(1, (int) ($assoc['rows'] ?? 10)));
+            $mapping = $mapping->forHeader($read['header']); // Each option column of the file (specs/051).
             $header = HeaderCheck::check($read['header'], $mapping);
             WP_CLI::log(sprintf(
                 /* translators: 1: mapping version, 2: rules version, 3: format, 4: encoding. */
@@ -163,6 +164,7 @@ final class CatalogueCommand
         CatalogueWriteGuard::install();
         try {
             $read   = ExportReader::read($file, $mapping->source());
+            $mapping = $mapping->forHeader($read['header']); // Each option column of the file (specs/051).
             $header = HeaderCheck::check($read['header'], $mapping);
             $payload['header'] = $header;
             $this->printHeader($header);

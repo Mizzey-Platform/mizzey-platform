@@ -16,6 +16,8 @@
 namespace MizzeySite\Tests\Integration;
 
 const CATALOGUE_FIXTURES = __DIR__ . '/fixtures/catalogue';
+/** The fixtures' own mapping, for their illustrative headers; the plugin's mapping reads the client's product sheet (specs/051). */
+const CATALOGUE_MAPPING = CATALOGUE_FIXTURES . '/mapping.json';
 
 /** Register a product or variation as an English original, the way a store record made in the admin is. */
 function catalogue_as_english( int $id, string $type = 'product' ): void {
@@ -166,11 +168,15 @@ function catalogue_fixture_header(): array {
 }
 
 /**
- * Run `wp mizzey catalogue <args>` in its own process.
+ * Run `wp mizzey catalogue <args>` in its own process; a preview or validation reads the fixtures' mapping unless the
+ * arguments name one.
  *
  * @return array{code:int,out:string}
  */
 function catalogue_command( string $args ): array {
+	if ( preg_match( '/(^|\s)(preview|validate) /', $args ) === 1 && ! str_contains( $args, '--mapping=' ) ) {
+		$args .= ' --mapping=' . escapeshellarg( CATALOGUE_MAPPING );
+	}
 	$bin  = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
 	$out  = array();
 	$code = 0;
