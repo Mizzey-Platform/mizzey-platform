@@ -50,7 +50,7 @@
  {
   "name": "M9 switcher links carry no choice",
   "file": "mizzey-site/src/I18n/LanguagePreference.php",
-  "old": "        if (! is_array($languages) || is_admin()) {",
+  "old": "        if (! is_string($url) || $code === null || is_admin()) {",
   "new": "        if (true) {"
  },
  {
