@@ -772,3 +772,7 @@ msgstr "أرضي"
 #: mizzey-site/src/Checkout/EgyptianAddress.php
 msgid "ground floor"
 msgstr "الدور الأرضي"
+
+#: mizzey-site/src/I18n/LanguagePreference.php
+msgid "Language"
+msgstr "اللغة"

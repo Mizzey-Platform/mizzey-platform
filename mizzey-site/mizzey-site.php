@@ -188,6 +188,8 @@ MizzeySite\I18n\WpmlProductSaveHook::register();
 MizzeySite\I18n\RewriteRoot::register();
 // Prices on Arabic pages: the amount, then the Arabic symbol (NFR-04b): specs/032-image-handling.
 MizzeySite\I18n\CurrencyFormat::register();
+// The chosen language is kept and followed: on the device (NAV-02) and on the account (D-31). specs/052.
+MizzeySite\I18n\LanguagePreference::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
