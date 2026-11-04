@@ -37,6 +37,8 @@ require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
 require_once __DIR__ . '/src/Search/ProductSearch.php';
 require_once __DIR__ . '/src/Storefront/ContactLinks.php';
+require_once __DIR__ . '/src/Storefront/Promotions.php';
+require_once __DIR__ . '/src/Storefront/TermContent.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -216,6 +218,10 @@ MizzeySite\Search\ProductSearch::register();
 
 // The WhatsApp click-to-chat link from the store's number: specs/059-whatsapp-contact.
 MizzeySite\Storefront\ContactLinks::register();
+
+// Promotional banners and each category's, brand's and collection's page content: specs/060-store-content.
+MizzeySite\Storefront\Promotions::register();
+MizzeySite\Storefront\TermContent::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.

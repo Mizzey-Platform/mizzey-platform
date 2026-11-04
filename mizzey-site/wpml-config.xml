@@ -39,4 +39,8 @@
 		<taxonomy translate="1">product_collection</taxonomy>
 		<taxonomy translate="0">mizzey_badge</taxonomy>
 	</taxonomies>
+	<!-- Promotional banners are written in each language (specs/060); their dates and targets are the original's. -->
+	<custom-types>
+		<custom-type translate="1">mizzey_promo</custom-type>
+	</custom-types>
 </wpml-config>
