@@ -308,7 +308,7 @@ run(
 		$check( $copy_id > 0 && $btrid && $copy_term instanceof WP_Term && 'أسود' === $copy_term->name, 'AC-5 MIG-10 an Arabic term that only repeated the English value takes the Arabic the sheet gives (' . ( $copy_term instanceof WP_Term ? $copy_term->name : 'none' ) . ')' );
 		$bin       = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
 		$answer    = array();
-		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( 'echo (int) apply_filters( "wpml_is_translated_taxonomy", false, "pa_' . $fin . '" );' ) . ' 2>&1', $answer );
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "echo (int) apply_filters( 'wpml_is_translated_taxonomy', false, 'pa_{$fin}' );" ) . ' 2>&1', $answer );
 		$check( '1' === trim( (string) end( $answer ) ), 'AC-5 an attribute another part of the store creates is translatable too, read in a request of its own (' . implode( ' ', $answer ) . ')' );
 		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( "pa_{$col}" ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
 

@@ -17,7 +17,8 @@ defined('ABSPATH') || exit;
  * WooCommerce Multilingual treats an attribute as translatable unless staff turn that off, but it records the choice
  * only when the attribute is created from its admin screen; an attribute created by code is left out of WPML's
  * settings, and WPML then serves its English terms on the Arabic store. The default is supplied as WPML's settings
- * are read: nothing is written, and a choice saved for an attribute (on or off) always wins.
+ * are read, and to the copy WPML keeps in memory (it reads them as its own plugin file loads, before this filter can
+ * be added): nothing is written, and a choice saved for an attribute (on or off) always wins.
  *
  * Register ids: MIG-10, SSC-21. See specs/053-sheet-arabic-tabs.
  */
@@ -26,6 +27,21 @@ final class StoreAttributes
     public static function register(): void
     {
         add_filter('option_icl_sitepress_settings', [self::class, 'translatable']);
+        add_action('plugins_loaded', [self::class, 'inMemory'], 0);
+    }
+
+    /** The same default for the settings WPML already holds in memory. */
+    public static function inMemory(): void
+    {
+        global $sitepress;
+        if (! is_object($sitepress) || ! method_exists($sitepress, 'get_setting') || ! method_exists($sitepress, 'set_setting')) {
+            return;
+        }
+        $sync = (array) $sitepress->get_setting('taxonomies_sync_option', []);
+        $with = (array) self::translatable(['taxonomies_sync_option' => $sync])['taxonomies_sync_option'];
+        if ($with !== $sync) {
+            $sitepress->set_setting('taxonomies_sync_option', $with, false); // Memory only: nothing is saved.
+        }
     }
 
     /**
