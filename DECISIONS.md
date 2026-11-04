@@ -2342,3 +2342,27 @@ not owed. The client is told in writing that it is included at no charge beyond 
 **3. How it is built.** Through the same code paths, permissions and checks as the store's admin, under a
 restricted role, and inside the ERP rules: no stock edits once the ERP is live, product edits only on the fields
 the website owns, and SKUs never changed. Before go-live.
+
+**4. Every action is traceable** (the owner's instruction of 4 November 2026: anything done through the MCP server
+must be logged and tracked, so the source of a problem can be found).
+
+- **A named person behind every action.** Each staff member connects with a personal key tied to their own staff
+  account. There is no shared key, and a key can be revoked on its own.
+- **One reference per action.** Every call the assistant makes gets a reference (for example `A-20261204-0012`), and
+  everything it touches carries that reference.
+- **The assistant log.** Each call is written to the staff log (specs/031, CoreX Activity) with source "assistant":
+  the time, the staff account, the assistant app (Claude or ChatGPT), the task, its inputs, the products and orders
+  touched, the value before and after for every field changed, and the outcome (done, refused as outside its tasks,
+  or failed). Reads are recorded as the task and its filters, not the data returned. The log is searchable by
+  source, person, task, product, order, outcome and date, cannot be changed or deleted from the interface (ADM-133),
+  and is kept for a year like the rest of the staff log.
+- **On the record itself.** A change to an order adds an order note, and a change to a product adds an entry to the
+  product's change history, each naming the assistant, the person and the reference, so the trail is visible where
+  a problem shows. An update this causes towards the ERP carries the same reference.
+- **Watching it.** The daily summary lists what the assistant changed the day before. Repeated refusals or an
+  unusual number of changes alert the website operations contact. An off switch in the admin stops the connection
+  and all its keys at once.
+- **Putting a change back.** The value before each change is kept, so any assistant change can be reversed by hand.
+
+This covers what the assistant does. It does not deliver ROLE-10 (the audit trail of sensitive operations done by
+hand in the admin), which stays DEF.
