@@ -51,6 +51,8 @@ final class ProductSearch
         add_filter('posts_search_orderby', [self::class, 'orderby'], 20, 2);
         // `the_posts`, not `found_posts`: WordPress skips the count, and its filter, when nothing is found.
         add_filter('the_posts', [self::class, 'logPosts'], 20, 2);
+        // A Store API search asks for ids only, which no post filter sees: it is logged from its answer instead.
+        add_filter('rest_post_dispatch', [self::class, 'logStoreApi'], 20, 3);
         // The Store API searches with its own `search` variable and its own clause (name or SKU): ours replaces it.
         add_filter('posts_clauses', [self::class, 'storeApiClauses'], 20, 2);
         add_action('rest_api_init', [self::class, 'routes']);
@@ -263,12 +265,8 @@ final class ProductSearch
         if (! $query instanceof \WP_Query || ! self::applies($query) || $query->get(self::SUGGEST)) {
             return $found;
         }
-        $rest = defined('REST_REQUEST') && REST_REQUEST;
-        if (! $rest && ! $query->is_main_query()) {
-            return $found;
-        }
-        if ($rest && max(1, (int) $query->get('paged')) > 1) {
-            return $found;
+        if ((defined('REST_REQUEST') && REST_REQUEST) || ! $query->is_main_query()) {
+            return $found; // The results page's own query; the Store API is logged from its answer.
         }
         $term = mb_substr(wp_strip_all_tags(self::term($query)), 0, 200);
         if ($term === '' || isset(self::$logged[$term]) || get_option(self::LOG_SCHEMA) !== self::LOG_VERSION) {
@@ -278,6 +276,29 @@ final class ProductSearch
         self::record($term, (int) $found);
 
         return $found;
+    }
+
+    /**
+     * @param mixed $response
+     * @param mixed $server
+     * @param mixed $request
+     * @return mixed
+     */
+    public static function logStoreApi($response, $server, $request)
+    {
+        if (! $request instanceof \WP_REST_Request || ! $response instanceof \WP_HTTP_Response || preg_match('#^/wc/store(/v\d+)?/products$#', $request->get_route()) !== 1) {
+            return $response;
+        }
+        $term = mb_substr(trim(wp_strip_all_tags((string) $request->get_param('search'))), 0, 200);
+        if ($term === '' || max(1, (int) $request->get_param('page')) > 1 || $response->get_status() !== 200 || isset(self::$logged[$term]) || get_option(self::LOG_SCHEMA) !== self::LOG_VERSION) {
+            return $response;
+        }
+        $headers = $response->get_headers();
+        $total   = isset($headers['X-WP-Total']) ? (int) $headers['X-WP-Total'] : count((array) $response->get_data());
+        self::$logged[$term] = true;
+        self::record($term, $total);
+
+        return $response;
     }
 
     public static function record(string $term, int $results): void
@@ -341,7 +362,9 @@ final class ProductSearch
             if (! taxonomy_exists($taxonomy)) {
                 continue;
             }
-            $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => true, 'number' => 200]);
+            $words = array_filter(explode(' ', (string) ($phrases[0] ?? '')), static fn (string $w): bool => mb_strlen($w) >= 2);
+            usort($words, static fn (string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
+            $terms = $words === [] ? [] : get_terms(['taxonomy' => $taxonomy, 'hide_empty' => true, 'number' => 50, 'name__like' => (string) reset($words)]);
             foreach (is_array($terms) ? $terms : [] as $term) {
                 $name = Normalise::text($term->name);
                 foreach ($phrases as $phrase) {

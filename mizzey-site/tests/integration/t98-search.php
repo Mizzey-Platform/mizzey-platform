@@ -156,6 +156,7 @@ run(
 		$body = (string) wp_remote_retrieve_body( $page );
 		storefront_refuse_shell( $url, (int) wp_remote_retrieve_response_code( $page ), $body );
 		$check( 200 === (int) wp_remote_retrieve_response_code( $page ) && storefront_shows( $body, "{$tag} Ionic Hair Dryer" ) && storefront_shows( $body, "{$tag} Night Serum" ) && 1 === preg_match( '/woocommerce-result-count|wc-block-product-results-count|woocommerce-ordering/i', $body ), 'AC-7 SRCH-04 the results page lists the matches as the product archive, with its count and ordering' );
+		$check( array( 3, 3 ) === $logged( "{$tag} haircare" ), 'AC-6 a search made on the results page is recorded too (' . wp_json_encode( $logged( "{$tag} haircare" ) ) . ')' );
 
 		return $ok;
 	}
