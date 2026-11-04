@@ -68,7 +68,7 @@ function t47_cart( int $product_id, array $cookies = array() ): array {
 /** A Store API checkout body for an email. */
 function t47_checkout_body( string $email, ?bool $create, ?array $signup ): array {
 	// An Egyptian address carries its district (specs/019).
-	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '010' . sprintf( '%08d', abs( crc32( $email ) ) % 100000000 ), 'mizzey/district' => 'Downtown' ); // a phone of its own: orders sharing a phone are one customer (first-order rules)
+	$address = array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'country' => 'EG', 'state' => 'EG-01', 'email' => $email, 'phone' => '010' . sprintf( '%08d', abs( crc32( $email ) ) % 100000000 ), 'mizzey/district' => 'Downtown', 'mizzey/place' => 'villa', 'mizzey/building' => '1' ); // a phone of its own: orders sharing a phone are one customer (first-order rules)
 	$body    = array( 'billing_address' => $address, 'shipping_address' => $address, 'payment_method' => 'cod' );
 	if ( null !== $create ) {
 		$body['create_account']    = $create;

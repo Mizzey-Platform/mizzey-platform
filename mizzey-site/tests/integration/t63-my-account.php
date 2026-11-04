@@ -31,7 +31,7 @@ function t63_customer( Scenario $s, string $login ): int {
 
 /** An address in the Egyptian structure. */
 function t63_address( array $change = array() ): array {
-	return $change + array( 'first_name' => 'Laila', 'last_name' => 'Fawzy', 'phone' => '+20 100 555 1234', 'state' => 'EG-01', 'city' => 'Cairo', 'district' => 'Zamalek', 'address_1' => '12 Brazil Street', 'landmark' => 'Near the club' );
+	return $change + array( 'first_name' => 'Laila', 'last_name' => 'Fawzy', 'phone' => '+20 100 555 1234', 'state' => 'EG-01', 'city' => 'Cairo', 'district' => 'Zamalek', 'place' => 'apartment', 'address_1' => '12 Brazil Street', 'building' => '12', 'floor' => '3', 'apartment' => '6', 'landmark' => 'Near the club' );
 }
 
 run(

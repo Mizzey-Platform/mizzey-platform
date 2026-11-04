@@ -78,7 +78,8 @@ def stock_of(ids: dict) -> dict:
 def address(n: int) -> dict:
     return {"first_name": "Load", "last_name": f"Buyer {n:02d}", "address_1": f"{n} Sample Street", "city": "Cairo",
             "state": "C", "postcode": "11511", "country": "EG", "email": f"load-buyer-{n:02d}@example.invalid",
-            "phone": f"0100000{n:04d}"}
+            "phone": f"0100000{n:04d}", "mizzey/district": "Downtown", "mizzey/place": "villa",
+            "mizzey/building": str(n)}
 
 
 def cmd_last_units(a) -> int:

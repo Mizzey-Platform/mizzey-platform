@@ -67,7 +67,7 @@ function t60_order( Scenario $s, array $lines ): \WC_Order {
 
 /** A Store API checkout body in the Egyptian structure. */
 function t60_body( string $email, ?string $district ): array {
-	$address = array( 'first_name' => 'Mona', 'last_name' => 'Sayed', 'address_1' => '5 Tahrir Street', 'city' => 'Cairo', 'state' => 'EG-01', 'country' => 'EG', 'postcode' => '', 'email' => $email, 'phone' => '01000000000' );
+	$address = array( 'first_name' => 'Mona', 'last_name' => 'Sayed', 'address_1' => 'Tahrir Street', 'city' => 'Cairo', 'state' => 'EG-01', 'country' => 'EG', 'postcode' => '', 'email' => $email, 'phone' => '01000000000', EgyptianAddress::PLACE => EgyptianAddress::APARTMENTS, EgyptianAddress::BUILDING => '5', EgyptianAddress::FLOOR => '3', EgyptianAddress::APARTMENT => '12' );
 	if ( null !== $district ) {
 		$address[ EgyptianAddress::DISTRICT ] = $district;
 		$address[ EgyptianAddress::LANDMARK ] = 'Next to the metro';

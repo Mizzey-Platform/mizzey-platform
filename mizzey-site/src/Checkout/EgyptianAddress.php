@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace MizzeySite\Checkout;
 
 use MizzeySite\Accounts\CustomerKey;
+use MizzeySite\Emails\OrderLanguage;
 
 defined('ABSPATH') || exit;
 
@@ -17,24 +18,47 @@ defined('ABSPATH') || exit;
  *
  * WooCommerce has Egypt's governorates as its states and no address format for Egypt. Its country locale for Egypt is
  * set here (`woocommerce_get_country_locale`), which both checkouts and the account's address forms read: the
- * governorate (the state field) required, the city, the street and building (the first address line), the second line
- * and the postcode hidden, as Egyptian addresses do not use them. The district (required) and a landmark (optional)
+ * governorate (the state field) required, the city, the street or compound (the first address line), the second line
+ * and the postcode hidden from the form, as Egyptian addresses do not use them. The district (required) and a landmark (optional)
  * are WooCommerce additional checkout fields in the address (`woocommerce_register_additional_checkout_field`), for an
  * Egyptian address only, kept with the order and the customer's address. They show on the block checkout, which the
  * storefront uses; the designed form is PRE-03b's.
  *
- * Register ids: CHK-01. See specs/019-checkout.
+ * One address (specs/050): WooCommerce asks for the billing address only and delivers to it. The address reads largest
+ * place first, as Egyptians give it: the kind of place (apartment, villa, office), the street or compound, the building,
+ * and for an apartment or an office the floor and the number, all address fields too; the mobile number is required.
+ * The building, floor and apartment are written as the address's second line on every save, in the order's language,
+ * so the order screens, the emails, the packing slip and the courier (Bosta's plugin sends that line) carry them.
+ *
+ * Register ids: CHK-01, CHK-11. See specs/019-checkout and specs/050-egyptian-address.
  */
 final class EgyptianAddress
 {
-    public const DISTRICT = 'mizzey/district';
-    public const LANDMARK = 'mizzey/landmark';
+    public const DISTRICT   = 'mizzey/district';
+    public const LANDMARK   = 'mizzey/landmark';
+    public const PLACE      = 'mizzey/place';
+    public const BUILDING   = 'mizzey/building';
+    public const FLOOR      = 'mizzey/floor';
+    public const APARTMENT  = 'mizzey/apartment';
+    public const APARTMENTS = 'apartment';
+    public const VILLA      = 'villa';
+    public const OFFICE     = 'office';
+    /** Set on an order placed while the checkout asks for one address: its billing address is the delivery address. */
+    public const ONE_ADDRESS = '_mizzey_one_address';
+    /** The second line last composed for an address type, so a line staff typed themselves is not overwritten. */
+    public const LINE = '_mizzey_address_line_';
+    /** The address's own fields, in the order a person reads an Egyptian address: largest place first. */
+    public const FIELDS = [self::DISTRICT, self::PLACE, self::BUILDING, self::FLOOR, self::APARTMENT, self::LANDMARK];
 
     public static function register(): void
     {
         add_filter('woocommerce_get_country_locale', [self::class, 'locale'], 10, 1);
         add_action('woocommerce_init', [self::class, 'fields']);
+        // One address: the order is delivered to the address the customer gives, as Egyptian stores ask for it.
+        add_filter('pre_option_woocommerce_ship_to_destination', [self::class, 'oneAddress']);
+        add_action('woocommerce_before_order_object_save', [self::class, 'composeOrder'], 10, 1);
         add_action('woocommerce_checkout_validate_order_before_payment', [self::class, 'beforePayment'], 10, 2);
+        add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'fromCheckout'], 5, 2);
         add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'payingOrder'], 10, 2);
         add_filter('woocommerce_validate_phone', [self::class, 'validPhone'], 10, 3);
     }
@@ -71,10 +95,26 @@ final class EgyptianAddress
         if (! $order instanceof \WC_Order || ! $request instanceof \WP_REST_Request || preg_match('#^/wc/store(/v\d+)?/checkout/\d+$#', $request->get_route()) !== 1) {
             return;
         }
+        $billing = $request->get_param('billing_address');
+        if (is_array($billing) && ($billing['country'] ?? '') === 'EG') {
+            $part  = static fn (string $key): string => isset($billing[$key]) && is_scalar($billing[$key]) ? trim((string) $billing[$key]) : '';
+            $place = $part(self::PLACE);
+            $need  = [self::PLACE => __('Type of place', 'mizzey-site'), self::BUILDING => __('Building or villa number', 'mizzey-site')];
+            if ($place !== self::VILLA) {
+                $need += [self::FLOOR => __('Floor', 'mizzey-site'), self::APARTMENT => __('Apartment or office number', 'mizzey-site')];
+            }
+            foreach ($need as $key => $label) {
+                if ($part($key) === '') {
+                    // Thrown before the order is saved, so the order keeps the parts it had.
+                    /* translators: %s: the field's name. */
+                    throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException('mizzey_address_part_missing', esc_html(sprintf(__('%s is required.', 'mizzey-site'), $label)), 400);
+                }
+            }
+        }
         $fields = \Automattic\WooCommerce\Blocks\Package::container()->get(\Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class);
         foreach (['billing', 'shipping'] as $type) {
             $address = $request->get_param($type . '_address') ?? ($type === 'shipping' ? $request->get_param('billing_address') : null);
-            foreach ([self::DISTRICT, self::LANDMARK] as $key) {
+            foreach (self::FIELDS as $key) {
                 if (is_array($address) && isset($address[$key]) && is_scalar($address[$key])) {
                     $fields->persist_field_for_order($key, sanitize_text_field((string) $address[$key]), $order, $type, false);
                 }
@@ -103,6 +143,22 @@ final class EgyptianAddress
                 break;
             }
         }
+        // The parts of the one address, checked here too, as paying an existing order (`/checkout/{id}`) does not run the
+        // checkout's own field rules.
+        if ($order->get_billing_country() === 'EG') {
+            $value = static fn (string $key): string => trim((string) $order->get_meta('_wc_billing/' . $key));
+            $place = $value(self::PLACE);
+            $parts = [self::PLACE => __('Type of place', 'mizzey-site'), self::BUILDING => __('Building or villa number', 'mizzey-site')];
+            if ($place !== self::VILLA) {
+                $parts += [self::FLOOR => __('Floor', 'mizzey-site'), self::APARTMENT => __('Apartment or office number', 'mizzey-site')];
+            }
+            foreach ($parts as $key => $label) {
+                if ($value($key) === '') {
+                    /* translators: %s: the field's name. */
+                    $errors->add('mizzey_address_part_missing', sprintf(__('%s is required.', 'mizzey-site'), $label));
+                }
+            }
+        }
         foreach (['billing', 'shipping'] as $type) {
             $country = $type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
             if ($country === 'EG' && trim((string) $order->get_meta("_wc_{$type}/" . self::DISTRICT)) === '' && ($type === 'billing' || $order->needs_shipping_address())) {
@@ -115,6 +171,53 @@ final class EgyptianAddress
     }
 
     /**
+     * A new order placed through the Store API checkout: the second line of an Egyptian address is the checkout's to
+     * compose (the form does not show it, so what arrives is a copy from the customer's saved address), and the order is
+     * marked as placed with one address. Paying an existing order (`/checkout/{id}`) keeps that order's own line and
+     * address policy.
+     *
+     * @param mixed $order
+     * @param mixed $request
+     */
+    public static function fromCheckout($order, $request): void
+    {
+        if (! $order instanceof \WC_Order || ! $request instanceof \WP_REST_Request || preg_match('#^/wc/store(/v\d+)?/checkout$#', $request->get_route()) !== 1) {
+            return;
+        }
+        foreach (['billing', 'shipping'] as $type) {
+            $order->delete_meta_data(self::LINE . $type);
+            if (($type === 'billing' ? $order->get_billing_country() : $order->get_shipping_country()) === 'EG') {
+                $type === 'billing' ? $order->set_billing_address_2('') : $order->set_shipping_address_2('');
+            }
+        }
+        if (wc_ship_to_billing_address_only()) {
+            $order->update_meta_data(self::ONE_ADDRESS, 'yes');
+        }
+    }
+
+    /**
+     * The floor as typed; a lone zero is the ground floor, written so (WooCommerce takes "0" for an empty field).
+     *
+     * @param mixed $value
+     */
+    public static function floor($value): string
+    {
+        $floor = trim(sanitize_text_field(is_scalar($value) ? (string) $value : ''));
+
+        return in_array($floor, ['0', '٠'], true) ? __('Ground', 'mizzey-site') : $floor;
+    }
+
+    /** One address for the order: WooCommerce's setting that delivers to the billing address, with no second form. */
+    public static function oneAddress(): string
+    {
+        return 'billing_only';
+    }
+
+    /**
+     * The Egyptian address in reading order, largest place first: governorate, city, district, the kind of place, the
+     * street or compound, building, floor, apartment, landmark. The core fields' order is set here; the address's own
+     * fields carry theirs in `fields()`.
+     *
      * @param mixed $locale
      * @return mixed
      */
@@ -124,11 +227,13 @@ final class EgyptianAddress
             return $locale;
         }
         $locale['EG'] = array_replace_recursive((array) ($locale['EG'] ?? []), [
-            'state'     => ['label' => __('Governorate', 'mizzey-site'), 'required' => true, 'hidden' => false],
-            'city'      => ['label' => __('City', 'mizzey-site'), 'required' => true],
-            'address_1' => ['label' => __('Street and building', 'mizzey-site'), 'required' => true],
+            'state'     => ['label' => __('Governorate', 'mizzey-site'), 'required' => true, 'hidden' => false, 'priority' => 41, 'index' => 41],
+            'city'      => ['label' => __('City or area', 'mizzey-site'), 'required' => true, 'priority' => 42, 'index' => 42],
+            'address_1' => ['label' => __('Street or compound', 'mizzey-site'), 'required' => true, 'priority' => 45, 'index' => 45],
             'address_2' => ['required' => false, 'hidden' => true],
             'postcode'  => ['required' => false, 'hidden' => true],
+            // The courier calls before delivering: an Egyptian address carries a mobile number.
+            'phone'     => ['required' => true, 'hidden' => false],
         ]);
 
         return $locale;
@@ -139,18 +244,73 @@ final class EgyptianAddress
         if (! function_exists('woocommerce_register_additional_checkout_field')) {
             return;
         }
-        // For an Egyptian address only: required and shown when the address being entered is in Egypt, hidden otherwise
-        // (WooCommerce's conditional field rules, on the checkout document's `customer.address`).
-        $egypt = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['const' => 'EG']]]]]];
-        $other = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['not' => ['const' => 'EG']]]]]]];
+        // For an Egyptian address only (WooCommerce's conditional field rules, on the checkout document's
+        // `customer.address`): shown when the address is in Egypt, hidden otherwise. A floor and an apartment are asked
+        // of a flat or an office, not of a villa.
+        $egypt      = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['const' => 'EG']]]]]];
+        $other      = ['customer' => ['properties' => ['address' => ['properties' => ['country' => ['not' => ['const' => 'EG']]]]]]];
+        // A rule's top-level keys are the document's properties, so the condition on two address fields sits on the
+        // address itself: in Egypt, and a flat or an office.
+        $isStacked  = [
+            'properties' => ['country' => ['const' => 'EG'], self::PLACE => ['enum' => [self::APARTMENTS, self::OFFICE]]],
+            'required'   => [self::PLACE],
+        ];
+        $stacked    = ['customer' => ['properties' => ['address' => $isStacked]]];
+        $notStacked = ['customer' => ['properties' => ['address' => ['not' => $isStacked]]]];
         woocommerce_register_additional_checkout_field([
             'id'         => self::DISTRICT,
-            'label'      => __('District', 'mizzey-site'),
+            'label'      => __('District or neighbourhood', 'mizzey-site'),
             'location'   => 'address',
             'type'       => 'text',
             'required'   => $egypt,
             'hidden'     => $other,
+            'index'      => 43,
             'attributes' => ['autocomplete' => 'address-level3'],
+        ]);
+        woocommerce_register_additional_checkout_field([
+            'id'       => self::PLACE,
+            'label'    => __('Type of place', 'mizzey-site'),
+            'location' => 'address',
+            'type'     => 'select',
+            'options'  => [
+                ['value' => self::APARTMENTS, 'label' => __('Apartment', 'mizzey-site')],
+                ['value' => self::VILLA, 'label' => __('Villa or house', 'mizzey-site')],
+                ['value' => self::OFFICE, 'label' => __('Office', 'mizzey-site')],
+            ],
+            'required' => $egypt,
+            'hidden'   => $other,
+            'index'    => 44,
+        ]);
+        woocommerce_register_additional_checkout_field([
+            'id'                         => self::BUILDING,
+            'label'                      => __('Building or villa number', 'mizzey-site'),
+            'location'                   => 'address',
+            'type'                       => 'text',
+            'required'                   => $egypt,
+            'hidden'                     => $other,
+            'index'                      => 46,
+            'show_in_order_confirmation' => false,
+        ]);
+        woocommerce_register_additional_checkout_field([
+            'id'                         => self::FLOOR,
+            'label'                      => __('Floor', 'mizzey-site'),
+            'location'                   => 'address',
+            'type'                       => 'text',
+            'sanitize_callback'          => [self::class, 'floor'],
+            'required'                   => $stacked,
+            'hidden'                     => $notStacked,
+            'index'                      => 47,
+            'show_in_order_confirmation' => false,
+        ]);
+        woocommerce_register_additional_checkout_field([
+            'id'                         => self::APARTMENT,
+            'label'                      => __('Apartment or office number', 'mizzey-site'),
+            'location'                   => 'address',
+            'type'                       => 'text',
+            'required'                   => $stacked,
+            'hidden'                     => $notStacked,
+            'index'                      => 48,
+            'show_in_order_confirmation' => false,
         ]);
         woocommerce_register_additional_checkout_field([
             'id'            => self::LANDMARK,
@@ -160,6 +320,107 @@ final class EgyptianAddress
             'type'          => 'text',
             'required'      => false,
             'hidden'        => $other,
+            'index'         => 49,
         ]);
+    }
+
+    /**
+     * The building, floor and apartment as one line, in the order's language, kept as the address's second line, which
+     * the order screens, the emails, the packing slip and the courier (Bosta sends it as `secondLine`) already show.
+     * Written on every save, so a change staff make to the parts on the order screen is carried; a second line staff
+     * typed themselves (it is not the line last composed) is kept. An address without the parts (an older order, another
+     * country) keeps its second line. On an order placed with one address, the delivery copy follows the billing address,
+     * so every reader shows the same one.
+     *
+     * @param mixed $order
+     */
+    public static function composeOrder($order): void
+    {
+        if (! $order instanceof \WC_Order) {
+            return;
+        }
+        if ($order->get_meta(self::ONE_ADDRESS, true, 'edit') !== 'yes') {
+            self::compose($order, 'billing');
+            self::compose($order, 'shipping');
+
+            return;
+        }
+        // One address: staff may correct either column of the order screen; the one they changed is the address.
+        $from = self::edited($order, 'shipping') && ! self::edited($order, 'billing') ? 'shipping' : 'billing';
+        self::compose($order, $from);
+        self::mirror($order, $from, $from === 'billing' ? 'shipping' : 'billing');
+    }
+
+    private static function compose(\WC_Order $order, string $type): void
+    {
+        if (($type === 'billing' ? $order->get_billing_country('edit') : $order->get_shipping_country('edit')) !== 'EG') {
+            return;
+        }
+        $value    = static fn (string $key): string => trim((string) $order->get_meta("_wc_{$type}/{$key}", true, 'edit'));
+        $line     = OrderLanguage::during($order, static fn (): string => self::line($value(self::PLACE), $value(self::BUILDING), $value(self::FLOOR), $value(self::APARTMENT)));
+        $current  = $type === 'billing' ? $order->get_billing_address_2('edit') : $order->get_shipping_address_2('edit');
+        $previous = (string) $order->get_meta(self::LINE . $type, true, 'edit');
+        if ($current !== '' && $current !== $previous) {
+            return; // typed by staff, or an older order's own line
+        }
+        if ($current !== $line) {
+            $type === 'billing' ? $order->set_billing_address_2($line) : $order->set_shipping_address_2($line);
+        }
+        $line === '' ? $order->delete_meta_data(self::LINE . $type) : $order->update_meta_data(self::LINE . $type, $line);
+    }
+
+    /** Whether this save changes the address of a type: one of its fields, or one of its parts. */
+    private static function edited(\WC_Order $order, string $type): bool
+    {
+        if (! empty($order->get_changes()[$type])) {
+            return true;
+        }
+        foreach ($order->get_meta_data() as $meta) {
+            $data = $meta->get_data();
+            if (str_starts_with((string) ($data['key'] ?? ''), "_wc_{$type}/") && (empty($data['id']) || $meta->get_changes() !== [])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** The other copy of a one-address order: the address, its parts and its composed line. */
+    private static function mirror(\WC_Order $order, string $from, string $to): void
+    {
+        foreach (['first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country', 'phone'] as $field) {
+            $order->{"set_{$to}_{$field}"}((string) $order->{"get_{$from}_{$field}"}('edit'));
+        }
+        foreach (self::FIELDS as $key) {
+            $order->update_meta_data("_wc_{$to}/{$key}", (string) $order->get_meta("_wc_{$from}/{$key}", true, 'edit'));
+        }
+        $line = (string) $order->get_meta(self::LINE . $from, true, 'edit');
+        $line === '' ? $order->delete_meta_data(self::LINE . $to) : $order->update_meta_data(self::LINE . $to, $line);
+    }
+
+    /** "Building 5, floor 4, apartment 18"; "Villa 12"; "Building 3, floor 2, office 7". Empty when nothing is given. */
+    public static function line(string $place, string $building, string $floor, string $apartment): string
+    {
+        $parts = [];
+        if ($building !== '') {
+            /* translators: %s: the building's or villa's number. */
+            $parts[] = sprintf($place === self::VILLA ? __('Villa %s', 'mizzey-site') : __('Building %s', 'mizzey-site'), $building);
+        }
+        if ($place !== self::VILLA) {
+            if (in_array($floor, ['Ground', 'أرضي', __('Ground', 'mizzey-site')], true)) {
+                // The ground floor as it is said, in either language it was typed in.
+                $parts[] = __('ground floor', 'mizzey-site');
+            } elseif ($floor !== '') {
+                /* translators: %s: the floor. */
+                $parts[] = sprintf(__('floor %s', 'mizzey-site'), $floor);
+            }
+            if ($apartment !== '') {
+                /* translators: %s: the apartment's or office's number. */
+                $parts[] = sprintf($place === self::OFFICE ? __('office %s', 'mizzey-site') : __('apartment %s', 'mizzey-site'), $apartment);
+            }
+        }
+
+        /* translators: separates the parts of an address line, as in "Building 5, floor 4". */
+        return implode(_x(', ', 'address parts', 'mizzey-site'), $parts);
     }
 }

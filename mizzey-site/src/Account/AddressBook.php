@@ -17,8 +17,8 @@ defined('ABSPATH') || exit;
  * The customer's address book (ACCT-04): add, edit, delete, set default.
  *
  * WooCommerce keeps one billing and one shipping address on the account. The book keeps up to ten addresses on the
- * account (`_mizzey_addresses`), each in the Egyptian structure of specs/019 (name, mobile, governorate, city, district,
- * street and building, landmark). Setting one as the default copies it into WooCommerce's own billing and shipping
+ * account (`_mizzey_addresses`), each in the Egyptian structure of specs/019 and specs/050 (name, mobile, governorate, city,
+ * district, the kind of place, street or compound, building, floor, apartment, landmark). Setting one as the default copies it into WooCommerce's own billing and shipping
  * address, which the checkout prefills (CHK-02); its mobile number goes to the shipping phone only, as the billing phone
  * is the number the customer signs in with (specs/017). Deleting the default leaves WooCommerce's copy as it is. The REST
  * routes act on the signed-in customer's own book only (WordPress's REST cookie sign-in, with its nonce); the designed
@@ -36,10 +36,14 @@ final class AddressBook
 {
     public const META     = '_mizzey_addresses';
     public const CAPACITY = 10;
-    public const FIELDS   = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'address_1', 'landmark'];
-    private const REQUIRED = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'address_1'];
+    public const FIELDS   = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'place', 'address_1', 'building', 'floor', 'apartment', 'landmark'];
+    private const REQUIRED = ['first_name', 'last_name', 'phone', 'state', 'city', 'district', 'place', 'address_1', 'building'];
+    /** Asked of a flat or an office, not of a villa. */
+    private const STACKED = ['floor', 'apartment'];
     /** The longest each part is kept. */
-    public const LENGTHS = ['first_name' => 60, 'last_name' => 60, 'phone' => 32, 'state' => 10, 'city' => 80, 'district' => 80, 'address_1' => 200, 'landmark' => 120];
+    public const LENGTHS = ['first_name' => 60, 'last_name' => 60, 'phone' => 32, 'state' => 10, 'city' => 80, 'district' => 80, 'place' => 10, 'address_1' => 200, 'building' => 40, 'floor' => 20, 'apartment' => 20, 'landmark' => 120];
+    /** The book's part and the checkout's field it is kept in. */
+    private const CHECKOUT = ['district' => EgyptianAddress::DISTRICT, 'place' => EgyptianAddress::PLACE, 'building' => EgyptianAddress::BUILDING, 'floor' => EgyptianAddress::FLOOR, 'apartment' => EgyptianAddress::APARTMENT, 'landmark' => EgyptianAddress::LANDMARK];
 
     public static function register(): void
     {
@@ -245,7 +249,16 @@ final class AddressBook
             $value           = isset($input[$field]) && is_scalar($input[$field]) ? sanitize_text_field((string) $input[$field]) : '';
             $address[$field] = mb_substr($value, 0, self::LENGTHS[$field] ?? 80);
         }
-        foreach (self::REQUIRED as $field) {
+        if (! in_array($address['place'], [EgyptianAddress::APARTMENTS, EgyptianAddress::VILLA, EgyptianAddress::OFFICE], true)) {
+            $address['place'] = '';
+        }
+        $required = $address['place'] === EgyptianAddress::VILLA ? self::REQUIRED : array_merge(self::REQUIRED, self::STACKED);
+        $address['floor'] = EgyptianAddress::floor($address['floor']);
+        if ($address['place'] === EgyptianAddress::VILLA) {
+            $address['floor']     = '';
+            $address['apartment'] = '';
+        }
+        foreach ($required as $field) {
             if ($address[$field] === '') {
                 return new \WP_Error('mizzey_address_incomplete', __('Please fill in every part of the address; only the landmark is optional.', 'mizzey-site'), ['status' => 400, 'field' => $field]);
             }
@@ -275,11 +288,14 @@ final class AddressBook
                     $customer->{$setter}($address[$field] ?? '');
                 }
             }
-            $customer->update_meta_data("_wc_{$type}/" . EgyptianAddress::DISTRICT, (string) $address['district']);
-            $customer->update_meta_data("_wc_{$type}/" . EgyptianAddress::LANDMARK, (string) $address['landmark']);
+            foreach (self::CHECKOUT as $part => $key) {
+                $customer->update_meta_data("_wc_{$type}/{$key}", (string) ($address[$part] ?? ''));
+            }
         }
-        $customer->set_billing_address_2('');
-        $customer->set_shipping_address_2('');
+        // The building, floor and apartment as the second line, as an order carries them (specs/050).
+        $line = EgyptianAddress::line((string) ($address['place'] ?? ''), (string) ($address['building'] ?? ''), (string) ($address['floor'] ?? ''), (string) ($address['apartment'] ?? ''));
+        $customer->set_billing_address_2($line);
+        $customer->set_shipping_address_2($line);
         $customer->save();
     }
 

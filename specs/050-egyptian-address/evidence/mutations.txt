@@ -1,0 +1,29 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0), scenario t90.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, t90 run.
+M8 and M23 were run again after the second line's ground-floor wording changed (M8's text moved with it).
+
+CAUGHT    M1 one address off  <- t90: FAIL  AC-3 the checkout asks for one address, the one the order is delivered to
+CAUGHT    M2 phone optional  <- t90: FAIL  AC-1 the phone is required for Egypt, the kind of place is apartment, villa or office, and the street line names a compound too
+CAUGHT    M3 building optional  <- t90: FAIL  AC-2 the form marks the building required in Egypt, and the floor and number for a flat or an office only
+CAUGHT    M4 floor never required  <- t90: FAIL  AC-2 the form marks the building required in Egypt, and the floor and number for a flat or an office only
+CAUGHT    M5 villa asked for floor  <- t90: FAIL  AC-2 the form marks the building required in Egypt, and the floor and number for a flat or an office only
+CAUGHT    M6 line not written  <- t90: FAIL  AC-2 an office without its number is refused; a ground floor typed as 0 is taken as the ground floor (400, 200, )
+CAUGHT    M7 line not in the order's language  <- t90: FAIL  AC-4 an Arabic order's line is in Arabic though it is saved in English (Building 5, floor 4, apartment 18)
+CAUGHT    M8 villa keeps floor in line  <- t90: FAIL  AC-4 the building, floor and apartment as one line; a villa has no floor or apartment (["Building 5, floor 4, apartment 18","Villa 12, floor 2, apartment 
+CAUGHT    M9 reading order broken  <- t90: FAIL  AC-1 the address reads largest place first: governorate, city, district, kind of place, street or compound, building, floor, apartment, landmark ({"state"
+CAUGHT    M10 book keeps no apartment  <- t90: FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a villa
+CAUGHT    M11 book accepts a flat without floor  <- t90: FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a villa
+CAUGHT    M12 book default copies no line  <- t90: FAIL  AC-5 the default address prefills the checkout with every part (CHK-02)
+CAUGHT    M13 slip drops landmark  <- t90: FAIL  AC-4 the courier's address (Bosta secondLine) and the packing slip carry the line and the landmark
+CAUGHT    M14 book keeps villa floor  <- t90: FAIL  AC-5 the address book keeps the kind of place, building, floor and apartment, refuses a flat without them, and keeps no floor for a villa
+CAUGHT    M15 a line staff typed is overwritten  <- t90: FAIL  AC-4 a second line staff typed themselves is kept, also when a part changes afterwards
+CAUGHT    M16 delivery copy not mirrored  <- t90: FAIL  AC-3, AC-4 a change staff make on the order screen is carried to the line, and the one address's delivery copy, packing slip, invoice and courier all show
+SURVIVED  M17 parts not checked before payment  <- EQUIVALENT: the pay-an-order route requires a billing address, and the request-level check (payingOrder, on that address) refuses a missing part before this order-level check runs; it is kept as a backstop
+CAUGHT    M18 ground floor 0 not taken  <- t90: FAIL  AC-2 an office without its number is refused; a ground floor typed as 0 is taken as the ground floor (400, 400)
+CAUGHT    M19 apartment never required  <- t90: FAIL  AC-2 the form marks the building required in Egypt, and the floor and number for a flat or an office only
+CAUGHT    M20 paying an order resets its line  <- t90: FAIL  [HTTP] AC-2 paying an existing order is refused without the building and keeps none of the refused parts; with them the order carries its line, and keeps 
+CAUGHT    M21 refused payment keeps the parts  <- t90: FAIL  [HTTP] AC-2 paying an existing order is refused without the building and keeps none of the refused parts; with them the order carries its line, and keeps 
+CAUGHT    M22 shipping correction ignored  <- t90: FAIL  AC-3 a correction staff make in the delivery column of a one-address order becomes the address, so every reader shows it
+CAUGHT    M23 ground floor read as floor Ground  <- t90: FAIL  AC-4 a ground floor reads as the ground floor, in Arabic too (عمارة 5، الدور أرضي، شقة 1)
+
+22 of 23 caught; M17 is equivalent (no request can reach the check it removes with a part missing).
