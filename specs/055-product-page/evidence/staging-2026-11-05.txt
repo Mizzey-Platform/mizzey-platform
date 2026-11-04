@@ -1,0 +1,8 @@
+Staging, 5 November 2026, release v0.1.21 (63cecd4), backup 20261105-001752-manual taken first.
+bin/deploy from the verified zip (checksum matches). staging.py build: no problems. staging.py check: 6 of 6.
+wp mizzey security check: every baseline passes.
+Run in the staging PHP container (~/mizzey-staging/staging-run.sh); evidence: ~/mizzey-staging/evidence/scenarios-20261105-001839/
+t95-product-page: 8 of 9 checks pass on the release. AC-3 failed: the scenario's own shipping zone
+  was never matched, because WooCommerce keeps a zone's order unsigned and staging has its own Egypt zone
+  (order 0). A test defect, not the site's: fixed by #532 (0aec7f6). With that file, t95 passes on staging,
+  9 checks (~/mizzey-staging/evidence/scenarios-20261105-002556-t95fix/); staging's zone kept its order.

@@ -13,4 +13,4 @@ Each task names its test. `t98` is `mizzey-site/tests/integration/t98-search.php
 | T005 | Suggestions and empty-state suggestions | t98 AC-5 |
 | T006 | The term log | t98 AC-6 |
 | T007 | Full gates; mutation checks; self-review (Codex paused) | `evidence/` |
-| T008 | Staging: t98 on the release | PR |
+| T008 | Staging: t98 on the release: done, v0.1.21 (`evidence/staging-2026-11-05.txt`) | PR |

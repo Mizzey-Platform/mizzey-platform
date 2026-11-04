@@ -12,4 +12,4 @@ Each task names its test. `t95` is `mizzey-site/tests/integration/t95-product-pa
 | T004 | Returns and authenticity statements | t95 AC-4 |
 | T005 | Share addresses and Open Graph tags | t95 AC-5 |
 | T006 | Full gates; mutation checks; self-review (Codex paused) | `evidence/` |
-| T007 | Staging: t95 on the release | PR |
+| T007 | Staging: t95 on the release: done, v0.1.21 (`evidence/staging-2026-11-05.txt`) | PR |
