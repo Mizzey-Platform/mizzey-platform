@@ -139,10 +139,11 @@ run(
 		$size = "size{$n}";
 		$col  = "colour{$n}";
 		$cap  = "capacity{$n}";
+		$fin  = "finish{$n}";
 		$s->on_finish(
-			static function () use ( $size, $col, $cap ): void {
+			static function () use ( $size, $col, $cap, $fin ): void {
 				catalogue_register_attributes(); // This process's attribute list predates the load.
-				foreach ( array( $size, $col, $cap ) as $name ) {
+				foreach ( array( $size, $col, $cap, $fin ) as $name ) {
 					$id = wc_attribute_taxonomy_id_by_name( $name );
 					if ( $id > 0 ) {
 						wc_delete_attribute( $id );
@@ -236,6 +237,23 @@ run(
 		$old_id = is_wp_error( $old ) ? 0 : (int) $old['term_id'];
 		do_action( 'wpml_set_element_language_details', array( 'element_id' => (int) get_term( $old_id, 'product_cat' )->term_taxonomy_id, 'element_type' => 'tax_product_cat', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
 
+		// The colour is already in the store from a load without its Arabic: its Arabic term only repeats "Black". This
+		// sheet gives the Arabic, so that term takes it.
+		wc_create_attribute( array( 'name' => ucfirst( $col ), 'slug' => $col, 'type' => 'select', 'order_by' => 'menu_order', 'has_archives' => false ) );
+		catalogue_register_attributes();
+		$black    = wp_insert_term( 'Black', "pa_{$col}", array( 'slug' => 'black' ) );
+		$black_tt = is_wp_error( $black ) ? 0 : (int) $black['term_taxonomy_id'];
+		do_action( 'wpml_set_element_language_details', array( 'element_id' => $black_tt, 'element_type' => "tax_pa_{$col}", 'trid' => null, 'language_code' => 'en' ) );
+		$btrid = apply_filters( 'wpml_element_trid', null, $black_tt, "tax_pa_{$col}" );
+		do_action( 'wpml_switch_language', 'ar' );
+		$copy = wp_insert_term( 'Black', "pa_{$col}", array( 'slug' => 'black-ar' ) );
+		do_action( 'wpml_switch_language', 'en' );
+		$copy_id = is_wp_error( $copy ) ? 0 : (int) $copy['term_id'];
+		do_action( 'wpml_set_element_language_details', array( 'element_id' => is_wp_error( $copy ) ? 0 : (int) $copy['term_taxonomy_id'], 'element_type' => "tax_pa_{$col}", 'trid' => $btrid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+
+		// An attribute made by other code than the load (a plugin, a script) is translatable as well, in a request of its own.
+		wc_create_attribute( array( 'name' => ucfirst( $fin ), 'slug' => $fin, 'type' => 'select', 'order_by' => 'menu_order', 'has_archives' => false ) );
+
 		$state = CatalogueLoad::start( "{$dir}/sheet.xlsx", Mapping::load( CatalogueCommand::defaultMapping() ), "{$dir}/run", false );
 		$bin   = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
 		for ( $round = 0; $round < 12 && in_array( CatalogueLoad::state()['status'] ?? '', array( 'sources', 'translations', 'images' ), true ); $round++ ) {
@@ -286,6 +304,12 @@ run(
 		sort( $colours_ar );
 		sort( $sizes_ar ); // A store attribute lists its terms by name.
 		$check( array( 'أبيض', 'أسود' ) === $colours_ar && array( 'L', 'M' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$copy_term = $copy_id > 0 ? get_term( $copy_id, "pa_{$col}" ) : null;
+		$check( $copy_id > 0 && $btrid && $copy_term instanceof WP_Term && 'أسود' === $copy_term->name, 'AC-5 MIG-10 an Arabic term that only repeated the English value takes the Arabic the sheet gives (' . ( $copy_term instanceof WP_Term ? $copy_term->name : 'none' ) . ')' );
+		$bin       = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
+		$answer    = array();
+		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( 'echo (int) apply_filters( "wpml_is_translated_taxonomy", false, "pa_' . $fin . '" );' ) . ' 2>&1', $answer );
+		$check( '1' === trim( (string) end( $answer ) ), 'AC-5 an attribute another part of the store creates is translatable too, read in a request of its own (' . implode( ' ', $answer ) . ')' );
 		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( "pa_{$col}" ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		// The options are store attributes, so the listing's attribute filter (PLP-09) can offer them: the Store API
