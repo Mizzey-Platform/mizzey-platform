@@ -1,0 +1,44 @@
+[
+ {
+  "name": "M1 badges never mirrored",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "        if ($now !== $want) {\n            wp_set_object_terms($product->get_id(), $badges, self::BADGE_TAXONOMY);",
+  "new": "        if (false) {\n            wp_set_object_terms($product->get_id(), $badges, self::BADGE_TAXONOMY);"
+ },
+ {
+  "name": "M2 the Arabic copy not mirrored",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "        if ($key !== ProductFields::BADGES || get_post_type((int) $postId) !== 'product') {",
+  "new": "        if (true) {"
+ },
+ {
+  "name": "M3 the taxonomy hidden from the blocks",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "            'show_in_rest'      => true,\n            'hierarchical'      => false,",
+  "new": "            'show_in_rest'      => false,\n            'hierarchical'      => false,"
+ },
+ {
+  "name": "M4 the home flag ignored",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "            if (get_term_meta($original, self::ON_HOME, true) !== 'yes') {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M5 the position ignored",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "        usort($shown, static fn (array $a, array $b): int => [$a['position'], $a['name']] <=> [$b['position'], $b['name']]);",
+  "new": "        usort($shown, static fn (array $a, array $b): int => $a['name'] <=> $b['name']);"
+ },
+ {
+  "name": "M6 the setting kept on the Arabic term",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "            $original = self::original($term);\n            if (get_term_meta",
+  "new": "            $original = (int) $term->term_id;\n            if (get_term_meta"
+ },
+ {
+  "name": "M7 the flag never saved",
+  "file": "mizzey-site/src/Storefront/HomeSections.php",
+  "old": "        empty($_POST['mizzey_on_home']) ? delete_term_meta($original, self::ON_HOME) : update_term_meta($original, self::ON_HOME, 'yes');",
+  "new": "        delete_term_meta($original, self::ON_HOME);"
+ }
+]

@@ -1,0 +1,12 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t96.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 badges never mirrored  <- t96: FAIL  AC-1 the badges set on the product are its badge terms, on its Arabic record too; a product with none has none ([[],[]])
+CAUGHT    M2 the Arabic copy not mirrored  <- t96: FAIL  AC-1 a later change of badges reaches the Arabic record's terms (["new","trending"])
+CAUGHT    M3 the taxonomy hidden from the blocks  <- t96: FAIL  AC-2 the editor can list the badges for a product section's filter: the taxonomy is in the REST API (401)
+CAUGHT    M4 the home flag ignored  <- t96: FAIL  AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused ([["T968
+CAUGHT    M5 the position ignored  <- t96: FAIL  AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused ([["T962
+CAUGHT    M6 the setting kept on the Arabic term  <- t96: FAIL  AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused ([["T967
+CAUGHT    M7 the flag never saved  <- t96: FAIL  AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused ([[],[]]
+
+7 of 7 caught.
