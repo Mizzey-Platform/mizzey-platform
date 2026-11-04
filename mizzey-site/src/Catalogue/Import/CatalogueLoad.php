@@ -130,6 +130,7 @@ final class CatalogueLoad
                     'price'      => $row['price'],
                     'fields'     => $row['fields'],
                     'attributes' => $row['attributes'],
+                    'attributes_ar' => $row['attributes_ar'] ?? [],
                 ];
             }
             usort($plan, static fn (array $a, array $b): int => [(int) ($a['type'] === 'variation'), $a['row']] <=> [(int) ($b['type'] === 'variation'), $b['row']]);
@@ -446,8 +447,15 @@ final class CatalogueLoad
             do_action('wpml_set_element_language_details', ['element_id' => $id, 'element_type' => $product instanceof \WC_Product_Variation ? 'post_product_variation' : 'post_product', 'trid' => false, 'language_code' => self::sourceLanguage()]);
         }
         if (! $product instanceof \WC_Product_Variation) {
-            self::set($f, 'category', static fn (string $v) => wp_set_object_terms($id, self::categoryPath($v), 'product_cat'));
-            self::set($f, 'brand', static fn (string $v) => taxonomy_exists('product_brand') ? wp_set_object_terms($id, [self::term(self::text($v), 'product_brand', 0)], 'product_brand') : null);
+            self::set($f, 'category', static fn (string $v) => wp_set_object_terms($id, self::categoryPath($v, (string) ($f['category_ar'] ?? '')), 'product_cat'));
+            self::set($f, 'brand', static function (string $v) use ($id, $f): void {
+                if (! taxonomy_exists('product_brand')) {
+                    return;
+                }
+                $brand = self::term(self::text($v), 'product_brand', 0);
+                self::arabicTerm($brand, 'product_brand', self::text((string) ($f['brand_ar'] ?? '')), 0);
+                wp_set_object_terms($id, [$brand], 'product_brand');
+            });
         } else {
             \WC_Product_Variable::sync($product->get_parent_id());
         }
@@ -488,17 +496,85 @@ final class CatalogueLoad
         return trim($value);
     }
 
-    /** @return list<int> The leaf category and its parents, created where missing. */
-    private static function categoryPath(string $path): array
+    /**
+     * The leaf category and its parents, created where missing; with the Arabic path of the same levels (specs/053),
+     * each level's Arabic name where it has none yet.
+     *
+     * @return list<int>
+     */
+    private static function categoryPath(string $path, string $arabic = ''): array
     {
+        $names  = array_values(array_filter(array_map('trim', explode('>', self::text($path))), 'strlen'));
+        $ar     = array_values(array_filter(array_map('trim', explode('>', self::text($arabic))), 'strlen'));
+        $ar     = count($ar) === count($names) ? $ar : []; // A different number of levels is W11's: not used.
         $parent = 0;
+        $arParent = 0;
         $leaf   = 0;
-        foreach (array_filter(array_map('trim', explode('>', self::text($path)))) as $name) {
-            $leaf   = self::term($name, 'product_cat', $parent);
-            $parent = $leaf;
+        foreach ($names as $level => $name) {
+            $leaf     = self::term($name, 'product_cat', $parent);
+            $arParent = self::arabicTerm($leaf, 'product_cat', (string) ($ar[$level] ?? ''), $arParent);
+            $parent   = $leaf;
         }
 
         return $leaf > 0 ? [$leaf] : [];
+    }
+
+    /**
+     * A category's or brand's Arabic name: the term's Arabic translation, created with the name given when it has none.
+     * A term already translated in the store keeps its translation as it is. Returns the Arabic term's id, or 0 when
+     * there is none and no name was given.
+     */
+    private static function arabicTerm(int $termId, string $taxonomy, string $name, int $arParent): int
+    {
+        if ($termId <= 0 || ! apply_filters('wpml_is_translated_taxonomy', false, $taxonomy)) {
+            return 0;
+        }
+        $existing = (int) apply_filters('wpml_object_id', $termId, $taxonomy, false, 'ar');
+        if ($existing > 0 && $existing !== $termId) {
+            return $existing;
+        }
+        if ($name === '') {
+            return 0;
+        }
+        $term = get_term($termId, $taxonomy);
+        if (! $term instanceof \WP_Term) {
+            return 0;
+        }
+        $trid   = apply_filters('wpml_element_trid', null, (int) $term->term_taxonomy_id, 'tax_' . $taxonomy);
+        $source = self::sourceLanguage();
+        do_action('wpml_switch_language', 'ar');
+        try {
+            $made = wp_insert_term($name, $taxonomy, ['parent' => $arParent]);
+        } finally {
+            do_action('wpml_switch_language', $source);
+        }
+        $madeId = is_wp_error($made) ? (int) $made->get_error_data('term_exists') : (int) $made['term_id'];
+        if ($madeId <= 0) {
+            throw new \RuntimeException(is_wp_error($made) ? $made->get_error_message() : __('The Arabic name was not written.', 'mizzey-site'));
+        }
+        $arTerm = get_term($madeId, $taxonomy);
+        if (! $arTerm instanceof \WP_Term) {
+            return 0;
+        }
+        // A term of that name already there may be used only if it is no other term's translation.
+        $theirs = apply_filters('wpml_element_trid', null, (int) $arTerm->term_taxonomy_id, 'tax_' . $taxonomy);
+        if (is_wp_error($made) && $theirs && (int) $theirs !== (int) $trid && count((array) apply_filters('wpml_get_element_translations', null, $theirs, 'tax_' . $taxonomy)) > 1) {
+            throw new \RuntimeException(sprintf(
+                /* translators: 1: an Arabic name, 2: the English name. */
+                __('The Arabic name "%1$s" is already used by another category or brand, so it was not given to "%2$s".', 'mizzey-site'),
+                $name,
+                $term->name,
+            ));
+        }
+        do_action('wpml_set_element_language_details', [
+            'element_id'           => (int) $arTerm->term_taxonomy_id,
+            'element_type'         => 'tax_' . $taxonomy,
+            'trid'                 => $trid,
+            'language_code'        => 'ar',
+            'source_language_code' => $source,
+        ]);
+
+        return (int) $arTerm->term_id;
     }
 
     private static function term(string $name, string $taxonomy, int $parent): int
@@ -579,7 +655,7 @@ final class CatalogueLoad
                 try {
                     self::$translated = true;
                     if (trim((string) ($f['name_ar'] ?? '')) !== '' || trim((string) ($f['description_ar'] ?? '')) !== '') {
-                        self::writeTranslation($id, $f);
+                        self::writeTranslation($id, $f, self::optionTranslations($id, $entry, $all));
                     }
                     self::follow($id, ! empty($entry['has_variations']), $state, $entry);
                 } catch (\Throwable $e) {
@@ -712,8 +788,61 @@ final class CatalogueLoad
         }
     }
 
-    /** @param array<string,string> $f */
-    private static function writeTranslation(int $id, array $f): void
+    /**
+     * The Arabic of a variable product's options (specs/053), as WooCommerce Multilingual's product editor takes them:
+     * by the option's key, its values in the product's own order (`M | L` becomes `M | L`, `Black | White` becomes
+     * `أسود | أبيض`), and by the key with `_name`, its name (`المقاس`). A value with no Arabic keeps its English
+     * wording. The values come from the variation rows' `option_<name>_ar`, the names from the product row's.
+     *
+     * @param array<string,mixed>       $entry
+     * @param list<array<string,mixed>> $all
+     * @return array<string,string>
+     */
+    private static function optionTranslations(int $id, array $entry, array $all): array
+    {
+        $product = wc_get_product($id);
+        if (! $product instanceof \WC_Product_Variable) {
+            return [];
+        }
+        $values = [];
+        foreach ($all as $e) {
+            if (($e['type'] ?? '') !== 'variation' || (string) ($e['parent_sku'] ?? '') !== (string) $entry['sku']) {
+                continue;
+            }
+            foreach ((array) ($e['attributes_ar'] ?? []) as $slug => $arabic) {
+                $english = (string) ($e['attributes'][$slug] ?? '');
+                if ($english !== '' && trim((string) $arabic) !== '') {
+                    $values[sanitize_title((string) $slug)][$english] = self::text((string) $arabic);
+                }
+            }
+        }
+        $names = [];
+        foreach ((array) ($entry['attributes_ar'] ?? []) as $slug => $arabic) {
+            if (trim((string) $arabic) !== '') {
+                $names[sanitize_title((string) $slug)] = self::text((string) $arabic);
+            }
+        }
+        $fields = [];
+        foreach ($product->get_attributes() as $key => $attribute) {
+            if (! $attribute instanceof \WC_Product_Attribute || $attribute->is_taxonomy()) {
+                continue;
+            }
+            if (isset($values[$key])) {
+                $fields[$key] = implode(' ' . WC_DELIMITER . ' ', array_map(static fn (string $option): string => $values[$key][$option] ?? $option, $attribute->get_options()));
+            }
+            if (isset($names[$key])) {
+                $fields[$key . '_name'] = $names[$key];
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param array<string,string> $f
+     * @param array<string,string> $options The Arabic of the options, by WooCommerce Multilingual's field names.
+     */
+    private static function writeTranslation(int $id, array $f, array $options = []): void
     {
         // A blank cell keeps what the Arabic record already has (blank means no change).
         $existing = (int) apply_filters('wpml_object_id', $id, 'product', false, 'ar');
@@ -728,7 +857,7 @@ final class CatalogueLoad
             'slug'            => (string) ($existing->post_name ?? ''),
             'product_content' => $body,
             'product_excerpt' => (string) ($existing->post_excerpt ?? ''),
-        ]);
+        ] + $options);
         if ($ar <= 0 || $ar === $id) {
             throw new \RuntimeException(__('The Arabic record was not created.', 'mizzey-site'));
         }
