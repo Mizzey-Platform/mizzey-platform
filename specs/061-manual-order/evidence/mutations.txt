@@ -1,0 +1,12 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t101.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 positions not applied  <- t101: FAIL  AC-1 MER-03 the category page lists the positioned products first, by position, then the rest (Alpha, Bravo, Charlie, Delta)
+CAUGHT    M2 the shopper's sort overridden  <- t101: FAIL  AC-2 the Store API answers the same order for the store's sorting, and leaves the price sorting as it is ([["Charlie","Alpha","Bravo","Delta"],["Charlie",
+CAUGHT    M3 the Arabic records not given the position  <- t101: FAIL  AC-1 SSC-12 the Arabic category page is in the same order (Alpha, Bravo, Charlie, Delta)
+CAUGHT    M4 the key per Arabic term  <- t101: FAIL  AC-1 SSC-12 the Arabic category page is in the same order (Alpha, Bravo, Charlie, Delta)
+CAUGHT    M5 saved without the nonce  <- t101: FAIL  AC-4 positions are saved only with the screen's nonce
+CAUGHT    M6 unpositioned first  <- t101: FAIL  AC-1 MER-03 the category page lists the positioned products first, by position, then the rest (Bravo, Delta, Alpha, Charlie)
+CAUGHT    M7 the Store API not ordered  <- t101: FAIL  AC-2 the Store API answers the same order for the store's sorting, and leaves the price sorting as it is ([["Alpha","Bravo","Charlie","Delta"],["Delta","C
+
+7 of 7 caught.

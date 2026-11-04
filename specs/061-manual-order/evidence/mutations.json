@@ -1,0 +1,44 @@
+[
+ {
+  "name": "M1 positions not applied",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "        $term = self::orderedTerm($query);\n        if ($term === null) {",
+  "new": "        $term = null;\n        if ($term === null) {"
+ },
+ {
+  "name": "M2 the shopper's sort overridden",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "        if ($orderby !== '' && ! str_starts_with($orderby, 'menu_order')) {",
+  "new": "        if (false) {"
+ },
+ {
+  "name": "M3 the Arabic records not given the position",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "            foreach (self::records((int) $productId) as $record) {",
+  "new": "            foreach ([(int) $productId] as $record) {"
+ },
+ {
+  "name": "M4 the key per Arabic term",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "        $key = self::PREFIX . self::original($term[1], $term[0]);",
+  "new": "        $key = self::PREFIX . $term[1];"
+ },
+ {
+  "name": "M5 saved without the nonce",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "        if ($nonce === '' || wp_verify_nonce($nonce, self::NONCE) === false || ! current_user_can('manage_product_terms')) {",
+  "new": "        if (! current_user_can('manage_product_terms')) {"
+ },
+ {
+  "name": "M6 unpositioned first",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "        $first              = sprintf('%s %s %s, %s(%s %s %s) %s', 'mzpos.meta_value', 'IS', 'NULL', 'CAST', 'mzpos.meta_value', 'AS', 'UNSIGNED', 'ASC');",
+  "new": "        $first              = sprintf('%s %s %s %s', 'mzpos.meta_value', 'IS', 'NOT', 'NULL');"
+ },
+ {
+  "name": "M7 the Store API not ordered",
+  "file": "mizzey-site/src/Storefront/ManualOrder.php",
+  "old": "            $terms = (array) ($clause['terms'] ?? []);\n            if (count($terms) !== 1 || $hit !== null) {",
+  "new": "            $terms = (array) ($clause['terms'] ?? []);\n            if (true) {"
+ }
+]
