@@ -67,7 +67,7 @@ function t93_xlsx( string $path, array $tabs ): void {
 					continue;
 				}
 				if ( is_int( $value ) || is_float( $value ) ) {
-					$data .= '<c r="' . $ref . '"><v>' . $value . '</v></c>';
+					$data .= '<c r="' . $ref . '"><v>' . ( is_float( $value ) ? sprintf( '%.17g', $value ) : $value ) . '</v></c>';
 				} elseif ( 1 === $n ) {
 					$shared[] = (string) $value;
 					$data    .= '<c r="' . $ref . '" t="s"><v>' . ( count( $shared ) - 1 ) . '</v></c>';
@@ -135,7 +135,22 @@ run(
 		$mapping = Mapping::load( CatalogueCommand::defaultMapping() );
 
 		// The revised sheet with this run's SKUs, categories and brands (each Arabic name tagged too).
-		$text = (string) file_get_contents( CATALOGUE_FIXTURES . '/product-sheet-v2.csv' );
+		$n    = (string) wp_rand( 1000, 9999 );
+		$size = "size{$n}";
+		$col  = "colour{$n}";
+		$cap  = "capacity{$n}";
+		$s->on_finish(
+			static function () use ( $size, $col, $cap ): void {
+				catalogue_register_attributes(); // This process's attribute list predates the load.
+				foreach ( array( $size, $col, $cap ) as $name ) {
+					$id = wc_attribute_taxonomy_id_by_name( $name );
+					if ( $id > 0 ) {
+						wc_delete_attribute( $id );
+					}
+				}
+			}
+		);
+		$text = str_replace( array( 'option_size', 'option_colour', 'option_capacity' ), array( "option_{$size}", "option_{$col}", "option_{$cap}" ), (string) file_get_contents( CATALOGUE_FIXTURES . '/product-sheet-v2.csv' ) );
 		$text = str_replace(
 			array( 'MZ-', 'Kitchen >', 'Clothing >', 'Mizzey Home', 'Mizzey Basics', 'المطبخ >', 'الملابس >', 'ميزي هوم', 'ميزي بيسكس' ),
 			array( "{$tag}-MZ-", "{$tag} Kitchen >", "{$tag} Clothing >", "{$tag} Home", "{$tag} Basics", "{$tag} المطبخ >", "{$tag} الملابس >", "{$tag} ميزي هوم", "{$tag} ميزي بيسكس" ),
@@ -149,7 +164,7 @@ run(
 		$v2check = HeaderCheck::check( $v2['header'], $v2map );
 		$v1      = ExportReader::read( CATALOGUE_FIXTURES . '/product-sheet.csv', $mapping->source() );
 		$v1check = HeaderCheck::check( $v1['header'], $mapping->forHeader( $v1['header'] ) );
-		$check( true === $v2check['complete'] && array() === $v2check['warnings'] && array( 'size' => 'option_size_ar', 'colour' => 'option_colour_ar', 'capacity' => 'option_capacity_ar' ) === $v2map->arabicAttributeColumns() && true === $v1check['complete'] && array() === $v1check['failures'], 'AC-3 the sheet with its Arabic columns is read whole, each option with its Arabic column; the first sheet, without them, still is (' . wp_json_encode( array( $v2check['failures'], $v1check['failures'] ) ) . ')' );
+		$check( true === $v2check['complete'] && array() === $v2check['warnings'] && array( $size => "option_{$size}_ar", $col => "option_{$col}_ar", $cap => "option_{$cap}_ar" ) === $v2map->arabicAttributeColumns() && true === $v1check['complete'] && array() === $v1check['failures'], 'AC-3 the sheet with its Arabic columns is read whole, each option with its Arabic column; the first sheet, without them, still is (' . wp_json_encode( array( $v2check['failures'], $v1check['failures'] ) ) . ')' );
 
 		// ---- AC-1: the workbook --------------------------------------------------------------------------------------
 		$rows   = array_map( 'str_getcsv', array_values( array_filter( preg_split( '/\r\n|\n/', preg_replace( '/^\xEF\xBB\xBF/', '', $text ) ), 'strlen' ) ) );
@@ -258,24 +273,24 @@ run(
 		$small     = $en( 'MZ-3001-500', 'product_variation' );
 		$small_ar  = $ar( $small, 'product_variation' );
 		do_action( 'wpml_switch_language', 'ar' );
-		$colours_ar = $names( $shirt_ar, 'pa_colour' );
-		$sizes_ar   = $names( $shirt_ar, 'pa_size' );
-		$white_val  = $white_ar > 0 ? (string) wc_get_product( $white_ar )->get_attribute( 'pa_colour' ) : '';
-		$small_val  = $small_ar > 0 ? (string) wc_get_product( $small_ar )->get_attribute( 'pa_capacity' ) : '';
+		$colours_ar = $names( $shirt_ar, "pa_{$col}" );
+		$sizes_ar   = $names( $shirt_ar, "pa_{$size}" );
+		$white_val  = $white_ar > 0 ? (string) wc_get_product( $white_ar )->get_attribute( "pa_{$col}" ) : '';
+		$small_val  = $small_ar > 0 ? (string) wc_get_product( $small_ar )->get_attribute( "pa_{$cap}" ) : '';
 		// The option's Arabic name as WooCommerce Multilingual reads it: WPML String Translation.
 		$arabic_of  = static fn ( string $label ): string => (string) apply_filters( 'wpml_translate_single_string', $label, 'WordPress', sprintf( '%s %s %s: %s', 'taxonomy', 'singular', 'name', $label ), 'ar' );
-		$colour_lbl = $arabic_of( 'Colour' );
-		$size_lbl   = $arabic_of( 'Size' );
-		$cap_lbl    = $arabic_of( 'Capacity' );
+		$colour_lbl = $arabic_of( ucfirst( $col ) );
+		$size_lbl   = $arabic_of( ucfirst( $size ) );
+		$cap_lbl    = $arabic_of( ucfirst( $cap ) );
 		do_action( 'wpml_switch_language', 'en' );
 		sort( $colours_ar );
 		sort( $sizes_ar ); // A store attribute lists its terms by name.
 		$check( array( 'أبيض', 'أسود' ) === $colours_ar && array( 'L', 'M' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
-		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( 'pa_colour' ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( "pa_{$col}" ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		// The options are store attributes, so the listing's attribute filter (PLP-09) can offer them: the Store API
 		// filter the filter block uses returns the shirt for "White" and not the bottle.
-		$filter = rest_url( 'wc/store/v1/products' ) . '?per_page=100&' . http_build_query( array( 'attributes' => array( array( 'attribute' => 'pa_colour', 'slug' => array( 'white' ), 'operator' => 'in' ) ) ) );
+		$filter = rest_url( 'wc/store/v1/products' ) . '?per_page=100&' . http_build_query( array( 'attributes' => array( array( 'attribute' => "pa_{$col}", 'slug' => array( 'white' ), 'operator' => 'in' ) ) ) );
 		$found  = array_map( 'intval', array_column( (array) ( sign_in_json( 'GET', $filter, null )['data'] ?? array() ), 'id' ) );
 		$check( in_array( $shirt, $found, true ) && ! in_array( $en( 'MZ-3001' ), $found, true ), 'AC-5 PLP-09 the options can be filtered by: the Store API returns the shirt for White, and not the bottle (' . wp_json_encode( $found ) . ')' );
 
