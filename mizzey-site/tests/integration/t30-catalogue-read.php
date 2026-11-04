@@ -30,7 +30,7 @@ run(
 			$ok = $ok && $condition;
 		};
 
-		$mapping = Mapping::load( CatalogueCommand::defaultMapping() );
+		$mapping = Mapping::load( CATALOGUE_MAPPING );
 		$read    = ExportReader::read( CATALOGUE_FIXTURES . '/export.tsv', $mapping->source() );
 		$check( 16 === count( $read['header'] ), 'AC-1: the header has its 16 columns (' . count( $read['header'] ) . ')' );
 		$check( 'seller-sku' === $read['header'][0], "AC-1: the byte-order mark is stripped from the first header ('" . $read['header'][0] . "')" );

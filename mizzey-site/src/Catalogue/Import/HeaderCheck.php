@@ -16,9 +16,11 @@ defined('ABSPATH') || exit;
  * A mapped column missing from the file, a header repeated in the file, or no header at all stops the run before
  * any row is interpreted (F1, F2, F3): a report built on a misapplied mapping would look right and be wrong. A
  * column the mapping does not list is reported (W2) and prevents a claim that the mapping is complete. A column the
- * mapping records as not imported may be absent without failing.
+ * mapping records as not imported may be absent without failing. A column with one of the mapping's prefixes that the
+ * mapping could not take (`Mapping::forHeader()`), as its name is not usable or names an option another column fills,
+ * stops the run too (F4): its values would otherwise be lost.
  *
- * Register ids: MIG-04, MIG-06. See specs/006-catalogue-import-spec, FR-008.
+ * Register ids: MIG-04, MIG-06, MIG-10. See specs/006-catalogue-import-spec, FR-008, and specs/051-product-sheet-import.
  */
 final class HeaderCheck
 {
@@ -69,7 +71,20 @@ final class HeaderCheck
             }
         }
 
-        $extra = array_values(array_diff(array_keys($counts), array_map('strval', array_keys($mapping->columns()))));
+        $extra = array_values(array_diff(array_map('strval', array_keys($counts)), array_map('strval', array_keys($mapping->columns()))));
+        foreach ($extra as $i => $name) {
+            if (! $mapping->isPrefixed($name)) {
+                continue;
+            }
+            // An option column the mapping could not take: its name is not usable, or another column fills it.
+            $failures[] = ['code' => 'F4', 'detail' => sprintf(
+                /* translators: %s: a header. */
+                __('The option column "%s" cannot be read: after the prefix, give the option a name of its own in English letters, digits, "_" or "-" (for example option_size), used by one column only.', 'mizzey-site'),
+                $name,
+            )];
+            unset($extra[$i]);
+        }
+        $extra = array_values($extra);
         foreach ($extra as $name) {
             $warnings[] = ['code' => 'W2', 'detail' => sprintf(
                 /* translators: %s: a header. */

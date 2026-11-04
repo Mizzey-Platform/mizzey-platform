@@ -35,7 +35,7 @@ run(
 		$record = is_array( $record ) ? $record : array();
 
 		$check( 'export.tsv' === ( $record['file']['name'] ?? '' ) && '' !== ( $record['file']['reference'] ?? '' ), 'CX-04: the file is referenced' );
-		$check( 'mizzey-site/import/catalogue-mapping.json' === ( $record['mapping_used'] ?? '' ) && '0.1.0-fixture' === ( $record['mapping_version'] ?? '' ), 'CX-04: the mapping used and its version (' . ( $record['mapping_used'] ?? '' ) . ')' );
+		$check( 'mizzey-site/tests/integration/fixtures/catalogue/mapping.json' === ( $record['mapping_used'] ?? '' ) && '0.1.0-fixture' === ( $record['mapping_version'] ?? '' ), 'CX-04: the mapping used and its version (' . ( $record['mapping_used'] ?? '' ) . ')' );
 		$check( 1 === ( $record['rules_version'] ?? null ), 'CX-04: the rules version' );
 		$counts = $record['counts'] ?? array();
 		$tally  = array_count_values( array_column( $lines, 'outcome' ) );

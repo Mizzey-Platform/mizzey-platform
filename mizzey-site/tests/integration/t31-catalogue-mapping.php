@@ -30,7 +30,7 @@ run(
 			$ok = $ok && $condition;
 		};
 
-		$mapping = Mapping::load( CatalogueCommand::defaultMapping() );
+		$mapping = Mapping::load( CATALOGUE_MAPPING );
 		$columns = $mapping->columns();
 		$check( '' !== $mapping->version() && 1 === $mapping->rulesVersion(), 'the mapping states its version (' . $mapping->version() . ') and rules version 1' );
 		$header = ExportReader::read( CATALOGUE_FIXTURES . '/export.tsv', $mapping->source(), 1 )['header'];
@@ -59,7 +59,7 @@ run(
 		$absent          = HeaderCheck::check( $without_ignored, $mapping );
 		$check( array() === $absent['failures'] && array( 'open-date' ) === $absent['absent_ignored'], 'a column recorded as not imported may be absent without failing' );
 
-		$base = json_decode( (string) file_get_contents( CatalogueCommand::defaultMapping() ), true );
+		$base = json_decode( (string) file_get_contents( CATALOGUE_MAPPING ), true );
 		$bad  = array(
 			'no version'            => array_merge( $base, array( 'version' => '' ) ),
 			'another rules version' => array_merge( $base, array( 'rules_version' => 2 ) ),

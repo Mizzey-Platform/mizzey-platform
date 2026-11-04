@@ -1,0 +1,15 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0), scenario t91.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, t91 run.
+
+CAUGHT    M1 option columns not added  <- t91: FAIL  AC-1 MIG-01, MIG-04 the plugin's mapping reads the sheet: every column mapped, none left over, eight rows ([[{"code":"F4","detail":"The option column \"op
+CAUGHT    M2 the same option twice taken  <- t91: FAIL  AC-3 an option column with no name, a name not in English letters, or an option given twice stops the run, named ({"option_":"F4 named","option_اللون":"F4
+CAUGHT    M3 an unreadable option column only warned  <- t91: FAIL  AC-3 an option column with no name, a name not in English letters, or an option given twice stops the run, named ({"option_":"","option_اللون":"","option_
+CAUGHT    M4 an option name in any letters taken  <- t91: FAIL  AC-3 an option column with no name, a name not in English letters, or an option given twice stops the run, named ({"option_":"F4 named","option_اللون":"",
+CAUGHT    M5 underscore kept in the option key  <- t91: FAIL  AC-2 an option the sample does not have (scent, pack size) is read as its own attribute, the mapping unchanged ({"size":"M","colour":"Black","scent":"Lave
+CAUGHT    M6 option name shown with its hyphen  <- t91: FAIL  AC-4 MIG-10 a product whose only option is its capacity, named in two words, has that option only, never an assumed size or colour ([["bottle-capacity"],"
+CAUGHT    M7 validation reads no option column  <- t91: FAIL  AC-1 MIG-06 the validation pass plans every row for creation, none rejected (exit 1, [])
+CAUGHT    M8 the load reads no option column  <- t91: FAIL  t91-product-sheet            MIG-01, MIG-04, MIG-09, MIG-10: the importer reads Mizzey's product sheet
+CAUGHT    M9 a parent row read as simple  <- t91: FAIL  AC-1 MIG-06 the validation pass plans every row for creation, none rejected (exit 0, {"create":1,"reject":7})
+CAUGHT    M10 a variation row asked for its Arabic name  <- t91: FAIL  AC-1 MIG-19 the client issue list asks no variation row for an Arabic name: a variation takes the name of its product ({"W3":10})
+
+10 of 10 caught.

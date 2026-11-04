@@ -54,7 +54,7 @@ run(
 		$check( false !== strpos( $by['MZ-UPD-002']['reason'] ?? '', 'original' ), 'a partial update, blank cells and all, is an update' );
 
 		// Order must not decide anything: the same rows reversed give the same outcomes.
-		$mapping  = Mapping::load( CatalogueCommand::defaultMapping() );
+		$mapping  = Mapping::load( CATALOGUE_MAPPING );
 		$read     = ExportReader::read( CATALOGUE_FIXTURES . '/export.tsv', $mapping->source() );
 		$reversed = array();
 		foreach ( array_reverse( $read['rows'] ) as $row ) {

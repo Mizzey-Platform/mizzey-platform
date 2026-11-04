@@ -1,0 +1,62 @@
+[
+ {
+  "name": "M1 option columns not added",
+  "file": "mizzey-site/src/Catalogue/Import/Mapping.php",
+  "old": "            if ($field === null || in_array($field, $filled, true)) {",
+  "new": "            if (true) {"
+ },
+ {
+  "name": "M2 the same option twice taken",
+  "file": "mizzey-site/src/Catalogue/Import/Mapping.php",
+  "old": "            if ($field === null || in_array($field, $filled, true)) {",
+  "new": "            if ($field === null) {"
+ },
+ {
+  "name": "M3 an unreadable option column only warned",
+  "file": "mizzey-site/src/Catalogue/Import/HeaderCheck.php",
+  "old": "            if (! $mapping->isPrefixed($name)) {",
+  "new": "            if (true) {"
+ },
+ {
+  "name": "M4 an option name in any letters taken",
+  "file": "mizzey-site/src/Catalogue/Import/Mapping.php",
+  "old": "preg_match('/^[a-z0-9][a-z0-9_-]*$/', $name)",
+  "new": "preg_match('/^.+$/u', $name)"
+ },
+ {
+  "name": "M5 underscore kept in the option key",
+  "file": "mizzey-site/src/Catalogue/Import/Mapping.php",
+  "old": "return $entry['to'] . str_replace('_', '-', $name);",
+  "new": "return $entry['to'] . $name;"
+ },
+ {
+  "name": "M6 option name shown with its hyphen",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "$attribute->set_name(ucfirst(str_replace('-', ' ', (string) $name)));",
+  "new": "$attribute->set_name(ucfirst((string) $name));"
+ },
+ {
+  "name": "M7 validation reads no option column",
+  "file": "mizzey-site/src/Catalogue/Import/Cli/CatalogueCommand.php",
+  "old": "            $mapping = $mapping->forHeader($read['header']); // Each option column of the file (specs/051).\n            $header = HeaderCheck::check($read['header'], $mapping);\n            $payload",
+  "new": "            $header = HeaderCheck::check($read['header'], $mapping);\n            $payload"
+ },
+ {
+  "name": "M8 the load reads no option column",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "            $mapping   = $mapping->forHeader($read['header']); // Each option column of the file (specs/051).\n",
+  "new": ""
+ },
+ {
+  "name": "M9 a parent row read as simple",
+  "file": "mizzey-site/import/catalogue-mapping.json",
+  "old": "\"parent\": \"variable\"",
+  "new": "\"parent\": \"simple\""
+ },
+ {
+  "name": "M10 a variation row asked for its Arabic name",
+  "file": "mizzey-site/src/Catalogue/Import/LoadRules.php",
+  "old": "if (! $update && $type !== null && $type !== 'variation') {",
+  "new": "if (! $update && $type !== null) {"
+ }
+]

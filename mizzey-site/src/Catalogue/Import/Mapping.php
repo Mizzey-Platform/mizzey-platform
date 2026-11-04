@@ -16,11 +16,13 @@ use InvalidArgumentException;
  * The import specification as data: the one mapping for the initial migration, versioned.
  *
  * It is a file kept with the plugin (`mizzey-site/import/catalogue-mapping.json`), not a saved profile (MIG-05 is
- * deferred) and not a screen. Loading validates its shape and refuses an unusable mapping with every problem named,
+ * deferred) and not a screen. Besides its named columns it may name header prefixes (`prefixes`): every column of a
+ * file whose header starts with one (`option_size`, `option_scent`) fills the attribute its name gives, so the client's
+ * product sheet can carry any option without the mapping listing each (specs/051). Loading validates its shape and refuses an unusable mapping with every problem named,
  * so a wrong mapping can never produce a report that looks right. The shape is documented in the specification's
  * `data-model.md`.
  *
- * Register ids: MIG-04. See specs/006-catalogue-import-spec, FR-002 and FR-003.
+ * Register ids: MIG-04, MIG-10. See specs/006-catalogue-import-spec, FR-002 and FR-003, and specs/051-product-sheet-import.
  */
 final class Mapping
 {
@@ -99,6 +101,78 @@ final class Mapping
         }
 
         return null;
+    }
+
+    /**
+     * @return array<string, array{to:string,note?:string}> A header prefix (`option_`) to the field prefix it fills
+     *                                                      (`attribute_`): each header that starts with it fills the
+     *                                                      attribute named by the rest of the header.
+     */
+    public function prefixes(): array
+    {
+        return (array) ($this->data['prefixes'] ?? []);
+    }
+
+    /**
+     * The attribute a prefixed header fills, or null when the header is not prefixed or its name cannot be an
+     * attribute. The name after the prefix becomes the attribute: `option_pack_size` fills `attribute_pack-size`, shown
+     * as "Pack size". Letters a to z, digits, `_` and `-` only, so the store's attribute key is the name itself.
+     */
+    public function prefixedField(string $header): ?string
+    {
+        foreach ($this->prefixes() as $prefix => $entry) {
+            if ($prefix === '' || ! str_starts_with($header, (string) $prefix)) {
+                continue;
+            }
+            $name = strtolower(trim(substr($header, strlen((string) $prefix))));
+            if (preg_match('/^[a-z0-9][a-z0-9_-]*$/', $name) !== 1) {
+                return null;
+            }
+
+            return $entry['to'] . str_replace('_', '-', $name);
+        }
+
+        return null;
+    }
+
+    /** Whether a header starts with one of the mapping's prefixes. */
+    public function isPrefixed(string $header): bool
+    {
+        foreach (array_keys($this->prefixes()) as $prefix) {
+            if ($prefix !== '' && str_starts_with($header, (string) $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * This mapping with every prefixed header of a file added as a column of its own, so a file may carry any option
+     * (size, colour, capacity, scent, material) without the mapping listing it. A header the mapping already lists is
+     * left as it is; a prefixed header whose name cannot be an attribute, or names one another column fills, is not
+     * added, and the header check refuses the file for it (F4).
+     *
+     * @param list<string> $header
+     */
+    public function forHeader(array $header): self
+    {
+        $data    = $this->data;
+        $filled  = array_filter(array_map(static fn ($entry): ?string => $entry['to'] ?? null, $data['columns']));
+        foreach ($header as $name) {
+            $name = (string) $name;
+            if (isset($data['columns'][$name])) {
+                continue;
+            }
+            $field = $this->prefixedField($name);
+            if ($field === null || in_array($field, $filled, true)) {
+                continue;
+            }
+            $data['columns'][$name] = ['to' => $field];
+            $filled[]               = $field;
+        }
+
+        return new self($this->path, $data);
     }
 
     /**
@@ -202,6 +276,21 @@ final class Mapping
                     );
                 }
                 $targets[] = $to;
+            }
+        }
+        $prefixes = $data['prefixes'] ?? [];
+        if (! is_array($prefixes) || ($prefixes !== [] && array_is_list($prefixes))) {
+            $problems[] = __('prefixes: an object of header prefixes is required', 'mizzey-site');
+        } else {
+            foreach ($prefixes as $prefix => $entry) {
+                // Only attributes are filled by prefix: every other field is one named column.
+                if (trim((string) $prefix) === '' || ! is_array($entry) || ($entry['to'] ?? null) !== 'attribute_') {
+                    $problems[] = sprintf(
+                        /* translators: %s: a header prefix. */
+                        __('prefixes.%s: a non-empty prefix that fills "attribute_" is required', 'mizzey-site'),
+                        $prefix,
+                    );
+                }
             }
         }
         foreach (['sku', 'name', 'regular_price', 'row_type'] as $required) {
