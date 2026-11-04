@@ -56,8 +56,8 @@
  {
   "name": "M10 no script for cached pages",
   "file": "mizzey-site/src/I18n/LanguagePreference.php",
-  "old": "        if (! self::isStorefrontPage() || is_user_logged_in()) {\n            return;\n        }\n        $script",
-  "new": "        return;\n        $script"
+  "old": "        if (! self::isStorefrontPage() || is_user_logged_in()) {\n            return;\n        }\n        $file",
+  "new": "        return;\n        $file"
  },
  {
   "name": "M11 signing in brings no choice",

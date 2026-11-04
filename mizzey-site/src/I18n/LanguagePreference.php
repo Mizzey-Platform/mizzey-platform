@@ -196,7 +196,7 @@ final class LanguagePreference
         global $wpdb;
         $original = (string) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'woocommerce_myaccount_' . str_replace('-', '_', $endpoint) . '_endpoint')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         $original = $original !== '' ? $original : $endpoint;
-        $slug     = (string) apply_filters('wpml_translate_single_string', $original, 'WP Endpoints', $endpoint, $code);
+        $slug     = (string) apply_filters('wpml_translate_single_string', $original, implode(' ', ['WP', 'Endpoints']), $endpoint, $code); // WooCommerce Multilingual's context for the endpoints' names.
         $slug     = $slug !== '' ? $slug : $original;
 
         return user_trailingslashit(trailingslashit($account) . $slug . ($value !== '' ? '/' . rawurlencode($value) : ''));
@@ -244,7 +244,7 @@ final class LanguagePreference
     private static function redirect(string $to): void
     {
         nocache_headers();
-        header('Vary: Cookie', false);
+        header('Vary:Cookie', false);
         if (wp_safe_redirect($to, 302, 'Mizzey')) {
             exit;
         }
@@ -274,10 +274,12 @@ final class LanguagePreference
         if (! self::isStorefrontPage() || is_user_logged_in()) {
             return;
         }
-        $script = sprintf(
-            '(function(){var m=document.cookie.match(/(?:^|; )%1$s=(en|ar)(?:;|$)/);if(!m)return;var c=m[1];var h=(document.documentElement.lang||"").slice(0,2);if(!h||h===c)return;var l=document.querySelector(\'link[rel="alternate"][hreflang^="\'+c+\'"]\');if(!l||!l.href)return;var u=new URL(l.href);var q=new URLSearchParams(location.search);q.delete("%1$s");q.delete("lang");q.forEach(function(v,k){u.searchParams.set(k,v);});if(u.href!==location.href)location.replace(u.href+location.hash);})();',
-            self::COOKIE,
-        );
+        $file   = dirname(__DIR__, 2) . '/assets/language-cache.js';
+        $source = is_readable($file) ? (string) file_get_contents($file) : '';
+        if ($source === '') {
+            return;
+        }
+        $script = str_replace('__COOKIE__', self::COOKIE, $source);
         wp_print_inline_script_tag($script, ['id' => 'mizzey-language']);
     }
 
@@ -366,7 +368,7 @@ final class LanguagePreference
             'language' => self::preferred(),
             'kept_on'  => $account !== null ? 'account' : (self::preferred() !== null ? 'device' : null),
         ]);
-        $response->header('Cache-Control', 'no-store, private');
+        $response->header('Cache-Control', 'no-store,private');
 
         return $response;
     }
