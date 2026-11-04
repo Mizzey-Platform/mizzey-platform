@@ -28,6 +28,7 @@ require_once __DIR__ . '/src/I18n/ProductTranslationJob.php';
 require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
+require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
