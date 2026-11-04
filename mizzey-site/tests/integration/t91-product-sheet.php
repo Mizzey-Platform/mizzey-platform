@@ -119,6 +119,7 @@ run(
 			exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' action-scheduler run --group=' . CatalogueLoad::GROUP . ' 2>&1', $ignored, $code );
 			wp_cache_flush();
 		}
+		catalogue_register_attributes();
 		$state = CatalogueLoad::state();
 		$check( 'done' === ( $state['status'] ?? '' ) && array() === (array) ( $state['problems'] ?? array() ), 'AC-4 the load ran in the background to the end, with no problem (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( $state['problems'] ?? null ) . ')' );
 
@@ -139,15 +140,19 @@ run(
 		$check( $tray && 'Bamboo Drawer Organiser | Mizzey' === $tray->get_meta( ProductFields::SEO_TITLE ) && str_contains( (string) $tray->get_meta( ProductFields::SEO_DESC ), 'Delivered across Egypt.' ) && 'B0EXAMPLE1' === $tray->get_meta( '_mizzey_source_asin' ), 'AC-4 MIG-15 the SEO title and description, and the ASIN kept hidden' );
 
 		$shirt  = $en( 'MZ-2001' );
+		// Each option is a store attribute (specs/053): its name, and its values as terms, read as stored.
+		// The option's name as WooCommerce keeps it (this process's attribute cache predates the load).
+		$named  = (array) $wpdb->get_results( "SELECT attribute_name, attribute_label FROM {$wpdb->prefix}woocommerce_attribute_taxonomies", OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$label  = static fn ( \WC_Product_Attribute $a ): string => (string) ( $named[ substr( $a->get_name(), 3 ) ]->attribute_label ?? $a->get_name() ) . ': ' . implode( '/', array_map( static fn ( $id ) => (string) $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->terms} WHERE term_id = %d", (int) $id ) ), $a->get_options() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$attrs  = $shirt instanceof \WC_Product_Variable ? $shirt->get_attributes() : array();
-		$names  = array_map( static fn ( $a ) => $a->get_name() . ': ' . implode( '/', $a->get_options() ), $attrs );
+		$names  = array_map( $label, $attrs );
 		$white  = $en( 'MZ-2001-M-WHT', 'product_variation' );
-		$check( $shirt instanceof \WC_Product_Variable && 3 === count( $shirt->get_children() ) && array( 'size' => 'Size: M/L', 'colour' => 'Colour: Black/White' ) === $names && $white && 'M' === $white->get_attribute( 'size' ) && 'White' === $white->get_attribute( 'colour' ) && 259.0 === (float) $white->get_regular_price() && 229.0 === (float) $white->get_sale_price() && 125.0 === (float) $white->get_cogs_value(), 'AC-4 MIG-09, MIG-10 the variable product has its three variations by size and colour, each with its price, sale price and cost (' . wp_json_encode( array( $names, $white ? array( $white->get_attribute( 'size' ), $white->get_attribute( 'colour' ), $white->get_regular_price() ) : null ) ) . ')' );
+		$check( $shirt instanceof \WC_Product_Variable && 3 === count( $shirt->get_children() ) && array( 'pa_size' => 'Size: L/M', 'pa_colour' => 'Colour: Black/White' ) === $names && $white && 'M' === $white->get_attribute( 'pa_size' ) && 'White' === $white->get_attribute( 'pa_colour' ) && 259.0 === (float) $white->get_regular_price() && 229.0 === (float) $white->get_sale_price() && 125.0 === (float) $white->get_cogs_value(), 'AC-4 MIG-09, MIG-10 the variable product has its three variations by size and colour, each with its price, sale price and cost (' . wp_json_encode( array( $names, $white ? array( $white->get_attribute( 'pa_size' ), $white->get_attribute( 'pa_colour' ), $white->get_regular_price() ) : null ) ) . ')' );
 		$bottle = $en( 'MZ-3001' );
 		$battrs = $bottle instanceof \WC_Product_Variable ? $bottle->get_attributes() : array();
-		$cap    = isset( $battrs['bottle-capacity'] ) ? $battrs['bottle-capacity']->get_name() . ': ' . implode( '/', $battrs['bottle-capacity']->get_options() ) : '';
+		$cap    = isset( $battrs['pa_bottle-capacity'] ) ? $label( $battrs['pa_bottle-capacity'] ) : '';
 		$small  = $en( 'MZ-3001-500', 'product_variation' );
-		$check( $bottle instanceof \WC_Product_Variable && 2 === count( $bottle->get_children() ) && array( 'bottle-capacity' ) === array_keys( $battrs ) && 'Bottle capacity: 500 ml/750 ml' === $cap && $small && '500 ml' === $small->get_attribute( 'bottle-capacity' ), 'AC-4 MIG-10 a product whose only option is its capacity, named in two words, has that option only, never an assumed size or colour (' . wp_json_encode( array( array_keys( $battrs ), $cap ) ) . ')' );
+		$check( $bottle instanceof \WC_Product_Variable && 2 === count( $bottle->get_children() ) && array( 'pa_bottle-capacity' ) === array_keys( $battrs ) && 'Bottle capacity: 500 ml/750 ml' === $cap && $small && '500 ml' === $small->get_attribute( 'pa_bottle-capacity' ), 'AC-4 MIG-10 a product whose only option is its capacity, named in two words, has that option only, never an assumed size or colour (' . wp_json_encode( array( array_keys( $battrs ), $cap ) ) . ')' );
 
 		$ar = static fn ( ?\WC_Product $p ): string => $p ? (string) get_post_field( 'post_title', (int) apply_filters( 'wpml_object_id', $p->get_id(), 'product', false, 'ar' ) ) : '';
 		$check( 'منظم أدراج من البامبو' === $ar( $tray ) && 'تيشيرت قطن للمنزل' === $ar( $shirt ) && 'زجاجة مياه معزولة' === $ar( $bottle ), 'AC-4 MIG-02 each product has its Arabic record, with the sheet\'s Arabic name (' . $ar( $tray ) . ')' );

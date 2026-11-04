@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0-product-sheet",
+  "version": "1.1.0-product-sheet",
   "rules_version": 1,
-  "note": "The mapping for Mizzey's product sheet (Mizzey-Product-Sheet.csv), the one initial migration (MIG-04). Any column named option_<name> fills the attribute <name>, so the sheet may carry any option. Bump the version when the sheet's columns change. See specs/051-product-sheet-import.",
+  "note": "The mapping for Mizzey's product sheet (Mizzey-Product-Sheet.csv, or the workbook downloaded from Google Sheets or Excel, every tab with the same columns), the one initial migration (MIG-04). Any column named option_<name> fills the attribute <name>, and option_<name>_ar gives its Arabic: on a variation row the value, on the product's row the option's name. category_ar and brand_ar are optional: a sheet without them still reads. Bump the version when the sheet's columns change. See specs/051 and specs/053.",
   "source": {
     "format": "csv",
     "encoding": "UTF-8"
@@ -40,8 +40,16 @@
     "category": {
       "to": "category"
     },
+    "category_ar": {
+      "to": "category_ar",
+      "optional": true
+    },
     "brand": {
       "to": "brand"
+    },
+    "brand_ar": {
+      "to": "brand_ar",
+      "optional": true
     },
     "image_urls": {
       "to": "images"
@@ -59,7 +67,8 @@
   "prefixes": {
     "option_": {
       "to": "attribute_",
-      "note": "One column per option, named by the client: option_size, option_colour, option_capacity, option_scent"
+      "note": "One column per option, named by the client: option_size, option_colour, option_capacity, option_scent; option_size_ar beside it for the Arabic",
+      "arabic_suffix": "_ar"
     }
   },
   "row_type": {

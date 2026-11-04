@@ -1,0 +1,21 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t93.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 only the first tab read  <- t93: FAIL  AC-1 MIG-01 a workbook is read as one sheet: both tabs, in order, each row with its tab and line, the reordered tab read by name, the empty tab skipped ([
+CAUGHT    M2 a reordered tab read by position  <- t93: FAIL  AC-1 MIG-01 a workbook is read as one sheet: both tabs, in order, each row with its tab and line, the reordered tab read by name, the empty tab skipped ([
+CAUGHT    M3 a mismatched tab accepted  <- t93: FAIL  AC-2 a tab whose columns differ stops the read, naming the tab and the column ()
+CAUGHT    M4 numbers read as stored  <- t93: FAIL  AC-1 numbers read as typed: 349.00 as 349, and 180.00000000000003 as 180 (180.00000000000003)
+CAUGHT    M5 the tab not carried  <- t93: FAIL  AC-1 MIG-19 the validation of the workbook plans the eight rows, and the report names each row's tab (exit 0)
+CAUGHT    M6 Arabic category levels not made  <- t93: FAIL  AC-4 the workbook loads to the end with no problem, and no category or brand is left without its Arabic name (done, [[],[{"row":2,"sku":"T931927-MZ-1001",
+CAUGHT    M7 a store translation overwritten  <- t93: FAIL  AC-4 MIG-11, MIG-12 the Arabic product shows the category in Arabic at each level and the brand in Arabic; the category already translated keeps its trans
+CAUGHT    M8 Arabic option values ignored  <- t93: FAIL  AC-5 MIG-10 the Arabic product has its options' Arabic names and values, a value with no Arabic kept as written; the English names stay English ([["Black"
+CAUGHT    M9 option names not translated  <- t93: FAIL  AC-5 MIG-10 the Arabic product has its options' Arabic names and values, a value with no Arabic kept as written; the English names stay English ([["أبيض",
+CAUGHT    M10 W11 never raised  <- t93: FAIL  AC-6 an Arabic category with other levels is a client issue (W11) on its row; an Arabic option column without its option stops the run (F4)
+CAUGHT    M11 an Arabic column without its option taken  <- t93: FAIL  AC-6 an Arabic category with other levels is a client issue (W11) on its row; an Arabic option column without its option stops the run (F4)
+CAUGHT    M12 an optional column required  <- t93: FAIL  AC-3 the sheet with its Arabic columns is read whole, each option with its Arabic column; the first sheet, without them, still is ([[],[{"code":"F1","deta | t91: FAIL  AC-1 MIG-01, MIG-04 the plugin's mapping reads the sheet: every column mapped, none left over, eight rows ([[{"code":"F1","detail":"The mapped column \"ca
+CAUGHT    M13 the brand's Arabic not set  <- t93: FAIL  AC-4 the workbook loads to the end with no problem, and no category or brand is left without its Arabic name (done, [[],[{"row":3,"sku":"T937430-MZ-3001",
+CAUGHT    M14 options left product attributes  <- t93: FAIL  AC-4 the workbook loads to the end with no problem, and no category or brand is left without its Arabic name (done, [[{"row":3,"sku":"T937286-MZ-2001-M-BL | t91: FAIL  AC-4 the load ran in the background to the end, with no problem (done, [{"row":4,"sku":"T917841-MZ-2001-M-BLK","problem":"Invalid taxonomy."},{"row":5,"sk
+CAUGHT    M15 an English-copy Arabic term never takes the Arabic  <- t93: FAIL  AC-5 MIG-10 the Arabic product has its options' Arabic names and values, a value with no Arabic kept as written; the English names stay English ([["Black"
+CAUGHT    M16 store attributes not translatable  <- t93: FAIL  AC-5 MIG-10 the Arabic product has its options' Arabic names and values, a value with no Arabic kept as written; the English names stay English ([["Black"
+
+16 of 16 caught.

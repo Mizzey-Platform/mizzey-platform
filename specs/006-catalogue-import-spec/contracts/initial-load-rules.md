@@ -53,9 +53,10 @@ decimal places; a comma, a currency sign or a thousands separator is R6, not a g
 
 | Code | When |
 |---|---|
-| `F1` | A column the mapping fills is missing from the header |
+| `F1` | A column the mapping fills is missing from the header (a column the mapping marks optional may be absent, specs/053) |
 | `F2` | A header appears more than once |
 | `F3` | The file has no header row (an empty file) |
+| `F4` | A column with one of the mapping's prefixes cannot be read: its name is not usable, it names an option another column fills, or an Arabic option column has no column for its option (specs/051, specs/053) |
 
 A file with a header and no rows completes with no outcomes.
 
@@ -73,6 +74,7 @@ A file with a header and no rows completes with no outcomes.
 | `W8` | Variation rows of one parent with the same attribute values, or filling different attributes | client |
 | `W9` | A simple row whose SKU belongs to a store product with variations; its price has no effect | client |
 | `W10` | The mapping fills the cost while WooCommerce's cost of goods is off; the load refuses to start until it is on | developer |
+| `W11` | The Arabic category path has a different number of levels from the English one; its Arabic names are not used (specs/053) | client |
 
 W5 to W10 were added on 2 November 2026 (audit B-15, B-16). They change no outcome, so the rules version stays 1.
 

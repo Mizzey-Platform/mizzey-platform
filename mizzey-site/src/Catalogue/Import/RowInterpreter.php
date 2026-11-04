@@ -48,7 +48,7 @@ final class RowInterpreter
 
         $fields = [];
         foreach ($mapping->columns() as $name => $entry) {
-            if (! isset($entry['to']) || str_starts_with($entry['to'], 'attribute_')) {
+            if (! isset($entry['to']) || str_starts_with($entry['to'], 'attribute_') || str_starts_with($entry['to'], 'ar_attribute_')) {
                 continue;
             }
             $value = $byHeader[$name] ?? '';
@@ -75,6 +75,15 @@ final class RowInterpreter
             $value = trim($value);
             if ($value !== '') {
                 $attributes[$slug] = $value;
+            }
+        }
+
+        // The Arabic of each option (specs/053): on a variation row its value, on a product row its name.
+        $attributesAr = [];
+        foreach ($mapping->arabicAttributeColumns() as $slug => $name) {
+            $value = trim((string) ($byHeader[$name] ?? ''));
+            if ($value !== '' && mb_check_encoding($value, 'UTF-8')) {
+                $attributesAr[$slug] = $value;
             }
         }
 
@@ -122,6 +131,19 @@ final class RowInterpreter
                 $cost,
             ), __('Write the cost as digits with a dot for decimals, with no currency.', 'mizzey-site'));
         }
+        // The Arabic category path names each level of the English one (specs/053); a different number of levels cannot be
+        // matched, so the Arabic names are not used.
+        $levels   = static fn (string $path): int => count(array_filter(array_map('trim', explode('>', $path)), 'strlen'));
+        $category = trim((string) ($fields['category'] ?? ''));
+        $arabic   = trim((string) ($fields['category_ar'] ?? ''));
+        if ($category !== '' && $arabic !== '' && $levels($category) !== $levels($arabic)) {
+            $issues[] = LoadRules::issue('W11', (string) $mapping->columnFor('category_ar'), sprintf(
+                /* translators: 1: levels in the Arabic path, 2: levels in the English path. */
+                __('The Arabic category has %1$d levels and the English one %2$d, so its Arabic names cannot be matched and are not used.', 'mizzey-site'),
+                $levels($arabic),
+                $levels($category),
+            ), __('Give the Arabic category the same levels as the English one, in the same order, for example المطبخ > التخزين for Kitchen > Storage.', 'mizzey-site'));
+        }
         $images = array_values(array_unique(array_filter(array_map('trim', explode('|', (string) ($fields['images'] ?? ''))), 'strlen')));
         foreach ($images as $address) {
             // The load's own check (CatalogueLoad::attach): an address it would refuse is reported here first.
@@ -148,6 +170,7 @@ final class RowInterpreter
 
         return [
             'row'               => $raw['row'],
+            'tab'               => (string) ($raw['tab'] ?? ''),
             'sku_source'        => $skuSource,
             'sku'               => trim($skuSource),
             'parent_sku_source' => $parentSkuSource,
@@ -156,6 +179,7 @@ final class RowInterpreter
             'type_source'       => $typeSource,
             'fields'            => array_map('trim', $fields),
             'attributes'        => $attributes,
+            'attributes_ar'     => $attributesAr,
             'price'             => $price === '' ? null : $price,
             'issues'            => $issues,
         ];

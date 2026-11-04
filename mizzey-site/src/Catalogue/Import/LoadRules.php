@@ -33,7 +33,7 @@ final class LoadRules
         'R1' => 'client', 'R2' => 'client', 'R3' => 'developer', 'R4' => 'developer', 'R5' => 'client',
         'R6' => 'client', 'R7' => 'client', 'R8' => 'client', 'R9' => 'developer',
         'W1' => 'developer', 'W3' => 'client', 'W4' => 'developer', 'W5' => 'client', 'W6' => 'client', 'W7' => 'client',
-        'W8' => 'client', 'W9' => 'client', 'W10' => 'developer',
+        'W8' => 'client', 'W9' => 'client', 'W10' => 'developer', 'W11' => 'client',
     ];
 
     /** @var array<string, list<string>> */
