@@ -155,8 +155,14 @@ final class LanguagePreference
      */
     public static function translationUrl(string $code): ?string
     {
-        $languages = apply_filters('wpml_active_languages', null, ['skip_missing' => 1]);
-        $url       = is_array($languages) && isset($languages[$code]['url']) && empty($languages[$code]['missing']) ? (string) $languages[$code]['url'] : '';
+        $url = self::accountEndpointUrl($code);
+        if ($url === null) {
+            // WPML's switcher data, without this class's own choice argument on its links.
+            remove_filter('icl_ls_languages', [self::class, 'switcherLinks'], 20);
+            $languages = apply_filters('wpml_active_languages', null, ['skip_missing' => 1]);
+            add_filter('icl_ls_languages', [self::class, 'switcherLinks'], 20);
+            $url = is_array($languages) && isset($languages[$code]['url']) && empty($languages[$code]['missing']) ? (string) $languages[$code]['url'] : '';
+        }
         if ($url === '') {
             return null;
         }
@@ -164,6 +170,29 @@ final class LanguagePreference
         unset($query[self::CHOICE], $query[self::NONCE], $query['lang']);
 
         return $query === [] ? $url : add_query_arg(array_map('rawurlencode', $query), $url);
+    }
+
+    /**
+     * An account page with an endpoint (an order, the addresses, the account details) in another language: WPML's
+     * switcher points at the account's home for these, so the same endpoint and value are built in that language.
+     * Null when this is not such a page.
+     */
+    private static function accountEndpointUrl(string $code): ?string
+    {
+        if (! function_exists('is_account_page') || ! is_account_page() || ! WC()->query instanceof \WC_Query) {
+            return null;
+        }
+        $endpoint = (string) WC()->query->get_current_endpoint();
+        if ($endpoint === '') {
+            return null;
+        }
+        $value   = (string) get_query_var($endpoint);
+        $current = self::current();
+        do_action('wpml_switch_language', $code);
+        $url = wc_get_endpoint_url($endpoint, $value, wc_get_page_permalink('myaccount'));
+        do_action('wpml_switch_language', $current);
+
+        return (string) $url;
     }
 
     /** The switcher link to a language, for the storefront's own switcher (the designed one is PRE-03b's). */
