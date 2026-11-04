@@ -33,7 +33,7 @@ options' Arabic through WPML and WooCommerce Multilingual; W11 and F4.
 | `Mapping` | `category_ar`, `brand_ar` fields; `optional` columns; `arabic_suffix` on a prefix (`option_colour_ar` fills `ar_attribute_colour`); `arabicAttributeColumns()` |
 | `HeaderCheck` | An optional mapped column may be absent; an Arabic option column without its option is F4 |
 | `RowInterpreter` | `attributes_ar`; `tab`; W11 |
-| `CatalogueLoad` | `categoryPath()` with the Arabic path; `arabicTerm()`; `optionTranslations()` into the translation editor's save |
+| `CatalogueLoad` | `categoryPath()` with the Arabic path; `arabicTerm()`; `storeAttribute()` (a global attribute per option, translatable); `parentAttributes()` with terms and their Arabic terms; `arabicLabel()` (the option's Arabic name in String Translation) |
 | Reports | A `tab` column after `row` |
 
 ## Criterion to test map
@@ -44,5 +44,5 @@ options' Arabic through WPML and WooCommerce Multilingual; W11 and F4.
 | AC-2 | A tab with a renamed column: the read stops naming the tab and the column |
 | AC-3 | The v2 sheet complete with its Arabic columns; the first sheet still complete |
 | AC-4 | The Arabic product's category path and brand in Arabic; a translated category kept |
-| AC-5 | The Arabic product's option values and names; each Arabic variation's values |
+| AC-5 | The Arabic product's option values and names; each Arabic variation's values; the Store API's attribute filter finds the shirt by White |
 | AC-6 | W11 on a mismatched path; F4 on an Arabic column without its option |

@@ -33,6 +33,7 @@ by specs/046. The PBIs are unchanged: MIG-01 and MIG-19 belong to #249, MIG-10 t
 |---|---|---|
 | MIG-05, MIG-07, MIG-08 | DEF | Nothing reusable: one file, for the one initial migration |
 | CR-15 | Client input | The Arabic words are the client's; the sheet is where they write them |
+| PLP-09 | P1 | Filter by attribute (#303): WooCommerce's attribute filter works only on store attributes, which is why the options are made so here; the filter itself is #303's |
 
 ## Open contract items
 
@@ -46,7 +47,7 @@ by specs/046. The PBIs are unchanged: MIG-01 and MIG-19 belong to #249, MIG-10 t
 | AC-2 | A tab whose columns differ from the first tab's stops the read, naming the tab and the columns | MIG-01 | final |
 | AC-3 | The sheet may carry `category_ar`, `brand_ar` and `option_<name>_ar`; a sheet without them is still read | MIG-01, MIG-10 | final |
 | AC-4 | The load gives each category level and the brand their Arabic names, created where the store has none, so the Arabic product shows them; a category or brand already translated in the store keeps its translation | MIG-11, MIG-12 | final |
-| AC-5 | The load gives the options their Arabic: on the product's row, the option's name; on each variation row, its value; a value with no Arabic keeps its English wording | MIG-10 | final |
+| AC-5 | Each option becomes a store attribute (a global WooCommerce attribute, created where missing) and each value one of its terms, so options are the store's own and can be filtered by; the load gives them their Arabic: on the product's row, the option's name; on each variation row, the value's term in Arabic; a value with no Arabic keeps its English wording | MIG-10 | final |
 | AC-6 | An Arabic category with other levels than the English one is a client issue (W11), and its Arabic is not used; an Arabic option column without its option's column stops the run (F4) | MIG-11, MIG-19 | final |
 
 ## User Scenarios & Testing *(mandatory)*
@@ -76,7 +77,8 @@ by specs/046. The PBIs are unchanged: MIG-01 and MIG-19 belong to #249, MIG-10 t
 |---|---|---|
 | Read a workbook | WooCommerce's importer reads CSV only | PHP's own zip and XML readers (`Workbook`), no library |
 | Arabic categories and brands | WPML term translations | Created through WPML's own API where a term has none |
-| Arabic option names and values | WooCommerce Multilingual's product editor fields for custom attributes | Passed through the editor's own save (`ProductTranslationJob`) |
+| Options | WooCommerce's global attributes and their terms (what its filters, its lookup table and WooCommerce Multilingual's term translation work on) | Created by the load where missing; the first load (specs/046, specs/051) wrote product-level attributes, which the filters cannot see |
+| Arabic option names and values | WPML term translations; WooCommerce Multilingual's translated attribute names (String Translation) | Created by the load from the `_ar` columns |
 
 ## Requirements
 
@@ -84,7 +86,7 @@ by specs/046. The PBIs are unchanged: MIG-01 and MIG-19 belong to #249, MIG-10 t
 
 - **FR-001**: The reader MUST read `.xlsx` as described in AC-1 and refuse a mismatched tab (AC-2).
 - **FR-002**: The mapping MUST allow optional columns and an Arabic suffix for its prefixes (AC-3).
-- **FR-003**: The load MUST write Arabic category levels, brands and options as in AC-4 and AC-5.
+- **FR-003**: The load MUST write options as store attributes and their terms, and Arabic category levels, brands and options, as in AC-4 and AC-5.
 - **FR-004**: The rules MUST raise W11 and F4 as in AC-6.
 
 ### Key Entities
