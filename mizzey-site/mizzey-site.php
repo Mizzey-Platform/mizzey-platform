@@ -31,6 +31,7 @@ require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
 require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/Storefront/ProductPage.php';
+require_once __DIR__ . '/src/Storefront/HomeSections.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -199,6 +200,9 @@ MizzeySite\Storefront\HeaderData::register();
 
 // What the product page states beside the product (saving, Buy Now, delivery, returns, authenticity, share): specs/055.
 MizzeySite\Storefront\ProductPage::register();
+
+// What the home page's sections draw from (badges as a taxonomy, terms on the home page): specs/056-home-sections.
+MizzeySite\Storefront\HomeSections::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.

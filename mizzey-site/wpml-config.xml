@@ -37,5 +37,6 @@
 	<taxonomies>
 		<taxonomy translate="1">product_brand</taxonomy>
 		<taxonomy translate="1">product_collection</taxonomy>
+		<taxonomy translate="0">mizzey_badge</taxonomy>
 	</taxonomies>
 </wpml-config>
