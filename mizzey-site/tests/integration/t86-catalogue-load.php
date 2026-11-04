@@ -195,8 +195,15 @@ run(
 		$mask   = wc_get_product( $by_sku( "{$tag}-MASK" ) );
 		$small  = wc_get_product( (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( "{$tag}-MASK-S" ), 'product_variation', true, 'en' ) );
 		$large  = wc_get_product( (int) apply_filters( 'wpml_object_id', wc_get_product_id_by_sku( "{$tag}-MASK-L" ), 'product_variation', true, 'en' ) );
-		$values = $mask instanceof \WC_Product_Variable && isset( $mask->get_attributes()['size'] ) ? $mask->get_attributes()['size']->get_options() : array();
-		$check( $mask instanceof \WC_Product_Variable && $small instanceof \WC_Product_Variation && $large instanceof \WC_Product_Variation && $small->get_parent_id() === $mask->get_id() && array( 'Small', 'Large' ) === $values && 'Small' === $small->get_attribute( 'size' ) && 60.0 === (float) $small->get_cogs_value() && '240' === (string) (float) $large->get_regular_price(), 'AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs (' . wp_json_encode( array( $mask ? get_class( $mask ) : null, $values, $small ? array( $small->get_parent_id(), $small->get_attribute( 'size' ), $small->get_cogs_value() ) : null, $large ? $large->get_regular_price() : null ) ) . ')' );
+		// An option is a store attribute (specs/053): its values are terms, read by name as stored.
+		$names  = static function ( $product ) use ( $wpdb ): array {
+			if ( ! $product instanceof \WC_Product_Variable || ! isset( $product->get_attributes()['pa_size'] ) ) {
+				return array();
+			}
+			return array_map( static fn ( $id ) => (string) $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->terms} WHERE term_id = %d", (int) $id ) ), $product->get_attributes()['pa_size']->get_options() ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		};
+		$values = $names( $mask );
+		$check( $mask instanceof \WC_Product_Variable && $small instanceof \WC_Product_Variation && $large instanceof \WC_Product_Variation && $small->get_parent_id() === $mask->get_id() && array( 'Small', 'Large' ) === $values && 'Small' === $small->get_attribute( 'pa_size' ) && 60.0 === (float) $small->get_cogs_value() && '240' === (string) (float) $large->get_regular_price(), 'AC-3 MIG-09, MIG-10 the variable product has its two variations, their size attribute, prices and costs (' . wp_json_encode( array( $mask ? get_class( $mask ) : null, $values, $small ? array( $small->get_parent_id(), $small->get_attribute( 'pa_size' ), $small->get_cogs_value() ) : null, $large ? $large->get_regular_price() : null ) ) . ')' );
 
 		// ---- AC-4: the Arabic records ------------------------------------------------------------------------------
 		$trid    = static fn ( int $id, string $type ) => (int) $wpdb->get_var( $wpdb->prepare( "SELECT trid FROM {$wpdb->prefix}icl_translations WHERE element_id = %d AND element_type = %s", $id, $type ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -208,7 +215,7 @@ run(
 		wp_cache_flush();
 		$sv = $small_ar > 0 ? wc_get_product( $small_ar ) : null;
 		$lv = $large_ar > 0 ? wc_get_product( $large_ar ) : null;
-		$check( $mask_ar > 0 && 'قناع الطين' === get_post_field( 'post_title', $mask_ar ) && $sv && $lv && '' !== $sv->get_attribute( 'size' ) && '' !== $lv->get_attribute( 'size' ) && $trid( $small_ar, 'post_product_variation' ) === $trid( $small->get_id(), 'post_product_variation' ) && $trid( $mask_ar, 'post_product' ) === $trid( $mask->get_id(), 'post_product' ), 'AC-4 #247 the Arabic variable product and its variations keep their attributes and their translation groups' );
+		$check( $mask_ar > 0 && 'قناع الطين' === get_post_field( 'post_title', $mask_ar ) && $sv && $lv && '' !== $sv->get_attribute( 'pa_size' ) && '' !== $lv->get_attribute( 'pa_size' ) && $trid( $small_ar, 'post_product_variation' ) === $trid( $small->get_id(), 'post_product_variation' ) && $trid( $mask_ar, 'post_product' ) === $trid( $mask->get_id(), 'post_product' ), 'AC-4 #247 the Arabic variable product and its variations keep their attributes and their translation groups' );
 		$amp    = $by_sku( "{$tag}-AMP" );
 		$amp_ar = $amp > 0 ? (int) apply_filters( 'wpml_object_id', $amp, 'product', false, 'ar' ) : 0;
 		$check( $amp_ar > 0 && $amp_ar !== $amp && 'صابون & زيت' === html_entity_decode( (string) get_post_field( 'post_title', $amp_ar ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ), 'AC-4 B-03 an Arabic name with "&" is written and reads back as written, not reported as failed (' . get_post_field( 'post_title', $amp_ar ) . ')' );
@@ -303,8 +310,8 @@ run(
 		$medium_ar = $medium > 0 ? (int) apply_filters( 'wpml_object_id', $medium, 'product_variation', false, 'ar' ) : 0;
 		$mv        = $medium_ar > 0 && $medium_ar !== $medium ? wc_get_product( $medium_ar ) : null;
 		$mask_arp  = $mask_ar > 0 ? wc_get_product( $mask_ar ) : null;
-		$ar_values = $mask_arp instanceof \WC_Product_Variable && isset( $mask_arp->get_attributes()['size'] ) ? $mask_arp->get_attributes()['size']->get_options() : array();
-		$check( $mv instanceof \WC_Product_Variation && $mv->get_parent_id() === $mask_ar && '180' === (string) (float) $mv->get_regular_price() && 'Medium' === $mv->get_attribute( 'size' ) && in_array( 'Medium', $ar_values, true ) && 3 === count( $mask_arp->get_children() ), 'AC-3 B-02 a size added to a translated product gets its Arabic variation, its price, and its place in the Arabic size list (' . wp_json_encode( array( $medium_ar, $ar_values, $mv ? $mv->get_regular_price() : null, $mask_arp ? count( $mask_arp->get_children() ) : null ) ) . ')' );
+		$ar_values = $names( $mask_arp );
+		$check( $mv instanceof \WC_Product_Variation && $mv->get_parent_id() === $mask_ar && '180' === (string) (float) $mv->get_regular_price() && 'Medium' === $mv->get_attribute( 'pa_size' ) && in_array( 'Medium', $ar_values, true ) && 3 === count( $mask_arp->get_children() ), 'AC-3 B-02 a size added to a translated product gets its Arabic variation, its price, and its place in the Arabic size list (' . wp_json_encode( array( $medium_ar, $ar_values, $mv ? $mv->get_regular_price() : null, $mask_arp ? count( $mask_arp->get_children() ) : null ) ) . ')' );
 		$check( is_array( ImportRunLog::get( (string) $state['id'] ) ) && is_array( ImportRunLog::get( (string) $upd['id'] ) ) && (string) $state['id'] !== (string) $upd['id'], 'A-273-1 ENT-19 the earlier run\'s record is kept beside the update run\'s' );
 
 		// B-10: an images action that died at a time limit is resumed from the saved progress, by the watchdog it queued,

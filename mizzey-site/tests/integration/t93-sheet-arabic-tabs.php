@@ -29,6 +29,7 @@ use MizzeySite\Catalogue\Import\Mapping;
 
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_catalogue.php';
+require_once __DIR__ . '/_sign_in.php';
 
 /**
  * A workbook as Google Sheets downloads one: a tab per name, each a list of rows (the first its header). A number is
@@ -245,15 +246,33 @@ run(
 
 		$shirt    = $en( 'MZ-2001' );
 		$shirt_ar = $ar( $shirt );
-		$attrs_ar = (array) get_post_meta( $shirt_ar, '_product_attributes', true );
-		$labels   = (array) ( get_post_meta( $shirt_ar, 'attr_label_translations', true )['ar'] ?? array() );
-		$white    = $en( 'MZ-2001-M-WHT', 'product_variation' );
-		$white_ar = $ar( $white, 'product_variation' );
-		$bottle_ar = $ar( $en( 'MZ-3001' ) );
-		$small_ar  = $ar( $en( 'MZ-3001-500', 'product_variation' ), 'product_variation' );
-		$cap_label = (string) ( ( (array) ( ( (array) get_post_meta( $bottle_ar, 'attr_label_translations', true ) )['ar'] ?? array() ) )['capacity'] ?? '' );
-		$check( 'أسود | أبيض' === ( $attrs_ar['colour']['value'] ?? '' ) && 'M | L' === ( $attrs_ar['size']['value'] ?? '' ) && 'اللون' === ( $labels['colour'] ?? '' ) && 'المقاس' === ( $labels['size'] ?? '' ), 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written (' . wp_json_encode( array( $attrs_ar['colour']['value'] ?? null, $attrs_ar['size']['value'] ?? null, $labels ), JSON_UNESCAPED_UNICODE ) . ')' );
-		$check( $white_ar > 0 && 'أبيض' === get_post_meta( $white_ar, 'attribute_colour', true ) && 'M' === get_post_meta( $white_ar, 'attribute_size', true ) && 'White' === get_post_meta( $white, 'attribute_colour', true ) && '500 مل' === get_post_meta( $small_ar, 'attribute_capacity', true ) && 'السعة' === $cap_label, 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( get_post_meta( $white_ar, 'attribute_colour', true ), get_post_meta( $small_ar, 'attribute_capacity', true ) ), JSON_UNESCAPED_UNICODE ) . ')' );
+		// Each option is a store attribute (specs/053): its values are terms, each with its Arabic term.
+		$names = static function ( int $id, string $taxonomy ) use ( $wpdb ): array {
+			$product = $id > 0 ? wc_get_product( $id ) : null;
+			$attr    = $product instanceof \WC_Product ? ( $product->get_attributes()[ $taxonomy ] ?? null ) : null;
+			return $attr instanceof \WC_Product_Attribute ? array_map( static fn ( $t ) => (string) $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->terms} WHERE term_id = %d", (int) $t ) ), $attr->get_options() ) : array(); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		};
+		$white     = $en( 'MZ-2001-M-WHT', 'product_variation' );
+		$white_ar  = $ar( $white, 'product_variation' );
+		$small     = $en( 'MZ-3001-500', 'product_variation' );
+		$small_ar  = $ar( $small, 'product_variation' );
+		do_action( 'wpml_switch_language', 'ar' );
+		$colours_ar = $names( $shirt_ar, 'pa_colour' );
+		$sizes_ar   = $names( $shirt_ar, 'pa_size' );
+		$white_val  = $white_ar > 0 ? (string) wc_get_product( $white_ar )->get_attribute( 'pa_colour' ) : '';
+		$small_val  = $small_ar > 0 ? (string) wc_get_product( $small_ar )->get_attribute( 'pa_capacity' ) : '';
+		$colour_lbl = (string) wc_attribute_label( 'pa_colour' );
+		$size_lbl   = (string) wc_attribute_label( 'pa_size' );
+		$cap_lbl    = (string) wc_attribute_label( 'pa_capacity' );
+		do_action( 'wpml_switch_language', 'en' );
+		$check( array( 'أسود', 'أبيض' ) === $colours_ar && array( 'M', 'L' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl && 'Colour' === wc_attribute_label( 'pa_colour' ), 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( 'pa_colour' ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
+
+		// The options are store attributes, so the listing's attribute filter (PLP-09) can offer them: the Store API
+		// filter the filter block uses returns the shirt for "White" and not the bottle.
+		$filter = rest_url( 'wc/store/v1/products' ) . '?per_page=100&' . http_build_query( array( 'attributes' => array( array( 'attribute' => 'pa_colour', 'slug' => array( 'white' ), 'operator' => 'in' ) ) ) );
+		$found  = array_map( 'intval', array_column( (array) ( sign_in_json( 'GET', $filter, null )['data'] ?? array() ), 'id' ) );
+		$check( in_array( $shirt, $found, true ) && ! in_array( $en( 'MZ-3001' ), $found, true ), 'AC-5 PLP-09 the options can be filtered by: the Store API returns the shirt for White, and not the bottle (' . wp_json_encode( $found ) . ')' );
 
 		return $ok;
 	}
