@@ -60,7 +60,7 @@ run(
 		$later   = $promo( "{$tag} Later", $fmt( time() + DAY_IN_SECONDS ), '', array(), (string) $page );
 		$ended   = $promo( "{$tag} Ended", '', $fmt( time() - HOUR_IN_SECONDS ), array( 'all' ) );
 		$every   = $promo( "{$tag} Everywhere", '', '', array( 'all' ) );
-		$check( array( 'page:' . $page ) === get_post_meta( $now_on, Promotions::TARGETS, true ) && '' !== get_post_meta( $now_on, Promotions::START, true ) && array( 'all' ) === get_post_meta( $every, Promotions::TARGETS, true ), 'AC-2 SSC-09 the dates and targets are kept as staff set them on the banner\'s screen' );
+		$check( array( 'page:' . $page ) === get_post_meta( $now_on, Promotions::TARGETS, true ) && abs( (int) get_post_meta( $now_on, Promotions::START, true ) - ( time() - HOUR_IN_SECONDS ) ) < 120 && array( 'all' ) === get_post_meta( $every, Promotions::TARGETS, true ), 'AC-2 SSC-09 the dates and targets are kept as staff set them on the banner\'s screen' );
 
 		// ---- AC-1: shown within its dates, on its targets -----------------------------------------------------------------
 		$fetch = static function ( int $id ): string {

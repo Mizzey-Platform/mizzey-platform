@@ -60,14 +60,14 @@ final class TermContent
         $banner = (int) get_term_meta($term->term_id, self::BANNER, true);
         echo '<tr class="form-field"><th scope="row">' . esc_html__('Banner', 'mizzey-site') . '</th><td>';
         wp_nonce_field(self::NONCE, 'mizzey_term_content_nonce');
-        echo '<p><label for="mizzey_banner">' . esc_html__('Banner image (media library address or id)', 'mizzey-site') . '</label><br><input type="text" name="mizzey_banner" id="mizzey_banner" value="' . esc_attr($banner > 0 ? (string) $banner : '') . '"></p>';
+        printf('<p><label for="mizzey_banner">%s</label><br><input type="text" name="mizzey_banner" id="mizzey_banner" value="%s"></p>', esc_html__('Banner image (media library address or id)', 'mizzey-site'), esc_attr($banner > 0 ? (string) $banner : ''));
         if ($banner > 0) {
             echo wp_get_attachment_image($banner, 'medium');
         }
-        echo '<p><label for="mizzey_banner_link">' . esc_html__('Banner link (optional)', 'mizzey-site') . '</label><br><input type="url" name="mizzey_banner_link" id="mizzey_banner_link" value="' . esc_attr((string) get_term_meta($term->term_id, self::BANNER_LINK, true)) . '"></p>';
+        printf('<p><label for="mizzey_banner_link">%s</label><br><input type="url" name="mizzey_banner_link" id="mizzey_banner_link" value="%s"></p>', esc_html__('Banner link (optional)', 'mizzey-site'), esc_attr((string) get_term_meta($term->term_id, self::BANNER_LINK, true)));
         if ($term->taxonomy === Collections::TAXONOMY) {
             $image = (int) get_term_meta($term->term_id, self::IMAGE, true);
-            echo '<p><label for="mizzey_term_image">' . esc_html__('Collection image (media library address or id)', 'mizzey-site') . '</label><br><input type="text" name="mizzey_term_image" id="mizzey_term_image" value="' . esc_attr($image > 0 ? (string) $image : '') . '"></p>';
+            printf('<p><label for="mizzey_term_image">%s</label><br><input type="text" name="mizzey_term_image" id="mizzey_term_image" value="%s"></p>', esc_html__('Collection image (media library address or id)', 'mizzey-site'), esc_attr($image > 0 ? (string) $image : ''));
         }
         echo '<p class="description">' . esc_html__('Set on the main language, the banner shows in both; set on the Arabic term, the Arabic page shows its own.', 'mizzey-site') . '</p></td></tr>';
     }

@@ -31,6 +31,8 @@ final class Promotions
     public const END     = '_mizzey_promo_end';
     public const TARGETS = '_mizzey_promo_targets';
     private const NONCE  = 'mizzey_promo';
+    /** A target naming a page or a category: `page` or `product_cat`, a separator, the id. */
+    private const SEP    = ':';
 
     public static function register(): void
     {
@@ -79,16 +81,16 @@ final class Promotions
         $end     = (string) get_post_meta($post->ID, self::END, true);
         $targets = (array) get_post_meta($post->ID, self::TARGETS, true);
         wp_nonce_field(self::NONCE, 'mizzey_promo_nonce');
-        $local = static fn (string $utc): string => $utc === '' ? '' : wp_date('Y-m-d\TH:i', (int) strtotime($utc . ' UTC'));
-        echo '<p><label>' . esc_html__('Shown from', 'mizzey-site') . '<br><input type="datetime-local" name="mizzey_promo_start" value="' . esc_attr($local($start)) . '"></label></p>';
-        echo '<p><label>' . esc_html__('Shown until', 'mizzey-site') . '<br><input type="datetime-local" name="mizzey_promo_end" value="' . esc_attr($local($end)) . '"></label></p>';
+        $local = static fn (string $at): string => $at === '' ? '' : (string) wp_date('Y-m-d\TH:i', (int) $at);
+        printf('<p><label>%s<br><input type="datetime-local" name="mizzey_promo_start" value="%s"></label></p>', esc_html__('Shown from', 'mizzey-site'), esc_attr($local($start)));
+        printf('<p><label>%s<br><input type="datetime-local" name="mizzey_promo_end" value="%s"></label></p>', esc_html__('Shown until', 'mizzey-site'), esc_attr($local($end)));
         echo '<p>' . esc_html__('Leave either empty for no limit. Times are the store\'s time zone.', 'mizzey-site') . '</p>';
         foreach (['all' => __('Every page', 'mizzey-site'), 'home' => __('The home page', 'mizzey-site'), 'shop' => __('The shop', 'mizzey-site')] as $key => $label) {
-            echo '<label><input type="checkbox" name="mizzey_promo_targets[]" value="' . esc_attr($key) . '"' . checked(in_array($key, $targets, true), true, false) . '> ' . esc_html($label) . '</label><br>';
+            printf('<label><input type="checkbox" name="mizzey_promo_targets[]" value="%s"%s> %s</label><br>', esc_attr($key), checked(in_array($key, $targets, true), true, false), esc_html($label)); // phpcs:ignore WordPress.Security.EscapeOutput
         }
-        $ids = static fn (string $prefix): string => implode(', ', array_map(static fn (string $t): string => substr($t, strlen($prefix)), array_values(array_filter($targets, static fn ($t): bool => is_string($t) && str_starts_with($t, $prefix)))));
-        echo '<p><label>' . esc_html__('Pages (ids, separated by commas)', 'mizzey-site') . '<br><input type="text" name="mizzey_promo_pages" value="' . esc_attr($ids('page:')) . '"></label></p>';
-        echo '<p><label>' . esc_html__('Product categories (ids, separated by commas)', 'mizzey-site') . '<br><input type="text" name="mizzey_promo_categories" value="' . esc_attr($ids('product_cat:')) . '"></label></p>';
+        $ids = static fn (string $kind): string => implode(', ', array_map(static fn (string $t): string => substr($t, strlen($kind . self::SEP)), array_values(array_filter($targets, static fn ($t): bool => is_string($t) && str_starts_with($t, $kind . self::SEP)))));
+        printf('<p><label>%s<br><input type="text" name="mizzey_promo_pages" value="%s"></label></p>', esc_html__('Pages (ids, separated by commas)', 'mizzey-site'), esc_attr($ids('page')));
+        printf('<p><label>%s<br><input type="text" name="mizzey_promo_categories" value="%s"></label></p>', esc_html__('Product categories (ids, separated by commas)', 'mizzey-site'), esc_attr($ids('product_cat')));
     }
 
     public static function save(int $postId): void
@@ -104,14 +106,14 @@ final class Promotions
             }
             $date = date_create_immutable($value, wp_timezone());
 
-            return $date === false ? '' : $date->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+            return $date === false ? '' : (string) $date->getTimestamp();
         };
         update_post_meta($postId, self::START, $utc('mizzey_promo_start'));
         update_post_meta($postId, self::END, $utc('mizzey_promo_end'));
         $targets = array_values(array_intersect(['all', 'home', 'shop'], array_map('sanitize_key', (array) wp_unslash($_POST['mizzey_promo_targets'] ?? [])))); // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-        foreach (['mizzey_promo_pages' => 'page:', 'mizzey_promo_categories' => 'product_cat:'] as $field => $prefix) {
+        foreach (['mizzey_promo_pages' => 'page', 'mizzey_promo_categories' => 'product_cat'] as $field => $kind) {
             foreach (wp_parse_id_list(isset($_POST[$field]) ? sanitize_text_field(wp_unslash($_POST[$field])) : '') as $id) { // phpcs:ignore WordPress.Security.NonceVerification
-                $targets[] = $prefix . $id;
+                $targets[] = $kind . self::SEP . $id;
             }
         }
         update_post_meta($postId, self::TARGETS, array_values(array_unique($targets)));
@@ -132,10 +134,10 @@ final class Promotions
             $context[] = 'shop';
         }
         if (is_page()) {
-            $context[] = 'page:' . self::original((int) get_queried_object_id(), 'page');
+            $context[] = 'page' . self::SEP . self::original((int) get_queried_object_id(), 'page');
         }
         if (function_exists('is_product_category') && is_product_category()) {
-            $context[] = 'product_cat:' . self::originalTerm((int) get_queried_object_id());
+            $context[] = 'product_cat' . self::SEP . self::originalTerm((int) get_queried_object_id());
         }
 
         return $context;
@@ -171,7 +173,7 @@ final class Promotions
             $start   = (string) get_post_meta($source, self::START, true);
             $end     = (string) get_post_meta($source, self::END, true);
             $targets = (array) get_post_meta($source, self::TARGETS, true);
-            if (($start !== '' && strtotime($start . ' UTC') > $now) || ($end !== '' && strtotime($end . ' UTC') <= $now)) {
+            if (($start !== '' && (int) $start > $now) || ($end !== '' && (int) $end <= $now)) {
                 continue;
             }
             if (array_intersect($targets, $context) === []) {
@@ -192,7 +194,7 @@ final class Promotions
         }
         $html = '';
         foreach ($banners as $post) {
-            $html .= '<div class="mizzey-promo" data-promo="' . esc_attr((string) $post->ID) . '">' . do_blocks((string) $post->post_content) . '</div>';
+            $html .= sprintf('<div class="mizzey-promo" data-promo="%s">%s</div>', esc_attr((string) $post->ID), do_blocks((string) $post->post_content));
         }
 
         return '<div class="mizzey-promos">' . $html . '</div>';
@@ -210,7 +212,7 @@ final class Promotions
                 if (in_array($asked, ['home', 'shop'], true)) {
                     $context[] = $asked;
                 } elseif (preg_match('/^(page|product_cat):(\d+)$/', $asked, $m) === 1) {
-                    $context[] = $m[1] . ':' . self::original((int) $m[2], $m[1]);
+                    $context[] = $m[1] . self::SEP . self::original((int) $m[2], $m[1]);
                 }
                 $out = array_map(static fn (\WP_Post $post): array => ['id' => (int) $post->ID, 'title' => get_the_title($post), 'content' => do_blocks((string) $post->post_content)], self::active($context));
 
