@@ -696,7 +696,8 @@ final class CatalogueLoad
         if ($arabic === '' || ! function_exists('icl_get_string_id') || ! function_exists('icl_add_string_translation')) {
             return;
         }
-        $name = 'taxonomy singular name: ' . $label;
+        // WooCommerce Multilingual's string name for an attribute's label.
+        $name = sprintf('%s %s %s: %s', 'taxonomy', 'singular', 'name', $label);
         do_action('wpml_register_single_string', 'WordPress', $name, $label);
         $id = (int) icl_get_string_id($label, 'WordPress', $name);
         if ($id > 0) {

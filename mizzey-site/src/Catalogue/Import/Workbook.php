@@ -153,7 +153,7 @@ final class Workbook
             $targets[(string) $rel['Id']] = $target;
         }
         $tabs = [];
-        foreach ($book->children(self::MAIN)->sheets->sheet as $sheet) {
+        foreach ($book->children(self::MAIN)->sheets->children(self::MAIN)->sheet as $sheet) {
             $id = (string) $sheet->attributes(self::RELS)['id'];
             if (isset($targets[$id])) {
                 $tabs[(string) $sheet['name']] = $targets[$id];
@@ -178,7 +178,7 @@ final class Workbook
             return [];
         }
         $next = 1;
-        foreach ($data->row as $row) {
+        foreach ($data->children(self::MAIN)->row as $row) {
             $number = isset($row['r']) ? (int) $row['r'] : $next;
             $next   = $number + 1;
             $cells  = [];

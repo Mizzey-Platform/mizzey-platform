@@ -227,6 +227,7 @@ run(
 			exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' action-scheduler run --group=' . CatalogueLoad::GROUP . ' 2>&1', $ignored, $code );
 			wp_cache_flush();
 		}
+		catalogue_register_attributes();
 		$state = CatalogueLoad::state();
 		$check( 'done' === ( $state['status'] ?? '' ) && array() === (array) ( $state['problems'] ?? array() ) && array() === array_values( array_filter( (array) ( $state['warnings'] ?? array() ), static fn ( $w ) => str_contains( (string) $w['warning'], 'has no ar name' ) ) ), 'AC-4 the workbook loads to the end with no problem, and no category or brand is left without its Arabic name (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( array( $state['problems'] ?? null, array_values( (array) ( $state['warnings'] ?? array() ) ) ), JSON_UNESCAPED_UNICODE ) . ')' );
 

@@ -119,6 +119,7 @@ run(
 			exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' action-scheduler run --group=' . CatalogueLoad::GROUP . ' 2>&1', $ignored, $code );
 			wp_cache_flush();
 		}
+		catalogue_register_attributes();
 		$state = CatalogueLoad::state();
 		$check( 'done' === ( $state['status'] ?? '' ) && array() === (array) ( $state['problems'] ?? array() ), 'AC-4 the load ran in the background to the end, with no problem (' . ( $state['status'] ?? '?' ) . ', ' . wp_json_encode( $state['problems'] ?? null ) . ')' );
 

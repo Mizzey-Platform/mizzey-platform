@@ -167,6 +167,19 @@ function catalogue_fixture_header(): array {
 	return explode( "\t", trim( str_replace( "\xEF\xBB\xBF", '', $first ) ) );
 }
 
+/** The store's attribute taxonomies, registered in this process: those the load made in another are not yet. */
+function catalogue_register_attributes(): void {
+	delete_transient( 'wc_attribute_taxonomies' );
+	\WC_Cache_Helper::invalidate_cache_group( 'woocommerce-attributes' );
+	foreach ( wc_get_attribute_taxonomies() as $attribute ) {
+		$taxonomy = wc_attribute_taxonomy_name( $attribute->attribute_name );
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			register_taxonomy( $taxonomy, array( 'product' ), array( 'hierarchical' => false, 'show_ui' => false, 'query_var' => true, 'rewrite' => false ) );
+		}
+	}
+	wp_cache_flush();
+}
+
 /**
  * Run `wp mizzey catalogue <args>` in its own process; a preview or validation reads the fixtures' mapping unless the
  * arguments name one.
