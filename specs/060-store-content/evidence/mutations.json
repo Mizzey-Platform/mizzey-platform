@@ -1,0 +1,62 @@
+[
+ {
+  "name": "M1 a banner shown before its start",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "            if (($start !== '' && (int) $start > $now) || ($end !== '' && (int) $end <= $now)) {",
+  "new": "            if ($end !== '' && (int) $end <= $now) {"
+ },
+ {
+  "name": "M2 a banner shown after its end",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "            if (($start !== '' && (int) $start > $now) || ($end !== '' && (int) $end <= $now)) {",
+  "new": "            if ($start !== '' && (int) $start > $now) {"
+ },
+ {
+  "name": "M3 targets ignored",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "            if (array_intersect($targets, $context) === []) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M4 the page not in its context",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "            $context[] = 'page' . self::SEP . self::original((int) get_queried_object_id(), 'page');",
+  "new": "            // dropped"
+ },
+ {
+  "name": "M5 the Arabic page reads its own targets",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "            $source  = self::original((int) $post->ID, self::TYPE);",
+  "new": "            $source  = (int) $post->ID;"
+ },
+ {
+  "name": "M6 the targets never saved",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "        update_post_meta($postId, self::TARGETS, array_values(array_unique($targets)));",
+  "new": "        update_post_meta($postId, self::TARGETS, []);"
+ },
+ {
+  "name": "M7 the banner block renders nothing",
+  "file": "mizzey-site/src/Storefront/Promotions.php",
+  "old": "        $banners = self::active(self::currentContext());",
+  "new": "        $banners = [];"
+ },
+ {
+  "name": "M8 the term banner not saved",
+  "file": "mizzey-site/src/Storefront/TermContent.php",
+  "old": "            $id > 0 ? update_term_meta($termId, $meta, $id) : delete_term_meta($termId, $meta);",
+  "new": "            delete_term_meta($termId, $meta);"
+ },
+ {
+  "name": "M9 the Arabic term not given the shared banner",
+  "file": "mizzey-site/src/Storefront/TermContent.php",
+  "old": "        return $original > 0 && $original !== (int) $term->term_id ? (string) get_term_meta($original, $key, true) : '';",
+  "new": "        return '';"
+ },
+ {
+  "name": "M10 term fields saved without the nonce",
+  "file": "mizzey-site/src/Storefront/TermContent.php",
+  "old": "        if ($nonce === '' || wp_verify_nonce($nonce, self::NONCE) === false || ! current_user_can('manage_product_terms')) {",
+  "new": "        if (! current_user_can('manage_product_terms')) {"
+ }
+]
