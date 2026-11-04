@@ -304,8 +304,9 @@ run(
 		sort( $colours_ar );
 		sort( $sizes_ar ); // A store attribute lists its terms by name.
 		$check( array( 'أبيض', 'أسود' ) === $colours_ar && array( 'L', 'M' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
-		$copy_term = $copy_id > 0 ? get_term( $copy_id, "pa_{$col}" ) : null;
-		$check( $copy_id > 0 && $btrid && $copy_term instanceof WP_Term && 'أسود' === $copy_term->name, 'AC-5 MIG-10 an Arabic term that only repeated the English value takes the Arabic the sheet gives (' . ( $copy_term instanceof WP_Term ? $copy_term->name : 'none: ' . wp_json_encode( array( is_wp_error( $black ) ? $black->get_error_message() : $black, is_wp_error( $copy ) ? $copy->get_error_message() : $copy, $btrid ) ) ) . ')' );
+		// Read as stored: WPML would answer get_term() with the term of the current language.
+		$copy_row = $wpdb->get_row( $wpdb->prepare( 'SELECT t.name, tt.taxonomy FROM %i t JOIN %i tt ON tt.term_id = t.term_id WHERE t.term_id = %d', $wpdb->terms, $wpdb->term_taxonomy, $copy_id ), ARRAY_A );
+		$check( $copy_id > 0 && $btrid && "pa_{$col}" === ( $copy_row['taxonomy'] ?? '' ) && 'أسود' === ( $copy_row['name'] ?? '' ), 'AC-5 MIG-10 an Arabic term that only repeated the English value takes the Arabic the sheet gives (' . wp_json_encode( $copy_row, JSON_UNESCAPED_UNICODE ) . ')' );
 		$bin       = getenv( 'MIZZEY_WP_BIN' ) ?: 'wp';
 		$answer    = array();
 		exec( escapeshellarg( $bin ) . ' --path=' . escapeshellarg( ABSPATH ) . ' eval ' . escapeshellarg( "echo (int) apply_filters( 'wpml_is_translated_taxonomy', false, 'pa_{$fin}' );" ) . ' 2>&1', $answer );
