@@ -38,9 +38,22 @@ run(
 		}
 		$zone = new \WC_Shipping_Zone();
 		$zone->set_zone_name( "{$tag} Cairo" );
-		$zone->set_zone_order( -100 );
+		$zone->set_zone_order( 0 );
 		$zone->add_location( 'EG:EG-01', 'state' );
 		$zone->save();
+		// WooCommerce keeps a zone's order unsigned and matches the first zone by order, then id, so a site's own zone
+		// for Egypt (staging has one) would take the address. The other zones move after this one for the run and get
+		// their order back at the end (as t52 does).
+		foreach ( \WC_Shipping_Zones::get_zones() as $other ) {
+			if ( (int) $other['id'] === $zone->get_id() ) {
+				continue;
+			}
+			$moved = new \WC_Shipping_Zone( (int) $other['id'] );
+			$order = $moved->get_zone_order();
+			$moved->set_zone_order( $order + 1000 );
+			$moved->save();
+			$s->on_finish( static function () use ( $moved, $order ): void { $moved->set_zone_order( $order ); $moved->save(); } );
+		}
 		$s->on_finish(
 			static function () use ( $kept, $zone ): void {
 				foreach ( $kept as $option => $value ) {
