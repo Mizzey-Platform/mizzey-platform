@@ -32,6 +32,10 @@ require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/Storefront/ProductPage.php';
 require_once __DIR__ . '/src/Storefront/HomeSections.php';
+require_once __DIR__ . '/src/Search/Normalise.php';
+require_once __DIR__ . '/src/Search/Synonyms.php';
+require_once __DIR__ . '/src/Search/SearchIndex.php';
+require_once __DIR__ . '/src/Search/ProductSearch.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -204,6 +208,11 @@ MizzeySite\Storefront\ProductPage::register();
 // What the home page's sections draw from (badges as a taxonomy, terms on the home page): specs/056-home-sections.
 MizzeySite\Storefront\HomeSections::register();
 
+// The store's own product search, its index, its synonym list and its term log: specs/058-search.
+MizzeySite\Search\Synonyms::register();
+MizzeySite\Search\SearchIndex::register();
+MizzeySite\Search\ProductSearch::register();
+
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
 add_action('plugins_loaded', [MizzeySite\Catalogue\CostTranslationSync::class, 'register'], 20);
@@ -322,6 +331,11 @@ if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('mizzey catalogue', MizzeySite\Catalogue\Import\Cli\CatalogueCommand::class);
     // The Arabic storefront's records and settings, run at release: specs/003-information-architecture-urls.
     WP_CLI::add_command('mizzey languages', MizzeySite\I18n\Cli\LanguagesCommand::class);
+    // `wp mizzey search reindex`: the product search's index rebuilt whole (specs/058).
+    WP_CLI::add_command('mizzey search reindex', static function (): void {
+        MizzeySite\Search\SearchIndex::install();
+        WP_CLI::success(sprintf('%d product records indexed.', MizzeySite\Search\SearchIndex::reindexAll()));
+    });
     // A preview or a validation run writes nothing to the catalogue, the load of WordPress included: the guard is
     // installed here, as this plugin loads, so WooCommerce's work on `init` is covered too.
     $mizzey_cli_arguments = WP_CLI::get_runner()->arguments;

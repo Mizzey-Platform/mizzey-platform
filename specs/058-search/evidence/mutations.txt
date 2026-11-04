@@ -1,0 +1,18 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t98.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 alef forms not unified  <- t98: FAIL  AC-2 the normaliser: hamza forms, short vowels, taa marbuta, alef maqsura, Arabic-Indic digits, accents
+CAUGHT    M2 digits not unified  <- t98: FAIL  AC-2 the normaliser: hamza forms, short vowels, taa marbuta, alef maqsura, Arabic-Indic digits, accents
+CAUGHT    M3 no synonyms  <- t98: FAIL  AC-3 SRCH-06 on the English store, any listed form finds the lipstick (Arabic, Franco-Arabic, a misspelling, two words); an unlisted word finds nothing
+CAUGHT    M4 any word enough  <- t98: FAIL  AC-1 SRCH-01 by name
+CAUGHT    M5 SKU not indexed  <- t98: FAIL  AC-1 SRCH-02 by SKU, whatever its case
+CAUGHT    M6 categories and brands not indexed  <- t98: FAIL  AC-1 SRCH-02 by category and by brand
+CAUGHT    M7 exact SKU not first  <- t98: FAIL  AC-1 PLP-15 an exact SKU comes first in the relevance order, before a name that contains it ([265705,265701])
+CAUGHT    M8 suggestions logged  <- t98: FAIL  AC-6 a search made on the results page is recorded too, with its count (the hair oil joined the category since) ([4,3])
+CAUGHT    M9 nothing logged  <- t98: FAIL  AC-6 a search made on the results page is recorded too, with its count (the hair oil joined the category since) ([3])
+CAUGHT    M10 no empty-state suggestions  <- t98: FAIL  AC-5 SRCH-05 no result offers the most stocked categories and the best sellers instead
+CAUGHT    M11 a one-form line kept as a group  <- t98: FAIL  AC-4 SRCH-07 the list keeps a group per line and drops a line with a single form (3)
+CAUGHT    M12 single letters match  <- t98: FAIL  AC-6 a search made on the results page is recorded too, with its count (the hair oil joined the category since) ([4,3])
+CAUGHT    M13 Store API searches not logged  <- t98: FAIL  AC-6 SRCH-08 each search is recorded once with its result count, a search with none told apart by its 0; suggestions are not recorded; nothing about the p
+
+13 of 13 caught.
