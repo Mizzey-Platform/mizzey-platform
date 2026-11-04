@@ -38,8 +38,8 @@
  {
   "name": "M7 a store translation overwritten",
   "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
-  "old": "        if ($existing > 0 && $existing !== $termId) {\n            return $existing;",
-  "new": "        if (false) {\n            return $existing;"
+  "old": "        if ($existing > 0 && $existing !== $termId) {\n            // Kept as it is",
+  "new": "        if (false) {\n            // Kept as it is"
  },
  {
   "name": "M8 Arabic option values ignored",
@@ -82,5 +82,17 @@
   "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
   "old": "            $taxonomy = self::storeAttribute((string) $slug);",
   "new": "            $taxonomy = sanitize_title((string) $slug);"
+ },
+ {
+  "name": "M15 an English-copy Arabic term never takes the Arabic",
+  "file": "mizzey-site/src/Catalogue/Import/CatalogueLoad.php",
+  "old": "            if ($name !== '' && $source instanceof \\WP_Term && $copy instanceof \\WP_Term && $copy->name === $source->name && $name !== $source->name) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M16 store attributes not translatable",
+  "file": "mizzey-site/src/Catalogue/StoreAttributes.php",
+  "old": "                $sync[$taxonomy] = 1;\n            }\n        }\n        $settings",
+  "new": "                $sync[$taxonomy] = 0;\n            }\n        }\n        $settings"
  }
 ]
