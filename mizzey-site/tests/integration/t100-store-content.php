@@ -85,8 +85,8 @@ run(
 		$promo_ar = (int) apply_filters( 'wpml_object_id', $now_on, Promotions::TYPE, false, 'ar' );
 		$page_ar  = (int) apply_filters( 'wpml_object_id', $page, 'page', false, 'ar' );
 		$posts    = array_merge( $posts, array( $promo_ar, $page_ar ) );
+		delete_post_meta( $promo_ar, '_icl_lang_duplicate_of' ); // Its own translation first: WPML re-copies a duplicate's content.
 		wp_update_post( array( 'ID' => $promo_ar, 'post_content' => '<!-- wp:paragraph --><p>' . $tag . ' عرض اليوم</p><!-- /wp:paragraph -->' ) );
-		delete_post_meta( $promo_ar, '_icl_lang_duplicate_of' );
 		$ar = $page_ar > 0 ? $fetch( $page_ar ) : '';
 		$check( storefront_shows( $ar, "{$tag} عرض اليوم" ) && ! storefront_shows( $ar, "{$tag} Now banner" ), 'AC-1 SSC-12 the Arabic page shows the banner\'s Arabic version, on the original\'s dates and targets (' . wp_json_encode( array( $promo_ar, $page_ar, mb_substr( (string) preg_replace( '/\s+/', ' ', wp_strip_all_tags( (string) preg_replace( '#<head.*?</head>|<script.*?</script>|<style.*?</style>#is', '', $ar ) ) ), 0, 300 ) ), JSON_UNESCAPED_UNICODE ) . ')' );
 
@@ -110,7 +110,7 @@ run(
 		wp_set_current_user( 0 );
 		$content = TermContent::content( get_term( (int) $cat['term_id'], 'product_cat' ) );
 		$ccoll   = TermContent::content( get_term( (int) $coll['term_id'], Collections::TAXONOMY ) );
-		$check( is_array( $content['banner'] ?? null ) && "{$tag} Summer sale" === $content['banner']['alt'] && home_url( '/offers/' ) === $content['banner']['link'] && "{$tag} All for the kitchen." === $content['description'] && '' !== ( $ccoll['image'] ?? '' ) && null === ( $ccoll['banner'] ?? 'x' ), 'AC-3 SSC-04, SSC-06 a category\'s banner (image, alternative text, link) and description, and a collection\'s image, set on their screens; a request without the nonce changes nothing (' . wp_json_encode( array( $image, wp_attachment_is_image( $image ), $content, $ccoll ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( is_array( $content['banner'] ?? null ) && "{$tag} Summer sale" === $content['banner']['alt'] && home_url( '/offers/' ) === $content['banner']['link'] && "{$tag} All for the kitchen." === $content['description'] && '' !== ( $ccoll['image'] ?? '' ) && is_array( $ccoll ) && array_key_exists( 'banner', $ccoll ) && null === $ccoll['banner'], 'AC-3 SSC-04, SSC-06 a category\'s banner (image, alternative text, link) and description, and a collection\'s image, set on their screens; a request without the nonce changes nothing (' . wp_json_encode( array( $image, wp_attachment_is_image( $image ), $content, $ccoll ), JSON_UNESCAPED_UNICODE ) . ')' );
 		// The Arabic category shows the banner too, unless it sets its own.
 		$trid = apply_filters( 'wpml_element_trid', null, (int) get_term( (int) $cat['term_id'], 'product_cat' )->term_taxonomy_id, 'tax_product_cat' );
 		do_action( 'wpml_switch_language', 'ar' );
