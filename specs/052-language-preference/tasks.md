@@ -13,4 +13,4 @@ Each task names its test. `t92` is `mizzey-site/tests/integration/t92-language-p
 | T005 | The cached-page script | t92 AC-7 |
 | T006 | Arabic for the new label | t92 AC-5 |
 | T007 | Full gates; mutation checks; self-review (Codex paused) | `evidence/` |
-| T008 | Staging: t92 on the release | PR |
+| T008 | Staging: t92 on the release: done, v0.1.21 (`evidence/staging-2026-11-05.txt`) | PR |

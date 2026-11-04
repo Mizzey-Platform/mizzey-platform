@@ -1,0 +1,10 @@
+Staging, 5 November 2026, release v0.1.21 (63cecd4), backup 20261105-001752-manual taken first.
+bin/deploy from the verified zip (checksum matches). staging.py build: no problems. staging.py check: 6 of 6.
+wp mizzey security check: every baseline passes.
+Run in the staging PHP container (~/mizzey-staging/staging-run.sh); evidence: ~/mizzey-staging/evidence/scenarios-20261105-001839/
+t93-sheet-arabic-tabs: pass, 13 checks (a workbook with two tabs and Arabic columns, loaded to the end).
+t91-product-sheet: pass, 15 checks.
+t86-catalogue-load: 41 of 42 checks pass. AC-1 B-14 failed: with WordPress served through a link
+  (current -> releases/<tag>, as bin/deploy serves every release), the site's folder above WordPress was
+  not recognised, so a run directory there was not refused. Fixed by #533 (a16b495, specs/046); proved on
+  staging with the next release.

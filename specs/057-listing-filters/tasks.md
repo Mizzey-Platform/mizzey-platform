@@ -6,4 +6,4 @@
 |---|---|---|
 | T001 | Measure the filters, sorting, paging and the category page | t97 AC-1 to AC-4 |
 | T002 | Full gates; self-review (Codex paused) | PR |
-| T003 | Staging: t97 on the release | PR |
+| T003 | Staging: t97 on the release: done, v0.1.21 (`evidence/staging-2026-11-05.txt`) | PR |

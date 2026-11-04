@@ -10,4 +10,4 @@ Each task names its test. `t96` is `mizzey-site/tests/integration/t96-home-secti
 | T002 | "Show on the home page" and its position | t96 AC-3 |
 | T003 | `GET mizzey/v1/home/terms` | t96 AC-3 |
 | T004 | Full gates; mutation checks; self-review (Codex paused) | `evidence/` |
-| T005 | Staging: t96 on the release | PR |
+| T005 | Staging: t96 on the release: done, v0.1.21 (`evidence/staging-2026-11-05.txt`) | PR |
