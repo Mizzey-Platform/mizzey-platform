@@ -2318,3 +2318,27 @@ included at no charge beyond the contracted scope. Defects in it are fixed like 
 are not owed.
 
 **3. Where it is.** Built in specs/049-stock-source-switch (D-28) and on staging. Nothing in D-28 changes.
+
+
+## 2026-11-04 - D-30: the assistant connection for the Mizzey team, a recorded gift
+
+**Status: the owner's decision of 4 November 2026, in his words: "Run the store by asking Claude or ChatGPT is a
+gift".** Internal record. It adds no register row, changes no fee and is not a Change Request.
+
+**1. What is given.** An MCP server that connects the store to an assistant the Mizzey team already uses, Claude or
+ChatGPT, so staff can ask in plain words, in English or Arabic, and the assistant answers with the store's figures or
+carries out the request. It works only through a fixed list of tasks set by the developer: reports (sales, best
+sellers, orders, customers), finding and updating orders, adding and editing products, a daily summary, and a
+description of what it is allowed to do. It cannot do anything outside that list: no design, layout, block,
+template or code changes, and no change to stock that comes from the ERP. Every request and every action is
+recorded.
+
+**2. Why it is a gift and not owed.** No register row names an assistant, a chat interface or an MCP connection.
+EX-06 and HOME-13 (AI and personalised recommendations, a personalised home page) stay excluded: this does not
+deliver them, and nothing in them is owed because this was given. Mizzey's own Claude or ChatGPT subscription is a
+third-party cost, not part of the gift. Defects in it are fixed like any delivered code; new tasks or extensions are
+not owed. The client is told in writing that it is included at no charge beyond the contracted scope.
+
+**3. How it is built.** Through the same code paths, permissions and checks as the store's admin, under a
+restricted role, and inside the ERP rules: no stock edits once the ERP is live, product edits only on the fields
+the website owns, and SKUs never changed. Before go-live.
