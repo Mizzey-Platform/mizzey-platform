@@ -70,5 +70,11 @@
   "file": "mizzey-site/src/Search/ProductSearch.php",
   "old": "                if (mb_strlen($word) < 2 && ! ctype_digit($word)) {",
   "new": "                if (false) {"
+ },
+ {
+  "name": "M13 Store API searches not logged",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "        self::$logged[$term] = true;\n        self::record($term, $total);",
+  "new": "        self::$logged[$term] = true;"
  }
 ]

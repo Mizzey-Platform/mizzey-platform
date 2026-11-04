@@ -364,7 +364,9 @@ final class ProductSearch
             }
             $words = array_filter(explode(' ', (string) ($phrases[0] ?? '')), static fn (string $w): bool => mb_strlen($w) >= 2);
             usort($words, static fn (string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
-            $terms = $words === [] ? [] : get_terms(['taxonomy' => $taxonomy, 'hide_empty' => true, 'number' => 50, 'name__like' => (string) reset($words)]);
+            // Counted by its products, not its stored count, which WooCommerce updates later.
+            $terms = $words === [] ? [] : get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false, 'number' => 50, 'name__like' => (string) reset($words)]);
+            $terms = array_values(array_filter(is_array($terms) ? $terms : [], static fn ($t): bool => $t instanceof \WP_Term && ((int) $t->count > 0 || get_objects_in_term((int) $t->term_id, $t->taxonomy) !== [])));
             foreach (is_array($terms) ? $terms : [] as $term) {
                 $name = Normalise::text($term->name);
                 foreach ($phrases as $phrase) {
