@@ -109,8 +109,9 @@ run(
 					'url'       => wc_get_checkout_url(),
 					'email'     => $fresh( 'br-checkout' ),
 					'state'     => 'EG-01',
-					// The district is an address field of specs/019; the block checkout writes the slash of its key as a hyphen in the id.
-					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000', 'mizzey-district' => 'Downtown' ),
+					// The district (specs/019) and the kind of place and building (specs/050) are address fields; the block checkout
+					// writes the slash of their keys as a hyphen in the id. A villa needs no floor or apartment.
+					'billing'   => array( 'first_name' => 'Test', 'last_name' => 'Buyer', 'address_1' => '1 Test Street', 'city' => 'Cairo', 'postcode' => '11511', 'phone' => '01000000000', 'mizzey-district' => 'Downtown', 'mizzey-place' => 'villa', 'mizzey-building' => '1' ),
 				),
 				'screenshotDir' => get_temp_dir(),
 				'checkoutTrap'  => array( 'email' => $fresh( 'br-checkout-trap' ) ),

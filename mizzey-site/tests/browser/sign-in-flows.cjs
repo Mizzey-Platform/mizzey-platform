@@ -133,7 +133,13 @@ async function checkoutWithAccount(browser, plan) {
 	for (const [field, value] of Object.entries(plan.checkout.billing)) {
 		const input = page.locator(`#billing-${field}`);
 		if (await input.count() && await input.isEditable()) {
-			await input.fill(value);
+			// The kind of place (specs/050) is a list; every other part is typed.
+			if ((await input.evaluate((el) => el.tagName)) === 'SELECT') {
+				await input.selectOption(value);
+				await wait(500);
+			} else {
+				await input.fill(value);
+			}
 		}
 	}
 	await wait(4000);
@@ -189,7 +195,13 @@ async function checkoutWithTrapFilled(browser, plan) {
 	for (const [field, value] of Object.entries(plan.checkout.billing)) {
 		const input = page.locator(`#billing-${field}`);
 		if (await input.count() && await input.isEditable()) {
-			await input.fill(value);
+			// The kind of place (specs/050) is a list; every other part is typed.
+			if ((await input.evaluate((el) => el.tagName)) === 'SELECT') {
+				await input.selectOption(value);
+				await wait(500);
+			} else {
+				await input.fill(value);
+			}
 		}
 	}
 	// What a form-filling script does: put a value in every input, the hidden one included.
