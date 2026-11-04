@@ -49,7 +49,8 @@ final class ProductSearch
         add_filter('posts_join', [self::class, 'join'], 20, 2);
         add_filter('posts_search', [self::class, 'where'], 20, 2);
         add_filter('posts_search_orderby', [self::class, 'orderby'], 20, 2);
-        add_filter('found_posts', [self::class, 'log'], 20, 2);
+        // `the_posts`, not `found_posts`: WordPress skips the count, and its filter, when nothing is found.
+        add_filter('the_posts', [self::class, 'logPosts'], 20, 2);
         // The Store API searches with its own `search` variable and its own clause (name or SKU): ours replaces it.
         add_filter('posts_clauses', [self::class, 'storeApiClauses'], 20, 2);
         add_action('rest_api_init', [self::class, 'routes']);
@@ -234,6 +235,20 @@ final class ProductSearch
         $clauses['join']  = (string) ($clauses['join'] ?? '') . self::joinClause();
 
         return $clauses;
+    }
+
+    /**
+     * @param mixed $posts
+     * @param mixed $query
+     * @return mixed
+     */
+    public static function logPosts($posts, $query)
+    {
+        if ($query instanceof \WP_Query) {
+            self::log(is_array($posts) && $posts !== [] ? max((int) $query->found_posts, count($posts)) : 0, $query);
+        }
+
+        return $posts;
     }
 
     /**

@@ -140,7 +140,7 @@ run(
 		$typed  = $suggest( "{$tag} hai" );
 		$short  = $suggest( 'h' );
 		$ar_s   = $suggest( "{$tag} مجف", 'ar' );
-		$check( in_array( $dryer->get_id(), array_column( (array) ( $typed['products'] ?? array() ), 'id' ), true ) && in_array( "{$tag} Haircare", array_column( (array) ( $typed['terms'] ?? array() ), 'name' ), true ) && str_contains( (string) ( $typed['url'] ?? '' ), 's=' ) && array() === ( $short['products'] ?? null ), 'AC-5 SRCH-03 typing offers products and categories, and the results address; one letter offers nothing' );
+		$check( in_array( $dryer->get_id(), array_column( (array) ( $typed['products'] ?? array() ), 'id' ), true ) && in_array( "{$tag} Haircare", array_column( (array) ( $typed['terms'] ?? array() ), 'name' ), true ) && str_contains( (string) ( $typed['url'] ?? '' ), 's=' ) && array() === ( $short['products'] ?? null ), 'AC-5 SRCH-03 typing offers products and categories, and the results address; one letter offers nothing (' . wp_json_encode( array( array_column( (array) ( $typed['products'] ?? array() ), 'id' ), array_column( (array) ( $typed['terms'] ?? array() ), 'name' ), $typed['url'] ?? null, $short['products'] ?? null ) ) . ')' );
 		$check( in_array( $arabic[ $dryer->get_id() ], array_column( (array) ( $ar_s['products'] ?? array() ), 'id' ), true ), 'AC-5 suggestions on the Arabic store are the Arabic records' );
 		$none = $suggest( "{$tag} zzzz" );
 		$check( array() === $none['products'] && is_array( $none['alternatives'] ?? null ) && array() !== ( $none['alternatives']['categories'] ?? array() ) && array() !== ( $none['alternatives']['products'] ?? array() ), 'AC-5 SRCH-05 no result offers the most stocked categories and the best sellers instead' );
