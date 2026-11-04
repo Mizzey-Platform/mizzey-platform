@@ -39,6 +39,7 @@ require_once __DIR__ . '/src/Search/ProductSearch.php';
 require_once __DIR__ . '/src/Storefront/ContactLinks.php';
 require_once __DIR__ . '/src/Storefront/Promotions.php';
 require_once __DIR__ . '/src/Storefront/TermContent.php';
+require_once __DIR__ . '/src/Storefront/ManualOrder.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -222,6 +223,9 @@ MizzeySite\Storefront\ContactLinks::register();
 // Promotional banners and each category's, brand's and collection's page content: specs/060-store-content.
 MizzeySite\Storefront\Promotions::register();
 MizzeySite\Storefront\TermContent::register();
+
+// Manual product ordering within each category and collection: specs/061-manual-order.
+MizzeySite\Storefront\ManualOrder::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
