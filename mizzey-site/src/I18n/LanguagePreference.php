@@ -51,7 +51,8 @@ final class LanguagePreference
     {
         add_filter('option__wcml_settings', [self::class, 'keepCart'], 20);
         add_action('template_redirect', [self::class, 'route'], 0);
-        add_filter('icl_ls_languages', [self::class, 'switcherLinks'], 20);
+        // Only the switcher's own links: WPML builds hreflang links and its redirects from `icl_ls_languages`.
+        add_filter('wpml_ls_language_url', [self::class, 'switcherLink'], 20, 2);
         add_action('wp_head', [self::class, 'cachedPageScript'], 1);
         add_action('wp_login', [self::class, 'signedIn'], 10, 2);
         add_action('user_register', [self::class, 'registered']);
@@ -157,10 +158,7 @@ final class LanguagePreference
     {
         $url = self::accountEndpointUrl($code);
         if ($url === null) {
-            // WPML's switcher data, without this class's own choice argument on its links.
-            remove_filter('icl_ls_languages', [self::class, 'switcherLinks'], 20);
             $languages = apply_filters('wpml_active_languages', null, ['skip_missing' => 1]);
-            add_filter('icl_ls_languages', [self::class, 'switcherLinks'], 20);
             $url = is_array($languages) && isset($languages[$code]['url']) && empty($languages[$code]['missing']) ? (string) $languages[$code]['url'] : '';
         }
         if ($url === '') {
@@ -253,24 +251,21 @@ final class LanguagePreference
     }
 
     /**
-     * The language switcher's links carry the choice, so following one keeps it.
+     * The language switcher's links carry the choice, so following one keeps it. Only the switcher's: the
+     * alternate-language (hreflang) links and WPML's own redirects keep their plain addresses.
      *
-     * @param mixed $languages
+     * @param mixed $url
+     * @param mixed $data
      * @return mixed
      */
-    public static function switcherLinks($languages)
+    public static function switcherLink($url, $data)
     {
-        if (! is_array($languages) || is_admin()) {
-            return $languages;
-        }
-        $args = is_user_logged_in() ? [self::NONCE => wp_create_nonce(self::NONCE)] : [];
-        foreach ($languages as $code => $language) {
-            if (is_array($language) && isset($language['url']) && self::valid($code) !== null) {
-                $languages[$code]['url'] = add_query_arg([self::CHOICE => $code] + $args, (string) $language['url']);
-            }
+        $code = self::valid(is_array($data) ? ($data['code'] ?? null) : null);
+        if (! is_string($url) || $code === null || is_admin()) {
+            return $url;
         }
 
-        return $languages;
+        return add_query_arg([self::CHOICE => $code] + (is_user_logged_in() ? [self::NONCE => wp_create_nonce(self::NONCE)] : []), $url);
     }
 
     /** The same move for a page served from a page cache, done in the browser from the cookie and the alternates. */

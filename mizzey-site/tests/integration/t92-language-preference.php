@@ -102,8 +102,12 @@ run(
 		// ---- AC-2: a switcher link keeps the choice ------------------------------------------------------------------
 		$switch = t92_page( add_query_arg( LanguagePreference::CHOICE, 'ar', $en_url ) );
 		$check( 302 === $switch['status'] && t92_same( $switch['location'], $ar_url ) && 'ar' === t92_cookie( $switch['cookies'], LanguagePreference::COOKIE ), 'AC-2 a switcher link to Arabic keeps the choice on the device and lands on the same product in Arabic (' . $switch['status'] . ' ' . $switch['location'] . ')' );
-		$sw_ls = apply_filters( 'icl_ls_languages', array( 'ar' => array( 'url' => $ar_url ), 'en' => array( 'url' => $en_url ) ) );
-		$check( str_contains( (string) ( $sw_ls['ar']['url'] ?? '' ), LanguagePreference::CHOICE . '=ar' ) && str_contains( (string) ( $sw_ls['en']['url'] ?? '' ), LanguagePreference::CHOICE . '=en' ), 'AC-2 the language switcher\'s links carry the choice' );
+		$sw_ar = (string) apply_filters( 'wpml_ls_language_url', $ar_url, array( 'code' => 'ar' ) );
+		$sw_en = (string) apply_filters( 'wpml_ls_language_url', $en_url, array( 'code' => 'en' ) );
+		$alts  = (array) apply_filters( 'icl_ls_languages', array( 'ar' => array( 'url' => $ar_url ) ) );
+		$check( str_contains( $sw_ar, LanguagePreference::CHOICE . '=ar' ) && str_contains( $sw_en, LanguagePreference::CHOICE . '=en' ) && ! str_contains( (string) ( $alts['ar']['url'] ?? '' ), LanguagePreference::CHOICE ), 'AC-2 the language switcher\'s links carry the choice; the alternate-language (hreflang) links do not' );
+		$head = (string) $plain_en['body'];
+		$check( 1 === preg_match( '/hreflang="ar"[^>]*>/', $head ) && ! str_contains( $head, 'hreflang="ar" href="' . esc_url( add_query_arg( LanguagePreference::CHOICE, 'ar', $ar_url ) ) ) && 0 === preg_match( '/<link[^>]+hreflang[^>]+' . LanguagePreference::CHOICE . '/', $head ), 'AC-1 the page\'s alternate-language links are the plain addresses, as search engines need them' );
 
 		// ---- AC-3: the choice is followed ----------------------------------------------------------------------------
 		$to_ar   = t92_page( $en_url, t92_device( 'ar' ) );

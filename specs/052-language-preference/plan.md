@@ -31,7 +31,7 @@ REST route; the cart setting held at keeping the cart; a head script for cached 
 | Piece | What it does |
 |---|---|
 | `choose()`, `preferred()` | The choice on the device (cookie) and the account (meta); the account wins |
-| `switcherLinks()`, `switchUrl()` | `?mizzey_language=<code>`, with a nonce for a signed-in customer |
+| `switcherLink()` (`wpml_ls_language_url`, the switcher only), `switchUrl()` | `?mizzey_language=<code>`, with a nonce for a signed-in customer |
 | `route()` | Keeps a switcher link's choice and strips it; moves a storefront page in the other language to the chosen one |
 | `translationUrl()` | WPML's translated address for the page (its query kept), or the account endpoint built in that language |
 | `signedIn()`, `registered()` | The account's choice comes to the device; an account with none takes the device's; a new account the language it was opened in |
