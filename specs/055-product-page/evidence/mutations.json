@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 the saving's percent wrong",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "            'percent' => (int) floor(($best[0] - $best[1]) / $best[0] * 100),",
+  "new": "            'percent' => (int) floor(($best[0] - $best[1]) / $best[1] * 100),"
+ },
+ {
+  "name": "M2 a variable product's first saving, not its largest",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "            if ($regular > 0 && $sale < $regular && ($best === null || $regular - $sale > $best[0] - $best[1])) {",
+  "new": "            if ($regular > 0 && $sale < $regular && $best === null) {"
+ },
+ {
+  "name": "M3 Buy Now stays on the product",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "        return isset($_REQUEST[self::BUY_NOW]) &&",
+  "new": "        return false &&"
+ },
+ {
+  "name": "M4 the zone's estimate ignored",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "            if (preg_match('/^\\s*(\\d+)\\s*-\\s*(\\d+)\\s*$/', (string) get_option(self::ZONE . $matched->get_id(), ''), $m) === 1) {",
+  "new": "            if (false) {"
+ },
+ {
+  "name": "M5 the Arabic text not used",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "        $text = trim((string) get_option($prefix . $language, ''));",
+  "new": "        $text = '';"
+ },
+ {
+  "name": "M6 the policy page not in the page's language",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "        $local = (int) apply_filters('wpml_object_id', $id, 'page', true, $language);",
+  "new": "        $local = $id;"
+ },
+ {
+  "name": "M7 no Open Graph tags",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "        if (! function_exists('is_product') || ! is_product()) {",
+  "new": "        if (true) {"
+ },
+ {
+  "name": "M8 share links without the product",
+  "file": "mizzey-site/src/Storefront/ProductPage.php",
+  "old": "                'whatsapp' => 'https://wa.me/?text=' . rawurlencode($title . ' ' . $url),",
+  "new": "                'whatsapp' => 'https://wa.me/?text=' . rawurlencode($title),"
+ }
+]

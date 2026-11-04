@@ -1,0 +1,13 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t95.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 the saving's percent wrong  <- t95: FAIL  AC-1 PDP-04 a product on sale states its saving, 50 or 25%, in the Store API's minor units; one not on sale states none ([{"amount":"5000","percent":33},"
+CAUGHT    M2 a variable product's first saving, not its largest  <- t95: FAIL  AC-1 a variable product states its largest saving, 60 or 50% ({"amount":"1000","percent":10})
+CAUGHT    M3 Buy Now stays on the product  <- t95: FAIL  AC-2 PDP-09 Buy Now adds the item and its quantity to the cart and lands on checkout (200 , [[265556,2]])
+CAUGHT    M4 the zone's estimate ignored  <- t95: FAIL  AC-3 PDP-14 the estimate is the zone's (1 to 2 days) where the address is known and its zone has one, otherwise the default (2 to 5), stated as an estimat
+CAUGHT    M5 the Arabic text not used  <- t95: FAIL  AC-4 the Arabic page states them in Arabic, each with its Arabic page ([{"summary":"T956971 Return within 14 days.","url":"http:\/\/mizzey.local\/ar\/t956
+CAUGHT    M6 the policy page not in the page's language  <- t95: FAIL  AC-4 the Arabic page states them in Arabic, each with its Arabic page ([{"summary":"T958020 الاسترجاع خلال 14 يوما.","url":"http:\/\/mizzey.local\/t958020
+CAUGHT    M7 no Open Graph tags  <- t95: FAIL  AC-5 the product page carries Open Graph tags, so a shared link shows its title and price
+CAUGHT    M8 share links without the product  <- t95: FAIL  AC-5 PDP-21 the share addresses carry the product's own address
+
+8 of 8 caught.
