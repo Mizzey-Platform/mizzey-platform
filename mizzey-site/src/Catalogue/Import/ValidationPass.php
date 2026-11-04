@@ -66,6 +66,7 @@ final class ValidationPass
                 if ($issue['owner'] === 'client') {
                     $clientIssues[] = [
                         'row'        => (string) $row['row'],
+                        'tab'        => (string) ($row['tab'] ?? ''),
                         'sku'        => $row['sku_source'],
                         'field'      => $issue['field'],
                         'problem'    => $issue['problem'],
@@ -272,6 +273,7 @@ final class ValidationPass
 
         return [
             'row'           => (string) $row['row'],
+            'tab'           => (string) ($row['tab'] ?? ''),
             'sku'           => $row['sku_source'],
             'type'          => (string) ($row['type'] ?? $row['type_source']),
             'outcome'       => $decision['outcome'],

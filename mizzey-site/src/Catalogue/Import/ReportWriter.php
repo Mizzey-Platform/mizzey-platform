@@ -24,8 +24,8 @@ final class ReportWriter
 {
     public const REPORT  = 'validation-report.csv';
     public const ISSUES  = 'client-issues.csv';
-    private const REPORT_COLUMNS = ['row', 'sku', 'type', 'outcome', 'rule', 'reason', 'resolved_id', 'language_role', 'translations', 'issues', 'near_matches'];
-    private const ISSUE_COLUMNS  = ['row', 'sku', 'field', 'problem', 'correction', 'issue_code'];
+    private const REPORT_COLUMNS = ['row', 'tab', 'sku', 'type', 'outcome', 'rule', 'reason', 'resolved_id', 'language_role', 'translations', 'issues', 'near_matches'];
+    private const ISSUE_COLUMNS  = ['row', 'tab', 'sku', 'field', 'problem', 'correction', 'issue_code'];
 
     /**
      * @param list<array<string,string>> $lines

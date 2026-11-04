@@ -59,7 +59,7 @@ final class HeaderCheck
             if (isset($counts[$name])) {
                 continue;
             }
-            if (isset($entry['to'])) {
+            if (isset($entry['to']) && ! $mapping->isOptional((string) $name)) {
                 $failures[] = ['code' => 'F1', 'detail' => sprintf(
                     /* translators: 1: a header, 2: the store field it fills. */
                     __('The mapped column "%1$s" (fills %2$s) is missing from the file.', 'mizzey-site'),
@@ -79,7 +79,7 @@ final class HeaderCheck
             // An option column the mapping could not take: its name is not usable, or another column fills it.
             $failures[] = ['code' => 'F4', 'detail' => sprintf(
                 /* translators: %s: a header. */
-                __('The option column "%s" cannot be read: after the prefix, give the option a name of its own in English letters, digits, "_" or "-" (for example option_size), used by one column only.', 'mizzey-site'),
+                __('The option column "%s" cannot be read: after the prefix, give the option a name of its own in English letters, digits, "_" or "-" (for example option_size), used by one column only; an Arabic column (option_size_ar) needs the column of its option beside it.', 'mizzey-site'),
                 $name,
             )];
             unset($extra[$i]);

@@ -48,7 +48,7 @@ final class RowInterpreter
 
         $fields = [];
         foreach ($mapping->columns() as $name => $entry) {
-            if (! isset($entry['to']) || str_starts_with($entry['to'], 'attribute_')) {
+            if (! isset($entry['to']) || str_starts_with($entry['to'], 'attribute_') || str_starts_with($entry['to'], 'ar_attribute_')) {
                 continue;
             }
             $value = $byHeader[$name] ?? '';
@@ -75,6 +75,15 @@ final class RowInterpreter
             $value = trim($value);
             if ($value !== '') {
                 $attributes[$slug] = $value;
+            }
+        }
+
+        // The Arabic of each option (specs/053): on a variation row its value, on a product row its name.
+        $attributesAr = [];
+        foreach ($mapping->arabicAttributeColumns() as $slug => $name) {
+            $value = trim((string) ($byHeader[$name] ?? ''));
+            if ($value !== '' && mb_check_encoding($value, 'UTF-8')) {
+                $attributesAr[$slug] = $value;
             }
         }
 
@@ -148,6 +157,7 @@ final class RowInterpreter
 
         return [
             'row'               => $raw['row'],
+            'tab'               => (string) ($raw['tab'] ?? ''),
             'sku_source'        => $skuSource,
             'sku'               => trim($skuSource),
             'parent_sku_source' => $parentSkuSource,
@@ -156,6 +166,7 @@ final class RowInterpreter
             'type_source'       => $typeSource,
             'fields'            => array_map('trim', $fields),
             'attributes'        => $attributes,
+            'attributes_ar'     => $attributesAr,
             'price'             => $price === '' ? null : $price,
             'issues'            => $issues,
         ];

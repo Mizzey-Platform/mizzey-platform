@@ -31,7 +31,7 @@ final class Mapping
      * `source_asin` keeps Amazon's identifier as a hidden source reference, never shown or searched (owner,
      * 30 October 2026).
      */
-    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar', 'source_asin', 'sale_price', 'cost', 'category', 'brand', 'images', 'image_alt', 'seo_title', 'seo_description'];
+    public const FIELDS = ['sku', 'name', 'description', 'regular_price', 'parent_sku', 'row_type', 'name_ar', 'description_ar', 'source_asin', 'sale_price', 'cost', 'category', 'category_ar', 'brand', 'brand_ar', 'images', 'image_alt', 'seo_title', 'seo_description'];
 
     /** Row types the rules know. */
     public const ROW_TYPES = ['simple', 'variable', 'variation'];
@@ -124,12 +124,16 @@ final class Mapping
             if ($prefix === '' || ! str_starts_with($header, (string) $prefix)) {
                 continue;
             }
-            $name = strtolower(trim(substr($header, strlen((string) $prefix))));
+            $name   = strtolower(trim(substr($header, strlen((string) $prefix))));
+            $suffix = strtolower((string) ($entry['arabic_suffix'] ?? ''));
+            // `option_colour_ar` gives the Arabic of the option `colour` (specs/053).
+            $arabic = $suffix !== '' && strlen($name) > strlen($suffix) && str_ends_with($name, $suffix);
+            $name   = $arabic ? substr($name, 0, -strlen($suffix)) : $name;
             if (preg_match('/^[a-z0-9][a-z0-9_-]*$/', $name) !== 1) {
                 return null;
             }
 
-            return $entry['to'] . str_replace('_', '-', $name);
+            return ($arabic ? 'ar_' : '') . $entry['to'] . str_replace('_', '-', $name);
         }
 
         return null;
@@ -171,8 +175,37 @@ final class Mapping
             $data['columns'][$name] = ['to' => $field];
             $filled[]               = $field;
         }
+        // An option's Arabic column needs the option's own column: without it there is nothing to translate.
+        foreach ($data['columns'] as $name => $entry) {
+            $to = (string) ($entry['to'] ?? '');
+            if (str_starts_with($to, 'ar_attribute_') && ! isset($this->data['columns'][$name]) && ! in_array(substr($to, 3), $filled, true)) {
+                unset($data['columns'][$name]);
+            }
+        }
 
         return new self($this->path, $data);
+    }
+
+    /**
+     * @return array<string, string> Attribute slug to the header of its Arabic column (`option_colour_ar`).
+     */
+    public function arabicAttributeColumns(): array
+    {
+        $attributes = [];
+        foreach ($this->columns() as $header => $entry) {
+            $to = $entry['to'] ?? '';
+            if (str_starts_with($to, 'ar_attribute_')) {
+                $attributes[substr($to, strlen('ar_attribute_'))] = (string) $header;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /** Whether a mapped column may be absent from a file: the mapping marks it `optional`. */
+    public function isOptional(string $header): bool
+    {
+        return ! empty($this->columns()[$header]['optional']);
     }
 
     /**
@@ -260,7 +293,7 @@ final class Mapping
                 );
             }
             if ($to !== null) {
-                if (! is_string($to) || (! in_array($to, self::FIELDS, true) && preg_match('/^attribute_[a-z0-9_-]+$/', $to) !== 1)) {
+                if (! is_string($to) || (! in_array($to, self::FIELDS, true) && preg_match('/^(ar_)?attribute_[a-z0-9_-]+$/', $to) !== 1)) {
                     $problems[] = sprintf(
                         /* translators: 1: a source header, 2: the field it names. */
                         __('columns.%1$s: "%2$s" is not a store field this tool knows', 'mizzey-site'),
@@ -284,10 +317,10 @@ final class Mapping
         } else {
             foreach ($prefixes as $prefix => $entry) {
                 // Only attributes are filled by prefix: every other field is one named column.
-                if (trim((string) $prefix) === '' || ! is_array($entry) || ($entry['to'] ?? null) !== 'attribute_') {
+                if (trim((string) $prefix) === '' || ! is_array($entry) || ($entry['to'] ?? null) !== 'attribute_' || (isset($entry['arabic_suffix']) && (! is_string($entry['arabic_suffix']) || trim($entry['arabic_suffix']) === ''))) {
                     $problems[] = sprintf(
                         /* translators: %s: a header prefix. */
-                        __('prefixes.%s: a non-empty prefix that fills "attribute_" is required', 'mizzey-site'),
+                        __('prefixes.%s: a non-empty prefix that fills "attribute_" is required, and an arabic_suffix, when given, is text', 'mizzey-site'),
                         $prefix,
                     );
                 }
