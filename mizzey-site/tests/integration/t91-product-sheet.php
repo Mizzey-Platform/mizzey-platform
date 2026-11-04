@@ -87,6 +87,8 @@ run(
 		$lines    = catalogue_csv( $out . '/validation-report.csv' );
 		$outcomes = array_count_values( array_column( $lines, 'outcome' ) );
 		$check( 0 === $run['code'] && 8 === count( $lines ) && 8 === ( $outcomes['create'] ?? 0 ), 'AC-1 MIG-06 the validation pass plans every row for creation, none rejected (exit ' . $run['code'] . ', ' . wp_json_encode( $outcomes ) . ')' );
+		$client = catalogue_csv( $out . '/client-issues.csv' );
+		$check( array() === array_filter( $client, static fn ( $r ) => 'W3' === ( $r['issue_code'] ?? '' ) ), 'AC-1 MIG-19 the client issue list asks no variation row for an Arabic name: a variation takes the name of its product (' . wp_json_encode( array_count_values( array_column( $client, 'issue_code' ) ) ) . ')' );
 
 		// ---- AC-2: any option, without changing the mapping -----------------------------------------------------------
 		$more   = array_merge( $read['header'], array( 'option_scent', 'option_pack_size' ) );

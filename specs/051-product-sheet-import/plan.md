@@ -33,6 +33,7 @@ illustrative fixtures keep their own mapping.
 | `Mapping::forHeader()` | The mapping with each prefixed header of the file added, the first of two that name one option only |
 | `HeaderCheck` F4 | A prefixed header left unmapped stops the run, named, with the correction |
 | Callers | The preview, the validation and the load expand the mapping from the file's header before the header check |
+| `LoadRules` W3 | Not on a variation row: the load writes no name or description for a variation |
 | `CatalogueLoad::parentAttributes` | The option's name with spaces for `-` ("Pack size"); its key unchanged |
 | Fixtures | `fixtures/catalogue/mapping.json` (the former plugin mapping) for t30 to t38; `product-sheet.csv`, the sample as sent |
 
@@ -40,7 +41,7 @@ illustrative fixtures keep their own mapping.
 
 | AC | `t91-product-sheet` asserts |
 |---|---|
-| AC-1 | The header check is complete with no failure or warning; the CLI validation plans the eight rows, no rejection |
+| AC-1 | The header check is complete with no failure or warning; the CLI validation plans the eight rows, no rejection; no W3 in the client issue list |
 | AC-2 | The sample's size, colour and capacity from its option columns; scent and pack size added to a row, read without a mapping change |
 | AC-3 | `option_`, `option_اللون`, `option_Size` beside `option_size`: F4, named; the CLI refuses such a sheet and names it |
 | AC-4 | The load: the simple product's fields, category path, brand, SEO, ASIN; the shirt's three variations by size and colour with their prices and cost; the bottle by capacity only; the Arabic records |

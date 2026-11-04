@@ -100,7 +100,9 @@ final class LoadRules
                 ), __('Give a sale price below the price, or the new price in the same row.', 'mizzey-site'));
             }
         }
-        if (! $update && $type !== null) {
+        // A variation's name and description are its product's (the load writes neither), so its row is not asked for
+        // the Arabic text (specs/051).
+        if (! $update && $type !== null && $type !== 'variation') {
             foreach ($mapping->arabicFields() as $field) {
                 if (($row['fields'][$field] ?? '') === '') {
                     $issues[] = self::issue('W3', self::header($field, $mapping), __('The Arabic text is empty.', 'mizzey-site'), __('Add the Arabic text, or confirm the product is English only.', 'mizzey-site'));

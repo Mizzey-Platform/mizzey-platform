@@ -52,5 +52,11 @@
   "file": "mizzey-site/import/catalogue-mapping.json",
   "old": "\"parent\": \"variable\"",
   "new": "\"parent\": \"simple\""
+ },
+ {
+  "name": "M10 a variation row asked for its Arabic name",
+  "file": "mizzey-site/src/Catalogue/Import/LoadRules.php",
+  "old": "if (! $update && $type !== null && $type !== 'variation') {",
+  "new": "if (! $update && $type !== null) {"
  }
 ]

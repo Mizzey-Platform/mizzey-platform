@@ -21,9 +21,10 @@ mapping listing every possible option (never size and colour only). It is for th
 | MIG-01 | P1-L | S1 | The Developer accepts one agreed catalogue export in CSV, tab-delimited or Excel format for the initial migration |
 | MIG-04 | P1-L | S1 | The Developer maps the source file columns to store fields for the initial migration. A self-service column-mapping interface is not delivered under the Launch Platform |
 | MIG-09 | P1-L | S1 | Product variations present in the agreed source data are converted correctly into variable products during the initial Developer-performed migration |
+| MIG-19 | P1-L | S1 | Validation issues encountered during the initial migration are reviewed by the Developer and provided to the Client as an actionable issue list where Client correction is required |
 | MIG-10 | P1-L | S1 | Source attributes are mapped to store attributes during the initial migration |
 
-The PBIs are unchanged: MIG-01 and MIG-04 belong to #249, MIG-09 and MIG-10 to #295 (`docs/scope/backlog-ownership.json`).
+The PBIs are unchanged: MIG-01, MIG-04 and MIG-19 belong to #249, MIG-09 and MIG-10 to #295 (`docs/scope/backlog-ownership.json`).
 This slice replaces the stand-in source those PBIs were verified on with the agreed one.
 
 ## Context rows (no obligation here)
@@ -43,7 +44,7 @@ This slice replaces the stand-in source those PBIs were verified on with the agr
 
 | # | Criterion | Traces | Status |
 |---|---|---|---|
-| AC-1 | The plugin's mapping reads the product sheet: every column is mapped (name and description in both languages, price, sale price, cost, category path, brand, image addresses, SEO title and description, Amazon identifier), none is left over, and the validation pass plans every row of the sample | MIG-01, MIG-04 | final |
+| AC-1 | The plugin's mapping reads the product sheet: every column is mapped (name and description in both languages, price, sale price, cost, category path, brand, image addresses, SEO title and description, Amazon identifier), none is left over, and the validation pass plans every row of the sample; the client's issue list asks for nothing the load does not use (no Arabic name for a variation row, which takes its product's) | MIG-01, MIG-04, MIG-19 | final |
 | AC-2 | Every `option_<name>` column is read as the option `<name>` of a variation, whatever the name, without the mapping listing it | MIG-04, MIG-10 | final |
 | AC-3 | An option column whose name cannot be read (no name, a name not in English letters, or the same option twice) stops the run and is named; its values are never dropped quietly | MIG-04 | final |
 | AC-4 | The load writes the sheet: simple products, and variable products with each variation's options, price, sale price and cost; a product's options are only the ones its sheet columns give | MIG-09, MIG-10 | final |
@@ -86,6 +87,7 @@ This slice replaces the stand-in source those PBIs were verified on with the agr
   header, for any header of the file (AC-2).
 - **FR-003**: A prefixed column the mapping cannot take MUST stop the run before any row is read, named (F4) (AC-3).
 - **FR-004**: An option's name MUST read as the client wrote it, with spaces for `_` (AC-4).
+- **FR-005**: A variation row MUST NOT be asked for Arabic text the load does not write (rule W3) (AC-1).
 
 ### Key Entities
 

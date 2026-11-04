@@ -65,7 +65,7 @@ A file with a header and no rows completes with no outcomes.
 |---|---|---|
 | `W1` | The SKU matched a store record that stores it differently (case, accents or spaces); the outcome follows the match | developer |
 | `W2` | The file has a column the mapping does not list (file level); the mapping is not complete until it is mapped or recorded as not imported | developer |
-| `W3` | On a create, an Arabic column the mapping fills is empty | client |
+| `W3` | On a create, an Arabic column the mapping fills is empty; not on a variation row, which takes its product's name and description (specs/051) | client |
 | `W4` | The SKU matched a translation; its original carries a different SKU | developer |
 | `W5` | A sale price that is not a plain number, or not below the row's price (on an update with the price blank, the price the store holds); the row loads without it | client |
 | `W6` | A cost that is not a plain number; the row loads without it | client |
