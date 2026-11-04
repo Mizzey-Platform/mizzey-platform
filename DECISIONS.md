@@ -2297,3 +2297,24 @@ stock, because the store's figure may be stale; switching is a person's decision
 **5. Not changed.** D-19 item 5 holds for items on the ERP source: no local writer alters their stock. The ERP
 adapter, its mechanism and its reconciliation still wait on PRE-09; the route is offered to PRE-09, not chosen (M-3).
 With nothing set, every item reads the ERP, as before this record. Built in specs/049-stock-source-switch.
+
+
+## 2026-11-04 - D-29: the store's own stock and the per-product switch (D-28), a recorded gift
+
+**Status: the owner's decision of 4 November 2026, in his words: "Yes, a gift".** Internal record. It adds no
+register row, changes no fee and is not a Change Request.
+
+**1. What is given.** D-28's resilience around the contracted ERP integration: the store's own stock, held in the
+store's database behind the same stock contract, and the switch that sets, for the whole store or for each product,
+whether stock is read from the ERP or from the store's own stock, or that the ERP is switched off. It lets the store
+keep selling when the ERP is missing, partly unreliable or down.
+
+**2. Why it is a gift and not owed.** The register contracts the ERP integration (ERP-01 to ERP-07, INT-16) and
+expressly excludes an interim operation on a separately maintained stock balance (ERP-09, OD-42, OUT). The switch is
+built and given; trading on the store's own stock for a period still needs the separate written agreement that ERP-09
+and OD-42 require. It is recorded so it is never read as owed: it does not make the ERP integration optional, it does
+not deliver ERP-09, and no P2 or OUT row is owed because it was given. The client is told in writing that it is
+included at no charge beyond the contracted scope. Defects in it are fixed like any delivered code; extensions to it
+are not owed.
+
+**3. Where it is.** Built in specs/049-stock-source-switch (D-28) and on staging. Nothing in D-28 changes.
