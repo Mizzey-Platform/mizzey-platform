@@ -313,8 +313,8 @@ final class LanguagePreference
     /** A new account starts with the device's choice, or the language it was opened in. */
     public static function registered(int $userId): void
     {
-        if (is_admin() && ! wp_doing_ajax()) {
-            return; // An account an administrator creates is not the customer's choice.
+        if ((is_admin() && ! wp_doing_ajax()) || (defined('WP_CLI') && WP_CLI)) {
+            return; // An account an administrator or a command creates is not the customer's choice.
         }
         $device = self::valid(wp_unslash($_COOKIE[self::COOKIE] ?? null)); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
         update_user_meta($userId, self::META, $device ?? self::current());
