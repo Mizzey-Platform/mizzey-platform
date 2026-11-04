@@ -159,10 +159,16 @@ final class HomeSections
         if (! in_array($taxonomy, self::TAXONOMIES, true) || ! taxonomy_exists($taxonomy)) {
             return [];
         }
-        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
-        $shown = [];
+        $terms    = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
+        $language = (string) apply_filters('wpml_current_language', null);
+        $shown    = [];
         foreach (is_array($terms) ? $terms : [] as $term) {
             if (! $term instanceof \WP_Term) {
+                continue;
+            }
+            // Only the request's language: WPML does not filter every taxonomy's terms in every context.
+            $own = (string) apply_filters('wpml_element_language_code', null, ['element_id' => (int) $term->term_taxonomy_id, 'element_type' => $taxonomy]);
+            if ($language !== '' && $own !== '' && $own !== $language) {
                 continue;
             }
             $original = self::original($term);
