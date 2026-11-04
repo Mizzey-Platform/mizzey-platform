@@ -776,3 +776,19 @@ msgstr "الدور الأرضي"
 #: mizzey-site/src/I18n/LanguagePreference.php
 msgid "Language"
 msgstr "اللغة"
+
+#: mizzey-site/src/Storefront/ProductPage.php
+#, php-format
+msgid "Estimated delivery: %d working day"
+msgid_plural "Estimated delivery: %d working days"
+msgstr[0] "التوصيل المتوقع: %d يوم عمل"
+msgstr[1] "التوصيل المتوقع: يوم عمل واحد"
+msgstr[2] "التوصيل المتوقع: يوما عمل"
+msgstr[3] "التوصيل المتوقع: %d أيام عمل"
+msgstr[4] "التوصيل المتوقع: %d يوم عمل"
+msgstr[5] "التوصيل المتوقع: %d يوم عمل"
+
+#: mizzey-site/src/Storefront/ProductPage.php
+#, php-format
+msgid "Estimated delivery: %1$d to %2$d working days"
+msgstr "التوصيل المتوقع: من %1$d إلى %2$d أيام عمل"
