@@ -44,8 +44,8 @@
  {
   "name": "M8 villa keeps floor in line",
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
-  "old": "        if ($place !== self::VILLA) {\n            if ($floor !== '') {",
-  "new": "        if (true) {\n            if ($floor !== '') {"
+  "old": "        if ($place !== self::VILLA) {\n            if (in_array($floor,",
+  "new": "        if (true) {\n            if (in_array($floor,"
  },
  {
   "name": "M9 reading order broken",
