@@ -1,0 +1,80 @@
+[
+ {
+  "name": "M1 the account's choice ignored",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "                return $kept;\n",
+  "new": "                return null;\n"
+ },
+ {
+  "name": "M2 the cart setting not held",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "            $settings['cart_sync']['lang_switch'] = WCML_CART_SYNC;",
+  "new": "            $settings['cart_sync']['lang_switch'] = $settings['cart_sync']['lang_switch'] ?? WCML_CART_SYNC;"
+ },
+ {
+  "name": "M3 the administration moved too",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "in_array($method, ['GET', 'HEAD'], true) && ! is_admin() && ! wp_doing_ajax()",
+  "new": "in_array($method, ['GET', 'HEAD'], true) && ! wp_doing_ajax()"
+ },
+ {
+  "name": "M4 account endpoints left to WPML",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "        $url = self::accountEndpointUrl($code);",
+  "new": "        $url = null;"
+ },
+ {
+  "name": "M5 a missing translation sends to the home page",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "['skip_missing' => 1]",
+  "new": "['skip_missing' => 0]"
+ },
+ {
+  "name": "M6 the query dropped",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "        return $query === [] ? $url : add_query_arg(array_map('rawurlencode', $query), $url);",
+  "new": "        return $url;"
+ },
+ {
+  "name": "M7 a link without the nonce changes the account",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "            $own = ! is_user_logged_in() || wp_verify_nonce(",
+  "new": "            $own = true || wp_verify_nonce("
+ },
+ {
+  "name": "M8 the choice not followed",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "        if ($preferred === null || $preferred === self::current()) {",
+  "new": "        if (true) {"
+ },
+ {
+  "name": "M9 switcher links carry no choice",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "        if (! is_array($languages) || is_admin()) {",
+  "new": "        if (true) {"
+ },
+ {
+  "name": "M10 no script for cached pages",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "        if (! self::isStorefrontPage() || is_user_logged_in()) {\n            return;\n        }\n        $script",
+  "new": "        return;\n        $script"
+ },
+ {
+  "name": "M11 signing in brings no choice",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "            self::remember($kept);\n",
+  "new": "            // dropped\n"
+ },
+ {
+  "name": "M12 the account field saves nothing",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "            self::choose($code, $userId);",
+  "new": "            // dropped"
+ },
+ {
+  "name": "M13 the switch link's choice not kept",
+  "file": "mizzey-site/src/I18n/LanguagePreference.php",
+  "old": "            if ($choice !== null) {\n                self::choose($choice);\n            }",
+  "new": "            if (false) {\n                self::choose($choice);\n            }"
+ }
+]
