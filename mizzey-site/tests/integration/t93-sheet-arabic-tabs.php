@@ -268,7 +268,9 @@ run(
 		$size_lbl   = $arabic_of( 'Size' );
 		$cap_lbl    = $arabic_of( 'Capacity' );
 		do_action( 'wpml_switch_language', 'en' );
-		$check( array( 'أسود', 'أبيض' ) === $colours_ar && array( 'M', 'L' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
+		sort( $colours_ar );
+		sort( $sizes_ar ); // A store attribute lists its terms by name.
+		$check( array( 'أبيض', 'أسود' ) === $colours_ar && array( 'L', 'M' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
 		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( 'pa_colour' ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		// The options are store attributes, so the listing's attribute filter (PLP-09) can offer them: the Store API
