@@ -1,0 +1,11 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t99.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 a 00 number kept as written  <- t99: FAIL  AC-1 a number written with 00 is read as digits; an empty Arabic greeting falls back to the English one
+CAUGHT    M2 a short number accepted  <- t99: FAIL  AC-2 with no number, or one too short to be a number, there is no link
+CAUGHT    M3 the Arabic greeting not used  <- t99: FAIL  AC-1 CMS-10 the link opens a chat with the number and the greeting in the page's language (https://wa.me/201001234567?text=Hello%20Mizzey%2C%20I%20have%20
+CAUGHT    M4 no English fallback  <- t99: FAIL  AC-1 a number written with 00 is read as digits; an empty Arabic greeting falls back to the English one
+CAUGHT    M5 the greeting not encoded  <- t99: FAIL  AC-1 CMS-10 the link opens a chat with the number and the greeting in the page's language (https://wa.me/201001234567?text=Hello Mizzey, I have a question
+CAUGHT    M6 no settings  <- t99: FAIL  AC-4 CMS-09 the number and the greetings are set in WooCommerce > Settings > General, without a developer
+
+6 of 6 caught.

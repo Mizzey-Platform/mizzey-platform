@@ -1,0 +1,38 @@
+[
+ {
+  "name": "M1 a 00 number kept as written",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "        $digits = str_starts_with($digits, '00') ? substr($digits, 2) : $digits;",
+  "new": "        $digits = $digits;"
+ },
+ {
+  "name": "M2 a short number accepted",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "        return strlen($digits) >= 8 && strlen($digits) <= 15 ? $digits : '';",
+  "new": "        return $digits;"
+ },
+ {
+  "name": "M3 the Arabic greeting not used",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "        $message    = trim((string) get_option(self::MESSAGE . $language, ''));",
+  "new": "        $message    = '';"
+ },
+ {
+  "name": "M4 no English fallback",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "        $message    = $message !== '' ? $message : trim((string) get_option(self::MESSAGE . 'en', ''));",
+  "new": "        $message    = $message;"
+ },
+ {
+  "name": "M5 the greeting not encoded",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "rawurlencode($message)",
+  "new": "$message"
+ },
+ {
+  "name": "M6 no settings",
+  "file": "mizzey-site/src/Storefront/ContactLinks.php",
+  "old": "        $settings[] = ['type' => 'text', 'id' => self::NUMBER,",
+  "new": "        $settings[] = ['type' => 'text', 'id' => 'x' . self::NUMBER,"
+ }
+]
