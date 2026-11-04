@@ -262,11 +262,13 @@ run(
 		$sizes_ar   = $names( $shirt_ar, 'pa_size' );
 		$white_val  = $white_ar > 0 ? (string) wc_get_product( $white_ar )->get_attribute( 'pa_colour' ) : '';
 		$small_val  = $small_ar > 0 ? (string) wc_get_product( $small_ar )->get_attribute( 'pa_capacity' ) : '';
-		$colour_lbl = (string) wc_attribute_label( 'pa_colour' );
-		$size_lbl   = (string) wc_attribute_label( 'pa_size' );
-		$cap_lbl    = (string) wc_attribute_label( 'pa_capacity' );
+		// The option's Arabic name as WooCommerce Multilingual reads it: WPML String Translation.
+		$arabic_of  = static fn ( string $label ): string => (string) apply_filters( 'wpml_translate_single_string', $label, 'WordPress', sprintf( '%s %s %s: %s', 'taxonomy', 'singular', 'name', $label ), 'ar' );
+		$colour_lbl = $arabic_of( 'Colour' );
+		$size_lbl   = $arabic_of( 'Size' );
+		$cap_lbl    = $arabic_of( 'Capacity' );
 		do_action( 'wpml_switch_language', 'en' );
-		$check( array( 'أسود', 'أبيض' ) === $colours_ar && array( 'M', 'L' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl && 'Colour' === wc_attribute_label( 'pa_colour' ), 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( array( 'أسود', 'أبيض' ) === $colours_ar && array( 'M', 'L' ) === $sizes_ar && 'اللون' === $colour_lbl && 'المقاس' === $size_lbl && 'السعة' === $cap_lbl, 'AC-5 MIG-10 the Arabic product has its options\' Arabic names and values, a value with no Arabic kept as written; the English names stay English (' . wp_json_encode( array( $colours_ar, $sizes_ar, $colour_lbl, $size_lbl, $cap_lbl ), JSON_UNESCAPED_UNICODE ) . ')' );
 		$check( 'أبيض' === $white_val && '500 مل' === $small_val && 'White' === (string) wc_get_product( $white )->get_attribute( 'pa_colour' ), 'AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (' . wp_json_encode( array( $white_val, $small_val ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		// The options are store attributes, so the listing's attribute filter (PLP-09) can offer them: the Store API

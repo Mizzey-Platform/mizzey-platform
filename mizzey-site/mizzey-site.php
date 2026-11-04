@@ -83,6 +83,7 @@ require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
 require_once __DIR__ . '/src/Catalogue/Import/Workbook.php';
+require_once __DIR__ . '/src/Catalogue/StoreAttributes.php';
 require_once __DIR__ . '/src/Catalogue/Import/LoadRules.php';
 require_once __DIR__ . '/src/Catalogue/Import/Mapping.php';
 require_once __DIR__ . '/src/Catalogue/Import/HeaderCheck.php';
@@ -227,6 +228,9 @@ MizzeySite\Storefront\TermContent::register();
 
 // Manual product ordering within each category and collection: specs/061-manual-order.
 MizzeySite\Storefront\ManualOrder::register();
+
+// Every store attribute translatable, so the Arabic store shows each value's Arabic term: specs/053.
+MizzeySite\Catalogue\StoreAttributes::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.

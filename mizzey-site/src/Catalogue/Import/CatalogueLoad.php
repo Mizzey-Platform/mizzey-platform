@@ -534,6 +534,14 @@ final class CatalogueLoad
         }
         $existing = (int) apply_filters('wpml_object_id', $termId, $taxonomy, false, 'ar');
         if ($existing > 0 && $existing !== $termId) {
+            // Kept as it is, unless it only repeats the English wording (made when no Arabic was given) and Arabic is
+            // given now: then it takes the Arabic.
+            $source = get_term($termId, $taxonomy);
+            $copy   = get_term($existing, $taxonomy);
+            if ($name !== '' && $source instanceof \WP_Term && $copy instanceof \WP_Term && $copy->name === $source->name && $name !== $source->name) {
+                wp_update_term($existing, $taxonomy, ['name' => $name]);
+            }
+
             return $existing;
         }
         if ($name === '') {
@@ -684,16 +692,14 @@ final class CatalogueLoad
                 'labels'       => ['name' => self::attributeLabel($slug)],
             ]);
         }
-        // Translatable, so each value has its Arabic term: WPML's own setting, and WooCommerce Multilingual's where loaded.
+        // Translatable (`StoreAttributes` supplies it to WPML), and recorded so in WooCommerce Multilingual where it is loaded.
         global $sitepress, $woocommerce_wpml;
-        if (is_object($sitepress) && method_exists($sitepress, 'get_setting') && method_exists($sitepress, 'set_setting')) {
+        \MizzeySite\Catalogue\StoreAttributes::forget();
+        if (is_object($sitepress) && method_exists($sitepress, 'get_setting')) {
             $sync = (array) $sitepress->get_setting('taxonomies_sync_option', []);
-            if (empty($sync[$taxonomy])) {
+            if (! array_key_exists($taxonomy, $sync) && method_exists($sitepress, 'set_setting')) {
                 $sync[$taxonomy] = 1;
-                $sitepress->set_setting('taxonomies_sync_option', $sync, true);
-                if (method_exists($sitepress, 'verify_taxonomy_translations')) {
-                    $sitepress->verify_taxonomy_translations($taxonomy);
-                }
+                $sitepress->set_setting('taxonomies_sync_option', $sync, false); // In memory for this request; the filter supplies it after.
             }
         }
         if (isset($woocommerce_wpml->attributes) && is_object($woocommerce_wpml->attributes) && method_exists($woocommerce_wpml->attributes, 'set_attribute_config_in_wcml_settings')) {

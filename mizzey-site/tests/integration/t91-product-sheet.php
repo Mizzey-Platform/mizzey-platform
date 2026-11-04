@@ -141,7 +141,9 @@ run(
 
 		$shirt  = $en( 'MZ-2001' );
 		// Each option is a store attribute (specs/053): its name, and its values as terms, read as stored.
-		$label  = static fn ( \WC_Product_Attribute $a ): string => wc_attribute_label( $a->get_name() ) . ': ' . implode( '/', array_map( static fn ( $id ) => (string) $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->terms} WHERE term_id = %d", (int) $id ) ), $a->get_options() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// The option's name as WooCommerce keeps it (this process's attribute cache predates the load).
+		$named  = (array) $wpdb->get_results( "SELECT attribute_name, attribute_label FROM {$wpdb->prefix}woocommerce_attribute_taxonomies", OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$label  = static fn ( \WC_Product_Attribute $a ): string => (string) ( $named[ substr( $a->get_name(), 3 ) ]->attribute_label ?? $a->get_name() ) . ': ' . implode( '/', array_map( static fn ( $id ) => (string) $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->terms} WHERE term_id = %d", (int) $id ) ), $a->get_options() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$attrs  = $shirt instanceof \WC_Product_Variable ? $shirt->get_attributes() : array();
 		$names  = array_map( $label, $attrs );
 		$white  = $en( 'MZ-2001-M-WHT', 'product_variation' );
