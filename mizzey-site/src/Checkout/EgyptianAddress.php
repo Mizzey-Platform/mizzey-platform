@@ -407,7 +407,10 @@ final class EgyptianAddress
             $parts[] = sprintf($place === self::VILLA ? __('Villa %s', 'mizzey-site') : __('Building %s', 'mizzey-site'), $building);
         }
         if ($place !== self::VILLA) {
-            if ($floor !== '') {
+            if (in_array($floor, ['Ground', 'أرضي', __('Ground', 'mizzey-site')], true)) {
+                // The ground floor as it is said, in either language it was typed in.
+                $parts[] = __('ground floor', 'mizzey-site');
+            } elseif ($floor !== '') {
                 /* translators: %s: the floor. */
                 $parts[] = sprintf(__('floor %s', 'mizzey-site'), $floor);
             }

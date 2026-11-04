@@ -82,10 +82,12 @@ run(
 		$check( array( 'Building 5, floor 4, apartment 18', 'Villa 12', 'Building 3, floor 2, office 7', '' ) === $lines, 'AC-4 the building, floor and apartment as one line; a villa has no floor or apartment (' . wp_json_encode( $lines ) . ')' );
 		$ar_line = '';
 		if ( switch_to_locale( 'ar' ) ) {
-			$ar_line = EgyptianAddress::line( 'apartment', '5', '4', '18' );
+			$ar_line   = EgyptianAddress::line( 'apartment', '5', '4', '18' );
+			$ar_ground = EgyptianAddress::line( 'apartment', '5', 'أرضي', '1' );
 			restore_previous_locale();
 		}
 		$check( str_contains( $ar_line, 'عمارة' ) && str_contains( $ar_line, '18' ), 'AC-4 in Arabic for an Arabic order (' . $ar_line . ')' );
+		$check( 'عمارة 5، الدور الأرضي، شقة 1' === ( $ar_ground ?? '' ), 'AC-4 a ground floor reads as the ground floor, in Arabic too (' . ( $ar_ground ?? '' ) . ')' );
 
 		// ---- [HTTP] AC-2, AC-3, AC-4 through the Store API checkout -------------------------------------------------
 		$cod = get_option( 'woocommerce_cod_settings', array() );
@@ -131,7 +133,7 @@ run(
 		[ $no_building ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::FLOOR => '4', EgyptianAddress::APARTMENT => '18' ), "{$tag}-b@example.invalid" );
 		[ $no_apartment ] = $place( array( EgyptianAddress::PLACE => 'office', EgyptianAddress::BUILDING => '5', EgyptianAddress::FLOOR => '4' ), "{$tag}-o@example.invalid" );
 		[ $ground_res, $ground ] = $place( array( EgyptianAddress::PLACE => 'apartment', EgyptianAddress::BUILDING => '5', EgyptianAddress::FLOOR => '0', EgyptianAddress::APARTMENT => '1' ), "{$tag}-g@example.invalid" );
-		$check( 400 === $no_apartment['status'] && 200 === $ground_res['status'] && $ground && 'Building 5, floor Ground, apartment 1' === $ground->get_billing_address_2(), 'AC-2 an office without its number is refused; a ground floor typed as 0 is taken as the ground floor (' . $no_apartment['status'] . ', ' . $ground_res['status'] . ( $ground ? ', ' . $ground->get_billing_address_2() : '' ) . ')' );
+		$check( 400 === $no_apartment['status'] && 200 === $ground_res['status'] && $ground && 'Building 5, ground floor, apartment 1' === $ground->get_billing_address_2(), 'AC-2 an office without its number is refused; a ground floor typed as 0 is taken as the ground floor (' . $no_apartment['status'] . ', ' . $ground_res['status'] . ( $ground ? ', ' . $ground->get_billing_address_2() : '' ) . ')' );
 		$check( 400 === $no_floor['status'] && 400 === $no_building['status'] && 200 === $villa_res['status'] && $villa && 'Villa 12' === $villa->get_billing_address_2(), 'AC-2 a flat without its floor is refused, and an address without its building; a villa is placed without them (' . $no_floor['status'] . ', ' . $no_building['status'] . ', ' . $villa_res['status'] . ')' );
 		[ $flat_res, $flat ] = $place( $flat_parts, "{$tag}-f@example.invalid" );
 		$check( 200 === $flat_res['status'] && $flat && 'Building 5, floor 4, apartment 18' === $flat->get_billing_address_2() && 'Dar Misr Al Andalus, 70 Building' === $flat->get_billing_address_1() && '18' === (string) $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) && ( '' === $flat->get_shipping_address_1() || $flat->get_billing_address_1() === $flat->get_shipping_address_1() ), '[HTTP] AC-3, AC-4 an order placed with a flat keeps each part and carries them as its second line, and is delivered to the one address given (' . wp_json_encode( $flat ? array( $flat->get_billing_address_1(), $flat->get_billing_address_2(), $flat->get_shipping_address_1(), $flat->get_meta( '_wc_billing/' . EgyptianAddress::APARTMENT ) ) : $flat_res['status'] ) . ')' );

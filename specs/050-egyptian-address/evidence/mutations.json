@@ -130,5 +130,11 @@
   "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
   "old": "$from = self::edited($order, 'shipping') && ! self::edited($order, 'billing') ? 'shipping' : 'billing';",
   "new": "$from = 'billing';"
+ },
+ {
+  "name": "M23 ground floor read as floor Ground",
+  "file": "mizzey-site/src/Checkout/EgyptianAddress.php",
+  "old": "if (in_array($floor, ['Ground', 'أرضي', __('Ground', 'mizzey-site')], true)) {",
+  "new": "if (false) {"
  }
 ]
