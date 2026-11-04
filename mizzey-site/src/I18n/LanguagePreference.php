@@ -189,10 +189,17 @@ final class LanguagePreference
         $value   = (string) get_query_var($endpoint);
         $current = self::current();
         do_action('wpml_switch_language', $code);
-        $url = wc_get_endpoint_url($endpoint, $value, wc_get_page_permalink('myaccount'));
+        $account = (string) wc_get_page_permalink('myaccount');
         do_action('wpml_switch_language', $current);
+        // The endpoint's own name is translated once per request, in the request's language; its name in the other
+        // language is WooCommerce's setting (English) or that setting's WPML translation (WooCommerce Multilingual
+        // keeps them in the "WP Endpoints" string context, by endpoint).
+        $original = (string) get_option('woocommerce_myaccount_' . str_replace('-', '_', $endpoint) . '_endpoint', $endpoint);
+        $original = $original !== '' ? $original : $endpoint;
+        $slug     = (string) apply_filters('wpml_translate_single_string', $original, 'WP Endpoints', $endpoint, $code);
+        $slug     = $slug !== '' ? $slug : $original;
 
-        return (string) $url;
+        return user_trailingslashit(trailingslashit($account) . $slug . ($value !== '' ? '/' . rawurlencode($value) : ''));
     }
 
     /** The switcher link to a language, for the storefront's own switcher (the designed one is PRE-03b's). */
