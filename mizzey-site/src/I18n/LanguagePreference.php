@@ -194,7 +194,9 @@ final class LanguagePreference
         // The endpoint's own name is translated once per request, in the request's language; its name in the other
         // language is WooCommerce's setting (English) or that setting's WPML translation (WooCommerce Multilingual
         // keeps them in the "WP Endpoints" string context, by endpoint).
-        $original = (string) get_option('woocommerce_myaccount_' . str_replace('-', '_', $endpoint) . '_endpoint', $endpoint);
+        // Read as stored: WooCommerce Multilingual filters the option itself into the request's language.
+        global $wpdb;
+        $original = (string) $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'woocommerce_myaccount_' . str_replace('-', '_', $endpoint) . '_endpoint')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         $original = $original !== '' ? $original : $endpoint;
         $slug     = (string) apply_filters('wpml_translate_single_string', $original, 'WP Endpoints', $endpoint, $code);
         $slug     = $slug !== '' ? $slug : $original;
