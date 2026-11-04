@@ -2366,3 +2366,45 @@ must be logged and tracked, so the source of a problem can be found).
 
 This covers what the assistant does. It does not deliver ROLE-10 (the audit trail of sensitive operations done by
 hand in the admin), which stays DEF.
+
+## 2026-11-04 - D-31: the language follows the customer's profile, a recorded gift
+
+**Status: the owner's decision of 4 November 2026, in his words (translated from Arabic): "the language switch will
+be from the profile; we will make it as a gift, we will not charge him for it, but I feel it is important".**
+Internal record. It adds no register row, changes no fee and is not a Change Request.
+
+**1. What is owed already.** NAV-02 and story US-01-02 contract the language switcher on every page, the same page in
+the other language, "the chosen language persists for the session and for a returning visitor on the same device",
+and "given items are in the cart, when the language is switched, then the cart is unchanged". OP-14 records that
+persistence is not built yet. That part is built as owed, not as a gift.
+
+**2. What is given.** A signed-in customer's language is kept on their account: it is chosen on the account page and
+by the header switcher, and it follows them on every device. Wherever a signed-in customer opens a store page in the
+other language (a link in an Arabic order, an email, a shared link), they are taken to the same page in their own
+language, never switched silently. A guest gets the same from their device's choice (the owed part). The order page
+shows the order's items in the customer's language.
+
+**3. Why it is a gift and not owed.** The register's wording is a device-level choice; a preference kept on the
+account across devices goes beyond it. It is given on the owner's choice and recorded so it is never read as owed:
+an Arabic administration (ADM-159a, P2) and any other P2 row are not owed because this was given. The administration
+stays English only (ADM-159). The client is told in writing that it is included at no charge beyond the contracted
+scope. Defects in it are fixed like any delivered code; extensions are not owed.
+
+**4. Where it is built.** With the header and navigation function layer (#253, NAV-02), now, under D-27; the switcher's
+designed look is PRE-03b's.
+
+## 2026-11-04 - D-32: the recommended choice where the owner's answer is awaited
+
+**Status: the owner's instruction of 4 November 2026, in his words (translated from Arabic): "work, do not stop until
+you finish everything that can be finished and does not wait on the client. If there is something you are waiting on
+me for, do the recommended, the best recommendation, the choice you see as right from the project's and the product's
+point of view, and go ahead."** Internal record. It decides engineering and preparation choices only: it adds no
+scope, changes no fee, stage or signed document, and makes no client decision. Each choice taken under it is listed
+here or in its PR, so it can be reviewed and reversed.
+
+| Question | Choice taken | Why |
+|---|---|---|
+| The Arabic for categories, brands and options in the product sheet | The sheet carries them: `category_ar`, `brand_ar` and `option_<name>_ar` columns beside the English ones; a category or brand already translated in the store is used as it is | The client fills the sheet by hand, so the Arabic is written once, where the product is described; nothing is left to translate after the load |
+| The client fills the sheet in Google Sheets, possibly one tab per category | The importer reads the workbook as downloaded (Excel, `.xlsx`), every tab with the same columns, as one file; a CSV of one tab still works | MIG-01 accepts CSV, tab-delimited or Excel; the client keeps their own way of organising the sheet |
+| Merging requirement PRs | Merged once CI is green and the local and staging checks named in the PR pass, then reported | The owner asked for work to continue without waiting |
+| The store's server (private note `pm/2026-11-04-server-recommendation.md`) | 4 GB, staging as a Cloudways staging copy on the production server, MySQL 8.4; offered to Mizzey with 2 GB as the contracted baseline | The note's reasons; hosting is the client's cost and choice (OD-14, OD-27) |
