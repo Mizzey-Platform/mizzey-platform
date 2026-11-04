@@ -86,6 +86,7 @@ run(
 		$page_ar  = (int) apply_filters( 'wpml_object_id', $page, 'page', false, 'ar' );
 		$posts    = array_merge( $posts, array( $promo_ar, $page_ar ) );
 		delete_post_meta( $promo_ar, '_icl_lang_duplicate_of' ); // Its own translation first: WPML re-copies a duplicate's content.
+		delete_post_meta( $promo_ar, Promotions::TARGETS ); // A translation keeps none of its own: the original's apply.
 		wp_update_post( array( 'ID' => $promo_ar, 'post_content' => '<!-- wp:paragraph --><p>' . $tag . ' عرض اليوم</p><!-- /wp:paragraph -->' ) );
 		do_action( 'wpml_switch_language', 'ar' ); // The Arabic page's own address, under /ar/.
 		$ar_url = $page_ar > 0 ? (string) get_permalink( $page_ar ) : '';
