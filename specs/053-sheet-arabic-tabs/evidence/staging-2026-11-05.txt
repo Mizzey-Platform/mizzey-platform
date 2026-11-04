@@ -8,3 +8,5 @@ t86-catalogue-load: 41 of 42 checks pass. AC-1 B-14 failed: with WordPress serve
   (current -> releases/<tag>, as bin/deploy serves every release), the site's folder above WordPress was
   not recognised, so a run directory there was not refused. Fixed by #533 (a16b495, specs/046); proved on
   staging with the next release.
+
+On v0.1.22 (b901925, backup 20261105-015340-manual): t86 passes, 42 of 42 checks, with the #533 fix.

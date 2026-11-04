@@ -6,3 +6,5 @@ t95-product-page: 8 of 9 checks pass on the release. AC-3 failed: the scenario's
   was never matched, because WooCommerce keeps a zone's order unsigned and staging has its own Egypt zone
   (order 0). A test defect, not the site's: fixed by #532 (0aec7f6). With that file, t95 passes on staging,
   9 checks (~/mizzey-staging/evidence/scenarios-20261105-002556-t95fix/); staging's zone kept its order.
+
+On v0.1.22 (b901925, backup 20261105-015340-manual): t95 from the release itself passes, 9 checks.
