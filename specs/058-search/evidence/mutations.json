@@ -1,0 +1,74 @@
+[
+ {
+  "name": "M1 alef forms not unified",
+  "file": "mizzey-site/src/Search/Normalise.php",
+  "old": "'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ٱ' => 'ا',",
+  "new": "'ٱ' => 'ا',"
+ },
+ {
+  "name": "M2 digits not unified",
+  "file": "mizzey-site/src/Search/Normalise.php",
+  "old": "'٠' => '0', '١' => '1', '٢' => '2',",
+  "new": "'٠' => '0', '١' => '١', '٢' => '2',"
+ },
+ {
+  "name": "M3 no synonyms",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "        return array_values(array_filter(array_unique(array_merge([$own], Synonyms::alternatives($query))), 'strlen'));",
+  "new": "        return array_values(array_filter([$own], 'strlen'));"
+ },
+ {
+  "name": "M4 any word enough",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "                $any[] = '(' . implode(' AND ', $all) . ')';",
+  "new": "                $any[] = '(' . implode(' OR ', $all) . ')';"
+ },
+ {
+  "name": "M5 SKU not indexed",
+  "file": "mizzey-site/src/Search/SearchIndex.php",
+  "old": "            'sku'        => ' ' . implode(' ', array_filter(array_map(static fn (string $s): string => mb_strtolower(trim($s)), $skus), 'strlen')) . ' ',",
+  "new": "            'sku'        => ' ',"
+ },
+ {
+  "name": "M6 categories and brands not indexed",
+  "file": "mizzey-site/src/Search/SearchIndex.php",
+  "old": "            'terms'      => Normalise::text(implode(' ', array_unique($terms))),",
+  "new": "            'terms'      => '',"
+ },
+ {
+  "name": "M7 exact SKU not first",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "        $cases   = [$wpdb->prepare('WHEN mzs.sku LIKE %s THEN 0', '% ' . $wpdb->esc_like(mb_strtolower($raw)) . ' %')];",
+  "new": "        $cases   = [$wpdb->prepare('WHEN mzs.sku LIKE %s THEN 9', '% ' . $wpdb->esc_like(mb_strtolower($raw)) . ' %')];"
+ },
+ {
+  "name": "M8 suggestions logged",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "        if (! $query instanceof \\WP_Query || ! self::applies($query) || $query->get(self::SUGGEST)) {",
+  "new": "        if (! $query instanceof \\WP_Query || ! self::applies($query)) {"
+ },
+ {
+  "name": "M9 nothing logged",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "        self::record($term, (int) $found);",
+  "new": "        // dropped"
+ },
+ {
+  "name": "M10 no empty-state suggestions",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "            $out['alternatives'] = self::emptySuggestions();",
+  "new": "            $out['alternatives'] = null;"
+ },
+ {
+  "name": "M11 a one-form line kept as a group",
+  "file": "mizzey-site/src/Search/Synonyms.php",
+  "old": "            if (count($forms) >= 2) {",
+  "new": "            if (count($forms) >= 1) {"
+ },
+ {
+  "name": "M12 single letters match",
+  "file": "mizzey-site/src/Search/ProductSearch.php",
+  "old": "                if (mb_strlen($word) < 2 && ! ctype_digit($word)) {",
+  "new": "                if (false) {"
+ }
+]
