@@ -13,4 +13,4 @@ Each task names its test. `t90` is `mizzey-site/tests/integration/t90-egyptian-a
 | T005 | Arabic for every new label and the line | t90 AC-4 |
 | T006 | The existing scenarios' checkout and address bodies carry the new parts | t47, t60, t63, t73 |
 | T007 | Full gates; mutation checks; review (Codex rounds 1 and 2, then a self-review: Codex is paused) | `evidence/` |
-| T008 | Staging: t90 and t60 on the release | PR |
+| T008 | Staging: t90 and t60 on the release: done, v0.1.20 (`evidence/staging-2026-11-04.txt`) | PR |

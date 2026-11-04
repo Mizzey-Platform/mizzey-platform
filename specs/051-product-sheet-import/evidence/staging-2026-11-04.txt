@@ -1,0 +1,12 @@
+Staging, 4 November 2026, release v0.1.20 (daa572c), backup 20261104-203901-manual taken first.
+staging.py build: no problems. staging.py check: 6 of 6. wp mizzey security check: every baseline passes.
+t91-product-sheet, run in the staging PHP container (~/mizzey-staging/staging-run.sh): pass, 15 checks, with
+0 client issues and 0 developer issues on the load. Evidence: ~/mizzey-staging/evidence/scenarios-20261104-205050/
+The sample sheet as sent to the client (Mizzey-Product-Sheet.csv), with the plugin's mapping:
+  wp mizzey catalogue validate: 8 rows, 8 create, 0 update, 0 reject, 0 client issues, 0 developer issues.
+  wp mizzey catalogue load: done; 8 source records, 3 Arabic records, no problem. Five warnings: the sheet's
+  categories and brands have no Arabic names (Storage, Loungewear, Drinkware, Mizzey Home, Mizzey Basics).
+  Store API over HTTP on staging, English and /ar/: the three products with their English and Arabic names,
+  prices and sale prices; the shirt by Size (M, L) and Colour (Black, White), the bottle by Capacity only.
+  On /ar/ the products show no category (no Arabic names yet), and option names and values read in English.
+The sample products stay on staging (SKUs MZ-1001, MZ-2001, MZ-3001 and their variations).
