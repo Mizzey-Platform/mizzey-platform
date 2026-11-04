@@ -87,7 +87,14 @@ run(
 		$posts    = array_merge( $posts, array( $promo_ar, $page_ar ) );
 		delete_post_meta( $promo_ar, '_icl_lang_duplicate_of' ); // Its own translation first: WPML re-copies a duplicate's content.
 		wp_update_post( array( 'ID' => $promo_ar, 'post_content' => '<!-- wp:paragraph --><p>' . $tag . ' عرض اليوم</p><!-- /wp:paragraph -->' ) );
-		$ar = $page_ar > 0 ? $fetch( $page_ar ) : '';
+		do_action( 'wpml_switch_language', 'ar' ); // The Arabic page's own address, under /ar/.
+		$ar_url = $page_ar > 0 ? (string) get_permalink( $page_ar ) : '';
+		do_action( 'wpml_switch_language', 'en' );
+		$ar_r = '' !== $ar_url ? wp_remote_get( $ar_url, array( 'timeout' => 60 ) ) : null;
+		$ar   = $ar_r ? (string) wp_remote_retrieve_body( $ar_r ) : '';
+		if ( $ar_r ) {
+			storefront_refuse_shell( $ar_url, (int) wp_remote_retrieve_response_code( $ar_r ), $ar );
+		}
 		$check( storefront_shows( $ar, "{$tag} عرض اليوم" ) && ! storefront_shows( $ar, "{$tag} Now banner" ), 'AC-1 SSC-12 the Arabic page shows the banner\'s Arabic version, on the original\'s dates and targets (' . wp_json_encode( array( $promo_ar, $page_ar, mb_substr( (string) preg_replace( '/\s+/', ' ', wp_strip_all_tags( (string) preg_replace( '#<head.*?</head>|<script.*?</script>|<style.*?</style>#is', '', $ar ) ) ), 0, 300 ) ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		// ---- AC-3: term banners --------------------------------------------------------------------------------------
