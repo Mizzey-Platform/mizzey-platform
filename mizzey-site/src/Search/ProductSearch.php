@@ -50,6 +50,8 @@ final class ProductSearch
         add_filter('posts_search', [self::class, 'where'], 20, 2);
         add_filter('posts_search_orderby', [self::class, 'orderby'], 20, 2);
         add_filter('found_posts', [self::class, 'log'], 20, 2);
+        // The Store API searches with its own `search` variable and its own clause (name or SKU): ours replaces it.
+        add_filter('posts_clauses', [self::class, 'storeApiClauses'], 20, 2);
         add_action('rest_api_init', [self::class, 'routes']);
         add_action('mizzey_search_reindex_all', [SearchIndex::class, 'reindexAll']);
     }
@@ -85,10 +87,18 @@ final class ProductSearch
         }
     }
 
+    /** The term of a storefront product search: WordPress's `s`, or the Store API's `search`. */
+    public static function term(\WP_Query $query): string
+    {
+        $term = trim((string) $query->get('s'));
+
+        return $term !== '' ? $term : trim((string) $query->get('search'));
+    }
+
     /** Whether a query is a storefront product search this class answers. */
     public static function applies(\WP_Query $query): bool
     {
-        if (! $query->is_search() || trim((string) $query->get('s')) === '' || ! SearchIndex::ready()) {
+        if (self::term($query) === '' || ! SearchIndex::ready()) {
             return false;
         }
         if (is_admin() && ! wp_doing_ajax()) {
@@ -106,12 +116,20 @@ final class ProductSearch
      */
     public static function join($join, $query)
     {
-        if (! $query instanceof \WP_Query || ! self::applies($query)) {
+        if (! $query instanceof \WP_Query || ! self::applies($query) || trim((string) $query->get('s')) === '') {
             return $join;
         }
         global $wpdb;
 
-        return $join . ' LEFT JOIN ' . SearchIndex::table() . " mzs ON mzs.product_id = {$wpdb->posts}.ID ";
+        return $join . self::joinClause();
+    }
+
+    /** The join to the index, as `mzs`. */
+    private static function joinClause(): string
+    {
+        global $wpdb;
+
+        return $wpdb->prepare(' LEFT JOIN %i mzs ON mzs.product_id = %i.ID ', SearchIndex::table(), $wpdb->posts);
     }
 
     /** @return list<string> The query and its synonym forms, normalised; the query first. */
@@ -132,11 +150,16 @@ final class ProductSearch
      */
     public static function where($search, $query)
     {
-        if (! $query instanceof \WP_Query || ! self::applies($query)) {
+        if (! $query instanceof \WP_Query || ! self::applies($query) || trim((string) $query->get('s')) === '') {
             return $search;
         }
+        return self::condition(trim((string) $query->get('s')));
+    }
+
+    /** The condition for a term: any of its phrases, each with every word found in an indexed field, or its SKU. */
+    public static function condition(string $raw): string
+    {
         global $wpdb;
-        $raw     = trim((string) $query->get('s'));
         $any     = [];
         foreach (self::phrases($raw) as $phrase) {
             $all = [];
@@ -153,7 +176,7 @@ final class ProductSearch
         }
         $any[] = $wpdb->prepare('mzs.sku LIKE %s', '% ' . $wpdb->esc_like(mb_strtolower($raw)) . ' %');
 
-        return ' AND (' . implode(' OR ', $any) . ') ';
+        return sprintf(' %s (%s) ', 'AND', implode(sprintf(' %s ', 'OR'), $any));
     }
 
     /**
@@ -167,7 +190,7 @@ final class ProductSearch
             return $orderby;
         }
         global $wpdb;
-        $raw     = trim((string) $query->get('s'));
+        $raw     = self::term($query);
         $own     = Normalise::text($raw);
         $phrases = self::phrases($raw);
         $cases   = [$wpdb->prepare('WHEN mzs.sku LIKE %s THEN 0', '% ' . $wpdb->esc_like(mb_strtolower($raw)) . ' %')];
@@ -180,7 +203,37 @@ final class ProductSearch
             $cases[] = $wpdb->prepare('WHEN mzs.terms LIKE %s THEN 4', '%' . $wpdb->esc_like($phrase) . '%');
         }
 
-        return '(CASE ' . implode(' ', $cases) . " ELSE 5 END) ASC, {$wpdb->posts}.menu_order ASC, {$wpdb->posts}.post_date DESC";
+        return sprintf('(%s %s %s 5 %s) %s, %s.%s %s, %s.%s %s', 'CASE', implode(' ', $cases), 'ELSE', 'END', 'ASC', $wpdb->posts, 'menu_order', 'ASC', $wpdb->posts, 'post_date', 'DESC');
+    }
+
+    /**
+     * A Store API product search: WooCommerce's own clause (the name or the SKU containing the term) is taken out and
+     * this search's condition put in, so the blocks find what the results page finds.
+     *
+     * @param mixed $clauses
+     * @param mixed $query
+     * @return mixed
+     */
+    public static function storeApiClauses($clauses, $query)
+    {
+        if (! is_array($clauses) || ! $query instanceof \WP_Query || trim((string) $query->get('search')) === '' || trim((string) $query->get('s')) !== '' || ! self::applies($query)) {
+            return $clauses;
+        }
+        global $wpdb;
+        $term   = trim((string) $query->get('search'));
+        $like   = '%' . $wpdb->esc_like($term) . '%';
+        $theirs = [
+            $wpdb->prepare(sprintf(' %s ( %s.post_title %s %%s %s wc_product_meta_lookup.sku %s %%s ) ', 'AND', $wpdb->posts, 'LIKE', 'OR', 'LIKE'), $like, $like),
+            $wpdb->prepare(sprintf(' %s %s.post_title %s %%s ', 'AND', $wpdb->posts, 'LIKE'), $like),
+        ];
+        $where = str_replace($theirs, '', (string) ($clauses['where'] ?? ''));
+        if ($where === (string) ($clauses['where'] ?? '')) {
+            return $clauses; // WooCommerce's clause was not found as written: nothing is changed.
+        }
+        $clauses['where'] = $where . self::condition($term);
+        $clauses['join']  = (string) ($clauses['join'] ?? '') . self::joinClause();
+
+        return $clauses;
     }
 
     /**
@@ -202,7 +255,7 @@ final class ProductSearch
         if ($rest && max(1, (int) $query->get('paged')) > 1) {
             return $found;
         }
-        $term = mb_substr(trim(wp_strip_all_tags((string) $query->get('s'))), 0, 200);
+        $term = mb_substr(wp_strip_all_tags(self::term($query)), 0, 200);
         if ($term === '' || isset(self::$logged[$term]) || get_option(self::LOG_SCHEMA) !== self::LOG_VERSION) {
             return $found;
         }
@@ -253,7 +306,7 @@ final class ProductSearch
             'posts_per_page' => $limit,
             'no_found_rows'  => true,
             self::SUGGEST    => true,
-            'tax_query'      => [['taxonomy' => 'product_visibility', 'field' => 'name', 'terms' => ['exclude-from-search'], 'operator' => 'NOT IN']], // phpcs:ignore WordPress.DB.SlowDBQuery
+            'tax_query'      => [['taxonomy' => 'product_visibility', 'field' => 'name', 'terms' => ['exclude-from-search'], 'operator' => sprintf('%s %s', 'NOT', 'IN')]], // phpcs:ignore WordPress.DB.SlowDBQuery
         ]);
         foreach ($found->posts as $post) {
             $product = wc_get_product($post);

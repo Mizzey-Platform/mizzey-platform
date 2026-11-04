@@ -128,7 +128,7 @@ final class Synonyms
         }
         echo '<p>' . esc_html__('One group per line: every way a shopper may write one thing, separated by commas, in English, Arabic and Franco-Arabic, misspellings included. A search for any of them finds what the others find. Example: lipstick, lip stick, روج, احمر شفاه, ahmar shafayef', 'mizzey-site') . '</p>';
         echo '<p>' . esc_html__('Searches already treat the forms of alef, taa marbuta and alef maqsura as the same, and ignore short vowels, so they need not be listed. Only what is listed here is corrected: there is no automatic typo correction.', 'mizzey-site') . '</p>';
-        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        printf('<form method="post" action="%s">', esc_url(admin_url('admin-post.php')));
         echo '<input type="hidden" name="action" value="mizzey_search_synonyms">';
         wp_nonce_field(self::NONCE);
         echo '<textarea name="mizzey_search_synonyms" rows="20" class="large-text code" dir="auto">' . esc_textarea((string) get_option(self::OPTION, '')) . '</textarea>';
