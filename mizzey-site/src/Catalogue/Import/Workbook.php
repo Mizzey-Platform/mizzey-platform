@@ -148,15 +148,15 @@ final class Workbook
         $rels = self::xml($zip, 'xl/_rels/workbook.xml.rels', true);
         $targets = [];
         foreach ($rels->children(self::PKG)->Relationship as $rel) {
-            $target = (string) $rel['Target'];
+            $target = (string) $rel->attributes()['Target'];
             $target = str_starts_with($target, '/') ? ltrim($target, '/') : 'xl/' . $target;
-            $targets[(string) $rel['Id']] = $target;
+            $targets[(string) $rel->attributes()['Id']] = $target;
         }
         $tabs = [];
         foreach ($book->children(self::MAIN)->sheets->children(self::MAIN)->sheet as $sheet) {
             $id = (string) $sheet->attributes(self::RELS)['id'];
             if (isset($targets[$id])) {
-                $tabs[(string) $sheet['name']] = $targets[$id];
+                $tabs[(string) $sheet->attributes()['name']] = $targets[$id];
             }
         }
 
@@ -179,12 +179,12 @@ final class Workbook
         }
         $next = 1;
         foreach ($data->children(self::MAIN)->row as $row) {
-            $number = isset($row['r']) ? (int) $row['r'] : $next;
+            $number = isset($row->attributes()['r']) ? (int) $row->attributes()['r'] : $next;
             $next   = $number + 1;
             $cells  = [];
             $column = 0;
             foreach ($row->children(self::MAIN)->c as $cell) {
-                $column = isset($cell['r']) ? self::column((string) $cell['r']) : $column + 1;
+                $column = isset($cell->attributes()['r']) ? self::column((string) $cell->attributes()['r']) : $column + 1;
                 $cells[$column - 1] = self::value($cell, $strings);
             }
             if ($cells === []) {
@@ -215,7 +215,7 @@ final class Workbook
     /** @param list<string> $strings */
     private static function value(\SimpleXMLElement $cell, array $strings): string
     {
-        $type = (string) $cell['t'];
+        $type = (string) $cell->attributes()['t']; // Read as no-namespace attributes: the elements came through children($ns).
         $node = $cell->children(self::MAIN);
         if ($type === 'inlineStr') {
             return isset($node->is) ? self::text($node->is) : '';
