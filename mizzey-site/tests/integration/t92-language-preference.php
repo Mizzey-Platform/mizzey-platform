@@ -25,6 +25,7 @@ use MizzeySite\I18n\LanguagePreference;
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_sign_in.php';
 require_once __DIR__ . '/_two_factor.php';
+require_once __DIR__ . '/_storefront.php';
 
 /** A storefront page as a browser asks for it, redirects not followed. */
 function t92_page( string $url, array $cookies = array() ): array {
