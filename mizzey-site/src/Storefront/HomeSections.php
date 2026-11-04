@@ -200,10 +200,15 @@ final class HomeSections
             return;
         }
         $original = self::original($term);
-        echo '<tr class="form-field"><th scope="row">' . esc_html__('Home page', 'mizzey-site') . '</th><td><label><input type="checkbox" name="mizzey_on_home" value="1"'
-            . checked(get_term_meta($original, self::ON_HOME, true) === 'yes', true, false) . '> ' . esc_html__('Show on the home page', 'mizzey-site') . '</label>'
-            . '<p><label for="mizzey_home_position">' . esc_html__('Position on the home page', 'mizzey-site') . '</label> <input type="number" min="0" step="1" name="mizzey_home_position" id="mizzey_home_position" value="' . esc_attr((string) (int) get_term_meta($original, self::POSITION, true)) . '"></p>'
-            . '<p class="description">' . esc_html__('Set on the term in the main language; it applies to both languages.', 'mizzey-site') . '</p>';
+        printf(
+            '<tr class="form-field"><th scope="row">%s</th><td><label><input type="checkbox" name="mizzey_on_home" value="1"%s> %s</label><p><label for="mizzey_home_position">%s</label> <input type="number" min="0" step="1" name="mizzey_home_position" id="mizzey_home_position" value="%s"></p><p class="description">%s</p>',
+            esc_html__('Home page', 'mizzey-site'),
+            checked(get_term_meta($original, self::ON_HOME, true) === 'yes', true, false), // phpcs:ignore WordPress.Security.EscapeOutput
+            esc_html__('Show on the home page', 'mizzey-site'),
+            esc_html__('Position on the home page', 'mizzey-site'),
+            esc_attr((string) (int) get_term_meta($original, self::POSITION, true)),
+            esc_html__('Set on the term in the main language; it applies to both languages.', 'mizzey-site'),
+        );
         wp_nonce_field(self::NONCE, 'mizzey_on_home_nonce');
         echo '</td></tr>';
     }
