@@ -97,7 +97,8 @@ not forensic reporting or log analytics (Feature Register section 1.2).
 - **FR-005**: The Users menu MUST have an Activity log screen, for `manage_options` only, with filters by account,
   event, outcome and dates, and a search of order notes (AC-3, AC-4).
 - **FR-006**: The screen MUST only read; no route Mizzey adds may change or delete an entry (AC-4).
-- **FR-007**: Nothing beyond sign-ins and security events MUST be written to the log (CX-03, ROLE-10 DEF).
+- **FR-007**: Nothing beyond sign-ins and security events MUST be written to the log (CX-03, ROLE-10 DEF), except
+  the assistant's own entries, with source "assistant" (D-30, specs/062-assistant-connection).
 
 ## Optional safeguards (not owed)
 
