@@ -1,0 +1,14 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t94.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, the scenario run.
+
+CAUGHT    M1 the cart count not read  <- t94: FAIL  AC-1 NAV-05, NAV-06 the header's data carries the cart's live count (0, then 2) and the wishlist's (1), for a guest ([{"count":0,"url":"http:\/\/mizzey.lo
+CAUGHT    M2 the wishlist count not read  <- t94: FAIL  AC-1 NAV-05, NAV-06 the header's data carries the cart's live count (0, then 2) and the wishlist's (1), for a guest ([{"count":0,"url":"http:\/\/mizzey.lo
+CAUGHT    M3 the header data cached  <- t94: FAIL  AC-1 NAV-03, NAV-04 its addresses are in the request's language, and it is never cached (http://mizzey.local/ar/cart/)
+CAUGHT    M4 the admin's order ignored  <- t94: FAIL  AC-3 a new order set in the admin is the navigation's order (["T943832 Beauty","T943832 Home"])
+CAUGHT    M5 empty categories listed  <- t94: FAIL  AC-2 NAV-07 the navigation lists the categories in the admin's order, with their children, and leaves the empty one out ([["T947053 Empty",[],"http:\/\/mi
+CAUGHT    M6 no children  <- t94: FAIL  AC-2 NAV-07 the navigation lists the categories in the admin's order, with their children, and leaves the empty one out ([["T944473 Beauty",[],"http:\/\/m
+CAUGHT    M7 the menu setting ignored  <- t94: FAIL  AC-3 a category taken out of the main menu in the admin leaves it in both languages, and its Arabic edit screen shows the same setting ([["T943037 Home","
+CAUGHT    M8 the setting kept on the Arabic category  <- t94: FAIL  AC-3 a category taken out of the main menu in the admin leaves it in both languages, and its Arabic edit screen shows the same setting ([["T943983 Home"],
+CAUGHT    M9 the setting never saved  <- t94: FAIL  AC-3 a category taken out of the main menu in the admin leaves it in both languages, and its Arabic edit screen shows the same setting ([["T949509 Home","
+
+9 of 9 caught.

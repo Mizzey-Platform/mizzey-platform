@@ -1,0 +1,56 @@
+[
+ {
+  "name": "M1 the cart count not read",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "$count = function_exists('WC') && WC()->cart !== null ? (int) WC()->cart->get_cart_contents_count() : 0;",
+  "new": "$count = 0;"
+ },
+ {
+  "name": "M2 the wishlist count not read",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "'wishlist' => ['count' => count(Wishlist::ids()),",
+  "new": "'wishlist' => ['count' => 0,"
+ },
+ {
+  "name": "M3 the header data cached",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "$response->header('Cache-Control', 'no-store,private');",
+  "new": "$response->header('Cache-Control', 'public,max-age=300');"
+ },
+ {
+  "name": "M4 the admin's order ignored",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "            'menu_order' => 'ASC',\n",
+  "new": "            'orderby'    => 'name',\n"
+ },
+ {
+  "name": "M5 empty categories listed",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "            'hide_empty' => true,",
+  "new": "            'hide_empty' => false,"
+ },
+ {
+  "name": "M6 no children",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "                'children' => self::categories((int) $term->term_id, $level + 1),",
+  "new": "                'children' => [],"
+ },
+ {
+  "name": "M7 the menu setting ignored",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "            if (! $term instanceof \\WP_Term || self::isDefault($term, $default) || self::hidden($term)) {",
+  "new": "            if (! $term instanceof \\WP_Term || self::isDefault($term, $default)) {"
+ },
+ {
+  "name": "M8 the setting kept on the Arabic category",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "        return get_term_meta(self::original($term), self::HIDDEN, true) === 'yes';",
+  "new": "        return get_term_meta((int) $term->term_id, self::HIDDEN, true) === 'yes';"
+ },
+ {
+  "name": "M9 the setting never saved",
+  "file": "mizzey-site/src/Storefront/HeaderData.php",
+  "old": "        empty($_POST['mizzey_menu_shown']) ? update_term_meta($original, self::HIDDEN, 'yes') : delete_term_meta($original, self::HIDDEN);",
+  "new": "        delete_term_meta($original, self::HIDDEN);"
+ }
+]

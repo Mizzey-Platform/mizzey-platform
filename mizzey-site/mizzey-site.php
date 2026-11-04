@@ -29,6 +29,7 @@ require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
 require_once __DIR__ . '/src/I18n/LanguagePreference.php';
+require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/I18n/LanguageSetup.php';
 require_once __DIR__ . '/src/I18n/Cli/LanguagesCommand.php';
 require_once __DIR__ . '/src/Catalogue/Collections.php';
@@ -191,6 +192,9 @@ MizzeySite\I18n\RewriteRoot::register();
 MizzeySite\I18n\CurrencyFormat::register();
 // The chosen language is kept and followed: on the device (NAV-02) and on the account (D-31). specs/052.
 MizzeySite\I18n\LanguagePreference::register();
+
+// What the header and its navigation show, as data for the designed header: specs/054-header-navigation.
+MizzeySite\Storefront\HeaderData::register();
 
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
