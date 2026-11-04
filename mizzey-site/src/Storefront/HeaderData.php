@@ -62,7 +62,7 @@ final class HeaderData
     private static function private(array $data): \WP_REST_Response
     {
         $response = new \WP_REST_Response($data);
-        $response->header('Cache-Control', 'no-store, private');
+        $response->header('Cache-Control', 'no-store,private');
 
         return $response;
     }
@@ -155,10 +155,14 @@ final class HeaderData
             return;
         }
         $shown = ! self::hidden($term);
-        echo '<tr class="form-field"><th scope="row">' . esc_html__('Main menu', 'mizzey-site') . '</th><td><label><input type="checkbox" name="mizzey_menu_shown" value="1"'
-            . checked($shown, true, false) . '> ' . esc_html__('Show in the main menu', 'mizzey-site') . '</label>'
-            . wp_nonce_field('mizzey_menu_shown', 'mizzey_menu_shown_nonce', true, false)
-            . '<p class="description">' . esc_html__('Set on the category in the main language; it applies to both languages.', 'mizzey-site') . '</p></td></tr>';
+        printf(
+            '<tr class="form-field"><th scope="row">%s</th><td><label><input type="checkbox" name="mizzey_menu_shown" value="1"%s> %s</label>%s<p class="description">%s</p></td></tr>',
+            esc_html__('Main menu', 'mizzey-site'),
+            checked($shown, true, false), // phpcs:ignore WordPress.Security.EscapeOutput
+            esc_html__('Show in the main menu', 'mizzey-site'),
+            wp_nonce_field('mizzey_menu_shown', 'mizzey_menu_shown_nonce', true, false), // phpcs:ignore WordPress.Security.EscapeOutput
+            esc_html__('Set on the category in the main language; it applies to both languages.', 'mizzey-site'),
+        );
     }
 
     public static function saveField(int $termId): void

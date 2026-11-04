@@ -14,8 +14,8 @@
  {
   "name": "M3 the header data cached",
   "file": "mizzey-site/src/Storefront/HeaderData.php",
-  "old": "$response->header('Cache-Control', 'no-store, private');",
-  "new": "$response->header('Cache-Control', 'public, max-age=300');"
+  "old": "$response->header('Cache-Control', 'no-store,private');",
+  "new": "$response->header('Cache-Control', 'public,max-age=300');"
  },
  {
   "name": "M4 the admin's order ignored",
