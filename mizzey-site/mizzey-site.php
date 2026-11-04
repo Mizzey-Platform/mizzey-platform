@@ -82,6 +82,7 @@ require_once __DIR__ . '/src/Security/Monitoring.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteRefused.php';
 require_once __DIR__ . '/src/Catalogue/Import/CatalogueWriteGuard.php';
 require_once __DIR__ . '/src/Catalogue/Import/ExportReader.php';
+require_once __DIR__ . '/src/Catalogue/Import/Workbook.php';
 require_once __DIR__ . '/src/Catalogue/Import/LoadRules.php';
 require_once __DIR__ . '/src/Catalogue/Import/Mapping.php';
 require_once __DIR__ . '/src/Catalogue/Import/HeaderCheck.php';
