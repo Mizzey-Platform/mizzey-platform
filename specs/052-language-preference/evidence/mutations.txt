@@ -1,0 +1,18 @@
+Mutation run, 4 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t92.
+Each deliberate defect in mutations.json applied alone, as a throwaway commit checked out on the test runtime, t92 run.
+
+CAUGHT    M1 the account's choice ignored  <- t92: FAIL  AC-5 the account page's language field keeps the choice on the account
+CAUGHT    M2 the cart setting not held  <- t92: FAIL  AC-7 the cart setting for a language switch is held at keeping the cart, even if it is saved as emptying it
+SURVIVED  M3 the administration moved too  <- EQUIVALENT: WordPress never runs template_redirect for an administration page, so the is_admin() guard cannot change what is moved; it is kept as a guard
+CAUGHT    M4 account endpoints left to WPML  <- t92: FAIL  AC-6 D-31 an order placed in Arabic, opened from its Arabic link by a customer who chose English, opens in English with its item in English (302 http://mi
+SURVIVED  M5 a missing translation sends to the home page  <- EQUIVALENT: a missing translation is refused twice, by skip_missing and by the 'missing' flag WPML sets on such an entry; either alone keeps the page as it is
+CAUGHT    M6 the query dropped  <- t92: FAIL  AC-3 the page's query is kept (http://mizzey.local/ar/product/t927059-misbah/)
+CAUGHT    M7 a link without the nonce changes the account  <- t92: FAIL  AC-5 D-31 a link made elsewhere, without the customer's nonce, changes nothing: the address is cleaned and the account stays English (http://mizzey.local/
+CAUGHT    M8 the choice not followed  <- t92: FAIL  AC-3 a device that chose Arabic opening the English page lands on the Arabic one, and the other way round ( | )
+CAUGHT    M9 switcher links carry no choice  <- t92: FAIL  AC-2 the language switcher's links carry the choice; the alternate-language (hreflang) links do not
+CAUGHT    M10 no script for cached pages  <- t92: FAIL  AC-7 a guest's page carries the script that does the same in the browser when the page comes from a cache
+CAUGHT    M11 signing in brings no choice  <- t92: FAIL  AC-5 D-31 on a new device, signing in brings the account's choice, and the English page opens in Arabic (302)
+CAUGHT    M12 the account field saves nothing  <- t92: FAIL  AC-5 the account page's language field keeps the choice on the account
+CAUGHT    M13 the switch link's choice not kept  <- t92: FAIL  AC-2 a switcher link to Arabic keeps the choice on the device and lands on the same product in Arabic (302 http://mizzey.local/ar/product/t921791-misbah/)
+
+11 of 13 caught; M3 and M5 are equivalent (explained on their lines).
