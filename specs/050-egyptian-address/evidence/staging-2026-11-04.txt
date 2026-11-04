@@ -1,0 +1,7 @@
+Staging, 4 November 2026, release v0.1.20 (daa572c), backup 20261104-203901-manual taken first.
+The server could not reach GitHub that evening: the release zip (checksum verified) and a git bundle of the tag
+were copied from the developer's machine, and the release deployed with bin/deploy --file.
+staging.py build: no problems. staging.py check: 6 of 6. wp mizzey security check: every baseline passes.
+t90-egyptian-address, run in the staging PHP container (~/mizzey-staging/staging-run.sh): pass, 19 checks.
+t60-checkout, same run: pass, 38 checks (the checkout bodies carry the new address parts).
+Evidence folder on the server: ~/mizzey-staging/evidence/scenarios-20261104-204855/
