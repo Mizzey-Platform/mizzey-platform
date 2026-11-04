@@ -76,6 +76,8 @@ run(
 		$none   = $fetch( $empty );
 		$check( storefront_shows( $second, "{$tag} Plain Mug" ) && storefront_shows( $second, "{$tag} Trend Lamp" ), 'AC-2 HOME-10 flagging another product in the admin adds it to the section, with no code change' );
 		$check( '' !== $none && storefront_shows( $none, "{$tag} after" ), 'AC-2 a section whose rule matches nothing leaves the page whole' );
+		$archive = wp_remote_get( add_query_arg( array( 'taxonomy' => HomeSections::BADGE_TAXONOMY, 'term' => 'trending' ), home_url( '/' ) ), array( 'timeout' => 60, 'redirection' => 0 ) ); // storefront-guard: exempt, a 404 is the answer.
+		$check( 404 === (int) wp_remote_retrieve_response_code( $archive ), 'AC-2 a badge has no page of its own: its archive address answers 404 (' . wp_remote_retrieve_response_code( $archive ) . ')' );
 
 		// ---- AC-3: terms on the home page ----------------------------------------------------------------------------
 		$terms = array();
@@ -128,7 +130,7 @@ run(
 		$_POST = array();
 		wp_set_current_user( 0 );
 		$names = static fn ( string $taxonomy ): array => array_values( array_filter( array_column( HomeSections::onHome( $taxonomy ), 'name' ), static fn ( $n ) => str_contains( (string) $n, $tag ) ) );
-		$check( ( ! $brands || array( "{$tag} Lumen" ) === $names( 'product_brand' ) ) && array( "{$tag} Summer" ) === $names( 'product_collection' ), 'AC-3 HOME-04, HOME-06 brands and collections shown on the home page are listed too' );
+		$check( ( ! $brands || array( "{$tag} Lumen" ) === $names( 'product_brand' ) ) && array( "{$tag} Summer" ) === $names( 'product_collection' ), 'AC-3 HOME-04, HOME-06 brands and collections shown on the home page are listed too (' . wp_json_encode( array( $brands ? $names( 'product_brand' ) : null, $names( 'product_collection' ) ), JSON_UNESCAPED_UNICODE ) . ')' );
 
 		return $ok;
 	}

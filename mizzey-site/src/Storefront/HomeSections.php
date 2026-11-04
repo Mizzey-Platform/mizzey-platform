@@ -52,6 +52,7 @@ final class HomeSections
             add_action($hook, [self::class, 'badgesWritten'], 10, 3);
         }
         add_action('rest_api_init', [self::class, 'routes']);
+        add_action('template_redirect', [self::class, 'noBadgeArchive'], 1);
         foreach (self::TAXONOMIES as $taxonomy) {
             add_action("{$taxonomy}_add_form_fields", [self::class, 'addFields']);
             add_action("{$taxonomy}_edit_form_fields", [self::class, 'editFields']);
@@ -65,7 +66,8 @@ final class HomeSections
         register_taxonomy(self::BADGE_TAXONOMY, ['product'], [
             'labels'            => ['name' => __('Badges', 'mizzey-site'), 'singular_name' => __('Badge', 'mizzey-site')],
             'public'            => false,
-            'publicly_queryable' => false,
+            // Queryable, as WordPress's block query reads only a queryable taxonomy's filter; its archive is answered 404.
+            'publicly_queryable' => true,
             'show_ui'           => false,
             'show_in_rest'      => true,
             'hierarchical'      => false,
@@ -81,6 +83,17 @@ final class HomeSections
             }
         }
         update_option('mizzey_badge_terms', '1', true);
+    }
+
+    /** A badge has no page of its own: its address answers 404, so no thin archive is served or indexed. */
+    public static function noBadgeArchive(): void
+    {
+        if (is_tax(self::BADGE_TAXONOMY)) {
+            global $wp_query;
+            $wp_query->set_404();
+            status_header(404);
+            nocache_headers();
+        }
     }
 
     /** @return array<string,string> */
