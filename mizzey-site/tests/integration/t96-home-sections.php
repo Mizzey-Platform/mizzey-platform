@@ -71,6 +71,13 @@ run(
 		$check( storefront_shows( $first, "{$tag} Trend Lamp" ) && ! storefront_shows( $first, "{$tag} Plain Mug" ), 'AC-2 HOME-02 a Product Collection block filtered by "Trending" shows the trending product and not the other' );
 		$plain->update_meta_data( ProductFields::BADGES, array( 'trending' ) );
 		$plain->save();
+		$trend = wc_get_product( $trend->get_id() );
+		$trend->update_meta_data( ProductFields::BADGES, array( 'trending' ) );
+		$trend->save();
+		wp_cache_flush();
+		$check( array( 'trending' ) === $slugs( $trend_ar ), 'AC-1 a later change of badges reaches the Arabic record\'s terms (' . wp_json_encode( $slugs( $trend_ar ) ) . ')' );
+		$rest_tax = sign_in_json( 'GET', rest_url( 'wp/v2/taxonomies/' . HomeSections::BADGE_TAXONOMY ) . '?context=view', null );
+		$check( 200 === $rest_tax['status'] && in_array( 'product', (array) ( $rest_tax['data']['types'] ?? array() ), true ), 'AC-2 the editor can list the badges for a product section\'s filter: the taxonomy is in the REST API (' . $rest_tax['status'] . ')' );
 		wp_cache_flush();
 		$second = $fetch( $page );
 		$none   = $fetch( $empty );
@@ -100,7 +107,7 @@ run(
 		$garden  = $make( 'product_cat', "{$tag} Garden", "{$tag} الحديقة" );
 		$admin   = (int) ( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] ?? 0 );
 		wp_set_current_user( $admin );
-		foreach ( array( array( $kitchen, 2 ), array( $beauty, 1 ) ) as list( $term, $position ) ) {
+		foreach ( array( array( $kitchen, 1 ), array( $beauty, 2 ) ) as list( $term, $position ) ) {
 			$_POST = array( 'mizzey_on_home_nonce' => wp_create_nonce( 'mizzey_on_home' ), 'mizzey_on_home' => '1', 'mizzey_home_position' => (string) $position );
 			HomeSections::saveFields( $term );
 		}
@@ -113,7 +120,7 @@ run(
 		$en = $list( 'en' );
 		$ar = $list( 'ar' );
 		$bad = sign_in_json( 'GET', rest_url( 'mizzey/v1/home/terms' ) . '?taxonomy=category', null );
-		$check( array( "{$tag} Beauty", "{$tag} Kitchen" ) === $en && array( "{$tag} الجمال", "{$tag} المطبخ" ) === $ar && 400 === $bad['status'], 'AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused (' . wp_json_encode( array( $en, $ar ), JSON_UNESCAPED_UNICODE ) . ')' );
+		$check( array( "{$tag} Kitchen", "{$tag} Beauty" ) === $en && array( "{$tag} المطبخ", "{$tag} الجمال" ) === $ar && 400 === $bad['status'], 'AC-3 HOME-05 the categories shown on the home page, in their position, in each language; one not shown is not listed; another taxonomy is refused (' . wp_json_encode( array( $en, $ar ), JSON_UNESCAPED_UNICODE ) . ')' );
 		$brands = taxonomy_exists( 'product_brand' );
 		if ( $brands ) {
 			$brand = $make( 'product_brand', "{$tag} Lumen", "{$tag} لومن" );
