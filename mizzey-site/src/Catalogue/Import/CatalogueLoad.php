@@ -547,7 +547,9 @@ final class CatalogueLoad
         $source = self::sourceLanguage();
         do_action('wpml_switch_language', 'ar');
         try {
-            $made = wp_insert_term($name, $taxonomy, ['parent' => $arParent]);
+            // A slug of its own, so an Arabic name equal to the English one ("M") is still a term of its own: WordPress
+            // would otherwise answer with the English term, which must keep its language.
+            $made = wp_insert_term($name, $taxonomy, ['parent' => $arParent, 'slug' => wp_unique_term_slug(sanitize_title($term->slug . '-ar'), (object) ['taxonomy' => $taxonomy, 'parent' => $arParent])]);
         } finally {
             do_action('wpml_switch_language', $source);
         }
@@ -556,8 +558,8 @@ final class CatalogueLoad
             throw new \RuntimeException(is_wp_error($made) ? $made->get_error_message() : __('The Arabic name was not written.', 'mizzey-site'));
         }
         $arTerm = get_term($madeId, $taxonomy);
-        if (! $arTerm instanceof \WP_Term) {
-            return 0;
+        if (! $arTerm instanceof \WP_Term || $madeId === $termId) {
+            return 0; // Never the source term itself.
         }
         // A term of that name already there may be used only if it is no other term's translation.
         $theirs = apply_filters('wpml_element_trid', null, (int) $arTerm->term_taxonomy_id, 'tax_' . $taxonomy);
@@ -682,9 +684,20 @@ final class CatalogueLoad
                 'labels'       => ['name' => self::attributeLabel($slug)],
             ]);
         }
-        global $woocommerce_wpml;
-        if (isset($woocommerce_wpml->attributes) && is_object($woocommerce_wpml->attributes) && method_exists($woocommerce_wpml->attributes, 'set_attribute_config_in_settings') && ! apply_filters('wpml_is_translated_taxonomy', false, $taxonomy)) {
-            $woocommerce_wpml->attributes->set_attribute_config_in_settings($taxonomy, 1);
+        // Translatable, so each value has its Arabic term: WPML's own setting, and WooCommerce Multilingual's where loaded.
+        global $sitepress, $woocommerce_wpml;
+        if (is_object($sitepress) && method_exists($sitepress, 'get_setting') && method_exists($sitepress, 'set_setting')) {
+            $sync = (array) $sitepress->get_setting('taxonomies_sync_option', []);
+            if (empty($sync[$taxonomy])) {
+                $sync[$taxonomy] = 1;
+                $sitepress->set_setting('taxonomies_sync_option', $sync, true);
+                if (method_exists($sitepress, 'verify_taxonomy_translations')) {
+                    $sitepress->verify_taxonomy_translations($taxonomy);
+                }
+            }
+        }
+        if (isset($woocommerce_wpml->attributes) && is_object($woocommerce_wpml->attributes) && method_exists($woocommerce_wpml->attributes, 'set_attribute_config_in_wcml_settings')) {
+            $woocommerce_wpml->attributes->set_attribute_config_in_wcml_settings($taxonomy, 1);
         }
 
         return $taxonomy;
