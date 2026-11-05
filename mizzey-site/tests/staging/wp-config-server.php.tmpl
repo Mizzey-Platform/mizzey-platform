@@ -62,9 +62,9 @@ define( 'WP_AUTO_UPDATE_CORE', false );
 // No request leaves the server for a real provider. A provider sandbox is allowed by name when one is wired.
 define( 'WP_HTTP_BLOCK_EXTERNAL', true );
 // The Paymob sandbox (specs/028-payments): its API host alone, used with test keys only.
-// WPML's licence API alone, so Mizzey's WPML licence registers and stays current. WPML's settings download
-// (cdn.wpml.org) stays blocked: staging carries development's copy (`staging.py parity`).
-define( 'WP_ACCESSIBLE_HOSTS', 'accept.paymob.com,api.wpml.org' );
+// WPML's licence API (api.wpml.org), so Mizzey's WPML licence registers and stays current, and WPML's settings
+// download (cdn.wpml.org), so staging loads WPML's configuration files as production will.
+define( 'WP_ACCESSIBLE_HOSTS', 'accept.paymob.com,api.wpml.org,cdn.wpml.org' );
 // The WPML site key (OTGS_INSTALLER_SITE_KEY_WPML) is added on the server only. It is never in this repository.
 
 // WordPress starts its scheduled tasks by calling its own address, which here is behind Cloudflare Access and

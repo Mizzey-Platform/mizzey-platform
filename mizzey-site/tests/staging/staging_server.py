@@ -531,8 +531,11 @@ def cmd_reset(a) -> None:
     # Installed with a password nobody keeps, then given the real one through the environment.
     wp("core", "install", f"--url={PUBLIC_URL}", "--title=Mizzey (staging)", "--admin_user=staging_admin",
        "--admin_email=staging-admin@example.invalid", "--skip-email", "--skip-plugins")
+    # WordPress marks an administrator it installed without a password as having an "auto-generated password" and
+    # nags on every screen; the real one is set here, so the mark goes too.
     with_secret("MIZZEY_ADMIN_PASSWORD", creds["staging_admin"]["password"], "eval",
-                'wp_set_password( getenv( "MIZZEY_ADMIN_PASSWORD" ), get_user_by( "login", "staging_admin" )->ID );',
+                '$id = get_user_by( "login", "staging_admin" )->ID; wp_set_password( getenv( "MIZZEY_ADMIN_PASSWORD" ), $id ); '
+                'delete_user_meta( $id, "default_password_nag" );',
                 "--skip-plugins")
     for plugin in local.ACTIVE_PLUGINS:
         wp("plugin", "activate", plugin)
