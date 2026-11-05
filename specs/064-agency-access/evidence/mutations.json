@@ -1,0 +1,56 @@
+[
+ {
+  "name": "M1 the role never written",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        if ((wp_load_alloptions()[self::STORED] ?? null) === self::stamp()) {\n            return;\n        }\n        remove_role(self::ROLE);",
+  "new": "        return;\n        remove_role(self::ROLE);"
+ },
+ {
+  "name": "M2 unfiltered_html given",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        'read',\n        'upload_files',",
+  "new": "        'read', 'unfiltered_html',\n        'upload_files',"
+ },
+ {
+  "name": "M3 templates and menus given",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        'manage_categories',\n",
+  "new": "        'manage_categories', 'edit_theme_options',\n"
+ },
+ {
+  "name": "M4 the user list given",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        'manage_categories',\n",
+  "new": "        'manage_categories', 'list_users',\n"
+ },
+ {
+  "name": "M5 the tracking screen left on manage_woocommerce",
+  "file": "mizzey-site/src/Marketing/TagManager.php",
+  "old": "        if (! current_user_can(\\MizzeySite\\Roles\\MarketingRole::TRACKING)) {",
+  "new": "        if (! current_user_can('manage_woocommerce')) {"
+ },
+ {
+  "name": "M6 the admin role not given the tracking setting",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "    public const GRANTED_TO = ['administrator', 'shop_manager'];",
+  "new": "    public const GRANTED_TO = ['administrator'];"
+ },
+ {
+  "name": "M7 content changes not recorded",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        $was = $before instanceof \\WP_Post ? $before->post_status : 'new';",
+  "new": "        return;\n        $was = $before instanceof \\WP_Post ? $before->post_status : 'new';"
+ },
+ {
+  "name": "M8 everyone's changes recorded as the agency's",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        return $user instanceof \\WP_User && in_array(self::ROLE, (array) $user->roles, true);",
+  "new": "        return $user instanceof \\WP_User && $user->ID > 0;"
+ },
+ {
+  "name": "M9 media not recorded",
+  "file": "mizzey-site/src/Roles/MarketingRole.php",
+  "old": "        if ($post instanceof \\WP_Post && self::holds()) {\n            self::record(StaffActivityLog::AGENCY_MEDIA,",
+  "new": "        if (false) {\n            self::record(StaffActivityLog::AGENCY_MEDIA,"
+ }
+]

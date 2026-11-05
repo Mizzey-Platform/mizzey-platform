@@ -32,7 +32,7 @@ final class TagManager
         add_action('wp_head', [self::class, 'head'], 1);
         add_action('admin_menu', [self::class, 'menu']);
         add_action('admin_init', [self::class, 'settings']);
-        add_filter('option_page_capability_' . self::PAGE, static fn (): string => 'manage_woocommerce');
+        add_filter('option_page_capability_' . self::PAGE, static fn (): string => \MizzeySite\Roles\MarketingRole::TRACKING);
     }
 
     /** The container id, or nothing when none (or a malformed one) is set. */
@@ -69,7 +69,7 @@ final class TagManager
 
     public static function menu(): void
     {
-        add_options_page(__('Marketing tags', 'mizzey-site'), __('Marketing tags', 'mizzey-site'), 'manage_woocommerce', self::PAGE, [self::class, 'render']);
+        add_options_page(__('Marketing tags', 'mizzey-site'), __('Marketing tags', 'mizzey-site'), \MizzeySite\Roles\MarketingRole::TRACKING, self::PAGE, [self::class, 'render']);
     }
 
     public static function settings(): void
@@ -87,7 +87,7 @@ final class TagManager
 
     public static function render(): void
     {
-        if (! current_user_can('manage_woocommerce')) {
+        if (! current_user_can(\MizzeySite\Roles\MarketingRole::TRACKING)) {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__('Marketing tags', 'mizzey-site') . '</h1>';

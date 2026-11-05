@@ -74,7 +74,7 @@ run(
 		// ---- AC-2: the consent banner and consent-gated attribution ----------------------------------------------
 		$check( str_contains( $home, 'id="mizzey-consent"' ) && str_contains( $home, 'Accept all' ) && str_contains( $home, 'Essential only' ) && str_contains( $home, 'assets/consent.js' ), 'AC-2 the consent banner and its script are on the English storefront' );
 		$check( str_contains( $home, 'data-mizzey-consent-open' ) && str_contains( $ar, 'إعدادات ملفات تعريف الارتباط' ), 'AC-2 a "Cookie settings" link reopens the choice, in both languages' );
-		$check( 'manage_woocommerce' === apply_filters( 'option_page_capability_' . TagManager::PAGE, 'manage_options' ), 'AC-1 shop managers can save the container' );
+		$check( \MizzeySite\Roles\MarketingRole::TRACKING === apply_filters( 'option_page_capability_' . TagManager::PAGE, 'manage_options' ) && get_role( 'shop_manager' )->has_cap( \MizzeySite\Roles\MarketingRole::TRACKING ), 'AC-1 shop managers can save the container (the tracking capability, specs/064, which they hold)' );
 		$check( str_contains( $ar, 'قبول الكل' ) && str_contains( $ar, 'الأساسية فقط' ), 'AC-2 the banner speaks Arabic on the Arabic storefront' );
 		unset( $_COOKIE[ ConsentBanner::COOKIE ] );
 		$denied = apply_filters( 'wc_order_attribution_allow_tracking', true );

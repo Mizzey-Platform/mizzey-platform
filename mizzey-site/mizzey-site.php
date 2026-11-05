@@ -109,6 +109,7 @@ require_once __DIR__ . '/src/Shipping/CodReconciliation.php';
 require_once __DIR__ . '/src/Admin/PluginAdminStyles.php';
 require_once __DIR__ . '/src/Shipping/DeliveryEstimate.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
+require_once __DIR__ . '/src/Roles/MarketingRole.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
 require_once __DIR__ . '/src/Promotions/PromotionRules.php';
 require_once __DIR__ . '/src/Promotions/DiscountCap.php';
@@ -295,6 +296,7 @@ MizzeySite\Orders\TransitionGuard::register();
 
 // Refunding is a capability of its own (ROLE-07, ROLE-08; D-10, D-11 item 7). See specs/013-launch-roles.
 MizzeySite\Roles\RefundCapability::register();
+MizzeySite\Roles\MarketingRole::register();
 // The cart: stock through the adapter, the guest cart merge and window, free shipping progress, suggestions (#306). See specs/018-cart.
 MizzeySite\Stock\FixtureStockSource::register();
 // The store's own stock beside the ERP's, switchable per product, and the route that feeds it: D-28, specs/049.

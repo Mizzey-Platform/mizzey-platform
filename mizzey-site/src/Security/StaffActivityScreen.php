@@ -47,6 +47,10 @@ final class StaffActivityScreen
             StaffActivityLog::SIGNOUT         => __('Staff sign-out', 'mizzey-site'),
             StaffActivityLog::RESET_REQUESTED => __('Password reset requested', 'mizzey-site'),
             StaffActivityLog::RESET_DONE      => __('Password reset', 'mizzey-site'),
+            StaffActivityLog::AGENCY_CONTENT  => __('Agency: content saved', 'mizzey-site'),
+            StaffActivityLog::AGENCY_DELETED  => __('Agency: content deleted', 'mizzey-site'),
+            StaffActivityLog::AGENCY_MEDIA    => __('Agency: media added', 'mizzey-site'),
+            StaffActivityLog::AGENCY_TRACKING => __('Agency: tracking changed', 'mizzey-site'),
         ];
     }
 
