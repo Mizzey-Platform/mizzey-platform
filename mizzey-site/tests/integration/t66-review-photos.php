@@ -168,7 +168,9 @@ run(
 		$heavy      = $files[] = t66_file( (string) ob_get_clean(), '.png' );
 		$was_limit  = ini_get( 'memory_limit' );
 		// A busy worker: WordPress's limit for images, as the upload raises it, with all but about 60 MB already held.
-		ini_set( 'memory_limit', '256M' ); // phpcs:ignore WordPress.PHP.IniSet
+		// PHP refuses a limit below what the process already holds, and a WP-CLI run holds more than 256 MB with WPML 5.3:
+		// the starting limit is set above it, so the limit is a real one and not left unlimited.
+		ini_set( 'memory_limit', (string) max( 256 * 1024 * 1024, memory_get_usage( true ) + 32 * 1024 * 1024 ) ); // phpcs:ignore WordPress.PHP.IniSet
 		wp_raise_memory_limit( 'image' );
 		$limit   = wp_convert_hr_to_bytes( (string) ini_get( 'memory_limit' ) );
 		$capped  = $limit > 0;

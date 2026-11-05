@@ -91,6 +91,9 @@ run(
 		$s->note( 'Zero is stored by WooCommerce as no cost, on the original and therefore on the translation. A deliberate zero cannot be told from an uncosted product: recorded for OD-12, not worked around here.' );
 
 		// --- Part 2: a translation that cannot be saved ---------------------------------------------------------
+		// Up to WPML 4.9 the Arabic cost then stayed as it was until the next save. WPML 5.3 copies the declared field
+		// (wpml-config.xml, FR-008) itself when the original's cost is written, so the Arabic cost follows even when
+		// our own save of the translation fails; that failure is still logged.
 		// The second pair here is also the case that exposed the identity defect of 22 September 2026 (see t12 and
 		// verification.md): before the correction, its Arabic copy was not synchronised at all.
 		$en1 = $w->simple( 'T13F1', 10.0 );
@@ -115,11 +118,11 @@ run(
 		$log     = Workflows::sync_log_lines();
 		$logged  = (bool) array_filter( $log, fn( $line ) => false !== strpos( $line, (string) $ar1 ) && false !== strpos( $line, 'forced failure for t13' ) );
 		$ok      = ( 'ok' === $r1 && 'ok' === $r2
-			&& 500.0 === Workflows::cost( $en1 ) && 10.0 === Workflows::cost( $ar1 )
+			&& 500.0 === Workflows::cost( $en1 ) && 500.0 === Workflows::cost( $ar1 )
 			&& 600.0 === Workflows::cost( $en2 ) && 600.0 === Workflows::cost( $ar2 )
 			&& $logged );
 		$s->note( sprintf(
-			'%s forced failure on translation %d: EN1 %s AR1 %s (stale, as expected); the unrelated pair EN2 %s AR2 %s still synchronised; logged to mizzey-cost-sync: %s',
+			'%s forced failure on translation %d: EN1 %s AR1 %s (carried all the same by the WPML copy of _cogs_total_value that the site plugin declares, which WPML 5.3 makes when the original cost is written); the unrelated pair EN2 %s AR2 %s synchronised; our failure logged to mizzey-cost-sync: %s',
 			$ok ? 'OK  ' : 'FAIL',
 			$ar1,
 			t13_fmt( Workflows::cost( $en1 ) ),

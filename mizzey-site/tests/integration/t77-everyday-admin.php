@@ -159,7 +159,10 @@ run(
 		delete_user_meta( $admin, 'locale' );
 		preg_match( '/<html[^>]*>/s', $screen, $html_tag );
 		$tag = (string) ( $html_tag[0] ?? '' );
-		$check( 1 === preg_match( '/lang="en/', $tag ) && ! str_contains( $tag, 'dir="rtl"' ) && str_contains( $screen, 'Products' ), 'AC-5 the administration stays in English for a staff member who chose Arabic (' . esc_html( preg_replace( '/\\s+/', ' ', $tag ) ) . ')' );
+		// Left to right in fact, not only in the html tag: no right-to-left stylesheets and no rtl body class (WPML 5.3 sets
+		// the direction from the profile language while the page is built).
+		$rtl_page = 1 === preg_match( '/<body[^>]*class="[^"]*\brtl\b/', $screen ) || str_contains( $screen, 'dir=rtl' ) || 1 === preg_match( '/-rtl(\.min)?\.css/', $screen );
+		$check( 1 === preg_match( '/lang="en/', $tag ) && ! str_contains( $tag, 'dir="rtl"' ) && ! $rtl_page && str_contains( $screen, 'Products' ), 'AC-5 the administration stays in English for a staff member who chose Arabic (' . esc_html( preg_replace( '/\\s+/', ' ', $tag ) ) . ')' );
 
 		// An admin action that switches to an order's language (its email, invoice or packing slip) keeps that language.
 		require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
