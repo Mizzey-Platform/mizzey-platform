@@ -18,11 +18,20 @@
 
 $endpoints = \MizzeySite\I18n\LanguageSetup::endpoints();
 
+// WPML is set up (setup.php) before WooCommerce Multilingual's configuration marks the product_type taxonomy as not
+// translatable (admin-visit.php), so WPML records the four product type terms as English originals. No product is
+// affected, but WooCommerce Multilingual then warns on every admin screen that product_type "was set incorrectly
+// for some product translations". Its own repair, the one its troubleshooting page runs, removes those records.
+global $wpdb;
+$product_type_records = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}icl_translations WHERE element_type = 'tax_product_type'" );
+WCML_Install::check_product_type_terms();
+
 flush_rewrite_rules( false );
 
 echo wp_json_encode(
 	array(
 		'ia_endpoints_ar'      => $endpoints['made'] + $endpoints['kept'],
 		'ia_endpoints_missing' => $endpoints['missing'],
+		'product_type_records_removed' => $product_type_records,
 	)
 ), "\n";
