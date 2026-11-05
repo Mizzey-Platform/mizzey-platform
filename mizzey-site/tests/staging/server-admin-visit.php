@@ -33,6 +33,12 @@ if ( 'open' === $mode ) {
 	if ( is_wp_error( $uid ) ) {
 		WP_CLI::error( $uid->get_error_message() );
 	}
+	// Two-factor sign-in is required for administrators here (ADM-131): a new administrator who has not set it up is
+	// sent to WP 2FA's set-up screen and never reaches the Plugins page. The temporary one is enrolled with WP 2FA's own
+	// functions, as the scenarios enrol theirs, and is removed with its settings by `close`.
+	if ( class_exists( '\WP2FA\Methods\TOTP' ) && class_exists( '\WP2FA\Authenticator\Authentication' ) ) {
+		\WP2FA\Methods\TOTP::set_user_method( get_userdata( $uid ), \WP2FA\Authenticator\Authentication::generate_key() );
+	}
 	$expiry  = time() + HOUR_IN_SECONDS;
 	$token   = WP_Session_Tokens::get_instance( $uid )->create( $expiry );
 	$secure  = is_ssl();
