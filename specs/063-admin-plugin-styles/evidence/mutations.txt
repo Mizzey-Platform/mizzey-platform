@@ -1,0 +1,14 @@
+Mutation run, 5 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t103.
+Each deliberate defect in mutations.json applied alone to the runtime's checkout, the scenario run, the file restored.
+
+CAUGHT    M1 the scoping not registered  <- t103: FAIL  AC-1 ADM-159 the order list does not load Paymob's admin sheet, which turns the status filter row into a card
+CAUGHT    M2 Paymob's sheet left on the order list  <- t103: FAIL  AC-1 ADM-159 the order list does not load Paymob's admin sheet, which turns the status filter row into a card
+CAUGHT    M3 Bosta's sheets left on every screen  <- t103: FAIL  AC-4 ADM-159 the posts screen loads neither Bosta's nor Paymob's admin sheet
+CAUGHT    M4 Bosta's settings section not recognised  <- t103: FAIL  AC-5 Bosta's settings section keeps its sheet, untouched by ours
+EQUIVALENT M5 our sheet printed before Bosta's  <- ours is enqueued after Bosta's, so it prints after it without the dependency; the dependency is kept as a guard
+CAUGHT    M6 a single order taken for the list  <- t103: FAIL  AC-5 a single order keeps Paymob's and Bosta's sheets for their panels
+CAUGHT    M7 the list's filters left stacked  <- t103: FAIL  AC-1 the list's own filters stay on one row and its table header in WordPress's size
+CAUGHT    M8 our checkbox left unmarked  <- t103: FAIL  AC-3 the "Cash collected, not remitted" filter is marked and sized as a checkbox
+
+7 of 8 caught.
+M5 is an equivalent defect, not a gap: with or without the dependency, the order of printing is the order of enqueueing.
