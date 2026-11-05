@@ -32,14 +32,28 @@ final class AdminEnglish
         // And its reading direction: English reads left to right, whatever the staff member's admin language.
         add_action('admin_init', [self::class, 'direction'], 0);
         add_action('set_current_user', [self::class, 'direction'], 99);
+        // WPML 5.3 sets the direction from the staff member's profile language on `admin_init` and on
+        // `admin_print_styles` (its rtl_fix, at 10): English is set again after it, before the styles are printed (20).
+        add_action('admin_init', [self::class, 'direction'], 99);
+        add_action('admin_print_styles', [self::class, 'direction'], 15);
+        // And WPML 5.3 writes the profile language into the page's `lang`: the administration's page says English.
+        add_filter('language_attributes', [self::class, 'attributes'], 99);
     }
 
     public static function direction(): void
     {
-        global $wp_locale;
-        if (self::adminScreen() && $wp_locale instanceof \WP_Locale) {
+        global $wp_locale, $wp_styles;
+        if (! self::adminScreen()) {
+            return;
+        }
+        if ($wp_locale instanceof \WP_Locale) {
             $wp_locale->text_direction = 'ltr';
         }
+        // The style queue's own direction chooses the right-to-left stylesheets (common-rtl.css and the rest).
+        if ($wp_styles instanceof \WP_Styles) {
+            $wp_styles->text_direction = 'ltr';
+        }
+        $GLOBALS['text_direction'] = 'ltr';
     }
 
     /** Whether this request is an administration screen (not a REST, ajax or storefront request). */
@@ -61,5 +75,21 @@ final class AdminEnglish
         }
 
         return self::adminScreen() ? self::LOCALE : $locale;
+    }
+
+    /**
+     * The page's `lang` and direction on an admin screen: English, left to right.
+     *
+     * @param mixed $attributes
+     * @return mixed
+     */
+    public static function attributes($attributes)
+    {
+        if (! self::adminScreen() || ! is_string($attributes) || (($GLOBALS['wp_locale_switcher'] ?? null) instanceof \WP_Locale_Switcher && is_locale_switched())) {
+            return $attributes;
+        }
+        $attributes = (string) preg_replace('/\s*dir="[^"]*"/', '', $attributes);
+
+        return (string) preg_replace('/lang="[^"]*"/', 'lang="en-US"', $attributes);
     }
 }

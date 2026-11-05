@@ -542,10 +542,21 @@ final class CatalogueLoad
         if ($existing > 0 && $existing !== $termId) {
             // Kept as it is, unless it only repeats the English wording (made when no Arabic was given) and Arabic is
             // given now: then it takes the Arabic.
-            $source = get_term($termId, $taxonomy);
-            $copy   = get_term($existing, $taxonomy);
+            $source = self::exactTerm($termId, $taxonomy);
+            $copy   = self::exactTerm($existing, $taxonomy);
             if ($name !== '' && $source instanceof \WP_Term && $copy instanceof \WP_Term && $copy->name === $source->name && $name !== $source->name) {
-                wp_update_term($existing, $taxonomy, ['name' => $name]);
+                // In Arabic, as the term was made: WPML resolves the update's slug check in the current language, and in
+                // English it finds the English term and refuses the Arabic one's own slug (WPML 5.3).
+                $language = self::sourceLanguage();
+                do_action('wpml_switch_language', 'ar');
+                try {
+                    $updated = wp_update_term($existing, $taxonomy, ['name' => $name]);
+                } finally {
+                    do_action('wpml_switch_language', $language);
+                }
+                if (is_wp_error($updated)) {
+                    throw new \RuntimeException($updated->get_error_message());
+                }
             }
 
             return $existing;
@@ -553,7 +564,7 @@ final class CatalogueLoad
         if ($name === '') {
             return 0;
         }
-        $term = get_term($termId, $taxonomy);
+        $term = self::exactTerm($termId, $taxonomy);
         if (! $term instanceof \WP_Term) {
             return 0;
         }
@@ -571,7 +582,7 @@ final class CatalogueLoad
         if ($madeId <= 0) {
             throw new \RuntimeException(is_wp_error($made) ? $made->get_error_message() : __('The Arabic name was not written.', 'mizzey-site'));
         }
-        $arTerm = get_term($madeId, $taxonomy);
+        $arTerm = self::exactTerm($madeId, $taxonomy);
         if (! $arTerm instanceof \WP_Term || $madeId === $termId) {
             return 0; // Never the source term itself.
         }
@@ -594,6 +605,23 @@ final class CatalogueLoad
         ]);
 
         return (int) $arTerm->term_id;
+    }
+
+    /**
+     * The term with exactly this id. get_term() hands back the term's translation in the current language when WPML
+     * adjusts ids (its `auto_adjust_ids` setting, on in this store), and WPML 5.3 does so for an Arabic id read while
+     * the current language is English: the loader, which names each term by its own id, would read the English term.
+     */
+    private static function exactTerm(int $termId, string $taxonomy): ?\WP_Term
+    {
+        add_filter('wpml_disable_term_adjust_id', '__return_true');
+        try {
+            $term = get_term($termId, $taxonomy);
+        } finally {
+            remove_filter('wpml_disable_term_adjust_id', '__return_true');
+        }
+
+        return $term instanceof \WP_Term && $term->term_id === $termId ? $term : null;
     }
 
     private static function term(string $name, string $taxonomy, int $parent): int
@@ -653,7 +681,7 @@ final class CatalogueLoad
                 $attribute->set_options($options);
             }
             $current[$taxonomy] = $attribute;
-            $term               = get_term($termId, $taxonomy);
+            $term               = self::exactTerm($termId, $taxonomy);
             $given[$taxonomy]   = $term instanceof \WP_Term ? $term->slug : sanitize_title((string) $value);
         }
         $parent->set_attributes($current);

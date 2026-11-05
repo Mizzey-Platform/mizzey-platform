@@ -30,6 +30,15 @@ function t94_nodes( array $tree, string $tag ): array {
 	return $out;
 }
 
+/**
+ * A category's own term_taxonomy_id. get_term() would give the term in the current language, which WPML 5.3
+ * resolves for an Arabic id when the current language is English.
+ */
+function t94_ttid( int $term_id ): int {
+	global $wpdb;
+	return (int) $wpdb->get_var( $wpdb->prepare( "SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} WHERE term_id = %d AND taxonomy = 'product_cat'", $term_id ) );
+}
+
 run(
 	new Scenario( 't94-header-navigation', 'NAV-03 to NAV-07, NAV-09, NAV-10: the header and its navigation as data' ),
 	function ( Scenario $s ): bool {
@@ -57,12 +66,12 @@ run(
 			do_action( 'wpml_switch_language', 'en' );
 			$made = wp_insert_term( $en, 'product_cat', array( 'parent' => $parent ) );
 			$id   = is_wp_error( $made ) ? 0 : (int) $made['term_id'];
-			$trid = apply_filters( 'wpml_element_trid', null, (int) get_term( $id, 'product_cat' )->term_taxonomy_id, 'tax_product_cat' );
+			$trid = apply_filters( 'wpml_element_trid', null, t94_ttid( $id ), 'tax_product_cat' );
 			do_action( 'wpml_switch_language', 'ar' );
 			$arm  = wp_insert_term( $ar, 'product_cat', array( 'parent' => $ar_parent ) );
 			do_action( 'wpml_switch_language', 'en' );
 			$ar_id = is_wp_error( $arm ) ? 0 : (int) $arm['term_id'];
-			do_action( 'wpml_set_element_language_details', array( 'element_id' => (int) get_term( $ar_id, 'product_cat' )->term_taxonomy_id, 'element_type' => 'tax_product_cat', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+			do_action( 'wpml_set_element_language_details', array( 'element_id' => t94_ttid( $ar_id ), 'element_type' => 'tax_product_cat', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
 			$terms[] = $id;
 			$terms[] = $ar_id;
 			return array( $id, $ar_id );
@@ -83,7 +92,7 @@ run(
 			}
 		}
 		foreach ( array( $home, $lamps, $beauty, $home_ar, $lamps_ar, $beauty_ar ) as $t ) {
-			wp_update_term_count_now( array( (int) get_term( $t, 'product_cat' )->term_taxonomy_id ), 'product_cat' );
+			wp_update_term_count_now( array( t94_ttid( $t ) ), 'product_cat' );
 		}
 		wp_cache_flush();
 		$nav = static fn ( string $lang ): array => (array) ( sign_in_json( 'GET', 'ar' === $lang ? home_url( '/ar/wp-json/mizzey/v1/navigation' ) : rest_url( 'mizzey/v1/navigation' ), null )['data']['categories'] ?? array() );
@@ -104,7 +113,10 @@ run(
 		HeaderData::saveField( $beauty );
 		$_POST = array();
 		ob_start();
+		// The Arabic edit screen is opened in Arabic: WPML reads a term in the current language.
+		do_action( 'wpml_switch_language', 'ar' );
 		HeaderData::editField( get_term( $beauty_ar, 'product_cat' ) );
+		do_action( 'wpml_switch_language', 'en' );
 		$field = (string) ob_get_clean();
 		wp_set_current_user( 0 );
 		wp_cache_flush();
