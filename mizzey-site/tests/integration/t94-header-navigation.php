@@ -33,6 +33,10 @@ function t94_nodes( array $tree, string $tag ): array {
 run(
 	new Scenario( 't94-header-navigation', 'NAV-03 to NAV-07, NAV-09, NAV-10: the header and its navigation as data' ),
 	function ( Scenario $s ): bool {
+		// Adding to the cart asks the stock source (ERP-03, specs/062): the stand-in answers for this run.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		global $sitepress;
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {

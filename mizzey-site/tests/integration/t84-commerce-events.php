@@ -29,6 +29,10 @@ require_once __DIR__ . '/_storefront.php';
 run(
 	new Scenario( 't84-commerce-events', 'EVT-01 to EVT-18: the commerce events' ),
 	function ( Scenario $s ): bool {
+		// Adding to the cart asks the stock source (ERP-03, specs/062): the stand-in answers for this run.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {
 			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );
