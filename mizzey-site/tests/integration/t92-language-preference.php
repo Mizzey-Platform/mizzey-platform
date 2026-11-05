@@ -68,6 +68,10 @@ function t92_same( string $a, string $b ): bool {
 run(
 	new Scenario( 't92-language-preference', 'NAV-02 (and D-31): the chosen language is kept and followed, the cart unchanged' ),
 	function ( Scenario $s ): bool {
+		// Adding to the cart asks the stock source (ERP-03, specs/062): the stand-in answers for this run.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		global $sitepress;
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {

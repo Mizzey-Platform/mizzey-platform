@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 the check not registered",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        add_filter('woocommerce_add_to_cart_validation', [self::class, 'validate'], 20, 4);\n",
+  "new": "        // not registered\n"
+ },
+ {
+  "name": "M2 what the cart holds not counted",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "                $inCart += (int) ($line['quantity'] ?? 0);\n",
+  "new": "                $inCart += 0;\n"
+ },
+ {
+  "name": "M3 lines matched by record, not stock item",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "            if (($lineItem !== null ? $lineItem->id : -$lineRecord) === $key) {\n",
+  "new": "            if ($lineRecord === $record) {\n"
+ },
+ {
+  "name": "M4 fails open when the source does not answer",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        if (! $answer->isKnown()) {\n            /* translators: %s: product name. */\n            return sprintf(",
+  "new": "        if (! $answer->isKnown()) {\n            return null;\n            /* translators: %s: product name. */\n            return sprintf("
+ },
+ {
+  "name": "M5 the held quantity not counted as the shopper's",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        $alreadyMine = max(0, $inCart - $held);\n",
+  "new": "        $alreadyMine = max(0, $inCart);\n"
+ },
+ {
+  "name": "M6 asks again after an earlier refusal",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        if (! $passed) {\n            return false;\n        }\n",
+  "new": "        if (false) {\n            return false;\n        }\n"
+ },
+ {
+  "name": "M7 one unit too many let in",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        if ($answer->sellable($alreadyMine + $quantity)) {\n",
+  "new": "        if ($answer->sellable($alreadyMine + $quantity - 1)) {\n"
+ },
+ {
+  "name": "M8 the parent asked instead of the variation",
+  "file": "mizzey-site/src/Cart/AddToCartStock.php",
+  "old": "        $record = (int) $variationId ?: (int) $productId;\n",
+  "new": "        $record = (int) $productId;\n"
+ }
+]

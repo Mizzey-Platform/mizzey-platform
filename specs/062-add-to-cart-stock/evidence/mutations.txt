@@ -1,0 +1,13 @@
+Mutation run, 5 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t102.
+Each deliberate defect in mutations.json applied alone to the runtime's checkout, the scenario run, the file restored.
+
+CAUGHT    M1 the check not registered  <- t102: FAIL  AC-5 woocommerce_add_to_cart_validation lets 2 in and refuses 5 with one error notice
+CAUGHT    M2 what the cart holds not counted  <- t102: FAIL  AC-1 with 2 in the cart, 2 more is refused against 3, naming what the cart holds ()
+CAUGHT    M3 lines matched by record, not stock item  <- t102: FAIL  AC-2 and the other way round: the Arabic record asks about the same stock item
+CAUGHT    M4 fails open when the source does not answer  <- t102: FAIL  AC-3 ERP-05 a source that is down refuses the add ()
+CAUGHT    M5 the held quantity not counted as the shopper's  <- t102: FAIL  AC-4 2 in the cart already held by the visitor's unpaid order, and 1 left at the source: 1 more is let in
+CAUGHT    M6 asks again after an earlier refusal  <- t102: FAIL  AC-5 an add another check already refused stays refused, and stock is not asked or reported again
+CAUGHT    M7 one unit too many let in  <- t102: FAIL  AC-1 adding 4 when the source holds 3 is refused, saying how many there are ()
+CAUGHT    M8 the parent asked instead of the variation  <- t102: FAIL  AC-5 a variation is asked about by its own record: the source knows the small shirt and not its parent, and it is let in
+
+8 of 8 caught.

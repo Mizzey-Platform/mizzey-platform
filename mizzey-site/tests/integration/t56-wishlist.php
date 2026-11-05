@@ -72,6 +72,10 @@ function t56_http( string $method, string $url, array $cookies, array $body = ar
 run(
 	new Scenario( 't56-wishlist', 'WISH-01 to WISH-04, WISH-07: the wishlist and recently viewed' ),
 	function ( Scenario $s ): bool {
+		// Adding to the cart asks the stock source (ERP-03, specs/062): the stand-in answers for this run.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {
 			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );

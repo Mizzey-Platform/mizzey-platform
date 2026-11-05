@@ -202,6 +202,36 @@ msgstr[5] "تتوفر %1$d قطعة فقط من %2$s. يرجى تعديل الك
 msgid "%s is out of stock. Please remove it from your cart."
 msgstr "%s غير متوفر في المخزون. يرجى إزالته من سلتك."
 
+#. translators: %s: product name.
+#: mizzey-site/src/Cart/AddToCartStock.php
+#, php-format
+msgid "%s is out of stock."
+msgstr "%s غير متوفر في المخزون."
+
+#. translators: 1: units available, 2: product name.
+#: mizzey-site/src/Cart/AddToCartStock.php
+#, php-format
+msgid "Only %1$d of %2$s is available."
+msgid_plural "Only %1$d of %2$s are available."
+msgstr[0] "لا تتوفر أي قطعة من %2$s."
+msgstr[1] "تتوفر قطعة واحدة فقط من %2$s."
+msgstr[2] "تتوفر قطعتان فقط من %2$s."
+msgstr[3] "تتوفر %1$d قطع فقط من %2$s."
+msgstr[4] "تتوفر %1$d قطعة فقط من %2$s."
+msgstr[5] "تتوفر %1$d قطعة فقط من %2$s."
+
+#. translators: 1: units available, 2: product name, 3: units already in the cart.
+#: mizzey-site/src/Cart/AddToCartStock.php
+#, php-format
+msgid "Only %1$d of %2$s is available, and your cart already holds %3$d."
+msgid_plural "Only %1$d of %2$s are available, and your cart already holds %3$d."
+msgstr[0] "لا تتوفر أي قطعة من %2$s، وسلتك تحتوي بالفعل على %3$d."
+msgstr[1] "تتوفر قطعة واحدة فقط من %2$s، وسلتك تحتوي بالفعل على %3$d."
+msgstr[2] "تتوفر قطعتان فقط من %2$s، وسلتك تحتوي بالفعل على %3$d."
+msgstr[3] "تتوفر %1$d قطع فقط من %2$s، وسلتك تحتوي بالفعل على %3$d."
+msgstr[4] "تتوفر %1$d قطعة فقط من %2$s، وسلتك تحتوي بالفعل على %3$d."
+msgstr[5] "تتوفر %1$d قطعة فقط من %2$s، وسلتك تحتوي بالفعل على %3$d."
+
 #. translators: %s: product names.
 #: mizzey-site/src/Cart/CartMerge.php
 #, php-format

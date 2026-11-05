@@ -80,6 +80,10 @@ function t57_customer( Scenario $s, string $login ): int {
 run(
 	new Scenario( 't57-launch-rules', 'BR-001, BR-002, BR-004, BR-006, BR-008, BR-009, BR-010: the launch business rules' ),
 	function ( Scenario $s ): bool {
+		// Adding to the cart asks the stock source (ERP-03, specs/062): the stand-in answers for this run.
+		$fixture_before = get_option( \MizzeySite\Stock\FixtureStockSource::OPTION );
+		$s->on_finish( static function () use ( $fixture_before ) { update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, $fixture_before ); } );
+		update_option( \MizzeySite\Stock\FixtureStockSource::OPTION, 'yes' );
 		$ok    = true;
 		$check = function ( bool $condition, string $line ) use ( &$ok, $s ): void {
 			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );
