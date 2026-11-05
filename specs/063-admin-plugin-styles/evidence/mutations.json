@@ -37,8 +37,8 @@
  },
  {
   "name": "M7 the list's filters left stacked",
-  "file": "mizzey-site/src/Admin/PluginAdminStyles.php",
-  "old": "            . '.wrap .tablenav .actions{float:left;width:auto;margin:0;padding:0 8px 0 0}'\n",
+  "file": "mizzey-site/assets/admin-plugin-styles.css",
+  "old": ".wrap .tablenav .actions { float: left; width: auto; margin: 0; padding: 0 8px 0 0; }\n",
   "new": ""
  },
  {

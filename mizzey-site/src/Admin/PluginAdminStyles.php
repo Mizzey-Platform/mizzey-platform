@@ -59,9 +59,8 @@ final class PluginAdminStyles
             return;
         }
         $deps = wp_style_is('myCSS', 'enqueued') ? ['myCSS'] : [];
-        wp_register_style(self::HANDLE, false, $deps, '1');
-        wp_enqueue_style(self::HANDLE);
-        wp_add_inline_style(self::HANDLE, self::css());
+        $file = dirname(__DIR__, 2) . '/assets/admin-plugin-styles.css';
+        wp_enqueue_style(self::HANDLE, plugins_url('mizzey-site/assets/admin-plugin-styles.css'), $deps, is_readable($file) ? (string) filemtime($file) : '1');
     }
 
     /** `order-list`, `order-edit`, `bosta` (Bosta's own screens) or `other`. */
@@ -82,32 +81,5 @@ final class PluginAdminStyles
         }
 
         return 'other';
-    }
-
-    /** WordPress's own button: its admin colour, outlined, as the toolbar's other buttons are. */
-    private static function css(): string
-    {
-        $button = 'font-size:13px;font-weight:500;line-height:30px;min-height:32px;height:auto;padding:0 12px;'
-            . 'border:1px solid var(--wp-admin-theme-color,#2271b1);border-radius:2px;'
-            . 'background:transparent;color:var(--wp-admin-theme-color,#2271b1);box-shadow:none;';
-
-        return '/* mizzey: ADM-159, specs/063 */'
-            . '.wrap .wp-heading-inline{font-size:23px;font-weight:400;line-height:1.3;color:inherit}'
-            . '.wp-core-ui .wrap .bulkactions .button{' . $button . '}'
-            . '.wrap .tablenav .actions{float:left;width:auto;margin:0;padding:0 8px 0 0}'
-            . '.wrap .tablenav .no-pages{display:none!important}'
-            . '.wrap .widefat thead tr th,.wrap .widefat tfoot tr th{color:inherit;font-size:14px;font-weight:400}'
-            . '.search-box input[name="s"]{min-height:32px}'
-            . '.wp-core-ui .search-box .button{height:auto;min-height:32px;font-size:13px}'
-            . '.wrap .tablenav .bosta_custom_buttons_div{justify-content:flex-start;gap:8px;margin:8px 0;width:100%;clear:both}'
-            . '.wrap .tablenav .bosta_custom_buttons_div .rightDiv,.wrap .tablenav .bosta_custom_buttons_div .leftDiv{gap:8px}'
-            . '.wrap .tablenav .bosta_custom_button.orders-button,.wrap .tablenav .bosta_custom_button.danger-button,'
-            . '.wrap .tablenav .bosta-filter-button,.wrap .tablenav .bosta-clear-button{' . $button . 'cursor:pointer}'
-            . '.wrap .tablenav .bosta_custom_buttons_div .refreshIcon{display:none}'
-            . '.wrap .tablenav .bosta_custom_p{font-size:13px;font-weight:400;line-height:32px;margin:0 6px 0 0}'
-            . '.wrap .tablenav .bosta_status_search_tags{width:auto;margin:0 12px 8px 0;font-weight:400}'
-            . '.wrap .tablenav .bosta-filter-select{min-height:32px;padding:0 24px 0 8px;border-radius:2px;font-size:13px}'
-            . '.wrap .tablenav .mizzey-unremitted{display:inline-flex;align-items:center;gap:4px;margin:0 6px 0 0;line-height:32px}'
-            . '.wrap .tablenav .mizzey-unremitted input[type=checkbox]{height:16px;min-height:0;width:16px;margin:0}';
     }
 }

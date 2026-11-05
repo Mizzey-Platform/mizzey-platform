@@ -30,7 +30,7 @@ function t103_admin( Scenario $s ): array {
 
 /** @return array{status:int,body:string} */
 function t103_get( string $path, array $cookies ): array {
-	$r = wp_remote_get( admin_url( $path ), array( 'cookies' => $cookies, 'timeout' => 120, 'redirection' => 0 ) );
+	$r = wp_remote_get( admin_url( $path ), array( 'cookies' => $cookies, 'timeout' => 120, 'redirection' => 0 ) ); // storefront-guard: exempt, an admin screen and not a storefront page.
 	return is_wp_error( $r ) ? array( 'status' => 0, 'body' => $r->get_error_message() ) : array( 'status' => (int) wp_remote_retrieve_response_code( $r ), 'body' => (string) wp_remote_retrieve_body( $r ) );
 }
 
@@ -71,23 +71,26 @@ run(
 
 		// AC-1: the order list keeps WordPress's status filter row and bulk actions.
 		$check( -1 === $at( 'order list', 'paymob-admin-css-css' ), 'AC-1 ADM-159 the order list does not load Paymob\'s admin sheet, which turns the status filter row into a card' );
-		$check( $at( 'order list', 'myCSS-css' ) >= 0 && $at( 'order list', 'mizzey-admin-plugin-styles-inline-css' ) > $at( 'order list', 'myCSS-css' ), 'AC-1 the order list keeps Bosta\'s sheet for its buttons and filters, and prints ours after it (' . $at( 'order list', 'myCSS-css' ) . ', ' . $at( 'order list', 'mizzey-admin-plugin-styles-inline-css' ) . ')' );
+		$check( $at( 'order list', 'myCSS-css' ) >= 0 && $at( 'order list', 'mizzey-admin-plugin-styles-css' ) > $at( 'order list', 'myCSS-css' ), 'AC-1 the order list keeps Bosta\'s sheet for its buttons and filters, and prints ours after it (' . $at( 'order list', 'myCSS-css' ) . ', ' . $at( 'order list', 'mizzey-admin-plugin-styles-css' ) . ')' );
 		$body = $got['order list']['body'];
-		$check( str_contains( $body, '.wp-core-ui .wrap .bulkactions .button{' ) && str_contains( $body, '.wrap .wp-heading-inline{font-size:23px' ) && str_contains( $body, 'var(--wp-admin-theme-color' ), 'AC-1 our sheet gives the title and the bulk-action buttons back to WordPress, in the admin colour scheme' );
-		$check( str_contains( $body, '.wrap .tablenav .actions{float:left;width:auto' ) && str_contains( $body, '.wrap .widefat thead tr th,.wrap .widefat tfoot tr th{color:inherit' ), 'AC-1 the list\'s own filters stay on one row and its table header in WordPress\'s size' );
-		$check( str_contains( $body, '.wrap .tablenav .bosta_status_search_tags{width:auto' ) && str_contains( $body, '.wrap .tablenav .bosta_custom_button.orders-button' ), 'AC-2 Bosta\'s filters are set on one row and its buttons in WordPress\'s button style' );
+		$sheet = (string) file_get_contents( WP_PLUGIN_DIR . '/mizzey-site/assets/admin-plugin-styles.css' );
+		// The sheet without its comments and spacing, so a rule reads as one string.
+		$sheet = (string) preg_replace( '/\s*([{};:,])\s*/', '$1', (string) preg_replace( '#/\*.*?\*/#s', '', $sheet ) );
+		$check( str_contains( $sheet, '.wp-core-ui .wrap .bulkactions .button,' ) && str_contains( $sheet, '.wrap .wp-heading-inline{font-size:23px' ) && str_contains( $sheet, 'var(--wp-admin-theme-color' ), 'AC-1 our sheet gives the title and the bulk-action buttons back to WordPress, in the admin colour scheme' );
+		$check( str_contains( $sheet, '.wrap .tablenav .actions{float:left;width:auto' ) && str_contains( $sheet, '.wrap .widefat thead tr th,.wrap .widefat tfoot tr th{color:inherit' ), 'AC-1 the list\'s own filters stay on one row and its table header in WordPress\'s size' );
+		$check( str_contains( $sheet, '.wrap .tablenav .bosta_status_search_tags{width:auto' ) && str_contains( $sheet, '.wrap .tablenav .bosta_custom_button.orders-button' ), 'AC-2 Bosta\'s filters are set on one row and its buttons in WordPress\'s button style' );
 
 		// AC-3: our own filter is a checkbox the size of one.
-		$check( 1 === preg_match( '/<label class="mizzey-unremitted"><input type="checkbox" name="mizzey_unremitted"/', $body ) && str_contains( $body, '.mizzey-unremitted input[type=checkbox]{height:16px' ), 'AC-3 the "Cash collected, not remitted" filter is marked and sized as a checkbox' );
+		$check( 1 === preg_match( '/<label class="mizzey-unremitted"><input type="checkbox" name="mizzey_unremitted"/', $body ) && str_contains( $sheet, '.mizzey-unremitted input[type="checkbox"]{height:16px' ), 'AC-3 the "Cash collected, not remitted" filter is marked and sized as a checkbox' );
 
 		// AC-4: everywhere else, neither sheet reaches WordPress's own screens.
 		foreach ( array( 'posts', 'dashboard', 'products' ) as $page ) {
-			$check( -1 === $at( $page, 'myCSS-css' ) && -1 === $at( $page, 'pickupsCSS-css' ) && -1 === $at( $page, 'paymob-admin-css-css' ) && -1 === $at( $page, 'mizzey-admin-plugin-styles-inline-css' ), "AC-4 ADM-159 the {$page} screen loads neither Bosta's nor Paymob's admin sheet" );
+			$check( -1 === $at( $page, 'myCSS-css' ) && -1 === $at( $page, 'pickupsCSS-css' ) && -1 === $at( $page, 'paymob-admin-css-css' ) && -1 === $at( $page, 'mizzey-admin-plugin-styles-css' ), "AC-4 ADM-159 the {$page} screen loads neither Bosta's nor Paymob's admin sheet" );
 		}
 
 		// AC-5: each plugin's own screens keep its sheet.
-		$check( $at( 'bosta', 'myCSS-css' ) >= 0 && -1 === $at( 'bosta', 'mizzey-admin-plugin-styles-inline-css' ), 'AC-5 Bosta\'s settings section keeps its sheet, untouched by ours' );
-		$check( $at( 'bosta pages', 'myCSS-css' ) >= 0 && $at( 'bosta pages', 'pickupsCSS-css' ) >= 0 && -1 === $at( 'bosta pages', 'mizzey-admin-plugin-styles-inline-css' ), 'AC-5 Bosta\'s own pages keep its sheets, untouched by ours' );
+		$check( $at( 'bosta', 'myCSS-css' ) >= 0 && -1 === $at( 'bosta', 'mizzey-admin-plugin-styles-css' ), 'AC-5 Bosta\'s settings section keeps its sheet, untouched by ours' );
+		$check( $at( 'bosta pages', 'myCSS-css' ) >= 0 && $at( 'bosta pages', 'pickupsCSS-css' ) >= 0 && -1 === $at( 'bosta pages', 'mizzey-admin-plugin-styles-css' ), 'AC-5 Bosta\'s own pages keep its sheets, untouched by ours' );
 		$check( $at( 'paymob tabs', 'paymob-admin-css-css' ) >= 0, 'AC-5 Paymob\'s settings keep its sheet' );
 		$check( $at( 'order edit', 'paymob-admin-css-css' ) >= 0 && $at( 'order edit', 'myCSS-css' ) >= 0, 'AC-5 a single order keeps Paymob\'s and Bosta\'s sheets for their panels' );
 
