@@ -32,6 +32,11 @@ final class StaffActivityLog
     public const SIGNOUT         = 'mizzey.signout';
     public const RESET_REQUESTED = 'mizzey.password.reset_requested';
     public const RESET_DONE      = 'mizzey.password.reset';
+    // What an account of the agency role changes (MKT-25, specs/064).
+    public const AGENCY_CONTENT  = 'mizzey.agency.content_saved';
+    public const AGENCY_DELETED  = 'mizzey.agency.content_deleted';
+    public const AGENCY_MEDIA    = 'mizzey.agency.media_added';
+    public const AGENCY_TRACKING = 'mizzey.agency.tracking_changed';
 
     /** The label of an attempt that names no existing account (a stored value, shown in the English-only admin). */
     public const UNKNOWN = 'unknown-account';
@@ -241,6 +246,21 @@ final class StaffActivityLog
         }
 
         return isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash((string) $_SERVER['REMOTE_ADDR'])) : '';
+    }
+
+    /**
+     * An administrative action by the signed-in account, recorded with it (MKT-25): what was changed and how.
+     *
+     * @param array<string,mixed> $context
+     */
+    public static function recordAction(string $kind, string $targetType, string $targetId, string $targetLabel, array $context = []): void
+    {
+        $user = wp_get_current_user();
+        if (! $user instanceof \WP_User || $user->ID === 0) {
+            return;
+        }
+        $context['target'] = $targetType;
+        self::write((int) $user->ID, (string) $user->user_login, $kind, 'success', $targetId, $targetLabel, $context);
     }
 
     /** @param array<string,mixed> $context */

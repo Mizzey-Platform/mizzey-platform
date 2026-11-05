@@ -49,7 +49,8 @@ final class BaselineReport
     public const TWO_FACTOR_VERSION = '4.2.1';
 
     /** The baseline roles of D-21. */
-    public const TWO_FACTOR_ROLES = ['administrator', 'shop_manager'];
+    // The agency role too: an outside account, on the owner's decision of 5 November 2026 (specs/064).
+    public const TWO_FACTOR_ROLES = ['administrator', 'shop_manager', 'mizzey_marketing'];
 
     /**
      * @return list<array{key:string,status:string,detail:string}>

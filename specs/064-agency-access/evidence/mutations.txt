@@ -1,0 +1,14 @@
+Mutation run, 5 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 5.3.0), scenario t104.
+Each deliberate defect in mutations.json applied alone to the runtime's checkout, the scenario run, the file restored.
+
+CAUGHT    M1 the role never written  <- t104: FAIL  setup: the Marketing (agency) role exists
+CAUGHT    M2 unfiltered_html given  <- t104: FAIL  AC-1 MKT-21 the role holds no plugin, theme, template, file, update, import or export capability, and not unfiltered_html (unfiltered_html)
+CAUGHT    M3 templates and menus given  <- t104: FAIL  AC-1 MKT-21 the role holds no plugin, theme, template, file, update, import or export capability, and not unfiltered_html (edit_theme_options)
+CAUGHT    M4 the user list given  <- t104: FAIL  AC-2 MKT-22 the role holds no user, order, customer, report or product capability (list_users)
+CAUGHT    M5 the tracking screen left on manage_woocommerce  <- t104: FAIL  [HTTP] AC-3 MKT-23 the account opens Settings, Marketing tags and names the Tag Manager container (200, 403, false)
+CAUGHT    M6 the admin role not given the tracking setting  <- t104: FAIL  AC-6 the owner and admin roles hold the tracking setting, as they did through manage_woocommerce
+CAUGHT    M7 content changes not recorded  <- t104: FAIL  AC-5 MKT-25 the staff log holds the account's page saves, its media and its tracking change, under its name (0, 1, 1)
+CAUGHT    M8 everyone's changes recorded as the agency's  <- t104: FAIL  AC-5 an admin's edit of the same page is not recorded as the agency's, under either name (1)
+CAUGHT    M9 media not recorded  <- t104: FAIL  AC-5 MKT-25 the staff log holds the account's page saves, its media and its tracking change, under its name (4, 0, 1)
+
+9 of 9 caught.
