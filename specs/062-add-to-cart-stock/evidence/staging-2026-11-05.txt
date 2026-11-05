@@ -1,0 +1,32 @@
+Staging, 5 November 2026: release v0.1.23 (tag on 279806c) on staging.mizzey.com, after backup 20261105-174010-manual.
+bin/deploy checksum matched; staging.py build without problems; staging.py check 6 of 6; wp mizzey security check: every baseline passes.
+
+Scenario t102, run in the staging PHP container (~/mizzey-staging/staging-run.sh), evidence scenarios-20261105-174416.
+
+=== t102 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+PASS  setup: the lamp has an Arabic record (1503)
+PASS  AC-1 ERP-03 adding 3 when the source holds 3 is let in
+PASS  AC-1 adding 4 when the source holds 3 is refused, saying how many there are (Only 3 of t102 lamp are available.)
+PASS  AC-1 with 2 in the cart, 2 more is refused against 3, naming what the cart holds (Only 3 of t102 lamp are available, and your cart already holds 2.)
+PASS  AC-1 with 2 in the cart, 1 more is let in against 3
+PASS  AC-1 PDP-22 an item the source holds none of is refused as out of stock (t102 soap is out of stock.)
+PASS  AC-2 2 in the cart under the Arabic record count against adding 2 of the English record (Only 3 of t102 lamp are available, and your cart already holds 2.)
+PASS  AC-2 and the other way round: the Arabic record asks about the same stock item
+PASS  AC-2 a variation is its own stock item: one small in the cart does not count against one medium
+PASS  AC-2 a second small against 1 is refused
+PASS  AC-3 ERP-05 a source that is down refuses the add (We could not confirm that t102 lamp is in stock. Please try again in a few minutes.)
+PASS  AC-3 a source that does not know the item refuses the add
+PASS  AC-3 with no stock source bound, nothing is let in (We could not confirm that t102 lamp is in stock. Please try again in a few minutes.)
+PASS  AC-4 2 in the cart already held by the visitor's unpaid order, and 1 left at the source: 1 more is let in
+PASS  AC-5 woocommerce_add_to_cart_validation lets 2 in and refuses 5 with one error notice
+PASS  AC-5 an add another check already refused stays refused, and stock is not asked or reported again
+PASS  AC-5 a variation is asked about by its own record: the source knows the small shirt and not its parent, and it is let in
+PASS  [HTTP] AC-3 AC-5 the Store API refuses the add with no stock source, says why, and the cart stays empty (400, We could not confirm that t102 lamp is in stock. Please try again in a few minutes.)
+PASS  setup: the stand-in holds 3 lamps while WooCommerce holds 5 (3)
+PASS  [HTTP] AC-1 the fixture holding 3: the Store API lets 2 in (201)
+PASS  [HTTP] AC-1 2 more is refused, naming what the cart holds (400, Only 3 of t102 lamp are available, and your cart already holds 2.)
+PASS  [HTTP] AC-1 1 more is let in, and the cart holds 3 (201)
+PASS  [HTTP] AC-2 with 3 English lamps in the cart, the Arabic lamp is refused: one stock item (400)
+PASS  [HTTP] AC-5 an add-to-cart link (buy now, the product form) adds when the fixture answers
+PASS  [HTTP] AC-3 AC-5 the same link with no stock source adds nothing
+PASS  AC-6 FIX-04 each refusal reads in Arabic for an Arabic visitor (t102 soap غير متوفر في المخزون. | تتوفر 3 قطع فقط من t102 lamp. | تتوفر 3 قطع فقط من t102 lamp، وسلتك تحتوي بالفعل على 2. | لم نتمكن من التأكد من توفر t102 lamp في المخزون. يرجى المحاولة مرة أخرى بعد بضع دقائق.)
