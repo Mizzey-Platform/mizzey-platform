@@ -1,4 +1,4 @@
-Mutation run, 5 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t103.
+Mutation run, 5 November 2026, local runtime (WordPress 7.1.4, WooCommerce 11.1.0, WPML 4.9.7), scenario t103, with the sheet as assets/admin-plugin-styles.css.
 Each deliberate defect in mutations.json applied alone to the runtime's checkout, the scenario run, the file restored.
 
 CAUGHT    M1 the scoping not registered  <- t103: FAIL  AC-1 ADM-159 the order list does not load Paymob's admin sheet, which turns the status filter row into a card
