@@ -9,4 +9,4 @@
 | T003 | Arabic for the three new messages; `.l10n.php` rebuilt | t102 AC-6 |
 | T004 | The scenarios that add over HTTP (t56, t57, t84, t92, t94, t95) switch the stand-in on for their run | those scenarios |
 | T005 | Full suite; mutation checks; self-review (Codex paused): done, 98 scenarios (t15 intermittent, passes alone), 8 of 8 defects caught | `evidence/` |
-| T006 | Staging: t102 on the release, on the owner's standing permission | `evidence/` |
+| T006 | Staging: t102 on the release: done, v0.1.23 (`evidence/staging-2026-11-05.txt`) | `evidence/` |

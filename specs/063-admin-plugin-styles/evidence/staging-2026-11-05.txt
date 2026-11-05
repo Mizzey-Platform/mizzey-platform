@@ -1,0 +1,21 @@
+Staging, 5 November 2026: release v0.1.23 (tag on 279806c) on staging.mizzey.com, after backup 20261105-174010-manual.
+bin/deploy checksum matched; staging.py build without problems; staging.py check 6 of 6; wp mizzey security check: every baseline passes.
+
+Scenario t103 as changed in this PR (Bosta's Create Pickup page checked only where it renders), run in the staging PHP container, evidence scenarios-20261105-174751. The release's own t103 run (scenarios-20261105-174416) failed only its setup line: Bosta's Create Pickup page answered 500, Bosta's plugin failing where its API cannot be reached (components/pickups/pickups.php:22 treats the request error as an answer).
+The order list was also looked at in a browser, signed in through Cloudflare Access: WordPress's status filter row and title, standard buttons, Bosta's controls on two rows, the checkbox at its size.
+
+=== t103 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "4.9.7", "wcml": "5.5.7"}
+PASS  setup: every admin screen answered 200 to the signed-in administrator ({"order list":200,"order edit":200,"posts":200,"dashboard":200,"products":200,"bosta":200,"paymob tabs":200})
+PASS  AC-1 ADM-159 the order list does not load Paymob's admin sheet, which turns the status filter row into a card
+PASS  AC-1 the order list keeps Bosta's sheet for its buttons and filters, and prints ours after it (7457, 8360)
+PASS  AC-1 our sheet gives the title and the bulk-action buttons back to WordPress, in the admin colour scheme
+PASS  AC-1 the list's own filters stay on one row and its table header in WordPress's size
+PASS  AC-2 Bosta's filters are set on one row and its buttons in WordPress's button style
+PASS  AC-3 the "Cash collected, not remitted" filter is marked and sized as a checkbox
+PASS  AC-4 ADM-159 the posts screen loads neither Bosta's nor Paymob's admin sheet
+PASS  AC-4 ADM-159 the dashboard screen loads neither Bosta's nor Paymob's admin sheet
+PASS  AC-4 ADM-159 the products screen loads neither Bosta's nor Paymob's admin sheet
+PASS  AC-5 Bosta's settings section keeps its sheet, untouched by ours
+FACT  AC-5 Bosta's Create Pickup page answered 500: Bosta's plugin fails when its API cannot be reached, so its sheets were not read there
+PASS  AC-5 Paymob's settings keep its sheet
+PASS  AC-5 a single order keeps Paymob's and Bosta's sheets for their panels
