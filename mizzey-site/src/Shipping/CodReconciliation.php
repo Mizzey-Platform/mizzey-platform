@@ -175,7 +175,7 @@ final class CodReconciliation
         }
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- a read-only list filter.
         $on = isset($_GET['mizzey_unremitted']);
-        printf('<label><input type="checkbox" name="mizzey_unremitted" value="1"%s /> %s</label>', checked($on, true, false), esc_html__('Cash collected, not remitted', 'mizzey-site'));
+        printf('<label class="mizzey-unremitted"><input type="checkbox" name="mizzey_unremitted" value="1"%s /> %s</label>', checked($on, true, false), esc_html__('Cash collected, not remitted', 'mizzey-site'));
     }
 
     /**

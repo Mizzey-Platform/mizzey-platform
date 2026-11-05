@@ -106,6 +106,7 @@ require_once __DIR__ . '/src/Shipping/Carrier.php';
 require_once __DIR__ . '/src/Shipping/BostaCarrier.php';
 require_once __DIR__ . '/src/Shipping/CarrierStatus.php';
 require_once __DIR__ . '/src/Shipping/CodReconciliation.php';
+require_once __DIR__ . '/src/Admin/PluginAdminStyles.php';
 require_once __DIR__ . '/src/Shipping/DeliveryEstimate.php';
 require_once __DIR__ . '/src/Roles/RefundCapability.php';
 require_once __DIR__ . '/src/Promotions/PromotionSettings.php';
@@ -333,6 +334,7 @@ MizzeySite\Orders\RefundIntegrity::register();
 // Bosta through its plugin, inside Mizzey's carrier layer: SHIP-01 to SHIP-17. See specs/041-bosta.
 MizzeySite\Shipping\CarrierStatus::register();
 MizzeySite\Shipping\CodReconciliation::register();
+MizzeySite\Admin\PluginAdminStyles::register();
 MizzeySite\Shipping\DeliveryEstimate::register();
 MizzeySite\Orders\RefundReference::register();
 
