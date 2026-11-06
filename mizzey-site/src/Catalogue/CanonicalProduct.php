@@ -26,6 +26,32 @@ final class CanonicalProduct
     public const PRODUCT   = 'product';
     public const VARIATION = 'variation';
 
+    public static function register(): void
+    {
+        add_filter('woocommerce_get_product_id_by_sku', [self::class, 'bySku'], 20, 2);
+    }
+
+    /**
+     * A product WooCommerce's CSV importer looks up by its SKU is the canonical record. WooCommerce Multilingual copies
+     * the SKU to each translation, so two records share it, and WooCommerce's lookup has no order: an import by SKU
+     * could update the Arabic record and leave the English one as it was (t15, import over HTTP). Only the importer's
+     * own lookups are answered so: WooCommerce Multilingual looks up the Arabic copy of a record by its SKU, and must
+     * keep finding it (t93). A record with no canonical record is left as WooCommerce found it.
+     *
+     * @param mixed $id
+     * @param mixed $sku
+     * @return mixed
+     */
+    public static function bySku($id, $sku = '')
+    {
+        if (! is_numeric($id) || (int) $id <= 0 || ! self::fromImporter()) {
+            return $id;
+        }
+        $canonical = self::of((int) $id);
+
+        return $canonical instanceof \WC_Product ? $canonical->get_id() : $id;
+    }
+
     /** The canonical product or variation for any of its language records, or null. */
     public static function of(int $id): ?\WC_Product
     {
@@ -55,6 +81,21 @@ final class CanonicalProduct
         $record = $source === $id ? $product : wc_get_product($source);
 
         return $record instanceof \WC_Product ? $record : null;
+    }
+
+    /** Whether WooCommerce's product CSV importer is the caller. */
+    private static function fromImporter(): bool
+    {
+        if (! class_exists('WC_Product_Importer', false)) {
+            return false;
+        }
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25) as $frame) {
+            if (isset($frame['class']) && is_a((string) $frame['class'], 'WC_Product_Importer', true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function kind(\WC_Product $product): string
