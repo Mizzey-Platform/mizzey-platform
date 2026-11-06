@@ -26,6 +26,21 @@ const COST_FIELDS = array( '_cogs_total_value', '_cogs_value_is_additive' );
 /** Fields WooCommerce maintains itself and writes on any CRUD save. Recorded, never treated as a failure. */
 const BOOKKEEPING_FIELDS = array( '_product_version', '_wc_average_rating', '_wc_review_count', '_thumbnail_id', '_variation_description', '_edit_lock', '_edit_last', '_wp_old_slug' );
 
+if ( ! class_exists( 'WC_Product_CSV_Importer', false ) ) {
+	require_once WC_ABSPATH . 'includes/import/class-wc-product-csv-importer.php';
+}
+
+/** WooCommerce's CSV importer, made without reading a file, to look a SKU up from inside it as an import does. */
+final class ImporterLookup extends \WC_Product_CSV_Importer {
+	public static function make(): self {
+		return ( new \ReflectionClass( self::class ) )->newInstanceWithoutConstructor();
+	}
+
+	public function lookup( string $sku ): int {
+		return (int) wc_get_product_id_by_sku( $sku );
+	}
+}
+
 final class Workflows {
 
 	private Scenario $s;
@@ -629,13 +644,14 @@ final class Workflows {
 	}
 
 	/**
-	 * The product a SKU resolves to, which is not always the one you meant: a WPML duplicate carries the SKU of
-	 * its original, so a CSV import row can reach either of them.
+	 * The product a CSV import row with this product's SKU reaches, asked from inside the importer as the import
+	 * asks: a WPML duplicate carries the SKU of its original, and the importer is answered with the original
+	 * (specs/001, t105).
 	 */
 	public static function sku_target( int $id ): int {
 		wp_cache_flush();
 		$product = wc_get_product( $id );
-		return $product && $product->get_sku() ? (int) wc_get_product_id_by_sku( $product->get_sku() ) : 0;
+		return $product && $product->get_sku() ? ImporterLookup::make()->lookup( $product->get_sku() ) : 0;
 	}
 
 	/** Everything stored about a post: fields, custom fields, language, translation group, product terms. */

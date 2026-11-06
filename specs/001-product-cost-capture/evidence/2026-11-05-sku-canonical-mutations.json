@@ -1,0 +1,20 @@
+[
+ {
+  "name": "M1 the SKU lookup left as WooCommerce answers",
+  "file": "mizzey-site/src/Catalogue/CanonicalProduct.php",
+  "old": "        add_filter('woocommerce_get_product_id_by_sku', [self::class, 'bySku'], 20, 2);\n",
+  "new": ""
+ },
+ {
+  "name": "M2 the canonical record ignored",
+  "file": "mizzey-site/src/Catalogue/CanonicalProduct.php",
+  "old": "        return $canonical instanceof \\WC_Product ? $canonical->get_id() : $id;",
+  "new": "        return $id;"
+ },
+ {
+  "name": "M3 every SKU lookup answered with the English record, not only the importer's",
+  "file": "mizzey-site/src/Catalogue/CanonicalProduct.php",
+  "old": "        if (! is_numeric($id) || (int) $id <= 0 || ! self::fromImporter()) {",
+  "new": "        if (! is_numeric($id) || (int) $id <= 0) {"
+ }
+]

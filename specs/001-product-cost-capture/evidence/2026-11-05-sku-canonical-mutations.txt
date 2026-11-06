@@ -1,0 +1,5 @@
+CAUGHT    M1 the SKU lookup left as WooCommerce answers  <- t105: FAIL  AC-1 the CSV importer, looking a simple product up by SKU, gets the English record even when the lookup lands on the Arabic one (394517, expected 394516)
+CAUGHT    M2 the canonical record ignored  <- t105: FAIL  AC-1 the CSV importer, looking a simple product up by SKU, gets the English record even when the lookup lands on the Arabic one (394525, expected 394524)
+CAUGHT    M3 every SKU lookup answered with the English record, not only the importer's  <- t105: FAIL  AC-1 the same lookup outside the importer keeps the answer WooCommerce gave, so WooCommerce Multilingual still finds an Arabic copy by its SKU (394535, expected 394538)
+
+3 of 3 caught.

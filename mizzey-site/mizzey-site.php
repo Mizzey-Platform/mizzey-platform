@@ -238,6 +238,7 @@ MizzeySite\Catalogue\StoreAttributes::register();
 // Product cost must stay equal across a product's language versions, including when the cost is changed by code
 // rather than through wp-admin. See the class for the reason and specs/001-product-cost-capture for the evidence.
 add_action('plugins_loaded', [MizzeySite\Catalogue\CostTranslationSync::class, 'register'], 20);
+MizzeySite\Catalogue\CanonicalProduct::register();
 // The same for price and every other field WPML copies, after a save by code: specs/036, specs/046 (#247).
 MizzeySite\Catalogue\TranslationSync::register();
 
