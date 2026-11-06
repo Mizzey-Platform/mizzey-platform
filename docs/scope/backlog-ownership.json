@@ -930,7 +930,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 18,
    "depends_on": [],
    "erp_blocked": "no",
@@ -948,7 +948,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "Per Stage 1 PBI, a done record against the nine criteria. Closes when the last Stage 1 PBI is accepted.",
+   "acceptance_evidence": "A per-PBI done record is kept in docs/2026-11-06-stage1-standards-record.md (6 November 2026), section 4. Per Stage 1 PBI, a done record against the nine criteria. Closes when the last Stage 1 PBI is accepted.",
    "not_in_slice": [],
    "notes": "Not a build PBI: the completion standard applied to every slice. DOD-04 is P1-L: tests covering critical business logic (pricing, promotions, refunds, stock, duplicate-order protection), not full coverage (Part One 1.2, EX-16). Constitution M-7 keeps workflow complete, technically verified and contractually accepted apart."
   },
@@ -1002,7 +1002,7 @@
     }
    ],
    "data_integrity": "A7 verified working; A12 measured (nine of fourteen fields do not follow a code-level save); B6 not yet tested (needs staging)",
-   "acceptance_evidence": "A non-functional verification record: mobile-first test runs, performance measurements on staging, locale formatting in both languages, a security checklist, the data-integrity probes, an accessibility check, and the consent and privacy flow. Reopened 3 November 2026 (audit A-269-4): verified so far are NFR-02's images and lazy loading (specs/032, t72), NFR-04b (specs/032, t72) and NFR-05 (specs/007 to 009, 031, 039; t39 to t50, t71, t79). Still to record: NFR-06, NFR-07 and NFR-12, which can be written now from built work; NFR-01 and NFR-11 wait for the designed storefront; NFR-02's caching and CDN and NFR-13's load test wait for the production host.",
+   "acceptance_evidence": "A non-functional verification record: mobile-first test runs, performance measurements on staging, locale formatting in both languages, a security checklist, the data-integrity probes, an accessibility check, and the consent and privacy flow. Reopened 3 November 2026 (audit A-269-4): verified so far are NFR-02's images and lazy loading (specs/032, t72), NFR-04b (specs/032, t72) and NFR-05 (specs/007 to 009, 031, 039; t39 to t50, t71, t79). Recorded 6 November 2026 in docs/2026-11-06-stage1-standards-record.md: NFR-06 (specs/028, t68), NFR-07 (t68, t60, t53, t59, and the concurrency harness on staging v0.1.25, #549) and NFR-12 (specs/043, t83; specs/017, t58; specs/050, t90; the privacy policy page, IA-30, t22, whose text is Mizzey's, I-13). NFR-01 and NFR-11 wait for the designed storefront; NFR-02's caching and CDN and NFR-13's load test wait for the production host.",
    "not_in_slice": [
     "NFR-12a (P1-L, stage S2, owned by E-NFR-1b)",
     "NFR-03 (P1, owned by #242)",
@@ -1081,7 +1081,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 21,
    "depends_on": [
     {
@@ -1110,7 +1110,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A traceability record: for each of the nine rows, the delivering PBI and its verification, checked at the Stage 1 gate.",
+   "acceptance_evidence": "Recorded 6 November 2026 in docs/2026-11-06-stage1-standards-record.md, section 2: FIX-03 and FIX-05 wait for the approved design; the other seven hold. A traceability record: for each of the nine rows, the delivering PBI and its verification, checked at the Stage 1 gate.",
    "not_in_slice": [
     "FIX-04 (P1, owned by #241)",
     "FIX-04a (P1, owned by #241)"
@@ -1144,7 +1144,7 @@
    "stage": "S1",
    "stage1": true,
    "create_now": true,
-   "status": "Ready",
+   "status": "In progress",
    "delivery_order": 22,
    "depends_on": [
     {
@@ -1168,7 +1168,7 @@
     }
    ],
    "data_integrity": "",
-   "acceptance_evidence": "A traceability record per row at the Stage 1 gate; OBJ-05 evidenced by the client changing a price, adding a product and running an offer unaided.",
+   "acceptance_evidence": "Recorded 6 November 2026 in docs/2026-11-06-stage1-standards-record.md, section 3: the functions are built; the design rows wait for #250, and OBJ-05's unaided test waits for the walkthrough (#267). A traceability record per row at the Stage 1 gate; OBJ-05 evidenced by the client changing a price, adding a product and running an offer unaided.",
    "not_in_slice": [
     "OBJ-06 (P1-L, stage S2, owned by E-FND-4b)",
     "OBJ-07 (P1-L, stage S2, owned by E-FND-4b)",
