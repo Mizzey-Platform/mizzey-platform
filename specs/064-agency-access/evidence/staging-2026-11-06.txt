@@ -1,0 +1,21 @@
+Staging, 6 November 2026: release v0.1.25 (tag on e0afc75) on staging.mizzey.com, after backup 20261106-144944-manual.
+bin/deploy checksum matched; staging.py build without problems; staging.py check 6 of 6. wp mizzey security two-factor-baseline
+was run so the stored policy carries the agency role (approved 5 November 2026, specs/064 S-1); then wp mizzey security check:
+every baseline passes.
+
+Scenarios run in the staging PHP container (~/mizzey-staging/staging-run.sh), evidence scenarios-20261106-145058.
+
+=== t104 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+PASS  setup: the Marketing (agency) role exists
+PASS  AC-1 MKT-21 the role holds no plugin, theme, template, file, update, import or export capability, and not unfiltered_html ()
+PASS  [HTTP] AC-1 the plugin, theme, editor, site editor, menu and settings screens all refuse the account ([])
+PASS  AC-2 MKT-22 the role holds no user, order, customer, report or product capability ()
+PASS  [HTTP] AC-2 the users, orders, customers and reports screens all refuse the account ([])
+PASS  AC-2 over the REST API the account reads no customers, no orders, no analytics of either, and no user record in edit context (403, 403, 403, 403, 403; public user list 200)
+PASS  [HTTP] AC-3 MKT-23 the account opens Settings, Marketing tags and names the Tag Manager container (200, 302, "GTM-T104AB")
+PASS  AC-3 a script put into a page by the account is taken out when it is saved: Tag Manager is the only route
+PASS  AC-4 the account publishes and edits a page, edits a promotional banner and uploads media (201, 200)
+PASS  AC-5 MKT-25 the staff log holds the account's page saves, its media and its tracking change, under its name (4, 1, 1)
+PASS  AC-5 an admin's edit of the same page is not recorded as the agency's, under either name (0)
+PASS  S-1 the security baseline requires two-factor sign-in for the agency role, as for administrators and shop managers
+PASS  AC-6 the owner and admin roles hold the tracking setting, as they did through manage_woocommerce

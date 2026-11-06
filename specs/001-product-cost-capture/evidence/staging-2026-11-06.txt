@@ -1,0 +1,104 @@
+Staging, 6 November 2026: release v0.1.25 (tag on e0afc75) on staging.mizzey.com, after backup 20261106-144944-manual.
+bin/deploy checksum matched; staging.py build without problems; staging.py check 6 of 6. wp mizzey security two-factor-baseline
+was run so the stored policy carries the agency role (approved 5 November 2026, specs/064 S-1); then wp mizzey security check:
+every baseline passes.
+
+Scenarios run in the staging PHP container (~/mizzey-staging/staging-run.sh), evidence scenarios-20261106-145058.
+
+t11 and t15 cannot pass in full on staging, by design of the runtime, not by this change: t15's hook recorder and t11's
+crud-web channel each install a temporary must-use plugin, and staging's release folder is read-only (t15 reports "hooks: none
+recorded"; crud-web gets a page, not its endpoint). Both pass locally (101 of 101, PR #546). What this change touches passes
+on staging: the CSV import channel in all four t11 cases and in t16, the importer lookup in t105, and WooCommerce Multilingual's
+own SKU lookup in t93.
+
+=== t105 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+PASS  setup: the Arabic records carry the same SKU as the English ones (T1052718S, T1052718V-S)
+PASS  AC-1 the CSV importer, looking a simple product up by SKU, gets the English record even when the lookup lands on the Arabic one (1628, expected 1628)
+PASS  AC-1 the CSV importer, looking a variation up by SKU, gets the English variation even when the lookup lands on the Arabic one (1631, expected 1631)
+PASS  AC-1 the same lookup outside the importer keeps the answer WooCommerce gave, so WooCommerce Multilingual still finds an Arabic copy by its SKU (1634, expected 1634)
+PASS  AC-1 an SKU no product has is still no product
+
+=== t93 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+Cost of Goods Sold before this scenario: on; enabled for the run and restored after.
+PASS  AC-3 the sheet with its Arabic columns is read whole, each option with its Arabic column; the first sheet, without them, still is ([[],[]])
+PASS  AC-1 MIG-01 a workbook is read as one sheet: both tabs, in order, each row with its tab and line, the reordered tab read by name, the empty tab skipped ([{"Kitchen":4,"Clothing":4},2,"T938883-MZ-2001"])
+PASS  AC-1 numbers read as typed: 349.00 as 349, and 180.00000000000003 as 180 (180)
+PASS  AC-1 MIG-19 the validation of the workbook plans the eight rows, and the report names each row's tab (exit 0)
+PASS  AC-2 a tab whose columns differ stops the read, naming the tab and the column (The tab "Clothing" does not have the same columns as the first tab. Missing: image_urls. Not in the first tab: title. Give every tab the same header row.)
+PASS  AC-6 an Arabic category with other levels is a client issue (W11) on its row; an Arabic option column without its option stops the run (F4)
+PASS  AC-4 the workbook loads to the end with no problem, and no category or brand is left without its Arabic name (done, [[],[]])
+PASS  AC-4 MIG-11, MIG-12 the Arabic product shows the category in Arabic at each level and the brand in Arabic; the category already translated keeps its translation (T938883 مطبخ قديم > التخزين, T938883 ميزي هوم)
+PASS  AC-5 MIG-10 the Arabic product has its options' Arabic names and values, a value with no Arabic kept as written; the English names stay English ([["أبيض","أسود"],["L","M"],"اللون","المقاس","السعة"])
+PASS  AC-5 MIG-10 an Arabic term that only repeated the English value takes the Arabic the sheet gives ({"name":"أسود","taxonomy":"pa_colour4245"})
+PASS  AC-5 an attribute another part of the store creates is translatable too, read in a request of its own (Warning: file_put_contents(/srv/sites/mizzeystaging/releases/v0.1.25/wp-content/plugins/paymob-for-woocommerce/includes/gateways/class-gateway-paymob-6030296-mizzey-staging-test-card-vpc-egp.
+PASS  AC-5 each Arabic variation carries its values in Arabic, the English one keeps its own (["أبيض","500 مل"])
+PASS  AC-5 PLP-09 the options can be filtered by: the Store API returns the shirt for White, and not the bottle ([1637])
+
+=== t16 pass=True versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+Cost of Goods Sold before this scenario: on; enabled for the run and restored after.
+OK   crud-cli simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+OK   crud-cli variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+OK   rest-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+OK   rest-http variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+OK   crud-web simple: the channel cannot reach the translation (crud-web: <!DOCTYPE html>
+OK   crud-web variation: the channel cannot reach the translation (crud-web: <!DOCTYPE html>
+OK   admin-http simple: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+     also written by the channel itself, not by the cost rule: _bosta_sku: null -> [""]; _mizzey_seo_canonical: null -> [""]; _mizzey_seo_description: null -> [""]; _mizzey_seo_robots: null -> [""]; _mizzey_seo_title: null -> [""]; _paymob_saved_period: null -> [""]; _paymob_saved_period_interval: n
+OK   admin-http variation: wrote 999 to the translation -> AR 100, EN 100 (want 100 for both), Arabic order recorded 100; language and translation group unchanged: yes; authored fields changed: none; override logged: yes
+     also written by the channel itself, not by the cost rule: _bosta_sku: null -> [""]; _paymob_saved_period: null -> [""]; _paymob_saved_period_interval: null -> [""]
+OK   import-http simple: wrote 999 to the translation -> AR 999, EN 999 (want 999 for both), Arabic order recorded 999; language and translation group unchanged: yes; authored fields changed: none; override logged: no | the importer matches by SKU, and the row reached the English original, so the ch
+OK   import-http variation: wrote 999 to the translation -> AR 999, EN 999 (want 999 for both), Arabic order recorded 999; language and translation group unchanged: yes; authored fields changed: none; override logged: no | the importer matches by SKU, and the row reached the English original, so the
+Unsupported by design, and not detectable: a direct database or update_post_meta() write bypasses the WooCommerce data store, so no filter can see it. The project forbids direct meta writes on products (woo-guard rule 2).
+Not bidirectional: nothing here lets a translation become the source of a cost. The original is the only copy that can change it.
+
+=== t11 pass=False versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+Cost of Goods Sold before this scenario: on; enabled for the run and restored after.
+WPML setting _cogs_total_value=1; WPML downloaded configuration present; mizzey-site/wpml-config.xml present
+OK   part1 crud-created simple, duplicate: AR 120
+OK   part1 crud-created variations, duplicate: AR 40/70
+OK   part1 crud-created simple, editor: AR 120
+OK   part1 crud-created variations, editor: AR 40/70
+OK   duplicate simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   duplicate simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   duplicate simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   duplicate simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+FAIL duplicate simple crud-web: set 100: EN none AR none [crud-web: <!DOCTYPE html>
+OK   duplicate variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   duplicate variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   duplicate variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   duplicate variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+FAIL duplicate variation crud-web: set 40: EN none AR none [crud-web: <!DOCTYPE html>
+OK   editor simple admin-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   editor simple import-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   editor simple rest-http: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+OK   editor simple crud-cli: set 100: EN 100 AR 100; change 111: EN 111 AR 111 | orders EN 111 AR 111 | price/stock/sku/status unchanged
+FAIL editor simple crud-web: set 100: EN none AR none [crud-web: <!DOCTYPE html>
+OK   editor variation admin-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   editor variation import-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   editor variation rest-http: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+OK   editor variation crud-cli: set 40: EN 40 AR 40; change 44: EN 44 AR 44 | orders EN 44 AR 44 | price/stock/sku/status unchanged
+FAIL editor variation crud-web: set 40: EN none AR none [crud-web: <!DOCTYPE html>
+
+=== t15 pass=False versions={"wordpress": "7.1.4", "woocommerce": "11.1.0", "wpml": "5.3.0", "wcml": "5.8.0"}
+Cost of Goods Sold before this scenario: on; enabled for the run and restored after.
+FAIL admin-http simple: woocommerce_update_product fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+FAIL admin-http variation: woocommerce_update_product_variation fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+FAIL import-http simple: woocommerce_update_product fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+FAIL import-http variation: woocommerce_update_product_variation fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+FAIL rest-http simple: woocommerce_update_product fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+FAIL rest-http variation: woocommerce_update_product_variation fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: none recorded
+OK   crud-cli simple: woocommerce_update_product fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: woocommerce_update_product(EN)@cli, woocommerce_update_product(AR)@cli
+OK   crud-cli variation: woocommerce_update_product_variation fired for the English post in context "cli"; save_post for it: no (WPML and WCML never run); EN 65 AR 65
+     hooks: woocommerce_update_product_variation(EN)@cli, woocommerce_update_product_variation(AR)@cli
+FAIL crud-web simple: woocommerce_update_product fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN none AR none [crud-web: <!DOCTYPE html>
+     hooks: none recorded
+FAIL crud-web variation: woocommerce_update_product_variation fired for the English post in context "never"; save_post for it: no (WPML and WCML never run); EN none AR none [crud-web: <!DOCTYPE html>
+     hooks: none recorded
+crud-cli covers WooCommerce CRUD and WP-CLI; crud-web covers front-end application code, webhooks and cron, which run in the same context.
