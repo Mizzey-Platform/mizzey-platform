@@ -31,7 +31,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import staging  # noqa: E402  the guards, the paths and the wp runner
 
-HOST, PORT = "127.0.0.1", staging.PORT
+# The copy on this machine: the local one on Windows, or the one on the developer's server (staging.profile()).
+if staging.profile() == "server":
+    import staging_server as tool  # noqa: E402
+    HOST, PORT = tool.http_address()
+    HOST_NAME = tool.LOCAL_HOST
+    EVIDENCE = tool.state("evidence")
+else:
+    tool = staging
+    HOST, PORT = "127.0.0.1", staging.PORT
+    HOST_NAME = None
+    EVIDENCE = staging.STAGING / "evidence"
 ITEM_SKU = "DEMO-LOAD-001"
 
 
@@ -39,6 +49,9 @@ def call(method: str, path: str, body: dict | None = None, headers: dict | None 
     conn = http.client.HTTPConnection(HOST, PORT, timeout=180)
     payload = json.dumps(body).encode("utf-8") if body is not None else None
     send = {"Accept": "application/json", **(headers or {})}
+    if HOST_NAME:
+        # The server's web server answers the staging site under its local host name, on loopback.
+        send["Host"] = HOST_NAME
     if payload:
         send["Content-Type"] = "application/json"
     started = time.perf_counter()
@@ -58,7 +71,7 @@ def call(method: str, path: str, body: dict | None = None, headers: dict | None 
 
 def item_ids() -> dict:
     # One line: the WP-CLI launcher on Windows is a batch file, and a line break ends its argument.
-    out = staging.wp("eval", f"$en = (int) apply_filters('wpml_object_id', (int) wc_get_product_id_by_sku('{ITEM_SKU}'), "
+    out = tool.wp("eval", f"$en = (int) apply_filters('wpml_object_id', (int) wc_get_product_id_by_sku('{ITEM_SKU}'), "
                              "'product', true, 'en'); echo wp_json_encode(array('en' => $en, 'ar' => (int) "
                              "apply_filters('wpml_object_id', $en, 'product', false, 'ar')));")
     return json.loads(out.splitlines()[-1])
@@ -66,30 +79,52 @@ def item_ids() -> dict:
 
 def set_stock(product_id: int, quantity: int) -> None:
     # The fixture's stock stands in for the ERP's projection (D-19 item 5; StockWriteGuard).
-    staging.wp("eval", f"add_filter('mizzey_stock_write_permitted', '__return_true'); wc_update_product_stock({product_id}, {quantity}, 'set'); wc_delete_product_transients({product_id});")
+    tool.wp("eval", f"add_filter('mizzey_stock_write_permitted', '__return_true'); wc_update_product_stock({product_id}, {quantity}, 'set'); wc_delete_product_transients({product_id});")
 
 
 def stock_of(ids: dict) -> dict:
-    out = staging.wp("eval", "echo wp_json_encode(array_map(fn($id) => $id ? wc_get_product($id)->get_stock_quantity() : null, "
+    out = tool.wp("eval", "echo wp_json_encode(array_map(fn($id) => $id ? wc_get_product($id)->get_stock_quantity() : null, "
                              f"array('en' => {ids['en']}, 'ar' => {ids['ar'] or 0})));")
     return json.loads(out.splitlines()[-1])
 
 
+def clear_source(ids: dict) -> None:
+    """The stand-in's record of earlier runs on the test item is dropped, so it holds what was just set."""
+    tool.wp("eval", f"$ids = array({ids['en']}, {ids['ar'] or 0}); "
+                    "$l = (array) get_option('mizzey_stock_fixture_ledger', array()); "
+                    "foreach ($l as $k => $row) { if (in_array((int) $row[0], $ids, true)) { unset($l[$k]); } } "
+                    "update_option('mizzey_stock_fixture_ledger', $l, false);")
+
+
+def source_level(ids: dict) -> int | None:
+    """What the stock source holds for the item when it is the staging stand-in: its base less what it recorded."""
+    out = tool.wp("eval", "if (get_option('mizzey_stock_fixture') !== 'yes') { echo 'null'; return; } "
+                          f"$ids = array({ids['en']}, {ids['ar'] or 0}); $p = wc_get_product({ids['en']}); "
+                          "$n = (int) $p->get_stock_quantity(); "
+                          "foreach ((array) get_option('mizzey_stock_fixture_ledger', array()) as $row) "
+                          "{ if (in_array((int) $row[0], $ids, true)) { $n += (int) $row[1]; } } echo $n;")
+    last = out.splitlines()[-1].strip()
+    return None if last == "null" else int(last)
+
+
 def address(n: int) -> dict:
-    return {"first_name": "Load", "last_name": f"Buyer {n:02d}", "address_1": f"{n} Sample Street", "city": "Cairo",
-            "state": "C", "postcode": "11511", "country": "EG", "email": f"load-buyer-{n:02d}@example.invalid",
+    # The Egyptian address the checkout asks for (specs/050): governorate code, city, district, kind of place.
+    return {"first_name": "Load", "last_name": f"Buyer {n:02d}", "address_1": f"{n} Tahrir Street", "city": "Cairo",
+            "state": "EG-01", "postcode": "", "country": "EG", "email": f"load-buyer-{n:02d}@example.invalid",
             "phone": f"0100000{n:04d}", "mizzey/district": "Downtown", "mizzey/place": "villa",
             "mizzey/building": str(n)}
 
 
 def cmd_last_units(a) -> int:
-    staging.guard_destructive()
+    tool.guard_destructive()
     languages = a.languages.split(",")
     ids = item_ids()
     if not ids["en"] or ("ar" in languages and not ids["ar"]):
         raise SystemExit(f"the staging seed has no {ITEM_SKU} in the languages asked for: {ids}")
     set_stock(ids["en"], a.stock)
+    clear_source(ids)
     before = stock_of(ids)
+    held_before = source_level(ids)
 
     # Phase 1, not simultaneous: each buyer opens a cart and puts one unit in it. Every one of these succeeds
     # while stock remains, because a cart reserves nothing.
@@ -137,12 +172,14 @@ def cmd_last_units(a) -> int:
         t.join()
 
     after = stock_of(ids)
+    held_after = source_level(ids)
     confirmed = [r for r in results if r.get("status") == 200 and r.get("order_id")]
     fired = [r["fired"] for r in results]
     report = {
         "measured": staging.now(), "what": "N buyers ordering the last K units at the same instant",
         "item": ITEM_SKU, "records": ids, "languages": languages, "payment_method": a.payment,
         "buyers": a.buyers, "buyers_with_a_cart": len(buyers), "stock_before": before, "stock_after": after,
+        "stock_source_before": held_before, "stock_source_after": held_after,
         "release_spread_ms": round((max(fired) - min(fired)) * 1000, 2) if fired else None,
         "orders_confirmed": len(confirmed), "orders_refused": len(results) - len(confirmed),
         "units_oversold": max(0, len(confirmed) - a.stock),
@@ -156,7 +193,7 @@ def cmd_last_units(a) -> int:
 
 
 def cmd_read_load(a) -> int:
-    staging.guard_tree()
+    tool.guard_tree()
     paths = ["/", "/ar/", "/shop/", "/ar/shop/", "/product/sample-product-01/", "/ar/product/sample-product-01/",
              "/cart/", "/my-account/"]
     jobs = [paths[i % len(paths)] for i in range(a.requests)]
@@ -204,7 +241,8 @@ def cmd_read_load(a) -> int:
 def finish(report: dict, a, name: str) -> int:
     text = json.dumps(report, indent=1, ensure_ascii=False)
     print(text)
-    out = staging.STAGING / "evidence" / f"concurrency-{name}-{time.strftime('%Y%m%d-%H%M%S')}.json"
+    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    out = EVIDENCE / f"concurrency-{name}-{time.strftime('%Y%m%d-%H%M%S')}.json"
     out.write_text(text + "\n", encoding="utf-8")
     print(f"evidence: {out}", file=sys.stderr)
     return 0
