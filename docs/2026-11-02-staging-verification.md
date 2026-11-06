@@ -80,3 +80,20 @@ before it, `staging.py build` no problems, `staging.py check` 6 of 6, security b
 Evidence on the server: `~/mizzey-staging/evidence/scenarios-20261103-133040` (t71, t84 on v0.1.18),
 `scenarios-20261103-163218` (t76, t77) and `scenarios-20261103-163706` (t71, t74). #275, #276, #278 and #286 move
 from In review to Verified. Verified is technical; none of them is accepted by the client (constitution M-7).
+
+## 6 November 2026: agency access and the add-to-cart stock check
+
+Release v0.1.25 (e0afc75, through #546), backup 20261106-144944-manual before it, `staging.py build` no problems,
+`staging.py check` 6 of 6. The stored two-factor policy predated the agency role, so `wp mizzey security
+two-factor-baseline` was run (approved 5 November 2026, specs/064 S-1); every security baseline then passes. The
+add-to-cart stock check went on staging with v0.1.23 on 5 November (#541).
+
+| Slice | Issue | Spec | Scenario | On staging |
+|---|---|---|---|---|
+| Agency access, MKT-21 to MKT-25 | #298 | 064 | t104 | Pass (v0.1.25) |
+| Add-to-cart stock check, ERP-03 | #314 | 062 | t102 | Pass (v0.1.23) |
+
+Evidence: `specs/064-agency-access/evidence/staging-2026-11-06.txt` (#547) and
+`specs/062-add-to-cart-stock/evidence/staging-2026-11-05.txt` (#541). Both move from Ready to In progress, not to
+Verified: #298's MKT-26, the Third-Party Access Protocol, is drafted and not yet delivered, and #314 has no final
+acceptance criteria before the ERP Integration Specification (PRE-09, constitution M-3).
