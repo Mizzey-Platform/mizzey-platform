@@ -2863,6 +2863,17 @@
       }
     ]
   },
+  "design_tool_export": {
+    "date": "2026-11-11",
+    "recorded_by": "Claude Code. A records-only entry: no wireframe, inventory, brief or scope record changes, and no owner decision is recorded here.",
+    "why": "Standalone Claude Design closes on 14 December 2026: projects become read-only, public links stop, and chats and comments are deleted later. The project Mizzey UX decision synthesis, where every batch was drawn, could not be moved into Claude because it holds too many files, so the owner downloaded it.",
+    "source": "Mizzey UX decision synthesis (23).zip (SHA-256 dd434ad92b7167725ac238316e7c98a47af24aba9e0bfec5b91cb3fefe0d92db, 16,417 files), downloaded by the owner on 11 November 2026. 14,510 files are under uploads/ (the input package for each batch) and 1,491 under _build/ (the project's working files). The ZIP is the owner's backup and is not committed.",
+    "comparison": "The other 416 files were compared by content with every file version in this repository's history and with the private archive. 100 are on main unchanged. 199 are earlier versions of files main holds (171 in main's history, 28 only on import branches). 58 are wireframe candidates or intermediate rounds that were never imported: the rejected first 09-D and 09-E outputs of 22 October 2026, and copies of batches 01, 04, 05, 06 and 08 from before their import corrections. The rest are 24 return ZIPs and 35 records (handoffs, decision sheets, the 09-C import pack of 22 October 2026, which PR #399 overtook, the quality-gate review, the project's own notes and three Claude Design reports). No wireframe in the export is newer than main: where a file differs, main holds the later version.",
+    "committed": "Nothing from the export. Its handoffs, decision sheets and reports stay private, as every earlier return did: they quote signed wording in places, and this repository is public.",
+    "archived_privately": "Every SHA-256 this manifest cites (240 distinct values) now resolves to a file in the private archive; 29 of them, mostly the batch 02 to 09 returns and their handoffs, had been held only outside it. The archive also keeps every text record of the export, including the three Claude Design reports: the structural UX decision report of 18 October 2026 (the report the selection record cites), the account and identity UX audit of 18 October 2026, and the Direction C-M mobile exploration of 21 October 2026.",
+    "not_exported": "The project's chats and comments are not in the export. Whatever was said only there (the owner's comments on the three reports, any reaction to the Direction C-M refinements, and instructions typed when issuing a package) is unrecorded until the owner copies it out, before 14 December 2026.",
+    "next": "Planned, not started: the remaining design work, from workflow step 9 (the brand identity) onward, continues in Claude as Design artifacts on a Mizzey design system. workflow.md still describes the ZIP exchange and changes only on the owner's word, in its own PR. The role split of D-15 is unchanged."
+  },
   "artifact_pattern": "design/wireframes/<s1|s2>/<batch id>/<surface id>.<en|ar>.html",
   "entries": [
     {
