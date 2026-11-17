@@ -17,6 +17,33 @@ from tools import design_inventory as di
 ROOT = Path(__file__).resolve().parent.parent.parent
 
 
+def _flat_tokens() -> dict:
+    out: dict = {}
+
+    def walk(node: dict, path: str) -> None:
+        for key, val in node.items():
+            if key.startswith("$") or not isinstance(val, dict):
+                continue
+            p = f"{path}.{key}" if path else key
+            if "$value" in val:
+                out[p] = val
+            else:
+                walk(val, p)
+
+    walk(json.loads((ROOT / "design" / "tokens" / "tokens.json").read_text(encoding="utf-8")), "")
+    return out
+
+
+def _contrast(a: str, b: str) -> float:
+    def lum(h: str) -> float:
+        c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        c = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4 for v in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
 class TheCommittedInventory(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -35,11 +62,38 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertEqual(report, di.render(self.data),
                          "design/coverage.md is stale; run python tools/design_inventory.py --write")
 
-    def test_no_token_value_and_no_brand_value_has_been_committed(self):
-        """Tokens stay empty and neutral until OD-01. Briefs and wireframes have their own checks."""
+    def test_the_tokens_are_one_dtcg_file_and_the_inventory_stays_structural(self):
+        """OD-01 arrived on 17 Nov 2026: brand values live in design/tokens/tokens.json only, never in the inventory."""
         found = sorted(p.name for p in (ROOT / "design" / "tokens").iterdir())
-        self.assertEqual(found, ["README.md"], "design/tokens/ holds more than its README")
+        self.assertEqual(found, ["README.md", "tokens.json"], "design/tokens/ holds its README and tokens.json only")
         self.assertTrue(all(c["brand"] == "neutral" for c in self.data["components"]))
+        flat = _flat_tokens()
+        self.assertTrue(flat)
+        for path, tok in flat.items():
+            self.assertIn("$type", tok, path)
+            self.assertIn(tok["$extensions"]["mizzey"]["status"], {"brand", "derived", "carried", "proposed"}, path)
+            for ref in re.findall(r"\{([a-z0-9.\-]+)\}", json.dumps(tok["$value"])):
+                self.assertIn(ref, flat, f"{path}: alias {{{ref}}} does not resolve")
+
+    def test_every_colour_role_pair_meets_wcag_aa(self):
+        """Text 4.5:1, large text, control boundaries and the focus ring 3:1 (WCAG 2.2 AA, 1.4.3 and 1.4.11)."""
+        flat = _flat_tokens()
+
+        def role(name):
+            v = flat[f"color.role.{name}"]["$value"]
+            while v.startswith("{"):
+                v = flat[v[1:-1]]["$value"]
+            return v
+
+        pairs = [(fg, bg, 4.5) for fg in ("text", "text-muted", "accent-text", "link", "success", "warning", "danger")
+                 for bg in ("page", "surface")]
+        pairs += [("text-on-brand", "surface-brand", 4.5), ("on-primary", "primary", 4.5),
+                  ("on-primary", "primary-hover", 4.5), ("on-accent", "accent", 4.5), ("on-accent-large", "accent", 3)]
+        pairs += [(fg, bg, 3) for fg in ("border-control", "focus") for bg in ("page", "surface")]
+        pairs += [("focus", "surface-brand", 3), ("focus", "primary", 3)]
+        for fg, bg, need in pairs:
+            ratio = _contrast(role(fg), role(bg))
+            self.assertGreaterEqual(ratio, need, f"{fg} on {bg}: {ratio:.2f}")
 
     def test_the_signed_documents_are_referenced_and_not_copied(self):
         for src in self.data["sources"]:
