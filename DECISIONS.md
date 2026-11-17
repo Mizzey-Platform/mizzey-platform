@@ -2408,3 +2408,16 @@ here or in its PR, so it can be reviewed and reversed.
 | The client fills the sheet in Google Sheets, possibly one tab per category | The importer reads the workbook as downloaded (Excel, `.xlsx`), every tab with the same columns, as one file; a CSV of one tab still works | MIG-01 accepts CSV, tab-delimited or Excel; the client keeps their own way of organising the sheet |
 | Merging requirement PRs | Merged once CI is green and the local and staging checks named in the PR pass, then reported | The owner asked for work to continue without waiting |
 | The store's server (private note `pm/2026-11-04-server-recommendation.md`) | 4 GB, staging as a Cloudways staging copy on the production server, MySQL 8.4; offered to Mizzey with 2 GB as the contracted baseline | The note's reasons; hosting is the client's cost and choice (OD-14, OD-27) |
+
+## 2026-11-18 - D-34: the brand's open points
+
+**Status: the owner's rulings of 18 November 2026, in chat.** They settle the points left open when the client's
+brand identity arrived (OD-01, 17 November 2026) and the tokens were built (#552). They add no scope and change no
+fee, stage or signed document.
+
+| Question | Ruling | Why |
+|---|---|---|
+| The brand orange: the colour sheet gives Persimmon #E65A42, the supplied logo files colour the i-dot and the wave #FF6A4A | **#E65A42**, in the interface and in the logo. The logo files are recoloured to it when the logo goes into the theme | One orange, as the colour sheet says |
+| Mizzey Ink #1E1E1E, in the proposal palette but not on the final colour sheet | **Part of the palette.** It stays the main text colour | Owner's ruling |
+| Body text weight: the brand gives Light for body | **Regular (400) for body text on screen**; Light (300) for large running text only, the `lead` role, 20px and up | Delegated to Claude Code ("take the right decision"). Light reads thin at 16px on a phone, Tajawal Light most, and body text carries product details, prices and checkout terms. Inter and Tajawal both have a Regular weight under the same open licence |
+| Written approval of the brand direction (CR-02) | **Not needed again.** The client approved the brand identity with its designers before handing it over | Owner's ruling. The interface design built on it is still presented for the client's approval under PRE-03b; `docs/scope/backlog-ownership.json` is updated in the next record sync |

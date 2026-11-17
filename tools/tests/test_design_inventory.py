@@ -71,7 +71,7 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertTrue(flat)
         for path, tok in flat.items():
             self.assertIn("$type", tok, path)
-            self.assertIn(tok["$extensions"]["mizzey"]["status"], {"brand", "derived", "carried", "proposed"}, path)
+            self.assertIn(tok["$extensions"]["mizzey"]["status"], {"brand", "decided", "derived", "carried", "proposed"}, path)
             for ref in re.findall(r"\{([a-z0-9.\-]+)\}", json.dumps(tok["$value"])):
                 self.assertIn(ref, flat, f"{path}: alias {{{ref}}} does not resolve")
 
