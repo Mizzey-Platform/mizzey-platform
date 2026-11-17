@@ -13,7 +13,7 @@ settle the open points (D-34). The interface design built on these tokens still 
 
 | Part | Value |
 |---|---|
-| Logo | Option 01 of the brand proposal: the wordmark with the double Z and the wave, and a ZZ mark for small sizes. Its orange accent is Persimmon #E65A42 (D-34) |
+| Logo | Option 01 of the brand proposal: the wordmark with the double Z and the wave, and a ZZ mark for small sizes. Used exactly as supplied, in its own colours; never recoloured (D-34) |
 | Colours | Royal Indigo #263B73, Persimmon #E65A42, Cream #F3F1E9, Mizzey Ink #1E1E1E |
 | Type | Inter for English and Tajawal for Arabic: Black for headlines, Medium for sub-headers, Regular for body text on screen, Light for large running text (D-34) |
 | Voice | The Savvy Companion: smart, playful, plain, never overdone |
@@ -55,8 +55,8 @@ Rules that follow from the brand colours:
 - **Persimmon never carries small Cream or White text.** Cream on Persimmon is 3.14:1, so it is for text of 24px and
   up (18.66px bold). Smaller text on Persimmon uses Ink.
 - **Persimmon as text on a light surface** uses `color.persimmon.700` (#B84835), not the brand Persimmon (3.14:1).
-- **There is one orange.** The supplied logo files colour the i-dot and the wave #FF6A4A; the logo used on the site
-  takes Persimmon #E65A42 instead (D-34).
+- **The interface orange is Persimmon #E65A42.** The logo keeps its own colours, including the #FF6A4A of the
+  i-dot and the wave; it is placed as supplied, never recoloured, and its colours are not interface tokens (D-34).
 - **Danger is crimson (#CD2949)**, kept apart from Persimmon in hue, and always comes with an icon and words, never
   colour alone.
 
