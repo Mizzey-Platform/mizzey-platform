@@ -14,7 +14,7 @@ settle the open points (D-34). The interface design built on these tokens still 
 | Part | Value |
 |---|---|
 | Logo | Option 01 of the brand proposal: the wordmark with the double Z and the wave, and a ZZ mark for small sizes. Used exactly as supplied, in its own colours; never recoloured (D-34) |
-| Colours | Royal Indigo #263B73, Persimmon #E65A42, Cream #F3F1E9, Mizzey Ink #1E1E1E |
+| Colours | Royal Indigo #263B73, Persimmon #FF6A4A, Cream #F3F1E9, Mizzey Ink #1E1E1E |
 | Type | Inter for English and Tajawal for Arabic: Black for headlines, Medium for sub-headers, Regular for body text on screen, Light for large running text (D-34) |
 | Voice | The Savvy Companion: smart, playful, plain, never overdone |
 
@@ -43,20 +43,22 @@ and the focus ring meet 3:1 (1.4.11). Checked on 18 November 2026:
 | Text (Ink) on Cream / White | 14.74 / 16.67 |
 | Muted text on Cream / White | 4.93 / 5.57 |
 | Cream on Royal Indigo (header, primary button) | 9.50 |
-| Ink on Persimmon (badge text) | 4.69 |
-| Cream on Persimmon (large text only) | 3.14 |
-| Text-safe Persimmon #B84835 on Cream / White | 4.62 / 5.23 |
+| Ink on Persimmon (all text on Persimmon) | 5.88 |
+| Persimmon #FF6A4A on White / Cream (fails, fills only) | 2.83 / 2.51 |
+| Icon Persimmon #EE5A3B on White / Cream / Royal Indigo | 3.41 / 3.01 / 3.15 |
+| Text-safe Persimmon #C63D1F on Cream / White | 4.54 / 5.14 |
 | Success, warning, danger on Cream / White / their own tint | 4.6 or more |
 | Control border on Cream / White | 3.27 / 3.69 |
-| Focus ring (Persimmon) on Cream / White / Royal Indigo | 3.14 / 3.56 / 3.02 |
+| Focus ring (#EE5A3B) on Cream / White / Royal Indigo | 3.01 / 3.41 / 3.15 |
 
 Rules that follow from the brand colours:
 
-- **Persimmon never carries small Cream or White text.** Cream on Persimmon is 3.14:1, so it is for text of 24px and
-  up (18.66px bold). Smaller text on Persimmon uses Ink.
-- **Persimmon as text on a light surface** uses `color.persimmon.700` (#B84835), not the brand Persimmon (3.14:1).
-- **The interface orange is Persimmon #E65A42.** The logo keeps its own colours, including the #FF6A4A of the
-  i-dot and the wave; it is placed as supplied, never recoloured, and its colours are not interface tokens (D-34).
+- **Text on Persimmon is always Ink.** White is 2.83:1 and Cream 2.51:1 on #FF6A4A, below even the 3:1 for large
+  text, so no heading size makes them pass.
+- **Persimmon on a light surface is a fill, not a line.** As text it uses `color.persimmon.700` (#C63D1F); as an
+  icon, border or focus ring it uses `color.persimmon.600` (#EE5A3B). The brand #FF6A4A is 2.83:1 on White.
+- **The interface orange is Persimmon #FF6A4A**, the same orange as the logo's i-dot and wave (owner's correction,
+  18 Nov 2026, D-34). The logo is placed as supplied and never recoloured (D-34).
 - **Danger is crimson (#CD2949)**, kept apart from Persimmon in hue, and always comes with an icon and words, never
   colour alone.
 
