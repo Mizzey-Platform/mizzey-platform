@@ -55,8 +55,8 @@ Rules that follow from the brand colours:
 
 - **Text on Persimmon is always Ink.** White is 2.83:1 and Cream 2.51:1 on #FF6A4A, below even the 3:1 for large
   text, so no heading size makes them pass.
-- **There is one orange, and it is a fill in fixed places only** (D-35): the logo, the cart count, the Offers chip,
-  sale badges, the slider's active dot, banner images and the add-confirmation tick. It is never text, never an
+- **There is one orange, and it is a fill in fixed places only** (D-35): the logo (and its i-dot as the phone tab bar
+  mark), the cart count, the Offers tag, sale badges, the slider's active dot and banner images. It is never text, never an
   icon or line on a light surface, and never reads as a warning. No darker orange steps exist. Sale prices and
   highlight words are Royal Indigo (`color.role.accent-text`); the focus ring is Royal Indigo on light surfaces
   and White on Indigo (`focus`, `focus-inverse`).

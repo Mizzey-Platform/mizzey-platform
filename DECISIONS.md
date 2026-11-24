@@ -2431,7 +2431,7 @@ client chose that direction on 24 November 2026. These rulings replace two parts
 
 | Question | Ruling | Replaces |
 |---|---|---|
-| Where orange appears | **One orange, Persimmon #FF6A4A, as a fill in fixed places only**: the logo, the cart count, the Offers chip, sale badges, the slider's active dot, banner images and the add-confirmation tick. It is never text, never an icon or line on a light surface, and never reads as a warning | The derived steps #C63D1F (text) and #EE5A3B (icons, focus) in D-34, which are removed from the tokens |
+| Where orange appears | **One orange, Persimmon #FF6A4A, as a fill in fixed places only**: the logo (with its i-dot as the phone tab bar mark), the cart count, the Offers tag, sale badges, the slider's active dot and banner images. The add-confirmation tick is White. It is never text, never an icon or line on a light surface, and never reads as a warning | The derived steps #C63D1F (text) and #EE5A3B (icons, focus) in D-34, which are removed from the tokens |
 | Sale prices and highlight words | **Royal Indigo** (`color.role.accent-text`) | #C63D1F |
 | The focus ring | **Royal Indigo, 2px, on White and Cream; White on Indigo surfaces** (`focus`, `focus-inverse`) | #EE5A3B |
 | The loader | **Royal Indigo** | |
