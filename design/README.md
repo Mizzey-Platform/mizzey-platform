@@ -17,7 +17,7 @@ that work is prepared, and it changes no contract term.
 | 3. Low-fidelity wireframe pass for the first-release (S1) surfaces | Done. Batches 01 to 09 reviewed and closed; the five reopened and two added surfaces reviewed in the stabilisation round (`wireframes/manifest.json`, `stabilisation`) |
 | 4. Structural component and interaction system, established and stable | Done in the stabilisation round, 28 October 2026; the deferred part of D6 is in `stabilisation.residual` |
 | 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Done. Batch-10: 10-A and 10-B reviewed and frozen, batch closed |
-| 6. Brand identity received and applied | Received 17 November 2026 (OD-01). Tokens built in `tokens/tokens.json`; written approval of the brand direction (CR-02) open |
+| 6. Brand identity received and applied | Received 17 November 2026 (OD-01). Tokens built in `tokens/tokens.json`; open points settled by the owner on 18 November 2026 (D-34) |
 | 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
 | 8. The contracted working HTML and CSS design | Not started |
 | 9. PRE-03b approved by the client | Not started |

@@ -71,7 +71,7 @@ class TheCommittedInventory(unittest.TestCase):
         self.assertTrue(flat)
         for path, tok in flat.items():
             self.assertIn("$type", tok, path)
-            self.assertIn(tok["$extensions"]["mizzey"]["status"], {"brand", "derived", "carried", "proposed"}, path)
+            self.assertIn(tok["$extensions"]["mizzey"]["status"], {"brand", "decided", "derived", "carried", "proposed"}, path)
             for ref in re.findall(r"\{([a-z0-9.\-]+)\}", json.dumps(tok["$value"])):
                 self.assertIn(ref, flat, f"{path}: alias {{{ref}}} does not resolve")
 
@@ -90,7 +90,7 @@ class TheCommittedInventory(unittest.TestCase):
         pairs += [("text-on-brand", "surface-brand", 4.5), ("on-primary", "primary", 4.5),
                   ("on-primary", "primary-hover", 4.5), ("on-accent", "accent", 4.5), ("on-accent-large", "accent", 3)]
         pairs += [(fg, bg, 3) for fg in ("border-control", "focus") for bg in ("page", "surface")]
-        pairs += [("focus", "surface-brand", 3), ("focus", "primary", 3)]
+        pairs += [("focus-inverse", "surface-brand", 3), ("focus-inverse", "primary", 3)]  # D-35
         for fg, bg, need in pairs:
             ratio = _contrast(role(fg), role(bg))
             self.assertGreaterEqual(ratio, need, f"{fg} on {bg}: {ratio:.2f}")

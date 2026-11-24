@@ -2408,3 +2408,34 @@ here or in its PR, so it can be reviewed and reversed.
 | The client fills the sheet in Google Sheets, possibly one tab per category | The importer reads the workbook as downloaded (Excel, `.xlsx`), every tab with the same columns, as one file; a CSV of one tab still works | MIG-01 accepts CSV, tab-delimited or Excel; the client keeps their own way of organising the sheet |
 | Merging requirement PRs | Merged once CI is green and the local and staging checks named in the PR pass, then reported | The owner asked for work to continue without waiting |
 | The store's server (private note `pm/2026-11-04-server-recommendation.md`) | 4 GB, staging as a Cloudways staging copy on the production server, MySQL 8.4; offered to Mizzey with 2 GB as the contracted baseline | The note's reasons; hosting is the client's cost and choice (OD-14, OD-27) |
+
+## 2026-11-18 - D-34: the brand's open points
+
+**Status: the owner's rulings of 18 November 2026, in chat.** They settle the points left open when the client's
+brand identity arrived (OD-01, 17 November 2026) and the tokens were built (#552). They add no scope and change no
+fee, stage or signed document.
+
+| Question | Ruling | Why |
+|---|---|---|
+| The brand orange: the colour sheet gives Persimmon #E65A42, the supplied logo files colour the i-dot and the wave #FF6A4A | **#FF6A4A** for the interface, the logo's own orange (the owner first ruled #E65A42, then corrected it the same day: "this is the correct Persimmon colour #ff6a4a"). Because #FF6A4A is 2.83:1 on White, text on it is Ink, and light surfaces use derived steps for text (#C63D1F) and icons or the focus ring (#EE5A3B). **The logo is used exactly as supplied**, in its own colours for each background, #FF6A4A accent included; nothing in it is recoloured | Owner's correction: #FF6A4A is the correct Persimmon. The logo is the designers' finished artwork |
+| Mizzey Ink #1E1E1E, in the proposal palette but not on the final colour sheet | **Part of the palette.** It stays the main text colour | Owner's ruling |
+| Body text weight: the brand gives Light for body | **Regular (400) for body text on screen**; Light (300) for large running text only, the `lead` role, 20px and up | Delegated to Claude Code ("take the right decision"). Light reads thin at 16px on a phone, Tajawal Light most, and body text carries product details, prices and checkout terms. Inter and Tajawal both have a Regular weight under the same open licence |
+| The main logo on light grounds: the final pack's white-ground logo has a Royal Indigo wordmark | **The Mizzey Ink wordmark with the #FF6A4A i-dot and wave**, the proposal's Option 01 primary logo: in the header the wordmark with the Arabic name under it (no "Online Shopping Platform"), in the footer the full logo with "Online Shopping Platform" on the left, the Arabic name and the registered trademark sign (the owner confirms the mark is registered; the sign's shapes are taken from the proposal's primary logo); the wordmark alone only where space is too small. The file is the supplied artwork with only the wordmark fill set to Ink #1E1E1E, as the proposal draws it; Royal Indigo grounds keep the supplied royal-bg versions | Owner's ruling, 18 Nov 2026 |
+| How much of each brand colour a screen carries | **White is the page ground; Royal Indigo leads (about 30% of the coloured area); Persimmon up to 8%, for the find moments; Cream at most 2%**, never a page, section or card ground | Owner's ruling, 18 Nov 2026, after the brand designer advised against Cream as a main colour; the percentages are Claude Code's, delegated |
+| Written approval of the brand direction (CR-02) | **Not needed again.** The client approved the brand identity with its designers before handing it over | Owner's ruling. The interface design built on it is still presented for the client's approval under PRE-03b; `docs/scope/backlog-ownership.json` is updated in the next record sync |
+
+## 2026-11-22 - D-35: one orange, and the colour balance of the chosen design
+
+**Status: the owner's rulings of 22 November 2026, in chat, made while the design direction was settled.** The
+client chose that direction on 24 November 2026. These rulings replace two parts of D-34 and add no scope.
+
+| Question | Ruling | Replaces |
+|---|---|---|
+| Where orange appears | **One orange, Persimmon #FF6A4A, as a fill in fixed places only**: the logo (with its i-dot as the phone tab bar mark), the cart count, the Offers tag, sale badges, the slider's active dot and banner images. The add-confirmation tick is White. It is never text, never an icon or line on a light surface, and never reads as a warning | The derived steps #C63D1F (text) and #EE5A3B (icons, focus) in D-34, which are removed from the tokens |
+| Sale prices and highlight words | **Royal Indigo** (`color.role.accent-text`) | #C63D1F |
+| The focus ring | **Royal Indigo, 2px, on White and Cream; White on Indigo surfaces** (`focus`, `focus-inverse`) | #EE5A3B |
+| The loader | **Royal Indigo** | |
+| How much colour a screen carries | **Royal Indigo leads; orange stays in its fixed places above.** White is the page ground, with a light Indigo glow (#E9EEF9 at the top, #F4F6FC lower); gradients use the Indigo family only, never orange | The 30% / 8% / 2% split in D-34 |
+
+The design boards of the chosen direction carry these rules; `design/tokens/tokens.json` and its README now match
+them.
