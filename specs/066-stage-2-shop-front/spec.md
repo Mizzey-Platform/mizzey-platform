@@ -268,6 +268,7 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
 - **Rows**: FIX-04a, NFR-04, NFR-04a, NFR-11, SSC-01, MER-06.
 - **Builds**: the tokens of `design/tokens/tokens.json` as the theme's global settings and `--mizzey-*` custom
   properties; Inter and Tajawal self-hosted, per script; the type roles, spacing, radius, focus ring and motion;
+  the icon set the boards draw, as one set of inline SVG icons that take their colour from a token;
   logical properties throughout, so one stylesheet serves both directions; the base components (buttons, fields,
   choices, chips and badges, notices, loader and skeletons, empty states, pagination, drawers and modals, steps,
   tooltips, tabs); the section library pattern above, with one section built end to end as the proof; the global
@@ -517,6 +518,10 @@ slices follow from 24 November 2026.
   board per surface is not required.
 - The cart page, checkout, account and content pages keep their present native screens, on the new tokens, until
   their stage.
+- The graphics the design itself needs (the icon set, and the banner and section artwork the boards show) are
+  produced with the design, as on the boards. Banner and section artwork ships as sample content the team replaces
+  in the editor: it carries no brand name, logo, label or face, and is never presented as the client's own
+  photography. Product photos and the store's own campaign images stay the client's content.
 - The initial entries of the synonym and correction list, the home page's words and images, and the WhatsApp
   number are the client's content; fixtures stand in on staging (M-10).
 
