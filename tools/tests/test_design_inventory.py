@@ -90,7 +90,7 @@ class TheCommittedInventory(unittest.TestCase):
         pairs += [("text-on-brand", "surface-brand", 4.5), ("on-primary", "primary", 4.5),
                   ("on-primary", "primary-hover", 4.5), ("on-accent", "accent", 4.5), ("on-accent-large", "accent", 3)]
         pairs += [(fg, bg, 3) for fg in ("border-control", "focus") for bg in ("page", "surface")]
-        pairs += [("focus", "surface-brand", 3), ("focus", "primary", 3)]
+        pairs += [("focus-inverse", "surface-brand", 3), ("focus-inverse", "primary", 3)]  # D-35
         for fg, bg, need in pairs:
             ratio = _contrast(role(fg), role(bg))
             self.assertGreaterEqual(ratio, need, f"{fg} on {bg}: {ratio:.2f}")

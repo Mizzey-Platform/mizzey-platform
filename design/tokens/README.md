@@ -45,18 +45,21 @@ and the focus ring meet 3:1 (1.4.11). Checked on 18 November 2026:
 | Cream on Royal Indigo (header, primary button) | 9.50 |
 | Ink on Persimmon (all text on Persimmon) | 5.88 |
 | Persimmon #FF6A4A on White / Cream (fails, fills only) | 2.83 / 2.51 |
-| Icon Persimmon #EE5A3B on White / Cream / Royal Indigo | 3.41 / 3.01 / 3.15 |
-| Text-safe Persimmon #C63D1F on Cream / White | 4.54 / 5.14 |
+| Sale price and highlight text, Royal Indigo, on Cream / White | 9.50 / 10.70 |
 | Success, warning, danger on Cream / White / their own tint | 4.6 or more |
 | Control border on Cream / White | 3.27 / 3.69 |
-| Focus ring (#EE5A3B) on Cream / White / Royal Indigo | 3.01 / 3.41 / 3.15 |
+| Focus ring, Royal Indigo, on Cream / White | 9.50 / 10.70 |
+| Focus ring, White, on Royal Indigo | 10.70 |
 
 Rules that follow from the brand colours:
 
 - **Text on Persimmon is always Ink.** White is 2.83:1 and Cream 2.51:1 on #FF6A4A, below even the 3:1 for large
   text, so no heading size makes them pass.
-- **Persimmon on a light surface is a fill, not a line.** As text it uses `color.persimmon.700` (#C63D1F); as an
-  icon, border or focus ring it uses `color.persimmon.600` (#EE5A3B). The brand #FF6A4A is 2.83:1 on White.
+- **There is one orange, and it is a fill in fixed places only** (D-35): the logo, the cart count, the Offers chip,
+  sale badges, the slider's active dot, banner images and the add-confirmation tick. It is never text, never an
+  icon or line on a light surface, and never reads as a warning. No darker orange steps exist. Sale prices and
+  highlight words are Royal Indigo (`color.role.accent-text`); the focus ring is Royal Indigo on light surfaces
+  and White on Indigo (`focus`, `focus-inverse`).
 - **The interface orange is Persimmon #FF6A4A**, the same orange as the logo's i-dot and wave (owner's correction,
   18 Nov 2026, D-34). The logo is placed as supplied and never recoloured (D-34).
 - **Danger is crimson (#CD2949)**, kept apart from Persimmon in hue, and always comes with an icon and words, never

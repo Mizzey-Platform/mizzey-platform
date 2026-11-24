@@ -2423,3 +2423,19 @@ fee, stage or signed document.
 | The main logo on light grounds: the final pack's white-ground logo has a Royal Indigo wordmark | **The Mizzey Ink wordmark with the #FF6A4A i-dot and wave**, the proposal's Option 01 primary logo: in the header the wordmark with the Arabic name under it (no "Online Shopping Platform"), in the footer the full logo with "Online Shopping Platform" on the left, the Arabic name and the registered trademark sign (the owner confirms the mark is registered; the sign's shapes are taken from the proposal's primary logo); the wordmark alone only where space is too small. The file is the supplied artwork with only the wordmark fill set to Ink #1E1E1E, as the proposal draws it; Royal Indigo grounds keep the supplied royal-bg versions | Owner's ruling, 18 Nov 2026 |
 | How much of each brand colour a screen carries | **White is the page ground; Royal Indigo leads (about 30% of the coloured area); Persimmon up to 8%, for the find moments; Cream at most 2%**, never a page, section or card ground | Owner's ruling, 18 Nov 2026, after the brand designer advised against Cream as a main colour; the percentages are Claude Code's, delegated |
 | Written approval of the brand direction (CR-02) | **Not needed again.** The client approved the brand identity with its designers before handing it over | Owner's ruling. The interface design built on it is still presented for the client's approval under PRE-03b; `docs/scope/backlog-ownership.json` is updated in the next record sync |
+
+## 2026-11-22 - D-35: one orange, and the colour balance of the chosen design
+
+**Status: the owner's rulings of 22 November 2026, in chat, made while the design direction was settled.** The
+client chose that direction on 24 November 2026. These rulings replace two parts of D-34 and add no scope.
+
+| Question | Ruling | Replaces |
+|---|---|---|
+| Where orange appears | **One orange, Persimmon #FF6A4A, as a fill in fixed places only**: the logo, the cart count, the Offers chip, sale badges, the slider's active dot, banner images and the add-confirmation tick. It is never text, never an icon or line on a light surface, and never reads as a warning | The derived steps #C63D1F (text) and #EE5A3B (icons, focus) in D-34, which are removed from the tokens |
+| Sale prices and highlight words | **Royal Indigo** (`color.role.accent-text`) | #C63D1F |
+| The focus ring | **Royal Indigo, 2px, on White and Cream; White on Indigo surfaces** (`focus`, `focus-inverse`) | #EE5A3B |
+| The loader | **Royal Indigo** | |
+| How much colour a screen carries | **Royal Indigo leads; orange stays in its fixed places above.** White is the page ground, with a light Indigo glow (#E9EEF9 at the top, #F4F6FC lower); gradients use the Indigo family only, never orange | The 30% / 8% / 2% split in D-34 |
+
+The design boards of the chosen direction carry these rules; `design/tokens/tokens.json` and its README now match
+them.
