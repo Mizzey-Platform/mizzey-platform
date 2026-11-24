@@ -2439,3 +2439,39 @@ client chose that direction on 24 November 2026. These rulings replace two parts
 
 The design boards of the chosen direction carry these rules; `design/tokens/tokens.json` and its README now match
 them.
+
+## 2026-11-24 - D-36: the chosen design, and each stage is designed before it is built
+
+**Status: the owner's rulings of 24 November 2026, in chat.** They add no scope and change no fee or stage.
+
+| Question | Ruling |
+|---|---|
+| The design direction | The client chose Concept 1, Clay, on 24 November 2026 (passed on by phone; written confirmation to follow). It is the direction the storefront is built in. The interface design (PRE-03b) is still presented for the client's written approval |
+| The order of work | Stage 2, the shop front, is closed first: its screens and states are drawn in full in the design workspace, then built from specs/066. Each later stage's screens are drawn just before that stage is built |
+| How a design return is accepted | Each return is checked rendered, against the approved Version 1 of the direction and the owner's rulings, not only against the rules; the shared components are corrected first and every page reuses them |
+
+## 2026-11-24 - D-37: sign-in and verification codes by email, a recorded gift
+
+**Status: the owner's decision of 24 November 2026, in chat: verification by a code is more professional, easier and
+safer than a link alone, and is added as a gift.** Internal record. It adds no register row, changes no fee and is
+not a Change Request.
+
+**1. What is given.** Email verification (AUTH-05) and passwordless sign-in (AUTH-12) send a six-digit code by email,
+which the customer types or taps in on the site. The same email still carries the link, so AUTH-12's sign-in link is
+delivered as worded. The password reset stays a single-use link (AUTH-16).
+
+**2. Why it is a gift.** AUTH-12 names a link and AUTH-05 names no mechanism. Codes by SMS and phone OTP stay P2
+(INT-07) and are not delivered by this: the code goes by email only. Given on the owner's choice and recorded so it is
+never read as owed. When Stage 3 is presented, the client is told in writing that it is included at no charge.
+
+**3. How it reads.** The email subject starts with the code ("482913 is your Mizzey code", Arabic the same order,
+Western digits, no spaces), the preview line repeats it with its purpose and expiry, and the code is the first thing
+in the body, so it can be read from the notification and mail apps can offer to copy it. The site has one code field
+marked as a one-time code (`autocomplete="one-time-code"`, numeric keyboard), accepts paste, and submits when six
+digits are in. Phone keyboards that support it (for example Safari with Apple Mail) offer the code; where they do
+not, the customer copies it.
+
+**4. Engineering limits (D-21 security).** Six digits; valid 10 minutes; single use; only the newest code works; five
+wrong entries end it; resend after 60 seconds and a cap per hour; rate limits per account and per address; codes
+stored hashed and compared in constant time; never written to logs. The code is visible on a lock screen, the usual
+trade-off for convenience, kept small by the expiry and single use. Built in the Stage 3 sign-in spec.
