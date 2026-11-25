@@ -34,6 +34,9 @@ require_once __DIR__ . '/src/Storefront/ProductPage.php';
 require_once __DIR__ . '/src/Storefront/HomeSections.php';
 require_once __DIR__ . '/src/Blocks/TrustSignals.php';
 require_once __DIR__ . '/src/Blocks/SectionLibrary.php';
+require_once __DIR__ . '/src/Stock/CardStock.php';
+require_once __DIR__ . '/src/Storefront/ProductCard.php';
+require_once __DIR__ . '/src/Storefront/ProductRail.php';
 require_once __DIR__ . '/src/Search/Normalise.php';
 require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
@@ -221,6 +224,9 @@ MizzeySite\Storefront\HomeSections::register();
 
 // The section library: complete sections staff place on the front page, each language its own (G11): specs/066.
 MizzeySite\Blocks\SectionLibrary::register();
+
+// The product card and the rail that carries cards (PLP-01 to PLP-05, MER-01, MER-07, REV-04): specs/066, slice 4.
+MizzeySite\Storefront\ProductCard::register();
 
 // The store's own product search, its index, its synonym list and its term log: specs/058-search.
 MizzeySite\Search\Synonyms::register();

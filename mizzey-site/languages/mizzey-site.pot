@@ -523,8 +523,7 @@ msgid "XML-RPC is not available on this site."
 msgstr ""
 
 # Spec 066, slice 1: the theme's base components and the section library (K-4).
-#: mizzey-theme/inc/components.php:67
-#: mizzey-theme/inc/components.php:541
+#: mizzey-theme/inc/components.php:67 mizzey-theme/inc/components.php:541
 msgid "Loading"
 msgstr ""
 
@@ -555,8 +554,7 @@ msgstr ""
 msgid "Remove %s"
 msgstr ""
 
-#: mizzey-theme/inc/components.php:460
-#: mizzey-theme/inc/components.php:505
+#: mizzey-theme/inc/components.php:460 mizzey-theme/inc/components.php:505
 #: mizzey-theme/inc/components.php:640
 msgid "Close"
 msgstr ""
@@ -658,12 +656,10 @@ msgid "Return and refund policy"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:74
-#, js-format
 msgid "Item %d title"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:85
-#, js-format
 msgid "Item %d line"
 msgstr ""
 
@@ -680,17 +676,14 @@ msgid "Optional, in this page's language. For example: Why shop with us."
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:114
-#, js-format
 msgid "Item %d"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:118
-#, js-format
 msgid "Item %d mark"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:127
-#, js-format
 msgid "Item %d link"
 msgstr ""
 
@@ -727,3 +720,133 @@ msgstr ""
 msgctxt "block keyword"
 msgid "returns"
 msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Out of stock"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Only %d left"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to cart, choose options"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Add %s to cart"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Adding"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%s is in your cart. Add one more"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to wishlist"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Remove from wishlist"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Was"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Added"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Sold out"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%s:"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Quantity"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Decrease quantity"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Increase quantity"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Choose options"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to cart"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "This could not be added. Please try again."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Your wishlist could not be changed. Please try again."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Added to your cart"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "View cart"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "View all"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "Previous products"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "Next products"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "New"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Trending"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Limited"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Best Seller"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Rated %1$s out of 5, %2$d review"
+msgid_plural "Rated %1$s out of 5, %2$d reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%d option"
+msgid_plural "%d options"
+msgstr[0] ""
+msgstr[1] ""

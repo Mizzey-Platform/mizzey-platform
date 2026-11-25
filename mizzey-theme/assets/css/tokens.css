@@ -403,6 +403,11 @@
 	--mizzey-control-trust-disc-phone: 40px;
 	--mizzey-control-trust-van: 56px;
 	--mizzey-control-trust-van-phone: 48px;
+	--mizzey-control-card-well: 168px;
+	--mizzey-control-card-add: 36px;
+	--mizzey-control-card-foot: 64px;
+	--mizzey-control-card-foot-wide: 44px;
+	--mizzey-control-card-rail-phone: 156px;
 	--mizzey-breakpoint-phone: 320px;
 	--mizzey-breakpoint-tablet: 600px;
 	--mizzey-breakpoint-desktop: 1024px;
