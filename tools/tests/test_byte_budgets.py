@@ -11,8 +11,9 @@ Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
   WordPress Interactivity API runtime it imports, and the site plugin's storefront scripts that can load on any page
   (consent default and banner, tag manager, events, language cache). `ui.js` and the runtime load on every page on
   purpose: the header's drawers, which slice 2 builds, are on every page.
-- **Home**: every page, plus every library section's stylesheet and the artwork the theme ships for them, as if every
-  section were placed at once.
+- **Home**: every page, plus the header (slice 2), every library section's stylesheet and storefront module, the
+  styles they share, the product card's and rail's stylesheets and script (slice 4), and the artwork the theme ships
+  for them, as if every section were placed at once (slice 5).
 
 Not counted: WordPress's and WooCommerce's own assets, which this repository does not ship, the web fonts (their
 own budget), and the content images staff upload.
@@ -63,9 +64,13 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
         + [SITE / "assets" / name for name in ("consent-default.js", "consent.js", "gtm.js", "events.js", "language-cache.js")],
         "images": [],
     }
+    blocks = SITE / "src" / "Blocks"
+    cards = SITE / "src" / "Storefront" / "blocks"
     home = {
-        "styles": every["styles"] + sorted((SITE / "src" / "Blocks").glob("*/style.css")),
-        "scripts": list(every["scripts"]),
+        "styles": every["styles"] + [THEME / "assets" / "css" / "header.css", blocks / "library.css"]
+        + sorted(blocks.glob("*/style.css")) + sorted(cards.glob("*/style.css")),
+        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / "header.js"]
+        + sorted(blocks.glob("*/view.js")) + sorted(cards.glob("*/view.js")),
         "images": sorted((THEME / "assets" / "images").glob("*")),
     }
     return {"every page": every, "home": home}

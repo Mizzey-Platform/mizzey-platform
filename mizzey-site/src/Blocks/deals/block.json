@@ -1,0 +1,94 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/deals",
+	"title": "Deals",
+	"category": "mizzey-sections",
+	"icon": "tag",
+	"description": "Product cards on the Indigo panel, with a heading and a line, from a rule or picked by hand.",
+	"keywords": [
+		"deals",
+		"offers",
+		"sale"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"line": {
+			"type": "string",
+			"default": ""
+		},
+		"source": {
+			"type": "string",
+			"enum": [
+				"badge",
+				"category",
+				"collection",
+				"newest",
+				"sale",
+				"products"
+			],
+			"default": "badge"
+		},
+		"badge": {
+			"type": "string",
+			"enum": [
+				"trending",
+				"new",
+				"limited",
+				"best-seller"
+			],
+			"default": "trending"
+		},
+		"term": {
+			"type": "integer",
+			"default": 0
+		},
+		"products": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "integer"
+			}
+		},
+		"count": {
+			"type": "integer",
+			"default": 12
+		},
+		"link": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": [
+		"mizzey-section-library-editor",
+		"mizzey-product-card-style",
+		"mizzey-product-rail-style"
+	],
+	"style": [
+		"mizzey-home-sections",
+		"mizzey-product-rail-style",
+		"file:./style.css"
+	],
+	"render": "file:./render.php"
+}

@@ -1,0 +1,106 @@
+/* The featured collections (spec 066, slice 5: HOME-04), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop
+   draw them. Loaded only on a page that shows them, and in the editor. Tokens only, logical sides only.
+
+   Square images with corners 24, the collection's name on a white pill at the bottom start corner with a chevron that
+   points the way the page reads. Phone: two to a row, 12 apart, the pill 36 high in label type, 8 from the corner.
+   From 1024 wide: four to a row, 24 apart, the pill 44 high in body strong, 12 from the corner. */
+
+.mizzey-section.mizzey-collections {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-collections__list {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--mizzey-space-3);
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: 0;
+	margin-inline: auto;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-collections__link {
+	position: relative;
+	display: block;
+	aspect-ratio: 1;
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-tile);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-text);
+	text-decoration: none;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-collections__link:active {
+	transform: scale(var(--mizzey-motion-scale-press-card));
+}
+
+.mizzey-collections__link:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-collections__name {
+	position: absolute;
+	inset-block-end: var(--mizzey-space-2);
+	inset-inline-start: var(--mizzey-space-2);
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-1);
+	box-sizing: border-box;
+	max-inline-size: calc(100% - var(--mizzey-space-5));
+	block-size: var(--mizzey-control-chip);
+	padding-inline: var(--mizzey-space-3) var(--mizzey-space-1);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+}
+
+.mizzey-collections__text {
+	min-inline-size: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mizzey-collections__name .mizzey-icon {
+	flex-shrink: 0;
+	scale: var(--mizzey-dir) 1;
+}
+
+@media (min-width: 600px) {
+	.mizzey-section.mizzey-collections {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-section.mizzey-collections {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-collections__list {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--mizzey-space-5);
+	}
+
+	.mizzey-collections__name {
+		inset-block-end: var(--mizzey-space-3);
+		inset-inline-start: var(--mizzey-space-3);
+		block-size: var(--mizzey-control-target-min);
+		padding-inline: var(--mizzey-space-4) var(--mizzey-space-2);
+		font: var(--mizzey-type-body-strong);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-collections__link:active {
+		transform: none;
+	}
+}

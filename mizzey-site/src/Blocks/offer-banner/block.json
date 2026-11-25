@@ -1,0 +1,68 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/offer-banner",
+	"title": "Offer banner",
+	"category": "mizzey-sections",
+	"icon": "megaphone",
+	"description": "An image with a tag, a heading, a line and a button.",
+	"keywords": [
+		"offer",
+		"banner",
+		"promotion"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"imageId": {
+			"type": "integer",
+			"default": 0
+		},
+		"imageAlt": {
+			"type": "string",
+			"default": ""
+		},
+		"tag": {
+			"type": "string",
+			"default": ""
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"text": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaUrl": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": [
+		"mizzey-home-sections",
+		"file:./style.css"
+	],
+	"render": "file:./render.php"
+}

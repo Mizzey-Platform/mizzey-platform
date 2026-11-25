@@ -1,0 +1,22 @@
+/* The products section (spec 066, slice 5: HOME-02, HOME-03). Its heading, "View all", arrows and cards are the
+   product rail's (slice 4, Storefront/blocks/product-rail/style.css), which carries the section rhythm; this wrapper
+   only holds the rail as one library section. Tokens only, logical sides only. */
+
+.mizzey-section.mizzey-home-products {
+	inline-size: 100%;
+	max-inline-size: none;
+	margin: 0;
+}
+
+/* The rail keeps 8 under its cards for their shadow; the boards measure the next section from the cards (40 on a
+   phone, 72 from 1024 wide, C1-Home-Phone, C1-Home-Desktop), so the section ends at the cards. */
+.mizzey-home-products .mizzey-products__list {
+	margin-block-end: calc(var(--mizzey-space-2) * -1);
+}
+
+/* From 1024 wide the board puts the cards 24 under the heading row (C1-Home-Desktop); the rail keeps 4 above them. */
+@media (min-width: 1024px) {
+	.mizzey-home-products .mizzey-products__head {
+		margin-block-end: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
+	}
+}

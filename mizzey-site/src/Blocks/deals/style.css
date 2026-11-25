@@ -1,0 +1,74 @@
+/* The deals panel (spec 066, slice 5: HOME-07), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop draw it.
+   Loaded only on a page that shows it, and in the editor. Tokens only, logical sides only.
+
+   The product cards (the rail of slice 4) on the deep Indigo gradient, under a heading in white, its line and "View
+   all". Phone: the panel runs the full width, corners 24, 24 above and 16 below its content; the line sits under the
+   heading and the cards scroll sideways from the page margin. From 1024 wide: the panel sits inside the desktop
+   margin with 40 inside it, and the line sits beside the heading. */
+
+.mizzey-section.mizzey-deals {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-block: var(--mizzey-space-5) var(--mizzey-space-4);
+	padding-inline: 0;
+	border-radius: var(--mizzey-radius-tile);
+	background-image: var(--mizzey-gradient-deep);
+	color: var(--mizzey-color-role-text-on-brand);
+}
+
+.mizzey-deals__head {
+	flex-wrap: wrap;
+	row-gap: 0;
+	margin-block-end: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-deals__line {
+	order: 3;
+	flex-basis: 100%;
+	margin: 0;
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-deals .mizzey-products {
+	margin-block: var(--mizzey-space-3) 0;
+}
+
+@media (min-width: 600px) {
+	.mizzey-deals__head {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-section.mizzey-deals {
+		inline-size: auto;
+		max-inline-size: var(--mizzey-layout-content-width);
+		margin-inline: max(var(--mizzey-layout-margin-desktop), calc((100% - var(--mizzey-layout-content-width)) / 2));
+		padding: var(--mizzey-space-7);
+	}
+
+	.mizzey-deals__head {
+		flex-wrap: nowrap;
+		padding-inline: 0;
+	}
+
+	.mizzey-deals__line {
+		order: 0;
+		flex-basis: auto;
+	}
+
+	/* The cards 24 under the heading row and 40 above the panel's edge, as the board draws (the rail keeps 4 above
+	   and 8 under its cards for their shadow). */
+	.mizzey-deals .mizzey-products {
+		margin-block-start: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
+		padding-inline: 0;
+	}
+
+	.mizzey-deals .mizzey-products__list {
+		margin-block-end: calc(var(--mizzey-space-2) * -1);
+	}
+}

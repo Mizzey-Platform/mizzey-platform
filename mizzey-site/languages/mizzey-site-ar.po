@@ -937,10 +937,12 @@ msgid "Returns arrow"
 msgstr "سهم الإرجاع"
 
 #: src/Blocks/trust-signals/edit.js:29
+#: src/Blocks/hero/edit.js
 msgid "Authentic products, guaranteed"
 msgstr "منتجات أصلية مضمونة"
 
 #: src/Blocks/trust-signals/edit.js:29
+#: src/Blocks/hero/edit.js
 msgid "Authenticity guarantee"
 msgstr "ضمان الأصالة"
 
@@ -969,10 +971,16 @@ msgid "Item %d line"
 msgstr "سطر العنصر %d"
 
 #: src/Blocks/trust-signals/edit.js:102
+#: src/Blocks/brand-highlights/edit.js
+#: src/Blocks/category-shortcuts/edit.js
+#: src/Blocks/deals/edit.js
+#: src/Blocks/featured-collections/edit.js
+#: src/Blocks/products/edit.js
 msgid "Section"
 msgstr "القسم"
 
 #: src/Blocks/trust-signals/edit.js:106
+#: src/Blocks/hero/edit.js
 msgid "Name read by screen readers"
 msgstr "الاسم الذي تقرؤه برامج قراءة الشاشة"
 
@@ -1123,18 +1131,23 @@ msgid "Next products"
 msgstr "المنتجات التالية"
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
+#: src/Blocks/offer-banner/edit.js
 msgid "New"
 msgstr "جديد"
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Trending"
 msgstr "رائج"
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Limited"
 msgstr "كمية محدودة"
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Best Seller"
 msgstr "الأكثر مبيعًا"
 
@@ -1433,6 +1446,7 @@ msgid "Site footer"
 msgstr "تذييل الموقع"
 
 #: assets/js/site-parts-editor.js
+#: src/Blocks/hero/edit.js
 msgid "Slider"
 msgstr "متتالي"
 
@@ -1477,3 +1491,632 @@ msgstr "إذا لم تكن هناك رسالة بلغة ما، فلا يظهر �
 #, php-format
 msgid "© %1$s %2$s."
 msgstr "© %1$s %2$s."
+
+#: src/Blocks/signup/block.json
+msgctxt "block description"
+msgid "A heading, a line and a button to sign up."
+msgstr "عنوان وسطر وزر للاشتراك."
+
+#: src/Blocks/products/block.json
+msgctxt "block description"
+msgid "A row of product cards from a rule (a badge, a category, a collection, the newest, on sale) or picked by hand."
+msgstr "صف من بطاقات المنتجات حسب قاعدة (شارة أو قسم أو مجموعة أو الأحدث أو المخفّض) أو باختيار يدوي."
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block description"
+msgid "An image with a tag, a heading, a line and a button."
+msgstr "صورة مع وسم وعنوان وسطر وزر."
+
+#: src/Blocks/deals/block.json
+msgctxt "block description"
+msgid "Product cards on the Indigo panel, with a heading and a line, from a rule or picked by hand."
+msgstr "بطاقات منتجات على اللوحة النيلية مع عنوان وسطر، حسب قاعدة أو باختيار يدوي."
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block description"
+msgid "The brands marked to show on the home page, as chips, with a link to all brands."
+msgstr "الماركات المحددة للظهور في الصفحة الرئيسية، مع رابط لكل الماركات."
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block description"
+msgid "The categories marked to show on the home page, as image tiles, and a tile for all categories."
+msgstr "الأقسام المحددة للظهور في الصفحة الرئيسية في مربعات بالصور، ومربع لكل الأقسام."
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block description"
+msgid "The collections marked to show on the home page, as square images with their names."
+msgstr "المجموعات المحددة للظهور في الصفحة الرئيسية في صور مربعة بأسمائها."
+
+#: src/Blocks/hero/block.json
+msgctxt "block description"
+msgid "The first banner of the home page: one banner, or a slider of banners, each with its image, headline, line and button."
+msgstr "أول بانر في الصفحة الرئيسية: بانر واحد أو شرائح متتالية، لكل منها صورة وعنوان وسطر وزر."
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "account"
+msgstr "الحساب"
+
+#: src/Blocks/hero/block.json src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "banner"
+msgstr "بانر"
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block keyword"
+msgid "brands"
+msgstr "الماركات"
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "carousel"
+msgstr "عرض متتابع"
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "categories"
+msgstr "الأقسام"
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block keyword"
+msgid "collections"
+msgstr "المجموعات"
+
+#: src/Blocks/deals/block.json
+msgctxt "block keyword"
+msgid "deals"
+msgstr "العروض"
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block keyword"
+msgid "featured"
+msgstr "مميزة"
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "hero"
+msgstr "البانر الرئيسي"
+
+#: src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "new arrivals"
+msgstr "وصل حديثًا"
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "newsletter"
+msgstr "النشرة البريدية"
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "offer"
+msgstr "عرض"
+
+#: src/Blocks/deals/block.json
+msgctxt "block keyword"
+msgid "offers"
+msgstr "العروض"
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "products"
+msgstr "منتجات"
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "promotion"
+msgstr "ترويج"
+
+#: src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "rail"
+msgstr "صف"
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "sale"
+msgstr "تخفيض"
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block keyword"
+msgid "shop by brand"
+msgstr "تسوّق حسب الماركة"
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "shop by category"
+msgstr "تسوّق حسب القسم"
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "shortcuts"
+msgstr "اختصارات"
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "sign up"
+msgstr "اشترك"
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "slider"
+msgstr "شرائح"
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "trending"
+msgstr "رائج"
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block title"
+msgid "Brand highlights"
+msgstr "أبرز الماركات"
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block title"
+msgid "Category shortcuts"
+msgstr "اختصارات الأقسام"
+
+#: src/Blocks/deals/block.json
+msgctxt "block title"
+msgid "Deals"
+msgstr "العروض"
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block title"
+msgid "Featured collections"
+msgstr "مجموعات مميزة"
+
+#: src/Blocks/hero/block.json
+msgctxt "block title"
+msgid "Hero"
+msgstr "البانر الرئيسي"
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block title"
+msgid "Offer banner"
+msgstr "بانر عرض"
+
+#: src/Blocks/products/block.json
+msgctxt "block title"
+msgid "Products"
+msgstr "منتجات"
+
+#: src/Blocks/signup/block.json
+msgctxt "block title"
+msgid "Sign-up prompt"
+msgstr "دعوة للاشتراك"
+
+#: src/Blocks/hero/edit.js
+msgid "A wide image whose calm side sits under the words. The first slide's image loads first."
+msgstr "صورة عريضة يقع جانبها الهادئ تحت الكلمات. صورة الشريحة الأولى تُحمَّل أولًا."
+
+#: src/Blocks/deals/edit.js
+msgid "In this page's language. For example: Deals of the week."
+msgstr "بلغة هذه الصفحة. مثال: عروض الأسبوع."
+
+#: src/Blocks/featured-collections/edit.js
+msgid "In this page's language. For example: Featured collections."
+msgstr "بلغة هذه الصفحة. مثال: مجموعات مميزة."
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "In this page's language. For example: Shop by brand."
+msgstr "بلغة هذه الصفحة. مثال: تسوّق حسب الماركة."
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "In this page's language. For example: Shop by category."
+msgstr "بلغة هذه الصفحة. مثال: تسوّق حسب القسم."
+
+#: src/Blocks/products/edit.js
+msgid "In this page's language. For example: Trending now."
+msgstr "بلغة هذه الصفحة. مثال: الأكثر رواجًا الآن."
+
+#: src/Blocks/hero/edit.js
+msgid "Optional, in this page's language. For example: Offers."
+msgstr "اختياري، بلغة هذه الصفحة. مثال: العروض."
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Optional. The last tile's words."
+msgstr "اختياري. كلمات المربع الأخير."
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Optional. The link at the heading's end."
+msgstr "اختياري. الرابط في نهاية العنوان."
+
+#: src/Blocks/offer-banner/edit.js
+msgid "See what's new"
+msgstr "شاهد الجديد"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "This month's arrivals. All original stock."
+msgstr "وصل هذا الشهر. كل البضاعة أصلية."
+
+#: mizzey-site/src/Blocks/Hero.php
+#, php-format
+msgid "%1$d of %2$d"
+msgstr "%1$d من %2$d"
+
+#: mizzey-site/src/Blocks/TermSections.php
+#, php-format
+msgid "%s category"
+msgid_plural "%s categories"
+msgstr[0] "لا أقسام"
+msgstr[1] "قسم واحد"
+msgstr[2] "قسمان"
+msgstr[3] "%s أقسام"
+msgstr[4] "%s قسمًا"
+msgstr[5] "%s قسم"
+
+#: src/Blocks/library.js
+msgid "A badge"
+msgstr "شارة"
+
+#: src/Blocks/library.js
+msgid "A category"
+msgstr "قسم"
+
+#: src/Blocks/library.js
+msgid "A collection"
+msgstr "مجموعة"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "A wide image; its calm side sits under the words."
+msgstr "صورة عريضة يقع جانبها الهادئ تحت الكلمات."
+
+#: src/Blocks/hero/edit.js
+msgid "Add a slide"
+msgstr "إضافة شريحة"
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "All brands label"
+msgstr "نص رابط كل الماركات"
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "All brands link"
+msgstr "رابط كل الماركات"
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "All categories label"
+msgstr "نص مربع كل الأقسام"
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "All categories link"
+msgstr "رابط كل الأقسام"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "At least %d. The slider pauses while a visitor touches, hovers or focuses it."
+msgstr "%d على الأقل. تتوقف الشرائح عندما يلمسها الزائر أو يمرّ عليها بالمؤشر أو ينتقل إليها بلوحة المفاتيح."
+
+#: src/Blocks/library.js
+msgid "Badge"
+msgstr "الشارة"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner button link"
+msgstr "رابط زر البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner button"
+msgstr "زر البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner headline"
+msgstr "عنوان البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner image description"
+msgstr "وصف صورة البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner tag"
+msgstr "وسم البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner text"
+msgstr "نص البانر"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner"
+msgstr "البانر"
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Brand highlights"
+msgstr "أبرز الماركات"
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Category shortcuts"
+msgstr "اختصارات الأقسام"
+
+#: src/Blocks/library.js
+msgid "Category"
+msgstr "القسم"
+
+#: src/Blocks/library.js
+msgid "Choose image"
+msgstr "اختر صورة"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Choose slide %d image"
+msgstr "اختر صورة الشريحة %d"
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Choose the banner image"
+msgstr "اختر صورة البانر"
+
+#: src/Blocks/hero/edit.js
+msgid "Choose the logo for Indigo slides"
+msgstr "اختر الشعار للشرائح النيلية"
+
+#: src/Blocks/library.js
+msgid "Choose…"
+msgstr "اختر…"
+
+#: src/Blocks/library.js
+msgid "Collection"
+msgstr "المجموعة"
+
+#: src/Blocks/deals/edit.js
+msgid "Deals"
+msgstr "العروض"
+
+#: src/Blocks/featured-collections/edit.js
+msgid "Featured collections"
+msgstr "مجموعات مميزة"
+
+#: src/Blocks/hero/edit.js src/Blocks/offer-banner/edit.js
+msgid "For people who cannot see the image. Leave empty when it only decorates."
+msgstr "لمن لا يستطيع رؤية الصورة. اتركه فارغًا إذا كانت الصورة للزينة فقط."
+
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/offer-banner/edit.js
+msgid "Fresh on the beauty shelf"
+msgstr "وصل حديثًا لرفّ الجمال"
+
+#: src/Blocks/library.js
+msgid "Hand-picked products"
+msgstr "منتجات مختارة يدويًا"
+
+#: src/Blocks/brand-highlights/edit.js src/Blocks/category-shortcuts/edit.js
+#: src/Blocks/deals/edit.js src/Blocks/featured-collections/edit.js
+#: src/Blocks/products/edit.js
+msgid "Heading"
+msgstr "العنوان"
+
+#: src/Blocks/hero/edit.js
+msgid "Hero style"
+msgstr "شكل البانر الرئيسي"
+
+#: src/Blocks/hero/edit.js
+msgid "Hero"
+msgstr "البانر الرئيسي"
+
+#: src/Blocks/library.js
+msgid "How many products"
+msgstr "عدد المنتجات"
+
+#: src/Blocks/hero/edit.js
+msgid "Indigo"
+msgstr "نيلية"
+
+#: src/Blocks/hero/edit.js
+msgid "Light for a pale image, with dark words; Indigo for a deep image, with white words."
+msgstr "فاتحة للصورة الفاتحة مع كلمات داكنة، ونيلية للصورة الداكنة مع كلمات بيضاء."
+
+#: src/Blocks/hero/edit.js
+msgid "Light"
+msgstr "فاتحة"
+
+#: src/Blocks/deals/edit.js
+msgid "Line"
+msgstr "السطر"
+
+#: src/Blocks/hero/edit.js
+msgid "More slides"
+msgstr "شرائح أخرى"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Move slide %d earlier"
+msgstr "تقديم الشريحة %d"
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Next slide"
+msgstr "الشريحة التالية"
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "No brand is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr "لم تُحدَّد أي ماركة \"للإظهار في الصفحة الرئيسية\" بعد، لذلك لا يرى الزوار هذا القسم."
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "No category is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr "لم يُحدَّد أي قسم \"للإظهار في الصفحة الرئيسية\" بعد، لذلك لا يرى الزوار هذا القسم."
+
+#: src/Blocks/featured-collections/edit.js
+msgid "No collection is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr "لم تُحدَّد أي مجموعة \"للإظهار في الصفحة الرئيسية\" بعد، لذلك لا يرى الزوار هذا القسم."
+
+#: src/Blocks/deals/edit.js src/Blocks/products/edit.js
+msgid "No product matches this rule yet, so visitors do not see this section. It appears once a product matches."
+msgstr "لا يطابق أي منتج هذه القاعدة بعد، لذلك لا يرى الزوار هذا القسم. يظهر بمجرد أن يطابقها منتج."
+
+#: src/Blocks/library.js
+msgid "On sale"
+msgstr "المخفّضة"
+
+#: src/Blocks/signup/edit.js
+msgid "One short email when something worth knowing lands."
+msgstr "رسالة قصيرة واحدة عندما يصل ما يستحق أن تعرفه."
+
+#: src/Blocks/deals/edit.js
+msgid "Optional. For example: Up to 25% off this week."
+msgstr "اختياري. مثال: خصم حتى 25% هذا الأسبوع."
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Optional. The link shows only with its words and its address."
+msgstr "اختياري. يظهر الرابط فقط إذا وُجد نصه وعنوانه."
+
+#: src/Blocks/library.js
+msgid "Optional. Without one, a section by category or collection links to its page."
+msgstr "اختياري. بدونه يربط القسم المبني على قسم أو مجموعة بصفحتها."
+
+#: src/Blocks/signup/edit.js
+msgid "Optional. Without one, the button opens the account page, where a visitor signs up."
+msgstr "اختياري. بدونه يفتح الزر صفحة الحساب حيث يشترك الزائر."
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Optional. Without one, the tile opens the shop."
+msgstr "اختياري. بدونه يفتح المربع المتجر."
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Pause the slides"
+msgstr "إيقاف الشرائح مؤقتًا"
+
+#: src/Blocks/library.js
+msgid "Picked by hand"
+msgstr "اختيار يدوي"
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Play the slides"
+msgstr "تشغيل الشرائح"
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Previous slide"
+msgstr "الشريحة السابقة"
+
+#: src/Blocks/library.js
+msgid "Products from"
+msgstr "المنتجات من"
+
+#: src/Blocks/products/edit.js
+msgid "Products"
+msgstr "منتجات"
+
+#: src/Blocks/library.js
+msgid "Remove image"
+msgstr "إزالة الصورة"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Remove slide %d"
+msgstr "حذف الشريحة %d"
+
+#: src/Blocks/library.js
+msgid "Replace image"
+msgstr "استبدال الصورة"
+
+#: src/Blocks/hero/edit.js
+msgid "Seconds per slide"
+msgstr "ثوانٍ لكل شريحة"
+
+#: src/Blocks/hero/edit.js
+msgid "Show the logo on desktop"
+msgstr "إظهار الشعار على الكمبيوتر"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign up"
+msgstr "اشترك"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up button link"
+msgstr "رابط زر الاشتراك"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up button"
+msgstr "زر الاشتراك"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up headline"
+msgstr "عنوان الاشتراك"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up prompt"
+msgstr "دعوة للاشتراك"
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up text"
+msgstr "نص الاشتراك"
+
+#: src/Blocks/hero/edit.js
+msgid "Single banner"
+msgstr "بانر واحد"
+
+#: mizzey-site/src/Blocks/Hero.php
+#, php-format
+msgid "Slide %1$d of %2$d"
+msgstr "الشريحة %1$d من %2$d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d button link"
+msgstr "رابط زر الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d button"
+msgstr "زر الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d ground"
+msgstr "خلفية الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d headline"
+msgstr "عنوان الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d image description"
+msgstr "وصف صورة الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d line"
+msgstr "سطر الشريحة %d"
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d"
+msgstr "الشريحة %d"
+
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
+msgid "Stay in touch"
+msgstr "ابقَ على تواصل"
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "The brands marked \"Show on the home page\" appear here, in their position."
+msgstr "تظهر هنا الماركات المحدد لها \"الإظهار في الصفحة الرئيسية\" حسب ترتيبها."
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "The categories marked \"Show on the home page\" appear here, in their position. Set them on Products, Categories."
+msgstr "تظهر هنا الأقسام المحدد لها \"الإظهار في الصفحة الرئيسية\" حسب ترتيبها. اضبطها من المنتجات، الأقسام."
+
+#: src/Blocks/featured-collections/edit.js
+msgid "The collections marked \"Show on the home page\" appear here, in their position, up to four."
+msgstr "تظهر هنا المجموعات المحدد لها \"الإظهار في الصفحة الرئيسية\" حسب ترتيبها، حتى أربع."
+
+#: src/Blocks/hero/edit.js
+msgid "The logo file made for Indigo grounds. Light slides show the site logo."
+msgstr "ملف الشعار المصمم للخلفيات النيلية. الشرائح الفاتحة تعرض شعار الموقع."
+
+#: src/Blocks/library.js
+msgid "The newest"
+msgstr "الأحدث"
+
+#: src/Blocks/hero/edit.js
+msgid "The real thing, delivered"
+msgstr "الأصلي، حتى باب بيتك"
+
+#: src/Blocks/library.js
+msgid "View all link"
+msgstr "رابط عرض الكل"
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "carousel"
+msgstr "عرض متتابع"
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "slide"
+msgstr "شريحة"

@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/featured-collections",
+	"title": "Featured collections",
+	"category": "mizzey-sections",
+	"icon": "images-alt2",
+	"description": "The collections marked to show on the home page, as square images with their names.",
+	"keywords": [
+		"collections",
+		"featured"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": [
+		"mizzey-home-sections",
+		"file:./style.css"
+	],
+	"render": "file:./render.php"
+}

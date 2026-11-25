@@ -1,0 +1,76 @@
+/* The sign-up prompt (spec 066, slice 5: HOME-09), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop draw
+   it. Loaded only on a page that shows it, and in the editor. Tokens only, logical sides only.
+
+   A soft Indigo panel with corners 24 and a hairline edge. Phone: inside the page margin, 24 above and below and 16
+   in; the heading in H2, the line, then the button across the full width. From 1024 wide: inside the desktop margin,
+   56 in, the words on the start side and the button on the end side in the golden split the board draws. */
+
+.mizzey-section.mizzey-signup {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	inline-size: auto;
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: var(--mizzey-space-section);
+	margin-inline: var(--mizzey-layout-margin-phone);
+	padding-block: var(--mizzey-space-5);
+	padding-inline: var(--mizzey-space-4);
+	border-radius: var(--mizzey-radius-tile);
+	background-image: linear-gradient(135deg, var(--mizzey-color-glow-lower) 0%, var(--mizzey-color-glow-top) 60%, var(--mizzey-color-indigo-100) 100%);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-signup__heading {
+	margin: 0;
+	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-signup__text {
+	margin-block: var(--mizzey-space-2) 0;
+	margin-inline: 0;
+	font: var(--mizzey-type-body);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-signup__action {
+	display: flex;
+	margin-block-start: var(--mizzey-space-4);
+}
+
+.mizzey-signup .mizzey-signup__button {
+	flex: 1;
+}
+
+@media (min-width: 600px) {
+	.mizzey-section.mizzey-signup {
+		margin-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-section.mizzey-signup {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+		column-gap: var(--mizzey-space-8);
+		align-items: center;
+		margin-inline: max(var(--mizzey-layout-margin-desktop), calc((100% - var(--mizzey-layout-content-width)) / 2));
+		padding: var(--mizzey-space-8);
+	}
+
+	.mizzey-signup__text {
+		margin-block-start: var(--mizzey-space-3);
+	}
+
+	.mizzey-signup__action {
+		margin-block-start: 0;
+	}
+
+	.mizzey-signup .mizzey-signup__button {
+		flex: 0 0 auto;
+		block-size: var(--mizzey-control-button-large);
+		padding-inline: var(--mizzey-space-6);
+	}
+}

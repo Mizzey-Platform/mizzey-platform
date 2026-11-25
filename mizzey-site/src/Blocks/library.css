@@ -1,0 +1,77 @@
+/* What the home page's sections share on the storefront (spec 066, slice 5), as C1-Home-Phone, C1-Home-Phone-Arabic
+   and C1-Home-Desktop draw it: the heading row with its link at the end, the image tile, and the image well that
+   breathes the ZZ while a photo loads. Loaded with any section that uses them, and in the editor. Tokens only,
+   logical sides only.
+
+   The heading row is 48 high, the heading in H2 (23 on a phone, 31 from 1024 wide), the link in body strong,
+   underlined; it sits inside the page margin, and the section's content follows 16 under it (24 from 1024 wide). */
+
+.mizzey-home__head {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-4);
+	box-sizing: border-box;
+	min-block-size: var(--mizzey-control-target-preferred);
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: 0 var(--mizzey-space-4);
+	margin-inline: auto;
+}
+
+.mizzey-home__heading {
+	min-inline-size: 0;
+	margin: 0;
+	color: inherit;
+	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-home__all {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	min-block-size: var(--mizzey-control-target-min);
+	margin-inline-start: auto;
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-body-strong);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-motion-distance-nudge);
+	white-space: nowrap;
+}
+
+.mizzey-home__all:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-on-brand .mizzey-home__all {
+	color: var(--mizzey-color-role-text-on-brand);
+}
+
+.mizzey-on-brand .mizzey-home__all:focus-visible {
+	outline-color: var(--mizzey-color-role-focus-inverse);
+}
+
+/* A photo fills its tile; the tile keeps its square, tinted, before the photo arrives or without one. */
+.mizzey-home__tile-image {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+/* The breathing ZZ in the middle of an image well, under the photo, seen only until the photo paints. */
+.mizzey-home__well {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-home__head {
+		margin-block-end: var(--mizzey-space-5);
+	}
+}

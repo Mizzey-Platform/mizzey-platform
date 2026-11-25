@@ -234,6 +234,13 @@
 	display: none;
 }
 
+/* Each chip's item is exactly the chip: no line box of its own, which Tajawal's taller lines grew by 3 in Arabic, so
+   the row stays 36 + 12 in both languages (C1-Home-Phone). */
+.mizzey-header__chips li {
+	display: flex;
+	align-items: center;
+}
+
 .mizzey-header__chips .mizzey-chip {
 	font: var(--mizzey-type-label);
 }

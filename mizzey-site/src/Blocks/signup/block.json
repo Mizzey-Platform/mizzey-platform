@@ -1,0 +1,53 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/signup",
+	"title": "Sign-up prompt",
+	"category": "mizzey-sections",
+	"icon": "email",
+	"description": "A heading, a line and a button to sign up.",
+	"keywords": [
+		"sign up",
+		"newsletter",
+		"account"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"text": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaUrl": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

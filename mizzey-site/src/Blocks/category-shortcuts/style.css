@@ -1,0 +1,128 @@
+/* The category shortcuts (spec 066, slice 5: HOME-05), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop
+   draw them. Loaded only on a page that shows them, and in the editor. Tokens only, logical sides only.
+
+   Phone: four square tiles to a row, 12 apart, corners 20, each with its name under it in caption type, two lines at
+   most; the last tile is "All categories" with the grid mark, its name in Indigo. From 1024 wide: eight to a row, 24
+   apart, corners 24, the names in body strong, and the all-categories tile also says how many categories there are. */
+
+.mizzey-section.mizzey-shortcuts {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-shortcuts__list {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--mizzey-space-3);
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: 0;
+	margin-inline: auto;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-shortcuts__item {
+	display: flex;
+	min-inline-size: 0;
+}
+
+.mizzey-shortcuts__link {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-inline-size: 0;
+	color: var(--mizzey-color-role-text);
+	text-decoration: none;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-shortcuts__link:active {
+	transform: scale(var(--mizzey-motion-scale-press-card));
+}
+
+.mizzey-shortcuts__link:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+	border-radius: var(--mizzey-radius-card);
+}
+
+.mizzey-shortcuts__image {
+	display: block;
+	aspect-ratio: 1;
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-card);
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-shortcuts__image--all {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-shortcuts__count {
+	display: none;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-shortcuts__name {
+	display: -webkit-box;
+	min-block-size: 2lh;
+	margin-block-start: var(--mizzey-space-2);
+	overflow: hidden;
+	font: var(--mizzey-type-caption);
+	letter-spacing: var(--mizzey-type-caption-letter-spacing);
+	text-align: center;
+	overflow-wrap: anywhere;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+.mizzey-shortcuts__item--all .mizzey-shortcuts__name {
+	color: var(--mizzey-color-role-primary);
+}
+
+@media (min-width: 600px) {
+	.mizzey-section.mizzey-shortcuts {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-section.mizzey-shortcuts {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-shortcuts__list {
+		grid-template-columns: repeat(8, minmax(0, 1fr));
+		gap: var(--mizzey-space-5);
+	}
+
+	.mizzey-shortcuts__image {
+		border-radius: var(--mizzey-radius-tile);
+	}
+
+	.mizzey-shortcuts__count {
+		display: block;
+	}
+
+	.mizzey-shortcuts__name {
+		margin-block-start: var(--mizzey-space-3);
+		font: var(--mizzey-type-body-strong);
+		letter-spacing: var(--mizzey-type-body-strong-letter-spacing);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-shortcuts__link:active {
+		transform: none;
+	}
+}

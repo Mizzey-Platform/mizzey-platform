@@ -11,7 +11,8 @@ by PHP. This check reads the blocks as checked in and fails when:
 - a setting stores a side as left or right instead of inline-start or inline-end;
 - a block stylesheet holds a literal colour, size, time or font instead of a token, or a physical left or right;
 - an editor script needs a build (an `import`, JSX or a `package.json`), shows an English sentence outside a
-  `wp.i18n` call, or translates in another text domain;
+  `wp.i18n` call, or translates in another text domain (a section's storefront module, `view.js`, is checked for
+  the build and the sentences too, but runs without the `wp.*` globals);
 - the theme lets the editor's colour pickers offer more than the approved palette (custom colours, custom
   gradients, the default palettes, duotone).
 """
@@ -44,7 +45,9 @@ def listed_sections() -> list[str]:
 
 
 def editor_scripts() -> list[Path]:
-    return sorted(BLOCKS.rglob("*.js"))
+    """The editor scripts: every script of the library but a section's storefront module (view.js), which runs
+    without the editor's wp.* globals."""
+    return sorted(p for p in BLOCKS.rglob("*.js") if p.name != "view.js")
 
 
 I18N_CALL = re.compile(r"\b(?:__|_x|_n|_nx|sprintf)\(\s*(?:'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\")")
@@ -135,6 +138,13 @@ class EditorScriptsNeedNoBuild(unittest.TestCase):
                 self.assertIsNone(re.search(r"^\s*import\s|\brequire\(", text, re.M), "plain script: no import or require")
                 self.assertIsNone(re.search(r"return\s*\(?\s*<[A-Za-z]", text), "no JSX")
                 self.assertIn("window.wp", text, "the editor script uses the wp.* globals")
+
+    def test_a_storefront_module_needs_no_build_and_shows_no_words_of_its_own(self) -> None:
+        for script in sorted(BLOCKS.rglob("view.js")):
+            text = script.read_text(encoding="utf-8")
+            with self.subTest(script=script.parent.name):
+                self.assertIsNone(re.search(r"^\s*import\s|require\(", text, re.M), "plain module: no import or require")
+                self.assertEqual([], untranslated_sentences(text), "the words a visitor reads come from the server, translated")
 
     def test_every_sentence_is_translated_in_the_site_domain(self) -> None:
         for script in editor_scripts():

@@ -88,8 +88,12 @@ LAYER_SOURCES = {
     "integration/baseline": (BASELINE, ("setup.php", "ia-endpoints.php", "wpml-settings.php")),
 }
 SEED_SCRIPTS = ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
-                "30-catalogue-translations.php", "40-orders.php", "50-reports.php")
+                "30-catalogue-translations.php", "40-orders.php", "50-reports.php", "60-home-page.php", "65-site-parts.php")
 PARITY_FILES = ("wpml-remote-config.json", "wpml-development-settings.json")
+# The logo files the home page seed sets (seed/60-home-page.php). The brand identity is not public before launch, so
+# they are never in the repository: they wait on the server in MIZZEY_STAGING_BRAND_DIR (default
+# ~/mizzey-staging/brand/), copied there by hand, and reach the container through the layer's brand/ folder.
+BRAND_FILES = ("logo-light.png", "logo-indigo.png")
 BOSTA_DISTRICTS = "bosta-districts.json"
 NOT_HERE = {
     "db-create": "the server creates the database and its account when it creates the site",
@@ -242,6 +246,14 @@ def layer_files() -> dict[str, Path]:
     carried = STATE / "parity" / PARITY_FILES[0]
     if carried.is_file():
         files[f"parity/{PARITY_FILES[0]}"] = carried
+    # The home page seed's banner artwork (no brand, label or face), beside the seed that adds it.
+    for picture in sorted((HERE / "seed" / "home-art").glob("*.webp")):
+        files[f"staging/seed/home-art/{picture.name}"] = picture
+    # The logo files, from the server only, when they have been put there.
+    brand = Path(os.environ.get("MIZZEY_STAGING_BRAND_DIR") or STATE / "brand")
+    for name in BRAND_FILES:
+        if (brand / name).is_file():
+            files[f"brand/{name}"] = brand / name
     # Bosta's district list, which the staging plugin answers the carrier plugin's request from.
     districts = STATE / "parity" / BOSTA_DISTRICTS
     if districts.is_file():
