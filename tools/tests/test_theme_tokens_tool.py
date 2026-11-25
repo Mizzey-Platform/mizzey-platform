@@ -154,6 +154,15 @@ class ThemeJson(Fixture):
         for key in ("defaultPalette", "defaultGradients"):
             self.assertIs(False, s["color"][key])
 
+    def test_a_colour_marked_off_the_editor_palette_stays_a_token_only(self) -> None:
+        fixture = json.loads(json.dumps(FIXTURE))
+        fixture["color"]["brand"]["orange"] = tok("color", "#FF6A4A", editorPalette=False)
+        self.tokens_path.write_text(json.dumps(fixture), encoding="utf-8")
+        tokens = tt.load_tokens(self.tokens_path)
+        palette = tt.render_theme_json({"version": 3, "settings": {}}, tokens, FONTS)["settings"]["color"]["palette"]
+        self.assertNotIn("#FF6A4A", [p["color"] for p in palette])
+        self.assertIn("--mizzey-color-brand-orange: #FF6A4A;", tt.render_css(tokens, FONTS))
+
     def test_keys_the_tool_does_not_own_are_kept(self) -> None:
         self.assertEqual({"keep": "me"}, self.json["styles"])
         self.assertIs(True, self.json["settings"]["appearanceTools"])

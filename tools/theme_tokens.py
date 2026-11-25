@@ -8,7 +8,8 @@ radius, shadow, font, motion, layout and control value. This tool writes, from i
   a `font` shorthand; the type roles (`--mizzey-type-<role>-*`), Latin by default and Arabic on `:lang(ar)` where
   an Arabic role exists; and the reduced-motion form, where every duration takes `motion.duration.reduced` except
   those marked `keepWhenReduced` (fades of 120 ms or less stay, C1-System 11);
-- the generated part of `<theme>/theme.json` `settings`: the palette, the gradients, the font families with their
+- the generated part of `<theme>/theme.json` `settings`: the palette (less any colour marked
+  `$extensions.mizzey.editorPalette: false`), the gradients, the font families with their
   faces (from `<theme>/assets/fonts/fonts.json`, which `tools/theme_fonts.py` writes), the font sizes, the spacing
   scale, the radius sizes, the shadow presets, and the layout widths. Every other key is kept as it is.
 
@@ -250,8 +251,10 @@ def render_theme_json(theme: dict, tokens: dict[str, dict], manifest: dict) -> d
     color = settings.setdefault("color", {})
     color["defaultPalette"] = False
     color["defaultGradients"] = False
+    # A colour marked `editorPalette: false` stays a token for the theme's own styles but is not offered in the
+    # editor's colour pickers: Persimmon is a fill in fixed places only, never text (D-35).
     color["palette"] = [{"slug": slug(p), "name": label(p.split(".", 1)[1]), "color": resolve(t["$value"], tokens)}
-                        for p, t in of("color")]
+                        for p, t in of("color") if mizzey(t).get("editorPalette", True) is not False]
     color["gradients"] = [{"slug": slug(p), "name": label(p.split(".", 1)[1]),
                            "gradient": css_value(t, literal=True, tokens=tokens)} for p, t in of("gradient")]
 
