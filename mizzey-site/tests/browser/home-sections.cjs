@@ -518,13 +518,47 @@ const find = ( view, type ) => view.sections.find( ( s ) => s.type === type ) ||
 		await slide.locator( '.mizzey-hero__arrow' ).last().click();
 		await slide.waitForTimeout( 800 );
 		check( await active( slide ) === ( paused + 1 ) % 2, 'HOME-01 the arrow shows the next slide' );
+		// Play, pressed with the mouse, leaves the keyboard focus on the button: it still runs the slides at once and
+		// again a slide later, over the focus hold of that moment.
+		const beforePlay = await active( slide );
+		await slide.locator( '.mizzey-hero__pause' ).click();
+		await slide.mouse.move( 5, 890 );
+		await slide.waitForTimeout( 800 );
+		const onPlay = await active( slide );
+		const playLabel = await slide.locator( '.mizzey-hero__pause' ).getAttribute( 'aria-label' );
+		const focusOnButton = await slide.evaluate( () => !! document.activeElement && document.activeElement.classList.contains( 'mizzey-hero__pause' ) );
+		await slide.waitForTimeout( 6800 );
+		const afterPlay = await active( slide );
+		check( focusOnButton && onPlay === ( beforePlay + 1 ) % 2 && afterPlay === ( onPlay + 1 ) % 2 && playLabel === 'Pause the slides', `HOME-01 Play restarts the slider at once and within one slide's time, with the focus on the button (${ beforePlay }, ${ onPlay }, ${ afterPlay }, ${ playLabel }, focus on the button: ${ focusOnButton })` );
+		// The next hold begins: the focus moves to an arrow in the hero, and the slider holds again.
+		await slide.locator( '.mizzey-hero__arrow' ).first().focus();
+		const focusHeld = await active( slide );
+		await slide.waitForTimeout( 7000 );
+		check( await active( slide ) === focusHeld, 'HOME-01 after Play, the focus elsewhere in the hero holds the slider again' );
+		await slide.locator( '.mizzey-hero__viewport' ).hover();
+		const hoverHeld = await active( slide );
+		await slide.waitForTimeout( 7000 );
+		check( await active( slide ) === hoverHeld, 'HOME-01 after Play, hovering the hero holds the slider again' );
 		await moving.close();
 		const calm = await browser.newContext( { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' } );
 		const still = await calm.newPage();
 		await still.goto( plan.en.view, { waitUntil: 'load', timeout: TIMEOUT } );
 		await still.mouse.move( 5, 890 );
 		await still.waitForTimeout( 7500 );
-		check( await active( still ) === 0, 'K-5 under reduced motion the slider stays still' );
+		const calmLabel = await still.locator( '.mizzey-hero__pause' ).getAttribute( 'aria-label' );
+		check( await active( still ) === 0 && calmLabel === 'Play the slides', `K-5 under reduced motion the slider starts still and its button offers to play it (${ calmLabel })` );
+		await still.locator( '.mizzey-hero__pause' ).click();
+		await still.mouse.move( 5, 890 );
+		await still.waitForTimeout( 800 );
+		const calmOn = await active( still );
+		const calmPlaying = await still.locator( '.mizzey-hero__pause' ).getAttribute( 'aria-label' );
+		await still.waitForTimeout( 6800 );
+		const calmNext = await active( still );
+		check( calmOn === 1 && calmNext === 0 && calmPlaying === 'Pause the slides', `K-5 under reduced motion, an explicit Play runs the slides and the button then offers to pause (${ calmOn }, ${ calmNext }, ${ calmPlaying })` );
+		await still.locator( '.mizzey-hero__pause' ).click();
+		const calmStopped = await active( still );
+		await still.waitForTimeout( 7000 );
+		check( await active( still ) === calmStopped && await still.locator( '.mizzey-hero__pause' ).getAttribute( 'aria-label' ) === 'Play the slides', 'K-5 under reduced motion, Pause stops it again and the button offers to play' );
 		await calm.close();
 
 		check( errors.length === 0, `no script error from the library's scripts${ errors.length ? ': ' + errors.slice( 0, 3 ).join( ' | ' ) : '' } (other script errors in this editor: ${ otherErrors })` );

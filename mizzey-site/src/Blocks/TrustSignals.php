@@ -52,7 +52,7 @@ final class TrustSignals
         if ([] === $items) {
             return '';
         }
-        $label   = self::text($attributes['label'] ?? '');
+        $label   = Section::plain($attributes['label'] ?? '');
         $wrapper = get_block_wrapper_attributes(
             ['class' => 'mizzey-section mizzey-trust alignfull'] + ('' === $label ? [] : ['aria-label' => $label])
         );

@@ -23,10 +23,22 @@ use MizzeySite\Storefront\ProductCard;
  */
 final class Section
 {
-    /** The words of a plain field. */
+    /**
+     * The words of a field written in place (RichText): it stores markup with its text as entities, so the tags go and
+     * the entities are decoded (TrustSignals::text). Escape the result where it is printed.
+     */
     public static function text($value): string
     {
         return TrustSignals::text($value);
+    }
+
+    /**
+     * The words of a text field in the sidebar (TextControl): stored raw, so every character is a character and "<" is
+     * never the start of a tag ("Under <EGP 500" stays whole). Escape the result where it is printed.
+     */
+    public static function plain($value): string
+    {
+        return is_scalar($value) ? trim((string) $value) : '';
     }
 
     /**

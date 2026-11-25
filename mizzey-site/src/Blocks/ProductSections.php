@@ -42,7 +42,7 @@ final class ProductSections
         if ([] === $ids) {
             return '';
         }
-        $heading = Section::text($attributes['heading'] ?? '');
+        $heading = Section::plain($attributes['heading'] ?? '');
         $rail    = ProductRail::render($ids, ['heading' => $heading, 'link' => self::link($attributes), 'label' => $heading]);
         if ('' === $rail) {
             return '';
@@ -54,17 +54,17 @@ final class ProductSections
     public static function renderDeals(array $attributes): string
     {
         $ids     = self::productIds($attributes);
-        $heading = Section::text($attributes['heading'] ?? '');
+        $heading = Section::plain($attributes['heading'] ?? '');
         $rail    = [] === $ids ? '' : ProductRail::render($ids, ['label' => $heading]);
         if ('' === $rail) {
             return '';
         }
-        $line = Section::rich($attributes['line'] ?? '');
+        $line = Section::plain($attributes['line'] ?? '');
         $link = esc_url(self::link($attributes));
         // The line sits beside the heading on a desktop and under it on a phone (style.css), so it is in the head row.
         $head = Section::el('div', ['class' => ['mizzey-home__head', 'mizzey-deals__head']],
             ('' !== $heading ? Section::el('h2', ['class' => 'mizzey-home__heading'], esc_html($heading)) : '')
-            . ('' !== $line ? Section::el('p', ['class' => 'mizzey-deals__line'], $line) : '')
+            . ('' !== $line ? Section::el('p', ['class' => 'mizzey-deals__line'], esc_html($line)) : '')
             . ('' !== $link ? Section::el('a', ['class' => 'mizzey-home__all', 'href' => $link], esc_html__('View all', 'mizzey-site')) : ''));
         return sprintf(
             '<section %s>%s%s</section>',
@@ -103,8 +103,9 @@ final class ProductSections
         $count  = $count > 0 ? min(self::MAX, $count) : self::FALLBACK;
 
         if ('products' === $source) {
+            // The editor sets no count for a hand-picked list: every pick shows, up to the maximum its field allows.
             $picked = array_values(array_filter(array_map('intval', (array) ($attributes['products'] ?? []))));
-            return array_slice($picked, 0, $count);
+            return array_slice($picked, 0, self::MAX);
         }
 
         $args = [

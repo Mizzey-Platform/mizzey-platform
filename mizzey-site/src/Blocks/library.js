@@ -185,6 +185,8 @@
 				__next40pxDefaultSize: true,
 				__nextHasNoMarginBottom: true,
 				label: __( 'Hand-picked products', 'mizzey-site' ),
+				// The storefront shows every pick up to this limit (ProductSections::MAX), so the field takes no more.
+				maxLength: data.maxCount || 24,
 				value: picked.map( nameOf ),
 				suggestions: found.filter( ( p ) => picked.indexOf( p.id ) === -1 ).map( ( p ) => `${ title( p ) } (#${ p.id })` ),
 				onInputChange: setSearch,

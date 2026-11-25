@@ -50,7 +50,7 @@ final class TermSections
         }
         $allUrl = trim((string) ($attributes['allUrl'] ?? ''));
         $allUrl = '' !== $allUrl ? $allUrl : (function_exists('wc_get_page_permalink') ? (string) wc_get_page_permalink('shop') : '');
-        $label  = Section::text($attributes['allLabel'] ?? '');
+        $label  = Section::plain($attributes['allLabel'] ?? '');
         if ('' !== esc_url($allUrl)) {
             $count  = self::categoryCount();
             /* translators: %s: the number of product categories, as digits. */
@@ -60,7 +60,7 @@ final class TermSections
                     self::icon('gridf', 32) . Section::el('span', ['class' => 'mizzey-shortcuts__count'], esc_html($counted)))
                 . Section::el('span', ['class' => 'mizzey-shortcuts__name'], esc_html('' !== $label ? $label : __('All categories', 'mizzey-site')))));
         }
-        $heading = Section::text($attributes['heading'] ?? '');
+        $heading = Section::plain($attributes['heading'] ?? '');
         $id      = wp_unique_id('mizzey-shortcuts-');
         return sprintf(
             '<section %s>%s<ul class="mizzey-shortcuts__list" role="list">%s</ul></section>',
@@ -83,7 +83,7 @@ final class TermSections
                 self::image((string) $term['image'])
                 . Section::el('span', ['class' => 'mizzey-collections__name'], Section::el('span', ['class' => 'mizzey-collections__text'], esc_html((string) $term['name'])) . self::icon('fwd', 20))));
         }
-        $heading = Section::text($attributes['heading'] ?? '');
+        $heading = Section::plain($attributes['heading'] ?? '');
         $id      = wp_unique_id('mizzey-collections-');
         return sprintf(
             '<section %s>%s<ul class="mizzey-collections__list" role="list">%s</ul></section>',
@@ -105,12 +105,12 @@ final class TermSections
             $chips .= Section::el('li', ['class' => 'mizzey-brands__item'], Section::el('a', ['class' => 'mizzey-brands__link', 'href' => esc_url((string) $term['url'])],
                 Section::el('span', ['class' => 'mizzey-brands__chip'], esc_html((string) $term['name']))));
         }
-        $heading = Section::text($attributes['heading'] ?? '');
+        $heading = Section::plain($attributes['heading'] ?? '');
         $id      = wp_unique_id('mizzey-brands-');
         return sprintf(
             '<section %s>%s<ul class="mizzey-brands__list" role="list">%s</ul></section>',
             Section::wrapper('brand-highlights', ['mizzey-brands'], ['aria-labelledby' => '' !== $heading ? $id : null]),
-            Section::head($heading, Section::text($attributes['allLabel'] ?? ''), (string) ($attributes['allUrl'] ?? ''), $id),
+            Section::head($heading, Section::plain($attributes['allLabel'] ?? ''), (string) ($attributes['allUrl'] ?? ''), $id),
             $chips
         );
     }

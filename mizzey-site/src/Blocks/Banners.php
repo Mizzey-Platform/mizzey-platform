@@ -36,7 +36,7 @@ final class Banners
         }
         $tag   = Section::text($attributes['tag'] ?? '');
         $text  = Section::rich($attributes['text'] ?? '');
-        $image = Section::image((int) ($attributes['imageId'] ?? 0), Section::text($attributes['imageAlt'] ?? ''), 'mizzey-offer__image', Hero::sizes(), ['loading' => 'lazy']);
+        $image = Section::image((int) ($attributes['imageId'] ?? 0), Section::plain($attributes['imageAlt'] ?? ''), 'mizzey-offer__image', Hero::sizes(), ['loading' => 'lazy']);
         return sprintf(
             '<section %s><div class="mizzey-offer__card">%s<div class="mizzey-offer__body">%s%s%s%s</div></div></section>',
             Section::wrapper('offer-banner', ['mizzey-offer', '' === $image ? 'mizzey-offer--no-image' : '']),

@@ -28,9 +28,11 @@
 
 namespace MizzeySite\Tests\Integration;
 
+use MizzeySite\Blocks\Banners;
 use MizzeySite\Blocks\Hero;
 use MizzeySite\Blocks\ProductSections;
 use MizzeySite\Blocks\TermSections;
+use MizzeySite\Blocks\TrustSignals;
 use MizzeySite\Catalogue\ProductFields;
 use MizzeySite\Storefront\HomeSections;
 
@@ -210,6 +212,39 @@ run(
 		$check( str_contains( $imgs[0][1] ?? '', 'loading="lazy"' ), 'K-6 the later slides\' images wait until needed' );
 		$check( str_contains( $slider, 'line two' ) && str_contains( $slider, '<br' ) && str_contains( $slider, '<strong>25%</strong>' ), 'HOME-01 a headline keeps its line break and a line its bold figure, as the boards draw them' );
 		$check( '' === Hero::render( array( 'slides' => array( array( 'title' => '' ) ) ) ), 'AC-3 a hero with no headline and no image renders nothing' );
+
+		// ---- HOME-10: products picked by hand are never cut without a word --------------------------------------------
+		// The editor offers no count for a hand-picked list, so a stale count (12 by default) must not drop a pick; the
+		// list stops only at the section's stated maximum, which the editor's field enforces too (maxCount).
+		$picks = range( 900001, 900013 );
+		$check( $picks === ProductSections::productIds( array( 'source' => 'products', 'products' => $picks, 'count' => 12 ) ) && $picks === ProductSections::productIds( array( 'source' => 'products', 'products' => $picks ) ), 'HOME-10 thirteen products picked by hand show all thirteen, in order, whatever the count setting holds' );
+		$lots = range( 900001, 900000 + ProductSections::MAX + 6 );
+		$check( array_slice( $lots, 0, ProductSections::MAX ) === ProductSections::productIds( array( 'source' => 'products', 'products' => $lots ) ), 'HOME-10 a hand-picked list stops at the section\'s stated maximum (' . ProductSections::MAX . '), the limit the editor\'s field sets' );
+
+		// ---- A plain text field keeps every character the editor typed ------------------------------------------------
+		// A text field (not written in place) stores its words raw: "<" is a character there, never the start of a tag.
+		$lt_a     = 'Under <EGP 500';
+		$lt_b     = 'Save <50% today';
+		$survives = static fn ( string $html, string $words ): bool => str_contains( $html, esc_html( $words ) );
+		$fields   = array(
+			'products heading'              => static fn ( string $w ): string => ProductSections::renderProducts( array( 'source' => 'products', 'products' => array( $sale ), 'heading' => $w ) ),
+			'deals heading'                 => static fn ( string $w ): string => ProductSections::renderDeals( array( 'source' => 'products', 'products' => array( $sale ), 'heading' => $w ) ),
+			'deals line'                    => static fn ( string $w ): string => ProductSections::renderDeals( array( 'source' => 'products', 'products' => array( $sale ), 'heading' => 'x', 'line' => $w ) ),
+			'category shortcuts heading'    => static fn ( string $w ): string => TermSections::renderCategories( array( 'heading' => $w ) ),
+			'category shortcuts all label'  => static fn ( string $w ): string => TermSections::renderCategories( array( 'heading' => 'x', 'allLabel' => $w ) ),
+			'featured collections heading'  => static fn ( string $w ): string => TermSections::renderCollections( array( 'heading' => $w ) ),
+			'brand highlights heading'      => static fn ( string $w ): string => 0 === $brand ? esc_html( $w ) : TermSections::renderBrands( array( 'heading' => $w ) ),
+			'brand highlights all label'    => static fn ( string $w ): string => 0 === $brand ? esc_html( $w ) : TermSections::renderBrands( array( 'heading' => 'x', 'allLabel' => $w, 'allUrl' => home_url( '/brands/' ) ) ),
+			'hero name for screen readers'  => static fn ( string $w ): string => Hero::render( array( 'variant' => 'slider', 'slides' => $slides, 'label' => $w ) ),
+			'hero slide image description'  => static fn ( string $w ): string => Hero::render( array( 'variant' => 'single', 'slides' => array( array( 'imageAlt' => $w ) + $slides[0] ) ) ),
+			'offer banner image description' => static fn ( string $w ): string => Banners::renderOffer( array( 'heading' => 'x', 'imageId' => $wide, 'imageAlt' => $w ) ),
+			'trust signals name for screen readers' => static fn ( string $w ): string => TrustSignals::render( array( 'label' => $w, 'items' => array( array( 'title' => 'x' ) ) ) ),
+		);
+		foreach ( $fields as $field => $render_field ) {
+			$check( $survives( $render_field( $lt_a ), $lt_a ) && $survives( $render_field( $lt_b ), $lt_b ), "SSC-02 the {$field}, a text field, keeps \"{$lt_a}\" and \"{$lt_b}\" whole" );
+		}
+		// A field written in place stores its text as entities, and still reads whole.
+		$check( $survives( Banners::renderOffer( array( 'heading' => esc_html( $lt_a ), 'text' => esc_html( $lt_b ) ) ), $lt_a ) && $survives( Banners::renderOffer( array( 'heading' => 'x', 'text' => esc_html( $lt_b ) ) ), $lt_b ), 'SSC-02 the offer banner\'s words written in place keep "<" too' );
 
 		// ---- The front page in each language, and the editor account --------------------------------------------------
 		do_action( 'wpml_switch_language', 'en' );

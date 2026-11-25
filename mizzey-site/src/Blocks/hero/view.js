@@ -7,8 +7,11 @@
  *
  * - At least six seconds a slide (the section's data-interval, never below MOTION.minSeconds).
  * - It holds while the visitor touches, hovers or focuses it, or the page is hidden, and starts again after.
- * - The pause button stops it until it is pressed again.
- * - Under reduced motion it never moves by itself; the arrows and a swipe still change the slide, without animation.
+ * - The pause button stops it until it is pressed again. Play moves on at once, over the hover, focus or touch hold of
+ *   that moment (pressing it puts the focus on the button), until the next hold begins: the rule of the announcement
+ *   strip (mizzey-theme/assets/js/site-parts.js).
+ * - Under reduced motion it starts paused and moves only after an explicit Play, without animation; the arrows and a
+ *   swipe still change the slide. The button's name always says what pressing it does.
  * - Only the slide shown can be reached by keyboard and read; the others are inert.
  *
  * How it moves is kept here, in MOTION, and in style.css under [data-motion]: another way from C1-Slider-Options is a
@@ -44,7 +47,7 @@ function setup( hero ) {
 	const holds = { hover: false, focus: false, touch: false, hidden: false };
 
 	const rtl = () => getComputedStyle( track ).direction === 'rtl';
-	const held = () => stopped || calm.matches || Object.values( holds ).some( Boolean );
+	const held = () => stopped || Object.values( holds ).some( Boolean );
 
 	function show( next ) {
 		index = next;
@@ -79,7 +82,7 @@ function setup( hero ) {
 	function restart() {
 		window.clearTimeout( timer );
 		hero.classList.remove( 'is-running' );
-		hero.classList.toggle( 'is-paused', stopped || calm.matches );
+		hero.classList.toggle( 'is-paused', stopped );
 		if ( held() ) {
 			return;
 		}
@@ -112,14 +115,31 @@ function setup( hero ) {
 	}, { passive: true } );
 
 	hero.querySelectorAll( '.mizzey-hero__arrow' ).forEach( ( arrow ) => arrow.addEventListener( 'click', () => go( index + Number( arrow.dataset.step || 1 ) ) ) );
-	if ( pause ) {
-		pause.addEventListener( 'click', () => {
-			stopped = ! stopped;
+	function name() {
+		if ( pause ) {
 			pause.setAttribute( 'aria-label', stopped ? pause.dataset.labelPlay : pause.dataset.labelPause );
-			restart();
-		} );
-		pause.setAttribute( 'aria-label', stopped || calm.matches ? pause.dataset.labelPlay : pause.dataset.labelPause );
+		}
 	}
+
+	function setStopped( on ) {
+		stopped = on;
+		name();
+		if ( on ) {
+			restart();
+			return;
+		}
+		// An explicit play overrides the hover, focus or touch hold of the moment (the next one holds again) and moves on
+		// at once. The page being hidden is not a hold a press can lift.
+		holds.hover = false;
+		holds.focus = false;
+		holds.touch = false;
+		go( index + 1 );
+	}
+
+	if ( pause ) {
+		pause.addEventListener( 'click', () => setStopped( ! stopped ) );
+	}
+	name();
 	const viewport = hero.querySelector( '.mizzey-hero__viewport' ) || hero;
 	viewport.addEventListener( 'pointerenter', ( e ) => e.pointerType === 'mouse' && hold( 'hover', true ) );
 	viewport.addEventListener( 'pointerleave', ( e ) => e.pointerType === 'mouse' && hold( 'hover', false ) );
@@ -131,9 +151,8 @@ function setup( hero ) {
 	document.addEventListener( 'visibilitychange', () => hold( 'hidden', document.hidden ) );
 	calm.addEventListener( 'change', () => {
 		if ( calm.matches ) {
-			stopped = true;
+			setStopped( true );
 		}
-		restart();
 	} );
 
 	show( 0 );

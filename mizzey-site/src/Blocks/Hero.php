@@ -61,7 +61,7 @@ final class Hero
         foreach ($slides as $index => $slide) {
             $html .= self::slide($slide, $index, $total, $slider, $logos);
         }
-        $label    = Section::text($attributes['label'] ?? '');
+        $label    = Section::plain($attributes['label'] ?? '');
         $interval = max(self::MIN_INTERVAL, (int) ($attributes['interval'] ?? self::MIN_INTERVAL));
 
         return sprintf(
@@ -91,7 +91,7 @@ final class Hero
             $slide = is_array($slide) ? $slide : [];
             $row   = [
                 'imageId'  => (int) ($slide['imageId'] ?? 0),
-                'imageAlt' => Section::text($slide['imageAlt'] ?? ''),
+                'imageAlt' => Section::plain($slide['imageAlt'] ?? ''),
                 'tone'     => in_array($slide['tone'] ?? '', self::TONES, true) ? (string) $slide['tone'] : 'light',
                 'title'    => Section::rich($slide['title'] ?? ''),
                 'line'     => Section::rich($slide['line'] ?? ''),
