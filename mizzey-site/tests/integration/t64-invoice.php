@@ -144,7 +144,9 @@ run(
 		wc_create_refund( array( 'order_id' => $first->get_id(), 'amount' => '30', 'reason' => 't64' ) );
 		$html  = InvoiceDocument::html( wc_get_order( $first->get_id() ) );
 		$text  = wp_strip_all_tags( str_replace( '<', ' <', $html ) );
-		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', '100.00', '200.00', 'Discount', '20.00', '50.00', '15.00', '245.00', 'Refunded', '30.00', '215.00' );
+		// Amounts as the boards draw them (owner ruling of 25 November 2026): EGP, a non-breaking space, no .00 on whole pounds.
+		$egp   = static fn ( string $amount ): string => "EGP\u{00A0}" . $amount;
+		$wants = array( 't64 Trading Company', '12 Nile Street', '123-456-789', 'CR 98765', $number1, (string) $first->get_order_number(), 'Mona Sayed', 'Garden City', '01000000000', 't64 serum', 't64 gift wrap', $egp( '100' ), $egp( '200' ), 'Discount', $egp( '20' ), $egp( '50' ), $egp( '15' ), $egp( '245' ), 'Refunded', $egp( '30' ), $egp( '215' ) );
 		$missing = array_values( array_filter( $wants, static fn ( string $want ): bool => false === strpos( $text, $want ) ) );
 		$check( array() === $missing && 245.0 === (float) $first->get_total() && 'ltr' === ( InvoiceDocument::rtl( $first ) ? 'rtl' : 'ltr' ), 'ADM-92, US-10-03 the invoice carries the seller, the numbers, the billing details and the amounts charged: unit price 100, discount 20, shipping 50, a fee of 15, total 245, the refund of 30 and the net 215 (' . ( array() === $missing ? 'all there' : 'missing: ' . implode( ' | ', $missing ) ) . ')' );
 
