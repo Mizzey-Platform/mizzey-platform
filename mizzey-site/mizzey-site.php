@@ -28,6 +28,7 @@ require_once __DIR__ . '/src/I18n/ProductTranslationJob.php';
 require_once __DIR__ . '/src/I18n/WpmlProductSaveHook.php';
 require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
+require_once __DIR__ . '/src/Storefront/AssetVersions.php';
 require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/Storefront/HeaderMenu.php';
@@ -225,6 +226,7 @@ MizzeySite\I18n\WpmlProductSaveHook::register();
 MizzeySite\I18n\RewriteRoot::register();
 // Prices on Arabic pages: the amount, then the Arabic symbol (NFR-04b): specs/032-image-handling.
 MizzeySite\I18n\CurrencyFormat::register();
+MizzeySite\Storefront\AssetVersions::register();
 // The chosen language is kept and followed: on the device (NAV-02) and on the account (D-31). specs/052.
 MizzeySite\I18n\LanguagePreference::register();
 
