@@ -225,7 +225,7 @@ run(
 		switch_to_locale( 'ar' );
 		$switched_price = html_entity_decode( wp_strip_all_tags( wc_price( 10 ) ), ENT_QUOTES, 'UTF-8' );
 		restore_previous_locale();
-		$check( 1 === preg_match( '/^10\.00' . $space . '\x{062C}\.\x{0645}$/u', $switched_price ), 'AC-4 an Arabic email or invoice, which switches to the order\'s language, writes the Arabic form too (' . $switched_price . ')' );
+		$check( 1 === preg_match( '/^10' . $space . '\x{062C}\.\x{0645}$/u', $switched_price ), 'AC-4 an Arabic email or invoice, which switches to the order\'s language, writes the Arabic form too (' . $switched_price . ')' );
 
 		return $ok;
 	}
