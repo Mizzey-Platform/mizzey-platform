@@ -368,7 +368,7 @@ const find = ( view, type ) => view.sections.find( ( s ) => s.type === type ) ||
 		check( find( live, 'featured-collections' ).heading === `${ T } Featured` && find( live, 'featured-collections' ).text.includes( `${ T } Gym bag` ), 'HOME-04 the featured collections show the collection set to show on the home page' );
 		check( find( live, 'deals' ).text.includes( plan.sale ) && find( live, 'deals' ).text.includes( 'Up to 25% off this week' ), 'HOME-07 the deals panel shows the products on sale and its line' );
 		check( find( live, 'brand-highlights' ).heading === `${ T } Brands`, 'HOME-06 the brand highlights show their heading' );
-		check( find( live, 'signup' ).heading === `${ T } Stay in touch` && find( live, 'signup' ).links.length === 1, 'HOME-09 the sign-up prompt shows its words and its button' );
+		check( find( live, 'signup' ).heading === `${ T } Stay in touch` && find( live, 'signup' ).links.length === 0, 'HOME-09 the sign-up prompt shows its words and its own form, with no link away (t119 checks the form)' );
 
 		// ---- Reordered, previewed, then published -------------------------------------------------------------------
 		step = 'reorder and preview';

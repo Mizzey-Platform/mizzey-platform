@@ -69,6 +69,13 @@ require_once __DIR__ . '/src/Marketing/TagManager.php';
 require_once __DIR__ . '/src/Marketing/ConsentBanner.php';
 require_once __DIR__ . '/src/Marketing/ProductFeed.php';
 require_once __DIR__ . '/src/Marketing/Events.php';
+require_once __DIR__ . '/src/Signups/SignupStoreError.php';
+require_once __DIR__ . '/src/Signups/SignupStore.php';
+require_once __DIR__ . '/src/Signups/SignupService.php';
+require_once __DIR__ . '/src/Signups/SignupRoutes.php';
+require_once __DIR__ . '/src/Signups/LeavePage.php';
+require_once __DIR__ . '/src/Signups/Welcome.php';
+require_once __DIR__ . '/src/Signups/SignupScreen.php';
 require_once __DIR__ . '/src/Reporting/PhysicalItems.php';
 require_once __DIR__ . '/src/Reporting/StockReport.php';
 require_once __DIR__ . '/src/Reporting/SalesReport.php';
@@ -291,6 +298,12 @@ MizzeySite\Marketing\TagManager::register();
 MizzeySite\Marketing\ConsentBanner::register();
 MizzeySite\Marketing\ProductFeed::register();
 MizzeySite\Marketing\Events::register();
+// The home page's sign-up: one small record, its welcome email, leaving, and a read-only list (HOME-09; DECISIONS A10,
+// ruled 25 November 2026). See specs/066-stage-2-shop-front, slice 5.
+MizzeySite\Signups\SignupStore::register();
+MizzeySite\Signups\SignupRoutes::register();
+MizzeySite\Signups\Welcome::register();
+MizzeySite\Signups\SignupScreen::register();
 
 // RPT-10: the standard stock report lists one line per physical item, whichever language its records are in and
 // whichever language the operator's session is in. Confined to that report's own query.

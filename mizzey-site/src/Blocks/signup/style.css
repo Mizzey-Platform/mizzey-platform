@@ -1,14 +1,19 @@
 /* The sign-up prompt (spec 066, slice 5: HOME-09), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop draw
-   it. Loaded only on a page that shows it, and in the editor. Tokens only, logical sides only.
+   it (frames A2 and C2), with the field and box states of C1-Components and the motion of C1-Motion-Playground.
+   Loaded only on a page that shows it, and in the editor. Tokens only, logical sides only.
 
    A soft Indigo panel with corners 24 and a hairline edge. Phone: inside the page margin, 24 above and below and 16
-   in; the heading in H2, the line, then the button across the full width. From 1024 wide: inside the desktop margin,
-   56 in, the words on the start side and the button on the end side in the golden split the board draws. */
+   in; the heading in H2, the line, then 16 below it the label, the 48 high pill field, the optional box and the Sign up
+   button across the full width. From 1024 wide: inside the desktop margin, 56 in, the words on the start side and the
+   form on the end side in the golden split the board draws, the field and the 56 high button on one row.
+
+   The success message sits in the same grid cell as what it replaces (the whole panel on a phone, the form on a
+   desktop), which is hidden but keeps its place: the panel keeps its height and nothing below it moves. */
 
 .mizzey-section.mizzey-signup {
 	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	inline-size: auto;
 	max-inline-size: var(--mizzey-layout-content-width);
 	margin-block: var(--mizzey-space-section);
@@ -19,6 +24,12 @@
 	background-image: linear-gradient(135deg, var(--mizzey-color-glow-lower) 0%, var(--mizzey-color-glow-top) 60%, var(--mizzey-color-indigo-100) 100%);
 	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
 	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-signup__words {
+	grid-row: 1;
+	grid-column: 1;
+	min-inline-size: 0;
 }
 
 .mizzey-signup__heading {
@@ -35,13 +46,210 @@
 	overflow-wrap: anywhere;
 }
 
-.mizzey-signup__action {
+/* ---- The form ------------------------------------------------------------------------------------------------- */
+
+.mizzey-signup__form {
+	grid-row: 2;
+	grid-column: 1;
 	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+	margin: 0;
 	margin-block-start: var(--mizzey-space-4);
 }
 
+.mizzey-signup__label {
+	font: var(--mizzey-type-label);
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-signup__box {
+	position: relative;
+	display: block;
+	margin-block-start: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-signup__input {
+	box-sizing: border-box;
+	display: block;
+	inline-size: 100%;
+	block-size: var(--mizzey-control-target-preferred);
+	margin: 0;
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-4);
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-input);
+	box-shadow: 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-indigo-300), var(--mizzey-elevation-1);
+	outline: none;
+	transition: box-shadow var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-signup__input::placeholder {
+	color: var(--mizzey-color-neutral-muted);
+	opacity: 1;
+}
+
+/* Focus: the edge turns Indigo and the 2 px line draws along the bottom (C1-Motion-Playground, "Input focus"). */
+.mizzey-signup__input:focus {
+	box-shadow: 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-role-primary), var(--mizzey-elevation-1);
+}
+
+/* The edge and the line are the field's focus mark, as on the fields of C1-Components: no second ring around it. */
+.mizzey-signup .mizzey-signup__input:focus-visible {
+	outline: none;
+}
+
+.mizzey-signup__line {
+	position: absolute;
+	inset-inline: var(--mizzey-space-5);
+	inset-block-end: 0;
+	block-size: var(--mizzey-border-control);
+	border-radius: var(--mizzey-border-control);
+	background-color: var(--mizzey-color-role-primary);
+	transform: scaleX(0);
+	transform-origin: var(--mizzey-origin-start) center;
+	pointer-events: none;
+	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-signup__input:focus ~ .mizzey-signup__line,
+.mizzey-signup.is-error .mizzey-signup__line {
+	transform: scaleX(1);
+}
+
+/* Invalid: a 2 px red ring and the alert icon; the words stay Ink and say how to fix it. They fade in and rise into
+   their line; the field does not shake. */
+.mizzey-signup.is-error .mizzey-signup__input {
+	box-shadow: 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-danger), var(--mizzey-elevation-1);
+}
+
+.mizzey-signup.is-error .mizzey-signup__line {
+	background-color: var(--mizzey-color-role-danger);
+}
+
+.mizzey-signup__error {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-1);
+	margin-block-start: var(--mizzey-space-2);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+	color: var(--mizzey-color-role-text);
+	animation: mizzey-rise var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-signup__error[hidden] {
+	display: none;
+}
+
+.mizzey-signup__error.is-again .mizzey-signup__error-icon {
+	display: none;
+}
+
+.mizzey-signup__error-icon {
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-danger);
+}
+
+/* The optional box: a 44 high row, the 24 box at the top of the words. */
+.mizzey-signup .mizzey-signup__consent {
+	align-items: flex-start;
+	margin-block-start: var(--mizzey-space-2);
+	padding-block: var(--mizzey-space-2);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+.mizzey-signup .mizzey-signup__consent .mizzey-check__tick {
+	inset-block-start: calc(var(--mizzey-space-2) + (var(--mizzey-control-choice) - var(--mizzey-control-icon-dense)) / 2);
+}
+
 .mizzey-signup .mizzey-signup__button {
-	flex: 1;
+	margin-block-start: var(--mizzey-space-3);
+	inline-size: 100%;
+	overflow: hidden;
+}
+
+/* The trap field: off the page, never focused, never read. */
+.mizzey-signup__trap {
+	position: absolute;
+	inline-size: var(--mizzey-border-hairline);
+	block-size: var(--mizzey-border-hairline);
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* ---- Success ---------------------------------------------------------------------------------------------------- */
+
+.mizzey-signup__done {
+	grid-row: 1 / span 2;
+	grid-column: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	gap: var(--mizzey-space-3);
+	min-inline-size: 0;
+	outline: none;
+}
+
+.mizzey-signup__done[hidden] {
+	display: none;
+}
+
+.mizzey-signup__done:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* Every part, so a part that sets its own visibility (the ticked box's tick) stays hidden too. */
+.mizzey-signup.is-sent .mizzey-signup__words,
+.mizzey-signup.is-sent .mizzey-signup__words *,
+.mizzey-signup.is-sent .mizzey-signup__form,
+.mizzey-signup.is-sent .mizzey-signup__form *,
+.mizzey-signup.is-sent .mizzey-signup__form .mizzey-check__box:checked ~ .mizzey-check__tick {
+	visibility: hidden;
+}
+
+.mizzey-signup__disc {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-target-preferred);
+	block-size: var(--mizzey-control-target-preferred);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+.mizzey-signup__disc .mizzey-icon {
+	stroke-width: var(--mizzey-border-indicator);
+}
+
+.mizzey-signup__done-words {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-3);
+	min-inline-size: 0;
+}
+
+.mizzey-signup__done-title {
+	margin: 0;
+	margin-block-start: var(--mizzey-space-1);
+	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
+}
+
+.mizzey-signup__done-text {
+	margin: 0;
+	font: var(--mizzey-type-body);
+	overflow-wrap: anywhere;
 }
 
 @media (min-width: 600px) {
@@ -52,7 +260,6 @@
 
 @media (min-width: 1024px) {
 	.mizzey-section.mizzey-signup {
-		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
 		column-gap: var(--mizzey-space-8);
 		align-items: center;
@@ -64,13 +271,74 @@
 		margin-block-start: var(--mizzey-space-3);
 	}
 
-	.mizzey-signup__action {
+	.mizzey-signup__form {
+		grid-row: 1;
+		grid-column: 2;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: var(--mizzey-space-3);
 		margin-block-start: 0;
 	}
 
+	.mizzey-signup__label,
+	.mizzey-signup__error,
+	.mizzey-signup .mizzey-signup__consent {
+		grid-column: 1 / -1;
+	}
+
+	.mizzey-signup__box {
+		grid-row: 2;
+		grid-column: 1;
+	}
+
+	.mizzey-signup__input {
+		block-size: var(--mizzey-control-field);
+		padding-inline: var(--mizzey-space-5);
+	}
+
 	.mizzey-signup .mizzey-signup__button {
-		flex: 0 0 auto;
+		grid-row: 2;
+		grid-column: 2;
+		inline-size: auto;
 		block-size: var(--mizzey-control-button-large);
+		margin-block-start: var(--mizzey-space-2);
 		padding-inline: var(--mizzey-space-6);
+	}
+
+	/* On a desktop the words stay and the message takes the form's place. */
+	.mizzey-signup.is-sent .mizzey-signup__words,
+	.mizzey-signup.is-sent .mizzey-signup__words * {
+		visibility: visible;
+	}
+
+	.mizzey-signup__done {
+		grid-row: 1;
+		grid-column: 2;
+		flex-direction: row;
+		align-items: center;
+		align-self: stretch;
+		gap: var(--mizzey-space-4);
+	}
+
+	.mizzey-signup__done-words {
+		gap: var(--mizzey-space-1);
+	}
+
+	.mizzey-signup__done-title {
+		margin-block-start: 0;
+		font: var(--mizzey-type-title);
+		font-weight: var(--mizzey-font-weight-black);
+		letter-spacing: normal;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-signup__error {
+		animation: none;
+	}
+
+	.mizzey-signup__line,
+	.mizzey-signup__input {
+		transition: none;
 	}
 }
