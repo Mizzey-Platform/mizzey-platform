@@ -323,12 +323,14 @@
 	box-shadow: var(--mizzey-elevation-1);
 }
 
+/* Adding: three small i-dots (6, gap 2, 22 wide) sit inside the 36 disc, as card state 7 draws. */
 .mizzey-card__disc .mizzey-loader {
+	gap: var(--mizzey-control-loader-gap-small);
 	color: var(--mizzey-color-role-on-primary);
 }
 
 .mizzey-card__disc .mizzey-loader__dot {
-	inline-size: var(--mizzey-control-loader-dot-button);
+	inline-size: var(--mizzey-control-loader-dot-small);
 }
 
 .mizzey-card .mizzey-card__loader,
