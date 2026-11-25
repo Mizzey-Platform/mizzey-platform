@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/brand-highlights",
+	"title": "Brand highlights",
+	"category": "mizzey-sections",
+	"icon": "awards",
+	"description": "The brands marked to show on the home page, as chips, with a link to all brands.",
+	"keywords": [
+		"brands",
+		"shop by brand"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"allLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"allUrl": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": [
+		"mizzey-home-sections",
+		"file:./style.css"
+	],
+	"render": "file:./render.php"
+}

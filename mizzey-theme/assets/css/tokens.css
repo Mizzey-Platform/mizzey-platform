@@ -418,6 +418,16 @@
 	--mizzey-control-footer-zz-bleed-block-phone: 40px;
 	--mizzey-control-footer-zz-bleed-inline-phone: 36px;
 	--mizzey-control-footer-line: 20px;
+	--mizzey-control-hero-desktop: 440px;
+	--mizzey-control-hero-media-phone: 224px;
+	--mizzey-control-hero-panel: 540px;
+	--mizzey-control-hero-logo: 96px;
+	--mizzey-control-hero-progress: 40px;
+	--mizzey-control-hero-dot: 8px;
+	--mizzey-control-offer-desktop: 320px;
+	--mizzey-control-offer-media-phone: 200px;
+	--mizzey-control-offer-panel: 520px;
+	--mizzey-control-brand-chip-max: 220px;
 	--mizzey-breakpoint-phone: 320px;
 	--mizzey-breakpoint-tablet: 600px;
 	--mizzey-breakpoint-desktop: 1024px;

@@ -632,10 +632,12 @@ msgid "Returns arrow"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:29
+#: src/Blocks/hero/edit.js
 msgid "Authentic products, guaranteed"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:29
+#: src/Blocks/hero/edit.js
 msgid "Authenticity guarantee"
 msgstr ""
 
@@ -664,10 +666,16 @@ msgid "Item %d line"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:102
+#: src/Blocks/brand-highlights/edit.js
+#: src/Blocks/category-shortcuts/edit.js
+#: src/Blocks/deals/edit.js
+#: src/Blocks/featured-collections/edit.js
+#: src/Blocks/products/edit.js
 msgid "Section"
 msgstr ""
 
 #: src/Blocks/trust-signals/edit.js:106
+#: src/Blocks/hero/edit.js
 msgid "Name read by screen readers"
 msgstr ""
 
@@ -822,18 +830,23 @@ msgid "Next products"
 msgstr ""
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
+#: src/Blocks/offer-banner/edit.js
 msgid "New"
 msgstr ""
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Trending"
 msgstr ""
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Limited"
 msgstr ""
 
 #: mizzey-site/src/Catalogue/ProductFields.php
+#: src/Blocks/library.js
 msgid "Best Seller"
 msgstr ""
 
@@ -1144,6 +1157,7 @@ msgid "Site footer"
 msgstr ""
 
 #: assets/js/site-parts-editor.js
+#: src/Blocks/hero/edit.js
 msgid "Slider"
 msgstr ""
 
@@ -1191,4 +1205,625 @@ msgstr ""
 #: mizzey-theme/inc/footer.php
 #, php-format
 msgid "© %1$s %2$s."
+msgstr ""
+
+#: src/Blocks/signup/block.json
+msgctxt "block description"
+msgid "A heading, a line and a button to sign up."
+msgstr ""
+
+#: src/Blocks/products/block.json
+msgctxt "block description"
+msgid "A row of product cards from a rule (a badge, a category, a collection, the newest, on sale) or picked by hand."
+msgstr ""
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block description"
+msgid "An image with a tag, a heading, a line and a button."
+msgstr ""
+
+#: src/Blocks/deals/block.json
+msgctxt "block description"
+msgid "Product cards on the Indigo panel, with a heading and a line, from a rule or picked by hand."
+msgstr ""
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block description"
+msgid "The brands marked to show on the home page, as chips, with a link to all brands."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block description"
+msgid "The categories marked to show on the home page, as image tiles, and a tile for all categories."
+msgstr ""
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block description"
+msgid "The collections marked to show on the home page, as square images with their names."
+msgstr ""
+
+#: src/Blocks/hero/block.json
+msgctxt "block description"
+msgid "The first banner of the home page: one banner, or a slider of banners, each with its image, headline, line and button."
+msgstr ""
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "account"
+msgstr ""
+
+#: src/Blocks/hero/block.json src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "banner"
+msgstr ""
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block keyword"
+msgid "brands"
+msgstr ""
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "carousel"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "categories"
+msgstr ""
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block keyword"
+msgid "collections"
+msgstr ""
+
+#: src/Blocks/deals/block.json
+msgctxt "block keyword"
+msgid "deals"
+msgstr ""
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block keyword"
+msgid "featured"
+msgstr ""
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "hero"
+msgstr ""
+
+#: src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "new arrivals"
+msgstr ""
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "newsletter"
+msgstr ""
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "offer"
+msgstr ""
+
+#: src/Blocks/deals/block.json
+msgctxt "block keyword"
+msgid "offers"
+msgstr ""
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "products"
+msgstr ""
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block keyword"
+msgid "promotion"
+msgstr ""
+
+#: src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "rail"
+msgstr ""
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "sale"
+msgstr ""
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block keyword"
+msgid "shop by brand"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "shop by category"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block keyword"
+msgid "shortcuts"
+msgstr ""
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "sign up"
+msgstr ""
+
+#: src/Blocks/hero/block.json
+msgctxt "block keyword"
+msgid "slider"
+msgstr ""
+
+#: src/Blocks/deals/block.json src/Blocks/products/block.json
+msgctxt "block keyword"
+msgid "trending"
+msgstr ""
+
+#: src/Blocks/brand-highlights/block.json
+msgctxt "block title"
+msgid "Brand highlights"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/block.json
+msgctxt "block title"
+msgid "Category shortcuts"
+msgstr ""
+
+#: src/Blocks/deals/block.json
+msgctxt "block title"
+msgid "Deals"
+msgstr ""
+
+#: src/Blocks/featured-collections/block.json
+msgctxt "block title"
+msgid "Featured collections"
+msgstr ""
+
+#: src/Blocks/hero/block.json
+msgctxt "block title"
+msgid "Hero"
+msgstr ""
+
+#: src/Blocks/offer-banner/block.json
+msgctxt "block title"
+msgid "Offer banner"
+msgstr ""
+
+#: src/Blocks/products/block.json
+msgctxt "block title"
+msgid "Products"
+msgstr ""
+
+#: src/Blocks/signup/block.json
+msgctxt "block title"
+msgid "Sign-up prompt"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "A wide image whose calm side sits under the words. The first slide's image loads first."
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "In this page's language. For example: Deals of the week."
+msgstr ""
+
+#: src/Blocks/featured-collections/edit.js
+msgid "In this page's language. For example: Featured collections."
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "In this page's language. For example: Shop by brand."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "In this page's language. For example: Shop by category."
+msgstr ""
+
+#: src/Blocks/products/edit.js
+msgid "In this page's language. For example: Trending now."
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Optional, in this page's language. For example: Offers."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Optional. The last tile's words."
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Optional. The link at the heading's end."
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "See what's new"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "This month's arrivals. All original stock."
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+#, php-format
+msgid "%1$d of %2$d"
+msgstr ""
+
+#: mizzey-site/src/Blocks/TermSections.php
+#, php-format
+msgid "%s category"
+msgid_plural "%s categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Blocks/library.js
+msgid "A badge"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "A category"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "A collection"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "A wide image; its calm side sits under the words."
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Add a slide"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "All brands label"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "All brands link"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "All categories label"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "All categories link"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "At least %d. The slider pauses while a visitor touches, hovers or focuses it."
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Badge"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner button link"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner button"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner headline"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner image description"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner tag"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner text"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Banner"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Brand highlights"
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Category shortcuts"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Category"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Choose image"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Choose slide %d image"
+msgstr ""
+
+#: src/Blocks/offer-banner/edit.js
+msgid "Choose the banner image"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Choose the logo for Indigo slides"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Choose…"
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "Deals"
+msgstr ""
+
+#: src/Blocks/featured-collections/edit.js
+msgid "Featured collections"
+msgstr ""
+
+#: src/Blocks/hero/edit.js src/Blocks/offer-banner/edit.js
+msgid "For people who cannot see the image. Leave empty when it only decorates."
+msgstr ""
+
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/offer-banner/edit.js
+msgid "Fresh on the beauty shelf"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Hand-picked products"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js src/Blocks/category-shortcuts/edit.js
+#: src/Blocks/deals/edit.js src/Blocks/featured-collections/edit.js
+#: src/Blocks/products/edit.js
+msgid "Heading"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Hero style"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Hero"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "How many products"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Indigo"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Light for a pale image, with dark words; Indigo for a deep image, with white words."
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Light"
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "Line"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "More slides"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Move slide %d earlier"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Next slide"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "No brand is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "No category is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr ""
+
+#: src/Blocks/featured-collections/edit.js
+msgid "No collection is marked \"Show on the home page\" yet, so visitors do not see this section."
+msgstr ""
+
+#: src/Blocks/deals/edit.js src/Blocks/products/edit.js
+msgid "No product matches this rule yet, so visitors do not see this section. It appears once a product matches."
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "On sale"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "One short email when something worth knowing lands."
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "Optional. For example: Up to 25% off this week."
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "Optional. The link shows only with its words and its address."
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Optional. Without one, a section by category or collection links to its page."
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Optional. Without one, the button opens the account page, where a visitor signs up."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "Optional. Without one, the tile opens the shop."
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Pause the slides"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Picked by hand"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Play the slides"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "Previous slide"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Products from"
+msgstr ""
+
+#: src/Blocks/products/edit.js
+msgid "Products"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Remove image"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Remove slide %d"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "Replace image"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Seconds per slide"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Show the logo on desktop"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign up"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up button link"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up button"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up headline"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up prompt"
+msgstr ""
+
+#: src/Blocks/signup/edit.js
+msgid "Sign-up text"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "Single banner"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+#, php-format
+msgid "Slide %1$d of %2$d"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d button link"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d button"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d ground"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d headline"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d image description"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d line"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+#, php-format
+msgid "Slide %d"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
+msgid "Stay in touch"
+msgstr ""
+
+#: src/Blocks/brand-highlights/edit.js
+msgid "The brands marked \"Show on the home page\" appear here, in their position."
+msgstr ""
+
+#: src/Blocks/category-shortcuts/edit.js
+msgid "The categories marked \"Show on the home page\" appear here, in their position. Set them on Products, Categories."
+msgstr ""
+
+#: src/Blocks/featured-collections/edit.js
+msgid "The collections marked \"Show on the home page\" appear here, in their position, up to four."
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "The logo file made for Indigo grounds. Light slides show the site logo."
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "The newest"
+msgstr ""
+
+#: src/Blocks/hero/edit.js
+msgid "The real thing, delivered"
+msgstr ""
+
+#: src/Blocks/library.js
+msgid "View all link"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "carousel"
+msgstr ""
+
+#: mizzey-site/src/Blocks/Hero.php
+msgid "slide"
 msgstr ""

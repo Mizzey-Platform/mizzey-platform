@@ -1,0 +1,132 @@
+/* The offer banner (spec 066, slice 5: HOME-07), as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop draw it.
+   Loaded only on a page that shows it, and in the editor. Tokens only, logical sides only.
+
+   Phone: one card with corners 24 and a hairline edge, the image 200 high on top, then the tag, the heading in H2,
+   the line and the button, 16 in. From 1024 wide: a banner 320 high, the image filling it, the words 520 wide at the
+   start side, 56 in and centred top to bottom, on a soft white veil that fades out towards the end side. */
+
+.mizzey-section.mizzey-offer {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-offer__card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-inline: auto;
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-tile);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-offer__media {
+	position: relative;
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-offer-media-phone);
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-offer__image {
+	position: absolute;
+	inset: 0;
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.mizzey-offer__body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding-block: var(--mizzey-space-4) var(--mizzey-space-5);
+	padding-inline: var(--mizzey-space-4);
+}
+
+.mizzey-offer__heading {
+	margin-block: var(--mizzey-space-3) 0;
+	margin-inline: 0;
+	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-offer__tag + .mizzey-offer__heading {
+	margin-block-start: var(--mizzey-space-3);
+}
+
+.mizzey-offer__body > .mizzey-offer__heading:first-child {
+	margin-block-start: 0;
+}
+
+.mizzey-offer__text {
+	margin-block: var(--mizzey-space-2) 0;
+	margin-inline: 0;
+	font: var(--mizzey-type-body);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-offer .mizzey-offer__button {
+	margin-block-start: var(--mizzey-space-4);
+}
+
+@media (min-width: 600px) {
+	.mizzey-section.mizzey-offer {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-section.mizzey-offer {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-offer__card {
+		block-size: var(--mizzey-control-offer-desktop);
+	}
+
+	.mizzey-offer__media {
+		position: absolute;
+		inset: 0;
+		block-size: auto;
+	}
+
+	.mizzey-offer__media::after {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 60%;
+		background-image: linear-gradient(calc(90deg * var(--mizzey-dir)), color-mix(in srgb, var(--mizzey-color-role-surface) 92%, transparent) 0%, color-mix(in srgb, var(--mizzey-color-role-surface) 92%, transparent) 42%, transparent 100%);
+	}
+
+	.mizzey-offer__body {
+		box-sizing: border-box;
+		justify-content: center;
+		inline-size: min(var(--mizzey-control-offer-panel), 100%);
+		block-size: 100%;
+		padding-block: 0;
+		padding-inline: var(--mizzey-space-8) 0;
+	}
+
+	.mizzey-offer__heading {
+		margin-block-start: var(--mizzey-space-4);
+	}
+
+	.mizzey-offer__text {
+		margin-block-start: var(--mizzey-space-3);
+	}
+
+	.mizzey-offer .mizzey-offer__button {
+		margin-block-start: var(--mizzey-space-5);
+	}
+}

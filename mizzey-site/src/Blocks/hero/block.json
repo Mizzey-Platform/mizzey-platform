@@ -1,0 +1,110 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/hero",
+	"title": "Hero",
+	"category": "mizzey-sections",
+	"icon": "cover-image",
+	"description": "The first banner of the home page: one banner, or a slider of banners, each with its image, headline, line and button.",
+	"keywords": [
+		"hero",
+		"banner",
+		"slider",
+		"carousel"
+	],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"variant": {
+			"type": "string",
+			"enum": [
+				"single",
+				"slider"
+			],
+			"default": "slider"
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"interval": {
+			"type": "integer",
+			"default": 6
+		},
+		"showLogo": {
+			"type": "boolean",
+			"default": true
+		},
+		"darkLogo": {
+			"type": "integer",
+			"default": 0
+		},
+		"slides": {
+			"type": "array",
+			"default": [
+				{
+					"imageId": 0,
+					"imageAlt": "",
+					"tone": "light",
+					"title": "",
+					"line": "",
+					"ctaLabel": "",
+					"ctaUrl": ""
+				}
+			],
+			"items": {
+				"type": "object",
+				"properties": {
+					"imageId": {
+						"type": "integer"
+					},
+					"imageAlt": {
+						"type": "string"
+					},
+					"tone": {
+						"type": "string",
+						"enum": [
+							"light",
+							"dark"
+						]
+					},
+					"title": {
+						"type": "string"
+					},
+					"line": {
+						"type": "string"
+					},
+					"ctaLabel": {
+						"type": "string"
+					},
+					"ctaUrl": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": [
+		"mizzey-home-sections",
+		"file:./style.css"
+	],
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

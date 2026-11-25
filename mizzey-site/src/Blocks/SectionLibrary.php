@@ -38,11 +38,12 @@ defined('ABSPATH') || exit;
 final class SectionLibrary
 {
     /** The section directories beside this class; each holds a block.json. */
-    public const SECTIONS = ['trust-signals'];
+    public const SECTIONS = ['hero', 'category-shortcuts', 'products', 'featured-collections', 'deals', 'offer-banner', 'brand-highlights', 'trust-signals', 'signup'];
     public const CATEGORY = 'mizzey-sections';
     public const VISIBLE  = 'visible';
     public const EDITOR_SCRIPT = 'mizzey-section-library';
     public const EDITOR_STYLE  = 'mizzey-section-library-editor';
+    public const SHARED_STYLE  = 'mizzey-home-sections';
 
     public static function register(): void
     {
@@ -51,6 +52,8 @@ final class SectionLibrary
         add_filter('allowed_block_types_all', [self::class, 'allowedBlocks'], 10, 2);
         add_filter('pre_render_block', [self::class, 'hideHidden'], 10, 2);
         add_action('enqueue_block_editor_assets', [self::class, 'editorAssets']);
+        // The hero's first image is the home page's Largest Contentful Paint: fetched from the head (slice 5, K-6).
+        add_action('wp_head', [Hero::class, 'preload'], 2);
     }
 
     /** @return list<string> The library's block names. */
@@ -67,12 +70,14 @@ final class SectionLibrary
         wp_register_script(
             self::EDITOR_SCRIPT,
             plugins_url('src/Blocks/library.js', $plugin),
-            ['wp-blocks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element', 'wp-hooks', 'wp-i18n'],
+            ['wp-blocks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-core-data', 'wp-data', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-server-side-render'],
             $version('library.js'),
             true
         );
         wp_set_script_translations(self::EDITOR_SCRIPT, 'mizzey-site', dirname(__DIR__, 2) . '/languages');
         wp_register_style(self::EDITOR_STYLE, plugins_url('src/Blocks/library-editor.css', $plugin), [], $version('library-editor.css'));
+        // What the home sections share on the storefront (the heading row, image tiles, the loading well): slice 5.
+        wp_register_style(self::SHARED_STYLE, plugins_url('src/Blocks/library.css', $plugin), [], $version('library.css'));
 
         foreach (self::SECTIONS as $section) {
             register_block_type(__DIR__ . '/' . $section);
@@ -100,7 +105,17 @@ final class SectionLibrary
         foreach (TrustSignals::MARKS as $mark) {
             $marks[$mark] = TrustSignals::markHtml($mark, false);
         }
-        return ['blocks' => self::names(), 'frontPages' => self::frontPageIds(), 'trustMarks' => $marks];
+        $logo = (int) get_theme_mod('custom_logo');
+        $logo = $logo > 0 ? $logo : (int) get_option('site_logo');
+        return [
+            'blocks'     => self::names(),
+            'frontPages' => self::frontPageIds(),
+            'trustMarks' => $marks,
+            'siteLogo'   => $logo > 0 ? (string) wp_get_attachment_image_url($logo, 'medium') : '',
+            'minSeconds' => Hero::MIN_INTERVAL,
+            'maxSlides'  => Hero::MAX_SLIDES,
+            'maxCount'   => ProductSections::MAX,
+        ];
     }
 
     /** @return list<int> The front page and its translations. */

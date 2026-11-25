@@ -1,0 +1,403 @@
+/* The hero (spec 066, slice 5: HOME-01), as C1-Home-Phone, C1-Home-Phone-Arabic, C1-Home-Desktop, C1-Hero-Banners and
+   C1-Options (single banner) draw it. Loaded only on a page that shows a hero, and in the editor. Every value is a
+   theme token (K-3) and every side is logical, so this one stylesheet serves both reading directions.
+
+   Phone: the image fills the width, 224 high, and the words sit on a white card that rises 32 over it with its top
+   corners rounded 28; the slider's pause button, dots and line sit under the card. From 1024 wide: one rounded banner
+   440 high inside the desktop margin, the image filling it; the logo, the headline in Display, the line and the
+   large button sit at its start side, 56 in and 48 from the top and bottom, on a soft white veil over a light image
+   or in white over an Indigo one; the arrows sit either side of the pause button, the dots and the line, 12 under it.
+
+   The motion (data-motion="slide", the default C1-Hero-Banners draws): the row of slides scrolls and snaps; the
+   active slide's words slide in from the end side; the active dot is the only orange; the Indigo line fills over the
+   slide's seconds. Under reduced motion nothing moves. */
+
+.mizzey-section.mizzey-hero {
+	position: relative;
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: 0;
+	margin-inline: 0;
+}
+
+.mizzey-hero__viewport {
+	position: relative;
+	overflow: hidden;
+}
+
+.mizzey-hero__track {
+	display: flex;
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+	scroll-snap-type: inline mandatory;
+	scrollbar-width: none;
+}
+
+.mizzey-hero__track::-webkit-scrollbar {
+	display: none;
+}
+
+.mizzey-hero__slide {
+	position: relative;
+	display: flex;
+	flex: 0 0 100%;
+	flex-direction: column;
+	min-inline-size: 0;
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-hero__media {
+	position: relative;
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-hero-media-phone);
+	overflow: hidden;
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-hero__slide--dark .mizzey-hero__media {
+	background-color: var(--mizzey-color-role-surface-brand);
+}
+
+.mizzey-hero__image {
+	position: absolute;
+	inset: 0;
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.mizzey-hero__panel {
+	position: relative;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-block-start: calc(var(--mizzey-space-6) * -1);
+	padding-block: var(--mizzey-space-4);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	border-start-start-radius: var(--mizzey-radius-sheet);
+	border-start-end-radius: var(--mizzey-radius-sheet);
+	background-color: var(--mizzey-color-role-surface);
+}
+
+/* The logo is drawn on the desktop banner only. */
+.mizzey-hero__logo {
+	display: none;
+}
+
+.mizzey-hero__title {
+	display: -webkit-box;
+	margin: 0;
+	overflow: hidden;
+	color: inherit;
+	font: var(--mizzey-type-display);
+	letter-spacing: var(--mizzey-type-display-letter-spacing);
+	overflow-wrap: anywhere;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+/* On a phone every slide keeps two lines for its headline and its line, so the slides are one height and the
+   dots never move (C1-Home-Phone: 440 high in all). */
+.mizzey-hero--slider .mizzey-hero__title,
+.mizzey-hero--slider .mizzey-hero__line {
+	min-block-size: 2lh;
+}
+
+.mizzey-hero__line {
+	display: -webkit-box;
+	margin-block: var(--mizzey-space-2) 0;
+	margin-inline: 0;
+	overflow: hidden;
+	font: var(--mizzey-type-body);
+	overflow-wrap: anywhere;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+.mizzey-hero .mizzey-hero__button {
+	margin-block-start: var(--mizzey-space-4);
+	block-size: var(--mizzey-control-button-compact);
+}
+
+/* ---- The slider's controls -------------------------------------------------------------------------------------- */
+
+/* On a phone the pause button, the dots and the line sit 16 from the slide's bottom, 12 under the button. */
+.mizzey-hero--slider .mizzey-hero__panel {
+	padding-block-end: calc(var(--mizzey-space-3) * 2 + var(--mizzey-space-4));
+}
+
+.mizzey-hero__controls {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: var(--mizzey-space-4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-5);
+	block-size: var(--mizzey-space-3);
+}
+
+.mizzey-hero__arrow {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: var(--mizzey-elevation-1);
+	cursor: pointer;
+}
+
+[dir="rtl"] .mizzey-hero__arrow .mizzey-icon {
+	scale: -1 1;
+}
+
+.mizzey-hero__status {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-hero__pause {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-space-3)) / -2);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: transparent;
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-hero__pause .mizzey-icon--play,
+.mizzey-hero.is-paused .mizzey-hero__pause .mizzey-icon--pause {
+	display: none;
+}
+
+.mizzey-hero.is-paused .mizzey-hero__pause .mizzey-icon--play {
+	display: block;
+}
+
+.mizzey-hero__arrow:focus-visible,
+.mizzey-hero__pause:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-hero__dots {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-hero__dot {
+	inline-size: var(--mizzey-control-hero-dot);
+	block-size: var(--mizzey-control-hero-dot);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-300);
+	transition: background-color var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-hero__dot.is-active {
+	background-color: var(--mizzey-color-brand-persimmon);
+}
+
+.mizzey-hero__progress {
+	position: relative;
+	inline-size: var(--mizzey-control-hero-progress);
+	block-size: var(--mizzey-motion-distance-nudge);
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-100);
+}
+
+.mizzey-hero__progress-fill {
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background-color: var(--mizzey-color-role-primary);
+	transform: scaleX(0);
+	transform-origin: var(--mizzey-origin-start) 50%;
+}
+
+.mizzey-hero.is-running .mizzey-hero__progress-fill {
+	animation: mizzey-hero-fill var(--mizzey-hero-interval) linear forwards;
+}
+
+@keyframes mizzey-hero-fill {
+	to {
+		transform: scaleX(1);
+	}
+}
+
+/* ---- The default motion: the words of the slide coming in slide in from the end side ------------------------- */
+
+.mizzey-hero[data-motion="slide"] .mizzey-hero__panel > * {
+	transition: translate var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out),
+		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-hero[data-motion="slide"] .mizzey-hero__slide:not(.is-active) .mizzey-hero__panel > * {
+	opacity: 0;
+	translate: calc(var(--mizzey-motion-distance-4) * var(--mizzey-dir)) 0;
+}
+
+.mizzey-hero[data-motion="slide"] .mizzey-hero__track {
+	scroll-behavior: smooth;
+}
+
+/* ---- From 1024 wide: the rounded banner ------------------------------------------------------------------------- */
+
+@media (min-width: 1024px) {
+	/* Padding, not margin: as the page's first section a margin would fold into the page's own (none, on the home
+	   template) and the banner would touch the header. */
+	.mizzey-section.mizzey-hero {
+		padding-block-start: var(--mizzey-space-5);
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-hero__viewport {
+		max-inline-size: var(--mizzey-layout-content-width);
+		margin-inline: auto;
+		border-radius: var(--mizzey-radius-tile);
+	}
+
+	.mizzey-hero__slide {
+		block-size: var(--mizzey-control-hero-desktop);
+		overflow: hidden;
+		border-radius: var(--mizzey-radius-tile);
+	}
+
+	.mizzey-hero__media {
+		position: absolute;
+		inset: 0;
+		block-size: auto;
+	}
+
+	/* The soft white veil over a light image, from the start side to 60% across. */
+	.mizzey-hero__slide--light .mizzey-hero__media::after {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 60%;
+		background-image: linear-gradient(calc(90deg * var(--mizzey-dir)), color-mix(in srgb, var(--mizzey-color-role-surface) 90%, transparent) 0%, color-mix(in srgb, var(--mizzey-color-role-surface) 90%, transparent) 40%, transparent 100%);
+	}
+
+	/* A light banner keeps a hairline edge against the white page. */
+	.mizzey-hero__slide--light::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+		pointer-events: none;
+	}
+
+	.mizzey-hero__panel {
+		position: absolute;
+		inset-block: calc(var(--mizzey-space-6) + var(--mizzey-space-4));
+		inset-inline-start: var(--mizzey-space-8);
+		inline-size: min(var(--mizzey-control-hero-panel), calc(100% - var(--mizzey-space-8) * 2));
+		margin: 0;
+		padding: 0;
+		border-radius: 0;
+		background-color: transparent;
+	}
+
+	.mizzey-hero__slide--dark {
+		color: var(--mizzey-color-role-text-on-brand);
+	}
+
+	.mizzey-hero__logo {
+		display: block;
+		flex-shrink: 0;
+		inline-size: var(--mizzey-control-hero-logo);
+		margin-block-end: var(--mizzey-space-5);
+	}
+
+	.mizzey-hero__logo-image {
+		display: block;
+		inline-size: 100%;
+		block-size: auto;
+	}
+
+	.mizzey-hero__line {
+		margin-block-start: var(--mizzey-space-4);
+		font: var(--mizzey-type-lead);
+		font-weight: var(--mizzey-font-weight-regular);
+	}
+
+	.mizzey-hero .mizzey-hero__button {
+		margin-block-start: auto;
+		block-size: var(--mizzey-control-button-large);
+		padding-inline: var(--mizzey-space-6);
+	}
+
+	/* On an Indigo banner the button is white with Indigo words, and has no glow. */
+	.mizzey-hero .mizzey-hero__button--on-dark {
+		background-color: var(--mizzey-color-brand-white);
+		color: var(--mizzey-color-role-primary);
+	}
+
+	.mizzey-hero .mizzey-hero__button--on-dark::after {
+		content: none;
+	}
+
+	.mizzey-hero .mizzey-hero__button--on-dark:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
+
+	.mizzey-hero .mizzey-hero__button--on-dark:focus-visible {
+		outline-color: var(--mizzey-color-role-focus-inverse);
+	}
+
+	.mizzey-hero--slider .mizzey-hero__panel {
+		padding-block-end: 0;
+	}
+
+	.mizzey-hero__controls {
+		position: static;
+		block-size: var(--mizzey-control-target-min);
+		margin-block-start: var(--mizzey-space-3);
+	}
+
+	.mizzey-hero__arrow {
+		display: flex;
+	}
+}
+
+/* In the editor every slide is shown, one under the other, so each can be edited. */
+.mizzey-hero--editing .mizzey-hero__slide + .mizzey-hero__slide {
+	margin-block-start: var(--mizzey-space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-hero[data-motion] .mizzey-hero__track {
+		scroll-behavior: auto;
+	}
+
+	.mizzey-hero[data-motion] .mizzey-hero__panel > *,
+	.mizzey-hero__dot {
+		transition: none;
+	}
+
+	.mizzey-hero.is-running .mizzey-hero__progress-fill {
+		animation: none;
+	}
+}

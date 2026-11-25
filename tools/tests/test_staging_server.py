@@ -273,6 +273,26 @@ class TheStagingLayer(OnTheServer):
         for script in srv.SEED_SCRIPTS:
             self.assertIn(f"staging/seed/{script}", installed)
 
+    def test_the_home_page_artwork_lands_beside_its_seed(self):
+        installed = srv.install_layer()
+        art = sorted((srv.HERE / "seed" / "home-art").glob("*.webp"))
+        self.assertTrue(art, "no artwork was found, so nothing was checked")
+        for picture in art:
+            self.assertIn(f"staging/seed/home-art/{picture.name}", installed)
+
+    def test_the_logo_files_come_from_the_server_and_never_from_the_repository(self):
+        in_repo = [p.name for p in (srv.HERE / "seed").rglob("*") if "logo" in p.name.lower() and p.suffix != ".php"]
+        self.assertEqual([], in_repo, "the brand identity is not public before launch")
+        self.assertNotIn("brand/logo-light.png", srv.install_layer(), "nothing to copy, nothing copied")
+        brand = srv.STATE / "brand"
+        brand.mkdir(parents=True)
+        for name in srv.BRAND_FILES:
+            (brand / name).write_bytes(b"\x89PNG")
+        installed = srv.install_layer()
+        for name in srv.BRAND_FILES:
+            self.assertIn(f"brand/{name}", installed)
+            self.assertTrue((srv.LAYER / "brand" / name).is_file())
+
     def test_the_fingerprint_finds_the_settings_file_it_requires(self):
         srv.install_layer()
         source = (srv.LAYER / "staging" / "fingerprint.php").read_text(encoding="utf-8")
@@ -281,7 +301,10 @@ class TheStagingLayer(OnTheServer):
 
     def test_nothing_from_the_layer_is_a_test_scenario_or_a_tool(self):
         installed = srv.install_layer()
-        self.assertFalse([name for name in installed if not name.endswith((".php", ".json"))])
+        # Scripts and data, and the pictures the seed adds: the home page's artwork and, from the server, the logo.
+        pictures = [name for name in installed if (name.startswith("staging/seed/home-art/") and name.endswith(".webp"))
+                    or (name.startswith("brand/") and name.endswith(".png"))]
+        self.assertFalse([name for name in installed if not name.endswith((".php", ".json")) and name not in pictures])
         self.assertFalse([name for name in installed if "admin-visit.php" in name and "server-" not in name])
 
     def test_a_file_the_tool_no_longer_ships_is_removed(self):
