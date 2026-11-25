@@ -219,6 +219,19 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 	if ( hold ) {
 		await page.waitForTimeout( hold );
 		early = await measure( page, list, id );
+		early.fit = await page.evaluate( ( [ l, i ] ) => {
+			const c = document.querySelector( `.mizzey-products--${ l } .mizzey-card[data-product-id="${ i }"]` );
+			const disc = c && c.querySelector( '.mizzey-card__disc' );
+			const dots = c ? [ ...c.querySelectorAll( '.mizzey-card__loader .mizzey-loader__dot' ) ] : [];
+			if ( ! disc || ! dots.length ) {
+				return null;
+			}
+			// Layout sizes, not the pulse: the dots scale while they breathe.
+			const loader = dots[ 0 ].parentElement;
+			const d = disc.getBoundingClientRect();
+			const box = loader.getBoundingClientRect();
+			return { disc: d.width, dot: parseFloat( getComputedStyle( dots[ 0 ] ).width ), width: box.width, inside: box.left >= d.left && box.right <= d.right };
+		}, [ list, id ] );
 		earlyEvents = await page.evaluate( () => [ ...window.__mizzeyCount ] );
 		release();
 	}
@@ -307,6 +320,8 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		const add = await quickAdd( page, 'en 1440', 'grid', ID.long, { hold: 1200 } );
 		check( add.early && add.early.classes.includes( 'is-busy' ) && ! add.early.classes.includes( 'is-added' ) && add.early.added === '' && add.earlyEvents.length === 0,
 			`PLP-04 while the server has not answered, the + shows the loader and nothing claims success (no "Added", no count): ${ JSON.stringify( add.early && { classes: add.early.classes, added: add.early.added, events: add.earlyEvents } ) }` );
+		check( add.early && add.early.fit && add.early.fit.inside && near( add.early.fit.dot, 6 ) && near( add.early.fit.width, 22 ),
+			`card state 7: the three i-dots (6 wide, 22 together) sit inside the 36 disc (${ JSON.stringify( add.early && add.early.fit ) })` );
 		check( add.status === 201 || add.status === 200, `PLP-04 the add went to WooCommerce's Store API (HTTP ${ add.status })` );
 		check( add.after.classes.includes( 'is-added' ) && /added/i.test( add.after.added ) && add.after.addLabel && /in your cart/i.test( add.after.addLabel ), `PLP-04 after the answer: the White tick, line 2 "${ add.after.added }", the button "${ add.after.addLabel }" (${ add.after.classes })` );
 		check( near( add.after.card.h, add.before.card.h ) && near( add.after.price.y - add.after.card.y, add.before.price.y - add.before.card.y ), `PLP-04 nothing else moves when the add confirms (${ [ add.before.card.h, add.after.card.h, add.before.price.y - add.before.card.y, add.after.price.y - add.after.card.y ].map( Math.round ).join( ', ' ) })` );
