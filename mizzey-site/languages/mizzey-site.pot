@@ -850,3 +850,101 @@ msgid "%d option"
 msgid_plural "%d options"
 msgstr[0] ""
 msgstr[1] ""
+
+#: mizzey-theme/inc/header.php
+msgid "Account"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "All categories"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Back"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Cart"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Cart, %d item"
+msgid_plural "Cart, %d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-theme/inc/header.php
+msgid "Cart, empty"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Categories"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Help"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Home"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Main menu"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Menu"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "More"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "New in %s"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Search products and brands"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Search"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Shop %s"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Shop all %s"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Shop by category"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Shortcuts"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Sign in"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Site header"
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "The store header: logo, search, language, account, wishlist, cart and the category menus."
+msgstr ""
+
+#: mizzey-theme/inc/header.php
+msgid "Wishlist"
+msgstr ""

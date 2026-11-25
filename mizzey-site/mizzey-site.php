@@ -30,6 +30,7 @@ require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
 require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
+require_once __DIR__ . '/src/Storefront/HeaderMenu.php';
 require_once __DIR__ . '/src/Storefront/ProductPage.php';
 require_once __DIR__ . '/src/Storefront/HomeSections.php';
 require_once __DIR__ . '/src/Blocks/TrustSignals.php';
@@ -215,6 +216,8 @@ MizzeySite\I18n\LanguagePreference::register();
 
 // What the header and its navigation show, as data for the designed header: specs/054-header-navigation.
 MizzeySite\Storefront\HeaderData::register();
+// The header's menu links from the Site Editor's navigation menu, and its "Offer" link style: specs/066, slice 2.
+MizzeySite\Storefront\HeaderMenu::register();
 
 // What the product page states beside the product (saving, Buy Now, delivery, returns, authenticity, share): specs/055.
 MizzeySite\Storefront\ProductPage::register();
