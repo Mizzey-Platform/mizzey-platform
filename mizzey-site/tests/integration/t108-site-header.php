@@ -208,7 +208,8 @@ run(
 		}
 
 		// ---- A page with WooCommerce's own add to cart button ----------------------------------------------------
-		$page = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => "{$tag} add", 'post_content' => '[products ids="' . $products[0]->get_id() . '" columns="1"]' ) );
+		$page = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => "{$tag} add", 'post_content' => '[products ids="' . $products[0]->get_id() . '" columns="1"]' . "
+<!-- wp:mizzey/product-card {\"productId\":" . $products[1]->get_id() . '} /-->' ) );
 		$s->on_finish( static function () use ( $page ): void { wp_delete_post( $page, true ); } );
 
 		// ---- A customer with a first name ------------------------------------------------------------------------
@@ -265,6 +266,7 @@ run(
 			'ar'          => $ar,
 			'addPage'     => (string) get_permalink( $page ),
 			'addSelector' => '.add_to_cart_button.ajax_add_to_cart[data-product_id="' . $products[0]->get_id() . '"]',
+			'cardSelector' => '.mizzey-card[data-product-id="' . $products[1]->get_id() . '"] .mizzey-card__add',
 			'customer'    => array( 'cookies' => $cookies, 'first' => 'Samira' ),
 			'shots'       => get_temp_dir(),
 		);

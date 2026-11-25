@@ -340,6 +340,20 @@ async function main( browser ) {
 			const label = await page.evaluate( () => document.querySelector( '.mizzey-header__cart' ).textContent.replace( /\s+/g, ' ' ).trim() );
 			check( after === before + 1 && kept, `NAV-06 [en, 1440] the cart's count goes from ${ before } to ${ after } after an add, without a reload (label: ${ label })` );
 			check( label.includes( String( after ) ), `NAV-06 [en, 1440] the cart's name says the new count` );
+			// A quick add from a product card (slice 4) raises the count too, without a reload.
+			const card = page.locator( plan.cardSelector ).first();
+			check( await card.count() === 1, `NAV-06 [en, 1440] the page has a product card's quick add (${ plan.cardSelector })` );
+			if ( await card.count() ) {
+				const from = await read();
+				await card.click();
+				let to = from;
+				for ( let i = 0; i < 120 && to === from; i++ ) {
+					await page.waitForTimeout( 250 );
+					to = await read();
+				}
+				const still = await page.evaluate( () => window.__s2NoReload === true );
+				check( to === from + 1 && still, `NAV-06 [en, 1440] a quick add from a product card raises the header's count from ${ from } to ${ to }, without a reload` );
+			}
 			// The product card's own event (slice 4) carries the server's count: the header shows it as told.
 			await page.evaluate( () => document.dispatchEvent( new CustomEvent( 'mizzey-cart-changed', { detail: { count: 5 } } ) ) );
 			await page.waitForTimeout( 300 );
