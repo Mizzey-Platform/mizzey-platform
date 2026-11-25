@@ -429,7 +429,6 @@ final class ProductCard
         $thumb = (int) $product->get_image_id() > 0
             ? wp_get_attachment_image((int) $product->get_image_id(), 'woocommerce_gallery_thumbnail', false, ['alt' => '', 'loading' => 'lazy', 'class' => 'mizzey-card-picker__image'])
             : self::icon('image', 24);
-        $close = self::el('button', ['type' => 'button', 'class' => ['mizzey-button', 'mizzey-button--icon'], 'aria-label' => __('Close', 'mizzey-site'), 'data-wp-on--click' => 'actions.closePicker'], self::icon('close'));
         $step  = static fn (int $by, string $label, string $icon): string => self::el('button', ['type' => 'button', 'class' => 'mizzey-stepper__button', 'aria-label' => $label, 'data-step' => (string) $by, 'data-wp-on--click' => 'actions.step'], self::icon($icon, 20));
         $stepper = self::el('div', ['class' => 'mizzey-stepper', 'role' => 'group', 'aria-label' => __('Quantity', 'mizzey-site')],
             $step(-1, __('Decrease quantity', 'mizzey-site'), 'minus')
@@ -437,28 +436,48 @@ final class ProductCard
             . $step(1, __('Increase quantity', 'mizzey-site'), 'plus'));
         $add = self::el('button', ['type' => 'button', 'class' => ['mizzey-button', 'mizzey-button--primary', 'mizzey-button--compact', 'mizzey-card-picker__add'], 'data-wp-on--click' => 'actions.addChosen'], esc_html__('Add to cart', 'mizzey-site'));
 
-        $panel = self::el('span', ['class' => 'mizzey-overlay__handle', 'aria-hidden' => 'true'])
-            . self::el('div', ['class' => 'mizzey-overlay__header'], self::el('h2', ['class' => 'mizzey-overlay__title', 'id' => $id . '-title'], esc_html__('Choose options', 'mizzey-site')) . $close)
-            . self::el('div', ['class' => 'mizzey-overlay__body'],
-                self::el('div', ['class' => 'mizzey-card-picker__product'],
-                    self::el('span', ['class' => 'mizzey-card-picker__thumb'], $thumb)
-                    . self::el('span', ['class' => 'mizzey-card-picker__summary'], self::el('span', ['class' => 'mizzey-card-picker__title'], esc_html($product->get_name())) . self::el('span', ['class' => 'mizzey-card-picker__price'], esc_html($price))))
-                . $groups)
-            . self::el('div', ['class' => ['mizzey-overlay__footer', 'mizzey-card-picker__footer']], $stepper . $add);
+        // The card's own controls live in the card's store inside slice 1's overlay, whose store closes it on a press
+        // on the scrim; showModal() keeps focus inside and closes on Escape.
+        $body = self::el('div', ['class' => 'mizzey-card-picker__content', 'data-wp-interactive' => self::STORE],
+            self::el('div', ['class' => 'mizzey-card-picker__product'],
+                self::el('span', ['class' => 'mizzey-card-picker__thumb'], $thumb)
+                . self::el('span', ['class' => 'mizzey-card-picker__summary'], self::el('span', ['class' => 'mizzey-card-picker__title'], esc_html($product->get_name())) . self::el('span', ['class' => 'mizzey-card-picker__price'], esc_html($price))))
+            . $groups);
+        $footer = self::el('div', ['class' => 'mizzey-card-picker__actions', 'data-wp-interactive' => self::STORE], $stepper . $add);
+        $title  = __('Choose options', 'mizzey-site');
 
-        // The slice 1 overlay's own store keeps focus inside and closes on the scrim; the panel is the card's.
+        if (function_exists('MizzeySite\Theme\Components\overlay')) {
+            $dialog = \MizzeySite\Theme\Components\overlay(['id' => $id, 'kind' => 'sheet', 'title' => $title, 'body' => $body, 'footer' => $footer]);
+
+            // The picker's own class, beside the overlay's: the popover form and the card's spacing hang on it.
+            $tags = new \WP_HTML_Tag_Processor($dialog);
+            if ($tags->next_tag('dialog')) {
+                $tags->add_class('mizzey-card-picker');
+            }
+
+            return $tags->get_updated_html();
+        }
+
+        // Without the theme's components (the site plugin on another theme): the same overlay, written here.
+        $close = self::el('button', ['type' => 'button', 'class' => ['mizzey-button', 'mizzey-button--icon'], 'aria-label' => __('Close', 'mizzey-site'), 'data-wp-on--click' => 'actions.close'], self::icon('close'));
+        $panel = self::el('span', ['class' => 'mizzey-overlay__handle', 'aria-hidden' => 'true'])
+            . self::el('div', ['class' => 'mizzey-overlay__header'], self::el('h2', ['class' => 'mizzey-overlay__title', 'id' => $id . '-title'], esc_html($title)) . $close)
+            . self::el('div', ['class' => 'mizzey-overlay__body'], $body)
+            . self::el('div', ['class' => 'mizzey-overlay__footer'], $footer);
+
         return self::el('dialog', [
-            'id'                  => $id,
-            'class'               => ['mizzey-overlay', 'mizzey-overlay--sheet', 'mizzey-card-picker'],
-            'aria-labelledby'     => $id . '-title',
-            'data-wp-interactive' => 'mizzey/ui',
-            'data-wp-on--click'   => 'actions.backdrop',
-            'data-wp-on--keydown' => 'actions.trap',
-        ], self::el('div', ['class' => 'mizzey-overlay__panel', 'data-wp-interactive' => self::STORE], $panel));
+            'id'                      => $id,
+            'class'                   => ['mizzey-card-picker', 'mizzey-overlay', 'mizzey-overlay--sheet'],
+            'aria-labelledby'         => $id . '-title',
+            'data-wp-interactive'     => 'mizzey/ui',
+            'data-wp-on--pointerdown' => 'actions.scrimDown',
+            'data-wp-on--click'       => 'actions.backdrop',
+        ], self::el('div', ['class' => 'mizzey-overlay__panel'], $panel));
     }
 
     /**
-     * Whether a value of one option can be bought with the other options as chosen.
+     * Whether a value of one option can be bought together with every other option as chosen: with Red chosen, L is
+     * sold out when no Red/L variation is in stock.
      *
      * @param list<array<string,mixed>> $variations
      * @param array<string,string>      $chosen
@@ -468,7 +487,7 @@ final class ProductCard
         $want       = $chosen;
         $want[$key] = $value;
         foreach ($variations as $variation) {
-            if ($variation['in'] && self::matches($variation, $want, $key)) {
+            if ($variation['in'] && self::matches($variation, $want)) {
                 return true;
             }
         }
@@ -482,12 +501,9 @@ final class ProductCard
      * @param array<string,mixed>  $variation
      * @param array<string,string> $want
      */
-    private static function matches(array $variation, array $want, string $only = ''): bool
+    private static function matches(array $variation, array $want): bool
     {
         foreach ($want as $key => $value) {
-            if ('' !== $only && $key !== $only) {
-                continue;
-            }
             $has = (string) ($variation['attrs'][$key] ?? '');
             if ('' !== $has && $has !== $value) {
                 return false;

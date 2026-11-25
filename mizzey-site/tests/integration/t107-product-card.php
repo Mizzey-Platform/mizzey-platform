@@ -162,13 +162,43 @@ run(
 		}
 		\WC_Product_Variable::sync( $var->get_id() );
 
+		// Two options at once, Colour and Size: only Blue/L and Red/M are in stock, so each choice rules out the other.
+		$pair_attrs = array();
+		foreach ( array( 'Colour' => array( 'Blue', 'Red' ), 'Size' => array( 'M', 'L' ) ) as $attr_name => $values ) {
+			$a = new \WC_Product_Attribute();
+			$a->set_name( $attr_name );
+			$a->set_options( $values );
+			$a->set_visible( true );
+			$a->set_variation( true );
+			$pair_attrs[] = $a;
+		}
+		$pair = new \WC_Product_Variable();
+		$pair->set_name( $tag . ' colour and size' );
+		$pair->set_status( 'publish' );
+		$pair->set_attributes( $pair_attrs );
+		$pair->save();
+		t107_english( $pair->get_id(), 'product' );
+		$s->track_post( $pair->get_id() );
+		foreach ( array( array( 'Blue', 'L', 5 ), array( 'Red', 'M', 5 ), array( 'Blue', 'M', 0 ), array( 'Red', 'L', 0 ) ) as [ $colour, $size, $qty ] ) {
+			$v = new \WC_Product_Variation();
+			$v->set_parent_id( $pair->get_id() );
+			$v->set_attributes( array( 'colour' => $colour, 'size' => $size ) );
+			$v->set_regular_price( '700' );
+			$v->set_manage_stock( true );
+			$v->set_stock_quantity( $qty );
+			$v->save();
+			t107_english( $v->get_id(), 'product_variation' );
+			$s->track_post( $v->get_id() );
+		}
+		\WC_Product_Variable::sync( $pair->get_id() );
+
 		// The stock source holds none of the "refused" product, while WooCommerce still lists 3 (the card says so).
 		$ledger                = get_option( FixtureStockSource::LEDGER, array() );
 		$ledger                = is_array( $ledger ) ? $ledger : array();
 		$ledger[ $ledger_key ] = array( $refused->get_id(), -3 );
 		update_option( FixtureStockSource::LEDGER, $ledger, false );
 
-		$order = array( $long->get_id(), $sale->get_id(), $sold->get_id(), $low->get_id(), $var->get_id(), $two->get_id(), $bare->get_id(), $refused->get_id(), $big->get_id() );
+		$order = array( $long->get_id(), $sale->get_id(), $sold->get_id(), $low->get_id(), $var->get_id(), $two->get_id(), $bare->get_id(), $refused->get_id(), $big->get_id(), $pair->get_id() );
 
 		// ---- The page, in English and in Arabic: a rail of the eight, then the same eight as a grid ----------------
 		$content = sprintf(
@@ -209,6 +239,7 @@ run(
 				'var'     => $var->get_id(),
 				'refused' => $refused->get_id(),
 				'big'     => $big->get_id(),
+				'pair'    => $pair->get_id(),
 			),
 			'variations' => $flavours,
 			'shots'    => get_temp_dir(),

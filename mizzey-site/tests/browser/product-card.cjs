@@ -18,6 +18,9 @@ const fs = require( 'node:fs' );
 const path = require( 'node:path' );
 const { loadPlaywright } = require( './_theme-preview.cjs' );
 
+// A response still awaited when a step fails is dropped with the browser; the failed step is reported by its check.
+process.on( 'unhandledRejection', () => {} );
+
 const plan = JSON.parse( fs.readFileSync( process.argv[ 2 ], 'utf8' ) );
 const checks = [];
 const shots = [];
@@ -345,6 +348,14 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		const returned = await page.evaluate( ( id ) => document.activeElement && document.activeElement.closest( `.mizzey-card[data-product-id="${ id }"]` ) !== null && document.activeElement.classList.contains( 'mizzey-card__add' ), ID.var );
 		check( returned, 'NFR-11 Escape closes the options and focus returns to the + it came from' );
 
+		// A press on the scrim (anywhere outside the popover) closes it too.
+		await page.locator( `.mizzey-products--grid .mizzey-card[data-product-id="${ ID.var }"] .mizzey-card__add` ).click();
+		await pop.waitFor( { timeout: TIMEOUT } );
+		await page.waitForTimeout( 400 );
+		await page.mouse.click( 4, 4 );
+		await page.waitForTimeout( 400 );
+		check( ( await page.locator( 'dialog.mizzey-card-picker[open]' ).count() ) === 0, 'PLP-04 [en 1440] a press on the scrim closes the options popover' );
+
 		// ---- PLP-05: the heart, saved, removed, and rolled back when the server fails -------------------------------
 		const heart = page.locator( `.mizzey-products--grid .mizzey-card[data-product-id="${ ID.sale }"] .mizzey-card__heart` );
 		const saved = page.waitForResponse( ( r ) => r.url().includes( '/mizzey/v1/wishlist/items' ) && r.request().method() === 'POST', { timeout: TIMEOUT } );
@@ -429,6 +440,24 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		const varAfter = await measure( phone, 'grid', ID.var );
 		check( varRes.status() === 201 && varAfter.classes.includes( 'is-added' ) && ! ( await phone.locator( 'dialog.mizzey-card-picker[open]' ).count() ), `PLP-04 [en 390] the chosen flavour is added, the sheet closes and the card shows "Added" (HTTP ${ varRes.status() })` );
 		await noPriceClipped( phone, 'en 390, after the add' );
+		// ---- Two options at once: each choice rules out what is not in stock with it --------------------------------
+		const pairCard = `.mizzey-products--grid .mizzey-card[data-product-id="${ ID.pair }"]`;
+		await phone.locator( `${ pairCard } .mizzey-card__add` ).click();
+		const pairSheet = phone.locator( `${ pairCard } dialog.mizzey-card-picker[open]` );
+		await pairSheet.waitFor( { timeout: TIMEOUT } );
+		await phone.waitForTimeout( 500 );
+		const marks = () => pairSheet.evaluate( ( d ) => Object.fromEntries( [ ...d.querySelectorAll( '[role="radio"]' ) ].map( ( o ) => [ o.querySelector( '.mizzey-option__label' ).textContent.trim(), ( o.getAttribute( 'aria-checked' ) === 'true' ? 'chosen' : '' ) + ( o.getAttribute( 'aria-disabled' ) === 'true' ? 'sold out' : '' ) ] ) ) );
+		const blue = await marks();
+		check( blue.Blue === 'chosen' && blue.L === 'chosen' && blue.M === 'sold out' && blue.Red === 'sold out', `PLP-03 [en 390] with Blue and L chosen, M and Red show sold out (only Blue/L and Red/M are in stock): ${ JSON.stringify( blue ) }` );
+		// Red is marked sold out with L, so it is pressed as a person presses it, past Playwright's own refusal.
+		await pairSheet.locator( '[role="radio"]', { hasText: 'Red' } ).click( { force: true } );
+		await phone.waitForTimeout( 300 );
+		const red = await marks();
+		check( red.Red === 'chosen' && red.M === 'chosen' && red.L === 'sold out' && red.Blue === 'sold out', `PLP-03 [en 390] choosing Red moves to Red/M, and L shows sold out with Red: ${ JSON.stringify( red ) }` );
+		await phone.mouse.click( 195, 40 );
+		await phone.waitForTimeout( 500 );
+		check( ( await phone.locator( 'dialog.mizzey-card-picker[open]' ).count() ) === 0, 'PLP-04 [en 390] a press on the scrim above the sheet closes it' );
+
 		check( phoneErrors.length === 0, `no script error on the phone (${ JSON.stringify( phoneErrors.slice( 0, 3 ) ) })` );
 		cart = await phone.evaluate( async ( url ) => ( await fetch( url + 'cart', { credentials: 'same-origin' } ) ).json(), plan.store );
 

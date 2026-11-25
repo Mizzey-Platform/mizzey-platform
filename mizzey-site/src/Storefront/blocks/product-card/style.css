@@ -605,7 +605,7 @@
 	outline-offset: var(--mizzey-focus-offset);
 }
 
-.mizzey-card-picker__footer {
+.mizzey-card-picker__actions {
 	display: flex;
 	align-items: center;
 	gap: var(--mizzey-space-3);

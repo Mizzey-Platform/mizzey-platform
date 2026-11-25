@@ -101,11 +101,21 @@ const { state } = store( 'mizzey/card', {
 		choose: withSyncEvent( ( event ) => {
 			const context = getContext();
 			const button = event.currentTarget;
+			const key = button.dataset.key;
+			const value = button.dataset.value;
+			let chosen = { ...context.picker.chosen, [ key ]: value };
 			if ( button.getAttribute( 'aria-disabled' ) === 'true' ) {
-				event.preventDefault();
-				return;
+				// Sold out with the other options as chosen: taken only when some variation with it is in stock, and
+				// then the other options move to that variation (Red from Blue/L moves to Red/M). Sold out everywhere,
+				// it cannot be chosen.
+				const other = context.picker.variations.find( ( v ) => v.in && ( v.attrs[ key ] || '' ) === value );
+				if ( ! other ) {
+					event.preventDefault();
+					return;
+				}
+				chosen = Object.fromEntries( Object.entries( chosen ).map( ( [ k, current ] ) => [ k, other.attrs[ k ] || current ] ) );
 			}
-			context.picker.chosen = { ...context.picker.chosen, [ button.dataset.key ]: button.dataset.value };
+			context.picker.chosen = chosen;
 			refresh( button.closest( 'dialog' ), context.picker );
 		} ),
 		step: withSyncEvent( ( event ) => {
@@ -114,12 +124,6 @@ const { state } = store( 'mizzey/card', {
 			context.picker.qty = next;
 			event.currentTarget.closest( '.mizzey-stepper' ).querySelector( '.mizzey-stepper__value' ).textContent = String( next );
 		} ),
-		closePicker() {
-			const dialog = getElement().ref.closest( 'dialog' );
-			if ( dialog && dialog.open ) {
-				dialog.close();
-			}
-		},
 		*wish() {
 			const context = getContext();
 			const was = context.wished;
@@ -238,11 +242,9 @@ function* send( context, body ) {
 	}
 }
 
-function matches( variation, chosen, only ) {
+/** Whether a variation fits every option chosen (an empty value on the variation means any). */
+function matches( variation, chosen ) {
 	return Object.entries( chosen ).every( ( [ key, value ] ) => {
-		if ( only && key !== only ) {
-			return true;
-		}
 		const has = variation.attrs[ key ] || '';
 		return has === '' || has === value;
 	} );
@@ -257,7 +259,7 @@ function refresh( dialog, picker ) {
 		const key = button.dataset.key;
 		const value = button.dataset.value;
 		const want = { ...picker.chosen, [ key ]: value };
-		const available = picker.variations.some( ( v ) => v.in && matches( v, want, key ) );
+		const available = picker.variations.some( ( v ) => v.in && matches( v, want ) );
 		button.setAttribute( 'aria-checked', picker.chosen[ key ] === value ? 'true' : 'false' );
 		button.setAttribute( 'aria-disabled', available ? 'false' : 'true' );
 	} );
