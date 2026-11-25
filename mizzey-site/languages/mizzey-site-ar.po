@@ -1245,3 +1245,11 @@ msgstr "الأقسام"
 #: mizzey-theme/inc/header.php
 msgid "Shortcuts"
 msgstr "اختصارات"
+
+#: mizzey-theme/inc/header.php
+msgid "Site header"
+msgstr "رأس الموقع"
+
+#: mizzey-theme/inc/header.php
+msgid "The store header: logo, search, language, account, wishlist, cart and the category menus."
+msgstr "رأس المتجر: الشعار والبحث واللغة والحساب وقائمة الأمنيات والسلة وقوائم الأقسام."

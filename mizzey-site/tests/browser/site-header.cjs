@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The designed header in a real browser (spec 066, slice 2; AC-1, AC-14). Driven by t107, which prepares the runtime
+ * The designed header in a real browser (spec 066, slice 2; AC-1, AC-14). Driven by t108, which prepares the runtime
  * and passes a JSON plan as the only argument; prints one JSON object: { checks: [{ ok, what }], menus: {...} }.
  *
  * In English and in Arabic, at 1440 and at 390 wide:
@@ -203,12 +203,24 @@ async function phoneMenu( page, lang, expected ) {
 	await page.waitForTimeout( 300 );
 	const back = tagged( await names( page, `${ drawer } .mizzey-menu__level:not([hidden]) .mizzey-menu__row .mizzey-menu__name` ) );
 	check( same( back, expected.top ), `NAV-10 ${ where } back returns to the first level` );
+	// A tap on the scrim beside the drawer closes it, and focus returns to the menu control.
+	await page.mouse.click( lang === 'ar' ? 20 : 370, 450 );
+	await page.waitForTimeout( 500 );
+	const tapped = await page.evaluate( ( s ) => ! document.querySelector( s ).open && document.activeElement && document.activeElement.classList.contains( 'mizzey-header__menu' ), drawer );
+	check( tapped, `NAV-10 ${ where } a tap on the scrim closes the drawer and focus returns to the menu control` );
+	await button.click();
+	await page.waitForTimeout( 600 );
+	// The drawer is a native modal dialog: the page behind is inert, so Tab never reaches a control of the page;
+	// past the last control the browser may hold focus itself (the document) before Tab comes back in.
 	let trapped = true;
 	for ( let i = 0; i < 30; i++ ) {
 		await page.keyboard.press( 'Tab' );
-		trapped = trapped && await focusInside( page, drawer );
+		trapped = trapped && await page.evaluate( ( s ) => {
+			const active = document.activeElement;
+			return ! active || active === document.body || document.querySelector( s ).contains( active );
+		}, drawer );
 	}
-	check( trapped, `NFR-11 ${ where } Tab stays inside the open drawer` );
+	check( trapped, `NFR-11 ${ where } Tab never leaves the open drawer for the page behind` );
 	await page.keyboard.press( 'Escape' );
 	await page.waitForTimeout( 500 );
 	const closed = await page.evaluate( ( s ) => ! document.querySelector( s ).open && document.activeElement && document.activeElement.classList.contains( 'mizzey-header__menu' ), drawer );
@@ -328,6 +340,14 @@ async function main( browser ) {
 			const label = await page.evaluate( () => document.querySelector( '.mizzey-header__cart' ).textContent.replace( /\s+/g, ' ' ).trim() );
 			check( after === before + 1 && kept, `NAV-06 [en, 1440] the cart's count goes from ${ before } to ${ after } after an add, without a reload (label: ${ label })` );
 			check( label.includes( String( after ) ), `NAV-06 [en, 1440] the cart's name says the new count` );
+			// The product card's own event (slice 4) carries the server's count: the header shows it as told.
+			await page.evaluate( () => document.dispatchEvent( new CustomEvent( 'mizzey-cart-changed', { detail: { count: 5 } } ) ) );
+			await page.waitForTimeout( 300 );
+			const told = await page.evaluate( () => {
+				const link = document.querySelector( '.mizzey-header__cart' );
+				return { count: link.querySelector( '.mizzey-count' ).textContent.trim(), label: link.querySelector( '.mizzey-header__cart-label' ).textContent.trim() };
+			} );
+			check( told.count === '5' && told.label.includes( '5' ), `NAV-06 [en, 1440] the card's "mizzey-cart-changed" event sets the count it carries (${ JSON.stringify( told ) })` );
 		}
 		check( errors.length === 0, `[en, add] no script error (${ errors.join( '; ' ).slice( 0, 300 ) })` );
 		// ---- Switching language keeps the page and the cart ----------------------------------------------------
@@ -368,7 +388,10 @@ async function after( browser ) {
 		await desk.page.locator( '.mizzey-header__all' ).click();
 		await desk.page.waitForTimeout( 300 );
 		const mega = tagged( await names( desk.page, '.mizzey-mega__row .mizzey-mega__name' ) );
+		await desk.page.keyboard.press( 'Escape' );
+		const row = tagged( await names( desk.page, '.mizzey-header__links .mizzey-header__link' ) );
 		await desk.context.close();
+		check( same( row, L.expected.row ), `SSC-07 [${ lang }] with a footer menu published later, the category row still carries the header's menu: ${ JSON.stringify( row ) }` );
 		const phone = await open( browser, L.home, 390 );
 		await phone.page.locator( '.mizzey-header__menu' ).click();
 		await phone.page.waitForTimeout( 500 );

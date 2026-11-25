@@ -1,6 +1,6 @@
 <?php
 /**
- * t107, spec 066 slice 2: the designed header and its menus in a real browser (AC-1, AC-14; NAV-01 to NAV-10, SSC-07,
+ * t108, spec 066 slice 2: the designed header and its menus in a real browser (AC-1, AC-14; NAV-01 to NAV-10, SSC-07,
  * NFR-11; the signed-in switcher is D-31, a gift).
  *
  * The runtime is prepared here and the browser part is mizzey-site/tests/browser/site-header.cjs:
@@ -27,13 +27,13 @@ use MizzeySite\Storefront\HeaderData;
 require_once __DIR__ . '/_bootstrap.php';
 
 /** A category's own term_taxonomy_id (as t94: get_term() would give the term in the current language). */
-function t107_ttid( int $term_id ): int {
+function t108_ttid( int $term_id ): int {
 	global $wpdb;
 	return (int) $wpdb->get_var( $wpdb->prepare( "SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} WHERE term_id = %d AND taxonomy = 'product_cat'", $term_id ) );
 }
 
 /** Run something in a language and come back. */
-function t107_in( string $lang, callable $fn ) {
+function t108_in( string $lang, callable $fn ) {
 	$current = (string) apply_filters( 'wpml_current_language', null );
 	do_action( 'wpml_switch_language', $lang );
 	$out = $fn();
@@ -46,8 +46,8 @@ function t107_in( string $lang, callable $fn ) {
  *
  * @return array<string,mixed>
  */
-function t107_browser( array $plan ): array {
-	$file = wp_tempnam( 't107-plan' );
+function t108_browser( array $plan ): array {
+	$file = wp_tempnam( 't108-plan' );
 	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 	$out  = array();
 	$code = 0;
@@ -58,7 +58,7 @@ function t107_browser( array $plan ): array {
 }
 
 /** A navigation menu's markup, as the Site Editor saves it. */
-function t107_menu( array $links ): string {
+function t108_menu( array $links ): string {
 	$out = '';
 	foreach ( $links as $link ) {
 		$out .= '<!-- wp:navigation-link ' . wp_json_encode( $link, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' /-->';
@@ -67,7 +67,7 @@ function t107_menu( array $links ): string {
 }
 
 run(
-	new Scenario( 't107-site-header', 'AC-1, AC-14 (slice 2): the designed header, the mega menu and the phone menu, in both languages at 1440 and 390' ),
+	new Scenario( 't108-site-header', 'AC-1, AC-14 (slice 2): the designed header, the mega menu and the phone menu, in both languages at 1440 and 390' ),
 	function ( Scenario $s ): bool {
 		global $sitepress;
 		$ok    = true;
@@ -102,12 +102,12 @@ run(
 			do_action( 'wpml_switch_language', 'en' );
 			$made = wp_insert_term( $en, 'product_cat', array( 'parent' => $parent ) );
 			$id   = is_wp_error( $made ) ? 0 : (int) $made['term_id'];
-			$trid = apply_filters( 'wpml_element_trid', null, t107_ttid( $id ), 'tax_product_cat' );
+			$trid = apply_filters( 'wpml_element_trid', null, t108_ttid( $id ), 'tax_product_cat' );
 			do_action( 'wpml_switch_language', 'ar' );
 			$arm = wp_insert_term( $ar, 'product_cat', array( 'parent' => $ar_parent ) );
 			do_action( 'wpml_switch_language', 'en' );
 			$ar_id = is_wp_error( $arm ) ? 0 : (int) $arm['term_id'];
-			do_action( 'wpml_set_element_language_details', array( 'element_id' => t107_ttid( $ar_id ), 'element_type' => 'tax_product_cat', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+			do_action( 'wpml_set_element_language_details', array( 'element_id' => t108_ttid( $ar_id ), 'element_type' => 'tax_product_cat', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
 			$terms[] = $id;
 			$terms[] = $ar_id;
 			return array( $id, $ar_id );
@@ -139,7 +139,7 @@ run(
 			$products[] = $product;
 		}
 		foreach ( array( $beauty, $skin, $hair, $home, $lamps, $desk, $beauty_ar, $skin_ar, $hair_ar, $home_ar, $lamps_ar, $desk_ar ) as $t ) {
-			wp_update_term_count_now( array( t107_ttid( $t ) ), 'product_cat' );
+			wp_update_term_count_now( array( t108_ttid( $t ) ), 'product_cat' );
 		}
 		wp_cache_flush();
 
@@ -152,14 +152,16 @@ run(
 				}
 			}
 		);
-		$link = static fn ( string $lang, int $term ): string => (string) t107_in( $lang, static fn () => get_term_link( $term, 'product_cat' ) );
+		$link = static fn ( string $lang, int $term ): string => (string) t108_in( $lang, static fn () => get_term_link( $term, 'product_cat' ) );
 		do_action( 'wpml_switch_language', 'en' );
 		$menus[] = $menu_en = (int) wp_insert_post(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_status'  => 'publish',
 				'post_title'   => "{$tag} header",
-				'post_content' => t107_menu(
+				// The header's menu is the one named for it (HeaderMenu::SLUG), never just the newest menu.
+				'post_name'    => \MizzeySite\Storefront\HeaderMenu::SLUG,
+				'post_content' => t108_menu(
 					array(
 						array( 'label' => "{$tag} Offers", 'url' => home_url( '/?s=offer' ), 'kind' => 'custom', 'className' => 'is-style-offer' ),
 						array( 'label' => "{$tag} Beauty", 'url' => $link( 'en', $beauty ), 'kind' => 'taxonomy', 'type' => 'product_cat', 'id' => $beauty ),
@@ -174,7 +176,7 @@ run(
 				'post_type'    => 'wp_navigation',
 				'post_status'  => 'publish',
 				'post_title'   => "{$tag} header ar",
-				'post_content' => t107_menu(
+				'post_content' => t108_menu(
 					array(
 						array( 'label' => "{$tag} العروض", 'url' => home_url( '/ar/?s=offer' ), 'kind' => 'custom', 'className' => 'is-style-offer' ),
 						array( 'label' => "{$tag} الجمال", 'url' => $link( 'ar', $beauty_ar ), 'kind' => 'taxonomy', 'type' => 'product_cat', 'id' => $beauty_ar ),
@@ -186,6 +188,24 @@ run(
 		do_action( 'wpml_switch_language', 'en' );
 		$trid = apply_filters( 'wpml_element_trid', null, $menu_en, 'post_wp_navigation' );
 		do_action( 'wpml_set_element_language_details', array( 'element_id' => $menu_ar, 'element_type' => 'post_wp_navigation', 'trid' => $trid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+
+		$check( \MizzeySite\Storefront\HeaderMenu::SLUG === get_post_field( 'post_name', $menu_en ), 'the menu staff name for the header carries that name (no other menu on this runtime holds it)' );
+
+		// ---- A footer menu published after the header's, in both languages: the header must not take it -----------
+		$footer = static function ( string $lang, string $label ) use ( $tag ): int {
+			do_action( 'wpml_switch_language', $lang );
+			$id = (int) wp_insert_post( array( 'post_type' => 'wp_navigation', 'post_status' => 'publish', 'post_title' => "{$tag} footer {$lang}", 'post_content' => t108_menu( array( array( 'label' => $label, 'url' => home_url( '/about/' ), 'kind' => 'custom' ) ) ) ) );
+			do_action( 'wpml_switch_language', 'en' );
+			return $id;
+		};
+		$menus[] = $footer_en = $footer( 'en', "{$tag} Footer link" );
+		$menus[] = $footer_ar = $footer( 'ar', "{$tag} رابط التذييل" );
+		$ftrid = apply_filters( 'wpml_element_trid', null, $footer_en, 'post_wp_navigation' );
+		do_action( 'wpml_set_element_language_details', array( 'element_id' => $footer_ar, 'element_type' => 'post_wp_navigation', 'trid' => $ftrid, 'language_code' => 'ar', 'source_language_code' => 'en' ) );
+		foreach ( array( 'en' => array( "{$tag} Offers", "{$tag} Beauty", "{$tag} Brands" ), 'ar' => array( "{$tag} العروض", "{$tag} الجمال", "{$tag} الماركات" ) ) as $lang => $labels ) {
+			$links = array_column( (array) t108_in( $lang, static fn () => \MizzeySite\Storefront\HeaderMenu::links() ), 'label' );
+			$check( $labels === $links, "SSC-07 [{$lang}] a footer menu published after the header's leaves the header's links unchanged (" . wp_json_encode( $links, JSON_UNESCAPED_UNICODE ) . ')' );
+		}
 
 		// ---- A page with WooCommerce's own add to cart button ----------------------------------------------------
 		$page = (int) wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => "{$tag} add", 'post_content' => '[products ids="' . $products[0]->get_id() . '" columns="1"]' ) );
@@ -205,7 +225,7 @@ run(
 
 		// ---- What each language should show ----------------------------------------------------------------------
 		$expected = static function ( string $lang ) use ( $tag ): array {
-			$tree = (array) t107_in( $lang, static fn () => HeaderData::categories() );
+			$tree = (array) t108_in( $lang, static fn () => HeaderData::categories() );
 			$top  = array_values( array_filter( $tree, static fn ( $n ) => str_contains( (string) $n['name'], $tag ) ) );
 			$parent = $top[0] ?? array( 'name' => '', 'url' => '', 'children' => array() );
 			return array(
@@ -215,13 +235,14 @@ run(
 				'children'  => array_column( (array) $parent['children'], 'name' ),
 				'photo'     => '' !== (string) ( $parent['image'] ?? '' ),
 				'offer'     => 'ar' === $lang ? "{$tag} العروض" : "{$tag} Offers",
+				'row'       => 'ar' === $lang ? array( "{$tag} العروض", "{$tag} الجمال", "{$tag} الماركات" ) : array( "{$tag} Offers", "{$tag} Beauty", "{$tag} Brands" ),
 				'after'     => array_values( array_diff( array_column( $top, 'name' ), array( 'ar' === $lang ? "{$tag} المنزل" : "{$tag} Home" ) ) ),
 			);
 		};
 		$language = static function ( string $lang ) use ( $link, $beauty, $beauty_ar, $products, $expected ): array {
-			$data = (array) t107_in( $lang, static fn () => HeaderData::header() );
+			$data = (array) t108_in( $lang, static fn () => HeaderData::header() );
 			return array(
-				'home'     => (string) t107_in( $lang, static fn () => apply_filters( 'wpml_home_url', home_url( '/' ) ) ),
+				'home'     => (string) t108_in( $lang, static fn () => apply_filters( 'wpml_home_url', home_url( '/' ) ) ),
 				'search'   => (string) apply_filters( 'wpml_permalink', home_url( '/' ), $lang ),
 				'account'  => (string) $data['account']['url'],
 				'wishlist' => (string) $data['wishlist']['url'],
@@ -247,7 +268,7 @@ run(
 			'customer'    => array( 'cookies' => $cookies, 'first' => 'Samira' ),
 			'shots'       => get_temp_dir(),
 		);
-		$result = t107_browser( $plan );
+		$result = t108_browser( $plan );
 		$check( empty( $result['error'] ), 'the browser ran' . ( empty( $result['error'] ) ? '' : ': ' . substr( (string) $result['error'], 0, 1500 ) ) );
 		foreach ( (array) ( $result['checks'] ?? array() ) as $row ) {
 			$check( true === $row['ok'], (string) $row['what'] );
@@ -257,12 +278,12 @@ run(
 		// ---- SSC-07: the admin takes Home out of the main menu; both menus follow after a reload --------------------
 		update_term_meta( $home, HeaderData::HIDDEN, 'yes' );
 		wp_cache_flush();
-		$after = t107_browser( array( 'part' => 'after' ) + $plan );
+		$after = t108_browser( array( 'part' => 'after' ) + $plan );
 		$check( empty( $after['error'] ), 'the browser ran after the change' . ( empty( $after['error'] ) ? '' : ': ' . substr( (string) $after['error'], 0, 1500 ) ) );
 		foreach ( (array) ( $after['checks'] ?? array() ) as $row ) {
 			$check( true === $row['ok'], (string) $row['what'] );
 		}
-		$check( 2 === count( (array) ( $after['checks'] ?? array() ) ), 'the browser made both checks after the change' );
+		$check( 4 === count( (array) ( $after['checks'] ?? array() ) ), 'the browser made every check after the change' );
 
 		return $ok;
 	}

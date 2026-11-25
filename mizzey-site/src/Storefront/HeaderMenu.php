@@ -15,10 +15,10 @@ defined('ABSPATH') || exit;
  * staff manage in the Site Editor (Appearance > Editor > Navigation), one menu per language through WPML (SSC-07,
  * NAV-07). Native first: the menu is WordPress's own `wp_navigation`; this class only reads it.
  *
- * - **Which menu.** The one the header names (its `menu` setting, in the store's main language, followed to the
- *   request's language), or, when none is named, the most recently published menu in the request's language, as the
- *   core navigation block falls back. With no menu at all, the top-level categories stand in (specs/054), so a new
- *   store still has a row.
+ * - **Which menu.** Named, never guessed: the one chosen in the header's `menu` setting, or else the menu whose slug
+ *   is `mizzey-header` (a menu titled "Mizzey header" gets it), each in the store's main language and followed to the
+ *   request's language. Other menus (the footer's, a page's) are never taken, however recent. With no named menu,
+ *   the top-level categories stand in (specs/054), so a new store still has a row.
  * - **An offer link.** A link given the "Offer" style in the menu editor (a block style registered here on the core
  *   navigation link) carries the Offers tag on desktop, leads the phone's chips and is the drawer's highlighted row.
  * - **A category link** carries its category's picture for the phone's chips, from the category in the store's main
@@ -32,6 +32,8 @@ defined('ABSPATH') || exit;
 final class HeaderMenu
 {
     public const OFFER_STYLE = 'offer';
+    /** The slug that names the header's menu when the header block names none. */
+    public const SLUG = 'mizzey-header';
     private const LINK_BLOCKS = ['core/navigation-link', 'core/navigation-submenu'];
 
     public static function register(): void
@@ -67,22 +69,24 @@ final class HeaderMenu
     /** The menu in the request's language. */
     private static function menu(int $menu): ?\WP_Post
     {
-        if ($menu > 0) {
-            $translated = (int) apply_filters('wpml_object_id', $menu, 'wp_navigation', true);
-            $post       = get_post($translated > 0 ? $translated : $menu);
-
-            return $post instanceof \WP_Post && 'wp_navigation' === $post->post_type && 'publish' === $post->post_status ? $post : null;
+        if ($menu <= 0) {
+            // The menu named for the header, whatever the request's language (WPML would hide the original).
+            $named = get_posts([
+                'post_type'        => 'wp_navigation',
+                'post_status'      => 'publish',
+                'name'             => self::SLUG,
+                'numberposts'      => 1,
+                'suppress_filters' => true,
+            ]);
+            $menu = isset($named[0]) && $named[0] instanceof \WP_Post ? (int) $named[0]->ID : 0;
         }
-        $found = get_posts([
-            'post_type'        => 'wp_navigation',
-            'post_status'      => 'publish',
-            'numberposts'      => 1,
-            'orderby'          => 'date',
-            'order'            => 'DESC',
-            'suppress_filters' => false,
-        ]);
+        if ($menu <= 0) {
+            return null;
+        }
+        $translated = (int) apply_filters('wpml_object_id', $menu, 'wp_navigation', true);
+        $post       = get_post($translated > 0 ? $translated : $menu);
 
-        return isset($found[0]) && $found[0] instanceof \WP_Post ? $found[0] : null;
+        return $post instanceof \WP_Post && 'wp_navigation' === $post->post_type && 'publish' === $post->post_status ? $post : null;
     }
 
     /**

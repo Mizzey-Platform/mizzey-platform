@@ -38,9 +38,9 @@
 						} ),
 						el( SelectControl, {
 							label: __( 'Menu of the category row', 'mizzey-site' ),
-							help: __( 'Each language uses its own translation of the menu. With none chosen, the newest menu is used.', 'mizzey-site' ),
+							help: __( 'Each language uses its own translation of the menu. With none chosen, the menu titled "Mizzey header" is used.', 'mizzey-site' ),
 							value: String( attributes.menu || 0 ),
-							options: [ { value: '0', label: __( 'The newest menu', 'mizzey-site' ) } ].concat(
+							options: [ { value: '0', label: __( 'The menu titled "Mizzey header"', 'mizzey-site' ) } ].concat(
 								menus.map( ( m ) => ( { value: String( m.id ), label: ( m.title && m.title.rendered ) || String( m.id ) } ) )
 							),
 							onChange: ( menu ) => setAttributes( { menu: Number( menu ) || 0 } ),

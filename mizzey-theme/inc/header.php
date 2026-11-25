@@ -10,7 +10,8 @@
  *
  * - **style**: one of the three headers the board draws, `white` (logo at the start, the default), `indigo` (Royal
  *   Indigo, logo at the start) or `centred` (White, logo centred). Nothing else is offered (G11).
- * - **menu**: the navigation menu of the category row (MizzeySite\Storefront\HeaderMenu reads it, per language);
+ * - **menu**: the navigation menu of the category row; with none chosen, the menu named "Mizzey header" (slug
+ *   `mizzey-header`). MizzeySite\Storefront\HeaderMenu reads it, per language;
  * - **helpUrl**: where Help leads; with none, Help is not shown;
  * - **darkLogo**: the logo file for the Indigo header (the brand's Royal BG artwork); the site logo serves the others.
  *
@@ -23,7 +24,7 @@
  * row and the chips ("home"); a product, the cart and checkout carry a search control instead of the row ("compact"),
  * and no tab bar, because their action bar takes its place; every other page carries the search row ("listing").
  *
- * Behaviour is in assets/js/header.js (store `mizzey/header`), the drawer's opening, focus trap and return in
+ * Behaviour is in assets/js/header.js (store `mizzey/header`), the drawer's opening, modal focus and return in
  * assets/js/ui.js (store `mizzey/ui`); the look in assets/css/header.css.
  *
  * Register ids: NAV-01 to NAV-10, SSC-07, NFR-11; the signed-in switcher shows D-31 (a gift). See
@@ -605,11 +606,13 @@ function drawer(array $d): string
             'id'                  => DRAWER,
             'class'               => 'mizzey-overlay mizzey-overlay--drawer-start mizzey-menu',
             'aria-label'          => __('Menu', 'mizzey-site'),
-            'data-wp-interactive' => 'mizzey/ui',
-            'data-wp-on--click'   => 'actions.backdrop',
-            'data-wp-on--keydown' => 'actions.trap',
-            'data-wp-on--close'   => 'actions.restore',
-            'data-wp-init'        => 'mizzey/header::callbacks.initDrawer',
+            // The base drawer's behaviour (store mizzey/ui, as overlay() wires it): showModal() moves focus in, keeps
+            // the page behind inert, closes on Escape and returns focus; a press that starts and ends on the scrim
+            // closes. The drawer's own markup holds one head per level, which overlay()'s single title does not.
+            'data-wp-interactive'     => 'mizzey/ui',
+            'data-wp-on--pointerdown' => 'actions.scrimDown',
+            'data-wp-on--click'       => 'actions.backdrop',
+            'data-wp-init'            => 'mizzey/header::callbacks.initDrawer',
         ],
         $panel
     );
