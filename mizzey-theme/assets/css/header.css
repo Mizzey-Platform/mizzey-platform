@@ -197,9 +197,10 @@
 	appearance: none;
 }
 
-/* On the home page the chips sit 6 under the field (the 152 header of C1-Header-Footer-Styles, H1 phone). */
+/* On the home page the chips sit 12 under the field, and 12 above the header's foot (C1-Home-Phone; the owner chose
+   it over the tighter 6 of C1-Header-Footer-Styles H1, 25 November 2026). */
 .mizzey-header--form-home .mizzey-header__search {
-	margin-block-end: calc(var(--mizzey-space-3) / 2);
+	margin-block-end: var(--mizzey-space-3);
 }
 
 /* The compact form (product, cart, checkout): a search control in the bar opens the row. */
@@ -221,7 +222,7 @@
 	display: flex;
 	gap: var(--mizzey-space-2);
 	margin: 0;
-	padding-block: 0 calc(var(--mizzey-space-3) / 2);
+	padding-block: 0 var(--mizzey-space-3);
 	padding-inline: var(--mizzey-space-4);
 	overflow-x: auto;
 	scrollbar-width: none;
