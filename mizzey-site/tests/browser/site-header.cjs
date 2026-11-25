@@ -91,8 +91,22 @@ async function entryPoints( page, lang, width ) {
 			chips: !! pick( '.mizzey-header__chips' ),
 			row: !! pick( '.mizzey-header__row' ),
 			menuControl: !! pick( '.mizzey-header__menu' ),
+			// The home page's phone header: 12 from the field to the chips, 12 from the chips to the header's foot.
+			gaps: ( () => {
+				const field = pick( '.mizzey-header__search' );
+				const chip = pick( '.mizzey-header__chips .mizzey-chip' );
+				const row = pick( '.mizzey-header__chips' );
+				if ( ! field || ! chip || ! row ) {
+					return null;
+				}
+				const f = field.getBoundingClientRect(), c = chip.getBoundingClientRect(), r = row.getBoundingClientRect();
+				return { above: Math.round( c.top - f.bottom ), below: Math.round( r.bottom - c.bottom ) };
+			} )(),
 		};
 	} );
+	if ( data && data.gaps ) {
+		check( data.gaps.above === 12 && data.gaps.below === 12, `${ where } the chips sit 12 under the search field and 12 above the header's foot (C1-Home-Phone), got ${ data.gaps.above } and ${ data.gaps.below }` );
+	}
 	return { where, data };
 }
 
