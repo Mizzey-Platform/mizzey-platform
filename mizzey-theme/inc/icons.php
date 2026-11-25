@@ -84,6 +84,15 @@ function shapes(): array
         'restart'      => '<path d="M5 12a7 7 0 1 0 2.2-5.1"/><path d="M5 4.5v3.9h3.9"/>',
         'share'        => '<circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/>'
             . '<path d="M8.7 10.8l6.1-3.5M8.7 13.2l6.1 3.5"/>',
+        // The product page's share list and stock lines (spec 066, slice 9), as C1-Product-Phone draws them.
+        'link'         => '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+        'whatsapp'     => '<path d="M5 19l1.2-3.6A7.5 7.5 0 1 1 9 18.3z"/><path d="M9.5 9.5c0 2.5 2.5 5 5 5l1-1.5-2-1-1 .8a3.4 3.4 0 0 1-1.8-1.8l.8-1-1-2z"/>',
+        'facebook'     => '<path d="M14.5 8.5H16V5.5h-2a3.5 3.5 0 0 0-3.5 3.5v2H8.5v3h2V20h3v-6h2.2l.5-3h-2.7V9.5a1 1 0 0 1 1-1z"/>',
+        'x'            => '<path d="M5 5l14 14M19 5l-5.6 6.2M10.6 12.8 5 19"/>',
+        'mail'         => '<rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5"/>',
+        'info'         => '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.5v.01"/>',
+        'unavailable'  => '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+        'warning'      => '<path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5"/><path d="M12 17v.01"/>',
         'play'         => '<path d="M9 7v10l8-5z" fill="currentColor"/>',
         'pause'        => '<rect x="7" y="6" width="3.5" height="12" rx="1.5" fill="currentColor" stroke="none"/>'
             . '<rect x="13.5" y="6" width="3.5" height="12" rx="1.5" fill="currentColor" stroke="none"/>',

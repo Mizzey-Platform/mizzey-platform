@@ -1,0 +1,1523 @@
+/* The product page's gallery and buying area (spec 066, slice 9), as C1-Product-Phone, C1-Product-Desktop and
+   C1-Arabic-Stage-2 (G1) draw them. Every value is a token; logical properties only, so Arabic is the mirror. The
+   numbers in the comments are the boards'. */
+
+:where(.mizzey-product-page, .mizzey-product-page *, .mizzey-zoom, .mizzey-zoom *, .mizzey-share, .mizzey-share *, .mizzey-buy-bar, .mizzey-buy-bar *) {
+	box-sizing: border-box;
+}
+
+:root:has(.mizzey-zoom[open], .mizzey-share[open]) {
+	overflow: hidden;
+}
+
+/* The page: the phone's 16 margin, the 1272 grid from 1024 wide. */
+.mizzey-product-page {
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+/* The page's parts touch: the spaces between them are the boards', not the block layout's. */
+.mizzey-product-page.mizzey-product-page > * {
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: 0;
+	margin-inline: auto;
+}
+
+.mizzey-product-page > .wc-block-store-notices:empty,
+.mizzey-product-page__crumbs {
+	display: none;
+}
+
+.mizzey-product-page__details:empty {
+	display: none;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The layout: one column on a phone; from 1024 the gallery 732 and the buying area 516, 24 apart. */
+
+.mizzey-buy {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	align-items: start;
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-buy__back {
+	display: inline-flex;
+	align-items: center;
+	justify-self: start;
+	gap: var(--mizzey-space-1);
+	min-block-size: var(--mizzey-control-target-min);
+	margin-inline-start: calc(var(--mizzey-space-1) * -1);
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-body-strong);
+	text-decoration: none;
+}
+
+.mizzey-buy__back svg {
+	flex-shrink: 0;
+}
+
+:dir(rtl) .mizzey-buy__back svg,
+[dir="rtl"] .mizzey-buy__back svg {
+	scale: -1 1;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-product-page {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	/* The breadcrumb: 44 high, 13 on 24, the links underlined. */
+	.mizzey-product-page__crumbs {
+		display: block;
+		min-block-size: var(--mizzey-control-target-min);
+		padding-block: calc((var(--mizzey-control-target-min) - var(--mizzey-space-5)) / 2);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--mizzey-color-role-text-muted);
+		font: var(--mizzey-type-label);
+		line-height: var(--mizzey-space-5);
+	}
+
+	.mizzey-product-page__crumbs > * {
+		display: inline;
+		margin: 0;
+		padding: 0;
+		font: inherit;
+	}
+
+	/* Each link a 44 target, the separators 8 either side, as drawn. */
+	.mizzey-product-page__crumbs .mizzey-crumb-sep {
+		margin-inline: var(--mizzey-space-2);
+		font-weight: var(--mizzey-font-weight-regular);
+	}
+
+	.mizzey-product-page__crumbs a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-inline-size: var(--mizzey-control-target-min);
+		min-block-size: var(--mizzey-control-target-min);
+		margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-space-5)) / -2);
+		color: var(--mizzey-color-role-link);
+		text-decoration: underline;
+		text-underline-offset: var(--mizzey-border-indicator);
+	}
+
+	.mizzey-buy {
+		grid-template-columns: minmax(0, 732fr) minmax(0, 516fr);
+		column-gap: var(--mizzey-layout-gutter-desktop);
+	}
+
+	.mizzey-buy__back {
+		display: none;
+	}
+
+	/* The gallery stays in view beside the buying area, whatever its length. */
+	.mizzey-gallery {
+		position: sticky;
+		inset-block-start: var(--mizzey-space-5);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The gallery: the stage (358 square on a phone, 732 by 560 on a desktop, radius 24), the thumbnails (64 / 88). */
+
+.mizzey-gallery {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-2);
+	min-inline-size: 0;
+}
+
+.mizzey-gallery__stage {
+	position: relative;
+	aspect-ratio: 1;
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-tile);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+}
+
+/* The counter's words on a 24 line in its 32 pill, as the product boards draw it. */
+.mizzey-gallery .mizzey-gallery-counter {
+	line-height: var(--mizzey-space-5);
+}
+
+.mizzey-gallery__stage.is-empty {
+	background-color: var(--mizzey-color-indigo-50);
+	box-shadow: none;
+}
+
+.mizzey-gallery__slides {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	cursor: zoom-in;
+}
+
+.mizzey-gallery__slide {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out), visibility var(--mizzey-motion-duration-reduced) linear var(--mizzey-motion-duration-6);
+}
+
+.mizzey-gallery__slide.is-current {
+	opacity: 1;
+	visibility: visible;
+	transition-delay: var(--mizzey-motion-duration-reduced);
+}
+
+/* Any shape, shown whole: the photo fits the stage's middle, 280 of 358 and 440 of 560. */
+.mizzey-gallery__image {
+	position: relative;
+	inline-size: auto;
+	block-size: auto;
+	max-inline-size: 78.2%;
+	max-block-size: 78.2%;
+	object-fit: contain;
+}
+
+.mizzey-gallery__loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--mizzey-color-indigo-50);
+	transition: opacity var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-gallery__slide.is-loaded .mizzey-gallery__loading {
+	opacity: 0;
+}
+
+.mizzey-gallery__slide--video {
+	cursor: default;
+	background-color: var(--mizzey-color-indigo-700);
+}
+
+.mizzey-gallery__video {
+	inline-size: 100%;
+	block-size: 100%;
+	border: 0;
+	object-fit: contain;
+}
+
+.mizzey-gallery-counter {
+	position: absolute;
+	inset-block-end: var(--mizzey-space-3);
+	inset-inline-start: var(--mizzey-space-3);
+}
+
+.mizzey-gallery__showing {
+	position: absolute;
+	inset-block-start: var(--mizzey-space-3);
+	inset-inline-start: var(--mizzey-space-3);
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-badge);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	font: var(--mizzey-type-caption);
+}
+
+.mizzey-gallery__showing[hidden] {
+	display: none;
+}
+
+.mizzey-gallery__zoom,
+.mizzey-gallery__arrow {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: var(--mizzey-elevation-1);
+	cursor: pointer;
+}
+
+.mizzey-gallery__zoom {
+	inset-block-end: var(--mizzey-space-2);
+	inset-inline-end: var(--mizzey-space-2);
+}
+
+/* The arrows: desktop only, 12 inside the stage, centred; Arabic's previous on the right, pointing right. */
+.mizzey-gallery__arrow {
+	inset-block-start: 50%;
+	translate: 0 -50%;
+}
+
+.mizzey-gallery__arrow--prev {
+	inset-inline-start: var(--mizzey-space-3);
+}
+
+.mizzey-gallery__arrow--next {
+	inset-inline-end: var(--mizzey-space-3);
+}
+
+[dir="rtl"] .mizzey-gallery__arrow svg {
+	scale: -1 1;
+}
+
+.mizzey-gallery__stage .mizzey-gallery__arrow {
+	display: none;
+}
+
+.mizzey-gallery__none {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--mizzey-color-indigo-300);
+}
+
+.mizzey-gallery__none-label {
+	position: absolute;
+	inset-block-end: var(--mizzey-space-3);
+	inset-inline-start: var(--mizzey-space-3);
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-badge);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-caption);
+}
+
+.mizzey-gallery__thumbs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-gallery__thumb,
+.mizzey-zoom__thumb {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-product-thumb-phone);
+	block-size: var(--mizzey-control-product-thumb-phone);
+	padding: 0;
+	overflow: hidden;
+	border: 0;
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	cursor: pointer;
+}
+
+.mizzey-gallery__thumb[hidden],
+.mizzey-zoom__thumb[hidden],
+.mizzey-gallery__video-label[hidden] {
+	display: none;
+}
+
+.mizzey-gallery__thumb[aria-current="true"],
+.mizzey-zoom__thumb[aria-current="true"] {
+	box-shadow: inset 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-primary);
+}
+
+.mizzey-gallery__thumb img,
+.mizzey-zoom__thumb img {
+	inline-size: calc(100% - var(--mizzey-space-4));
+	block-size: calc(100% - var(--mizzey-space-4));
+	object-fit: contain;
+}
+
+.mizzey-gallery__play {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: color-mix(in srgb, var(--mizzey-color-role-primary) 16%, transparent);
+}
+
+.mizzey-gallery__play-disc {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-space-6);
+	block-size: var(--mizzey-space-6);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+.mizzey-gallery__video-label {
+	margin-inline-start: var(--mizzey-space-1);
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-caption);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-gallery__stage {
+		aspect-ratio: auto;
+		block-size: var(--mizzey-control-product-stage);
+	}
+
+	.mizzey-gallery__stage .mizzey-gallery__arrow {
+		display: flex;
+	}
+
+	/* 440 of the 560 stage. */
+	.mizzey-gallery__image {
+		max-inline-size: 78.6%;
+		max-block-size: 78.6%;
+	}
+
+	.mizzey-gallery__thumb {
+		inline-size: var(--mizzey-control-product-thumb);
+		block-size: var(--mizzey-control-product-thumb);
+	}
+
+	.mizzey-gallery__none svg {
+		inline-size: var(--mizzey-space-6);
+		block-size: var(--mizzey-space-6);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The buying area. */
+
+.mizzey-buy__summary {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	min-inline-size: 0;
+	padding-block-start: var(--mizzey-space-2);
+}
+
+.mizzey-buy__brand {
+	display: inline-flex;
+	align-items: center;
+	align-self: flex-start;
+	min-block-size: var(--mizzey-control-target-min);
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-label);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+/* The name: 19 on 27 (20 on 28 at 1440), three lines until "Show full name". */
+.mizzey-buy__name {
+	display: -webkit-box;
+	margin: 0;
+	overflow: hidden;
+	font: var(--mizzey-type-title);
+	overflow-wrap: anywhere;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+.mizzey-buy__name.is-open {
+	display: block;
+	-webkit-line-clamp: none;
+}
+
+.mizzey-buy__more {
+	align-self: flex-start;
+	min-block-size: var(--mizzey-control-target-min);
+	margin-block: calc(var(--mizzey-space-3) / -2);
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-label);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+	cursor: pointer;
+}
+
+
+
+.mizzey-buy__rating {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	min-block-size: var(--mizzey-space-5);
+	margin: var(--mizzey-space-3) 0 0;
+	font: var(--mizzey-type-label);
+	line-height: var(--mizzey-space-5);
+}
+
+.mizzey-buy__star {
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__reviews {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-space-5)) / -2);
+	color: var(--mizzey-color-role-link);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+/* The price: 28 on 35 Bold Indigo (31 at 1440); the struck price and "Save N%" beside it; "You save" under. */
+.mizzey-buy__prices {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	column-gap: var(--mizzey-space-3);
+	margin-block-start: var(--mizzey-space-4);
+}
+
+.mizzey-buy__from {
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__price {
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-price-lg);
+	font-feature-settings: "tnum" 1;
+}
+
+.mizzey-buy__old {
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-body);
+	font-family: var(--mizzey-font-family-numeric);
+	text-decoration: line-through;
+}
+
+.mizzey-buy__save {
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-badge);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-accent);
+	color: var(--mizzey-color-role-on-accent);
+	font: var(--mizzey-type-caption);
+}
+
+.mizzey-buy__old[hidden],
+.mizzey-buy__save[hidden],
+.mizzey-buy__from[hidden],
+.mizzey-buy__saving[hidden],
+.mizzey-buy__message[hidden],
+.mizzey-buy-bar__cart[hidden] {
+	display: none;
+}
+
+.mizzey-buy__saving {
+	margin: var(--mizzey-space-1) 0 0;
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__saving.is-blank {
+	visibility: hidden;
+}
+
+.mizzey-buy__authentic,
+.mizzey-buy__stock {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	margin: var(--mizzey-space-2) 0 0;
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__authentic svg {
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__authentic a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.mizzey-buy__authentic a:hover {
+	text-decoration: underline;
+}
+
+.mizzey-buy__stock {
+	gap: var(--mizzey-space-1);
+	min-block-size: var(--mizzey-control-icon-dense);
+}
+
+.mizzey-buy__stock .mizzey-buy__stock-icon {
+	display: none;
+	stroke-width: 2.5;
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__stock[data-state="in"] .mizzey-buy__stock-icon--in,
+.mizzey-buy__stock[data-state="low"] .mizzey-buy__stock-icon--low,
+.mizzey-buy__stock[data-state="out"] .mizzey-buy__stock-icon--out,
+.mizzey-buy__stock[data-state="unknown"] .mizzey-buy__stock-icon--unknown {
+	/* One icon for the state shown. */
+	display: block;
+}
+
+.mizzey-buy__stock[data-state="out"] {
+	color: var(--mizzey-color-role-text-muted);
+}
+
+/* The options: a legend 16 on 24 ("Flavour:" muted, the value in Ink), the pills 44 high, 8 apart. */
+.mizzey-buy__form {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+}
+
+.mizzey-buy__group {
+	margin-block-start: var(--mizzey-space-4);
+}
+
+.mizzey-buy__legend {
+	margin: 0;
+	font: var(--mizzey-type-body-strong);
+}
+
+.mizzey-buy__legend-name {
+	color: var(--mizzey-color-role-text-muted);
+}
+
+.mizzey-buy__options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mizzey-space-2);
+	margin-block-start: var(--mizzey-space-2);
+}
+
+.mizzey-buy__option {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	max-inline-size: 100%;
+	min-block-size: var(--mizzey-control-option);
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-4);
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-text);
+	box-shadow: var(--mizzey-elevation-1-soft), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-role-border-control);
+	font: var(--mizzey-type-input);
+	line-height: var(--mizzey-control-icon-dense);
+	cursor: pointer;
+}
+
+.mizzey-buy__option-label {
+	overflow-wrap: anywhere;
+}
+
+.mizzey-buy__option[aria-checked="true"] {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	box-shadow: none;
+	font-weight: var(--mizzey-font-weight-medium);
+}
+
+.mizzey-buy__option-note {
+	display: none;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-caption);
+	line-height: calc(var(--mizzey-space-3) + var(--mizzey-border-control));
+}
+
+/* Sold out with the other choices: on the tint, struck, "Sold out" under; chosen, an Indigo ring. */
+.mizzey-buy__option.is-out {
+	padding-block: calc(var(--mizzey-space-3) / 2);
+	line-height: calc(var(--mizzey-control-icon-dense) - var(--mizzey-border-control));
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-text-muted);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-indigo-200);
+}
+
+.mizzey-buy__option.is-out .mizzey-buy__option-label {
+	text-decoration: line-through;
+}
+
+.mizzey-buy__option.is-out .mizzey-buy__option-note {
+	display: block;
+}
+
+.mizzey-buy__option.is-out[aria-checked="true"] {
+	color: var(--mizzey-color-role-text-muted);
+	box-shadow: inset 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-primary);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+/* A swatch: the 36 disc, its name under it; chosen, a White then Indigo ring. */
+.mizzey-buy__option--swatch {
+	inline-size: var(--mizzey-control-swatch-inline);
+	min-block-size: 0;
+	gap: var(--mizzey-space-1);
+	padding: var(--mizzey-space-1) 0 0;
+	border-radius: var(--mizzey-radius-xs);
+	background: none;
+	box-shadow: none;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-caption);
+}
+
+.mizzey-buy__option--swatch[aria-checked="true"],
+.mizzey-buy__option--swatch.is-out {
+	background: none;
+	color: var(--mizzey-color-role-text);
+	box-shadow: none;
+}
+
+.mizzey-buy__disc {
+	inline-size: var(--mizzey-control-swatch);
+	block-size: var(--mizzey-control-swatch);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-swatch);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) color-mix(in srgb, var(--mizzey-color-role-text) 20%, transparent);
+}
+
+.mizzey-buy__option--swatch[aria-checked="true"] .mizzey-buy__disc {
+	box-shadow: 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-surface), 0 0 0 calc(var(--mizzey-border-control) * 2) var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__option--swatch.is-out .mizzey-buy__disc {
+	opacity: 0.4;
+}
+
+.mizzey-buy__option:focus-visible,
+.mizzey-buy__step:focus-visible,
+.mizzey-buy__wish:focus-visible,
+.mizzey-buy__share:focus-visible,
+.mizzey-buy__more:focus-visible,
+.mizzey-gallery__thumb:focus-visible,
+.mizzey-gallery__zoom:focus-visible,
+.mizzey-gallery__arrow:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* A plain line that says what to do: a combination sold out, not made, or an option not chosen. */
+.mizzey-buy__message {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-2);
+	margin: var(--mizzey-space-4) 0 0;
+	padding: var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__message svg {
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__message[data-kind="plain"] {
+	padding: 0;
+	background: none;
+}
+
+.mizzey-buy__message[data-kind="plain"] svg {
+	display: none;
+}
+
+/* The actions: on a phone the "Quantity" row, then Add to Cart 52; from 1024 the stepper and Add to Cart on one
+   row, 56 high, 12 apart, 24 under the stock line. */
+.mizzey-buy__actions {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-4);
+	margin-block-start: var(--mizzey-space-4);
+}
+
+.mizzey-buy__qty {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-buy__qty-label {
+	font: var(--mizzey-type-body-strong);
+}
+
+.mizzey-buy__stepper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-stepper-inline);
+	block-size: var(--mizzey-control-stepper-block);
+	padding: var(--mizzey-space-1);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-buy__step {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-stepper-button);
+	block-size: var(--mizzey-control-stepper-button);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	cursor: pointer;
+}
+
+.mizzey-buy__step:disabled {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-indigo-300);
+	cursor: not-allowed;
+}
+
+.mizzey-buy__count {
+	flex: 1;
+	text-align: center;
+	font: var(--mizzey-type-body-strong);
+	font-family: var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+}
+
+.mizzey-buy .mizzey-buy__add,
+.mizzey-buy .mizzey-buy__now,
+.mizzey-buy .mizzey-buy-bar__add {
+	position: relative;
+	block-size: var(--mizzey-control-button-regular);
+	text-decoration: none;
+}
+
+.mizzey-buy__add {
+	inline-size: 100%;
+	box-shadow: var(--mizzey-elevation-glow-primary);
+}
+
+.mizzey-buy__add:disabled,
+.mizzey-buy-bar__add:disabled,
+.mizzey-buy__now[aria-disabled="true"] {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-text-muted);
+	box-shadow: none;
+	cursor: not-allowed;
+}
+
+.mizzey-buy__now {
+	margin-block-start: var(--mizzey-space-3);
+}
+
+/* Busy and done: the label keeps the button's width; the i-dot loader, then the tick and "Added", sit in its middle. */
+.mizzey-buy__loader,
+.mizzey-buy__done {
+	position: absolute;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+}
+
+[aria-busy="true"] > .mizzey-buy__label,
+.is-done > .mizzey-buy__label {
+	visibility: hidden;
+}
+
+[aria-busy="true"] > .mizzey-buy__loader,
+.is-done:not([aria-busy="true"]) > .mizzey-buy__done {
+	display: flex;
+}
+
+[aria-busy="true"] {
+	cursor: progress;
+}
+
+.is-done .mizzey-buy__tick path {
+	stroke-dasharray: 24;
+	stroke-dashoffset: 24;
+	animation: mizzey-buy-draw var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out) var(--mizzey-motion-duration-3) forwards;
+}
+
+@keyframes mizzey-buy-draw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+.mizzey-buy__out {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-2);
+	order: -1;
+	margin: var(--mizzey-space-4) 0 0;
+	padding: var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__out svg {
+	flex-shrink: 0;
+}
+
+/* Wishlist and share: two halves, 44 high, 8 under Buy Now. */
+.mizzey-buy__links {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--mizzey-space-2);
+	margin-block-start: var(--mizzey-space-2);
+}
+
+.mizzey-buy__wish,
+.mizzey-buy__share {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+	min-block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background: none;
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-body-strong);
+	cursor: pointer;
+}
+
+.mizzey-buy__heart {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-icon);
+	block-size: var(--mizzey-control-icon);
+}
+
+.mizzey-buy__heart svg {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+}
+
+.mizzey-buy__heart-fill {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transform: scale(var(--mizzey-motion-scale-pop, 1));
+}
+
+.mizzey-buy__wish[aria-pressed="true"] .mizzey-buy__heart-fill {
+	opacity: 1;
+	animation: mizzey-buy-pop var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-pop);
+}
+
+@keyframes mizzey-buy-pop {
+	from {
+		transform: scale(var(--mizzey-motion-scale-pop, 1));
+	}
+
+	to {
+		transform: none;
+	}
+}
+
+/* The delivery box: 24 under, radius 20, padding 16; the van, then the returns line. */
+.mizzey-buy__delivery {
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--mizzey-space-2) + var(--mizzey-border-control));
+	margin-block-start: var(--mizzey-space-5);
+	padding: var(--mizzey-space-4);
+	border-radius: var(--mizzey-radius-card);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-buy__estimate,
+.mizzey-buy__returns {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	margin: 0;
+}
+
+.mizzey-buy__rule {
+	display: block;
+	margin-block-end: var(--mizzey-border-control);
+	block-size: var(--mizzey-border-hairline);
+	background-color: var(--mizzey-color-role-border);
+}
+
+.mizzey-buy__returns svg {
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-buy__returns a {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-control-icon-dense)) / -2);
+	color: var(--mizzey-color-role-link);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+.mizzey-buy__van {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-delivery-van);
+	block-size: auto;
+	aspect-ratio: 64 / 31;
+	object-fit: contain;
+}
+
+/* Key features: 32 under, the title 19 on 25 Black (20 on 28 at 1440), Indigo dots. */
+.mizzey-buy__features {
+	margin-block-start: var(--mizzey-space-6);
+}
+
+.mizzey-buy__features h2 {
+	margin: 0;
+	font: var(--mizzey-type-h3-compact);
+	line-height: calc(var(--mizzey-space-5) + var(--mizzey-border-hairline));
+}
+
+.mizzey-buy__features-text {
+	margin-block-start: var(--mizzey-space-3);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-buy__features-text p {
+	margin: 0 0 var(--mizzey-space-2);
+}
+
+.mizzey-buy__features-text ul {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-buy__features-text li {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-buy__dot {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-space-2);
+	block-size: var(--mizzey-space-2);
+	margin-block-start: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-buy__summary {
+		padding-block-start: 0;
+	}
+
+	.mizzey-buy__actions {
+		flex-direction: row;
+		gap: var(--mizzey-space-3);
+		margin-block-start: var(--mizzey-space-5);
+	}
+
+	.mizzey-buy__qty-label {
+		display: none;
+	}
+
+	.mizzey-buy__stepper {
+		block-size: var(--mizzey-control-button-large);
+		padding: calc(var(--mizzey-space-3) / 2);
+	}
+
+	.mizzey-buy .mizzey-buy__add,
+	.mizzey-buy .mizzey-buy__now {
+		block-size: var(--mizzey-control-button-large);
+	}
+
+	.mizzey-buy__add {
+		flex: 1;
+	}
+
+	.mizzey-buy__features h2 {
+		font: var(--mizzey-type-title);
+		font-weight: var(--mizzey-font-weight-black);
+	}
+
+	/* 31 on 40, as drawn (the price-lg token gives 39 at 1440). */
+	.mizzey-buy__price {
+		line-height: var(--mizzey-space-7);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The phone's buy bar: 80 high at the foot, padding 14 16, the price 16 on 24 Bold, the button 52; it comes up once
+   Add to Cart has scrolled away; the consent banner and the notices sit above it. */
+
+.mizzey-buy-bar {
+	position: fixed;
+	z-index: 15;
+	inset-inline: 0;
+	inset-block-end: 0;
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-4);
+	min-block-size: var(--mizzey-layout-action-bar-height);
+	padding: calc(var(--mizzey-space-3) + var(--mizzey-border-control)) var(--mizzey-space-4) env(safe-area-inset-bottom);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: 0 calc(var(--mizzey-border-control) * -1) var(--mizzey-space-2) var(--mizzey-border-control) color-mix(in srgb, var(--mizzey-color-role-primary) 6%, transparent);
+	translate: 0 100%;
+	transition: translate var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-buy-bar.is-shown {
+	translate: none;
+}
+
+/* The consent banner (slice 3) rises above the bar: the bar never covers it. */
+body.has-buy-bar .mizzey-consent {
+	inset-block-end: calc(var(--mizzey-layout-action-bar-height) + var(--mizzey-space-2));
+}
+
+.mizzey-buy-bar__summary {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-inline-size: 0;
+	min-block-size: var(--mizzey-control-button-regular);
+}
+
+.mizzey-buy-bar__price {
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-price);
+	white-space: nowrap;
+}
+
+.mizzey-buy-bar__note {
+	overflow: hidden;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.mizzey-buy-bar__cart {
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-label);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+.mizzey-buy-bar__cart:not([hidden]) ~ .mizzey-buy-bar__note,
+.mizzey-buy-bar__note:has(~ .mizzey-buy-bar__cart:not([hidden])) {
+	display: none;
+}
+
+.mizzey-buy-bar__add {
+	flex: 1;
+	box-shadow: var(--mizzey-elevation-glow-primary);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-buy-bar {
+		display: none;
+	}
+}
+
+/* The page's notices: from the top end corner on a desktop, above the bottom edge on a phone, above the buy bar. */
+.mizzey-buy-toasts {
+	position: fixed;
+	z-index: 100;
+	inset-block-end: max(var(--mizzey-space-4), env(safe-area-inset-bottom));
+	inset-inline: var(--mizzey-layout-margin-phone);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	pointer-events: none;
+}
+
+body.has-buy-bar .mizzey-buy-toasts {
+	inset-block-end: calc(var(--mizzey-layout-action-bar-height) + var(--mizzey-space-2));
+}
+
+.mizzey-buy-toasts .mizzey-notice {
+	inline-size: 100%;
+	max-inline-size: var(--mizzey-control-notice-inline);
+	pointer-events: auto;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-buy-toasts {
+		inset-block: calc(var(--mizzey-control-header-desktop) + var(--mizzey-space-4)) auto;
+		inset-inline: auto var(--mizzey-layout-margin-desktop);
+		align-items: flex-end;
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Zoom: the whole screen on a phone; from 1024 a dialog 880 by 640, radius 24, over the dimmed page. */
+
+.mizzey-zoom {
+	inline-size: 100%;
+	max-inline-size: none;
+	block-size: 100%;
+	max-block-size: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+.mizzey-zoom::backdrop {
+	background-color: var(--mizzey-color-role-scrim);
+}
+
+.mizzey-zoom__panel {
+	display: flex;
+	flex-direction: column;
+	inline-size: 100%;
+	block-size: 100%;
+	overflow: hidden;
+	background-color: var(--mizzey-color-role-surface);
+}
+
+.mizzey-zoom__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-zoom-thumb);
+	padding-inline: var(--mizzey-space-4) var(--mizzey-space-1);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-zoom__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background: none;
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-zoom__view {
+	position: relative;
+	flex: 1;
+	min-block-size: 0;
+	overflow: auto;
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-zoom__image {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: contain;
+	transform-origin: center;
+	transition: scale var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-zoom__view .mizzey-gallery__arrow {
+	position: absolute;
+}
+
+.mizzey-zoom__level {
+	position: absolute;
+	inset-block-end: var(--mizzey-space-3);
+	inset-inline-start: 50%;
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-1);
+	inline-size: var(--mizzey-control-zoom-level-inline);
+	block-size: var(--mizzey-control-zoom-level-block);
+	padding: calc(var(--mizzey-space-1) / 2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: var(--mizzey-elevation-1);
+	translate: -50% 0;
+}
+
+[dir="rtl"] .mizzey-zoom__level {
+	translate: 50% 0;
+}
+
+.mizzey-zoom__out,
+.mizzey-zoom__in {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-zoom__in {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+.mizzey-zoom__value {
+	flex: 1;
+	text-align: center;
+	font: var(--mizzey-type-label);
+	font-family: var(--mizzey-font-family-numeric);
+}
+
+.mizzey-zoom__thumbs {
+	display: flex;
+	flex-shrink: 0;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+	padding: var(--mizzey-space-3) var(--mizzey-space-4) var(--mizzey-space-4);
+}
+
+.mizzey-zoom__thumb {
+	inline-size: var(--mizzey-control-zoom-thumb);
+	block-size: var(--mizzey-control-zoom-thumb);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-zoom {
+		inline-size: var(--mizzey-control-zoom-inline);
+		block-size: var(--mizzey-control-zoom-block);
+		margin: auto;
+	}
+
+	.mizzey-zoom__panel {
+		border-radius: var(--mizzey-radius-tile);
+		box-shadow: var(--mizzey-elevation-4);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Share: a bottom sheet on a phone (its two top corners round), a popover under Share from 1024. */
+
+.mizzey-share {
+	inline-size: 100%;
+	max-inline-size: none;
+	margin: auto 0 0;
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+.mizzey-share::backdrop {
+	background-color: var(--mizzey-color-role-scrim);
+}
+
+.mizzey-share__panel {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-3);
+	padding: var(--mizzey-space-2) var(--mizzey-space-4) max(var(--mizzey-space-4), env(safe-area-inset-bottom));
+	border-start-start-radius: var(--mizzey-radius-sheet);
+	border-start-end-radius: var(--mizzey-radius-sheet);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: var(--mizzey-elevation-4);
+}
+
+.mizzey-share__handle {
+	align-self: center;
+	inline-size: var(--mizzey-control-handle-inline);
+	block-size: var(--mizzey-control-handle-block);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-200);
+}
+
+.mizzey-share__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.mizzey-share__title {
+	margin: 0;
+	font: var(--mizzey-type-h3-compact);
+}
+
+.mizzey-share__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background: none;
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-share__product {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+	margin: 0;
+	padding: var(--mizzey-space-2) var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-field);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-role-border);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-share__thumb {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-space-7);
+	block-size: var(--mizzey-space-7);
+	object-fit: contain;
+}
+
+.mizzey-share__list {
+	display: flex;
+	flex-direction: column;
+}
+
+.mizzey-share__item {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-4);
+	min-block-size: var(--mizzey-control-zoom-thumb);
+	padding-inline: var(--mizzey-space-3);
+	border: 0;
+	border-radius: var(--mizzey-radius-field);
+	background: none;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-body-strong);
+	text-align: start;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.mizzey-share__item:hover,
+.mizzey-share__item:focus-visible {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-share__item:focus-visible,
+.mizzey-share__close:focus-visible,
+.mizzey-zoom__close:focus-visible,
+.mizzey-zoom__thumb:focus-visible,
+.mizzey-zoom__in:focus-visible,
+.mizzey-zoom__out:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-share__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-share {
+		position: fixed;
+		inset-block-start: calc(var(--mizzey-pop-block, 0px) + var(--mizzey-space-2));
+		inset-inline-end: var(--mizzey-pop-inline, 0px);
+		inset-inline-start: auto;
+		inline-size: auto;
+		margin: 0;
+	}
+
+	.mizzey-share::backdrop {
+		background: none;
+	}
+
+	.mizzey-share__panel {
+		min-inline-size: calc(var(--mizzey-control-zoom-inline) / 3);
+		padding: var(--mizzey-space-2);
+		border-radius: var(--mizzey-radius-card);
+	}
+
+	.mizzey-share__handle,
+	.mizzey-share__head,
+	.mizzey-share__product {
+		display: none;
+	}
+}
+
+/* The thumbnail that flies to the header's cart after an add on a desktop; its path is the script's. */
+.mizzey-buy-fly {
+	--mizzey-buy-fly-time: var(--mizzey-motion-duration-8);
+	--mizzey-buy-fly-easing: var(--mizzey-motion-easing-travel);
+	position: fixed;
+	z-index: 110;
+	/* The window's origin in either direction: the path is measured in the window's coordinates. */
+	inset: 0 auto auto 0;
+	inline-size: var(--mizzey-control-product-thumb-phone);
+	block-size: var(--mizzey-control-product-thumb-phone);
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: var(--mizzey-elevation-3);
+	object-fit: contain;
+	pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Reduced motion: the photos change at once; the bar, the tick and the heart do not move. */
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-gallery__slide,
+	.mizzey-gallery__loading,
+	.mizzey-buy-bar,
+	.mizzey-zoom__image {
+		transition: none;
+	}
+
+	.is-done .mizzey-buy__tick path,
+	.mizzey-buy__wish[aria-pressed="true"] .mizzey-buy__heart-fill {
+		animation: none;
+		stroke-dasharray: none;
+	}
+}
+
+/* Option names are the staff's, in either script: each line orders itself by its own first strong letter. */
+.mizzey-buy-bar__note,
+.mizzey-buy__stock-text,
+.mizzey-buy__message-text,
+.mizzey-gallery-counter,
+.mizzey-gallery__showing {
+	unicode-bidi: plaintext;
+}

@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/product-buy",
+	"title": "Product gallery and buying area",
+	"category": "woocommerce",
+	"icon": "cart",
+	"description": "The top of the product page: the gallery, name, price, options, stock, quantity, Add to Cart, Buy Now, wishlist, share, delivery and key features.",
+	"textdomain": "mizzey-site",
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"inserter": false,
+		"reusable": false,
+		"interactivity": true
+	},
+	"style": "file:./style.css",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}
