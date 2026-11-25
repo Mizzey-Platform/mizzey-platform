@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/product-rail",
+	"title": "Product rail",
+	"category": "woocommerce",
+	"icon": "slides",
+	"description": "Product cards in a rail that scrolls sideways, or in a grid.",
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"products": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "integer"
+			}
+		},
+		"layout": {
+			"type": "string",
+			"enum": [
+				"rail",
+				"grid"
+			],
+			"default": "rail"
+		},
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"link": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"inserter": false,
+		"reusable": false,
+		"interactivity": true
+	},
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

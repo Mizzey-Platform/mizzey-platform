@@ -1,0 +1,186 @@
+/* Cards in a rail or a grid (spec 066, slice 4), as C1-Home-Phone, C1-Home-Desktop, C1-Category-Phone and
+   C1-Category-Desktop draw them. Loaded only where a rail or a grid is shown. Every value is a theme token (K-3) and
+   every side logical, so this one stylesheet serves both reading directions; a rail scrolls the other way in Arabic
+   by itself.
+
+   Rail: on a phone the cards are 156 wide, 12 apart, and run past the page margin to the screen's edge, snapping to
+   the margin; from 1024 wide six cards fill the 1272 grid, 24 apart, and the arrows sit beside "View all".
+   Grid: two in a row on a phone (12 apart), three on a tablet, four from 1024 wide (24 apart). */
+
+.mizzey-products {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-products__head,
+.mizzey-products__list {
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-inline: auto;
+}
+
+.mizzey-products__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-4);
+	margin-block-end: var(--mizzey-space-3);
+}
+
+.mizzey-products__heading {
+	margin: 0;
+	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
+}
+
+.mizzey-products__tools {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-4);
+	flex-shrink: 0;
+}
+
+.mizzey-products__all {
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-body-strong);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-motion-distance-nudge);
+}
+
+.mizzey-products__arrows {
+	display: none;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-products__arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: var(--mizzey-elevation-1);
+	cursor: pointer;
+}
+
+.mizzey-products__arrow:disabled {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-indigo-300);
+	box-shadow: none;
+	cursor: default;
+}
+
+.mizzey-products__arrow:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* The arrows point the way the rail reads. */
+[dir="rtl"] .mizzey-products__arrow .mizzey-icon {
+	transform: scaleX(-1);
+}
+
+.mizzey-products__list {
+	margin-block: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-products__item {
+	display: flex;
+	min-inline-size: 0;
+}
+
+.mizzey-products__item > .mizzey-card {
+	flex: 1;
+}
+
+.mizzey-products--rail .mizzey-products__list {
+	display: flex;
+	gap: var(--mizzey-layout-gutter-phone);
+	margin-inline: calc(var(--mizzey-layout-margin-phone) * -1);
+	padding-block: var(--mizzey-space-1) var(--mizzey-space-2);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+	scroll-snap-type: inline mandatory;
+	scroll-padding-inline: var(--mizzey-layout-margin-phone);
+	scrollbar-width: none;
+}
+
+.mizzey-products--rail .mizzey-products__list::-webkit-scrollbar {
+	display: none;
+}
+
+.mizzey-products--rail .mizzey-products__item {
+	flex: 0 0 var(--mizzey-control-card-rail-phone);
+	scroll-snap-align: start;
+}
+
+.mizzey-products--grid .mizzey-products__list {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--mizzey-layout-gutter-phone);
+}
+
+@media (min-width: 600px) {
+	.mizzey-products {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+
+	.mizzey-products--grid .mizzey-products__list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--mizzey-layout-gutter-tablet);
+	}
+
+	.mizzey-products--rail .mizzey-products__list {
+		margin-inline: calc(var(--mizzey-layout-margin-tablet) * -1);
+		padding-inline: var(--mizzey-layout-margin-tablet);
+		scroll-padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-products {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-products__head {
+		margin-block-end: var(--mizzey-space-4);
+	}
+
+	.mizzey-products__arrows {
+		display: flex;
+	}
+
+	.mizzey-products--grid .mizzey-products__list {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--mizzey-layout-gutter-desktop);
+	}
+
+	/* Six to the grid; the list keeps the grid's width, the shadows room above and below. */
+	.mizzey-products--rail .mizzey-products__list {
+		gap: var(--mizzey-layout-gutter-desktop);
+		margin-inline: auto;
+		padding-inline: 0;
+		scroll-padding-inline: 0;
+		scroll-behavior: smooth;
+	}
+
+	.mizzey-products--rail .mizzey-products__item {
+		flex-basis: calc((100% - 5 * var(--mizzey-layout-gutter-desktop)) / 6);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-products--rail .mizzey-products__list {
+		scroll-behavior: auto;
+	}
+}

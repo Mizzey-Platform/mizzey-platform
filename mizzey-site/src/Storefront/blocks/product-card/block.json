@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/product-card",
+	"title": "Product card",
+	"category": "woocommerce",
+	"icon": "products",
+	"description": "One product as a card: image, label, name, rating, price, stock, wishlist heart and quick add.",
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"productId": {
+			"type": "integer",
+			"default": 0
+		},
+		"skeleton": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"inserter": false,
+		"reusable": false,
+		"interactivity": true
+	},
+	"style": "file:./style.css",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

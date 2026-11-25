@@ -824,8 +824,7 @@ msgid "Estimated delivery: %1$d to %2$d working days"
 msgstr "التوصيل المتوقع: من %1$d إلى %2$d أيام عمل"
 
 # Spec 066, slice 1: the theme's base components and the section library (K-4).
-#: mizzey-theme/inc/components.php:67
-#: mizzey-theme/inc/components.php:541
+#: mizzey-theme/inc/components.php:67 mizzey-theme/inc/components.php:541
 msgid "Loading"
 msgstr "جارٍ التحميل"
 
@@ -856,8 +855,7 @@ msgstr "%1$d / %2$d"
 msgid "Remove %s"
 msgstr "إزالة %s"
 
-#: mizzey-theme/inc/components.php:460
-#: mizzey-theme/inc/components.php:505
+#: mizzey-theme/inc/components.php:460 mizzey-theme/inc/components.php:505
 #: mizzey-theme/inc/components.php:640
 msgid "Close"
 msgstr "إغلاق"
@@ -963,12 +961,10 @@ msgid "Return and refund policy"
 msgstr "سياسة الإرجاع والاسترداد"
 
 #: src/Blocks/trust-signals/edit.js:74
-#, js-format
 msgid "Item %d title"
 msgstr "عنوان العنصر %d"
 
 #: src/Blocks/trust-signals/edit.js:85
-#, js-format
 msgid "Item %d line"
 msgstr "سطر العنصر %d"
 
@@ -985,17 +981,14 @@ msgid "Optional, in this page's language. For example: Why shop with us."
 msgstr "اختياري، بلغة هذه الصفحة. مثال: لماذا تتسوق معنا."
 
 #: src/Blocks/trust-signals/edit.js:114
-#, js-format
 msgid "Item %d"
 msgstr "العنصر %d"
 
 #: src/Blocks/trust-signals/edit.js:118
-#, js-format
 msgid "Item %d mark"
 msgstr "رمز العنصر %d"
 
 #: src/Blocks/trust-signals/edit.js:127
-#, js-format
 msgid "Item %d link"
 msgstr "رابط العنصر %d"
 
@@ -1032,3 +1025,137 @@ msgstr "توصيل"
 msgctxt "block keyword"
 msgid "returns"
 msgstr "إرجاع"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Out of stock"
+msgstr "نفدت الكمية"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Only %d left"
+msgstr "بقي %d فقط"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to cart, choose options"
+msgstr "أضف إلى السلة، اختر الخيارات"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Add %s to cart"
+msgstr "أضف %s إلى السلة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Adding"
+msgstr "جارٍ الإضافة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%s is in your cart. Add one more"
+msgstr "%s في سلتك. أضف واحدًا آخر"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to wishlist"
+msgstr "أضف إلى المفضلة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Remove from wishlist"
+msgstr "أزل من المفضلة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Was"
+msgstr "كان"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Added"
+msgstr "أُضيف"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Sold out"
+msgstr "نفدت الكمية"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%s:"
+msgstr "%s:"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Decrease quantity"
+msgstr "إنقاص الكمية"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Increase quantity"
+msgstr "زيادة الكمية"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Choose options"
+msgstr "اختر الخيارات"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Add to cart"
+msgstr "أضف إلى السلة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "This could not be added. Please try again."
+msgstr "تعذّرت الإضافة. يُرجى المحاولة مرة أخرى."
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Your wishlist could not be changed. Please try again."
+msgstr "تعذّر تعديل المفضلة. يُرجى المحاولة مرة أخرى."
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "Added to your cart"
+msgstr "أُضيف إلى سلتك"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+msgid "View cart"
+msgstr "عرض السلة"
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "View all"
+msgstr "عرض الكل"
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "Previous products"
+msgstr "المنتجات السابقة"
+
+#: mizzey-site/src/Storefront/ProductRail.php
+msgid "Next products"
+msgstr "المنتجات التالية"
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "New"
+msgstr "جديد"
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Trending"
+msgstr "رائج"
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Limited"
+msgstr "كمية محدودة"
+
+#: mizzey-site/src/Catalogue/ProductFields.php
+msgid "Best Seller"
+msgstr "الأكثر مبيعًا"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "Rated %1$s out of 5, %2$d review"
+msgid_plural "Rated %1$s out of 5, %2$d reviews"
+msgstr[0] "التقييم %1$s من 5، بلا مراجعات"
+msgstr[1] "التقييم %1$s من 5، مراجعة واحدة"
+msgstr[2] "التقييم %1$s من 5، مراجعتان"
+msgstr[3] "التقييم %1$s من 5، %2$d مراجعات"
+msgstr[4] "التقييم %1$s من 5، %2$d مراجعة"
+msgstr[5] "التقييم %1$s من 5، %2$d مراجعة"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%d option"
+msgid_plural "%d options"
+msgstr[0] "بلا خيارات"
+msgstr[1] "خيار واحد"
+msgstr[2] "خياران"
+msgstr[3] "%d خيارات"
+msgstr[4] "%d خيارًا"
+msgstr[5] "%d خيار"
