@@ -396,6 +396,8 @@
 	--mizzey-control-icon-small: 18px;
 	--mizzey-control-handle-inline: 36px;
 	--mizzey-control-handle-block: 4px;
+	--mizzey-control-loader-dot-count: 7px;
+	--mizzey-control-loader-gap-count: 3px;
 	--mizzey-control-loader-dot: 14px;
 	--mizzey-control-loader-dot-button: 12px;
 	--mizzey-control-loader-dot-small: 6px;

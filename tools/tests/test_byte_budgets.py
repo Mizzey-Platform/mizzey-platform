@@ -14,6 +14,8 @@ Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
   purpose: the header's drawers, which slice 2 builds, are on every page.
 - **Product**: every page, plus the header, the gallery and buying area (slice 9) and the product card and rail its
   lower part carries (slice 10). The van in the delivery box is slice 1's image, counted on the home page.
+- **Listing** (slice 6): every page, plus the header, the category listing's stylesheet and script, and the product
+  card and grid it carries.
 - **Home**: every page, plus the header (slice 2), every library section's stylesheet and storefront module, the
   styles they share, the product card's and rail's stylesheets and script (slice 4), and the artwork the theme ships
   for them, as if every section were placed at once (slice 5).
@@ -44,6 +46,7 @@ BUDGETS = {
     "every page": {"styles": 40 * KB, "scripts": 45 * KB, "images": 0},
     "home": {"styles": 60 * KB, "scripts": 45 * KB, "images": 60 * KB},
     "product": {"styles": 60 * KB, "scripts": 45 * KB, "images": 0},
+    "listing": {"styles": 60 * KB, "scripts": 45 * KB, "images": 0},
 }
 
 
@@ -88,7 +91,16 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
         + sorted(buy.glob("*/view.js")),
         "images": [],
     }
-    return {"every page": every, "home": home, "product": product}
+    # Slice 6: a category listing is every page, the header, the listing's own stylesheet and script, and the product
+    # card and the grid it carries (the rail's stylesheet, in its grid layout).
+    listing = {
+        "styles": every["styles"] + [THEME / "assets" / "css" / name for name in ("header.css", "listing.css")]
+        + [cards / "product-card" / "style.css", cards / "product-rail" / "style.css"],
+        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / name for name in ("header.js", "listing.js")]
+        + [cards / "product-card" / "view.js"],
+        "images": [],
+    }
+    return {"every page": every, "home": home, "product": product, "listing": listing}
 
 
 def totals() -> dict[str, dict[str, int]]:
