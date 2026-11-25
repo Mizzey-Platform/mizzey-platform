@@ -240,7 +240,8 @@ it. The owner's design rulings that change what the slices build:
   the filters drawer follow it. Bottom sheets round their two top corners only. Dialogs that float (Quick Look,
   cookie preferences) round all four.
 - **Product card labels, one per zone.** At most one merchandising tag in the image's top start corner (Limited,
-  New, Trending, Best Seller, in that order of precedence), on the light Indigo tint, flush with the card's corner.
+  New, Best Seller, Trending, in that order of precedence: the owner's batch-02 ruling of 19 October 2026, which
+  stands where a board lists another order), on the light Indigo tint, flush with the card's corner.
   The sale lives in the price line (price, struck old price, the orange "-20%" tag; on cards under 260 wide the tag
   drops under the struck price, clear of the add button). Stock lives on the card's second line ("Only 3 left",
   "Out of stock"). An out-of-stock card shows no sale and no add button.

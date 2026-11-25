@@ -2,7 +2,30 @@
 
 Live status. First action each session: read this, then continue from **Next**.
 
-## Now (11 October 2026)
+## Now (25 November 2026)
+
+- **Stage 1 is approved** (3 November 2026). The storefront's function layer (specs/050 to specs/064) is merged
+  and on staging.
+- **The Stage 2 design is closed** in the Concept 1 (Clay) direction the client chose on 24 November (D-36): every
+  Stage 2 screen and state is drawn, checked rendered in two correction rounds and a closing round, and recorded in
+  `specs/066-stage-2-shop-front/`, "The design this builds" (#556).
+- **The Stage 2 build has started** (D-38, #557): the design-first freeze of D-14 is lifted for Stage 2. The
+  client's written approval of the interface design (Project Plan 3.2) is asked for in the email of 24 November.
+- **Slices 1 to 5 are merged and on staging** (25 November): the foundation (#560, with #558 and #559), the header
+  and menus (#562, fixes #563 and #564), the footer, strip and consent (#565), the product card and rail (#561) and
+  the home page (#566). Staging runs v0.1.31 with staging-only sample content (home page, menus, strip, logo); the
+  logo files sit on the server, not in this repository.
+
+## Next (25 November 2026)
+
+1. Slices 6 to 12 of specs/066 (category listing, collection and brand, search, product page, Quick Look, mini
+   cart), each one pull request compared with its boards with measured spacing (K-1 to K-8).
+2. The owner's open points on the design (price display, the hero slider's motion, consent preferences, Arabic
+   "Wishlist") are settled before the slices they touch.
+3. Closing Stage 2: a tagged release on staging, the D-21 measurements, the browser check, then the client's
+   browse.
+
+## Now (11 October 2026): history
 
 - **Staging on the developer's own server: D-16 is applied, and nothing is carried out yet.** PR #344, approved
   by the owner, squash-merged on 11 October 2026 as `d45aca9`. The reviewed staging copy moves to the
@@ -302,7 +325,7 @@ Live status. First action each session: read this, then continue from **Next**.
   the committed suite evidence. Two scenarios came with it, `t22-information-architecture.php` and
   `t23-seo-fundamentals.php`.
 
-## Next
+## Next (October 2026): history
 
 **Design first (D-14, applied). No functional PBI starts, #249 included, until Mustafa says so. Batches 01 to 10 and
 the supplementary stabilisation review are closed under the recorded review authority, and CoreX is not upgraded until he says so either.** In order:
