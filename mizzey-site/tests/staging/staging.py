@@ -550,10 +550,14 @@ def seed() -> None:
     creds = load_credentials()
     passwords = {u: secrets.token_urlsafe(14) for u in ("client_operator", "demo_customer")}
     os.environ["MIZZEY_SEED_PASSWORDS"] = json.dumps(passwords)
-    for script in ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
-                   "30-catalogue-translations.php", "40-orders.php", "50-reports.php", "60-home-page.php", "65-site-parts.php"):
-        out = wp("eval-file", str(HERE / "seed" / script))
-        say(f"seed/{script}: {out.splitlines()[-1] if out else ''}")
+    # The sample catalogue (70) runs twice, English then Arabic, each pass its own process (finding A11), and before
+    # the header (65), whose menu points at its categories. It reads MIZZEY_STAGING_SAMPLE_DIR, or skips.
+    for script, extra in (("10-users.php", ()), ("15-store-settings.php", ()), ("20-catalogue-sources.php", ()),
+                          ("30-catalogue-translations.php", ()), ("40-orders.php", ()), ("50-reports.php", ()),
+                          ("60-home-page.php", ()), ("70-sample-catalog.php", ()),
+                          ("70-sample-catalog.php", ("translate",)), ("65-site-parts.php", ())):
+        out = wp("eval-file", str(HERE / "seed" / script), *extra)
+        say(f"seed/{' '.join((script, *extra))}: {out.splitlines()[-1] if out else ''}")
     for user, password in passwords.items():
         creds[user] = {"user": user, "password": password}
     save_credentials(creds)
