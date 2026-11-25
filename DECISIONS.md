@@ -2475,3 +2475,14 @@ not, the customer copies it.
 wrong entries end it; resend after 60 seconds and a cap per hour; rate limits per account and per address; codes
 stored hashed and compared in constant time; never written to logs. The code is visible on a lock screen, the usual
 trade-off for convenience, kept small by the expiry and single use. Built in the Stage 3 sign-in spec.
+
+## 2026-11-25 - D-38: the Stage 2 build starts
+
+**Status: the owner's instruction of 25 November 2026, in chat ("Start the build").** It adds no scope and changes
+no fee, stage or date.
+
+| Question | Ruling |
+|---|---|
+| What starts | The Stage 2 shop front is built from specs/066, slice by slice, now that its design is closed (D-36). The design-first freeze of D-14 is lifted for Stage 2 only |
+| The client's written approval | The Project Plan (section 3.2) lists the client's written approval of the interface design as needed before Stage 2 starts. It is requested in writing; the client chose the direction on 24 November 2026. Building before that approval is the supplier's own choice and risk: it moves no date and no payment, and a change the client asks for in the approval is made in the screens |
+| Later stages | Each is drawn just before it is built (D-36), and its implementation starts when its design is closed |

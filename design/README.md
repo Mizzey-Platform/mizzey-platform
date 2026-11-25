@@ -18,10 +18,10 @@ that work is prepared, and it changes no contract term.
 | 4. Structural component and interaction system, established and stable | Done in the stabilisation round, 28 October 2026; the deferred part of D6 is in `stabilisation.residual` |
 | 5. Second low-fidelity pass, for the contracted second-release (S2) surfaces | Done. Batch-10: 10-A and 10-B reviewed and frozen, batch closed |
 | 6. Brand identity received and applied | Received 17 November 2026 (OD-01). Tokens built in `tokens/tokens.json`; open points settled by the owner on 18 November 2026 (D-34) |
-| 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Not started |
-| 8. The contracted working HTML and CSS design | Not started |
-| 9. PRE-03b approved by the client | Not started |
-| 10. Storefront implementation | Frozen until step 9 (D-14) |
+| 7. High-fidelity design for all contracted storefront surfaces, S1 and S2 | Stage 2 closed on 25 November 2026 in the Concept 1 (Clay) direction the client chose (D-36); recorded in `specs/066-stage-2-shop-front/`, "The design this builds". Each later stage is drawn just before it is built |
+| 8. The contracted working HTML and CSS design | Built by the Stage 2 slices of specs/066: the working screens are its HTML and CSS form (SOW 9.1) |
+| 9. PRE-03b approved by the client | The direction was chosen on 24 November 2026; the written approval of the interface design is to be requested (D-38) |
+| 10. Storefront implementation | Stage 2 started on 25 November 2026 (D-38) |
 
 **Low-fidelity wireframes are design artefacts, prepared here first.** They are not built in `mizzey-theme/`, and
 nothing is implemented in the theme until the work reaches step 6. They are not a client deliverable: PRE-03b

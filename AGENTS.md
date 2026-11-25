@@ -15,7 +15,15 @@ and the current phase are in [README.md](README.md). The rules are in the
 - Site identity: namespace `MizzeySite\`, text domain `mizzey-site`, REST namespace `mizzey/v1`, CSS prefix
   `--mizzey-`, option and CPT prefix `mizzey_`. Use `wp corex make:*` generators.
 
-## Current phase: design first (D-14, 6 October 2026)
+## Current phase: the Stage 2 build (D-38, 25 November 2026)
+
+**The Stage 2 storefront build has started.** The client chose the Concept 1 (Clay) direction (D-36), the Stage 2
+design is closed, and the shop front is built from `specs/066-stage-2-shop-front/` in `mizzey-theme/` and
+`mizzey-site/`, one slice per pull request. The design-first freeze below is lifted for Stage 2 only. Each later
+stage is drawn just before it is built (D-36), and its implementation starts when its design is closed. The section
+below is the history of how the work reached this point.
+
+## Design first (D-14, 6 October 2026): history
 
 **No functional PBI implementation starts now.** Do not start #249, do not create a `006-` spec, do not run Spec
 Kit for a functional PBI, and do not upgrade CoreX, until Mustafa says so. The order is: signed scope and PBIs,
