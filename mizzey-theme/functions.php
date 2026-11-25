@@ -44,6 +44,10 @@ add_action(
 require_once __DIR__ . '/inc/icons.php';
 require_once __DIR__ . '/inc/components.php';
 require_once __DIR__ . '/inc/header.php';
+// The footer, the announcement strip and the consent banner's look (spec 066, slice 3).
+require_once __DIR__ . '/inc/footer.php';
+require_once __DIR__ . '/inc/strip.php';
+require_once __DIR__ . '/inc/consent.php';
 
 /*
  * The token layer (spec 066, slice 1). tokens.css and fonts.css are generated from design/tokens/tokens.json and

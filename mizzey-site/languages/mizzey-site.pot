@@ -948,3 +948,247 @@ msgstr ""
 #: mizzey-theme/inc/header.php
 msgid "Wishlist"
 msgstr ""
+
+# Spec 066, slice 3: the footer, the announcement strip and the consent banner's look (K-4).
+#: mizzey-theme/inc/footer.php
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php src/Marketing/ConsentBanner.php
+msgid "Accept all"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Add a column"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Add a message"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Always on"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Analytics"
+msgstr ""
+
+#: mizzey-theme/inc/strip.php assets/js/site-parts-editor.js
+msgid "Announcement strip"
+msgstr ""
+
+#: mizzey-theme/inc/strip.php
+msgid "Announcements"
+msgstr ""
+
+#: mizzey-theme/inc/footer.php
+msgid "Chat on WhatsApp"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Choose the logo for the Indigo footer"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Choose what you allow. You can change this any time from Cookie preferences at the foot of every page."
+msgstr ""
+
+#. translators: %d: the column's number.
+#: assets/js/site-parts-editor.js
+msgid "Column %d"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Columns"
+msgstr ""
+
+#: src/Marketing/ConsentBanner.php
+msgid "Cookie choices"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php src/Marketing/ConsentBanner.php
+msgid "Cookie preferences"
+msgstr ""
+
+#: mizzey-theme/inc/footer.php src/Marketing/ConsentBanner.php
+msgid "Cookie settings"
+msgstr ""
+
+#: mizzey-theme/inc/footer.php assets/js/site-parts-editor.js
+msgid "Customer care"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Decline"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Each column shows a navigation menu, with its title as the heading. Choose the menu for each language. A link to #cookie-preferences opens the cookie preferences."
+msgstr ""
+
+#: src/Marketing/ConsentBanner.php
+msgid "Essential only"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Fixed"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Fixed shows the first message. The slider shows up to three in turn, six seconds each."
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Footer"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Help us see which pages are used most, without your name."
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Keep your cart, checkout and sign-in working."
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Legal line"
+msgstr ""
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Legal line in %s"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Link address"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Link words"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Marketing"
+msgstr ""
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Menu in %s"
+msgstr ""
+
+#. translators: %d: the message's number.
+#: assets/js/site-parts-editor.js
+msgid "Message %d"
+msgstr ""
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Messages in %s"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Move down"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Move up"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Necessary"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "None"
+msgstr ""
+
+#: mizzey-theme/inc/strip.php
+msgid "Pause the messages"
+msgstr ""
+
+#: mizzey-theme/inc/strip.php
+msgid "Play the messages"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Remove"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Remove the column"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Remove the message"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Replace the logo for the Indigo footer"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Royal Indigo"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Save choices"
+msgstr ""
+
+#: mizzey-theme/inc/consent.php
+msgid "Show you offers that fit you on other sites."
+msgstr ""
+
+#: mizzey-theme/inc/footer.php
+msgid "Site footer"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Slider"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Style"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "The WhatsApp link comes first, from WooCommerce > Settings > General > Store contact. Then this menu: the phone, the email, the address."
+msgstr ""
+
+#: mizzey-theme/inc/strip.php
+msgid "The short message above the header, fixed or as a slider of up to three, in each language."
+msgstr ""
+
+#: mizzey-theme/inc/footer.php
+msgid "The store footer: logo, language, the link columns from your menus, customer care and the legal line."
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Under the column before it"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Variant"
+msgstr ""
+
+#: src/Marketing/ConsentBanner.php
+msgid "We use cookies to measure visits and to show you relevant offers on other sites. Essential cookies keep the store working and are always on."
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "White"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "Wide, links in two columns"
+msgstr ""
+
+#: assets/js/site-parts-editor.js
+msgid "With no message in a language, the strip is not shown in that language."
+msgstr ""
+
+#. translators: 1: the year, 2: the site's name.
+#: mizzey-theme/inc/footer.php
+#, php-format
+msgid "© %1$s %2$s."
+msgstr ""

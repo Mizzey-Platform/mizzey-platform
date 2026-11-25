@@ -20,6 +20,7 @@
 	--mizzey-color-neutral-scrim: rgba(16,24,48,.48);
 	--mizzey-color-neutral-hairline-strong: rgba(38,59,115,.12);
 	--mizzey-color-neutral-on-brand-hover: rgba(255,255,255,.12);
+	--mizzey-color-neutral-on-brand-hairline: rgba(255,255,255,.16);
 	--mizzey-color-feedback-success: #247B47;
 	--mizzey-color-feedback-success-bg: #E6F3EB;
 	--mizzey-color-feedback-warning: #916300;
@@ -329,6 +330,7 @@
 	--mizzey-motion-loop-breathe: 1600ms;
 	--mizzey-motion-delay-tooltip: 400ms;
 	--mizzey-motion-life-toast: 5000ms;
+	--mizzey-motion-life-strip: 6000ms;
 	--mizzey-layout-columns-phone: 4;
 	--mizzey-layout-columns-tablet: 8;
 	--mizzey-layout-columns-desktop: 12;
@@ -408,6 +410,14 @@
 	--mizzey-control-card-foot: 64px;
 	--mizzey-control-card-foot-wide: 44px;
 	--mizzey-control-card-rail-phone: 156px;
+	--mizzey-control-logo-footer: 48px;
+	--mizzey-control-footer-zz: 320px;
+	--mizzey-control-footer-zz-phone: 200px;
+	--mizzey-control-footer-zz-bleed-block: 64px;
+	--mizzey-control-footer-zz-bleed-inline: 56px;
+	--mizzey-control-footer-zz-bleed-block-phone: 40px;
+	--mizzey-control-footer-zz-bleed-inline-phone: 36px;
+	--mizzey-control-footer-line: 20px;
 	--mizzey-breakpoint-phone: 320px;
 	--mizzey-breakpoint-tablet: 600px;
 	--mizzey-breakpoint-desktop: 1024px;
@@ -419,6 +429,7 @@
 	--mizzey-overlay-sheet-top: 56px;
 	--mizzey-overlay-sheet-max: 90dvh;
 	--mizzey-overlay-drawer-header: 64px;
+	--mizzey-overlay-dialog-wide: 560px;
 	--mizzey-type-display-font-family: var(--mizzey-type-latin-display-font-family);
 	--mizzey-type-display-font-weight: var(--mizzey-type-latin-display-font-weight);
 	--mizzey-type-display-font-size: var(--mizzey-type-latin-display-font-size);

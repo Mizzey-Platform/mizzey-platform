@@ -1,0 +1,290 @@
+/* The designed footer (spec 066, slice 3), as C1-Header-Footer-Styles (F1 Indigo, F2 White) and C1-Global (B8) draw
+   it. Markup from inc/footer.php. Every value is a token; logical properties only, so the Arabic footer reverses its
+   columns, aligns to the right and keeps the ZZ mark in its end corner (the left) without a second stylesheet. */
+
+/* Sizes are measured with the border and padding inside, as the boards do. */
+:where(.mizzey-footer, .mizzey-footer *) {
+	box-sizing: border-box;
+}
+
+/* The 72 above the footer carries the page's lower glow, so the footer's rounded top shows against it. */
+.wp-block-template-part:has(> .mizzey-footer) {
+	margin-block-start: 0;
+	padding-block-start: var(--mizzey-space-9);
+	background-image: linear-gradient(180deg, var(--mizzey-color-role-page), var(--mizzey-color-glow-lower));
+}
+
+.mizzey-footer {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	padding-block: var(--mizzey-space-5) var(--mizzey-space-4);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	border-start-start-radius: var(--mizzey-radius-tile);
+	border-start-end-radius: var(--mizzey-radius-tile);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-footer--indigo {
+	background-image: var(--mizzey-gradient-deep);
+	color: var(--mizzey-color-role-text-on-brand);
+	--mizzey-footer-heading: var(--mizzey-color-indigo-200);
+	--mizzey-footer-hover: var(--mizzey-color-role-text-on-brand);
+	--mizzey-footer-hairline: var(--mizzey-color-neutral-on-brand-hairline);
+	--mizzey-footer-focus: var(--mizzey-color-role-focus-inverse);
+}
+
+.mizzey-footer--white {
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-text);
+	box-shadow: inset 0 var(--mizzey-border-hairline) 0 var(--mizzey-color-neutral-hairline);
+	--mizzey-footer-heading: var(--mizzey-color-role-text-muted);
+	--mizzey-footer-hover: var(--mizzey-color-role-primary);
+	--mizzey-footer-hairline: var(--mizzey-color-neutral-hairline);
+	--mizzey-footer-focus: var(--mizzey-color-role-focus);
+}
+
+/* On a phone: the logo and the language link on one row, then Customer care, then each column in turn. */
+.mizzey-footer__grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: var(--mizzey-space-5);
+}
+
+.mizzey-footer__brand {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-4);
+	min-block-size: var(--mizzey-space-8);
+}
+
+.mizzey-footer__logo {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	color: inherit;
+	text-decoration: none;
+}
+
+.mizzey-footer__logo-image {
+	display: block;
+	inline-size: auto;
+	block-size: var(--mizzey-control-logo-desktop);
+}
+
+.mizzey-footer__logo-text {
+	font: var(--mizzey-type-title);
+}
+
+.mizzey-footer__language {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	color: inherit;
+	font: var(--mizzey-type-body-strong);
+	text-decoration: none;
+}
+
+.mizzey-footer--white .mizzey-footer__language {
+	color: var(--mizzey-color-role-link);
+}
+
+.mizzey-footer__group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-5);
+	min-inline-size: 0;
+}
+
+.mizzey-footer__column {
+	min-inline-size: 0;
+}
+
+.mizzey-footer__heading {
+	/* A 32 row in both scripts (13/20 Latin, 14/22 Arabic), the words at its top. */
+	box-sizing: border-box;
+	block-size: var(--mizzey-space-6);
+	margin: 0;
+	overflow: hidden;
+	color: var(--mizzey-footer-heading);
+	font: var(--mizzey-type-label);
+	letter-spacing: 0;
+}
+
+.mizzey-footer__links {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-footer__links--two {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--mizzey-layout-gutter-phone);
+}
+
+.mizzey-footer__links li {
+	min-inline-size: 0;
+}
+
+/* Every link a row of at least 44; a long name wraps inside its column. */
+.mizzey-footer__link {
+	display: flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	padding-block: var(--mizzey-space-3);
+	color: inherit;
+	font-weight: var(--mizzey-font-weight-regular);
+	line-height: var(--mizzey-control-footer-line);
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+/* A phone number or an email address: one line, left to right, in both languages. */
+.mizzey-footer__ltr {
+	white-space: nowrap;
+	unicode-bidi: isolate;
+}
+
+.mizzey-footer__link:hover,
+.mizzey-footer__language:hover {
+	color: var(--mizzey-footer-hover);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+.mizzey-footer__link:focus-visible,
+.mizzey-footer__language:focus-visible,
+.mizzey-footer__logo:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-footer-focus);
+	outline-offset: var(--mizzey-focus-offset);
+	border-radius: var(--mizzey-radius-xs);
+	color: var(--mizzey-footer-hover);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+/* The legal line, above a hairline. */
+.mizzey-footer__foot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	column-gap: var(--mizzey-space-5);
+	min-block-size: var(--mizzey-space-8);
+	margin-block-start: var(--mizzey-space-5);
+	box-shadow: inset 0 var(--mizzey-border-hairline) 0 var(--mizzey-footer-hairline);
+}
+
+.mizzey-footer__legal {
+	margin: 0;
+	padding-block: var(--mizzey-space-3);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+.mizzey-footer--white .mizzey-footer__legal {
+	color: var(--mizzey-color-role-text-muted);
+}
+
+.mizzey-footer__foot .mizzey-footer__link {
+	font: var(--mizzey-type-label);
+}
+
+/* The ZZ mark in the end corner: still, never mirrored; White at 6% on Indigo, the mark's own colours at 5% on White. */
+.mizzey-footer__zz {
+	position: absolute;
+	z-index: -1;
+	inset-block-end: calc(var(--mizzey-control-footer-zz-bleed-block-phone) * -1);
+	inset-inline-end: calc(var(--mizzey-control-footer-zz-bleed-inline-phone) * -1);
+	inline-size: var(--mizzey-control-footer-zz-phone);
+	block-size: var(--mizzey-control-footer-zz-phone);
+	pointer-events: none;
+	opacity: 0.06;
+}
+
+.mizzey-footer--white .mizzey-footer__zz {
+	opacity: 0.05;
+}
+
+.mizzey-footer__zz .mizzey-zz {
+	inline-size: 100%;
+	block-size: 100%;
+	opacity: 1;
+	animation: none;
+}
+
+.mizzey-footer--indigo .mizzey-footer__zz path {
+	fill: var(--mizzey-color-brand-white);
+}
+
+@media (min-width: 600px) {
+	.mizzey-footer {
+		padding-inline: var(--mizzey-layout-margin-tablet);
+	}
+
+	.mizzey-footer__links--two {
+		column-gap: var(--mizzey-layout-gutter-tablet);
+	}
+}
+
+/* Desktop: six tracks on the 1272 grid. The logo first, the columns in order, Customer care in the last track. */
+@media (min-width: 1024px) {
+	.mizzey-footer {
+		padding-block: var(--mizzey-space-8) 0;
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-footer__grid {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		column-gap: var(--mizzey-layout-gutter-desktop);
+		row-gap: var(--mizzey-space-6);
+		max-inline-size: var(--mizzey-layout-content-width);
+		margin-inline: auto;
+	}
+
+	.mizzey-footer__group {
+		gap: var(--mizzey-space-3);
+	}
+
+	.mizzey-footer__logo {
+		min-block-size: var(--mizzey-control-logo-footer);
+	}
+
+	.mizzey-footer__brand {
+		min-block-size: 0;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+
+	.mizzey-footer__logo-image {
+		block-size: var(--mizzey-control-logo-footer);
+	}
+
+	.mizzey-footer__group--care {
+		grid-column: -2 / -1;
+		grid-row: 1;
+	}
+
+	.mizzey-footer__group--wide {
+		grid-column: span 2;
+	}
+
+	.mizzey-footer__links--two {
+		column-gap: var(--mizzey-layout-gutter-desktop);
+	}
+
+	.mizzey-footer__foot {
+		max-inline-size: var(--mizzey-layout-content-width);
+		margin-inline: auto;
+	}
+
+	.mizzey-footer__zz {
+		inset-block-end: calc(var(--mizzey-control-footer-zz-bleed-block) * -1);
+		inset-inline-end: calc(var(--mizzey-control-footer-zz-bleed-inline) * -1);
+		inline-size: var(--mizzey-control-footer-zz);
+		block-size: var(--mizzey-control-footer-zz);
+	}
+}

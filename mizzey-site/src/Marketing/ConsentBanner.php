@@ -18,7 +18,12 @@ defined('ABSPATH') || exit;
  * Google's consent mode stays denied (`TagManager`) and WooCommerce's order attribution (MKT-09) sets no cookie.
  * Nothing that depends on the choice is decided on the server: the banner is printed hidden and shown by its script,
  * and order attribution is printed off and switched on in the browser from the cookie, so a cached page serves every
- * visitor correctly. Its look is neutral until the interface design (PRE-03b).
+ * visitor correctly.
+ *
+ * The banner is printed first in the page (`wp_body_open`), so it is the first thing the keyboard reaches; its look,
+ * the cookie preferences it links to and the room it keeps at the foot of the page are the theme's (spec 066, slice 3,
+ * mizzey-theme/inc/consent.php). The designed footer carries the link that reopens it; this class prints its own
+ * "Cookie settings" link only on a page without that footer.
  *
  * Register ids: MKT-10. See specs/043-measurement-tools.
  */
@@ -29,6 +34,7 @@ final class ConsentBanner
 
     public static function register(): void
     {
+        add_action('wp_body_open', [self::class, 'banner'], 1);
         add_action('wp_footer', [self::class, 'banner'], 5);
         add_action('wp_footer', [self::class, 'settingsLink'], 4);
         add_action('wp_enqueue_scripts', [self::class, 'enqueue']);
@@ -72,26 +78,30 @@ final class ConsentBanner
         wp_enqueue_script(self::SCRIPT, plugins_url('mizzey-site/assets/consent.js'), [], is_readable($file) ? (string) filemtime($file) : null, true);
     }
 
-    /** The footer's "Cookie settings", which reopens the banner. Placed in the footer design with PRE-03b. */
+    /** The "Cookie settings" link that reopens the banner, on a page whose designed footer does not carry one. */
     public static function settingsLink(): void
     {
-        if (is_admin()) {
+        if (is_admin() || did_action('mizzey_footer_consent_link')) {
             return;
         }
         printf('<p class="mizzey-cookie-settings"><a href="#" data-mizzey-consent-open="1">%s</a></p>', esc_html__('Cookie settings', 'mizzey-site'));
     }
 
+    /** The banner, once: first in the page where the theme opens the body, otherwise after it. */
     public static function banner(): void
     {
-        if (is_admin()) {
+        static $printed = false;
+        if ($printed || is_admin()) {
             return;
         }
+        $printed = true;
         printf(
-            '<div id="mizzey-consent" class="mizzey-consent" role="dialog" aria-live="polite" aria-label="%s" hidden><p>%s</p><p><button type="button" data-mizzey-consent="granted">%s</button><button type="button" data-mizzey-consent="denied">%s</button></p></div>',
+            '<div id="mizzey-consent" class="mizzey-consent" role="dialog" aria-live="polite" aria-label="%s" hidden><p class="mizzey-consent__text">%s <a class="mizzey-consent__preferences" href="#cookie-preferences">%s</a></p><p class="mizzey-consent__choices"><button type="button" class="mizzey-button mizzey-button--secondary mizzey-button--compact" data-mizzey-consent="denied">%s</button><button type="button" class="mizzey-button mizzey-button--primary mizzey-button--compact" data-mizzey-consent="granted">%s</button></p></div>',
             esc_attr__('Cookie choices', 'mizzey-site'),
             esc_html__('We use cookies to measure visits and to show you relevant offers on other sites. Essential cookies keep the store working and are always on.', 'mizzey-site'),
-            esc_html__('Accept all', 'mizzey-site'),
-            esc_html__('Essential only', 'mizzey-site')
+            esc_html__('Cookie preferences', 'mizzey-site'),
+            esc_html__('Essential only', 'mizzey-site'),
+            esc_html__('Accept all', 'mizzey-site')
         );
     }
 }

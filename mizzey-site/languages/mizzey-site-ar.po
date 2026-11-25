@@ -1253,3 +1253,227 @@ msgstr "رأس الموقع"
 #: mizzey-theme/inc/header.php
 msgid "The store header: logo, search, language, account, wishlist, cart and the category menus."
 msgstr "رأس المتجر: الشعار والبحث واللغة والحساب وقائمة الأمنيات والسلة وقوائم الأقسام."
+
+# Spec 066, slice 3: the footer, the announcement strip and the consent banner's look (K-4).
+#: mizzey-theme/inc/footer.php
+msgid "(opens in a new tab)"
+msgstr "(يفتح في علامة تبويب جديدة)"
+
+#: assets/js/site-parts-editor.js
+msgid "Add a column"
+msgstr "إضافة عمود"
+
+#: assets/js/site-parts-editor.js
+msgid "Add a message"
+msgstr "إضافة رسالة"
+
+#: mizzey-theme/inc/consent.php
+msgid "Always on"
+msgstr "تعمل دائمًا"
+
+#: mizzey-theme/inc/consent.php
+msgid "Analytics"
+msgstr "التحليلات"
+
+#: mizzey-theme/inc/strip.php assets/js/site-parts-editor.js
+msgid "Announcement strip"
+msgstr "شريط الإعلانات"
+
+#: mizzey-theme/inc/strip.php
+msgid "Announcements"
+msgstr "الإعلانات"
+
+#: mizzey-theme/inc/footer.php
+msgid "Chat on WhatsApp"
+msgstr "تحدث عبر واتساب"
+
+#: assets/js/site-parts-editor.js
+msgid "Choose the logo for the Indigo footer"
+msgstr "اختيار الشعار للتذييل النيلي"
+
+#: mizzey-theme/inc/consent.php
+msgid "Choose what you allow. You can change this any time from Cookie preferences at the foot of every page."
+msgstr "اختر ما تسمح به. يمكنك تغيير ذلك في أي وقت من الرابط تفضيلات ملفات تعريف الارتباط في أسفل كل صفحة."
+
+#. translators: %d: the column's number.
+#: assets/js/site-parts-editor.js
+msgid "Column %d"
+msgstr "العمود %d"
+
+#: assets/js/site-parts-editor.js
+msgid "Columns"
+msgstr "الأعمدة"
+
+#: mizzey-theme/inc/consent.php src/Marketing/ConsentBanner.php
+msgid "Cookie preferences"
+msgstr "تفضيلات ملفات تعريف الارتباط"
+
+#: mizzey-theme/inc/footer.php assets/js/site-parts-editor.js
+msgid "Customer care"
+msgstr "خدمة العملاء"
+
+#: mizzey-theme/inc/consent.php
+msgid "Decline"
+msgstr "رفض"
+
+#: assets/js/site-parts-editor.js
+msgid "Each column shows a navigation menu, with its title as the heading. Choose the menu for each language. A link to #cookie-preferences opens the cookie preferences."
+msgstr "يعرض كل عمود قائمة تنقل، ويكون اسمها عنوانًا له. اختر القائمة لكل لغة. الرابط إلى ‎#cookie-preferences يفتح تفضيلات ملفات تعريف الارتباط."
+
+#: assets/js/site-parts-editor.js
+msgid "Fixed"
+msgstr "ثابت"
+
+#: assets/js/site-parts-editor.js
+msgid "Fixed shows the first message. The slider shows up to three in turn, six seconds each."
+msgstr "الثابت يعرض الرسالة الأولى. والمتتالي يعرض حتى ثلاث رسائل بالتناوب، ست ثوانٍ لكل منها."
+
+#: assets/js/site-parts-editor.js
+msgid "Footer"
+msgstr "التذييل"
+
+#: mizzey-theme/inc/consent.php
+msgid "Help us see which pages are used most, without your name."
+msgstr "تساعدنا على معرفة الصفحات الأكثر استخدامًا، دون اسمك."
+
+#: mizzey-theme/inc/consent.php
+msgid "Keep your cart, checkout and sign-in working."
+msgstr "تُبقي السلة والدفع وتسجيل الدخول تعمل."
+
+#: assets/js/site-parts-editor.js
+msgid "Legal line"
+msgstr "السطر القانوني"
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Legal line in %s"
+msgstr "السطر القانوني بـ%s"
+
+#: assets/js/site-parts-editor.js
+msgid "Link address"
+msgstr "عنوان الرابط"
+
+#: assets/js/site-parts-editor.js
+msgid "Link words"
+msgstr "نص الرابط"
+
+#: mizzey-theme/inc/consent.php
+msgid "Marketing"
+msgstr "التسويق"
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Menu in %s"
+msgstr "القائمة بـ%s"
+
+#. translators: %d: the message's number.
+#: assets/js/site-parts-editor.js
+msgid "Message %d"
+msgstr "الرسالة %d"
+
+#. translators: %s: a language's name.
+#: assets/js/site-parts-editor.js
+msgid "Messages in %s"
+msgstr "الرسائل بـ%s"
+
+#: assets/js/site-parts-editor.js
+msgid "Move down"
+msgstr "نقل لأسفل"
+
+#: assets/js/site-parts-editor.js
+msgid "Move up"
+msgstr "نقل لأعلى"
+
+#: mizzey-theme/inc/consent.php
+msgid "Necessary"
+msgstr "الضرورية"
+
+#: assets/js/site-parts-editor.js
+msgid "None"
+msgstr "لا شيء"
+
+#: mizzey-theme/inc/strip.php
+msgid "Pause the messages"
+msgstr "إيقاف الرسائل مؤقتًا"
+
+#: mizzey-theme/inc/strip.php
+msgid "Play the messages"
+msgstr "تشغيل الرسائل"
+
+#: assets/js/site-parts-editor.js
+msgid "Remove"
+msgstr "إزالة"
+
+#: assets/js/site-parts-editor.js
+msgid "Remove the column"
+msgstr "إزالة العمود"
+
+#: assets/js/site-parts-editor.js
+msgid "Remove the message"
+msgstr "إزالة الرسالة"
+
+#: assets/js/site-parts-editor.js
+msgid "Replace the logo for the Indigo footer"
+msgstr "استبدال شعار التذييل النيلي"
+
+#: assets/js/site-parts-editor.js
+msgid "Royal Indigo"
+msgstr "النيلي الملكي"
+
+#: mizzey-theme/inc/consent.php
+msgid "Save choices"
+msgstr "حفظ الاختيارات"
+
+#: mizzey-theme/inc/consent.php
+msgid "Show you offers that fit you on other sites."
+msgstr "تعرض لك عروضًا تناسبك على مواقع أخرى."
+
+#: mizzey-theme/inc/footer.php
+msgid "Site footer"
+msgstr "تذييل الموقع"
+
+#: assets/js/site-parts-editor.js
+msgid "Slider"
+msgstr "متتالي"
+
+#: assets/js/site-parts-editor.js
+msgid "Style"
+msgstr "النمط"
+
+#: assets/js/site-parts-editor.js
+msgid "The WhatsApp link comes first, from WooCommerce > Settings > General > Store contact. Then this menu: the phone, the email, the address."
+msgstr "يأتي رابط واتساب أولًا، من WooCommerce > الإعدادات > عام > تواصل المتجر. ثم هذه القائمة: الهاتف والبريد الإلكتروني والعنوان."
+
+#: mizzey-theme/inc/strip.php
+msgid "The short message above the header, fixed or as a slider of up to three, in each language."
+msgstr "الرسالة القصيرة أعلى رأس الصفحة، ثابتة أو متتالية حتى ثلاث رسائل، بكل لغة."
+
+#: mizzey-theme/inc/footer.php
+msgid "The store footer: logo, language, the link columns from your menus, customer care and the legal line."
+msgstr "تذييل المتجر: الشعار واللغة وأعمدة الروابط من قوائمك وخدمة العملاء والسطر القانوني."
+
+#: assets/js/site-parts-editor.js
+msgid "Under the column before it"
+msgstr "تحت العمود الذي قبله"
+
+#: assets/js/site-parts-editor.js
+msgid "Variant"
+msgstr "الشكل"
+
+#: assets/js/site-parts-editor.js
+msgid "White"
+msgstr "أبيض"
+
+#: assets/js/site-parts-editor.js
+msgid "Wide, links in two columns"
+msgstr "عريض، والروابط في عمودين"
+
+#: assets/js/site-parts-editor.js
+msgid "With no message in a language, the strip is not shown in that language."
+msgstr "إذا لم تكن هناك رسالة بلغة ما، فلا يظهر الشريط بتلك اللغة."
+
+#. translators: 1: the year, 2: the site's name.
+#: mizzey-theme/inc/footer.php
+#, php-format
+msgid "© %1$s %2$s."
+msgstr "© %1$s %2$s."
