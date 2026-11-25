@@ -48,6 +48,8 @@ require_once __DIR__ . '/inc/header.php';
 require_once __DIR__ . '/inc/footer.php';
 require_once __DIR__ . '/inc/strip.php';
 require_once __DIR__ . '/inc/consent.php';
+// What a page loads before it can be used on a phone, and the first tap (spec 066, K-6).
+require_once __DIR__ . '/inc/performance.php';
 
 /*
  * The token layer (spec 066, slice 1). tokens.css and fonts.css are generated from design/tokens/tokens.json and

@@ -35,6 +35,65 @@ body {
 	outline-color: var(--mizzey-color-role-focus-inverse);
 }
 
+/* The page change (C1-Motion-Playground, page transition): a cross-document view transition. The old page stays
+   until the new one can show, then fades out in 120 ms while the new one fades in over 320 ms with an 8 px rise,
+   after 80 ms. The strip, the header and the tab bar hold still: they are their own groups, shown at once. A browser
+   without view transitions changes page as before. */
+@view-transition {
+	navigation: auto;
+}
+
+.mizzey-announcement {
+	view-transition-name: mizzey-strip;
+}
+
+.mizzey-header {
+	view-transition-name: mizzey-header;
+}
+
+.mizzey-tabbar {
+	view-transition-name: mizzey-tabbar;
+}
+
+::view-transition-old(root) {
+	animation: mizzey-page-out var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-in) both;
+}
+
+::view-transition-new(root) {
+	animation: mizzey-page-in var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) var(--mizzey-motion-duration-1) both;
+}
+
+::view-transition-group(mizzey-strip),
+::view-transition-group(mizzey-header),
+::view-transition-group(mizzey-tabbar),
+::view-transition-old(mizzey-strip),
+::view-transition-old(mizzey-header),
+::view-transition-old(mizzey-tabbar),
+::view-transition-new(mizzey-strip),
+::view-transition-new(mizzey-header),
+::view-transition-new(mizzey-tabbar) {
+	animation: none;
+}
+
+::view-transition-old(mizzey-strip),
+::view-transition-old(mizzey-header),
+::view-transition-old(mizzey-tabbar) {
+	display: none;
+}
+
+@keyframes mizzey-page-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes mizzey-page-in {
+	from {
+		opacity: 0;
+		transform: translateY(var(--mizzey-space-2));
+	}
+}
+
 /* Reduced motion: durations over 120 ms drop to the reduced token in tokens.css, so movement, springs and
    stagger go while short fades stay (C1-System 11). Keyframe loops stop here. */
 @media (prefers-reduced-motion: reduce) {
@@ -57,3 +116,16 @@ body {
 .mizzey-icon__knockout { stroke: var(--mizzey-color-role-surface); }
 .mizzey-icon__knockout-fill { fill: var(--mizzey-color-role-surface); }
 .mizzey-icon__accent { fill: var(--mizzey-color-role-accent); }
+
+/* The page change under reduced motion: the two 120 ms fades, no rise and no wait (C1-System 11). */
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-new(root) {
+		animation: mizzey-page-fade var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out) both;
+	}
+}
+
+@keyframes mizzey-page-fade {
+	from {
+		opacity: 0;
+	}
+}

@@ -11,6 +11,60 @@ import { store, getContext, getElement, withSyncEvent } from '@wordpress/interac
 
 const pressedOnScrim = new WeakMap();
 
+/*
+ * An overlay closes by playing its way out (components.css, .is-closing), then closing the dialog, which gives the
+ * focus back and lets the page scroll again. Keyframes, not transitions: Safari before 17.5 has no @starting-style
+ * and no transition of the top layer, and showed and hid the drawers at once. The close waits for the panel's
+ * animation to end, with a fallback in case it never reports, and is immediate when there is no animation to play.
+ * Escape takes the same way: the dialog's cancel event is stopped and the overlay closed here.
+ */
+const ms = ( value ) => Math.max( 0, ...String( value ).split( ',' ).map( ( v ) => ( v.trim().endsWith( 'ms' ) ? parseFloat( v ) : parseFloat( v ) * 1000 ) || 0 ) );
+
+function closeOverlay( dialog ) {
+	if ( ! dialog || ! dialog.open || dialog.classList.contains( 'is-closing' ) ) {
+		return;
+	}
+	const panel = dialog.querySelector( '.mizzey-overlay__panel' );
+	if ( ! dialog.classList.contains( 'mizzey-overlay' ) || ! panel ) {
+		dialog.close();
+		return;
+	}
+	dialog.classList.add( 'is-closing' );
+	const style = getComputedStyle( panel );
+	const wait = style.animationName === 'none' ? 0 : ms( style.animationDuration ) + ms( style.animationDelay );
+	let done = false;
+	let timer = 0;
+	const finish = () => {
+		if ( done ) {
+			return;
+		}
+		done = true;
+		panel.removeEventListener( 'animationend', onEnd );
+		window.clearTimeout( timer );
+		dialog.close();
+		dialog.classList.remove( 'is-closing' );
+	};
+	const onEnd = ( event ) => event.target === panel && finish();
+	if ( wait <= 0 || document.hidden ) {
+		finish();
+		return;
+	}
+	panel.addEventListener( 'animationend', onEnd );
+	timer = window.setTimeout( finish, wait + 100 );
+}
+
+document.addEventListener(
+	'cancel',
+	( event ) => {
+		const dialog = event.target;
+		if ( dialog instanceof HTMLDialogElement && dialog.classList.contains( 'mizzey-overlay' ) && event.cancelable ) {
+			event.preventDefault();
+			closeOverlay( dialog );
+		}
+	},
+	true
+);
+
 const isRtl = ( el ) => getComputedStyle( el ).direction === 'rtl';
 
 function activateTab( tab ) {
@@ -73,8 +127,8 @@ function choose( parts, option ) {
 
 store( 'mizzey/ui', {
 	actions: {
-		/* Overlays. showModal() does the rest: it moves focus in, makes the page behind inert, closes on Escape and
-		   gives focus back to the control that opened it. */
+		/* Overlays. showModal() does the rest: it moves focus in, makes the page behind inert and gives focus back to
+		   the control that opened it; closeOverlay() plays the way out first, on Escape too. */
 		open: withSyncEvent( ( event ) => {
 			const { target } = getContext();
 			const dialog = document.getElementById( target );
@@ -84,12 +138,15 @@ store( 'mizzey/ui', {
 			event.preventDefault();
 			dialog.showModal();
 		} ),
+		/* For the other stores (the product card's picker, the cookie preferences):
+		   store( 'mizzey/ui' ).actions.closeOverlay( dialog ). */
+		closeOverlay( dialog ) {
+			closeOverlay( dialog );
+		},
 		close() {
 			const { ref } = getElement();
 			const dialog = ref.closest( 'dialog' );
-			if ( dialog && dialog.open ) {
-				dialog.close();
-			}
+			closeOverlay( dialog );
 		},
 		/* A press on the scrim closes, only when it starts there too: a text selection dragged out of a field onto
 		   the scrim ends with a click on the dialog, and must not close it. */
@@ -102,7 +159,7 @@ store( 'mizzey/ui', {
 			const started = pressedOnScrim.get( ref );
 			pressedOnScrim.delete( ref );
 			if ( event.target === ref && started ) {
-				ref.close();
+				closeOverlay( ref );
 			}
 		} ),
 
@@ -217,5 +274,13 @@ store( 'mizzey/ui', {
 				}
 			}
 		} ),
+	},
+	callbacks: {
+		/* The last region on the page (inc/performance.php prints it at the end of the body) has hydrated, so every
+		   control before it has too: taps held by early-taps.js are replayed now. */
+		ready() {
+			document.documentElement.setAttribute( 'data-mizzey-ready', '' );
+			document.dispatchEvent( new Event( 'mizzey:ready' ) );
+		},
 	},
 } );

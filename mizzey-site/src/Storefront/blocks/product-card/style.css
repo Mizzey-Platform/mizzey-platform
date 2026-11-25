@@ -467,6 +467,11 @@
 	animation: mizzey-card-pop-in var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
 }
 
+/* The popover fades out (the sheet's way out would drop it by its own height). */
+.mizzey-card-picker.is-popover.is-closing .mizzey-overlay__panel {
+	animation: mizzey-overlay-fade-out var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-in) both;
+}
+
 .mizzey-card-picker.is-popover .mizzey-overlay__header {
 	display: none;
 }

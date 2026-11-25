@@ -95,7 +95,7 @@ const { state } = store( 'mizzey/card', {
 			const attributes = picker.attributes.map( ( a ) => ( { attribute: a.name, value: picker.chosen[ a.key ] } ) );
 			const done = yield* send( context, { id: variation.id, quantity: picker.qty, variation: attributes } );
 			if ( done && dialog && dialog.open ) {
-				dialog.close();
+				store( 'mizzey/ui' ).actions.closeOverlay( dialog );
 			}
 		},
 		choose: withSyncEvent( ( event ) => {
