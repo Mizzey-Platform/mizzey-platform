@@ -94,6 +94,16 @@
 					"color": "rgba(16,24,48,.48)"
 				},
 				{
+					"slug": "color-neutral-hairline-strong",
+					"name": "Neutral Hairline Strong",
+					"color": "rgba(38,59,115,.12)"
+				},
+				{
+					"slug": "color-neutral-on-brand-hover",
+					"name": "Neutral On Brand Hover",
+					"color": "rgba(255,255,255,.12)"
+				},
+				{
 					"slug": "color-feedback-success",
 					"name": "Feedback Success",
 					"color": "#247B47"
@@ -351,6 +361,11 @@
 					"slug": "type-h3",
 					"name": "H3",
 					"size": "var(--mizzey-type-h3-font-size)"
+				},
+				{
+					"slug": "type-h3-compact",
+					"name": "H3 Compact",
+					"size": "var(--mizzey-type-h3-compact-font-size)"
 				},
 				{
 					"slug": "type-title",

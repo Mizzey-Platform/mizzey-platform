@@ -92,7 +92,8 @@ def physical_sides(text: str) -> list[tuple[int, str]]:
 
 
 def theme_stylesheets() -> list[Path]:
-    return sorted(p for p in THEME.rglob("*.css") if p not in GENERATED)
+    """The shipped stylesheets: not the generated layer, and not the test fixtures under mizzey-theme/tests/."""
+    return sorted(p for p in THEME.rglob("*.css") if p not in GENERATED and "tests" not in p.relative_to(THEME).parts)
 
 
 # The checks --------------------------------------------------------------------------------------------------------

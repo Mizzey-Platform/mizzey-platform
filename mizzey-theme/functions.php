@@ -30,14 +30,40 @@ add_action(
 );
 
 require_once __DIR__ . '/inc/icons.php';
+require_once __DIR__ . '/inc/components.php';
 
 /*
  * The token layer (spec 066, slice 1). tokens.css and fonts.css are generated from design/tokens/tokens.json and
  * the font files by tools/theme_tokens.py and tools/theme_fonts.py; base.css holds the theme-level type roles,
- * focus ring and motion. The same three files style the editor, so what an editor sees is what a visitor sees.
- * The web font faces themselves are declared in theme.json, which WordPress prints inline in the head.
+ * focus ring and motion; components.css the base components. The same files style the editor, so what an editor
+ * sees is what a visitor sees. The web font faces themselves are declared in theme.json, which WordPress prints
+ * inline in the head.
  */
-const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base'];
+const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base', 'components'];
+
+/*
+ * The components' behaviour: one script module on the Interactivity API WordPress ships. It is enqueued on every
+ * storefront page because the header's drawers, on every page, need it.
+ */
+add_action(
+    'init',
+    static function (): void {
+        $file = get_theme_file_path('assets/js/ui.js');
+        wp_register_script_module(
+            'mizzey-theme/ui',
+            get_theme_file_uri('assets/js/ui.js'),
+            [['id' => '@wordpress/interactivity', 'import' => 'static']],
+            is_file($file) ? (string) filemtime($file) : false
+        );
+    }
+);
+
+add_action(
+    'wp_enqueue_scripts',
+    static function (): void {
+        wp_enqueue_script_module('mizzey-theme/ui');
+    }
+);
 
 add_action(
     'wp_enqueue_scripts',
