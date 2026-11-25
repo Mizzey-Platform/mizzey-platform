@@ -1,0 +1,142 @@
+/* The announcement strip (spec 066, slice 3), fixed or as a slider, as C1-Header-Footer-Styles, C1-Global (B6) and
+   C1-Strip-Slider draw it: Royal Indigo, a shade deeper above the Indigo header; 36 high on a phone and 40 on desktop,
+   growing to two lines for a long message, which then ends in an ellipsis. Markup from inc/strip.php; the slider's
+   behaviour is in assets/js/site-parts.js. Every value is a token; logical properties only. */
+
+/* Sizes are measured with the border and padding inside, as the boards do. */
+:where(.mizzey-announcement, .mizzey-announcement *) {
+	box-sizing: border-box;
+}
+
+.mizzey-announcement {
+	position: relative;
+	display: flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-strip-phone);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	overflow: hidden;
+	background-color: var(--mizzey-color-role-surface-brand);
+	color: var(--mizzey-color-role-text-on-brand);
+	font: var(--mizzey-type-label);
+}
+
+.wp-block-template-part:has(.mizzey-header--indigo) .mizzey-announcement {
+	background-color: var(--mizzey-color-indigo-700);
+}
+
+/* Every message in one cell, so the strip is as tall as its tallest and a message slides in place. */
+.mizzey-announcement__track {
+	display: grid;
+	flex: 1 1 auto;
+	min-inline-size: 0;
+}
+
+.mizzey-announcement__message {
+	grid-area: 1 / 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-3);
+	min-inline-size: 0;
+	min-block-size: var(--mizzey-control-strip-phone);
+	margin: 0;
+	text-align: center;
+}
+
+.mizzey-announcement__text {
+	display: -webkit-box;
+	padding-block: var(--mizzey-space-2);
+	min-inline-size: 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+}
+
+.mizzey-announcement__link {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-control-strip-phone)) / -2);
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+.mizzey-announcement__link:focus-visible,
+.mizzey-announcement__pause:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus-inverse);
+	outline-offset: calc(var(--mizzey-focus-offset) * -1);
+	border-radius: var(--mizzey-radius-xs);
+}
+
+/* The slider: the message showing in place, the next waiting under it, the last one leaving upwards. */
+.mizzey-announcement--slider .mizzey-announcement__message {
+	transform: translateY(100%);
+	opacity: 0;
+	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out),
+		opacity var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-announcement--slider .mizzey-announcement__message.is-current {
+	transform: none;
+	opacity: 1;
+}
+
+.mizzey-announcement--slider .mizzey-announcement__message.is-leaving {
+	transform: translateY(-100%);
+	opacity: 0;
+}
+
+.mizzey-announcement__pause {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-control-strip-phone)) / -2);
+	margin-inline-end: calc(var(--mizzey-space-3) * -1);
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+
+.mizzey-announcement__pause:hover {
+	background-color: var(--mizzey-color-neutral-on-brand-hover);
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-announcement__icon-play,
+.mizzey-announcement.is-paused .mizzey-announcement__icon-pause {
+	display: none;
+}
+
+.mizzey-announcement.is-paused .mizzey-announcement__icon-play {
+	display: block;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-announcement {
+		min-block-size: var(--mizzey-control-strip-desktop);
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-announcement__message {
+		min-block-size: var(--mizzey-control-strip-desktop);
+	}
+
+	.mizzey-announcement__link,
+	.mizzey-announcement__pause {
+		margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-control-strip-desktop)) / -2);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-announcement--slider .mizzey-announcement__message {
+		transition: none;
+	}
+}

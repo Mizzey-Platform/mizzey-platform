@@ -55,9 +55,11 @@ def runtime_size() -> tuple[int, str]:
 
 
 def template_files() -> dict[str, dict[str, list[Path]]]:
+    # Slice 3: the consent banner's look, the footer and the strip are on every page, with the script of the strip's
+    # slider and the cookie preferences.
     every = {
-        "styles": [THEME / "assets" / "css" / f"{name}.css" for name in ("tokens", "fonts", "base", "components")],
-        "scripts": [THEME / "assets" / "js" / "ui.js"]
+        "styles": [THEME / "assets" / "css" / f"{name}.css" for name in ("tokens", "fonts", "base", "components", "consent", "footer", "strip")],
+        "scripts": [THEME / "assets" / "js" / name for name in ("ui.js", "site-parts.js")]
         + [SITE / "assets" / name for name in ("consent-default.js", "consent.js", "gtm.js", "events.js", "language-cache.js")],
         "images": [],
     }
