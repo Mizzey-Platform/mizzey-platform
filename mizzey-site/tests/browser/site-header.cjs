@@ -415,6 +415,52 @@ async function after( browser ) {
 	}
 }
 
+/**
+ * A phone never scrolls sideways (AC-14, NFR-08): at 390 and 360, in both languages, on a phone's viewport, the
+ * document is no wider than the screen, every header control is inside it, and the logo's slot never runs into the
+ * controls. With no logo file the store's name stands in, clamped to one line with an ellipsis.
+ */
+async function overflow( browser ) {
+	for ( const lang of [ 'en', 'ar' ] ) {
+		for ( const width of [ 390, 360 ] ) {
+			for ( const url of [ plan[ lang ].home, plan[ lang ].category ] ) {
+				const context = await browser.newContext( { viewport: { width, height: 800 }, isMobile: true, hasTouch: true } );
+				const page = await context.newPage();
+				await page.goto( url, { waitUntil: 'load', timeout: TIMEOUT } );
+				await page.waitForTimeout( 300 );
+				const r = await page.evaluate( () => {
+					const d = document.documentElement;
+					const W = d.clientWidth;
+					const header = document.querySelector( '.mizzey-header' );
+					const shown = ( el ) => el.getClientRects().length > 0 && getComputedStyle( el ).visibility !== 'hidden';
+					const out = header ? [ ...header.querySelectorAll( '.mizzey-header__bar a, .mizzey-header__bar button, .mizzey-header__bar input:not([type="hidden"])' ) ]
+						.filter( shown ).map( ( el ) => el.getBoundingClientRect() ).filter( ( b ) => b.left < -1 || b.right > W + 1 ).length : -1;
+					const logo = header && header.querySelector( '.mizzey-header__logo' );
+					const actions = header && header.querySelector( '.mizzey-header__actions' );
+					const menu = header && header.querySelector( '.mizzey-header__menu' );
+					const text = header && header.querySelector( '.mizzey-header__logo-text' );
+					const box = ( el ) => el.getBoundingClientRect();
+					const apart = ( a, b ) => box( a ).right <= box( b ).left + 1 || box( b ).right <= box( a ).left + 1;
+					const line = text ? parseFloat( getComputedStyle( text ).lineHeight ) : 0;
+					return {
+						doc: d.scrollWidth <= W && document.body.scrollWidth <= W,
+						sizes: [ d.scrollWidth, W ],
+						out,
+						apart: !! logo && apart( logo, actions ) && apart( logo, menu ),
+						text: text ? { one: box( text ).height <= line * 1.2, clamped: text.scrollWidth > text.clientWidth, ellipsis: getComputedStyle( text ).textOverflow } : null,
+					};
+				} );
+				const where = `[${ lang }, ${ width }, ${ url === plan[ lang ].home ? 'home' : 'category' }]`;
+				check( r.doc, `AC-14 ${ where } the page never scrolls sideways (${ r.sizes.join( ' in ' ) })` );
+				check( r.out === 0, `NAV-08 ${ where } every header control is inside the screen (${ r.out } outside)` );
+				check( r.apart, `NAV-01 ${ where } the logo's slot never runs into the menu control or the header's controls` );
+				check( !! r.text && r.text.one && r.text.clamped && r.text.ellipsis === 'ellipsis', `NAV-01 ${ where } a long store name with no logo file stays on one line, ended by an ellipsis (${ JSON.stringify( r.text ) })` );
+				await context.close();
+			}
+		}
+	}
+}
+
 ( async () => {
 	const found = loadPlaywright();
 	if ( ! found ) {
@@ -424,6 +470,8 @@ async function after( browser ) {
 	try {
 		if ( plan.part === 'after' ) {
 			await after( browser );
+		} else if ( plan.part === 'overflow' ) {
+			await overflow( browser );
 		} else {
 			await main( browser );
 		}

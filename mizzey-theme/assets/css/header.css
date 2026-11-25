@@ -24,7 +24,8 @@
 
 .mizzey-header__top {
 	display: grid;
-	grid-template-columns: auto auto minmax(0, 1fr);
+	/* The logo's slot takes what the menu control and the controls leave, and never more (C1-Global, long content). */
+	grid-template-columns: auto minmax(0, 1fr) auto;
 	grid-template-areas:
 		"menu logo actions"
 		"search search search";
@@ -41,6 +42,10 @@
 	grid-area: logo;
 	display: inline-flex;
 	align-items: center;
+	justify-self: start;
+	min-inline-size: 0;
+	max-inline-size: calc(100% - var(--mizzey-space-2));
+	overflow: hidden;
 	block-size: var(--mizzey-control-target-min);
 	margin-inline-start: var(--mizzey-space-2);
 	color: var(--mizzey-color-role-primary);
@@ -54,7 +59,19 @@
 }
 
 .mizzey-header__logo-text {
+	display: block;
+	min-inline-size: 0;
+	overflow: hidden;
 	font: var(--mizzey-type-h3-compact);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	/* A Latin name on an Arabic page is cut at its own end. */
+	unicode-bidi: plaintext;
+}
+
+.mizzey-header__logo-image {
+	max-inline-size: 100%;
+	object-fit: contain;
 }
 
 .mizzey-header__top > .mizzey-header__logo,
@@ -236,7 +253,7 @@
    The three styles on a phone. Centred: the logo in the middle of the bar. */
 
 .mizzey-header--centred .mizzey-header__top {
-	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	grid-template-columns: 1fr minmax(0, auto) 1fr;
 }
 
 .mizzey-header--centred .mizzey-header__logo {
@@ -769,6 +786,8 @@
 .mizzey-menu__logo {
 	display: inline-flex;
 	align-items: center;
+	min-inline-size: 0;
+	overflow: hidden;
 	block-size: var(--mizzey-control-target-min);
 	margin-inline-end: auto;
 	color: var(--mizzey-color-role-primary);
@@ -790,6 +809,8 @@
 	font: var(--mizzey-type-h3-compact);
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	/* A Latin name on an Arabic page is cut at its own end. */
+	unicode-bidi: plaintext;
 }
 
 .mizzey-menu__back .mizzey-icon {
