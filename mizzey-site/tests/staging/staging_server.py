@@ -88,12 +88,21 @@ LAYER_SOURCES = {
     "integration/baseline": (BASELINE, ("setup.php", "ia-endpoints.php", "wpml-settings.php")),
 }
 SEED_SCRIPTS = ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
-                "30-catalogue-translations.php", "40-orders.php", "50-reports.php", "60-home-page.php", "65-site-parts.php")
+                "30-catalogue-translations.php", "40-orders.php", "50-reports.php", "60-home-page.php",
+                "70-sample-catalog.php", "65-site-parts.php")
+# A step run more than once, each pass its own process: the sample catalogue writes its English records, then its
+# Arabic records (finding A11). The header (65) runs after it, so its menu can point at the sample categories.
+SEED_PASSES = {"70-sample-catalog.php": ((), ("translate",))}
 PARITY_FILES = ("wpml-remote-config.json", "wpml-development-settings.json")
 # The logo files the home page seed sets (seed/60-home-page.php). The brand identity is not public before launch, so
 # they are never in the repository: they wait on the server in MIZZEY_STAGING_BRAND_DIR (default
 # ~/mizzey-staging/brand/), copied there by hand, and reach the container through the layer's brand/ folder.
 BRAND_FILES = ("logo-light.png", "logo-indigo.png")
+# The sample catalogue the Stage 2 boards draw (seed/70-sample-catalog.php): its names, brands and photos are not this
+# repository's to publish, so they wait on the server in MIZZEY_STAGING_SAMPLE_DIR (default
+# ~/mizzey-staging/sample-catalog/: catalog.json and images/), copied there by hand, and reach the container through
+# the layer's sample-catalog/ folder.
+SAMPLE_PICTURES = (".jpg", ".jpeg", ".png", ".webp")
 BOSTA_DISTRICTS = "bosta-districts.json"
 NOT_HERE = {
     "db-create": "the server creates the database and its account when it creates the site",
@@ -254,6 +263,13 @@ def layer_files() -> dict[str, Path]:
     for name in BRAND_FILES:
         if (brand / name).is_file():
             files[f"brand/{name}"] = brand / name
+    # The sample catalogue, from the server only, when it has been put there.
+    sample = Path(os.environ.get("MIZZEY_STAGING_SAMPLE_DIR") or STATE / "sample-catalog")
+    if (sample / "catalog.json").is_file():
+        files["sample-catalog/catalog.json"] = sample / "catalog.json"
+        for picture in sorted((sample / "images").rglob("*")):
+            if picture.is_file() and picture.suffix.lower() in SAMPLE_PICTURES:
+                files[f"sample-catalog/{picture.relative_to(sample).as_posix()}"] = picture
     # Bosta's district list, which the staging plugin answers the carrier plugin's request from.
     districts = STATE / "parity" / BOSTA_DISTRICTS
     if districts.is_file():
@@ -513,9 +529,10 @@ def seed() -> None:
     creds = load_credentials()
     passwords = {u: secrets.token_urlsafe(14) for u in ("client_operator", "demo_customer")}
     for script in SEED_SCRIPTS:
-        out = with_secret("MIZZEY_SEED_PASSWORDS", json.dumps(passwords), "eval-file",
-                          in_layer("staging", "seed", script))
-        say(f"seed/{script}: {out.splitlines()[-1] if out else ''}")
+        for extra in SEED_PASSES.get(script, ((),)):
+            out = with_secret("MIZZEY_SEED_PASSWORDS", json.dumps(passwords), "eval-file",
+                              in_layer("staging", "seed", script), *extra)
+            say(f"seed/{' '.join((script, *extra))}: {out.splitlines()[-1] if out else ''}")
     for user, password in passwords.items():
         creds[user] = {"user": user, "password": password}
     save_credentials(creds)

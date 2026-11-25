@@ -14,7 +14,10 @@
  *  - rebuilds the stored header and footer template parts from the theme's current parts/*.html on every run, adding
  *    only the menus, the strip's message and the logo for Indigo grounds, as staff would set them in the Site Editor
  *    (a stored part would otherwise freeze the markup of the release it was saved under);
- *  - sets a sample WhatsApp number (+20 100 000 0000) and greeting (specs/059).
+ *  - sets a sample WhatsApp number (+20 100 000 0000) and greeting (specs/059);
+ *  - links the category row and the footer's Shop column to the sample catalogue's top categories when step 70 has
+ *    loaded them (the staging tool runs it first), else to step 20's placeholder categories; a menu this step wrote is
+ *    brought up to date when its links change, and one staff have edited since is kept.
  *
  * Idempotent: a second run finds what the first made by its seed name and changes nothing else. Staging only.
  *
@@ -26,6 +29,7 @@ defined( 'MIZZEY_STAGING' ) && MIZZEY_STAGING || WP_CLI::error( 'staging only' )
 
 use MizzeySite\Storefront\ContactLinks;
 use MizzeySite\Storefront\HeaderMenu;
+use MizzeySite\Storefront\HomeSections;
 
 global $sitepress;
 $sitepress->switch_lang( 'en', true );
@@ -72,8 +76,21 @@ $nav = static function ( string $slug, array $menu ) use ( $link, $sitepress ): 
 	foreach ( array( 'en', 'ar' ) as $lang ) {
 		$name  = 'en' === $lang ? $slug : $slug . '-ar';
 		$found = get_posts( array( 'post_type' => 'wp_navigation', 'post_status' => 'publish', 'name' => $name, 'numberposts' => 1, 'fields' => 'ids', 'suppress_filters' => true ) );
+		$want  = implode( "\n", array_map( $link, $menu[ $lang ][1] ) );
 		if ( $found ) {
 			$ids[ $lang ] = (int) $found[0];
+			// Brought up to date when its links change (the sample catalogue's categories arriving), unless staff
+			// changed it since this step wrote it: a menu edited in the Site Editor is kept. One with no record is ours.
+			$held = (string) get_post_field( 'post_content', $ids[ $lang ] );
+			$ours = (string) get_post_meta( $ids[ $lang ], '_mizzey_seed_nav', true );
+			if ( $held !== $want && ( '' === $ours || md5( $held ) === $ours ) ) {
+				wp_update_post( array( 'ID' => $ids[ $lang ], 'post_content' => wp_slash( $want ) ) );
+				$held = (string) get_post_field( 'post_content', $ids[ $lang ] );
+				$ours = '';
+			}
+			if ( '' === $ours ) {
+				update_post_meta( $ids[ $lang ], '_mizzey_seed_nav', md5( $held ) );
+			}
 			continue;
 		}
 		$sitepress->switch_lang( $lang, true );
@@ -83,7 +100,7 @@ $nav = static function ( string $slug, array $menu ) use ( $link, $sitepress ): 
 				'post_status'  => 'publish',
 				'post_name'    => $name,
 				'post_title'   => $menu[ $lang ][0],
-				'post_content' => wp_slash( implode( "\n", array_map( $link, $menu[ $lang ][1] ) ) ),
+				'post_content' => wp_slash( $want ),
 			),
 			true
 		);
@@ -92,6 +109,7 @@ $nav = static function ( string $slug, array $menu ) use ( $link, $sitepress ): 
 			WP_CLI::error( $id->get_error_message() );
 		}
 		$ids[ $lang ] = (int) $id;
+		update_post_meta( $ids[ $lang ], '_mizzey_seed_nav', md5( (string) get_post_field( 'post_content', $ids[ $lang ] ) ) );
 		if ( 'en' === $lang ) {
 			$sitepress->set_element_language_details( $ids['en'], 'post_wp_navigation', null, 'en' );
 		} else {
@@ -102,7 +120,20 @@ $nav = static function ( string $slug, array $menu ) use ( $link, $sitepress ): 
 	return $ids;
 };
 
-$cats = array( 'sample-care', 'sample-home', 'sample-accessories' );
+// The sample catalogue's top categories (70-sample-catalog.php marks the terms it makes), in their home page order,
+// when it has been loaded; otherwise the placeholder categories of step 20.
+$cats = array();
+foreach ( (array) get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => false, 'parent' => 0, 'meta_query' => array( array( 'key' => '_mizzey_sample', 'compare' => 'EXISTS' ) ) ) ) as $term ) {
+	if ( ! $term instanceof WP_Term ) {
+		continue;
+	}
+	$lang = apply_filters( 'wpml_element_language_code', null, array( 'element_id' => (int) $term->term_taxonomy_id, 'element_type' => 'product_cat' ) );
+	if ( in_array( $lang, array( null, 'en' ), true ) ) {
+		$cats[ $term->slug ] = array( (int) get_term_meta( $term->term_id, HomeSections::POSITION, true ) ?: PHP_INT_MAX, $term->name );
+	}
+}
+asort( $cats );
+$cats = $cats ? array_keys( $cats ) : array( 'sample-care', 'sample-home', 'sample-accessories' );
 $cat_links = static function ( string $lang ) use ( $cats, $category ): array {
 	$out = array();
 	foreach ( $cats as $slug ) {

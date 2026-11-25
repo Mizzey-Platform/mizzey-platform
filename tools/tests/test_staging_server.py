@@ -293,6 +293,34 @@ class TheStagingLayer(OnTheServer):
             self.assertIn(f"brand/{name}", installed)
             self.assertTrue((srv.LAYER / "brand" / name).is_file())
 
+    def test_the_sample_catalogue_comes_from_the_server_and_never_from_the_repository(self):
+        in_repo = [p for p in srv.REPO.rglob("catalog.json") if ".git" not in p.parts and "node_modules" not in p.parts]
+        self.assertEqual([], in_repo, "the sample catalogue's names and photos are not this repository's to publish")
+        self.assertFalse([n for n in srv.install_layer() if n.startswith("sample-catalog/")], "nothing to copy, nothing copied")
+        sample = srv.STATE / "sample-catalog"
+        (sample / "images" / "products").mkdir(parents=True)
+        (sample / "catalog.json").write_text('{"version": 1, "products": []}', encoding="utf-8")
+        (sample / "images" / "products" / "sample-001.jpg").write_bytes(b"\xff\xd8")
+        (sample / "images" / "notes.txt").write_text("not a picture", encoding="utf-8")
+        installed = srv.install_layer()
+        for name in ("sample-catalog/catalog.json", "sample-catalog/images/products/sample-001.jpg"):
+            self.assertIn(name, installed)
+            self.assertTrue((srv.LAYER / name).is_file(), name)
+        self.assertNotIn("sample-catalog/images/notes.txt", installed)
+        # Where the seed looks first: the layer's folder, two levels above the seed's own.
+        source = (srv.HERE / "seed" / "70-sample-catalog.php").read_text(encoding="utf-8")
+        self.assertIn("dirname( __DIR__, 2 ) . '/sample-catalog'", source)
+
+    def test_the_sample_catalogue_writes_its_arabic_records_in_a_second_process_before_the_header(self):
+        with mock.patch.object(srv, "load_credentials", return_value={}),                 mock.patch.object(srv, "save_credentials"):
+            srv.seed()
+        runs = [c for c in self.container.commands() if "eval-file" in c and "/staging/seed/" in c]
+        steps = [c.split("/staging/seed/")[1] for c in runs]
+        self.assertEqual(["70-sample-catalog.php", "70-sample-catalog.php translate"],
+                         [s for s in steps if s.startswith("70-")], "English, then Arabic, each its own process")
+        self.assertLess(steps.index("70-sample-catalog.php translate"), steps.index("65-site-parts.php"))
+        self.assertEqual(len(srv.SEED_SCRIPTS) + 1, len(steps))
+
     def test_the_fingerprint_finds_the_settings_file_it_requires(self):
         srv.install_layer()
         source = (srv.LAYER / "staging" / "fingerprint.php").read_text(encoding="utf-8")
@@ -303,7 +331,8 @@ class TheStagingLayer(OnTheServer):
         installed = srv.install_layer()
         # Scripts and data, and the pictures the seed adds: the home page's artwork and, from the server, the logo.
         pictures = [name for name in installed if (name.startswith("staging/seed/home-art/") and name.endswith(".webp"))
-                    or (name.startswith("brand/") and name.endswith(".png"))]
+                    or (name.startswith("brand/") and name.endswith(".png"))
+                    or (name.startswith("sample-catalog/images/") and name.endswith(srv.SAMPLE_PICTURES))]
         self.assertFalse([name for name in installed if not name.endswith((".php", ".json")) and name not in pictures])
         self.assertFalse([name for name in installed if "admin-visit.php" in name and "server-" not in name])
 
