@@ -74,9 +74,13 @@ function t109_menu( string $lang, string $column, string $title, array $links ):
 	return $id;
 }
 
-/** The two blocks with their settings, as the Site Editor stores them. */
+/**
+ * The blocks with their settings, as the Site Editor stores them; the strip followed by the site header, as the
+ * theme's header part places them (checked below), so the browser can see the strip above the header.
+ */
 function t109_blocks( array $footer, array $strip ): string {
 	return '<!-- wp:mizzey/announcement-strip ' . serialize_block_attributes( $strip ) . ' /-->'
+		. '<!-- wp:mizzey/site-header /-->'
 		. '<!-- wp:mizzey/site-footer ' . serialize_block_attributes( $footer ) . ' /-->';
 }
 
@@ -154,7 +158,7 @@ run(
 		$columns = static fn ( array $m ): array => array(
 			array( 'menus' => array( 'en' => $m['shop-en'], 'ar' => $m['shop-ar'] ), 'wide' => true ),
 			array( 'menus' => array( 'en' => $m['help-en'], 'ar' => $m['help-ar'] ) ),
-			array( 'menus' => array( 'en' => $m['legal-en'], 'ar' => $m['legal-ar'] ) ),
+			array( 'menus' => array( 'en' => $m['legal-en'], 'ar' => $m['legal-ar'] ), 'under' => true ),
 		);
 		$footer = static fn ( string $style ): array => array(
 			'style'   => $style,
@@ -194,6 +198,12 @@ run(
 			'messages' => array( 'en' => array_column( $messages['en'], 'text' ), 'ar' => array_column( $messages['ar'], 'text' ) ),
 			'shots'    => get_temp_dir(),
 		);
+
+		// ---- The theme's header part places the strip first, above the site header ----------------------------
+		$header_part = (string) file_get_contents( get_theme_file_path( 'parts/header.html' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$strip_at    = strpos( $header_part, '<!-- wp:mizzey/announcement-strip' );
+		$header_at   = strpos( $header_part, '<!-- wp:mizzey/site-header' );
+		$check( false !== $strip_at && false !== $header_at && $strip_at < $header_at, 'G11 parts/header.html places the announcement strip before the site header' );
 
 		// ---- Run 1: the White footer and the fixed strip -------------------------------------------------------
 		$save( t109_blocks( $footer( 'white' ), array( 'variant' => 'fixed', 'messages' => $messages ) ) );

@@ -143,7 +143,7 @@ async function footerChecks( browser, lang, width ) {
 	const where = `[${ lang } ${ width }]`;
 	const { context, page } = await open( browser, plan[ lang ], { width } );
 	const f = await readFooter( page );
-	check( f, `SSC-08 ${ where } the designed footer is on the page` );
+	check( f, `SSC-08 ${ where } the designed footer is on the page${ f ? '' : ` (${ page.url() }, "${ await page.title() }")` }` );
 	if ( ! f ) {
 		await context.close();
 		return;
@@ -192,9 +192,57 @@ async function footerChecks( browser, lang, width ) {
 		const shopLinks = f.links.filter( ( l ) => plan.links[ lang ].slice( 0, 2 ).includes( l.text ) );
 		check( 2 === shopLinks.length && Math.abs( shopLinks[ 0 ].box.y - shopLinks[ 1 ].box.y ) < 2 && shopLinks[ 0 ].box.x !== shopLinks[ 1 ].box.x, `F1 ${ where } Shop sets its links in two columns on the phone` );
 	} else {
-		const tops = new Set( f.columns.slice( 0, 4 ).map( ( c ) => Math.round( c.box.y ) ) );
-		check( 1 === tops.size, `F1 ${ where } the columns stand side by side on desktop` );
+		const byHeading = ( i ) => f.columns.find( ( c ) => c.heading.trim() === want[ i ] );
+		const tops = new Set( [ 0, 1, 3 ].map( ( i ) => Math.round( byHeading( i ).box.y ) ) );
+		check( 1 === tops.size && byHeading( 2 ).box.y > byHeading( 1 ).box.y, `F1 ${ where } the columns stand side by side on desktop, Legal under Help` );
 	}
+
+	// The page boards' numbers (C1-Home-Phone at 390, C1-Home-Desktop at 1440; C1-Global and
+	// C1-Header-Footer-Styles agree with them except where the report lists otherwise).
+	const small = width < 1024;
+	const m = await page.evaluate( ( scope ) => {
+		const footer = document.querySelector( `${ scope } .mizzey-footer` );
+		const F = footer.getBoundingClientRect();
+		const cs = getComputedStyle( footer );
+		const r = ( el ) => el.getBoundingClientRect();
+		const heads = [ ...footer.querySelectorAll( '.mizzey-footer__heading' ) ];
+		const firstHead = heads.map( r ).sort( ( a, b ) => a.top - b.top )[ 0 ];
+		const columns = [ ...footer.querySelectorAll( '.mizzey-footer__column' ) ].map( r ).sort( ( a, b ) => a.top - b.top );
+		const grid = r( footer.querySelector( '.mizzey-footer__grid' ) );
+		const foot = r( footer.querySelector( '.mizzey-footer__foot' ) );
+		const links = [ ...footer.querySelectorAll( '.mizzey-footer__links .mizzey-footer__link' ) ];
+		const single = links.filter( ( a ) => r( a ).height < 50 );
+		const group = [ ...footer.querySelectorAll( '.mizzey-footer__group' ) ].find( ( g ) => g.querySelectorAll( '.mizzey-footer__column' ).length > 1 );
+		const stacked = group ? [ ...group.querySelectorAll( '.mizzey-footer__column' ) ].map( r ) : [];
+		const brand = r( footer.querySelector( '.mizzey-footer__brand' ) );
+		const language = r( footer.querySelector( '.mizzey-footer__language' ) );
+		const logo = r( footer.querySelector( '.mizzey-footer__logo' ) );
+		return {
+			padTop: parseFloat( cs.paddingTop ), padInline: parseFloat( cs.paddingLeft ), padBottom: parseFloat( cs.paddingBottom ),
+			radius: parseFloat( cs.borderTopLeftRadius ), radiusEnd: parseFloat( cs.borderTopRightRadius ),
+			firstHeading: Math.round( firstHead.top - F.top ), headingHeight: Math.round( r( heads[ 0 ] ).height ),
+			linkHeights: [ ...new Set( single.map( ( a ) => Math.round( r( a ).height ) ) ) ],
+			linkLine: getComputedStyle( links[ 0 ] ).lineHeight, linkSize: getComputedStyle( links[ 0 ] ).fontSize,
+			stackGap: stacked.length > 1 ? Math.round( stacked[ 1 ].top - stacked[ 0 ].bottom ) : null,
+			sectionGaps: [ ...new Set( columns.slice( 1 ).map( ( c, i ) => Math.round( c.top - columns[ i ].bottom ) ).filter( ( g ) => g > 0 ) ) ],
+			brandHeight: Math.round( brand.height ), languageFromLogo: Math.round( language.top - logo.top ),
+			footHeight: Math.round( foot.height ), footGap: Math.round( foot.top - grid.bottom ), footToBottom: Math.round( F.bottom - foot.bottom ),
+		};
+	}, SCOPE );
+	const near = ( a, b ) => Math.abs( a - b ) <= 1;
+	const board = small
+		? { padTop: 24, padInline: 16, padBottom: 16, firstHeading: 104, stackGap: 24, brandHeight: 56, footBottom: 16 }
+		: { padTop: 56, padInline: 84, padBottom: 0, firstHeading: 56, stackGap: 12, languageFromLogo: 64, footBottom: 0 };
+	check( near( m.padTop, board.padTop ) && near( m.padInline, board.padInline ) && near( m.padBottom, board.padBottom ) && 24 === m.radius && 24 === m.radiusEnd, `K-1 ${ where } footer padding ${ board.padTop } ${ board.padInline } ${ board.padBottom } and top corners 24 (${ m.padTop } ${ m.padInline } ${ m.padBottom }, ${ m.radius })` );
+	check( near( m.firstHeading, board.firstHeading ) && 32 === m.headingHeight, `K-1 ${ where } the first heading ${ board.firstHeading } from the footer's top, 32 high (${ m.firstHeading }, ${ m.headingHeight })` );
+	check( 1 === m.linkHeights.length && 44 === m.linkHeights[ 0 ] && '20px' === m.linkLine, `K-1 ${ where } one-line links are rows of 44, text 16/20 (${ m.linkHeights } ${ m.linkSize }/${ m.linkLine })` );
+	check( near( m.stackGap, board.stackGap ), `K-1 ${ where } a stacked column starts ${ board.stackGap } under the one above (${ m.stackGap })` );
+	if ( small ) {
+		check( near( m.brandHeight, 56 ) && m.sectionGaps.every( ( g ) => near( g, 24 ) ), `K-1 ${ where } the logo row is 56 and the sections 24 apart (${ m.brandHeight }, ${ m.sectionGaps })` );
+	} else {
+		check( near( m.languageFromLogo, 64 ), `K-1 ${ where } the language link 64 under the logo's top (48 logo, 16 gap) (${ m.languageFromLogo })` );
+	}
+	check( near( m.footHeight, 56 ) && near( m.footGap, 24 ) && near( m.footToBottom, board.footBottom ), `K-1 ${ where } the legal row is 56 high, 24 under the columns, ${ board.footBottom } from the foot (${ m.footHeight }, ${ m.footGap }, ${ m.footToBottom })` );
 	const footer = page.locator( `${ SCOPE } .mizzey-footer` );
 	await footer.screenshot( { path: path.join( plan.shots, `s3-footer-${ plan.style }-${ lang }-${ width }.png` ) } );
 	await context.close();
@@ -217,6 +265,46 @@ async function stripChecks( browser, lang, width ) {
 		check( s.count === plan.messages[ lang ].length && null !== s.pause, `G11 ${ where } the slider carries every message (${ s.count }) and a pause control (${ s.pause })` );
 		check( ! s.hiddenFocusable, `NFR-11 ${ where } a message that is not showing cannot be reached by the keyboard` );
 	}
+	const order = await page.evaluate( ( scope ) => {
+		const strip = document.querySelector( `${ scope } .mizzey-announcement` );
+		const header = document.querySelector( `${ scope } .mizzey-header` );
+		if ( ! strip || ! header ) {
+			return null;
+		}
+		const a = strip.getBoundingClientRect();
+		const b = header.getBoundingClientRect();
+		// The page's content spaces its blocks apart (its flow layout); the header part does not. So the gap is read
+		// without that spacing, and the site's own header part is checked to add none.
+		const flow = parseFloat( getComputedStyle( header ).marginBlockStart ) || 0;
+		const real = document.querySelector( 'header.wp-block-template-part > .mizzey-header' );
+		return {
+			gap: Math.round( b.top - a.bottom - flow ),
+			stripFirst: !! ( strip.compareDocumentPosition( header ) & Node.DOCUMENT_POSITION_FOLLOWING ),
+			partSpacing: real ? parseFloat( getComputedStyle( real ).marginBlockStart ) || 0 : null,
+		};
+	}, SCOPE );
+	check( order && order.stripFirst && Math.abs( order.gap ) <= 1 && 0 === order.partSpacing, `G11 ${ where } the strip sits right above the header (${ JSON.stringify( order ) })` );
+	const sm = await page.evaluate( ( scope ) => {
+		const strip = document.querySelector( `${ scope } .mizzey-announcement` );
+		const message = strip.querySelector( '.mizzey-announcement__message.is-current' );
+		const text = message.querySelector( '.mizzey-announcement__text' );
+		const link = message.querySelector( '.mizzey-announcement__link' );
+		const ts = getComputedStyle( text );
+		const rtl = getComputedStyle( strip ).direction === 'rtl';
+		const line = parseFloat( ts.lineHeight );
+		return {
+			height: Math.round( strip.getBoundingClientRect().height ),
+			lines: Math.round( ( text.getBoundingClientRect().height - parseFloat( ts.paddingTop ) - parseFloat( ts.paddingBottom ) ) / line ),
+			line: Math.round( line ),
+			size: Math.round( parseFloat( ts.fontSize ) ),
+			weight: ts.fontWeight,
+			linkGap: link ? Math.round( rtl ? text.getBoundingClientRect().left - link.getBoundingClientRect().right : link.getBoundingClientRect().left - text.getBoundingClientRect().right ) : null,
+			linkHeight: link ? Math.round( link.getBoundingClientRect().height ) : null,
+		};
+	}, SCOPE );
+	// One line: 36 on a phone, 40 on desktop; a long message takes two lines with 8 above and below (C1-Global B6).
+	const tall = 1 === sm.lines ? ( width < 1024 ? 36 : 40 ) : 16 + sm.lines * sm.line;
+	check( sm.lines <= 2 && Math.abs( sm.height - tall ) <= 1 && sm.size === ( 'ar' === lang ? 14 : 13 ) && '500' === sm.weight && ( null === sm.linkGap || ( 12 === sm.linkGap && 44 === sm.linkHeight ) ), `K-1 ${ where } the strip is ${ tall } high for ${ sm.lines } line(s), ${ sm.size }px 500, its link 12 after the words in a 44 target (${ JSON.stringify( sm ) })` );
 	await page.locator( `${ SCOPE } .mizzey-announcement` ).screenshot( { path: path.join( plan.shots, `s3-strip-${ plan.variant }-${ lang }-${ width }.png` ) } );
 	if ( 'slider' === plan.variant && 'en' === lang && width >= 1024 ) {
 		const first = s.current;
@@ -233,6 +321,13 @@ async function stripChecks( browser, lang, width ) {
 		check( ( await readStrip( page ) ).current === focused, 'G11 the slider pauses while it holds the keyboard focus' );
 		await page.locator( `${ SCOPE } .mizzey-announcement__pause` ).press( 'Enter' );
 		check( /play/i.test( ( await readStrip( page ) ).pause || '' ), `NFR-11 the pause control is pressed by keyboard and offers to play again (${ ( await readStrip( page ) ).pause })` );
+		// Play, pressed while the focus is still on the control, moves on at once and keeps moving.
+		const before = ( await readStrip( page ) ).current;
+		await page.locator( `${ SCOPE } .mizzey-announcement__pause` ).press( 'Enter' );
+		const atOnce = await waitForChange( page, before, 1500 );
+		check( atOnce !== before && /pause/i.test( ( await readStrip( page ) ).pause || '' ), `G11 play moves on at once, though the focus is still on the control (${ before } then ${ atOnce })` );
+		const again = await waitForChange( page, atOnce, ROTATE + 2500 );
+		check( again !== atOnce, `G11 after play the slider keeps moving (${ atOnce } then ${ again })` );
 	}
 	await context.close();
 	if ( 'slider' === plan.variant && 'en' === lang && width >= 1024 ) {
@@ -272,6 +367,26 @@ async function consentChecks( browser, lang, width ) {
 		return l.bottom <= b.top + 0.5 ? '' : `legal ${ Math.round( l.top ) }-${ Math.round( l.bottom ) }, banner from ${ Math.round( b.top ) }`;
 	} );
 	check( '' === covered, `MKT-10 ${ where } the banner covers no content: the foot of the page scrolls clear above it ${ covered }` );
+	const place = await page.evaluate( () => {
+		const bar = document.getElementById( 'mizzey-consent' ).getBoundingClientRect();
+		const tabs = [ ...document.querySelectorAll( '.mizzey-tabbar' ) ].find( ( t ) => t.getBoundingClientRect().height > 0 );
+		const style = getComputedStyle( document.body );
+		return {
+			barBottom: Math.round( bar.bottom ),
+			barTop: Math.round( bar.top ),
+			tabTop: tabs ? Math.round( tabs.getBoundingClientRect().top ) : null,
+			fromFoot: Math.round( window.innerHeight - bar.bottom ),
+			padding: Math.round( parseFloat( style.paddingBottom ) ),
+			room: Math.round( parseFloat( style.getPropertyValue( '--mizzey-consent-space' ) ) ),
+			reach: Math.round( window.innerHeight - bar.top ),
+		};
+	} );
+	if ( width < 1024 ) {
+		check( null !== place.tabTop && place.barBottom <= place.tabTop, `B3 ${ where } the cookie bar sits above the tab bar (${ JSON.stringify( place ) })` );
+	} else {
+		check( null === place.tabTop && place.fromFoot < 40, `B3 ${ where } with no tab bar the cookie bar sits at the foot of the window, not lifted (${ JSON.stringify( place ) })` );
+	}
+	check( Math.abs( place.padding - place.reach ) <= 1, `MKT-10 ${ where } the page's foot room is the banner's reach once, the tab bar not counted twice (${ JSON.stringify( place ) })` );
 	await page.screenshot( { path: path.join( plan.shots, `s3-consent-${ lang }-${ width }.png` ) } );
 	if ( width >= 1024 ) {
 		// The footer's own cookie preferences link opens the preferences; Accept all there is recorded as the banner's choice.
@@ -325,10 +440,10 @@ async function consentChecks( browser, lang, width ) {
 	const browser = await loaded.pw.chromium.launch( loaded.launch );
 	try {
 		for ( const lang of [ 'en', 'ar' ] ) {
-			for ( const width of [ 1440, 390 ] ) {
+			for ( const width of [ 1440, 390, 360 ] ) {
 				await footerChecks( browser, lang, width );
 				await stripChecks( browser, lang, width );
-				if ( 1 === plan.run ) {
+				if ( 1 === plan.run && 360 !== width ) {
 					await consentChecks( browser, lang, width );
 				}
 			}

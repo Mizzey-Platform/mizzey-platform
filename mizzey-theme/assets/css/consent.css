@@ -29,18 +29,17 @@
 	display: none;
 }
 
-/* Above the phone's tab bar, where the header has one (slice 2). */
-body:has(.mizzey-tabbar) .mizzey-consent {
-	inset-block-end: calc(var(--mizzey-layout-tab-bar-height) + var(--mizzey-space-2));
+/* Above the phone's tab bar, where the header has one (slice 2); the tab bar is hidden from 1024 wide. */
+@media (max-width: 1023px) {
+	body:has(.mizzey-tabbar) .mizzey-consent {
+		inset-block-end: calc(var(--mizzey-layout-tab-bar-height) + var(--mizzey-space-2));
+	}
 }
 
-/* The page keeps room at its foot as tall as the banner, so nothing ends up under it. */
+/* The page keeps room at its foot as tall as the banner reaches from the window's foot, so nothing ends up under it.
+   site-parts.js measures that reach, the tab bar under the banner included, so it is not added again here. */
 body:has(#mizzey-consent:not([hidden])) {
 	padding-block-end: var(--mizzey-consent-space);
-}
-
-body:has(.mizzey-tabbar):has(#mizzey-consent:not([hidden])) {
-	padding-block-end: calc(var(--mizzey-consent-space) + var(--mizzey-layout-tab-bar-height));
 }
 
 .mizzey-consent__text,

@@ -3,7 +3,8 @@
  *
  * The slider (inc/strip.php) shows each message for --mizzey-motion-life-strip, sliding the next up into place. It
  * holds while the pointer is over it, while the keyboard focus is in it and after a touch, until the touch is elsewhere;
- * its pause control stops and starts it. Under reduced motion it starts paused. A message that is not showing is inert.
+ * its pause control stops and starts it, and play moves on at once, over any hold of that moment, until the next hold
+ * begins. Under reduced motion it starts paused. A message that is not showing is inert.
  *
  * The preferences (inc/consent.php) open from any link to #cookie-preferences. They record nothing themselves: each
  * choice presses the consent banner's own button (specs/043, consent.js), so the cookie, the consent mode update and
@@ -60,6 +61,12 @@ function schedule( state ) {
 
 function setPaused( state, paused ) {
 	state.paused = paused;
+	if ( ! paused ) {
+		// An explicit play overrides the pointer, focus or touch hold of the moment (the next one holds again) and
+		// moves on at once.
+		state.holds.clear();
+		show( state, ( state.index + 1 ) % state.messages.length );
+	}
 	state.root.classList.toggle( 'is-paused', paused );
 	const button = state.root.querySelector( '.mizzey-announcement__pause' );
 	if ( button ) {
@@ -151,7 +158,11 @@ store( 'mizzey/site', {
 					hold( state, 'touch', ref.contains( event.target ) );
 				}
 			} );
-			setPaused( state, reducedMotion() );
+			if ( reducedMotion() ) {
+				setPaused( state, true );
+			} else {
+				schedule( state );
+			}
 		},
 		consentInit() {
 			document.addEventListener( 'click', ( event ) => {

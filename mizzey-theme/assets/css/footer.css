@@ -18,7 +18,7 @@
 	position: relative;
 	isolation: isolate;
 	overflow: hidden;
-	padding-block: var(--mizzey-space-6) 0;
+	padding-block: var(--mizzey-space-5) var(--mizzey-space-4);
 	padding-inline: var(--mizzey-layout-margin-phone);
 	border-start-start-radius: var(--mizzey-radius-tile);
 	border-start-end-radius: var(--mizzey-radius-tile);
@@ -48,7 +48,7 @@
 .mizzey-footer__grid {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	row-gap: var(--mizzey-space-6);
+	row-gap: var(--mizzey-space-5);
 }
 
 .mizzey-footer__brand {
@@ -56,6 +56,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--mizzey-space-4);
+	min-block-size: var(--mizzey-space-8);
 }
 
 .mizzey-footer__logo {
@@ -92,7 +93,7 @@
 .mizzey-footer__group {
 	display: flex;
 	flex-direction: column;
-	gap: var(--mizzey-space-3);
+	gap: var(--mizzey-space-5);
 	min-inline-size: 0;
 }
 
@@ -101,8 +102,11 @@
 }
 
 .mizzey-footer__heading {
+	/* A 32 row in both scripts (13/20 Latin, 14/22 Arabic), the words at its top. */
+	box-sizing: border-box;
+	block-size: var(--mizzey-space-6);
 	margin: 0;
-	padding-block-end: var(--mizzey-space-3);
+	overflow: hidden;
 	color: var(--mizzey-footer-heading);
 	font: var(--mizzey-type-label);
 	letter-spacing: 0;
@@ -130,9 +134,10 @@
 	display: flex;
 	align-items: center;
 	min-block-size: var(--mizzey-control-target-min);
-	padding-block: var(--mizzey-space-2);
+	padding-block: var(--mizzey-space-3);
 	color: inherit;
 	font-weight: var(--mizzey-font-weight-regular);
+	line-height: var(--mizzey-control-footer-line);
 	text-decoration: none;
 	overflow-wrap: anywhere;
 }
@@ -227,7 +232,7 @@
 /* Desktop: six tracks on the 1272 grid. The logo first, the columns in order, Customer care in the last track. */
 @media (min-width: 1024px) {
 	.mizzey-footer {
-		padding-block-start: var(--mizzey-space-8);
+		padding-block: var(--mizzey-space-8) 0;
 		padding-inline: var(--mizzey-layout-margin-desktop);
 	}
 
@@ -239,7 +244,16 @@
 		margin-inline: auto;
 	}
 
+	.mizzey-footer__group {
+		gap: var(--mizzey-space-3);
+	}
+
+	.mizzey-footer__logo {
+		min-block-size: var(--mizzey-control-logo-footer);
+	}
+
 	.mizzey-footer__brand {
+		min-block-size: 0;
 		flex-direction: column;
 		align-items: flex-start;
 		justify-content: flex-start;
