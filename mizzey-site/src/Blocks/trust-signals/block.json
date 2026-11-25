@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/trust-signals",
+	"title": "Trust signals",
+	"category": "mizzey-sections",
+	"icon": "shield",
+	"description": "Three reasons to shop with confidence, each with its mark, a short title and a line.",
+	"keywords": [ "trust", "authentic", "delivery", "returns" ],
+	"textdomain": "mizzey-site",
+	"attributes": {
+		"visible": {
+			"type": "boolean",
+			"default": true
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"items": {
+			"type": "array",
+			"default": [
+				{ "icon": "shield", "title": "", "line": "", "url": "" },
+				{ "icon": "van", "title": "", "line": "", "url": "" },
+				{ "icon": "returns", "title": "", "line": "", "url": "" }
+			],
+			"items": {
+				"type": "object",
+				"properties": {
+					"icon": { "type": "string", "enum": [ "shield", "van", "returns" ] },
+					"title": { "type": "string" },
+					"line": { "type": "string" },
+					"url": { "type": "string" }
+				}
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"color": false,
+		"typography": false,
+		"spacing": false,
+		"align": false,
+		"reusable": false,
+		"lock": false
+	},
+	"example": {},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "mizzey-section-library-editor",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

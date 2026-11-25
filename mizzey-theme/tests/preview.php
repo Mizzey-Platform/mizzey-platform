@@ -255,6 +255,7 @@ $html .= section('11', t('Drawers, bottom sheets and dialogs', 'الأدراج �
 $html .= section('13', t('Steps line, tooltips and tabs', 'الخطوات والتلميحات والتبويبات'),
     row(
         cell(t('Steps line: step 2 of 4', 'الخطوة 2 من 4'), '<div class="pv-600">' . C\steps([t('Address', 'العنوان'), t('Shipping', 'الشحن'), t('Payment', 'الدفع'), t('Review', 'المراجعة')], 2) . '</div>'),
+        cell(t('Steps line in a 358 column: labels under the discs', 'الخطوات بعرض 358'), '<div class="pv-358" id="pv-steps-358">' . C\steps([t('Address', 'العنوان'), t('Shipping', 'الشحن'), t('Payment', 'الدفع'), t('Review', 'المراجعة')], 2) . '</div>'),
         cell(t('Tooltips: below, and beside', 'تلميحات'), '<span class="pv-tips">'
             . C\tooltip(C\button(['label' => t('Wishlist', 'المفضلة'), 'variant' => 'icon', 'icon' => 'heart']), t('Wishlist', 'المفضلة'))
             . C\tooltip(C\button(['label' => t('Account', 'حسابي'), 'variant' => 'icon', 'icon' => 'user']), t('Account', 'حسابي'), 'start') . '</span>', 'tips')

@@ -674,7 +674,8 @@ function steps(array $labels, int $current): string
             element('span', ['class' => 'mizzey-steps__dot', 'aria-hidden' => 'true'], $dot) . esc_html($label) . $done
         );
     }
-    return element('ol', ['class' => 'mizzey-steps'], $items);
+    // The host is the size container the narrow layout answers to (components.css).
+    return element('div', ['class' => 'mizzey-steps-host'], element('ol', ['class' => 'mizzey-steps'], $items));
 }
 
 /**

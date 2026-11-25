@@ -8,8 +8,10 @@
  * wide, for the mini cart drawer, the phone menu drawer, the bottom sheet and the dialog: opening moves focus inside;
  * Tab and Shift+Tab stay inside; Escape closes and focus returns to the control that opened it; a press on the scrim
  * closes and focus returns; in Arabic the end drawer comes from the left and the start drawer from the right. With
- * reduced motion the drawer does not slide (its transform does not change) and fades in 120 ms or less. Tabs move
- * with the arrow keys, mirrored in Arabic.
+ * reduced motion the drawer does not slide (its transform does not change), fades in 120 ms or less, and fades out
+ * the same way instead of vanishing. Tabs move with the arrow keys, mirrored in Arabic. The board values a computed
+ * style shows: the notice words (C1-Notices: 13/20, Arabic 14/24), the tab indicator's 14 px inset, and a steps
+ * line that fits a 358 column in both languages with every label whole.
  *
  * Prints one JSON object; exits 0 when every check passes, 1 when one fails, 2 when it cannot run.
  */
@@ -95,6 +97,61 @@ async function tabChecks( page, dir ) {
 	];
 }
 
+/* What the boards fix that a computed style can show: C1-Notices' notice words (13/20, Arabic 14/24), the tab
+   indicator's 14 px inset, and the steps line that fits a 358 column in both languages with every label whole. */
+async function boardValueChecks( page, dir, size ) {
+	const got = await page.evaluate( () => {
+		const notice = getComputedStyle( document.querySelector( '.mizzey-notice' ) );
+		const indicator = getComputedStyle( document.querySelector( '.mizzey-tabs__indicator' ) );
+		const host = document.querySelector( '#pv-steps-358' );
+		const list = host.querySelector( '.mizzey-steps' );
+		const box = host.getBoundingClientRect();
+		const steps = [ ...host.querySelectorAll( '.mizzey-steps__step' ) ].map( ( step ) => {
+			const r = step.getBoundingClientRect();
+			return { inside: r.left >= box.left - 0.5 && r.right <= box.right + 0.5, whole: step.scrollWidth <= step.clientWidth + 0.5, text: step.textContent.trim() };
+		} );
+		return {
+			fontSize: parseFloat( notice.fontSize ),
+			lineHeight: parseFloat( notice.lineHeight ),
+			inset: [ indicator.paddingInlineStart, indicator.paddingInlineEnd ],
+			hostWidth: Math.round( box.width ),
+			overflow: list.scrollWidth - list.clientWidth,
+			steps,
+		};
+	} );
+	const want = dir === 'rtl' ? [ 14, 24 ] : [ 13, 20 ];
+	const where = `${ dir } ${ size.width }`;
+	return [
+		{ ok: Math.round( got.fontSize ) === want[ 0 ] && Math.round( got.lineHeight ) === want[ 1 ], what: `${ where }: notice words are ${ want.join( '/' ) } (C1-Notices), got ${ got.fontSize }/${ got.lineHeight }` },
+		{ ok: got.inset[ 0 ] === '14px' && got.inset[ 1 ] === '14px', what: `${ where }: the tab indicator is inset 14 px, got ${ got.inset.join( ' ' ) }` },
+		{ ok: got.hostWidth <= 358 && got.overflow <= 0 && got.steps.length === 4 && got.steps.every( ( s ) => s.inside && s.whole ), what: `${ where }: the steps line fits ${ got.hostWidth } px with every label whole (${ JSON.stringify( got.steps ) }, overflow ${ got.overflow })` },
+	];
+}
+
+/* Under reduced motion an overlay still fades out in 120 ms: just after it closes it is still shown, fading. */
+async function reducedMotionCloseCheck( browser, base ) {
+	const context = await browser.newContext( { reducedMotion: 'reduce', viewport: SIZES[ 0 ] } );
+	const page = await context.newPage();
+	await page.goto( `${ base }/tests/preview-ltr.html`, { waitUntil: 'networkidle' } );
+	await page.locator( '[aria-controls="pv-cart"]' ).click();
+	await page.waitForTimeout( 300 );
+	const during = await page.evaluate( () => new Promise( ( resolve ) => {
+		const dialog = document.getElementById( 'pv-cart' );
+		dialog.close();
+		setTimeout( () => {
+			const panel = getComputedStyle( dialog.querySelector( '.mizzey-overlay__panel' ) );
+			resolve( { display: getComputedStyle( dialog ).display, opacity: parseFloat( panel.opacity ) } );
+		}, 40 );
+	} ) );
+	await page.waitForTimeout( 300 );
+	const after = await page.evaluate( () => getComputedStyle( document.getElementById( 'pv-cart' ) ).display );
+	await context.close();
+	return [
+		{ ok: during.display !== 'none' && during.opacity > 0 && during.opacity < 1, what: `reduced motion: closing fades instead of vanishing (40 ms in: display ${ during.display }, opacity ${ during.opacity })` },
+		{ ok: after === 'none', what: `reduced motion: the overlay is gone once the fade ends (${ after })` },
+	];
+}
+
 async function reducedMotionCheck( browser, base ) {
 	const context = await browser.newContext( { reducedMotion: 'reduce', viewport: SIZES[ 0 ] } );
 	const page = await context.newPage();
@@ -145,10 +202,12 @@ async function reducedMotionCheck( browser, base ) {
 				if ( size.width === 1440 ) {
 					results.push( ...( await tabChecks( page, dir ) ) );
 				}
+				results.push( ...( await boardValueChecks( page, dir, size ) ) );
 				await context.close();
 			}
 		}
 		results.push( ...( await reducedMotionCheck( browser, server.url ) ) );
+		results.push( ...( await reducedMotionCloseCheck( browser, server.url ) ) );
 	} finally {
 		await browser.close();
 		server.close();

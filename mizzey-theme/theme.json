@@ -10,8 +10,13 @@
 			}
 		},
 		"color": {
+			"custom": false,
+			"customGradient": false,
+			"customDuotone": false,
 			"defaultPalette": false,
 			"defaultGradients": false,
+			"defaultDuotone": false,
+			"duotone": [],
 			"palette": [
 				{
 					"slug": "color-brand-royal-indigo",
@@ -401,6 +406,11 @@
 					"slug": "type-label",
 					"name": "Label",
 					"size": "var(--mizzey-type-label-font-size)"
+				},
+				{
+					"slug": "type-notice",
+					"name": "Notice",
+					"size": "var(--mizzey-type-notice-font-size)"
 				},
 				{
 					"slug": "type-price",

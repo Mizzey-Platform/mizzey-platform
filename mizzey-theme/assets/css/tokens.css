@@ -132,6 +132,12 @@
 	--mizzey-type-latin-label-line-height: 1.54;
 	--mizzey-type-latin-label-letter-spacing: 0;
 	--mizzey-type-latin-label: var(--mizzey-type-latin-label-font-weight) var(--mizzey-type-latin-label-font-size)/var(--mizzey-type-latin-label-line-height) var(--mizzey-type-latin-label-font-family);
+	--mizzey-type-latin-notice-font-family: var(--mizzey-font-family-latin);
+	--mizzey-type-latin-notice-font-weight: var(--mizzey-font-weight-medium);
+	--mizzey-type-latin-notice-font-size: 0.8125rem;
+	--mizzey-type-latin-notice-line-height: 1.54;
+	--mizzey-type-latin-notice-letter-spacing: 0;
+	--mizzey-type-latin-notice: var(--mizzey-type-latin-notice-font-weight) var(--mizzey-type-latin-notice-font-size)/var(--mizzey-type-latin-notice-line-height) var(--mizzey-type-latin-notice-font-family);
 	--mizzey-type-latin-price-font-family: var(--mizzey-font-family-numeric);
 	--mizzey-type-latin-price-font-weight: var(--mizzey-font-weight-bold);
 	--mizzey-type-latin-price-font-size: 1rem;
@@ -238,6 +244,12 @@
 	--mizzey-type-arabic-label-line-height: 1.57;
 	--mizzey-type-arabic-label-letter-spacing: 0;
 	--mizzey-type-arabic-label: var(--mizzey-type-arabic-label-font-weight) var(--mizzey-type-arabic-label-font-size)/var(--mizzey-type-arabic-label-line-height) var(--mizzey-type-arabic-label-font-family);
+	--mizzey-type-arabic-notice-font-family: var(--mizzey-font-family-arabic);
+	--mizzey-type-arabic-notice-font-weight: var(--mizzey-font-weight-medium);
+	--mizzey-type-arabic-notice-font-size: 0.875rem;
+	--mizzey-type-arabic-notice-line-height: 1.714;
+	--mizzey-type-arabic-notice-letter-spacing: 0;
+	--mizzey-type-arabic-notice: var(--mizzey-type-arabic-notice-font-weight) var(--mizzey-type-arabic-notice-font-size)/var(--mizzey-type-arabic-notice-line-height) var(--mizzey-type-arabic-notice-font-family);
 	--mizzey-type-arabic-caption-font-family: var(--mizzey-font-family-arabic);
 	--mizzey-type-arabic-caption-font-weight: var(--mizzey-font-weight-medium);
 	--mizzey-type-arabic-caption-font-size: 0.8125rem;
@@ -370,6 +382,7 @@
 	--mizzey-control-switch-thumb: 22px;
 	--mizzey-control-switch-inset: 5px;
 	--mizzey-control-step: 28px;
+	--mizzey-control-tab-indicator-inset: 14px;
 	--mizzey-control-tooltip: 28px;
 	--mizzey-control-tooltip-arrow: 8px;
 	--mizzey-control-disc: 96px;
@@ -385,6 +398,11 @@
 	--mizzey-control-zz: 38px;
 	--mizzey-control-tag: 20px;
 	--mizzey-control-gallery-counter: 32px;
+	--mizzey-control-trust-strip: 72px;
+	--mizzey-control-trust-disc: 48px;
+	--mizzey-control-trust-disc-phone: 40px;
+	--mizzey-control-trust-van: 56px;
+	--mizzey-control-trust-van-phone: 48px;
 	--mizzey-breakpoint-phone: 320px;
 	--mizzey-breakpoint-tablet: 600px;
 	--mizzey-breakpoint-desktop: 1024px;
@@ -468,6 +486,12 @@
 	--mizzey-type-label-line-height: var(--mizzey-type-latin-label-line-height);
 	--mizzey-type-label-letter-spacing: var(--mizzey-type-latin-label-letter-spacing);
 	--mizzey-type-label: var(--mizzey-type-latin-label);
+	--mizzey-type-notice-font-family: var(--mizzey-type-latin-notice-font-family);
+	--mizzey-type-notice-font-weight: var(--mizzey-type-latin-notice-font-weight);
+	--mizzey-type-notice-font-size: var(--mizzey-type-latin-notice-font-size);
+	--mizzey-type-notice-line-height: var(--mizzey-type-latin-notice-line-height);
+	--mizzey-type-notice-letter-spacing: var(--mizzey-type-latin-notice-letter-spacing);
+	--mizzey-type-notice: var(--mizzey-type-latin-notice);
 	--mizzey-type-price-font-family: var(--mizzey-type-latin-price-font-family);
 	--mizzey-type-price-font-weight: var(--mizzey-type-latin-price-font-weight);
 	--mizzey-type-price-font-size: var(--mizzey-type-latin-price-font-size);
@@ -577,6 +601,12 @@
 	--mizzey-type-label-line-height: var(--mizzey-type-arabic-label-line-height);
 	--mizzey-type-label-letter-spacing: var(--mizzey-type-arabic-label-letter-spacing);
 	--mizzey-type-label: var(--mizzey-type-arabic-label);
+	--mizzey-type-notice-font-family: var(--mizzey-type-arabic-notice-font-family);
+	--mizzey-type-notice-font-weight: var(--mizzey-type-arabic-notice-font-weight);
+	--mizzey-type-notice-font-size: var(--mizzey-type-arabic-notice-font-size);
+	--mizzey-type-notice-line-height: var(--mizzey-type-arabic-notice-line-height);
+	--mizzey-type-notice-letter-spacing: var(--mizzey-type-arabic-notice-letter-spacing);
+	--mizzey-type-notice: var(--mizzey-type-arabic-notice);
 	--mizzey-type-caption-font-family: var(--mizzey-type-arabic-caption-font-family);
 	--mizzey-type-caption-font-weight: var(--mizzey-type-arabic-caption-font-weight);
 	--mizzey-type-caption-font-size: var(--mizzey-type-arabic-caption-font-size);
@@ -649,6 +679,11 @@
 .mizzey-type--label {
 	font: var(--mizzey-type-label);
 	letter-spacing: var(--mizzey-type-label-letter-spacing);
+}
+
+.mizzey-type--notice {
+	font: var(--mizzey-type-notice);
+	letter-spacing: var(--mizzey-type-notice-letter-spacing);
 }
 
 .mizzey-type--price {

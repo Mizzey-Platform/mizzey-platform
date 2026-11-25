@@ -1,0 +1,37 @@
+/* The section library in the editor's canvas (spec 066, "The section library"). Tokens only, logical sides only.
+   A hidden section stays in the canvas, faded behind a dashed outline and labelled, so its content can still be
+   edited and shown again (SSC-03). */
+
+.is-mizzey-hidden {
+	position: relative;
+	outline: var(--mizzey-border-field) dashed var(--mizzey-color-neutral-muted);
+	outline-offset: var(--mizzey-space-1);
+}
+
+.is-mizzey-hidden > * {
+	opacity: 0.45;
+}
+
+.is-mizzey-hidden::before {
+	content: attr(data-mizzey-hidden);
+	position: absolute;
+	z-index: 1;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	padding-block: var(--mizzey-space-1);
+	padding-inline: var(--mizzey-space-2);
+	border-end-end-radius: var(--mizzey-radius-xs);
+	background-color: var(--mizzey-color-neutral-muted);
+	color: var(--mizzey-color-brand-white);
+	font: var(--mizzey-type-caption);
+}
+
+/* The editor's own wrapper around a mark drawn by the theme: the mark keeps its place in the item. */
+.mizzey-trust__mark-host {
+	display: contents;
+}
+
+/* The line is typed in place at every width of the canvas, also where the phone layout does not show it. */
+.mizzey-trust .mizzey-trust__line {
+	display: flex;
+}

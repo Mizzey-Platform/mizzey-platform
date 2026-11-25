@@ -1,0 +1,145 @@
+/* The trust signals section (spec 066, slice 1; HOME-08), as C1-Home-Phone, C1-Home-Phone-Arabic and
+   C1-Home-Desktop draw it. Loaded only on a page that shows the section, and in the editor. Every value is a theme
+   token (K-3) and every side is logical, so this one stylesheet serves both reading directions.
+
+   Phone: three equal columns inside the page margin, 8 apart; each item stacks its 40 disc (or the van) over its
+   title, centred; the line is not shown, as the phone board draws. From 1024 wide: one row 72 high inside the
+   desktop margin, each item centred in its third with a 48 disc 16 from its words, the title in body strong and the
+   line under it as a link, the middle third ruled with hairlines on both sides. The section keeps a small gap under
+   the hero above it (16, 24 from 1024 wide) and the section rhythm below it. */
+
+.mizzey-trust {
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-inline-size: none;
+	margin-block: var(--mizzey-space-4) var(--mizzey-space-section);
+	margin-inline: 0;
+	padding-inline: var(--mizzey-layout-margin-phone);
+}
+
+.mizzey-trust__list {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(0, 1fr);
+	gap: var(--mizzey-space-2);
+	max-inline-size: var(--mizzey-layout-content-width);
+	margin-block: 0;
+	margin-inline: auto;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-trust__item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	min-inline-size: 0;
+	text-align: center;
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-trust__mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-trust-disc-phone);
+	block-size: var(--mizzey-control-trust-disc-phone);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+}
+
+/* The van stands alone, at the disc's height, its width set by the board. */
+.mizzey-trust__mark--art {
+	inline-size: auto;
+	border-radius: 0;
+	background-color: transparent;
+}
+
+.mizzey-trust__van {
+	display: block;
+	inline-size: var(--mizzey-control-trust-van-phone);
+	block-size: auto;
+}
+
+/* The returns arrow points back the way the page reads. */
+.mizzey-trust .mizzey-icon--returns {
+	scale: var(--mizzey-dir, 1) 1;
+}
+
+.mizzey-trust__text {
+	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+}
+
+.mizzey-trust__title {
+	font: var(--mizzey-type-caption);
+	letter-spacing: var(--mizzey-type-caption-letter-spacing);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-trust__line {
+	display: none;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-trust {
+		margin-block-start: var(--mizzey-space-5);
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+
+	.mizzey-trust__list {
+		gap: 0;
+		min-block-size: var(--mizzey-control-trust-strip);
+		align-items: center;
+	}
+
+	.mizzey-trust__item {
+		flex-direction: row;
+		justify-content: center;
+		gap: var(--mizzey-space-4);
+		padding-inline: var(--mizzey-space-4);
+		text-align: start;
+	}
+
+	.mizzey-trust__item + .mizzey-trust__item {
+		border-inline-start: var(--mizzey-border-hairline) solid var(--mizzey-color-neutral-hairline);
+	}
+
+	.mizzey-trust__mark {
+		inline-size: var(--mizzey-control-trust-disc);
+		block-size: var(--mizzey-control-trust-disc);
+	}
+
+	.mizzey-trust__mark--art {
+		inline-size: auto;
+	}
+
+	.mizzey-trust__van {
+		inline-size: var(--mizzey-control-trust-van);
+	}
+
+	.mizzey-trust__title {
+		font: var(--mizzey-type-body-strong);
+		letter-spacing: var(--mizzey-type-body-strong-letter-spacing);
+	}
+
+	.mizzey-trust__line {
+		display: flex;
+		align-items: center;
+		min-block-size: var(--mizzey-control-target-min);
+		margin-block: calc((var(--mizzey-control-target-min) - var(--mizzey-space-5)) / -2);
+		color: var(--mizzey-color-role-link);
+		font: var(--mizzey-type-label);
+		font-weight: var(--mizzey-font-weight-regular);
+		text-underline-offset: var(--mizzey-border-indicator);
+		overflow-wrap: anywhere;
+	}
+
+	span.mizzey-trust__line {
+		color: var(--mizzey-color-neutral-muted);
+	}
+}

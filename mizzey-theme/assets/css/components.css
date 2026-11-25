@@ -856,7 +856,7 @@ textarea.mizzey-field__control {
 	background-color: var(--mizzey-color-role-surface-raised);
 	color: var(--mizzey-color-role-text);
 	box-shadow: var(--mizzey-elevation-2), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
-	font: var(--mizzey-type-label);
+	font: var(--mizzey-type-notice);
 	animation: mizzey-arrive var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
 	--mizzey-notice-tone: var(--mizzey-color-role-primary);
 	--mizzey-notice-tint: var(--mizzey-color-indigo-50);
@@ -1500,6 +1500,50 @@ textarea.mizzey-field__control {
 	background-color: var(--mizzey-color-role-primary);
 }
 
+/* Narrow: the steps share the width equally, each label under its disc and free to wrap, as C1-Checkout-Phone
+   draws them; the connector runs from the previous disc's centre to this one's, so no label is cut or shrunk. */
+.mizzey-steps-host {
+	container-type: inline-size;
+}
+
+@container (max-width: 599px) {
+	.mizzey-steps {
+		align-items: flex-start;
+	}
+
+	.mizzey-steps__line {
+		display: none;
+	}
+
+	.mizzey-steps__step {
+		position: relative;
+		flex: 1 1 0;
+		flex-direction: column;
+		min-inline-size: 0;
+		text-align: center;
+		white-space: normal;
+		overflow-wrap: anywhere;
+	}
+
+	.mizzey-steps__dot {
+		position: relative;
+		z-index: 1;
+	}
+
+	.mizzey-steps__line + .mizzey-steps__step::before {
+		content: "";
+		position: absolute;
+		inset-block-start: calc((var(--mizzey-control-step) - var(--mizzey-border-control)) / 2);
+		inset-inline: calc(-50% - var(--mizzey-space-3)) 50%;
+		block-size: var(--mizzey-border-control);
+		background-color: var(--mizzey-color-indigo-100);
+	}
+
+	.mizzey-steps__line + .mizzey-steps__step:not(.is-todo)::before {
+		background-color: var(--mizzey-color-role-primary);
+	}
+}
+
 .mizzey-tooltip-host {
 	position: relative;
 	display: inline-flex;
@@ -1653,7 +1697,7 @@ textarea.mizzey-field__control {
 	inset-block-end: 0;
 	inset-inline-start: 0;
 	inline-size: calc(100% / var(--mizzey-tabs-count, 4));
-	padding-inline: var(--mizzey-space-3);
+	padding-inline: var(--mizzey-control-tab-indicator-inset);
 	pointer-events: none;
 	transform: translateX(calc(var(--mizzey-tab-index, 0) * 100% * var(--mizzey-dir)));
 	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
@@ -1839,5 +1883,16 @@ textarea.mizzey-field__control {
 
 	.mizzey-overlay:not([open]) .mizzey-overlay__panel {
 		opacity: 0;
+	}
+
+	/* The 120 ms fade is kept (C1-System 11), on the way out too: the dialog stays shown while its panel and scrim
+	   fade, instead of disappearing at once. */
+	.mizzey-overlay {
+		transition: display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
+	}
+
+	.mizzey-overlay::backdrop {
+		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out),
+			display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
 	}
 }

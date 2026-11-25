@@ -32,6 +32,8 @@ require_once __DIR__ . '/src/I18n/LanguagePreference.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/Storefront/ProductPage.php';
 require_once __DIR__ . '/src/Storefront/HomeSections.php';
+require_once __DIR__ . '/src/Blocks/TrustSignals.php';
+require_once __DIR__ . '/src/Blocks/SectionLibrary.php';
 require_once __DIR__ . '/src/Search/Normalise.php';
 require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
@@ -216,6 +218,9 @@ MizzeySite\Storefront\ProductPage::register();
 
 // What the home page's sections draw from (badges as a taxonomy, terms on the home page): specs/056-home-sections.
 MizzeySite\Storefront\HomeSections::register();
+
+// The section library: complete sections staff place on the front page, each language its own (G11): specs/066.
+MizzeySite\Blocks\SectionLibrary::register();
 
 // The store's own product search, its index, its synonym list and its term log: specs/058-search.
 MizzeySite\Search\Synonyms::register();
