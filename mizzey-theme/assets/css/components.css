@@ -1,0 +1,1910 @@
+/* The base components of slice 1 (spec 066), as C1-Components, C1-Notices and C1-Motion-Playground draw them.
+   Every value is a token from tokens.css; logical properties only, so Arabic mirrors without a second stylesheet.
+   Markup comes from inc/components.php; behaviour that needs script is in assets/js/ui.js (Interactivity API). */
+
+:root {
+	--mizzey-dir: 1;
+	--mizzey-origin-start: 0%;
+}
+
+[dir="rtl"] {
+	--mizzey-dir: -1;
+	--mizzey-origin-start: 100%;
+}
+
+/* Every component measures its border and padding inside its size, as the boards do: the component roots and
+   what is inside them, nothing else (a section or the page keeps its own box model). :where() keeps it weightless. */
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz),
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz)::before,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz)::after,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *::before,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *::after {
+	box-sizing: border-box;
+}
+
+/* The page behind an open modal does not scroll, on iOS Safari too: overflow on the root, no fixed-position trick,
+   so the page never jumps to the top. (A stable scrollbar gutter is not used: it would also narrow the top layer,
+   and a drawer would stop short of the screen edge.) */
+:root:has(.mizzey-overlay[open]) {
+	overflow: hidden;
+}
+
+/* Text for assistive technology only. */
+.mizzey-visually-hidden {
+	position: absolute;
+	inline-size: var(--mizzey-border-hairline);
+	block-size: var(--mizzey-border-hairline);
+	margin: calc(var(--mizzey-border-hairline) * -1);
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Buttons: pills in three sizes (Regular 52, Large 56, Compact 44), the toolbar button and the icon button.
+   Press answers within 100 ms (duration 1); release springs back (duration 2). */
+
+.mizzey-button {
+	position: relative;
+	isolation: isolate;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-button-regular);
+	min-inline-size: var(--mizzey-control-button-min);
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-5);
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: transparent;
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-button);
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out),
+		color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out),
+		transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-button:active:not(:disabled) {
+	transform: scale(var(--mizzey-motion-scale-press-button));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-button--primary {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+/* The glow sits on its own layer, so pressing fades it to 60% instead of animating box-shadow. */
+.mizzey-button--primary:not(.mizzey-button--compact)::after {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: var(--mizzey-elevation-glow-primary);
+	transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-button--primary:hover,
+.mizzey-button--primary:active {
+	background-color: var(--mizzey-color-role-primary-hover);
+}
+
+.mizzey-button--primary:active::after {
+	opacity: 0.6;
+	transition: opacity var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-button--secondary {
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-button--secondary:hover {
+	background-color: var(--mizzey-color-indigo-50);
+	box-shadow: var(--mizzey-elevation-2), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-button--secondary:active {
+	background-color: var(--mizzey-color-glow-top);
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-button--text:hover {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-button--large {
+	block-size: var(--mizzey-control-button-large);
+}
+
+.mizzey-button--compact {
+	block-size: var(--mizzey-control-button-compact);
+	min-inline-size: 0;
+	padding-inline: var(--mizzey-space-4);
+}
+
+.mizzey-button--block {
+	inline-size: 100%;
+}
+
+.mizzey-button--toolbar {
+	block-size: var(--mizzey-control-toolbar);
+	min-inline-size: 0;
+	padding-inline: var(--mizzey-space-3);
+	background-color: var(--mizzey-color-brand-white);
+	box-shadow: var(--mizzey-elevation-1);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-button--toolbar:hover {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-button--icon {
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	min-inline-size: 0;
+	padding: 0;
+}
+
+.mizzey-button--icon:hover,
+.mizzey-button--icon:active {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-button--icon:active:not(:disabled) {
+	transform: scale(var(--mizzey-motion-scale-press-icon));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-button--icon .mizzey-count {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-end: 0;
+}
+
+.mizzey-button:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-button:disabled:not([aria-busy="true"]),
+.mizzey-button[aria-disabled="true"] {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-neutral-muted);
+	box-shadow: none;
+	cursor: default;
+}
+
+.mizzey-button:disabled:not([aria-busy="true"])::after {
+	content: none;
+}
+
+/* Busy: disabled, its width locked by the markup, the label swapped for the i-dot loader and the busy word. */
+.mizzey-button[aria-busy="true"] {
+	cursor: progress;
+}
+
+.mizzey-button[aria-busy="true"] .mizzey-loader {
+	color: currentColor;
+}
+
+/* Done: the tick draws, only after the server has answered. */
+.mizzey-button.is-done .mizzey-button__tick path {
+	stroke-dasharray: 24;
+	stroke-dashoffset: 24;
+	animation: mizzey-draw var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out) var(--mizzey-motion-duration-3) forwards;
+}
+
+.mizzey-button__label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mizzey-button__tick {
+	flex-shrink: 0;
+}
+
+/* On Royal Indigo: a White button, White icons, a White focus ring. */
+.mizzey-on-brand {
+	background-color: var(--mizzey-color-role-surface-brand);
+	color: var(--mizzey-color-role-text-on-brand);
+}
+
+.mizzey-on-brand .mizzey-button--secondary {
+	box-shadow: none;
+}
+
+.mizzey-on-brand .mizzey-button--icon {
+	color: var(--mizzey-color-role-text-on-brand);
+}
+
+.mizzey-on-brand .mizzey-button--icon:hover {
+	background-color: var(--mizzey-color-neutral-on-brand-hover);
+}
+
+.mizzey-on-brand .mizzey-button:focus-visible {
+	outline-color: var(--mizzey-color-role-focus-inverse);
+}
+
+/* Two buttons share a row when both fit; otherwise they stack, full width, primary first. */
+.mizzey-button-pair {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-button-pair > .mizzey-button {
+	flex: 1 1 0;
+	min-inline-size: 0;
+}
+
+.mizzey-button-pair--stacked {
+	flex-direction: column;
+}
+
+.mizzey-button-pair--stacked > .mizzey-button {
+	flex: none;
+	inline-size: 100%;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Fields: 56 high, 16 corners, a 1.5 border, the label above, a line of space reserved under the field, and a
+   2 px line that draws along the bottom edge on focus. */
+
+.mizzey-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-1);
+	min-inline-size: 0;
+}
+
+.mizzey-field__label {
+	font: var(--mizzey-type-label);
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-field__box {
+	position: relative;
+	display: block;
+	border-radius: var(--mizzey-radius-field);
+}
+
+.mizzey-field__control {
+	display: block;
+	inline-size: 100%;
+	block-size: var(--mizzey-control-field);
+	margin: 0;
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-4);
+	border: var(--mizzey-border-field) solid var(--mizzey-color-indigo-300);
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-input);
+	outline: none;
+	transition: border-color var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+/* A left-to-right value in an Arabic form still starts at the reading start. */
+[dir="rtl"] .mizzey-field__control[dir="ltr"] {
+	text-align: end;
+}
+
+.mizzey-field__control::placeholder {
+	color: var(--mizzey-color-neutral-muted);
+	opacity: 1;
+}
+
+textarea.mizzey-field__control {
+	block-size: auto;
+	min-block-size: var(--mizzey-control-textarea);
+	padding-block: var(--mizzey-space-4);
+	resize: vertical;
+}
+
+.mizzey-field__control:focus {
+	border-color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-field__control:disabled {
+	border-color: var(--mizzey-color-indigo-200);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-field--status .mizzey-field__control {
+	padding-inline-end: calc(var(--mizzey-space-4) * 2 + var(--mizzey-control-icon));
+}
+
+.mizzey-field__line {
+	position: absolute;
+	inset-inline: var(--mizzey-space-4);
+	inset-block-end: 0;
+	block-size: var(--mizzey-border-control);
+	border-radius: var(--mizzey-border-control);
+	background-color: var(--mizzey-color-role-primary);
+	transform: scaleX(0);
+	transform-origin: var(--mizzey-origin-start) center;
+	pointer-events: none;
+	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-field__control:focus ~ .mizzey-field__line,
+.mizzey-field.is-error .mizzey-field__line,
+.mizzey-field.is-ok .mizzey-field__line {
+	transform: scaleX(1);
+}
+
+.mizzey-field__status {
+	position: absolute;
+	inset-block-start: var(--mizzey-space-4);
+	inset-inline-end: var(--mizzey-space-4);
+	display: flex;
+	pointer-events: none;
+}
+
+.mizzey-field.is-ok .mizzey-field__control {
+	border-color: var(--mizzey-color-role-success);
+}
+
+.mizzey-field.is-ok .mizzey-field__line {
+	background-color: var(--mizzey-color-role-success);
+}
+
+.mizzey-field.is-ok .mizzey-field__status {
+	color: var(--mizzey-color-role-success);
+}
+
+.mizzey-field.is-error .mizzey-field__control {
+	border-color: var(--mizzey-color-role-danger);
+}
+
+.mizzey-field.is-error .mizzey-field__line {
+	background-color: var(--mizzey-color-role-danger);
+}
+
+.mizzey-field.is-error .mizzey-field__status {
+	color: var(--mizzey-color-role-danger);
+}
+
+.mizzey-field.is-error .mizzey-field__box {
+	animation: mizzey-nudge var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-loop) var(--mizzey-motion-duration-4) 1;
+}
+
+/* One line of space is always reserved under the field, so an error never moves the layout. */
+.mizzey-field__message,
+.mizzey-field__helper {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-1);
+	min-block-size: var(--mizzey-type-label-line-height);
+	font-size: var(--mizzey-type-label-font-size);
+	line-height: var(--mizzey-type-label-line-height);
+	font-weight: var(--mizzey-font-weight-regular);
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-field__helper {
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-field.is-error .mizzey-field__message {
+	animation: mizzey-rise var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
+}
+
+/* The select: the same box, our own list, never the browser's. */
+.mizzey-select {
+	position: relative;
+}
+
+.mizzey-select__button {
+	position: relative;
+	display: flex;
+	align-items: center;
+	inline-size: 100%;
+	block-size: var(--mizzey-control-field);
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-4) calc(var(--mizzey-space-4) * 2 + var(--mizzey-control-icon));
+	border: var(--mizzey-border-field) solid var(--mizzey-color-indigo-300);
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-input);
+	text-align: start;
+	cursor: pointer;
+	transition: border-color var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-select__button:focus-visible,
+.mizzey-select__button[aria-expanded="true"] {
+	border-color: var(--mizzey-color-role-primary);
+	outline: none;
+}
+
+.mizzey-select__button:focus-visible ~ .mizzey-field__line,
+.mizzey-select__button[aria-expanded="true"] ~ .mizzey-field__line {
+	transform: scaleX(1);
+}
+
+.mizzey-select__chevron {
+	position: absolute;
+	inset-block-start: var(--mizzey-space-4);
+	inset-inline-end: var(--mizzey-space-4);
+	display: flex;
+	color: var(--mizzey-color-role-primary);
+	pointer-events: none;
+	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-select__button[aria-expanded="true"] ~ .mizzey-select__chevron {
+	transform: rotate(180deg);
+}
+
+.mizzey-select__list,
+.mizzey-popover {
+	margin: 0;
+	padding: var(--mizzey-space-2);
+	list-style: none;
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-role-surface-raised);
+	box-shadow: var(--mizzey-elevation-3);
+}
+
+.mizzey-select__list {
+	position: absolute;
+	z-index: 3;
+	inset-block-start: calc(100% + var(--mizzey-space-2));
+	inset-inline: 0;
+	transform-origin: center top;
+	animation: mizzey-pop var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-select__list[hidden] {
+	display: none;
+}
+
+.mizzey-popover {
+	inline-size: var(--mizzey-overlay-popover);
+	max-inline-size: 100%;
+	border-radius: var(--mizzey-radius-card);
+}
+
+.mizzey-select__option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-2);
+	min-block-size: var(--mizzey-control-option);
+	padding-block: var(--mizzey-space-2);
+	padding-inline: var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-sm);
+	font: var(--mizzey-type-input);
+	cursor: pointer;
+	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-select__option:hover,
+.mizzey-select__option[aria-selected="true"] {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-select__option[aria-selected="true"] {
+	color: var(--mizzey-color-role-primary);
+	font-weight: var(--mizzey-font-weight-medium);
+}
+
+.mizzey-select__option:not([aria-selected="true"]) .mizzey-icon {
+	visibility: hidden;
+}
+
+.mizzey-select__option.is-active {
+	box-shadow: inset 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-primary);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Choices: rows 44 high. Checkbox 24 with radius 8, radio circles, the 52 by 32 switch. */
+
+.mizzey-check,
+.mizzey-radio {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+	min-block-size: var(--mizzey-control-target-min);
+	font: var(--mizzey-type-body);
+	color: var(--mizzey-color-role-text);
+	cursor: pointer;
+}
+
+.mizzey-check__box,
+.mizzey-radio__dot {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-choice);
+	block-size: var(--mizzey-control-choice);
+	margin: 0;
+	border: var(--mizzey-border-control) solid var(--mizzey-color-indigo-300);
+	background-color: var(--mizzey-color-brand-white);
+	appearance: none;
+	cursor: pointer;
+	transition: background-color var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out),
+		border-color var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-check__box {
+	border-radius: var(--mizzey-radius-xs);
+}
+
+.mizzey-check__box:checked {
+	border-color: var(--mizzey-color-role-primary);
+	background-color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-check__tick {
+	position: absolute;
+	inset-inline-start: calc((var(--mizzey-control-choice) - var(--mizzey-control-icon-dense)) / 2);
+	display: flex;
+	color: var(--mizzey-color-role-on-primary);
+	pointer-events: none;
+	visibility: hidden;
+}
+
+.mizzey-check__box:checked ~ .mizzey-check__tick {
+	visibility: visible;
+}
+
+.mizzey-check__box:checked ~ .mizzey-check__tick path {
+	stroke-dasharray: 24;
+	animation: mizzey-draw var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-check__box:disabled,
+.mizzey-radio__dot:disabled {
+	border-color: var(--mizzey-color-indigo-200);
+	cursor: default;
+}
+
+.mizzey-check:has(:disabled),
+.mizzey-radio:has(:disabled) {
+	color: var(--mizzey-color-neutral-muted);
+	cursor: default;
+}
+
+.mizzey-check__count {
+	margin-inline-start: auto;
+	font: var(--mizzey-type-label);
+	font-family: var(--mizzey-font-family-numeric);
+	font-weight: var(--mizzey-font-weight-regular);
+	font-variant-numeric: tabular-nums;
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-radio__dot {
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-radio__dot:checked {
+	border-color: var(--mizzey-color-role-primary);
+	background-color: var(--mizzey-color-role-primary);
+	box-shadow: inset 0 0 0 calc((var(--mizzey-control-choice) - var(--mizzey-control-radio-dot)) / 2 - var(--mizzey-border-control)) var(--mizzey-color-brand-white);
+}
+
+.mizzey-check__box:focus-visible,
+.mizzey-radio__dot:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-radio__text {
+	display: flex;
+	flex-direction: column;
+}
+
+.mizzey-radio__hint {
+	font-size: var(--mizzey-type-label-font-size);
+	line-height: var(--mizzey-type-label-line-height);
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-switch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-3);
+	inline-size: 100%;
+	min-block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-body);
+	text-align: start;
+	cursor: pointer;
+}
+
+.mizzey-switch__track {
+	position: relative;
+	display: block;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-switch-inline);
+	block-size: var(--mizzey-control-switch-block);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-300);
+	transition: background-color var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-switch__thumb {
+	position: absolute;
+	inset-block-start: var(--mizzey-control-switch-inset);
+	inset-inline-start: var(--mizzey-control-switch-inset);
+	inline-size: var(--mizzey-control-switch-thumb);
+	block-size: var(--mizzey-control-switch-thumb);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-brand-white);
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-switch[aria-checked="true"] .mizzey-switch__track {
+	background-color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-switch[aria-checked="true"] .mizzey-switch__thumb {
+	transform: translateX(calc((var(--mizzey-control-switch-inline) - var(--mizzey-control-switch-thumb) - var(--mizzey-control-switch-inset) * 2) * var(--mizzey-dir)));
+}
+
+.mizzey-switch:focus-visible {
+	outline: none;
+}
+
+.mizzey-switch:focus-visible .mizzey-switch__track {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-switch:disabled {
+	color: var(--mizzey-color-neutral-muted);
+	cursor: default;
+}
+
+.mizzey-switch:disabled .mizzey-switch__track {
+	background-color: var(--mizzey-color-indigo-200);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Chips 36 high in a 44 target; badges 24; counts 20; the card's corner tag and the sale tag (C1-Options g). */
+
+.mizzey-chip {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-chip);
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-4);
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-text);
+	box-shadow: var(--mizzey-elevation-1);
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out),
+		transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+}
+
+/* The visible chip is 36; the target is 44. */
+.mizzey-chip::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	inset-block: calc((var(--mizzey-control-chip) - var(--mizzey-control-target-min)) / 2);
+}
+
+.mizzey-chip:hover {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-chip:active {
+	transform: scale(var(--mizzey-motion-scale-press-button));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-chip:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-chip__count {
+	font-family: var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-chip--chosen,
+.mizzey-chip--chosen:hover {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	box-shadow: none;
+}
+
+.mizzey-chip--chosen .mizzey-chip__count {
+	color: var(--mizzey-color-indigo-100);
+}
+
+.mizzey-chip--applied,
+.mizzey-chip--applied:hover {
+	padding-inline: var(--mizzey-space-4) var(--mizzey-space-2);
+	background-color: var(--mizzey-color-indigo-100);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: none;
+}
+
+.mizzey-chip--category {
+	padding-inline: var(--mizzey-space-2) var(--mizzey-space-4);
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-chip--category img {
+	display: block;
+	inline-size: var(--mizzey-control-icon);
+	block-size: var(--mizzey-control-icon);
+	object-fit: contain;
+}
+
+.mizzey-badge {
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-badge);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	font: var(--mizzey-type-badge);
+	letter-spacing: var(--mizzey-type-badge-letter-spacing);
+	white-space: nowrap;
+}
+
+.mizzey-badge--ink {
+	background-color: var(--mizzey-color-role-text);
+	color: var(--mizzey-color-brand-white);
+}
+
+.mizzey-badge--sale {
+	background-color: var(--mizzey-color-role-accent);
+	color: var(--mizzey-color-role-on-accent);
+}
+
+.mizzey-badge--tint {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: var(--mizzey-control-count);
+	block-size: var(--mizzey-control-count);
+	padding-inline: var(--mizzey-space-1);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-accent);
+	color: var(--mizzey-color-role-on-accent);
+	font: var(--mizzey-font-weight-medium) var(--mizzey-type-latin-badge-font-size)/var(--mizzey-type-latin-badge-line-height) var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+}
+
+/* One merchandising tag, flush with the card's top start corner, on the light Indigo tint (C1-Options g, chosen). */
+.mizzey-corner-tag {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-badge);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: 0;
+	border-start-start-radius: var(--mizzey-radius-card);
+	border-end-end-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-badge);
+	white-space: nowrap;
+}
+
+/* The sale lives in the price line: the orange "-20%" tag, Inter in both languages. */
+.mizzey-sale-tag {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	block-size: var(--mizzey-control-tag);
+	padding-inline: calc(var(--mizzey-space-3) / 2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-accent);
+	color: var(--mizzey-color-role-on-accent);
+	font: var(--mizzey-font-weight-bold) var(--mizzey-type-latin-badge-font-size)/var(--mizzey-type-latin-badge-line-height) var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+	unicode-bidi: isolate;
+}
+
+.mizzey-gallery-counter {
+	display: inline-flex;
+	align-items: center;
+	block-size: var(--mizzey-control-gallery-counter);
+	padding-inline: var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-font-weight-medium) var(--mizzey-type-latin-label-font-size)/var(--mizzey-type-latin-label-line-height) var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Notices: a White card at level 2, radius 16, at least 56 high, an icon tile, the words in Ink, a life line. */
+
+.mizzey-notice {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+	inline-size: 100%;
+	max-inline-size: var(--mizzey-control-notice-inline);
+	min-block-size: var(--mizzey-control-notice);
+	padding-block: var(--mizzey-space-3);
+	padding-inline: var(--mizzey-space-4);
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-role-surface-raised);
+	color: var(--mizzey-color-role-text);
+	box-shadow: var(--mizzey-elevation-2), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	font: var(--mizzey-type-notice);
+	animation: mizzey-arrive var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
+	--mizzey-notice-tone: var(--mizzey-color-role-primary);
+	--mizzey-notice-tint: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-notice--success {
+	--mizzey-notice-tone: var(--mizzey-color-role-success);
+	--mizzey-notice-tint: var(--mizzey-color-feedback-success-bg);
+}
+
+.mizzey-notice--info {
+	--mizzey-notice-tone: var(--mizzey-color-role-primary);
+}
+
+.mizzey-notice--warning {
+	--mizzey-notice-tone: var(--mizzey-color-role-warning);
+	--mizzey-notice-tint: var(--mizzey-color-feedback-warning-bg);
+}
+
+.mizzey-notice--error {
+	--mizzey-notice-tone: var(--mizzey-color-role-danger);
+	--mizzey-notice-tint: var(--mizzey-color-feedback-danger-bg);
+}
+
+.mizzey-notice__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-notice-icon);
+	block-size: var(--mizzey-control-notice-icon);
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-notice-tint);
+	color: var(--mizzey-notice-tone);
+}
+
+.mizzey-notice__text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.mizzey-notice__action {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	min-inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	margin-block: calc(var(--mizzey-space-2) * -1);
+	color: var(--mizzey-color-role-link);
+	font: inherit;
+	text-underline-offset: var(--mizzey-border-indicator);
+	white-space: nowrap;
+}
+
+.mizzey-notice__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	margin-block: calc(var(--mizzey-space-2) * -1);
+	margin-inline-end: calc(var(--mizzey-space-2) * -1);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: transparent;
+	color: var(--mizzey-color-neutral-muted);
+	cursor: pointer;
+	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-notice__close:hover {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-notice__close:focus-visible,
+.mizzey-notice__action:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* The life line runs down over the toast's life and pauses while the toast is hovered or focused. */
+.mizzey-notice__life {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: 0;
+	block-size: var(--mizzey-border-indicator);
+	background-color: var(--mizzey-notice-tone);
+	transform-origin: var(--mizzey-origin-start) center;
+	animation: mizzey-life var(--mizzey-motion-life-toast) var(--mizzey-motion-easing-linear) forwards;
+}
+
+.mizzey-notice:hover .mizzey-notice__life,
+.mizzey-notice:focus-within .mizzey-notice__life {
+	animation-play-state: paused;
+}
+
+/* The promo strip (its look; the slider is slice 3) and the store-wide notice strip. */
+.mizzey-strip {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-3);
+	block-size: var(--mizzey-control-strip-phone);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	background-color: var(--mizzey-color-role-surface-brand);
+	color: var(--mizzey-color-role-text-on-brand);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-strip a {
+	display: flex;
+	align-items: center;
+	block-size: var(--mizzey-control-target-min);
+	color: inherit;
+	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+.mizzey-strip a:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus-inverse);
+	outline-offset: calc(var(--mizzey-focus-offset) * -1);
+}
+
+.mizzey-sitewide {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+	min-block-size: var(--mizzey-control-target-min);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-text);
+	box-shadow: 0 var(--mizzey-border-hairline) 0 var(--mizzey-color-neutral-hairline);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-sitewide > .mizzey-icon {
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-sitewide--warning {
+	background-color: var(--mizzey-color-feedback-warning-bg);
+}
+
+.mizzey-sitewide--warning > .mizzey-icon {
+	color: var(--mizzey-color-role-warning);
+}
+
+.mizzey-sitewide .mizzey-notice__text {
+	padding-block: var(--mizzey-space-3);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-strip {
+		block-size: var(--mizzey-control-strip-desktop);
+	}
+
+	.mizzey-sitewide {
+		padding-inline: var(--mizzey-layout-margin-desktop);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The i-dot loader, skeletons and the breathing ZZ. */
+
+.mizzey-loader {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--mizzey-space-1);
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-on-brand .mizzey-loader {
+	color: var(--mizzey-color-role-text-on-brand);
+}
+
+.mizzey-loader__dot {
+	display: block;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-loader-dot);
+	block-size: auto;
+	animation: mizzey-dot var(--mizzey-motion-loop-loader) var(--mizzey-motion-easing-loop) 4;
+}
+
+.mizzey-button .mizzey-loader__dot {
+	inline-size: var(--mizzey-control-loader-dot-button);
+}
+
+.mizzey-loader__dot:nth-child(2) {
+	rotate: 180deg;
+	animation-delay: var(--mizzey-motion-loop-loader-step);
+}
+
+.mizzey-loader__dot:nth-child(3) {
+	animation-delay: calc(var(--mizzey-motion-loop-loader-step) * 2);
+}
+
+.mizzey-loader--still .mizzey-loader__dot {
+	animation: none;
+}
+
+.mizzey-loader-row {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	font: var(--mizzey-type-label);
+}
+
+/* Static blocks in Glow top, with the exact size of what they stand for; a soft pulse, three cycles, then still. */
+.mizzey-skeleton {
+	display: block;
+	inline-size: var(--mizzey-skeleton-inline, 100%);
+	block-size: var(--mizzey-skeleton-block, var(--mizzey-space-3));
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-glow-top);
+	animation: mizzey-pulse var(--mizzey-motion-loop-pulse) var(--mizzey-motion-easing-loop) 3;
+}
+
+.mizzey-skeleton--block {
+	border-radius: var(--mizzey-radius-tile);
+}
+
+.mizzey-well {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-zz {
+	display: block;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-zz);
+	block-size: var(--mizzey-control-zz);
+	opacity: 0.06;
+	animation: mizzey-breathe var(--mizzey-motion-loop-breathe) var(--mizzey-motion-easing-loop) infinite alternate;
+}
+
+.mizzey-zz__indigo {
+	fill: var(--mizzey-color-brand-royal-indigo);
+}
+
+.mizzey-zz__persimmon {
+	fill: var(--mizzey-color-brand-persimmon);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Empty states and pagination. */
+
+.mizzey-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-2);
+	padding: var(--mizzey-space-5);
+	text-align: center;
+}
+
+.mizzey-empty__disc {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-disc);
+	block-size: var(--mizzey-control-disc);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-empty__title {
+	margin: var(--mizzey-space-2) 0 0;
+	font: var(--mizzey-type-h3-compact);
+	letter-spacing: var(--mizzey-type-h3-compact-letter-spacing);
+	text-wrap: balance;
+}
+
+.mizzey-empty__text {
+	max-inline-size: var(--mizzey-layout-measure-empty);
+	margin: 0 0 var(--mizzey-space-3);
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-pagination {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-pagination__item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-role-primary);
+	box-shadow: var(--mizzey-elevation-1);
+	font: var(--mizzey-font-weight-medium) var(--mizzey-type-latin-button-font-size)/var(--mizzey-type-latin-button-line-height) var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+	text-decoration: none;
+	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-pagination__item:hover {
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-pagination__item:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-pagination__item[aria-current="page"] {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	box-shadow: none;
+}
+
+.mizzey-pagination__item[aria-disabled="true"] {
+	background-color: transparent;
+	color: var(--mizzey-color-indigo-200);
+	box-shadow: none;
+	pointer-events: none;
+}
+
+.mizzey-pagination__item .mizzey-icon {
+	scale: var(--mizzey-dir) 1;
+}
+
+.mizzey-pagination__gap {
+	color: var(--mizzey-color-neutral-muted);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Overlays: native modal dialogs. A side drawer is square where it meets the screen edge and rounded 28 on the two
+   corners facing the page; a bottom sheet rounds its top corners; a dialog floats and rounds all four. The dialog
+   element covers the screen, so a press outside the panel lands on it and closes it. */
+
+.mizzey-overlay {
+	position: fixed;
+	inset: 0;
+	inline-size: 100%;
+	max-inline-size: none;
+	block-size: 100%;
+	max-block-size: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	color: var(--mizzey-color-role-text);
+	overflow: hidden;
+	transition: display var(--mizzey-motion-duration-5) allow-discrete, overlay var(--mizzey-motion-duration-5) allow-discrete;
+}
+
+.mizzey-overlay[open] {
+	display: flex;
+}
+
+.mizzey-overlay::backdrop {
+	background-color: var(--mizzey-color-role-scrim);
+	opacity: 0;
+	transition: opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out),
+		display var(--mizzey-motion-duration-5) allow-discrete, overlay var(--mizzey-motion-duration-5) allow-discrete;
+}
+
+.mizzey-overlay[open]::backdrop {
+	opacity: 1;
+}
+
+@starting-style {
+	.mizzey-overlay[open]::backdrop {
+		opacity: 0;
+	}
+}
+
+.mizzey-overlay__panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: var(--mizzey-color-role-surface-raised);
+	box-shadow: var(--mizzey-elevation-3);
+	transition: transform var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in),
+		opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in);
+}
+
+.mizzey-overlay--drawer-end,
+.mizzey-overlay--drawer-start {
+	--mizzey-overlay-from: calc(100% * var(--mizzey-dir));
+}
+
+.mizzey-overlay--drawer-start {
+	--mizzey-overlay-from: calc(-100% * var(--mizzey-dir));
+}
+
+.mizzey-overlay--drawer-end {
+	justify-content: flex-end;
+}
+
+.mizzey-overlay--drawer-start {
+	justify-content: flex-start;
+}
+
+.mizzey-overlay--drawer-end .mizzey-overlay__panel,
+.mizzey-overlay--drawer-start .mizzey-overlay__panel {
+	inline-size: min(var(--mizzey-overlay-drawer), 100%);
+	block-size: 100%;
+	border-radius: 0;
+}
+
+.mizzey-overlay--drawer-end .mizzey-overlay__panel {
+	border-start-start-radius: var(--mizzey-radius-drawer);
+	border-end-start-radius: var(--mizzey-radius-drawer);
+}
+
+.mizzey-overlay--drawer-start .mizzey-overlay__panel {
+	border-start-end-radius: var(--mizzey-radius-drawer);
+	border-end-end-radius: var(--mizzey-radius-drawer);
+}
+
+.mizzey-overlay:not([open]) .mizzey-overlay__panel {
+	transform: translateX(var(--mizzey-overlay-from, 0));
+}
+
+.mizzey-overlay[open] .mizzey-overlay__panel {
+	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft),
+		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+}
+
+@starting-style {
+	.mizzey-overlay--drawer-end[open] .mizzey-overlay__panel,
+	.mizzey-overlay--drawer-start[open] .mizzey-overlay__panel {
+		transform: translateX(var(--mizzey-overlay-from));
+	}
+}
+
+.mizzey-overlay--sheet {
+	align-items: flex-end;
+}
+
+.mizzey-overlay--sheet .mizzey-overlay__panel {
+	inline-size: 100%;
+	max-block-size: var(--mizzey-overlay-sheet-max);
+	padding-block-end: max(var(--mizzey-space-4), env(safe-area-inset-bottom));
+	border-radius: 0;
+	border-start-start-radius: var(--mizzey-radius-sheet);
+	border-start-end-radius: var(--mizzey-radius-sheet);
+}
+
+.mizzey-overlay--sheet-full .mizzey-overlay__panel {
+	block-size: calc(100% - var(--mizzey-overlay-sheet-top));
+	max-block-size: none;
+}
+
+.mizzey-overlay--sheet:not([open]) .mizzey-overlay__panel {
+	transform: translateY(100%);
+}
+
+.mizzey-overlay--sheet[open] .mizzey-overlay__panel {
+	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-spring-soft);
+}
+
+@starting-style {
+	.mizzey-overlay--sheet[open] .mizzey-overlay__panel {
+		transform: translateY(100%);
+	}
+}
+
+.mizzey-overlay__handle {
+	position: absolute;
+	inset-block-start: var(--mizzey-space-2);
+	inset-inline: 0;
+	inline-size: var(--mizzey-control-handle-inline);
+	block-size: var(--mizzey-control-handle-block);
+	margin-inline: auto;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-200);
+}
+
+.mizzey-overlay--dialog {
+	align-items: center;
+	justify-content: center;
+	padding: var(--mizzey-space-4);
+}
+
+.mizzey-overlay--dialog .mizzey-overlay__panel {
+	inline-size: var(--mizzey-overlay-dialog);
+	max-inline-size: 100%;
+	max-block-size: 100%;
+	padding: var(--mizzey-space-5);
+	border-radius: var(--mizzey-radius-tile);
+	box-shadow: var(--mizzey-elevation-4);
+}
+
+.mizzey-overlay--dialog:not([open]) .mizzey-overlay__panel {
+	opacity: 0;
+	transform: scale(0.96);
+}
+
+.mizzey-overlay--dialog[open] .mizzey-overlay__panel {
+	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out),
+		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+}
+
+@starting-style {
+	.mizzey-overlay--dialog[open] .mizzey-overlay__panel {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+}
+
+.mizzey-overlay__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	block-size: var(--mizzey-overlay-drawer-header);
+	padding-inline: var(--mizzey-space-5) var(--mizzey-space-3);
+	box-shadow: 0 var(--mizzey-border-hairline) 0 var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-overlay--dialog .mizzey-overlay__header,
+.mizzey-overlay--sheet .mizzey-overlay__header {
+	block-size: auto;
+	padding: 0;
+	box-shadow: none;
+}
+
+.mizzey-overlay--sheet .mizzey-overlay__header {
+	padding: var(--mizzey-space-5) var(--mizzey-space-4) var(--mizzey-space-2);
+}
+
+.mizzey-overlay__title {
+	margin: 0;
+	font: var(--mizzey-type-h3-compact);
+	letter-spacing: var(--mizzey-type-h3-compact-letter-spacing);
+	text-wrap: balance;
+}
+
+.mizzey-overlay__body {
+	flex: 1;
+	min-block-size: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+	padding-block: var(--mizzey-space-4);
+	padding-inline: var(--mizzey-space-5);
+}
+
+.mizzey-overlay--sheet .mizzey-overlay__body {
+	padding-block: 0 var(--mizzey-space-4);
+	padding-inline: var(--mizzey-space-4);
+}
+
+.mizzey-overlay--dialog .mizzey-overlay__body {
+	flex: none;
+	padding: var(--mizzey-space-2) 0 var(--mizzey-space-5);
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-overlay__footer {
+	flex-shrink: 0;
+	/* The pinned button stays above the home indicator (the drawer's "Show N products" rule, spec 066). */
+	padding: var(--mizzey-space-4) var(--mizzey-space-5) max(var(--mizzey-space-5), env(safe-area-inset-bottom));
+	box-shadow: 0 calc(var(--mizzey-border-hairline) * -1) 0 var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-overlay--dialog .mizzey-overlay__footer {
+	padding: 0;
+	box-shadow: none;
+}
+
+@media (max-width: 599px) {
+	.mizzey-overlay--drawer-start .mizzey-overlay__panel,
+	.mizzey-overlay--drawer-end .mizzey-overlay__panel {
+		inline-size: var(--mizzey-overlay-drawer-phone);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Steps line, tooltips and tabs. */
+
+.mizzey-steps {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-3);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-steps__step {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+}
+
+.mizzey-steps__step.is-todo {
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-steps__dot {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-step);
+	block-size: var(--mizzey-control-step);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+	font: var(--mizzey-font-weight-medium) var(--mizzey-type-latin-label-font-size)/var(--mizzey-type-latin-label-line-height) var(--mizzey-font-family-numeric);
+	font-variant-numeric: tabular-nums;
+}
+
+.mizzey-steps__step.is-todo .mizzey-steps__dot {
+	background-color: var(--mizzey-color-brand-white);
+	color: var(--mizzey-color-neutral-muted);
+	box-shadow: inset 0 0 0 var(--mizzey-border-field) var(--mizzey-color-indigo-300);
+}
+
+.mizzey-steps__line {
+	flex: 1;
+	min-inline-size: var(--mizzey-space-5);
+	block-size: var(--mizzey-border-control);
+	border-radius: var(--mizzey-border-control);
+	background-color: var(--mizzey-color-indigo-100);
+}
+
+.mizzey-steps__line.is-done {
+	background-color: var(--mizzey-color-role-primary);
+}
+
+/* Narrow: the steps share the width equally, each label under its disc and free to wrap, as C1-Checkout-Phone
+   draws them; the connector runs from the previous disc's centre to this one's, so no label is cut or shrunk. */
+.mizzey-steps-host {
+	container-type: inline-size;
+}
+
+@container (max-width: 599px) {
+	.mizzey-steps {
+		align-items: flex-start;
+	}
+
+	.mizzey-steps__line {
+		display: none;
+	}
+
+	.mizzey-steps__step {
+		position: relative;
+		flex: 1 1 0;
+		flex-direction: column;
+		min-inline-size: 0;
+		text-align: center;
+		white-space: normal;
+		overflow-wrap: anywhere;
+	}
+
+	.mizzey-steps__dot {
+		position: relative;
+		z-index: 1;
+	}
+
+	.mizzey-steps__line + .mizzey-steps__step::before {
+		content: "";
+		position: absolute;
+		inset-block-start: calc((var(--mizzey-control-step) - var(--mizzey-border-control)) / 2);
+		inset-inline: calc(-50% - var(--mizzey-space-3)) 50%;
+		block-size: var(--mizzey-border-control);
+		background-color: var(--mizzey-color-indigo-100);
+	}
+
+	.mizzey-steps__line + .mizzey-steps__step:not(.is-todo)::before {
+		background-color: var(--mizzey-color-role-primary);
+	}
+}
+
+.mizzey-tooltip-host {
+	position: relative;
+	display: inline-flex;
+}
+
+.mizzey-tooltip {
+	position: absolute;
+	z-index: 9;
+	inset-block-start: calc(100% + var(--mizzey-space-2));
+	inset-inline-start: 50%;
+	display: flex;
+	align-items: center;
+	block-size: var(--mizzey-control-tooltip);
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-xs);
+	background-color: var(--mizzey-color-indigo-700);
+	color: var(--mizzey-color-brand-white);
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	translate: calc(-50% * var(--mizzey-dir)) var(--mizzey-motion-distance-1);
+	transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-in),
+		translate var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-in);
+}
+
+.mizzey-tooltip::before {
+	content: "";
+	position: absolute;
+	inset-block-start: calc(var(--mizzey-control-tooltip-arrow) / -2);
+	inset-inline-start: calc(50% - var(--mizzey-control-tooltip-arrow) / 2);
+	inline-size: var(--mizzey-control-tooltip-arrow);
+	block-size: var(--mizzey-control-tooltip-arrow);
+	border-radius: calc(var(--mizzey-radius-xs) / 4);
+	background-color: inherit;
+	rotate: 45deg;
+}
+
+.mizzey-tooltip--top {
+	inset-block: auto calc(100% + var(--mizzey-space-2));
+}
+
+.mizzey-tooltip--top::before {
+	inset-block: auto calc(var(--mizzey-control-tooltip-arrow) / -2);
+}
+
+.mizzey-tooltip--start,
+.mizzey-tooltip--end {
+	inset-block-start: 50%;
+	translate: 0 -50%;
+}
+
+.mizzey-tooltip--start {
+	inset-inline: auto calc(100% + var(--mizzey-space-2));
+}
+
+.mizzey-tooltip--end {
+	inset-inline-start: calc(100% + var(--mizzey-space-2));
+}
+
+.mizzey-tooltip--start::before,
+.mizzey-tooltip--end::before {
+	inset-block-start: calc(50% - var(--mizzey-control-tooltip-arrow) / 2);
+}
+
+.mizzey-tooltip--start::before {
+	inset-inline: auto calc(var(--mizzey-control-tooltip-arrow) / -2);
+}
+
+.mizzey-tooltip--end::before {
+	inset-inline-start: calc(var(--mizzey-control-tooltip-arrow) / -2);
+}
+
+.mizzey-tooltip-host:has(:focus-visible) > .mizzey-tooltip,
+.mizzey-tooltip-host.is-shown > .mizzey-tooltip {
+	opacity: 1;
+	translate: calc(-50% * var(--mizzey-dir)) 0;
+	transition: opacity var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out),
+		translate var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+@media (hover: hover) {
+	.mizzey-tooltip-host:hover > .mizzey-tooltip {
+		opacity: 1;
+		translate: calc(-50% * var(--mizzey-dir)) 0;
+		transition: opacity var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out) var(--mizzey-motion-delay-tooltip),
+			translate var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out) var(--mizzey-motion-delay-tooltip);
+	}
+}
+
+.mizzey-tooltip-host:hover > .mizzey-tooltip--start,
+.mizzey-tooltip-host:hover > .mizzey-tooltip--end,
+.mizzey-tooltip-host:has(:focus-visible) > .mizzey-tooltip--start,
+.mizzey-tooltip-host:has(:focus-visible) > .mizzey-tooltip--end {
+	translate: 0 -50%;
+}
+
+/* Escape dismisses a tooltip without moving focus (WCAG 1.4.13). */
+.mizzey-tooltip-host.is-dismissed > .mizzey-tooltip {
+	opacity: 0;
+	transition: none;
+}
+
+@media (hover: none) {
+	.mizzey-tooltip {
+		display: none;
+	}
+}
+
+.mizzey-tabs {
+	display: block;
+	min-inline-size: 0;
+}
+
+.mizzey-tabs__list {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(var(--mizzey-tabs-count, 4), minmax(0, 1fr));
+	box-shadow: inset 0 calc(var(--mizzey-border-hairline) * -1) 0 var(--mizzey-color-neutral-hairline-strong);
+}
+
+.mizzey-tabs__tab {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	block-size: var(--mizzey-control-target-preferred);
+	padding-block: 0;
+	padding-inline: var(--mizzey-space-2);
+	border: 0;
+	border-radius: var(--mizzey-radius-xs);
+	background-color: transparent;
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-button);
+	white-space: nowrap;
+	cursor: pointer;
+	transition: color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-tabs__tab:hover,
+.mizzey-tabs__tab[aria-selected="true"] {
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-tabs__tab:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: calc(var(--mizzey-focus-width) * -1);
+}
+
+.mizzey-tabs__indicator {
+	position: absolute;
+	inset-block-end: 0;
+	inset-inline-start: 0;
+	inline-size: calc(100% / var(--mizzey-tabs-count, 4));
+	padding-inline: var(--mizzey-control-tab-indicator-inset);
+	pointer-events: none;
+	transform: translateX(calc(var(--mizzey-tab-index, 0) * 100% * var(--mizzey-dir)));
+	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-tabs__indicator::after {
+	content: "";
+	display: block;
+	block-size: var(--mizzey-border-indicator);
+	border-radius: var(--mizzey-border-indicator);
+	background-color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-tabs__panel {
+	padding-block-start: var(--mizzey-space-4);
+	animation: mizzey-fade var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-tabs__panel[hidden] {
+	display: none;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Keyframes. */
+
+@keyframes mizzey-draw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes mizzey-dot {
+	0%,
+	100% {
+		opacity: 1;
+		scale: 1;
+	}
+
+	50% {
+		opacity: 0.4;
+		scale: 0.6;
+	}
+}
+
+@keyframes mizzey-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.6;
+	}
+}
+
+@keyframes mizzey-breathe {
+	to {
+		opacity: 0.12;
+	}
+}
+
+@keyframes mizzey-life {
+	from {
+		transform: scaleX(1);
+	}
+
+	to {
+		transform: scaleX(0);
+	}
+}
+
+@keyframes mizzey-arrive {
+	from {
+		opacity: 0;
+		transform: translateY(calc(var(--mizzey-motion-distance-3) * -1));
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes mizzey-rise {
+	from {
+		opacity: 0;
+		transform: translateY(var(--mizzey-motion-distance-nudge));
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes mizzey-nudge {
+	0%,
+	100% {
+		translate: 0;
+	}
+
+	25% {
+		translate: calc(var(--mizzey-motion-distance-nudge) * -1);
+	}
+
+	75% {
+		translate: var(--mizzey-motion-distance-nudge);
+	}
+}
+
+@keyframes mizzey-pop {
+	from {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes mizzey-fade {
+	from {
+		opacity: 0;
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Reduced motion: movement, scale, springs, loops and the life line go; short fades stay (C1-System 11). */
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-button,
+	.mizzey-button:active:not(:disabled),
+	.mizzey-button--icon:active:not(:disabled),
+	.mizzey-chip:active {
+		transform: none;
+	}
+
+	.mizzey-button.is-done .mizzey-button__tick path,
+	.mizzey-check__box:checked ~ .mizzey-check__tick path {
+		animation: none;
+		stroke-dashoffset: 0;
+	}
+
+	.mizzey-loader__dot,
+	.mizzey-skeleton,
+	.mizzey-notice,
+	.mizzey-notice__life,
+	.mizzey-field.is-error .mizzey-field__box,
+	.mizzey-field.is-error .mizzey-field__message,
+	.mizzey-select__list,
+	.mizzey-tabs__panel {
+		animation: none;
+	}
+
+	.mizzey-notice__life {
+		display: none;
+	}
+
+	.mizzey-zz {
+		animation: none;
+		opacity: 0.09;
+	}
+
+	.mizzey-field__line,
+	.mizzey-switch__thumb,
+	.mizzey-tabs__indicator,
+	.mizzey-select__chevron {
+		transition: none;
+	}
+
+	.mizzey-tooltip,
+	.mizzey-tooltip-host:has(:focus-visible) > .mizzey-tooltip {
+		translate: calc(-50% * var(--mizzey-dir)) 0;
+	}
+
+	.mizzey-overlay:not([open]) .mizzey-overlay__panel,
+	.mizzey-overlay[open] .mizzey-overlay__panel {
+		transform: none;
+		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
+	}
+
+	.mizzey-overlay:not([open]) .mizzey-overlay__panel {
+		opacity: 0;
+	}
+
+	/* The 120 ms fade is kept (C1-System 11), on the way out too: the dialog stays shown while its panel and scrim
+	   fade, instead of disappearing at once. */
+	.mizzey-overlay {
+		transition: display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
+	}
+
+	.mizzey-overlay::backdrop {
+		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out),
+			display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
+	}
+}

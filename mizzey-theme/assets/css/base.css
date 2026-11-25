@@ -1,0 +1,59 @@
+/* Theme-level type, focus ring, motion and icons (spec 066, slice 1).
+   Every value comes from the generated token layer (tokens.css), which also holds the type role classes
+   (.mizzey-type--<role>); nothing literal lives here (K-3). Logical properties only, so this one stylesheet
+   serves both reading directions. */
+
+body {
+	font: var(--mizzey-type-body);
+	font-synthesis: none;
+	color: var(--mizzey-color-role-text);
+	background-color: var(--mizzey-color-role-page);
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Prices, quantities, order numbers, countdowns and codes: Inter in both languages, tabular figures, never
+   wrapped, isolated from the reading direction. */
+.mizzey-type--price,
+.mizzey-type--price-lg,
+.mizzey-type--old-price {
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	unicode-bidi: isolate;
+}
+
+/* Focus ring: Royal Indigo on light grounds, White on Indigo grounds (D-35). */
+:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-on-brand :focus-visible,
+.has-color-role-surface-brand-background-color :focus-visible,
+.has-color-brand-royal-indigo-background-color :focus-visible,
+.has-gradient-deep-gradient-background :focus-visible {
+	outline-color: var(--mizzey-color-role-focus-inverse);
+}
+
+/* Reduced motion: durations over 120 ms drop to the reduced token in tokens.css, so movement, springs and
+   stagger go while short fades stay (C1-System 11). Keyframe loops stop here. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	::before,
+	::after {
+		animation-duration: var(--mizzey-motion-duration-reduced) !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* Icons (inc/icons.php): the colour of the text around them. */
+.mizzey-icon {
+	display: inline-block;
+	flex-shrink: 0;
+	vertical-align: middle;
+}
+
+.mizzey-icon__knockout { stroke: var(--mizzey-color-role-surface); }
+.mizzey-icon__knockout-fill { fill: var(--mizzey-color-role-surface); }
+.mizzey-icon__accent { fill: var(--mizzey-color-role-accent); }

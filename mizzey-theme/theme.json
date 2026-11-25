@@ -8,6 +8,559 @@
 			"mizzey-theme": {
 				"comment": "Site design tokens are exposed as --wp--custom--mizzey-theme--* and the --mizzey-* convention."
 			}
+		},
+		"color": {
+			"custom": false,
+			"customGradient": false,
+			"customDuotone": false,
+			"defaultPalette": false,
+			"defaultGradients": false,
+			"defaultDuotone": false,
+			"duotone": [],
+			"palette": [
+				{
+					"slug": "color-brand-royal-indigo",
+					"name": "Brand Royal Indigo",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-brand-cream",
+					"name": "Brand Cream",
+					"color": "#F3F1E9"
+				},
+				{
+					"slug": "color-brand-ink",
+					"name": "Brand Ink",
+					"color": "#1E1E1E"
+				},
+				{
+					"slug": "color-brand-white",
+					"name": "Brand White",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-indigo-50",
+					"name": "Indigo 50",
+					"color": "#EEF1FA"
+				},
+				{
+					"slug": "color-indigo-100",
+					"name": "Indigo 100",
+					"color": "#DCE0E9"
+				},
+				{
+					"slug": "color-indigo-200",
+					"name": "Indigo 200",
+					"color": "#BAC0D2"
+				},
+				{
+					"slug": "color-indigo-300",
+					"name": "Indigo 300",
+					"color": "#7B84A0"
+				},
+				{
+					"slug": "color-indigo-500",
+					"name": "Indigo 500",
+					"color": "#3A55A0"
+				},
+				{
+					"slug": "color-indigo-700",
+					"name": "Indigo 700",
+					"color": "#1A2850"
+				},
+				{
+					"slug": "color-glow-top",
+					"name": "Glow Top",
+					"color": "#E9EEF9"
+				},
+				{
+					"slug": "color-glow-lower",
+					"name": "Glow Lower",
+					"color": "#F4F6FC"
+				},
+				{
+					"slug": "color-neutral-muted",
+					"name": "Neutral Muted",
+					"color": "#5B6480"
+				},
+				{
+					"slug": "color-neutral-hairline",
+					"name": "Neutral Hairline",
+					"color": "rgba(38,59,115,.08)"
+				},
+				{
+					"slug": "color-neutral-scrim",
+					"name": "Neutral Scrim",
+					"color": "rgba(16,24,48,.48)"
+				},
+				{
+					"slug": "color-neutral-hairline-strong",
+					"name": "Neutral Hairline Strong",
+					"color": "rgba(38,59,115,.12)"
+				},
+				{
+					"slug": "color-neutral-on-brand-hover",
+					"name": "Neutral On Brand Hover",
+					"color": "rgba(255,255,255,.12)"
+				},
+				{
+					"slug": "color-feedback-success",
+					"name": "Feedback Success",
+					"color": "#247B47"
+				},
+				{
+					"slug": "color-feedback-success-bg",
+					"name": "Feedback Success Bg",
+					"color": "#E6F3EB"
+				},
+				{
+					"slug": "color-feedback-warning",
+					"name": "Feedback Warning",
+					"color": "#916300"
+				},
+				{
+					"slug": "color-feedback-warning-bg",
+					"name": "Feedback Warning Bg",
+					"color": "#FDEFD4"
+				},
+				{
+					"slug": "color-feedback-danger",
+					"name": "Feedback Danger",
+					"color": "#CD2949"
+				},
+				{
+					"slug": "color-feedback-danger-bg",
+					"name": "Feedback Danger Bg",
+					"color": "#FBE9ED"
+				},
+				{
+					"slug": "color-role-page",
+					"name": "Role Page",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-surface",
+					"name": "Role Surface",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-surface-raised",
+					"name": "Role Surface Raised",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-surface-quiet",
+					"name": "Role Surface Quiet",
+					"color": "#EEF1FA"
+				},
+				{
+					"slug": "color-role-surface-brand",
+					"name": "Role Surface Brand",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-role-text",
+					"name": "Role Text",
+					"color": "#1E1E1E"
+				},
+				{
+					"slug": "color-role-text-muted",
+					"name": "Role Text Muted",
+					"color": "#5B6480"
+				},
+				{
+					"slug": "color-role-text-on-brand",
+					"name": "Role Text On Brand",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-border",
+					"name": "Role Border",
+					"color": "rgba(38,59,115,.08)"
+				},
+				{
+					"slug": "color-role-border-control",
+					"name": "Role Border Control",
+					"color": "#7B84A0"
+				},
+				{
+					"slug": "color-role-primary",
+					"name": "Role Primary",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-role-primary-hover",
+					"name": "Role Primary Hover",
+					"color": "#1A2850"
+				},
+				{
+					"slug": "color-role-on-primary",
+					"name": "Role On Primary",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-on-accent",
+					"name": "Role On Accent",
+					"color": "#1E1E1E"
+				},
+				{
+					"slug": "color-role-on-accent-large",
+					"name": "Role On Accent Large",
+					"color": "#1E1E1E"
+				},
+				{
+					"slug": "color-role-accent-text",
+					"name": "Role Accent Text",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-role-link",
+					"name": "Role Link",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-role-success",
+					"name": "Role Success",
+					"color": "#247B47"
+				},
+				{
+					"slug": "color-role-warning",
+					"name": "Role Warning",
+					"color": "#916300"
+				},
+				{
+					"slug": "color-role-danger",
+					"name": "Role Danger",
+					"color": "#CD2949"
+				},
+				{
+					"slug": "color-role-focus",
+					"name": "Role Focus",
+					"color": "#263B73"
+				},
+				{
+					"slug": "color-role-focus-inverse",
+					"name": "Role Focus Inverse",
+					"color": "#FFFFFF"
+				},
+				{
+					"slug": "color-role-scrim",
+					"name": "Role Scrim",
+					"color": "rgba(16,24,48,.48)"
+				}
+			],
+			"gradients": [
+				{
+					"slug": "gradient-deep",
+					"name": "Deep",
+					"gradient": "linear-gradient(135deg, #1A2850 0%, #263B73 55%, #3A55A0 100%)"
+				},
+				{
+					"slug": "gradient-air",
+					"name": "Air",
+					"gradient": "linear-gradient(180deg, #E9EEF9 0%, #F4F6FC 100%)"
+				}
+			]
+		},
+		"typography": {
+			"defaultFontSizes": false,
+			"fluid": false,
+			"fontFamilies": [
+				{
+					"slug": "font-family-latin",
+					"name": "Latin",
+					"fontFamily": "\"Inter\", \"Inter Fallback\", system-ui, -apple-system, \"Segoe UI\", \"Arial\", sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Inter",
+							"fontWeight": "300 900",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/inter-var-latin-548fe1ef.woff2"
+							],
+							"unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+						}
+					]
+				},
+				{
+					"slug": "font-family-arabic",
+					"name": "Arabic",
+					"fontFamily": "\"Tajawal\", \"Inter Ar\", \"Tajawal Fallback\", \"Inter Fallback\", \"Tahoma\", \"Arial\", sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Tajawal",
+							"fontWeight": "300",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/tajawal-300-arabic-92ae4edb.woff2"
+							],
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+						},
+						{
+							"fontFamily": "Tajawal",
+							"fontWeight": "400",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/tajawal-400-arabic-05b9a65f.woff2"
+							],
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+						},
+						{
+							"fontFamily": "Tajawal",
+							"fontWeight": "500",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/tajawal-500-arabic-1c95ce6a.woff2"
+							],
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+						},
+						{
+							"fontFamily": "Tajawal",
+							"fontWeight": "900",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/tajawal-900-arabic-806f93d0.woff2"
+							],
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+						}
+					]
+				},
+				{
+					"slug": "font-family-numeric",
+					"name": "Numeric",
+					"fontFamily": "\"Inter\", \"Inter Fallback\", system-ui, \"Arial\", sans-serif"
+				}
+			],
+			"fontSizes": [
+				{
+					"slug": "type-display",
+					"name": "Display",
+					"size": "var(--mizzey-type-display-font-size)"
+				},
+				{
+					"slug": "type-h1",
+					"name": "H1",
+					"size": "var(--mizzey-type-h1-font-size)"
+				},
+				{
+					"slug": "type-h2",
+					"name": "H2",
+					"size": "var(--mizzey-type-h2-font-size)"
+				},
+				{
+					"slug": "type-h3",
+					"name": "H3",
+					"size": "var(--mizzey-type-h3-font-size)"
+				},
+				{
+					"slug": "type-h3-compact",
+					"name": "H3 Compact",
+					"size": "var(--mizzey-type-h3-compact-font-size)"
+				},
+				{
+					"slug": "type-title",
+					"name": "Title",
+					"size": "var(--mizzey-type-title-font-size)"
+				},
+				{
+					"slug": "type-lead",
+					"name": "Lead",
+					"size": "var(--mizzey-type-lead-font-size)"
+				},
+				{
+					"slug": "type-body",
+					"name": "Body",
+					"size": "var(--mizzey-type-body-font-size)"
+				},
+				{
+					"slug": "type-body-strong",
+					"name": "Body Strong",
+					"size": "var(--mizzey-type-body-strong-font-size)"
+				},
+				{
+					"slug": "type-button",
+					"name": "Button",
+					"size": "var(--mizzey-type-button-font-size)"
+				},
+				{
+					"slug": "type-input",
+					"name": "Input",
+					"size": "var(--mizzey-type-input-font-size)"
+				},
+				{
+					"slug": "type-label",
+					"name": "Label",
+					"size": "var(--mizzey-type-label-font-size)"
+				},
+				{
+					"slug": "type-notice",
+					"name": "Notice",
+					"size": "var(--mizzey-type-notice-font-size)"
+				},
+				{
+					"slug": "type-price",
+					"name": "Price",
+					"size": "var(--mizzey-type-price-font-size)"
+				},
+				{
+					"slug": "type-price-lg",
+					"name": "Price Lg",
+					"size": "var(--mizzey-type-price-lg-font-size)"
+				},
+				{
+					"slug": "type-old-price",
+					"name": "Old Price",
+					"size": "var(--mizzey-type-old-price-font-size)"
+				},
+				{
+					"slug": "type-caption",
+					"name": "Caption",
+					"size": "var(--mizzey-type-caption-font-size)"
+				},
+				{
+					"slug": "type-badge",
+					"name": "Badge",
+					"size": "var(--mizzey-type-badge-font-size)"
+				}
+			]
+		},
+		"spacing": {
+			"defaultSpacingSizes": false,
+			"spacingSizes": [
+				{
+					"slug": "space-1",
+					"name": "1",
+					"size": "0.25rem"
+				},
+				{
+					"slug": "space-2",
+					"name": "2",
+					"size": "0.5rem"
+				},
+				{
+					"slug": "space-3",
+					"name": "3",
+					"size": "0.75rem"
+				},
+				{
+					"slug": "space-4",
+					"name": "4",
+					"size": "1rem"
+				},
+				{
+					"slug": "space-5",
+					"name": "5",
+					"size": "1.5rem"
+				},
+				{
+					"slug": "space-6",
+					"name": "6",
+					"size": "2rem"
+				},
+				{
+					"slug": "space-7",
+					"name": "7",
+					"size": "2.5rem"
+				},
+				{
+					"slug": "space-8",
+					"name": "8",
+					"size": "3.5rem"
+				},
+				{
+					"slug": "space-9",
+					"name": "9",
+					"size": "4.5rem"
+				},
+				{
+					"slug": "space-section",
+					"name": "section",
+					"size": "clamp(2.5rem, 1.7571rem + 3.0476vw, 4.5rem)"
+				}
+			]
+		},
+		"border": {
+			"radiusSizes": [
+				{
+					"slug": "radius-xs",
+					"name": "Xs",
+					"size": "8px"
+				},
+				{
+					"slug": "radius-sm",
+					"name": "Sm",
+					"size": "12px"
+				},
+				{
+					"slug": "radius-field",
+					"name": "Field",
+					"size": "16px"
+				},
+				{
+					"slug": "radius-card",
+					"name": "Card",
+					"size": "20px"
+				},
+				{
+					"slug": "radius-tile",
+					"name": "Tile",
+					"size": "24px"
+				},
+				{
+					"slug": "radius-sheet",
+					"name": "Sheet",
+					"size": "28px"
+				},
+				{
+					"slug": "radius-drawer",
+					"name": "Drawer",
+					"size": "28px"
+				},
+				{
+					"slug": "radius-pill",
+					"name": "Pill",
+					"size": "999px"
+				}
+			]
+		},
+		"shadow": {
+			"defaultPresets": false,
+			"presets": [
+				{
+					"slug": "elevation-1",
+					"name": "Elevation 1",
+					"shadow": "0px 1px 2px 0px rgba(38,59,115,.06), 0px 1px 3px 1px rgba(38,59,115,.04), 0px 0px 0px 1px rgba(38,59,115,.08)"
+				},
+				{
+					"slug": "elevation-2",
+					"name": "Elevation 2",
+					"shadow": "0px 2px 6px 2px rgba(38,59,115,.06), 0px 1px 2px 0px rgba(38,59,115,.08)"
+				},
+				{
+					"slug": "elevation-3",
+					"name": "Elevation 3",
+					"shadow": "0px 4px 12px 3px rgba(38,59,115,.08), 0px 1px 3px 0px rgba(38,59,115,.10)"
+				},
+				{
+					"slug": "elevation-4",
+					"name": "Elevation 4",
+					"shadow": "0px 8px 24px 4px rgba(38,59,115,.10), 0px 2px 6px 0px rgba(38,59,115,.10)"
+				},
+				{
+					"slug": "elevation-glow-primary",
+					"name": "Elevation Glow Primary",
+					"shadow": "0px 6px 16px 0px rgba(38,59,115,.22)"
+				}
+			]
+		},
+		"layout": {
+			"contentSize": "840px",
+			"wideSize": "1272px"
 		}
 	}
 }

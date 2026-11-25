@@ -39,8 +39,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # This engagement's own storefront code, and nothing else.
 SCANNED = ("mizzey-site/src", "mizzey-site/mizzey-site.php", "mizzey-theme")
-# The harness is developer-facing: its output is evidence, not interface.
-EXCLUDED = ("mizzey-site/tests",)
+# The harness is developer-facing: its output is evidence, not interface. The theme's tests/ holds the component
+# preview fixture and its WordPress stand-ins (spec 066, slice 1); neither is shipped.
+EXCLUDED = ("mizzey-site/tests", "mizzey-theme/tests")
 
 # WordPress translation functions. A literal inside one of these is translatable by definition.
 TRANSLATION_FUNCTIONS = (

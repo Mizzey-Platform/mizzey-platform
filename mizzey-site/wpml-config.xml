@@ -43,4 +43,21 @@
 	<custom-types>
 		<custom-type translate="1">mizzey_promo</custom-type>
 	</custom-types>
+	<!--
+		The section library's words are each language's own (G11, specs/066): an editor either edits the Arabic
+		front page in the block editor, or translates these attributes in WPML's translation editor. The mark and
+		"Show on the site" are settings, not words, and are not listed.
+	-->
+	<gutenberg-blocks>
+		<gutenberg-block type="mizzey/trust-signals" translate="1">
+			<key name="label" />
+			<key name="items">
+				<key name="*">
+					<key name="title" />
+					<key name="line" />
+					<key name="url" />
+				</key>
+			</key>
+		</gutenberg-block>
+	</gutenberg-blocks>
 </wpml-config>
