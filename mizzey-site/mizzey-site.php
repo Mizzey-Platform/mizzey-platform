@@ -46,6 +46,7 @@ require_once __DIR__ . '/src/Storefront/ProductCard.php';
 require_once __DIR__ . '/src/Storefront/ProductRail.php';
 require_once __DIR__ . '/src/Storefront/ProductBuy.php';
 require_once __DIR__ . '/src/Catalogue/AttributeSwatch.php';
+require_once __DIR__ . '/src/Storefront/Listing.php';
 require_once __DIR__ . '/src/Search/Normalise.php';
 require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
@@ -251,6 +252,9 @@ MizzeySite\Storefront\ProductCard::register();
 MizzeySite\Storefront\ProductBuy::register();
 // The swatch colour staff give an attribute's value, which the product page shows (PDP-05): specs/066, slice 9.
 MizzeySite\Catalogue\AttributeSwatch::register();
+// The category listing's data over WooCommerce's product query, its drawer count and its filters without JavaScript:
+// specs/066, slice 6 (PLP-06 to PLP-22, SSC-04).
+MizzeySite\Storefront\Listing::register();
 
 // The store's own product search, its index, its synonym list and its term log: specs/058-search.
 MizzeySite\Search\Synonyms::register();

@@ -1709,7 +1709,7 @@ msgstr ""
 msgid "Show the logo on desktop"
 msgstr ""
 
-#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
+#: src/Blocks/Banners.php src/Blocks/signup/edit.js
 msgid "Sign up"
 msgstr ""
 
@@ -1815,6 +1815,233 @@ msgstr ""
 
 #: mizzey-site/src/Blocks/Hero.php
 msgid "slide"
+msgstr ""
+
+# Spec 066, slice 6: the category listing (K-4).
+#. translators: %s: how many products the chosen filters find.
+#: mizzey-site/src/Storefront/Listing.php:170 mizzey-theme/inc/listing.php:100
+#, php-format
+msgid "Show %s product"
+msgid_plural "Show %s products"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: a number of products.
+#. translators: %s: how many products the category has.
+#: mizzey-site/src/Storefront/Listing.php:172 mizzey-theme/inc/listing.php:93
+#: mizzey-theme/inc/listing.php:333 mizzey-theme/inc/listing.php:366
+#, php-format
+msgid "%s product"
+msgid_plural "%s products"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: how many values of one filter are chosen, for example brands.
+#: mizzey-theme/inc/listing.php:238
+#, php-format
+msgid "%d chosen"
+msgid_plural "%d chosen"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: how many products the filters find, 2: how many the category has.
+#: mizzey-theme/inc/listing.php:360
+#, php-format
+msgid "%1$s of %2$s product"
+msgid_plural "%1$s of %2$s products"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: how many filters are applied.
+#: mizzey-theme/inc/listing.php:377
+#, php-format
+msgid "%d applied"
+msgid_plural "%d applied"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: the first product shown, 2: the last, 3: how many there are.
+#: mizzey-theme/inc/listing.php:486
+#, php-format
+msgid "Showing %1$s to %2$s of %3$s product"
+msgid_plural "Showing %1$s to %2$s of %3$s products"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-site/src/Storefront/Listing.php:282
+msgid "Brand"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:457
+msgid "Price"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:518 mizzey-theme/inc/listing.php:204
+msgid "In stock only"
+msgstr ""
+
+#. translators: 1: the low end of a price range, 2: its high end, both numbers without the currency.
+#: mizzey-site/src/Storefront/Listing.php:534
+#, php-format
+msgid "%1$s to %2$s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:556
+msgid "Relevance"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:557
+msgid "Newest"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:558
+msgid "Price low to high"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:559
+msgid "Price high to low"
+msgstr ""
+
+#: mizzey-site/src/Storefront/Listing.php:560
+msgid "Best selling"
+msgstr ""
+
+#. translators: %d: how many values of one filter are chosen, for example brands.
+#: mizzey-site/src/Storefront/Listing.php:588 mizzey-theme/inc/listing.php:238
+msgid "All"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:67
+msgid "Category listing"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:70
+msgid "The category page: banner, filters, sort, products and paging."
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:136 mizzey-theme/inc/listing.php:218
+msgid "Updating"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:145
+msgid "Breadcrumb"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:214 mizzey-theme/inc/listing.php:374
+#: mizzey-theme/inc/listing.php:557
+msgid "Filters"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:215
+msgid "Close the filters"
+msgstr ""
+
+#. translators: %d: how many values of one filter are chosen, for example brands.
+#: mizzey-theme/inc/listing.php:238
+msgid "Any"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:258 mizzey-theme/inc/listing.php:260
+msgid "Search brands"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:263
+msgid "Show more"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:263
+msgid "Show fewer"
+msgstr ""
+
+#. translators: the lower handle of the price filter.
+#: mizzey-theme/inc/listing.php:318
+msgid "Minimum price"
+msgstr ""
+
+#. translators: the upper handle of the price filter.
+#: mizzey-theme/inc/listing.php:320
+msgid "Maximum price"
+msgstr ""
+
+#. translators: %s: the chosen price range.
+#: mizzey-theme/inc/listing.php:322
+#, php-format
+msgid "Type a price range, now %s"
+msgstr ""
+
+#. translators: %s: the currency, for example EGP.
+#: mizzey-theme/inc/listing.php:325
+#, php-format
+msgid "From, %s"
+msgstr ""
+
+#. translators: %s: the currency, for example EGP.
+#: mizzey-theme/inc/listing.php:327
+#, php-format
+msgid "To, %s"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:329 mizzey-theme/inc/listing.php:330
+msgid "Updating the count"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:372
+msgid "Sort"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:390 mizzey-theme/inc/listing.php:546
+msgid "Clear all"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:391
+msgid "Active filters"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:399
+msgid "No products match these filters"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:400
+msgid "Your filters are still applied. Remove one, or clear them all."
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:401
+msgid "Clear filters"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:437 mizzey-theme/inc/listing.php:468
+#: mizzey-theme/inc/listing.php:584 mizzey-theme/inc/listing.php:585
+msgid "Sort by"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:449
+msgid "Sort:"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:515
+msgid "Previous"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:530
+msgid "Next"
+msgstr ""
+
+#. translators: %s: the name of a category that has no products.
+#: mizzey-theme/inc/listing.php:596
+#, php-format
+msgid "Nothing in %s yet"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:597
+msgid "New products land here soon. Until then, these are close."
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:598
+msgid "Browse all categories"
+msgstr ""
+
+#: mizzey-theme/inc/listing.php:600
+msgid "You may like"
 msgstr ""
 
 # Spec 066, slice 5: the home page's sign-up, its welcome email, the leave page and the list (HOME-09).
