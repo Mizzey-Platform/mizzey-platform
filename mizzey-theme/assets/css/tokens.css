@@ -286,6 +286,7 @@
 	--mizzey-elevation-3: 0px 4px 12px 3px rgba(38,59,115,.08), 0px 1px 3px 0px rgba(38,59,115,.10);
 	--mizzey-elevation-4: 0px 8px 24px 4px rgba(38,59,115,.10), 0px 2px 6px 0px rgba(38,59,115,.10);
 	--mizzey-elevation-glow-primary: 0px 6px 16px 0px rgba(38,59,115,.22);
+	--mizzey-elevation-1-soft: 0px 1px 2px 0px rgba(38,59,115,.06), 0px 1px 3px 1px rgba(38,59,115,.04);
 	--mizzey-focus-width: 2px;
 	--mizzey-focus-offset: 2px;
 	--mizzey-border-hairline: 1px;
@@ -430,6 +431,17 @@
 	--mizzey-control-offer-media-phone: 200px;
 	--mizzey-control-offer-panel: 520px;
 	--mizzey-control-brand-chip-max: 220px;
+	--mizzey-control-product-stage: 560px;
+	--mizzey-control-product-thumb: 88px;
+	--mizzey-control-product-thumb-phone: 64px;
+	--mizzey-control-zoom-inline: 880px;
+	--mizzey-control-zoom-block: 640px;
+	--mizzey-control-zoom-thumb: 56px;
+	--mizzey-control-zoom-level-inline: 148px;
+	--mizzey-control-zoom-level-block: 48px;
+	--mizzey-control-delivery-van: 64px;
+	--mizzey-control-swatch: 36px;
+	--mizzey-control-swatch-inline: 48px;
 	--mizzey-breakpoint-phone: 320px;
 	--mizzey-breakpoint-tablet: 600px;
 	--mizzey-breakpoint-desktop: 1024px;

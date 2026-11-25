@@ -2120,3 +2120,219 @@ msgstr "عرض متتابع"
 #: mizzey-site/src/Blocks/Hero.php
 msgid "slide"
 msgstr "شريحة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$d / %2$d · %3$s"
+msgstr "%1$d / %2$d · %3$s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%d review"
+msgid_plural "%d reviews"
+msgstr[0] "لا تقييمات"
+msgstr[1] "تقييم واحد"
+msgstr[2] "تقييمان"
+msgstr[3] "%d تقييمات"
+msgstr[4] "%d تقييمًا"
+msgstr[5] "%d تقييم"
+
+
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid ", "
+msgstr "، "
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Availability is being confirmed"
+msgstr "جارٍ تأكيد التوفر"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Buy now"
+msgstr "اشترِ الآن"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Choose a %s to add this to your cart."
+msgstr "اختر %s لإضافة المنتج إلى السلة."
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Close photos"
+msgstr "إغلاق الصور"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Copy link"
+msgstr "نسخ الرابط"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "From"
+msgstr "يبدأ من"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "In stock"
+msgstr "متوفر"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "In stock in %s"
+msgstr "متوفر: %s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "In your wishlist"
+msgstr "في قائمة المفضلة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Key features"
+msgstr "أهم المميزات"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Link copied"
+msgstr "تم نسخ الرابط"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Next photo"
+msgstr "الصورة التالية"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "No photo yet"
+msgstr "لا توجد صورة بعد"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Only %1$d left in %2$s"
+msgstr "بقي %1$d فقط: %2$s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Out of stock in every option. Add it to your wishlist to find it again."
+msgstr "نفدت الكمية بكل الخيارات. أضفه إلى المفضلة لتجده بسهولة لاحقًا."
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Photo %d"
+msgstr "الصورة %d"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Photo %d, shown"
+msgstr "الصورة %d، معروضة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Play the product video"
+msgstr "تشغيل فيديو المنتج"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Previous photo"
+msgstr "الصورة السابقة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Product photos"
+msgstr "صور المنتج"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Rated %s out of 5"
+msgstr "التقييم %s من 5"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Removed from your wishlist"
+msgstr "تمت الإزالة من المفضلة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Return & refund policy"
+msgstr "سياسة الإرجاع والاسترداد"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Save %d%%"
+msgstr "وفّر %d%%"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Share"
+msgstr "مشاركة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Shop"
+msgstr "المتجر"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Show full name"
+msgstr "عرض الاسم كاملًا"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Show less"
+msgstr "عرض أقل"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Showing %s"
+msgstr "معروض: %s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Undo"
+msgstr "تراجع"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Video"
+msgstr "فيديو"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "You save %s"
+msgstr "توفّر %s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom image"
+msgstr "تكبير الصورة"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom in"
+msgstr "تكبير"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom out"
+msgstr "تصغير"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s is not made. Choose another %2$s."
+msgstr "%1$s غير متاح. اختر %2$s آخر."
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s is sold out. Choose another %2$s."
+msgstr "%1$s نفدت كميته. اختر %2$s آخر."
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s in %2$s"
+msgstr "%1$s، %2$s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s or %2$s"
+msgstr "%1$s أو %2$s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Choose a %s"
+msgstr "اختر %s"
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Availability being confirmed"
+msgstr "جارٍ تأكيد التوفر"
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "No colour: show this value as text"
+msgstr "بلا لون: يظهر هذا الخيار نصًا"
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "The colour shown as a swatch for this value on the product page."
+msgstr "اللون الذي يظهر لهذا الخيار في صفحة المنتج."
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "Swatch colour"
+msgstr "لون الخيار"

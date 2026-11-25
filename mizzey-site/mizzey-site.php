@@ -43,6 +43,8 @@ require_once __DIR__ . '/src/Blocks/SectionLibrary.php';
 require_once __DIR__ . '/src/Stock/CardStock.php';
 require_once __DIR__ . '/src/Storefront/ProductCard.php';
 require_once __DIR__ . '/src/Storefront/ProductRail.php';
+require_once __DIR__ . '/src/Storefront/ProductBuy.php';
+require_once __DIR__ . '/src/Catalogue/AttributeSwatch.php';
 require_once __DIR__ . '/src/Search/Normalise.php';
 require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
@@ -235,6 +237,11 @@ MizzeySite\Blocks\SectionLibrary::register();
 
 // The product card and the rail that carries cards (PLP-01 to PLP-05, MER-01, MER-07, REV-04): specs/066, slice 4.
 MizzeySite\Storefront\ProductCard::register();
+
+// The product page's gallery and buying area (PDP-01 to PDP-11, PDP-14 to PDP-16, PDP-21, PDP-22): specs/066, slice 9.
+MizzeySite\Storefront\ProductBuy::register();
+// The swatch colour staff give an attribute's value, which the product page shows (PDP-05): specs/066, slice 9.
+MizzeySite\Catalogue\AttributeSwatch::register();
 
 // The store's own product search, its index, its synonym list and its term log: specs/058-search.
 MizzeySite\Search\Synonyms::register();

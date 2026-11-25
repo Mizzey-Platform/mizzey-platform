@@ -11,6 +11,8 @@ Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
   WordPress Interactivity API runtime it imports, and the site plugin's storefront scripts that can load on any page
   (consent default and banner, tag manager, events, language cache). `ui.js` and the runtime load on every page on
   purpose: the header's drawers, which slice 2 builds, are on every page.
+- **Product**: every page, plus the header, the gallery and buying area (slice 9) and the product card and rail its
+  lower part carries (slice 10). The van in the delivery box is slice 1's image, counted on the home page.
 - **Home**: every page, plus the header (slice 2), every library section's stylesheet and storefront module, the
   styles they share, the product card's and rail's stylesheets and script (slice 4), and the artwork the theme ships
   for them, as if every section were placed at once (slice 5).
@@ -39,6 +41,7 @@ RUNTIME_RECORDED = 16070  # gzip bytes of the runtime at WordPress 7.1.5, measur
 BUDGETS = {
     "every page": {"styles": 40 * KB, "scripts": 45 * KB, "images": 0},
     "home": {"styles": 60 * KB, "scripts": 45 * KB, "images": 60 * KB},
+    "product": {"styles": 60 * KB, "scripts": 45 * KB, "images": 0},
 }
 
 
@@ -73,7 +76,17 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
         + sorted(blocks.glob("*/view.js")) + sorted(cards.glob("*/view.js")),
         "images": sorted((THEME / "assets" / "images").glob("*")),
     }
-    return {"every page": every, "home": home}
+    # Slice 9: the product page is every page, the header, the gallery and buying area, and the product card and rail
+    # its lower part carries (slice 10).
+    buy = SITE / "src" / "Storefront" / "product"
+    product = {
+        "styles": every["styles"] + [THEME / "assets" / "css" / "header.css"] + sorted(cards.glob("*/style.css"))
+        + sorted(buy.glob("*/style.css")),
+        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / "header.js"] + sorted(cards.glob("*/view.js"))
+        + sorted(buy.glob("*/view.js")),
+        "images": [],
+    }
+    return {"every page": every, "home": home, "product": product}
 
 
 def totals() -> dict[str, dict[str, int]]:

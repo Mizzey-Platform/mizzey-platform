@@ -1827,3 +1827,215 @@ msgstr ""
 #: mizzey-site/src/Blocks/Hero.php
 msgid "slide"
 msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$d / %2$d · %3$s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%d review"
+msgid_plural "%d reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid ", "
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Availability is being confirmed"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Buy now"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Choose a %s to add this to your cart."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Close photos"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Copy link"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Email"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "From"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "In stock"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "In stock in %s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "In your wishlist"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Key features"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Link copied"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Next photo"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "No photo yet"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Only %1$d left in %2$s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Out of stock in every option. Add it to your wishlist to find it again."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Photo %d"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Photo %d, shown"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Play the product video"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Previous photo"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Product photos"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Rated %s out of 5"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Removed from your wishlist"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Return & refund policy"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Save %d%%"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Share"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Shop"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Show full name"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Show less"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Showing %s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Undo"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Video"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "You save %s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom image"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom in"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Zoom out"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s is not made. Choose another %2$s."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s is sold out. Choose another %2$s."
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s in %2$s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "%1$s or %2$s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+#, php-format
+msgid "Choose a %s"
+msgstr ""
+
+#: mizzey-site/src/Storefront/ProductBuy.php
+msgid "Availability being confirmed"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "No colour: show this value as text"
+msgstr ""
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "The colour shown as a swatch for this value on the product page."
+msgstr ""
+
+#: mizzey-site/src/Catalogue/AttributeSwatch.php
+msgid "Swatch colour"
+msgstr ""

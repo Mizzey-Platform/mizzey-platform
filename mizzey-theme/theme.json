@@ -555,6 +555,11 @@
 					"slug": "elevation-glow-primary",
 					"name": "Elevation Glow Primary",
 					"shadow": "0px 6px 16px 0px rgba(38,59,115,.22)"
+				},
+				{
+					"slug": "elevation-1-soft",
+					"name": "Elevation 1 Soft",
+					"shadow": "0px 1px 2px 0px rgba(38,59,115,.06), 0px 1px 3px 1px rgba(38,59,115,.04)"
 				}
 			]
 		},
