@@ -11,16 +11,17 @@ Live status. First action each session: read this, then continue from **Next**.
   `specs/066-stage-2-shop-front/`, "The design this builds" (#556).
 - **The Stage 2 build has started** (D-38, #557): the design-first freeze of D-14 is lifted for Stage 2. The
   client's written approval of the interface design (Project Plan 3.2) is asked for in the email of 24 November.
-- **Slice 1 (foundation) is under way.** #558 put the closed design's tokens into `design/tokens/tokens.json` and
-  added `tools/theme_tokens.py` and `tools/theme_fonts.py` (self-hosted Inter 4.1 variable and Tajawal 1.700,
-  inside the D-21 font budgets). The theme layer, the icon set and the base components are on branch
-  `066-slice-1-foundation`, not yet in a pull request.
+- **Slices 1 to 5 are merged and on staging** (25 November): the foundation (#560, with #558 and #559), the header
+  and menus (#562, fixes #563 and #564), the footer, strip and consent (#565), the product card and rail (#561) and
+  the home page (#566). Staging runs v0.1.31 with staging-only sample content (home page, menus, strip, logo); the
+  logo files sit on the server, not in this repository.
 
 ## Next (25 November 2026)
 
-1. Finish slice 1: the base components, then the section library pattern with one proof section; review against
-   the boards at 390 and 1440 in both directions; one pull request.
-2. Slices 2 to 12 of specs/066 in order, each one pull request compared with its boards (K-1 to K-8).
+1. Slices 6 to 12 of specs/066 (category listing, collection and brand, search, product page, Quick Look, mini
+   cart), each one pull request compared with its boards with measured spacing (K-1 to K-8).
+2. The owner's open points on the design (price display, the hero slider's motion, consent preferences, Arabic
+   "Wishlist") are settled before the slices they touch.
 3. Closing Stage 2: a tagged release on staging, the D-21 measurements, the browser check, then the client's
    browse.
 
