@@ -225,6 +225,41 @@ later slice follows it:
 The section list and the fields each exposes are confirmed by the boards, slice by slice. The working map is
 `docs/2026-10-29-storefront-composition-and-ownership.md`, sections 3 to 5.
 
+## The design this builds
+
+The Stage 2 design was closed on 25 November 2026, after two correction rounds, each checked rendered against the
+approved first version and the owner's rulings. The build follows the Concept 1 workspace at version
+**1795564351-dde6**. A later change to a board replaces that board and is checked the same way before a slice uses
+it. The owner's design rulings that change what the slices build:
+
+- **Header and footer styles.** C1-Header-Footer-Styles draws three headers and two footers (Indigo or White, logo
+  at the start or centred), in English and Arabic. These are the only header and footer variants (G11): a theme
+  setting chooses one, and slices 2 and 3 build exactly these.
+- **Drawers.** A side drawer comes out of the screen edge: full height, square on the edge it comes from, radius 28
+  on the two corners facing the page; from the opposite side in Arabic. The desktop mini cart, the phone menu and
+  the filters drawer follow it. Bottom sheets round their two top corners only. Dialogs that float (Quick Look,
+  cookie preferences) round all four.
+- **Product card labels, one per zone.** At most one merchandising tag in the image's top start corner (Limited,
+  New, Trending, Best Seller, in that order of precedence), on the light Indigo tint, flush with the card's corner.
+  The sale lives in the price line (price, struck old price, the orange "-20%" tag; on cards under 260 wide the tag
+  drops under the struck price, clear of the add button). Stock lives on the card's second line ("Only 3 left",
+  "Out of stock"). An out-of-stock card shows no sale and no add button.
+- **Price filter.** The price group is a bar chart of how many products sit at each price, above a two-handle
+  slider with a price bubble while dragging; the range line opens two fields for typing. Arabic puts the low end
+  on the right.
+- **The ZZ mark** appears in three places only: the footer's end corner, behind the tick on the order confirmed page
+  (a later stage), and breathing in loading image wells and the hero skeleton while content loads. Empty states use
+  a line icon in a disc. The page-not-found boards are approved as drawn.
+- **Motion never claims success early.** A count, a total or a confirmation changes only after the server answers;
+  the waiting state shows the i-dot loader. Every motion has its reduced-motion form, as C1-Motion-Playground draws.
+
+Two rules settle drawing slips found in the final check (C1-Category-Phone, frame 2): the filters drawer's "Show N
+products" button is always pinned to the bottom of the drawer above the safe area, with the content scrolling under
+it; and the drawer shows one count, the server's answer for every chosen filter together, on that button only.
+
+The cart, checkout, order confirmed, email and error-page boards are drawn too. They are built in their own stage
+(D-36) and are not part of these slices.
+
 ## Slices
 
 ### The checks every slice passes
@@ -247,15 +282,15 @@ and Stage 2 does not close without it.
 
 | # | Slice | Boards | Design | PBIs |
 |---|---|---|---|---|
-| 1 | Foundation: tokens, type, base components, notices, the section library pattern | C1-System, C1-Components (01 to 05, 08 to 14, 16), C1-Notices, C1-Motion-Playground | Drawn | #250, #241, #269, #311 |
-| 2 | Header and menus | C1-Menus-Phone, C1-Menus-Desktop, the header on the home boards | Drawn | #253, #311 |
-| 3 | Footer, announcement strip, WhatsApp link, consent banner | The footer and strip on the home boards, C1-Strip-Slider, C1-Options | Footer and strip drawn; the WhatsApp link and consent banner wait for design | #311, #310, #288 |
-| 4 | Product card and product rail | C1-Components (05 to 07, 15), C1-Category-Phone (quick add with options) | Drawn | #303, #282, #309 |
-| 5 | Home page sections | C1-Home-Phone, C1-Home-Phone-Arabic, C1-Home-Desktop, C1-Hero-Banners, C1-Options (single banner) | Drawn | #302, #311 |
-| 6 | Category listing | C1-Category-Phone, C1-Category-Desktop | Drawn | #303, #311 |
-| 7 | Collection and brand pages, promotional banner | Not drawn | Waits for design | #242, #303, #311 |
-| 8 | Search | C1-Menus-Phone and C1-Menus-Desktop (search panel), C1-Components (03, 10) | Panel and zero-result state drawn; the results page waits for design | #304 |
-| 9 | Product page: gallery and buying area | C1-Product-Phone, C1-Product-Desktop | Drawn | #254 |
+| 1 | Foundation: tokens, type, base components, notices, the section library pattern | C1-System, C1-Components (every section except the card, 05 to 07, and Quick Look, 15), C1-Notices, C1-Motion-Playground | Drawn | #250, #241, #269, #311 |
+| 2 | Header and menus | C1-Menus-Phone, C1-Menus-Desktop, C1-Header-Footer-Styles (headers), C1-Global | Drawn | #253, #311 |
+| 3 | Footer, announcement strip, WhatsApp link, consent banner | C1-Header-Footer-Styles (footers), C1-Global (footer, strip, cookie consent), C1-Strip-Slider, C1-Options | Drawn | #311, #310, #288 |
+| 4 | Product card and product rail | C1-Components (05 to 07), C1-Options (card labels, chosen), C1-Category-Phone (quick add with options) | Drawn | #303, #282, #309 |
+| 5 | Home page sections | C1-Home-Phone, C1-Home-Phone-Arabic, C1-Home-Desktop, C1-Hero-Banners, C1-Slider-Options, C1-Options (single banner) | Drawn | #302, #311 |
+| 6 | Category listing | C1-Category-Phone, C1-Category-Desktop, C1-Options (price filter, chosen) | Drawn | #303, #311 |
+| 7 | Collection and brand pages, promotional banner | C1-Collection-Phone, C1-Collection-Desktop, C1-Brand-Phone, C1-Brand-Desktop | Drawn | #242, #303, #311 |
+| 8 | Search | C1-Search-Phone, C1-Search-Desktop, the search panel on C1-Menus-Phone and C1-Menus-Desktop | Drawn | #304 |
+| 9 | Product page: gallery and buying area | C1-Product-Phone, C1-Product-Desktop, C1-Arabic-Stage-2 | Drawn | #254 |
 | 10 | Product page: details, reviews, related and recently viewed | C1-Product-Phone, C1-Product-Desktop, C1-Photo-Reviews | Drawn | #254, #309 |
 | 11 | Quick Look (D-26, a gift) | C1-Category-Desktop, C1-Components (15) | Drawn | none: a gift |
 | 12 | Mini cart | C1-Mini-Cart | Drawn | #306 |
@@ -303,13 +338,13 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
   the consent banner blocks no content and is reachable first by keyboard.
 - **Test first**: a browser test that fails until the footer's columns come from the admin in each language, the
   WhatsApp link carries the configured number, and the strip's variant follows its setting.
-- **Design**: the footer and strip are drawn. The WhatsApp link and the consent banner are built when drawn.
+- **Footer styles**: the two footers of C1-Header-Footer-Styles, chosen by a theme setting.
 
 ### Slice 4: product card and product rail
 
 - **Rows**: PLP-01 to PLP-05, MER-01, MER-07, REV-04. D-29's gift shows as the stock state from whichever source
   the product is set to.
-- **Builds**: the card with its image (any shape, shown whole), name, brand, price and sale price, badge, rating,
+- **Builds**: the card with its image (any shape, shown whole), name, brand, price and sale price, the labels one per zone, rating,
   stock state, wishlist heart, quick add, and quick add with options on a phone; its loading skeleton; the rail
   that carries cards on the home page and the product page.
 - **Acceptance**: K-1 to K-8; AC-5, AC-6; a card with a 200 character name, no image, no rating, a sale and a
@@ -348,7 +383,6 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
 - **Acceptance**: K-1 to K-8; AC-8, AC-9.
 - **Test first**: a browser test that fails until a collection lists its products in the staff's order with its
   content in each language, and a scheduled banner shows on its target only inside its dates.
-- **Design**: waits for design.
 
 ### Slice 8: search
 
@@ -359,7 +393,6 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
   term on the staff's list (an Arabic variant and a Franco-Arabic spelling from the fixture) reaches its products.
 - **Test first**: a browser test in both languages, failing on the native search form: suggestions while typing,
   the results with a filter applied, the zero-result alternatives, and the listed spellings.
-- **Design**: the panel and the zero-result state are drawn. The results page is built when drawn.
 
 ### Slice 9: product page, gallery and buying area
 
@@ -398,7 +431,8 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
 ### Slice 12: mini cart
 
 - **Rows**: CART-12.
-- **Builds**: the mini cart as drawn: a drawer on desktop, full screen on a phone, with its empty state; over
+- **Builds**: the mini cart as drawn: a drawer out of the screen edge on desktop, a bottom sheet on a phone, with its
+  free-delivery progress, loading and empty states; over
   WooCommerce's mini-cart block and specs/018. The cart page itself stays Stage 3.
 - **Acceptance**: K-1 to K-8; AC-13; the mini cart shows the same lines and totals the cart page computes; it
   opens from the cart control, traps and returns focus.
@@ -527,8 +561,7 @@ slices follow from 24 November 2026.
 
 ## Open points for the owner
 
-1. The boards still to draw: the collection page, the brand page and brands index, the search results page, the
-   WhatsApp link and the consent banner (to be confirmed against the Stage 2 gap list).
+1. Settled 25 November 2026: every Stage 2 board is drawn (see "The design this builds").
 2. Board C1-Options also draws "without free delivery" and the fields and select boxes: each is ruled before the
-   slice it belongs to (slices 3 and 1).
-3. The records that precede slice 1: D-34 on `main`, and the entry for the rulings of 24 November 2026.
+   slice it belongs to (slices 3 and 1). The order confirmed email, the price filter and the card labels are ruled.
+3. Settled: D-34 and D-35 are on `main` (#554), and D-36 records the rulings of 24 November 2026 (#555).
