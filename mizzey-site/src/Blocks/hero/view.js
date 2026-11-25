@@ -6,7 +6,9 @@
  * moves it on a timer, follows a swipe, and keeps the dots, the label and the progress line in step.
  *
  * - At least six seconds a slide (the section's data-interval, never below MOTION.minSeconds).
- * - It holds while the visitor touches, hovers or focuses it, or the page is hidden, and starts again after.
+ * - It holds while the visitor touches, hovers or focuses it, or the page is hidden, and starts again after. It also
+ *   holds while a finger or a button is down anywhere on the page, so no slide changes during a tap: iOS Safari can
+ *   treat a tap that sees content change as a hover only, and the tapped control would not act.
  * - The pause button stops it until it is pressed again. Play moves on at once, over the hover, focus or touch hold of
  *   that moment (pressing it puts the focus on the button), until the next hold begins: the rule of the announcement
  *   strip (mizzey-theme/assets/js/site-parts.js).
@@ -44,7 +46,7 @@ function setup( hero ) {
 	let moving = false;
 	let settle = 0;
 	let stopped = calm.matches;
-	const holds = { hover: false, focus: false, touch: false, hidden: false };
+	const holds = { hover: false, focus: false, touch: false, hidden: false, press: false };
 
 	const rtl = () => getComputedStyle( track ).direction === 'rtl';
 	const held = () => stopped || Object.values( holds ).some( Boolean );
@@ -149,6 +151,9 @@ function setup( hero ) {
 	hero.addEventListener( 'focusin', () => hold( 'focus', true ) );
 	hero.addEventListener( 'focusout', ( e ) => ! hero.contains( e.relatedTarget ) && hold( 'focus', false ) );
 	document.addEventListener( 'visibilitychange', () => hold( 'hidden', document.hidden ) );
+	document.addEventListener( 'pointerdown', () => hold( 'press', true ), { capture: true, passive: true } );
+	[ 'pointerup', 'pointercancel' ].forEach( ( name ) => document.addEventListener( name, () => hold( 'press', false ), { capture: true, passive: true } ) );
+	holds.hidden = document.hidden;
 	calm.addEventListener( 'change', () => {
 		if ( calm.matches ) {
 			setStopped( true );

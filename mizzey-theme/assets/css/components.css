@@ -1227,27 +1227,74 @@ textarea.mizzey-field__control {
 	background-color: transparent;
 	color: var(--mizzey-color-role-text);
 	overflow: hidden;
-	transition: display var(--mizzey-motion-duration-5) allow-discrete, overlay var(--mizzey-motion-duration-5) allow-discrete;
 }
 
+/* The way in and out are keyframes, which every engine starts when the dialog goes from display none to flex: Safari
+   before 17.5 has no @starting-style and no transition of the top layer. The way out is .is-closing, which ui.js
+   sets, then closes the dialog when the panel's animation ends. */
 .mizzey-overlay[open] {
 	display: flex;
 }
 
 .mizzey-overlay::backdrop {
 	background-color: var(--mizzey-color-role-scrim);
-	opacity: 0;
-	transition: opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out),
-		display var(--mizzey-motion-duration-5) allow-discrete, overlay var(--mizzey-motion-duration-5) allow-discrete;
 }
 
 .mizzey-overlay[open]::backdrop {
-	opacity: 1;
+	animation: mizzey-overlay-fade-in var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out) both;
 }
 
-@starting-style {
-	.mizzey-overlay[open]::backdrop {
+.mizzey-overlay[open].is-closing::backdrop {
+	animation: mizzey-overlay-fade-out var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in) both;
+}
+
+@keyframes mizzey-overlay-fade-in {
+	from {
 		opacity: 0;
+	}
+}
+
+@keyframes mizzey-overlay-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes mizzey-overlay-slide-in {
+	from {
+		transform: translateX(var(--mizzey-overlay-from));
+	}
+}
+
+@keyframes mizzey-overlay-slide-out {
+	to {
+		transform: translateX(var(--mizzey-overlay-from));
+	}
+}
+
+@keyframes mizzey-overlay-rise-in {
+	from {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes mizzey-overlay-rise-out {
+	to {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes mizzey-overlay-grow-in {
+	from {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+}
+
+@keyframes mizzey-overlay-grow-out {
+	to {
+		opacity: 0;
+		transform: scale(0.96);
 	}
 }
 
@@ -1258,8 +1305,6 @@ textarea.mizzey-field__control {
 	overflow: hidden;
 	background-color: var(--mizzey-color-role-surface-raised);
 	box-shadow: var(--mizzey-elevation-3);
-	transition: transform var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in),
-		opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in);
 }
 
 .mizzey-overlay--drawer-end,
@@ -1296,20 +1341,14 @@ textarea.mizzey-field__control {
 	border-end-end-radius: var(--mizzey-radius-drawer);
 }
 
-.mizzey-overlay:not([open]) .mizzey-overlay__panel {
-	transform: translateX(var(--mizzey-overlay-from, 0));
+.mizzey-overlay--drawer-end[open] .mizzey-overlay__panel,
+.mizzey-overlay--drawer-start[open] .mizzey-overlay__panel {
+	animation: mizzey-overlay-slide-in var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft) both;
 }
 
-.mizzey-overlay[open] .mizzey-overlay__panel {
-	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft),
-		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
-}
-
-@starting-style {
-	.mizzey-overlay--drawer-end[open] .mizzey-overlay__panel,
-	.mizzey-overlay--drawer-start[open] .mizzey-overlay__panel {
-		transform: translateX(var(--mizzey-overlay-from));
-	}
+.mizzey-overlay--drawer-end[open].is-closing .mizzey-overlay__panel,
+.mizzey-overlay--drawer-start[open].is-closing .mizzey-overlay__panel {
+	animation: mizzey-overlay-slide-out var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in) both;
 }
 
 .mizzey-overlay--sheet {
@@ -1330,18 +1369,12 @@ textarea.mizzey-field__control {
 	max-block-size: none;
 }
 
-.mizzey-overlay--sheet:not([open]) .mizzey-overlay__panel {
-	transform: translateY(100%);
-}
-
 .mizzey-overlay--sheet[open] .mizzey-overlay__panel {
-	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-spring-soft);
+	animation: mizzey-overlay-rise-in var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-spring-soft) both;
 }
 
-@starting-style {
-	.mizzey-overlay--sheet[open] .mizzey-overlay__panel {
-		transform: translateY(100%);
-	}
+.mizzey-overlay--sheet[open].is-closing .mizzey-overlay__panel {
+	animation: mizzey-overlay-rise-out var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in) both;
 }
 
 .mizzey-overlay__handle {
@@ -1370,21 +1403,12 @@ textarea.mizzey-field__control {
 	box-shadow: var(--mizzey-elevation-4);
 }
 
-.mizzey-overlay--dialog:not([open]) .mizzey-overlay__panel {
-	opacity: 0;
-	transform: scale(0.96);
-}
-
 .mizzey-overlay--dialog[open] .mizzey-overlay__panel {
-	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out),
-		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+	animation: mizzey-overlay-grow-in var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
 }
 
-@starting-style {
-	.mizzey-overlay--dialog[open] .mizzey-overlay__panel {
-		opacity: 0;
-		transform: scale(0.96);
-	}
+.mizzey-overlay--dialog[open].is-closing .mizzey-overlay__panel {
+	animation: mizzey-overlay-grow-out var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in) both;
 }
 
 .mizzey-overlay__header {
@@ -1887,24 +1911,18 @@ textarea.mizzey-field__control {
 		translate: calc(-50% * var(--mizzey-dir)) 0;
 	}
 
-	.mizzey-overlay:not([open]) .mizzey-overlay__panel,
-	.mizzey-overlay[open] .mizzey-overlay__panel {
-		transform: none;
-		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
-	}
-
-	.mizzey-overlay:not([open]) .mizzey-overlay__panel {
-		opacity: 0;
-	}
-
 	/* The 120 ms fade is kept (C1-System 11), on the way out too: the dialog stays shown while its panel and scrim
-	   fade, instead of disappearing at once. */
-	.mizzey-overlay {
-		transition: display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
+	   fade, instead of disappearing at once. Its duration is held over base.css, which takes every other animation
+	   to none under reduced motion. */
+	.mizzey-overlay[open] .mizzey-overlay__panel,
+	.mizzey-overlay[open]::backdrop {
+		animation: mizzey-overlay-fade-in var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out) both;
+		animation-duration: var(--mizzey-motion-duration-2) !important;
 	}
 
-	.mizzey-overlay::backdrop {
-		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out),
-			display var(--mizzey-motion-duration-2) allow-discrete, overlay var(--mizzey-motion-duration-2) allow-discrete;
+	.mizzey-overlay[open].is-closing .mizzey-overlay__panel,
+	.mizzey-overlay[open].is-closing::backdrop {
+		animation: mizzey-overlay-fade-out var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out) both;
+		animation-duration: var(--mizzey-motion-duration-2) !important;
 	}
 }

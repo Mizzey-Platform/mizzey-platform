@@ -2,7 +2,9 @@
  * The announcement strip's slider and the cookie preferences (spec 066, slice 3), on the WordPress Interactivity API.
  *
  * The slider (inc/strip.php) shows each message for --mizzey-motion-life-strip, sliding the next up into place. It
- * holds while the pointer is over it, while the keyboard focus is in it and after a touch, until the touch is elsewhere;
+ * holds while the pointer is over it, while the keyboard focus is in it and after a touch, until the touch is elsewhere,
+ * while the page is hidden, and while a finger or a button is down anywhere on the page (no message changes during a
+ * tap: iOS Safari can treat a tap that sees content change as a hover only);
  * its pause control stops and starts it, and play moves on at once, over any hold of that moment, until the next hold
  * begins. Under reduced motion it starts paused. A message that is not showing is inert.
  *
@@ -132,7 +134,7 @@ store( 'mizzey/site', {
 				press.click();
 			}
 			if ( dialog && dialog.open ) {
-				dialog.close();
+				store( 'mizzey/ui' ).actions.closeOverlay( dialog );
 			}
 		} ),
 	},
@@ -158,6 +160,12 @@ store( 'mizzey/site', {
 					hold( state, 'touch', ref.contains( event.target ) );
 				}
 			} );
+			document.addEventListener( 'pointerdown', () => hold( state, 'press', true ), { capture: true, passive: true } );
+			[ 'pointerup', 'pointercancel' ].forEach( ( name ) => document.addEventListener( name, () => hold( state, 'press', false ), { capture: true, passive: true } ) );
+			document.addEventListener( 'visibilitychange', () => hold( state, 'hidden', document.hidden ) );
+			if ( document.hidden ) {
+				state.holds.add( 'hidden' );
+			}
 			if ( reducedMotion() ) {
 				setPaused( state, true );
 			} else {

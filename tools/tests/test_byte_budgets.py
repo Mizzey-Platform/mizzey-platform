@@ -7,7 +7,8 @@ proposal, sized to leave the later slices of spec 066 room, and are the owner's 
 
 Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
 
-- **Every page**: the theme's stylesheets (tokens, fonts, base, components), the theme's behaviour (`ui.js`), the
+- **Every page**: the theme's stylesheets (tokens, fonts, base, components), the theme's behaviour (`ui.js`, and
+  `early-taps.js`, printed inline in the head), the
   WordPress Interactivity API runtime it imports, and the site plugin's storefront scripts that can load on any page
   (consent default and banner, tag manager, events, language cache). `ui.js` and the runtime load on every page on
   purpose: the header's drawers, which slice 2 builds, are on every page.
@@ -28,6 +29,7 @@ from __future__ import annotations
 
 import gzip
 import os
+import re
 import unittest
 from pathlib import Path
 
@@ -63,7 +65,7 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
     # slider and the cookie preferences.
     every = {
         "styles": [THEME / "assets" / "css" / f"{name}.css" for name in ("tokens", "fonts", "base", "components", "consent", "footer", "strip")],
-        "scripts": [THEME / "assets" / "js" / name for name in ("ui.js", "site-parts.js")]
+        "scripts": [THEME / "assets" / "js" / name for name in ("early-taps.js", "ui.js", "site-parts.js")]
         + [SITE / "assets" / name for name in ("consent-default.js", "consent.js", "gtm.js", "events.js", "language-cache.js")],
         "images": [],
     }
@@ -72,7 +74,7 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
     home = {
         "styles": every["styles"] + [THEME / "assets" / "css" / "header.css", blocks / "library.css"]
         + sorted(blocks.glob("*/style.css")) + sorted(cards.glob("*/style.css")),
-        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / "header.js"]
+        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / name for name in ("header.js", "after-load.js")]
         + sorted(blocks.glob("*/view.js")) + sorted(cards.glob("*/view.js")),
         "images": sorted((THEME / "assets" / "images").glob("*")),
     }
@@ -110,6 +112,18 @@ class EachTemplateStaysInsideItsBudget(unittest.TestCase):
                 if size > BUDGETS[template][kind]:
                     over.append(f"{template} {kind}: {size / KB:.1f} KB gzip, budget {BUDGETS[template][kind] / KB:.0f} KB")
         self.assertEqual([], over, "over the D-21 byte budget")
+
+    def test_the_early_taps_script_printed_in_the_head_stays_small(self) -> None:
+        # As inc/performance.php prints it: no header comment, no whitespace next to punctuation. It is in every page's
+        # head before anything else, so it is held to a few hundred bytes compressed.
+        source = (THEME / "assets" / "js" / "early-taps.js").read_text(encoding="utf-8")
+        source = re.sub(r"^\s*/\*\*.*?\*/", "", source, flags=re.S)
+        source = re.sub(r"\s*([(){};,=:!&|<>?+\-])\s*", r"\1", re.sub(r"\s+", " ", source)).strip()
+        self.assertNotIn("/*", source)
+        # The punctuation is kept, only the space around it goes: the size checked is the size printed.
+        self.assertTrue(source.startswith("(function(d){var root=d.documentElement,"), source[:60])
+        self.assertLessEqual(len(source.encode()), 1536, "early-taps.js printed")
+        self.assertLessEqual(gz(source.encode()), 700, "early-taps.js printed, gzip")
 
     def test_the_sum_counts_compressed_bytes(self) -> None:
         self.assertLess(gz(b"a" * 10000), 100)
