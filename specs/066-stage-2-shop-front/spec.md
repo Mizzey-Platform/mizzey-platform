@@ -358,11 +358,28 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
 - **Rows**: HOME-01 to HOME-11, SSC-02, SSC-03, SSC-12, SSC-13.
 - **Builds**: the sections on the boards as library blocks: the hero in its two variants (single banner, slider),
   category shortcuts, trending, new arrivals, featured collections, offer and deal banners, brand highlights, trust
-  signals, the signup prompt; the home template that accepts sections only.
+  signals, the signup prompt; the home template that accepts sections only. The signup prompt is built as the boards
+  draw it, with its email field and optional box for news and offers, on one small sign-up and consent record with a
+  welcome email and a leave link, no customer account and no campaign engine (DECISIONS A10, ruled by the owner on
+  25 November 2026), and a read-only list for staff.
 - **Acceptance**: K-1 to K-8; AC-3, AC-4; each product section reads the rule or curation of specs/056, and an
   empty one renders nothing broken; the Arabic home page is compared with C1-Home-Phone-Arabic.
 - **Test first**: a browser test as an editor account: add, edit, hide, reorder and preview sections in each
   language, failing until the storefront shows the same order and content, and the hidden section's content is kept.
+- **The signup prompt** (HOME-09, AC-3), checked by t119 in Chromium and WebKit, at 390 and 1440, in both languages:
+  - the field, the optional box and the button as drawn; an address that is not one is refused with words that say
+    how to fix it; the button shows the i-dot loader until the server answers; success replaces the form at the same
+    height with the focus on the message; the same states come back without JavaScript;
+  - the record: one per address, in lower case, with the language, the date, the source "home", the status and a
+    random leave token; consent only when the box is ticked, with the version of its words; no WordPress account;
+    the same answer for a new and a known address; a record that cannot be written is answered as a failure;
+  - the welcome: one email in the sign-up's language, through the store's customer email, with the leave link; tried
+    again while it is owed;
+  - the leave page: in the sign-up's language, one press leaves, a mail program's one-click request leaves, an
+    unknown link answers 404; it loads no tracking;
+  - the list: read-only, searchable and counted, for the owner, administrators and shop managers, with no export;
+  - the limits: a timed single-use form token, a trap field, per network address and per email, and an hourly
+    ceiling on welcomes (docs/security-baseline.md).
 
 ### Slice 6: category listing
 
@@ -481,6 +498,7 @@ Project Plan names. Three states are reported apart: workflow complete, technica
 | Listing, filters, sort, paging, breadcrumb | WooCommerce product collection and filter blocks | Styled as drawn; the phone drawer where the native overlay does not match the board |
 | Product page parts, mini cart | WooCommerce product and mini-cart blocks | Styled as drawn; Buy Now, saving, delivery and statements from specs/055 |
 | Home sections | No native block gives a complete, locked section | The library's blocks in `mizzey-site`, made with the CoreX generators |
+| Sign-up record (HOME-09) | WooCommerce keeps no sign-up list outside customer accounts; corex-newsletter is not enabled (D-18, item 5; A4) | A small Mizzey table, its welcome as a WooCommerce email, and a read-only list (A10) |
 | Search panel and results | Core search form | The panel over specs/058's suggestions |
 | Quick Look | None | The gift's own block (D-26) |
 

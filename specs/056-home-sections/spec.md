@@ -34,7 +34,7 @@ the rule or curation set in admin, not from code"; "An empty section ... renders
 |---|---|---|
 | HOME-01, HOME-07 | P1 | Hero and offer banners: core image and cover blocks, the client's own images and words in each language |
 | HOME-08 | P1 | Trust signals: blocks with the client's words in each language; the product page's statements are specs/055 |
-| HOME-09 | P1 | The signup prompt: a link to the account's registration, whose consent is separate (specs/017, AUTH-09) |
+| HOME-09 | P1 | The signup prompt: an email sign-up with an optional, separate box for news and offers, kept as one small sign-up and consent record with a welcome email and a leave link; no customer account and no campaign engine (DECISIONS A10, ruled by the owner on 25 November 2026; built in specs/066, slice 5) |
 | HOME-12, HOME-13 | P2, P3 | Scheduling and a personalised home page: not built |
 | MER-01 | P1 | The badges themselves: specs/036 (D-19) |
 

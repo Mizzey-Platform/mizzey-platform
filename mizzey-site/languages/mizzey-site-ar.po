@@ -936,13 +936,11 @@ msgstr "شاحنة التوصيل"
 msgid "Returns arrow"
 msgstr "سهم الإرجاع"
 
-#: src/Blocks/trust-signals/edit.js:29
-#: src/Blocks/hero/edit.js
+#: src/Blocks/trust-signals/edit.js:29 src/Blocks/hero/edit.js
 msgid "Authentic products, guaranteed"
 msgstr "منتجات أصلية مضمونة"
 
-#: src/Blocks/trust-signals/edit.js:29
-#: src/Blocks/hero/edit.js
+#: src/Blocks/trust-signals/edit.js:29 src/Blocks/hero/edit.js
 msgid "Authenticity guarantee"
 msgstr "ضمان الأصالة"
 
@@ -970,17 +968,13 @@ msgstr "عنوان العنصر %d"
 msgid "Item %d line"
 msgstr "سطر العنصر %d"
 
-#: src/Blocks/trust-signals/edit.js:102
-#: src/Blocks/brand-highlights/edit.js
-#: src/Blocks/category-shortcuts/edit.js
-#: src/Blocks/deals/edit.js
-#: src/Blocks/featured-collections/edit.js
-#: src/Blocks/products/edit.js
+#: src/Blocks/trust-signals/edit.js:102 src/Blocks/brand-highlights/edit.js
+#: src/Blocks/category-shortcuts/edit.js src/Blocks/deals/edit.js
+#: src/Blocks/featured-collections/edit.js src/Blocks/products/edit.js
 msgid "Section"
 msgstr "القسم"
 
-#: src/Blocks/trust-signals/edit.js:106
-#: src/Blocks/hero/edit.js
+#: src/Blocks/trust-signals/edit.js:106 src/Blocks/hero/edit.js
 msgid "Name read by screen readers"
 msgstr "الاسم الذي تقرؤه برامج قراءة الشاشة"
 
@@ -1130,24 +1124,20 @@ msgstr "المنتجات السابقة"
 msgid "Next products"
 msgstr "المنتجات التالية"
 
-#: mizzey-site/src/Catalogue/ProductFields.php
-#: src/Blocks/library.js
+#: mizzey-site/src/Catalogue/ProductFields.php src/Blocks/library.js
 #: src/Blocks/offer-banner/edit.js
 msgid "New"
 msgstr "جديد"
 
-#: mizzey-site/src/Catalogue/ProductFields.php
-#: src/Blocks/library.js
+#: mizzey-site/src/Catalogue/ProductFields.php src/Blocks/library.js
 msgid "Trending"
 msgstr "رائج"
 
-#: mizzey-site/src/Catalogue/ProductFields.php
-#: src/Blocks/library.js
+#: mizzey-site/src/Catalogue/ProductFields.php src/Blocks/library.js
 msgid "Limited"
 msgstr "كمية محدودة"
 
-#: mizzey-site/src/Catalogue/ProductFields.php
-#: src/Blocks/library.js
+#: mizzey-site/src/Catalogue/ProductFields.php src/Blocks/library.js
 msgid "Best Seller"
 msgstr "الأكثر مبيعًا"
 
@@ -1445,8 +1435,7 @@ msgstr "تعرض لك عروضًا تناسبك على مواقع أخرى."
 msgid "Site footer"
 msgstr "تذييل الموقع"
 
-#: assets/js/site-parts-editor.js
-#: src/Blocks/hero/edit.js
+#: assets/js/site-parts-editor.js src/Blocks/hero/edit.js
 msgid "Slider"
 msgstr "متتالي"
 
@@ -2013,7 +2002,7 @@ msgstr "ثوانٍ لكل شريحة"
 msgid "Show the logo on desktop"
 msgstr "إظهار الشعار على الكمبيوتر"
 
-#: src/Blocks/signup/edit.js
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
 msgid "Sign up"
 msgstr "اشترك"
 
@@ -2121,6 +2110,202 @@ msgstr "عرض متتابع"
 msgid "slide"
 msgstr "شريحة"
 
+# Spec 066, slice 5: the home page's sign-up, its welcome email, the leave page and the list (HOME-09).
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Email address"
+msgstr "البريد الإلكتروني"
+
+#: mizzey-site/src/Blocks/Banners.php src/Blocks/signup/edit.js
+msgid "Email me news and offers. Optional, and separate from your account."
+msgstr "راسلني بالأخبار والعروض. اختياري، ومنفصل عن حسابك."
+
+#: mizzey-site/src/Blocks/Banners.php
+msgid "Signing up"
+msgstr "جارٍ الاشتراك"
+
+#: mizzey-site/src/Blocks/Banners.php
+msgid "You are on the list"
+msgstr "أنت على القائمة"
+
+#: mizzey-site/src/Blocks/Banners.php
+msgid "We sent a short welcome note to %s. You can leave any time from the link in every email."
+msgstr "أرسلنا رسالة ترحيب قصيرة إلى %s. يمكنك إلغاء الاشتراك في أي وقت من الرابط في كل رسالة."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "Enter an email address like name@example.com."
+msgstr "اكتب بريدًا إلكترونيًا مثل name@example.com."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "This page has been open a long time. Reload it and try again."
+msgstr "هذه الصفحة مفتوحة منذ وقت طويل. أعد تحميلها وحاول مرة أخرى."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "Too many sign-ups from your connection. Please wait a few minutes and try again."
+msgstr "اشتراكات كثيرة من اتصالك. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى."
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "Sign-up welcome"
+msgstr "ترحيب الاشتراك"
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "Sent once to an address that signs up on the home page, in its language, with the link to leave the list."
+msgstr "تُرسل مرة واحدة إلى العنوان الذي يشترك من الصفحة الرئيسية، بلغته، مع رابط مغادرة القائمة."
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "You are on the Mizzey list"
+msgstr "أنت على قائمة ميزي"
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "Welcome to the list"
+msgstr "أهلًا بك في القائمة"
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "Thank you for signing up. This note confirms that %s is on the Mizzey list."
+msgstr "شكرًا لاشتراكك. تؤكد هذه الرسالة أن %s على قائمة ميزي."
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "You also asked us to email you news and offers."
+msgstr "وطلبت أيضًا أن نراسلك بالأخبار والعروض."
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+msgid "If you did not sign up, or you want to stop, you can leave the list here:"
+msgstr "إن لم تكن قد اشتركت، أو أردت التوقف، يمكنك مغادرة القائمة من هنا:"
+
+#: mizzey-site/src/Signups/WelcomeEmail.php
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Leave the list"
+msgstr "مغادرة القائمة"
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Leave the Mizzey list"
+msgstr "مغادرة قائمة ميزي"
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Press the button to stop the list's emails to %s."
+msgstr "اضغط الزر لإيقاف رسائل القائمة إلى %s."
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "You have left the list"
+msgstr "لقد غادرت القائمة"
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "We will not email %s from this list again. You can sign up again from the home page at any time."
+msgstr "لن نراسل %s من هذه القائمة مرة أخرى. يمكنك الاشتراك من جديد من الصفحة الرئيسية في أي وقت."
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "This link does not work"
+msgstr "هذا الرابط لا يعمل"
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Open the link from the email again, all of it."
+msgstr "افتح الرابط من الرسالة مرة أخرى كاملًا."
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Back to the home page"
+msgstr "العودة إلى الصفحة الرئيسية"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Sign-ups"
+msgstr "الاشتراكات"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "You are not allowed to see the sign-up list."
+msgstr "لا يُسمح لك برؤية قائمة الاشتراكات."
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Addresses that signed up on the home page. The list is read-only."
+msgstr "العناوين التي اشتركت من الصفحة الرئيسية. القائمة للقراءة فقط."
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "%1$s sign-up, %2$s subscribed"
+msgid_plural "%1$s sign-ups, %2$s subscribed"
+msgstr[0] "%1$s اشتراك، %2$s مشترك"
+msgstr[1] "اشتراك واحد، %2$s مشترك"
+msgstr[2] "اشتراكان، %2$s مشترك"
+msgstr[3] "%1$s اشتراكات، %2$s مشترك"
+msgstr[4] "%1$s اشتراكًا، %2$s مشترك"
+msgstr[5] "%1$s اشتراك، %2$s مشترك"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Signed up"
+msgstr "تاريخ الاشتراك"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "News and offers"
+msgstr "الأخبار والعروض"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Yes (words of %s)"
+msgstr "نعم (صيغة %s)"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Left"
+msgstr "غادر"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Subscribed"
+msgstr "مشترك"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "No sign-ups match."
+msgstr "لا توجد اشتراكات مطابقة."
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Status"
+msgstr "الحالة"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "No"
+msgstr "لا"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Newer"
+msgstr "الأحدث"
+
+#: mizzey-site/src/Signups/SignupScreen.php
+msgid "Older"
+msgstr "الأقدم"
+
+#: src/Blocks/signup/block.json
+msgctxt "block description"
+msgid "A heading, a line and an email sign-up with an optional box for news and offers."
+msgstr "عنوان وسطر واشتراك بالبريد الإلكتروني مع خانة اختيارية للأخبار والعروض."
+
+#: src/Blocks/signup/block.json
+msgctxt "block keyword"
+msgid "email"
+msgstr "بريد إلكتروني"
+
+# Spec 066, slice 5, review round: the sign-up's failure words and the leave page's failure (HOME-09).
+#: mizzey-site/src/Signups/SignupService.php
+msgid "This form could not be checked. Reload the page and try again."
+msgstr "تعذر التحقق من هذا النموذج. أعد تحميل الصفحة وحاول مرة أخرى."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "We could not sign you up just now. Please try again in a few minutes."
+msgstr "تعذر اشتراكك الآن. يرجى المحاولة مرة أخرى بعد بضع دقائق."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "We could not reach Mizzey. Check your connection and try again."
+msgstr "تعذر الوصول إلى ميزي. تحقق من اتصالك وحاول مرة أخرى."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "Sign-up is paused for a moment while we work on the site. Please try again shortly."
+msgstr "الاشتراك متوقف لحظات بينما نعمل على الموقع. يرجى المحاولة بعد قليل."
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "We could not do that just now"
+msgstr "تعذر تنفيذ ذلك الآن"
+
+#: mizzey-site/src/Signups/LeavePage.php
+msgid "Please open the link again in a few minutes."
+msgstr "يرجى فتح الرابط مرة أخرى بعد بضع دقائق."
+
+#: mizzey-site/src/Signups/SignupService.php
+msgid "Your address is kept. Press Sign up again to finish."
+msgstr "عنوانك محفوظ. اضغط اشترك مرة أخرى للإتمام."
+
 #: mizzey-site/src/Storefront/ProductBuy.php
 #, php-format
 msgid "%1$d / %2$d · %3$s"
@@ -2136,8 +2321,6 @@ msgstr[2] "تقييمان"
 msgstr[3] "%d تقييمات"
 msgstr[4] "%d تقييمًا"
 msgstr[5] "%d تقييم"
-
-
 
 #: mizzey-site/src/Storefront/ProductBuy.php
 msgid ", "
