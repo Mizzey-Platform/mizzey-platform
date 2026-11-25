@@ -1,6 +1,6 @@
 /* The section library in the editor's canvas (spec 066, "The section library"). Tokens only, logical sides only.
    A hidden section stays in the canvas, faded behind a dashed outline and labelled, so its content can still be
-   edited and shown again (SSC-03). */
+   edited and shown again (SSC-01, the library pattern). */
 
 .is-mizzey-hidden {
 	position: relative;

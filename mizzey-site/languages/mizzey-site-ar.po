@@ -822,3 +822,213 @@ msgstr[5] "التوصيل المتوقع: %d يوم عمل"
 #, php-format
 msgid "Estimated delivery: %1$d to %2$d working days"
 msgstr "التوصيل المتوقع: من %1$d إلى %2$d أيام عمل"
+
+# Spec 066, slice 1: the theme's base components and the section library (K-4).
+#: mizzey-theme/inc/components.php:67
+#: mizzey-theme/inc/components.php:541
+msgid "Loading"
+msgstr "جارٍ التحميل"
+
+#: mizzey-theme/inc/components.php:115
+msgid "Working"
+msgstr "جارٍ التنفيذ"
+
+#. translators: shown on a count badge when the number is over 99.
+#: mizzey-theme/inc/components.php:152
+msgid "99+"
+msgstr "99+"
+
+#. translators: %d: the discount in percent, shown as a tag beside a sale price, for example "-20%".
+#: mizzey-theme/inc/components.php:172
+#, php-format
+msgid "-%d%%"
+msgstr "-%d%%"
+
+#. translators: 1: the photo shown, 2: the number of photos.
+#: mizzey-theme/inc/components.php:180
+#, php-format
+msgid "%1$d / %2$d"
+msgstr "%1$d / %2$d"
+
+#. translators: %s: the name of an applied filter, for example a brand.
+#: mizzey-theme/inc/components.php:212
+#, php-format
+msgid "Remove %s"
+msgstr "إزالة %s"
+
+#: mizzey-theme/inc/components.php:460
+#: mizzey-theme/inc/components.php:505
+#: mizzey-theme/inc/components.php:640
+msgid "Close"
+msgstr "إغلاق"
+
+#: mizzey-theme/inc/components.php:589
+msgid "Previous page"
+msgstr "الصفحة السابقة"
+
+#. translators: %d: a page number in a list of results.
+#: mizzey-theme/inc/components.php:599
+#, php-format
+msgid "Page %d"
+msgstr "الصفحة %d"
+
+#: mizzey-theme/inc/components.php:604
+msgid "Next page"
+msgstr "الصفحة التالية"
+
+#: mizzey-theme/inc/components.php:606
+msgid "Pages"
+msgstr "الصفحات"
+
+#: mizzey-theme/inc/components.php:680
+msgid "completed"
+msgstr "مكتملة"
+
+#. translators: 1: a button's name, such as Cart; 2: its count in words, such as "3 items".
+#: mizzey-theme/inc/components.php:112
+#, php-format
+msgid "%1$s, %2$s"
+msgstr "%1$s، %2$s"
+
+#. translators: %d: how many, read after a button's name: cart items, chosen filters.
+#: mizzey-theme/inc/components.php:145
+#, php-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d عنصر"
+msgstr[1] "عنصر واحد"
+msgstr[2] "عنصران"
+msgstr[3] "%d عناصر"
+msgstr[4] "%d عنصرًا"
+msgstr[5] "%d عنصر"
+
+#: mizzey-site/src/Blocks/SectionLibrary.php:127
+msgid "Mizzey sections"
+msgstr "أقسام ميزي"
+
+#: src/Blocks/library.js:39
+msgid "Visibility"
+msgstr "الظهور"
+
+#: src/Blocks/library.js:42
+msgid "Show on the site"
+msgstr "إظهار في الموقع"
+
+#: src/Blocks/library.js:44
+msgid "Hidden: visitors do not see this section. Its content is kept here."
+msgstr "مخفي: لا يرى الزوار هذا القسم، ويبقى محتواه محفوظًا هنا."
+
+#: src/Blocks/library.js:45
+msgid "Visitors see this section."
+msgstr "يرى الزوار هذا القسم."
+
+#: src/Blocks/library.js:58
+msgid "Hidden on the site"
+msgstr "مخفي في الموقع"
+
+#: src/Blocks/trust-signals/edit.js:22
+msgid "Authenticity shield"
+msgstr "درع الأصالة"
+
+#: src/Blocks/trust-signals/edit.js:23
+msgid "Delivery van"
+msgstr "شاحنة التوصيل"
+
+#: src/Blocks/trust-signals/edit.js:24
+msgid "Returns arrow"
+msgstr "سهم الإرجاع"
+
+#: src/Blocks/trust-signals/edit.js:29
+msgid "Authentic products, guaranteed"
+msgstr "منتجات أصلية مضمونة"
+
+#: src/Blocks/trust-signals/edit.js:29
+msgid "Authenticity guarantee"
+msgstr "ضمان الأصالة"
+
+#: src/Blocks/trust-signals/edit.js:30
+msgid "Fast delivery"
+msgstr "توصيل سريع"
+
+#: src/Blocks/trust-signals/edit.js:30
+msgid "Free delivery on orders over EGP 1,000"
+msgstr "توصيل مجاني للطلبات فوق 1,000 ج.م"
+
+#: src/Blocks/trust-signals/edit.js:31
+msgid "Easy returns"
+msgstr "إرجاع سهل"
+
+#: src/Blocks/trust-signals/edit.js:31
+msgid "Return and refund policy"
+msgstr "سياسة الإرجاع والاسترداد"
+
+#: src/Blocks/trust-signals/edit.js:74
+#, js-format
+msgid "Item %d title"
+msgstr "عنوان العنصر %d"
+
+#: src/Blocks/trust-signals/edit.js:85
+#, js-format
+msgid "Item %d line"
+msgstr "سطر العنصر %d"
+
+#: src/Blocks/trust-signals/edit.js:102
+msgid "Section"
+msgstr "القسم"
+
+#: src/Blocks/trust-signals/edit.js:106
+msgid "Name read by screen readers"
+msgstr "الاسم الذي تقرؤه برامج قراءة الشاشة"
+
+#: src/Blocks/trust-signals/edit.js:107
+msgid "Optional, in this page's language. For example: Why shop with us."
+msgstr "اختياري، بلغة هذه الصفحة. مثال: لماذا تتسوق معنا."
+
+#: src/Blocks/trust-signals/edit.js:114
+#, js-format
+msgid "Item %d"
+msgstr "العنصر %d"
+
+#: src/Blocks/trust-signals/edit.js:118
+#, js-format
+msgid "Item %d mark"
+msgstr "رمز العنصر %d"
+
+#: src/Blocks/trust-signals/edit.js:127
+#, js-format
+msgid "Item %d link"
+msgstr "رابط العنصر %d"
+
+#: src/Blocks/trust-signals/edit.js:128
+msgid "Optional. The line links here; without a link it is plain text."
+msgstr "اختياري. يفتح السطر هذا الرابط، ومن دون رابط يبقى نصًا عاديًا."
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block title"
+msgid "Trust signals"
+msgstr "علامات الثقة"
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block description"
+msgid "Three reasons to shop with confidence, each with its mark, a short title and a line."
+msgstr "ثلاثة أسباب للتسوق بثقة، لكل منها رمزه وعنوان قصير وسطر."
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "trust"
+msgstr "ثقة"
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "authentic"
+msgstr "أصلي"
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "delivery"
+msgstr "توصيل"
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "returns"
+msgstr "إرجاع"

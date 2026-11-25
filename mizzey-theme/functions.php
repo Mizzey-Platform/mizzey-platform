@@ -1,19 +1,20 @@
 <?php
 
 /**
- * Mizzey theme bootstrap.
+ * Mizzey theme bootstrap: what theme.json cannot say on its own.
  *
- * Presentation stays in theme.json and style.css. This file exists for one reason: the theme's translations have
- * to be loaded, and nothing else loads them. Corex provides no after_setup_theme or theme-support abstraction and
- * never calls load_theme_textdomain, so a theme that needs its own text domain has to say so itself.
+ * - The theme's translations. CoreX never calls load_theme_textdomain, so the theme loads the `mizzey-site` domain
+ *   it shares with the site plugin. The Arabic catalogue of that domain, the theme's strings included, is the
+ *   plugin's `mizzey-site/languages/`; the theme's own `languages/` folder is where a theme-only override would go.
+ * - The site logo: core's site logo, with the theme's support for a custom logo (global brand controls, spec 066).
+ * - The token layer, the base components and their behaviour (spec 066, slice 1), for the storefront and the editor.
+ * - The preload of the first screen's body font.
  *
- * The domain is `mizzey-site`, shared with the site plugin, as both headers declare. Each artifact loads its own
- * translations from its own `languages/` directory, which is the WordPress convention and means neither has to
- * test whether the other is active.
+ * Presentation stays in theme.json and the stylesheets. Do not add business logic here: it belongs in the Mizzey
+ * Site plugin.
  *
- * Do not add business logic here. It belongs in the Mizzey Site plugin.
- *
- * Register ids: NFR-04a, supported by FIX-04. See specs/002-bilingual-platform-baseline.
+ * Register ids: NFR-04a, FIX-04a, NFR-04, NFR-11, SSC-01, MER-06. See specs/002-bilingual-platform-baseline and
+ * specs/066-stage-2-shop-front, slice 1.
  *
  * @package MizzeySite
  */
@@ -26,6 +27,17 @@ add_action(
     'after_setup_theme',
     static function (): void {
         load_theme_textdomain('mizzey-site', get_stylesheet_directory() . '/languages');
+    }
+);
+
+/*
+ * The site logo is core's: the Site Logo block and its `site_logo` setting, which WordPress keeps in step with the
+ * custom logo when the theme supports it. The supplied file is never cropped or recoloured, so both sides are free.
+ */
+add_action(
+    'after_setup_theme',
+    static function (): void {
+        add_theme_support('custom-logo', ['flex-width' => true, 'flex-height' => true, 'unlink-homepage-logo' => false]);
     }
 );
 
@@ -42,8 +54,10 @@ require_once __DIR__ . '/inc/components.php';
 const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base', 'components'];
 
 /*
- * The components' behaviour: one script module on the Interactivity API WordPress ships. It is enqueued on every
- * storefront page because the header's drawers, on every page, need it.
+ * The components' behaviour: one script module on the Interactivity API WordPress ships. It and the Interactivity
+ * runtime it imports load on every storefront page on purpose: the header's drawers (the phone menu and the mini
+ * cart, spec 066 slice 2) are on every page. Their bytes are inside the every-page budget of
+ * tools/tests/test_byte_budgets.py (D-21).
  */
 add_action(
     'init',

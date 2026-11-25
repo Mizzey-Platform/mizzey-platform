@@ -16,22 +16,16 @@
 
 declare(strict_types=1);
 
+// A test fixture for the command line only: never served by WordPress or a web server.
+if ('cli' !== PHP_SAPI || defined('ABSPATH')) {
+    exit;
+}
+
 $dir = ($argv[1] ?? 'ltr') === 'rtl' ? 'rtl' : 'ltr';
 $ar  = 'rtl' === $dir;
 
-if ($ar) {
-    $GLOBALS['mizzey_preview_strings'] = [
-        'Loading'       => 'جارٍ التحميل',
-        'Working'       => 'جارٍ التنفيذ',
-        'Close'         => 'إغلاق',
-        'Previous page' => 'الصفحة السابقة',
-        'Next page'     => 'الصفحة التالية',
-        'Page %d'       => 'الصفحة %d',
-        'Pages'         => 'الصفحات',
-        'Remove %s'     => 'إزالة %s',
-        'completed'     => 'مكتملة',
-    ];
-}
+// Arabic words come from the compiled catalogue the site loads, so a missing translation shows as English here too.
+$GLOBALS['mizzey_preview_locale'] = $ar ? 'ar' : 'en';
 
 require __DIR__ . '/wp-shim.php';
 require dirname(__DIR__) . '/inc/icons.php';
@@ -132,7 +126,7 @@ $html .= section('01', t('Buttons', 'الأزرار'),
         cell(t('hover', 'تمرير'), C\button(['label' => t('Wishlist', 'المفضلة'), 'variant' => 'icon', 'icon' => 'heart']), 'hover'),
         cell(t('pressed', 'ضغط'), C\button(['label' => t('Wishlist', 'المفضلة'), 'variant' => 'icon', 'icon' => 'heart']), 'active'),
         cell(t('focus', 'تركيز'), C\button(['label' => t('Wishlist', 'المفضلة'), 'variant' => 'icon', 'icon' => 'heart']), 'focus-visible'),
-        cell(t('Cart, with its count', 'السلة'), C\button(['label' => t('Cart, 3 items', 'السلة، 3 منتجات'), 'variant' => 'icon', 'icon' => 'cart', 'count' => 3]))
+        cell(t('Cart, with its count', 'السلة'), C\button(['label' => t('Cart', 'السلة'), 'variant' => 'icon', 'icon' => 'cart', 'count' => 3]))
     )
     . row(
         cell(t('On Indigo: a White button, White icons, a White 2 px focus ring', 'على النيلي'),
@@ -271,7 +265,7 @@ $html .= section('13', t('Steps line, tooltips and tabs', 'الخطوات وال
 );
 
 $overlays = C\overlay(['id' => 'pv-cart', 'kind' => 'drawer-end', 'title' => t('Your cart', 'سلتك'), 'body' => $cart_rows, 'footer' => C\button(['label' => t('Checkout', 'إتمام الطلب'), 'block' => true])])
-    . C\overlay(['id' => 'pv-menu', 'kind' => 'drawer-start', 'title' => t('Menu', 'القائمة'), 'body' => '<p><a href="#beauty">' . esc_html(t('Beauty', 'الجمال')) . '</a></p><p><a href="#health">' . esc_html(t('Health & Household', 'الصحة والمنزل')) . '</a></p>'])
+    . C\overlay(['id' => 'pv-menu', 'kind' => 'drawer-start', 'title' => t('Menu', 'القائمة'), 'body' => C\field(['id' => 'pv-menu-search', 'label' => t('Search', 'بحث')]) . '<p><a href="#beauty">' . esc_html(t('Beauty', 'الجمال')) . '</a></p><p><a href="#health">' . esc_html(t('Health & Household', 'الصحة والمنزل')) . '</a></p>'])
     . C\overlay(['id' => 'pv-sheet', 'kind' => 'sheet', 'title' => t('Sort by', 'ترتيب حسب'), 'body' => '<div role="radiogroup" aria-label="' . esc_attr(t('Sort by', 'ترتيب حسب')) . '">' . C\radio(['name' => 'sort', 'value' => 'rel', 'label' => t('Relevance', 'الأكثر صلة'), 'checked' => true]) . C\radio(['name' => 'sort', 'value' => 'new', 'label' => t('Newest', 'الأحدث')]) . '</div>'])
     . C\overlay(['id' => 'pv-dialog', 'kind' => 'dialog', 'title' => t('Remove this item?', 'إزالة هذا المنتج؟'), 'body' => esc_html(t('You can add it again at any time.', 'يمكنك إضافته مرة أخرى في أي وقت.')),
         'footer' => '<div class="mizzey-button-pair">' . C\button(['label' => t('Keep it', 'إبقاء'), 'variant' => 'secondary', 'attrs' => ['data-wp-interactive' => 'mizzey/ui', 'data-wp-on--click' => 'actions.close']]) . C\button(['label' => t('Remove', 'إزالة'), 'attrs' => ['data-wp-interactive' => 'mizzey/ui', 'data-wp-on--click' => 'actions.close']]) . '</div>']);

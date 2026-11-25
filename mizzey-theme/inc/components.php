@@ -108,6 +108,8 @@ function button(array $args): string
         $attributes['aria-label'] = $label;
         if (isset($args['count'])) {
             $inner .= counter((int) $args['count']);
+            /* translators: 1: a button's name, such as Cart; 2: its count in words, such as "3 items". */
+            $attributes['aria-label'] = sprintf(__('%1$s, %2$s', 'mizzey-site'), $label, count_words((int) $args['count']));
         }
     } elseif ($busy) {
         $inner = loader(['label' => __('Working', 'mizzey-site')])
@@ -119,7 +121,8 @@ function button(array $args): string
         $inner = (isset($args['icon']) ? icon((string) $args['icon'], ['size' => 20]) : '')
             . element('span', ['class' => 'mizzey-button__label'], esc_html($label));
         if (isset($args['count'])) {
-            $inner .= counter((int) $args['count']);
+            $inner .= counter((int) $args['count'])
+                . element('span', ['class' => 'mizzey-visually-hidden'], esc_html(count_words((int) $args['count'])));
         }
     }
 
@@ -132,6 +135,14 @@ function button(array $args): string
         ['type' => (string) ($args['type'] ?? 'button'), 'disabled' => $disabled, 'aria-busy' => $busy ? 'true' : null] + $attributes,
         $inner
     );
+}
+
+/** A count in words, for assistive technology: the badge itself is decoration. */
+function count_words(int $number): string
+{
+    $number = max(0, $number);
+    /* translators: %d: how many, read after a button's name: cart items, chosen filters. */
+    return sprintf(_n('%d item', '%d items', $number, 'mizzey-site'), $number);
 }
 
 /** The Persimmon count: cart items, active filters. */
@@ -634,8 +645,8 @@ function overlay(array $args): string
 
     $panel = $handle
         . element('div', ['class' => 'mizzey-overlay__header'], element('h2', ['class' => 'mizzey-overlay__title', 'id' => $id . '-title'], esc_html((string) $args['title'])) . $close)
-        . element('div', ['class' => 'mizzey-overlay__body'], wp_kses_post((string) $args['body']))
-        . (isset($args['footer']) ? element('div', ['class' => 'mizzey-overlay__footer'], wp_kses_post((string) $args['footer'])) : '');
+        . element('div', ['class' => 'mizzey-overlay__body'], (string) $args['body'])
+        . (isset($args['footer']) ? element('div', ['class' => 'mizzey-overlay__footer'], (string) $args['footer']) : '');
 
     return element(
         'dialog',
@@ -644,9 +655,8 @@ function overlay(array $args): string
             'class'               => $class,
             'aria-labelledby'     => $id . '-title',
             'data-wp-interactive' => STORE,
-            'data-wp-on--click'   => 'actions.backdrop',
-            'data-wp-on--keydown' => 'actions.trap',
-            'data-wp-on--close'   => 'actions.restore',
+            'data-wp-on--pointerdown' => 'actions.scrimDown',
+            'data-wp-on--click'       => 'actions.backdrop',
         ],
         element('div', ['class' => 'mizzey-overlay__panel'], $panel)
     );
@@ -727,7 +737,7 @@ function tabs(string $id, array $tabs, int $selected = 0, string $label = ''): s
             'aria-labelledby' => $id . '-tab-' . $i,
             'tabindex'        => '0',
             'hidden'          => ! $on,
-        ], wp_kses_post($tab['panel']));
+        ], (string) $tab['panel']);
     }
     return element(
         'div',

@@ -1,47 +1,15 @@
 /**
  * Behaviour of the base components (spec 066, slice 1), on the WordPress Interactivity API and nothing else.
  *
- * Overlays are native modal dialogs: showModal() makes the page behind them inert and gives the top layer and the
- * scrim (::backdrop); Escape closes them natively. This store adds what the platform leaves open: focus moves to the
- * first control on open, Tab and Shift+Tab stay inside, a press on the scrim closes, and focus returns to the
- * control that opened the overlay. Tabs follow the keyboard pattern of the ARIA practices (arrows mirror in
+ * Overlays are native modal dialogs: showModal() moves focus in, makes the page behind inert, gives the top layer
+ * and the scrim (::backdrop), closes on Escape and returns focus to the opener, so this store adds only what the
+ * platform leaves open: a press on the scrim closes (when it also started there). The page behind does not scroll
+ * while one is open (components.css). Tabs follow the keyboard pattern of the ARIA practices (arrows mirror in
  * Arabic, Home and End), a tooltip is dismissed with Escape, the switch toggles, and the select is our own list.
  */
 import { store, getContext, getElement, withSyncEvent } from '@wordpress/interactivity';
 
-const FOCUSABLE = [
-	'a[href]',
-	'button:not([disabled])',
-	'input:not([disabled]):not([type="hidden"])',
-	'select:not([disabled])',
-	'textarea:not([disabled])',
-	'[tabindex]:not([tabindex="-1"])',
-].join( ',' );
-
-const openers = new WeakMap();
-
-/* The controls Tab reaches, in order: visible ones, and one radio per group (the checked one, or the first). */
-function focusables( root ) {
-	const seen = new Set();
-	return [ ...root.querySelectorAll( FOCUSABLE ) ].filter( ( el ) => {
-		if ( el.getClientRects().length === 0 ) {
-			return false;
-		}
-		if ( el.type !== 'radio' || ! el.name ) {
-			return true;
-		}
-		if ( seen.has( el.name ) ) {
-			return false;
-		}
-		const group = [ ...root.querySelectorAll( `input[type="radio"][name="${ CSS.escape( el.name ) }"]` ) ];
-		const chosen = group.find( ( radio ) => radio.checked ) || group[ 0 ];
-		if ( chosen === el ) {
-			seen.add( el.name );
-			return true;
-		}
-		return false;
-	} );
-}
+const pressedOnScrim = new WeakMap();
 
 const isRtl = ( el ) => getComputedStyle( el ).direction === 'rtl';
 
@@ -105,7 +73,8 @@ function choose( parts, option ) {
 
 store( 'mizzey/ui', {
 	actions: {
-		/* Overlays. */
+		/* Overlays. showModal() does the rest: it moves focus in, makes the page behind inert, closes on Escape and
+		   gives focus back to the control that opened it. */
 		open: withSyncEvent( ( event ) => {
 			const { target } = getContext();
 			const dialog = document.getElementById( target );
@@ -113,12 +82,7 @@ store( 'mizzey/ui', {
 				return;
 			}
 			event.preventDefault();
-			openers.set( dialog, event.currentTarget );
 			dialog.showModal();
-			const first = dialog.querySelector( '[autofocus]' ) || focusables( dialog )[ 0 ];
-			if ( first ) {
-				first.focus();
-			}
 		} ),
 		close() {
 			const { ref } = getElement();
@@ -127,41 +91,20 @@ store( 'mizzey/ui', {
 				dialog.close();
 			}
 		},
+		/* A press on the scrim closes, only when it starts there too: a text selection dragged out of a field onto
+		   the scrim ends with a click on the dialog, and must not close it. */
+		scrimDown: withSyncEvent( ( event ) => {
+			const { ref } = getElement();
+			pressedOnScrim.set( ref, event.target === ref );
+		} ),
 		backdrop: withSyncEvent( ( event ) => {
 			const { ref } = getElement();
-			if ( event.target === ref ) {
+			const started = pressedOnScrim.get( ref );
+			pressedOnScrim.delete( ref );
+			if ( event.target === ref && started ) {
 				ref.close();
 			}
 		} ),
-		trap: withSyncEvent( ( event ) => {
-			if ( event.key !== 'Tab' ) {
-				return;
-			}
-			const { ref } = getElement();
-			const items = focusables( ref );
-			if ( ! items.length ) {
-				event.preventDefault();
-				return;
-			}
-			const first = items[ 0 ];
-			const last = items[ items.length - 1 ];
-			const inside = ref.contains( document.activeElement );
-			if ( event.shiftKey && ( document.activeElement === first || ! inside ) ) {
-				event.preventDefault();
-				last.focus();
-			} else if ( ! event.shiftKey && ( document.activeElement === last || ! inside ) ) {
-				event.preventDefault();
-				first.focus();
-			}
-		} ),
-		restore() {
-			const { ref } = getElement();
-			const opener = openers.get( ref );
-			openers.delete( ref );
-			if ( opener && opener.isConnected ) {
-				opener.focus();
-			}
-		},
 
 		/* Notices: the close control removes its notice. */
 		dismiss() {

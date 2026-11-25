@@ -134,6 +134,9 @@ class EveryTokenReachesTheTheme(unittest.TestCase):
             slug = theme_tokens.slug(path)
             if kind == "type":
                 slug = "type-" + path.split(".")[2]
+            if kind == "color" and theme_tokens.mizzey(token).get("editorPalette", True) is False:
+                self.assertNotIn(slug, found["color"], f"{path} is kept out of the editor's palette (D-35)")
+                continue
             if kind in found and slug not in found[kind]:
                 missing.append(path)
         self.assertEqual([], missing, "tokens whose class is in theme.json settings but which are missing from it")

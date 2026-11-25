@@ -24,11 +24,6 @@
 					"color": "#263B73"
 				},
 				{
-					"slug": "color-brand-persimmon",
-					"name": "Brand Persimmon",
-					"color": "#FF6A4A"
-				},
-				{
 					"slug": "color-brand-cream",
 					"name": "Brand Cream",
 					"color": "#F3F1E9"
@@ -202,11 +197,6 @@
 					"slug": "color-role-on-primary",
 					"name": "Role On Primary",
 					"color": "#FFFFFF"
-				},
-				{
-					"slug": "color-role-accent",
-					"name": "Role Accent",
-					"color": "#FF6A4A"
 				},
 				{
 					"slug": "color-role-on-accent",

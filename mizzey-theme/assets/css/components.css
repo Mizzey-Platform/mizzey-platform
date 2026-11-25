@@ -12,11 +12,22 @@
 	--mizzey-origin-start: 100%;
 }
 
-/* Every component measures its border and padding inside its size, as the boards do. */
-[class*="mizzey-"],
-[class*="mizzey-"]::before,
-[class*="mizzey-"]::after {
+/* Every component measures its border and padding inside its size, as the boards do: the component roots and
+   what is inside them, nothing else (a section or the page keeps its own box model). :where() keeps it weightless. */
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz),
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz)::before,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz)::after,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *::before,
+:where(.mizzey-badge, .mizzey-button, .mizzey-button-pair, .mizzey-check, .mizzey-chip, .mizzey-corner-tag, .mizzey-count, .mizzey-empty, .mizzey-field, .mizzey-gallery-counter, .mizzey-loader, .mizzey-loader-row, .mizzey-notice, .mizzey-overlay, .mizzey-pagination, .mizzey-popover, .mizzey-radio, .mizzey-sale-tag, .mizzey-select, .mizzey-sitewide, .mizzey-skeleton, .mizzey-steps, .mizzey-strip, .mizzey-switch, .mizzey-tabs, .mizzey-tooltip, .mizzey-well, .mizzey-zz) *::after {
 	box-sizing: border-box;
+}
+
+/* The page behind an open modal does not scroll, on iOS Safari too: overflow on the root, no fixed-position trick,
+   so the page never jumps to the top. (A stable scrollbar gutter is not used: it would also narrow the top layer,
+   and a drawer would stop short of the screen edge.) */
+:root:has(.mizzey-overlay[open]) {
+	overflow: hidden;
 }
 
 /* Text for assistive technology only. */
@@ -1427,7 +1438,8 @@ textarea.mizzey-field__control {
 
 .mizzey-overlay__footer {
 	flex-shrink: 0;
-	padding: var(--mizzey-space-4) var(--mizzey-space-5) var(--mizzey-space-5);
+	/* The pinned button stays above the home indicator (the drawer's "Show N products" rule, spec 066). */
+	padding: var(--mizzey-space-4) var(--mizzey-space-5) max(var(--mizzey-space-5), env(safe-area-inset-bottom));
 	box-shadow: 0 calc(var(--mizzey-border-hairline) * -1) 0 var(--mizzey-color-neutral-hairline);
 }
 

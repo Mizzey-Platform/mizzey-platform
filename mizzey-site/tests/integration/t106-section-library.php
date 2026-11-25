@@ -1,7 +1,10 @@
 <?php
 /**
- * t106, spec 066 slice 1: the section library pattern, with the trust signals section as its proof (G11; SSC-01,
- * HOME-10, HOME-11, SSC-02, SSC-03, SSC-12, SSC-13 through AC-4).
+ * t106, spec 066 slice 1: the section library pattern, with the trust signals section as its proof (G11; SSC-01).
+ *
+ * On the server: a translation of the front page started with WPML's "+" (an auto-draft with no translation group
+ * yet) takes library sections only, another new page does not; the Site Editor's settings are left whole for
+ * library.js; a title such as "Save <50% today" reaches the storefront whole.
  *
  * In Chromium (mizzey-site/tests/browser/section-library.cjs), signed in as an editor account:
  *
@@ -13,6 +16,8 @@
  *   still shows the old one), then published, and the live page follows;
  * - one instance is hidden with "Show on the site": the storefront no longer shows it, and the editor still holds
  *   its content.
+ *
+ * In the Site Editor, as an administrator: the front page offers only the library's sections, another page does not.
  *
  * Then, on the server: the stored front page holds both instances in the new order, the hidden one with its words
  * and `visible` false, and the Arabic page holds its own words. The front page setting, the pages and the account
@@ -73,7 +78,8 @@ run(
 			$s->note( ( $condition ? 'PASS  ' : 'FAIL  ' ) . $line );
 			$ok = $ok && $condition;
 		};
-		$tag = 't106-' . wp_generate_password( 5, false, false );
+		// Every record this run makes is named s1-..., beside other builders on the same database.
+		$tag = 's1-t106-' . wp_generate_password( 5, false, false );
 
 		// ---- The editor account, signed in by cookie (the sign-in form is AUTH-15's, tested by t49) ----------------
 		$user_id = wp_insert_user(
@@ -131,6 +137,46 @@ run(
 		update_option( 'page_on_front', $en );
 		$check( (int) apply_filters( 'wpml_object_id', $en, 'page', false, 'ar' ) === $ar, 'the Arabic page is the front page\'s translation' );
 
+		// ---- WPML's "+": a translation of the front page being started is an auto-draft with no group yet ---------
+		require_once ABSPATH . 'wp-admin/includes/post.php';
+		wp_set_current_user( (int) $user_id );
+		$draft = get_default_post_to_edit( 'page', true );
+		$s->on_finish( static function () use ( $draft ): void { wp_delete_post( $draft->ID, true ); } );
+		$context = new \WP_Block_Editor_Context( array( 'post' => $draft ) );
+		$names   = \MizzeySite\Blocks\SectionLibrary::names();
+		$get     = $_GET;
+		$_GET    = array( 'post_type' => 'page', 'trid' => (string) $trid, 'lang' => 'ar', 'source_lang' => 'en' );
+		$check( $names === apply_filters( 'allowed_block_types_all', true, $context ), 'G11 a translation of the front page started with WPML\'s "+" (an auto-draft) takes library sections only' );
+		$_GET = array( 'post_type' => 'page', 'lang' => 'ar' );
+		$check( true === apply_filters( 'allowed_block_types_all', true, $context ), 'G11 a new page that is not the front page keeps the ordinary inserter' );
+		$_GET = $get;
+		$check( true === apply_filters( 'allowed_block_types_all', true, new \WP_Block_Editor_Context( array( 'name' => 'core/edit-site', 'post' => get_post( $en ) ) ) ), 'G11 the Site Editor\'s one load of settings is left whole on the server (library.js narrows it per entity)' );
+		wp_set_current_user( $admin );
+
+		// ---- The words survive: tags stripped first, entities decoded after (a "<" in plain words is kept) --------
+		$html = \MizzeySite\Blocks\TrustSignals::render( array( 'items' => array( array( 'icon' => 'shield', 'title' => 'Save &lt;50% today', 'line' => '&lt;24h delivery', 'url' => '' ), array( 'icon' => 'returns', 'title' => '<strong>Easy</strong> returns &amp; refunds', 'line' => '' ) ) ) );
+		$check( str_contains( $html, '>Save &lt;50% today<' ) && str_contains( $html, '>&lt;24h delivery<' ) && str_contains( $html, '>Easy returns &amp; refunds<' ), 'SSC-01 "Save <50% today" and "<24h delivery" reach the storefront whole; markup is dropped' );
+
+		// ---- An administrator, for the Site Editor, which an editor cannot open -------------------------------------
+		$admin_id = wp_insert_user( array( 'user_login' => $tag . '-admin', 'user_email' => $tag . '-admin@example.com', 'user_pass' => wp_generate_password( 24 ), 'role' => 'administrator', 'locale' => 'en_US' ) );
+		if ( is_wp_error( $admin_id ) ) {
+			throw new \RuntimeException( 'The administrator account could not be made: ' . $admin_id->get_error_message() );
+		}
+		$s->track_user( (int) $admin_id );
+		update_user_meta(
+			(int) $admin_id,
+			$wpdb->get_blog_prefix() . 'persisted_preferences',
+			array(
+				'core/edit-site' => array( 'welcomeGuide' => false, 'welcomeGuidePage' => false, 'welcomeGuideTemplate' => false, 'welcomeGuideStyles' => false ),
+				'core'           => array( 'enableChoosePatternModal' => false ),
+				'_modified'      => gmdate( 'c' ),
+			)
+		);
+		$admin_cookies = array(
+			array( 'name' => AUTH_COOKIE, 'value' => wp_generate_auth_cookie( (int) $admin_id, $expire, 'auth' ) ),
+			array( 'name' => LOGGED_IN_COOKIE, 'value' => wp_generate_auth_cookie( (int) $admin_id, $expire, 'logged_in' ) ),
+		);
+
 		$plan = array(
 			'tag'     => $tag,
 			'base'    => home_url( '/' ),
@@ -140,6 +186,11 @@ run(
 			'en'      => array( 'edit' => admin_url( "post.php?post={$en}&action=edit&lang=en" ), 'view' => t106_home( 'en' ) ),
 			'ar'      => array( 'edit' => admin_url( "post.php?post={$ar}&action=edit&lang=ar" ), 'view' => t106_home( 'ar' ) ),
 			'other'   => array( 'edit' => admin_url( "post.php?post={$other}&action=edit&lang=en" ) ),
+			'site'    => array(
+				'cookies' => $admin_cookies,
+				'front'   => array( 'id' => $en, 'url' => admin_url( 'site-editor.php?p=' . rawurlencode( "/page/{$en}" ) . '&canvas=edit' ) ),
+				'other'   => array( 'id' => $other, 'url' => admin_url( 'site-editor.php?p=' . rawurlencode( "/page/{$other}" ) . '&canvas=edit' ) ),
+			),
 			'shots'   => get_temp_dir(),
 		);
 		$result = t106_browser( $plan );
@@ -147,22 +198,22 @@ run(
 		foreach ( (array) ( $result['checks'] ?? array() ) as $row ) {
 			$check( true === $row['ok'], (string) $row['what'] );
 		}
-		$check( count( (array) ( $result['checks'] ?? array() ) ) >= 20, 'the browser made every check (' . count( (array) ( $result['checks'] ?? array() ) ) . ')' );
+		$check( count( (array) ( $result['checks'] ?? array() ) ) >= 24, 'the browser made every check (' . count( (array) ( $result['checks'] ?? array() ) ) . ')' );
 
 		// ---- What is stored ------------------------------------------------------------------------------------
 		$stored = t106_sections( $en );
 		$s->note( '      stored English sections: ' . wp_json_encode( $stored, JSON_UNESCAPED_UNICODE ) );
 		$check(
 			2 === count( $stored ) && "{$tag} B1" === ( $stored[0]['titles'][0] ?? '' ) && "{$tag} A1" === ( $stored[1]['titles'][0] ?? '' ),
-			'SSC-02, HOME-11: the stored front page holds both sections, the second instance now first'
+			'SSC-01: the stored front page holds both sections, the second instance now first'
 		);
 		$check(
 			isset( $stored[1] ) && false === $stored[1]['visible'] && array( "{$tag} A1", "{$tag} A2", "{$tag} A3" ) === $stored[1]['titles'] && true === $stored[0]['visible'],
-			'SSC-03: the hidden section is stored with its content and Show on the site off'
+			'SSC-01: the hidden section is stored with its content and Show on the site off'
 		);
 		$stored_ar = t106_sections( $ar );
 		$s->note( '      stored Arabic sections: ' . wp_json_encode( $stored_ar, JSON_UNESCAPED_UNICODE ) );
-		$check( 1 === count( $stored_ar ) && "{$tag} أصلي" === ( $stored_ar[0]['titles'][0] ?? '' ), 'SSC-12: the Arabic front page holds its own section and words' );
+		$check( 1 === count( $stored_ar ) && "{$tag} أصلي" === ( $stored_ar[0]['titles'][0] ?? '' ), 'SSC-01: the Arabic front page holds its own section and words' );
 
 		return $ok;
 	}

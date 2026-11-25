@@ -58,7 +58,7 @@ async function inserterItems( page ) {
 		} );
 		return [ ...names ];
 	} );
-	const data = await page.evaluate( () => wp.data.select( 'core/block-editor' ).getInserterItems().map( ( i ) => i.name || i.id ) );
+	const data = await page.evaluate( () => wp.data.select( 'core/block-editor' ).getInserterItems().map( ( i ) => i.name || i.id ) ).catch( () => [] );
 	await toggle.click();
 	return { items, data };
 }
@@ -176,17 +176,18 @@ const firstTitles = ( view ) => view.sections.map( ( s ) => s.titles[ 0 ] );
 		check( JSON.stringify( typed ) === JSON.stringify( [ [ `${ T } A1`, `${ T } A2`, `${ T } A3` ], [ `${ T } B1`, `${ T } B2`, `${ T } B3` ] ] ), `SSC-01 the words typed in place are each section's own: ${ JSON.stringify( typed ) }` );
 		await save( page );
 		let live = await sectionsOn( visitor, plan.en.view );
-		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } A1`, `${ T } B1` ] ), `SSC-02 [en] the storefront shows both sections in their order: ${ JSON.stringify( firstTitles( live ) ) }` );
+		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } A1`, `${ T } B1` ] ), `SSC-01 [en] the storefront shows both sections in their order: ${ JSON.stringify( firstTitles( live ) ) }` );
 		check( JSON.stringify( live.sections[ 0 ] && live.sections[ 0 ].titles ) === JSON.stringify( [ `${ T } A1`, `${ T } A2`, `${ T } A3` ] ), 'SSC-01 [en] each item shows the words typed for it' );
-		check( live.sections[ 0 ] && live.sections[ 0 ].links[ 0 ] === plan.link, `SSC-02 [en] the item's line links where it was set: ${ live.sections[ 0 ] && live.sections[ 0 ].links[ 0 ] }` );
+		check( live.sections[ 0 ] && live.sections[ 0 ].links[ 0 ] === plan.link, `SSC-01 [en] the item's line links where it was set: ${ live.sections[ 0 ] && live.sections[ 0 ].links[ 0 ] }` );
 
 		// ---- Reordered against the second instance, previewed, then published ----------------------------------
 		step = 'reorder and preview';
 		await selectBlock( canvas, page, b );
 		await canvas.locator( `[data-block="${ b }"]` ).getByRole( 'textbox', { name: 'Item 1 title', exact: true } ).click();
 		await page.locator( 'button[aria-label="Move up"]' ).first().click();
-		await page.waitForFunction( ( id ) => wp.data.select( 'core/block-editor' ).getBlockOrder()[ 0 ] === id, b, { timeout: TIMEOUT } );
-		check( true, 'HOME-11 the second section moves above the first with the block toolbar' );
+		await page.waitForFunction( ( id ) => wp.data.select( 'core/block-editor' ).getBlockOrder()[ 0 ] === id, b, { timeout: 20000 } ).catch( () => {} );
+		const order = await page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlockOrder() );
+		check( order[ 0 ] === b && order[ 1 ] === a, `SSC-01 the second section moves above the first with the block toolbar: ${ JSON.stringify( order.map( ( id ) => ( id === a ? 'A' : id === b ? 'B' : id ) ) ) }` );
 		let preview = null;
 		const toggle = page.locator( '.editor-preview-dropdown__toggle' );
 		if ( await toggle.count() ) {
@@ -198,30 +199,30 @@ const firstTitles = ( view ) => view.sections.map( ( s ) => s.titles[ 0 ] );
 			preview = popup.url();
 			await popup.close();
 		}
-		check( !! preview && /preview/.test( preview ), `SSC-13 the editor's Preview opens a preview (${ preview })` );
+		check( !! preview && /preview/.test( preview ), `SSC-01 the editor's Preview opens a preview (${ preview })` );
 		const previewView = preview ? await sectionsOn( editor, preview ) : { sections: [] };
 		live = await sectionsOn( visitor, plan.en.view );
-		check( JSON.stringify( firstTitles( previewView ) ) === JSON.stringify( [ `${ T } B1`, `${ T } A1` ] ), `SSC-13 the preview shows the new order before it is published: ${ JSON.stringify( firstTitles( previewView ) ) }` );
-		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } A1`, `${ T } B1` ] ), `SSC-13 the live page keeps the old order until then: ${ JSON.stringify( firstTitles( live ) ) }` );
+		check( JSON.stringify( firstTitles( previewView ) ) === JSON.stringify( [ `${ T } B1`, `${ T } A1` ] ), `SSC-01 the preview shows the new order before it is published: ${ JSON.stringify( firstTitles( previewView ) ) }` );
+		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } A1`, `${ T } B1` ] ), `SSC-01 the live page keeps the old order until then: ${ JSON.stringify( firstTitles( live ) ) }` );
 		await save( page );
 		live = await sectionsOn( visitor, plan.en.view );
-		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1`, `${ T } A1` ] ), `HOME-11 published, the storefront shows the new order: ${ JSON.stringify( firstTitles( live ) ) }` );
+		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1`, `${ T } A1` ] ), `SSC-01 published, the storefront shows the new order: ${ JSON.stringify( firstTitles( live ) ) }` );
 
 		// ---- Hidden, its content kept -----------------------------------------------------------------------------
 		step = 'hide';
 		await selectBlock( canvas, page, a );
 		const show = page.getByRole( 'checkbox', { name: 'Show on the site', exact: true } );
-		check( await show.isChecked(), 'SSC-03 a section is shown on the site by default' );
+		check( await show.isChecked(), 'SSC-01 a section is shown on the site by default' );
 		await show.click();
-		check( ! ( await show.isChecked() ), 'SSC-03 "Show on the site" switches off' );
-		check( await canvas.locator( `[data-block="${ a }"].is-mizzey-hidden` ).count() === 1, 'SSC-03 the editor marks the hidden section as hidden' );
+		check( ! ( await show.isChecked() ), 'SSC-01 "Show on the site" switches off' );
+		check( await canvas.locator( `[data-block="${ a }"].is-mizzey-hidden` ).count() === 1, 'SSC-01 the editor marks the hidden section as hidden' );
 		await save( page );
 		live = await sectionsOn( visitor, plan.en.view );
-		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1` ] ), `SSC-03 the storefront no longer shows the hidden section: ${ JSON.stringify( firstTitles( live ) ) }` );
+		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1` ] ), `SSC-01 the storefront no longer shows the hidden section: ${ JSON.stringify( firstTitles( live ) ) }` );
 		canvas = await openEditor( page, plan.en.edit );
 		const kept = await page.evaluate( ( [ n, tag ] ) => wp.data.select( 'core/block-editor' ).getBlocks().filter( ( x ) => x.name === n ).map( ( x ) => ( { visible: x.attributes.visible, title: x.attributes.items[ 0 ].title } ) ), [ SECTION, T ] );
-		check( kept.length === 2 && kept[ 1 ].visible === false && kept[ 1 ].title === `${ T } A1`, `SSC-03 reopened, the editor still holds the hidden section's content: ${ JSON.stringify( kept ) }` );
-		check( await canvas.getByText( `${ T } A2`, { exact: true } ).count() === 1, 'SSC-03 its words are still there to edit' );
+		check( kept.length === 2 && kept[ 1 ].visible === false && kept[ 1 ].title === `${ T } A1`, `SSC-01 reopened, the editor still holds the hidden section's content: ${ JSON.stringify( kept ) }` );
+		check( await canvas.getByText( `${ T } A2`, { exact: true } ).count() === 1, 'SSC-01 its words are still there to edit' );
 
 		// ---- The Arabic front page: its own inserter and its own words ------------------------------------------
 		step = 'Arabic';
@@ -236,15 +237,39 @@ const firstTitles = ( view ) => view.sections.map( ( s ) => s.titles[ 0 ] );
 		await typeInto( canvas, page, c, 'Item 1 line', `${ T } ضمان الأصالة` );
 		await save( page );
 		const ar = await sectionsOn( visitor, plan.ar.view );
-		check( ar.dir === 'rtl' && JSON.stringify( ar.sections.map( ( s ) => s.titles ) ) === JSON.stringify( [ arabic.map( ( w ) => `${ T } ${ w }` ) ] ), `SSC-12 [ar] the Arabic storefront shows its own words, right to left: ${ ar.dir } ${ JSON.stringify( ar.sections.map( ( s ) => s.titles ) ) }` );
+		check( ar.dir === 'rtl' && JSON.stringify( ar.sections.map( ( s ) => s.titles ) ) === JSON.stringify( [ arabic.map( ( w ) => `${ T } ${ w }` ) ] ), `SSC-01 [ar] the Arabic storefront shows its own words, right to left: ${ ar.dir } ${ JSON.stringify( ar.sections.map( ( s ) => s.titles ) ) }` );
 		live = await sectionsOn( visitor, plan.en.view );
-		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1` ] ), 'SSC-12 [en] the English storefront is unchanged by the Arabic edit' );
+		check( JSON.stringify( firstTitles( live ) ) === JSON.stringify( [ `${ T } B1` ] ), 'SSC-01 [en] the English storefront is unchanged by the Arabic edit' );
 
 		// ---- Any other page keeps the ordinary inserter --------------------------------------------------------
 		step = 'other page';
 		await openEditor( page, plan.other.edit );
 		seen = await inserterItems( page );
 		check( seen.data.includes( 'core/paragraph' ) && seen.data.includes( 'core/columns' ) && seen.data.length > plan.library.length, `FR-003 another page's inserter is unchanged (${ seen.data.length } blocks, core/paragraph and core/columns among them)` );
+		// ---- The Site Editor: sections only while the front page is the entity being edited ----------------------
+		step = 'Site Editor';
+		const admin = await browser.newContext( { viewport: { width: 1440, height: 900 } } );
+		await admin.addCookies( plan.site.cookies.map( ( c ) => ( { name: c.name, value: c.value, domain: base.hostname, path: '/' } ) ) );
+		const site = await admin.newPage();
+		site.setDefaultTimeout( TIMEOUT );
+		// What the Site Editor's inserter lists, read from its open panel, as a person sees it.
+		const insertableIn = async ( entry ) => {
+			await site.goto( entry.url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT } );
+			await site.waitForFunction( ( id ) => window.wp && wp.data && wp.data.select( 'core/editor' ) && Number( wp.data.select( 'core/editor' ).getCurrentPostId() ) === id, entry.id, { timeout: TIMEOUT } );
+			await site.waitForTimeout( 1500 );
+			// A first-run guide that still opens is dismissed, as a person would.
+			for ( let i = 0; i < 3 && ( await site.locator( '.components-modal__screen-overlay' ).count() ); i++ ) {
+				await site.keyboard.press( 'Escape' );
+				await site.waitForTimeout( 500 );
+			}
+			return ( await inserterItems( site ) ).items;
+		};
+		const onFront = await insertableIn( plan.site.front );
+		check( JSON.stringify( onFront.sort() ) === JSON.stringify( library ), `G11 in the Site Editor the front page's inserter lists only the library's sections: ${ onFront.join( ', ' ).slice( 0, 120 ) }` );
+		const onOther = await insertableIn( plan.site.other );
+		check( onOther.includes( 'paragraph' ) && onOther.length > library.length, `G11 in the Site Editor another page's inserter is unchanged (${ onOther.length } items)` );
+		await admin.close();
+
 		check( errors.length === 0, `no script error from the library's scripts${ errors.length ? ': ' + errors.slice( 0, 3 ).join( ' | ' ) : '' } (other script errors in this editor: ${ otherErrors })` );
 	} catch ( error ) {
 		check( false, `stopped at "${ step }": ${ String( error && error.message ).split( '\n' )[ 0 ] }` );

@@ -11,7 +11,7 @@ namespace MizzeySite\Blocks;
 defined('ABSPATH') || exit;
 
 /**
- * The trust signals section (HOME-08): the row under the hero that C1-Home-Phone, C1-Home-Phone-Arabic and
+ * The trust signals section: the row under the hero that C1-Home-Phone, C1-Home-Phone-Arabic and
  * C1-Home-Desktop draw ("Authentic products, guaranteed", "Fast delivery", "Easy returns").
  *
  * Three items, as the boards draw. Each has a mark chosen from the three the boards draw (the authenticity shield,
@@ -23,7 +23,8 @@ defined('ABSPATH') || exit;
  * the items sit in one 72 high row with the line under the title, as the desktop board draws. The van is the theme's
  * artwork, its own mirrored drawing in Arabic (the logo on its side is never mirrored); the returns arrow mirrors.
  *
- * Register ids: HOME-08, SSC-01, SSC-02. See specs/066-stage-2-shop-front, slice 1 (the library's proof section).
+ * Register ids: SSC-01, as the proof of the section library pattern (slice 1). The trust signals' own row is
+ * traced by slice 5, the home page sections. See specs/066-stage-2-shop-front.
  */
 final class TrustSignals
 {
@@ -86,9 +87,13 @@ final class TrustSignals
             : sprintf('<a class="mizzey-trust__line" href="%s">%s</a>', $href, esc_html($line));
     }
 
-    /** The plain words of a field the editor wrote with its text field (which stores entities). */
-    private static function text($value): string
+    /**
+     * The plain words of a field the editor wrote in place. The text field stores markup with its text as entities,
+     * so tags go first and the entities are decoded after: "Save <50% today" is stored as "Save &lt;50% today" and
+     * comes back whole, where decoding first would have read "<50% today" as a tag and dropped it.
+     */
+    public static function text($value): string
     {
-        return trim(wp_strip_all_tags(html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        return trim(html_entity_decode(wp_strip_all_tags((string) $value), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 }

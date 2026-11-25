@@ -19,16 +19,21 @@ defined('ABSPATH') || exit;
  * with a plain editor script on WordPress's `wp.*` globals (there is no build step) and a PHP render that uses the
  * theme's tokens and components. What every section shares lives here:
  *
- * - **Sections only on the front page**: on the page set as the front page, and on its translations, the editor
- *   offers only the library's sections (`allowed_block_types_all`); every other page is unchanged.
+ * - **Sections only on the front page**: on the page set as the front page and on its translations, the editor
+ *   offers only the library's sections; every other page is unchanged. In the post editor the server decides
+ *   (`allowed_block_types_all`), also for a translation WPML is starting ("+" in the languages column), which is
+ *   an auto-draft with no translation group yet but carries the group's `trid` on post-new.php. The Site Editor
+ *   loads its settings once for every page and template it opens, so there library.js answers each insertion
+ *   (`blockEditor.__unstableCanInsertBlockType`): only sections while the front page is the entity being edited.
  * - **"Show on the site"**: every section carries `visible`. A hidden section renders nothing on the storefront and
- *   keeps its content in the editor, where it is marked as hidden (SSC-03).
+ *   keeps its content in the editor, where it is marked as hidden.
  * - **One category** in the inserter, and the editor script and style the sections share.
  *
  * Each language has its own content: the front page's Arabic translation is its own page, edited the same way
- * (WPML, SSC-12), and the storefront previews and publishes through WordPress's own preview (SSC-13).
+ * (WPML), and the storefront previews and publishes through WordPress's own preview.
  *
- * Register ids: SSC-01, SSC-02, SSC-03, SSC-12, SSC-13, HOME-10, HOME-11. See specs/066-stage-2-shop-front, slice 1.
+ * Register ids: SSC-01 (the section library pattern, G11). The sections' own rows are traced by the slice that
+ * builds each section. See specs/066-stage-2-shop-front, slice 1.
  */
 final class SectionLibrary
 {
@@ -45,6 +50,7 @@ final class SectionLibrary
         add_filter('block_categories_all', [self::class, 'category']);
         add_filter('allowed_block_types_all', [self::class, 'allowedBlocks'], 10, 2);
         add_filter('pre_render_block', [self::class, 'hideHidden'], 10, 2);
+        add_action('enqueue_block_editor_assets', [self::class, 'editorAssets']);
     }
 
     /** @return list<string> The library's block names. */
@@ -66,18 +72,25 @@ final class SectionLibrary
             true
         );
         wp_set_script_translations(self::EDITOR_SCRIPT, 'mizzey-site', dirname(__DIR__, 2) . '/languages');
-        // As window.mizzeySections, for library.js and each section's editor script.
-        wp_localize_script(self::EDITOR_SCRIPT, 'mizzeySections', self::editorData());
         wp_register_style(self::EDITOR_STYLE, plugins_url('src/Blocks/library-editor.css', $plugin), [], $version('library-editor.css'));
 
         foreach (self::SECTIONS as $section) {
             register_block_type(__DIR__ . '/' . $section);
+            // The editor script's words: the JSON files `wp i18n make-json` writes beside the plugin's catalogue.
+            wp_set_script_translations(generate_block_asset_handle('mizzey/' . $section, 'editorScript'), 'mizzey-site', dirname(__DIR__, 2) . '/languages');
         }
     }
 
+    /** The editor's data, as window.mizzeySections, only where an editor loads (not on every request). */
+    public static function editorAssets(): void
+    {
+        wp_localize_script(self::EDITOR_SCRIPT, 'mizzeySections', self::editorData());
+    }
+
     /**
-     * What the editor scripts need from the server: the library's names, and the trust signals' marks drawn by the
-     * theme's own icon set, so the editor shows what the storefront shows.
+     * What the editor scripts need from the server: the library's names, the front page in every language (for the
+     * Site Editor), and the trust signals' marks drawn by the theme's own icon set, so the editor shows what the
+     * storefront shows.
      *
      * @return array<string,mixed>
      */
@@ -87,7 +100,24 @@ final class SectionLibrary
         foreach (TrustSignals::MARKS as $mark) {
             $marks[$mark] = TrustSignals::markHtml($mark, false);
         }
-        return ['blocks' => self::names(), 'trustMarks' => $marks];
+        return ['blocks' => self::names(), 'frontPages' => self::frontPageIds(), 'trustMarks' => $marks];
+    }
+
+    /** @return list<int> The front page and its translations. */
+    public static function frontPageIds(): array
+    {
+        $front = 'page' === get_option('show_on_front') ? (int) get_option('page_on_front') : 0;
+        if ($front <= 0) {
+            return [];
+        }
+        $ids   = [$front];
+        $group = apply_filters('wpml_element_trid', null, $front, 'post_page');
+        if ($group) {
+            foreach ((array) apply_filters('wpml_get_element_translations', null, $group, 'post_page') as $translation) {
+                $ids[] = (int) ($translation->element_id ?? 0);
+            }
+        }
+        return array_values(array_unique(array_filter($ids)));
     }
 
     /**
@@ -109,11 +139,30 @@ final class SectionLibrary
      */
     public static function allowedBlocks($allowed, $context)
     {
-        $post = is_object($context) && isset($context->post) ? $context->post : null;
-        if (! $post instanceof \WP_Post || ! self::isFrontPage((int) $post->ID)) {
+        // The Site Editor's settings serve every entity it opens in one load: library.js narrows them there.
+        if (is_object($context) && 'core/edit-site' === ($context->name ?? '')) {
             return $allowed;
         }
-        return self::names();
+        $post = is_object($context) && isset($context->post) ? $context->post : null;
+        if (! $post instanceof \WP_Post) {
+            return $allowed;
+        }
+        return self::isFrontPage((int) $post->ID) || self::isNewFrontPageTranslation($post) ? self::names() : $allowed;
+    }
+
+    /**
+     * A translation of the front page WPML is starting: an auto-draft page opened from the languages column, whose
+     * request names the translation group (`trid`) it will join when first saved.
+     */
+    public static function isNewFrontPageTranslation(\WP_Post $post): bool
+    {
+        if ('auto-draft' !== $post->post_status || 'page' !== $post->post_type || 'page' !== get_option('show_on_front')) {
+            return false;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only, to choose the inserter's blocks.
+        $group = isset($_GET['trid']) ? absint(wp_unslash($_GET['trid'])) : 0;
+        $front = (int) get_option('page_on_front');
+        return $group > 0 && $front > 0 && $group === (int) apply_filters('wpml_element_trid', null, $front, 'post_page');
     }
 
     /** The page set as the front page, in any language. */
@@ -135,7 +184,7 @@ final class SectionLibrary
     }
 
     /**
-     * A hidden section renders nothing; its content stays in the page for the editor (SSC-03).
+     * A hidden section renders nothing; its content stays in the page for the editor.
      *
      * @param string|null         $pre
      * @param array<string,mixed> $block

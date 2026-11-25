@@ -1,4 +1,4 @@
-/* The trust signals section (spec 066, slice 1; HOME-08), as C1-Home-Phone, C1-Home-Phone-Arabic and
+/* The trust signals section (spec 066, slice 1: SSC-01, the library's proof section), as C1-Home-Phone, C1-Home-Phone-Arabic and
    C1-Home-Desktop draw it. Loaded only on a page that shows the section, and in the editor. Every value is a theme
    token (K-3) and every side is logical, so this one stylesheet serves both reading directions.
 

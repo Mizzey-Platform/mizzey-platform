@@ -64,6 +64,17 @@ def untranslated_sentences(js: str) -> list[str]:
     return found
 
 
+def is_orange(colour: str) -> bool:
+    """An orange or orange-red a reader would see as the brand's orange: hue 5 to 40, saturated, mid lightness."""
+    import colorsys
+    match = re.fullmatch(r"#([0-9a-fA-F]{6})", colour.strip())
+    if not match:
+        return False
+    r, g, b = (int(match.group(1)[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    hue, light, sat = colorsys.rgb_to_hls(r, g, b)
+    return 5 <= hue * 360 <= 40 and sat >= 0.6 and 0.35 <= light <= 0.8
+
+
 class EveryBlockIsALibrarySection(unittest.TestCase):
     def test_the_library_lists_exactly_the_block_directories(self) -> None:
         dirs = [p.name for p in block_dirs()]
@@ -147,6 +158,25 @@ class TheEditorOffersOnlyTheApprovedPalette(unittest.TestCase):
             self.assertIs(False, color.get(key), f"settings.color.{key}")
         self.assertEqual([], color.get("duotone"), "no duotone presets")
         self.assertTrue(color.get("palette"), "the approved palette is offered")
+
+    def test_the_site_logo_is_cores_with_custom_logo_support(self) -> None:
+        functions = (ROOT / "mizzey-theme" / "functions.php").read_text(encoding="utf-8")
+        self.assertRegex(functions, r"add_theme_support\(\s*'custom-logo'", "the theme supports core's custom logo")
+        own = [p for p in (ROOT / "mizzey-site" / "src").rglob("*.php") if "mizzey_logo" in p.read_text(encoding="utf-8")]
+        self.assertEqual([], own, "no second logo setting beside core's")
+
+    def test_no_orange_is_offered_to_editors(self) -> None:
+        # D-35: Persimmon is a fill in fixed places only, never text; an editor's colour picker could make it text.
+        palette = json.loads(THEME_JSON.read_text(encoding="utf-8"))["settings"]["color"]["palette"]
+        self.assertTrue(palette, "no palette was read, so nothing was checked")
+        offered = [entry["slug"] for entry in palette if is_orange(entry["color"])]
+        self.assertEqual([], offered, "an orange colour in the editor's palette (D-35)")
+
+    def test_the_orange_rule_tells_orange_from_the_other_colours(self) -> None:
+        for orange in ("#FF6A4A", "#E65A42", "#C63D1F", "#EE5A3B", "#ff8800"):
+            self.assertTrue(is_orange(orange), orange)
+        for other in ("#263B73", "#CD2949", "#916300", "#FDEFD4", "#F3F1E9", "#1E1E1E", "rgba(38,59,115,.08)"):
+            self.assertFalse(is_orange(other), other)
 
 
 if __name__ == "__main__":

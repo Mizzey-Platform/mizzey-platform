@@ -1,5 +1,5 @@
 /**
- * The trust signals section in the editor (spec 066, slice 1; HOME-08, SSC-01, SSC-02).
+ * The trust signals section in the editor (spec 066, slice 1: SSC-01, the proof of the section library).
  *
  * A plain script on WordPress's globals: there is no build step in this repository. The canvas shows the section
  * with the storefront's own classes and stylesheet, so it looks as it will on the site; each item's title and line

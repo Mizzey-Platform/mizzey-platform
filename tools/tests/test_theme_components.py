@@ -170,6 +170,22 @@ class Drawers(unittest.TestCase):
         self.assertIn("var(--mizzey-color-role-scrim)", self.body(".mizzey-overlay::backdrop"))
 
 
+class Scope(unittest.TestCase):
+    def test_the_box_sizing_rule_reaches_only_the_components(self) -> None:
+        text = css()
+        self.assertNotIn('[class*="mizzey-"]', text, "a rule on every class containing mizzey- reaches the sections and the page")
+        self.assertRegex(text, r":where\([^)]*\.mizzey-button,[^)]*\.mizzey-overlay[^)]*\)", "box-sizing is scoped to the component roots")
+
+    def test_a_drawer_footer_clears_the_safe_area(self) -> None:
+        footer = " ".join(body for selector, body in rules(css()) if selector.strip() == ".mizzey-overlay__footer")
+        self.assertIn("env(safe-area-inset-bottom)", footer, "the pinned button sits above the home indicator")
+
+    def test_the_page_behind_an_open_modal_does_not_scroll(self) -> None:
+        text = css()
+        self.assertRegex(text, r":root:has\(\.mizzey-overlay\[open\]\)\s*\{[^}]*overflow:\s*hidden", "scroll lock while a modal is open")
+        self.assertNotRegex(text, r"position:\s*fixed[^}]*top:\s*calc\(", "no fixed-body trick, which jumps on iOS")
+
+
 class Behaviour(unittest.TestCase):
     def test_the_script_uses_only_the_interactivity_api(self) -> None:
         source = SCRIPT.read_text(encoding="utf-8")
@@ -199,6 +215,14 @@ echo json_encode([
   'loader' => C\loader(),
   'empty' => C\empty_state(['icon' => 'cart', 'title' => 'Empty', 'text' => 'Nothing']),
   'drawer' => C\overlay(['id' => 'cart', 'kind' => 'drawer-end', 'title' => 'Your cart', 'body' => '<p>x</p>']),
+  'controls' => $controls = C\field(['id' => 'c1', 'label' => 'Coupon', 'error' => 'Check it']) . C\check(['name' => 'brand', 'label' => 'Brand', 'checked' => true])
+      . C\switch_control(['label' => 'In stock', 'checked' => true]) . C\button(['label' => 'Add', 'busy' => true]),
+  'overlay_controls' => C\overlay(['id' => 'f', 'kind' => 'drawer-start', 'title' => 'Filters', 'body' => $controls, 'footer' => $controls]),
+  'tabs_controls' => C\tabs('t', [['label' => 'One', 'panel' => $controls]]),
+  'shim_kses' => wp_kses_post($controls),
+  'counted' => C\button(['label' => 'Filters', 'variant' => 'secondary', 'count' => 3]),
+  'counted_one' => C\button(['label' => 'Filters', 'variant' => 'secondary', 'count' => 1]),
+  'counted_icon' => C\button(['label' => 'Cart', 'variant' => 'icon', 'icon' => 'cart', 'count' => 120]),
 ]);
 """
 
@@ -237,6 +261,29 @@ class Helpers(unittest.TestCase):
         self.assertIn('data-wp-interactive="mizzey/ui"', drawer)
         self.assertIn('data-wp-on--click="actions.backdrop"', drawer)
         self.assertIn("mizzey-overlay--drawer-end", drawer)
+
+
+    def test_an_overlay_and_tabs_keep_the_controls_their_caller_passes(self) -> None:
+        # The caller escapes what it passes (the helpers' contract); running it through wp_kses_post stripped the
+        # very controls a drawer holds. The shim strips as WordPress does, so this fails if a helper filters again.
+        for key in ("overlay_controls", "tabs_controls"):
+            for needle in ("<input", "<svg", 'aria-checked="true"', 'aria-invalid="true"', 'aria-busy="true"', 'type="checkbox"'):
+                self.assertGreater(self.out["controls"].count(needle), 0, needle)
+                self.assertGreaterEqual(self.out[key].count(needle), self.out["controls"].count(needle), f"{key}: {needle}")
+
+    def test_a_count_on_a_button_is_read_out(self) -> None:
+        # The badge itself is decoration (aria-hidden); its number reaches assistive technology as words.
+        self.assertIn('<span class="mizzey-count" aria-hidden="true">3</span>', self.out["counted"])
+        self.assertIn('<span class="mizzey-visually-hidden">3 items</span>', self.out["counted"])
+        self.assertIn('<span class="mizzey-visually-hidden">1 item</span>', self.out["counted_one"])
+        self.assertIn('aria-label="Cart, 120 items"', self.out["counted_icon"])
+        self.assertIn(">99+<", self.out["counted_icon"])
+
+    def test_the_shim_strips_as_wordpress_does(self) -> None:
+        for gone in ("<input", "<svg", "aria-checked", "aria-invalid", "aria-busy"):
+            self.assertNotIn(gone, self.out["shim_kses"])
+        self.assertIn('role="alert"', self.out["shim_kses"])
+        self.assertIn("<label", self.out["shim_kses"])
 
 
 if __name__ == "__main__":

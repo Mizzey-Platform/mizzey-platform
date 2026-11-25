@@ -1,10 +1,14 @@
 /**
- * What every section of the library shares in the editor (spec 066, "The section library"; SSC-03).
+ * What every section of the library shares in the editor (spec 066, "The section library"; SSC-01).
  *
  * A plain script on WordPress's globals: there is no build step in this repository. It adds the common
  * "Show on the site" setting to the sidebar of every library section, and marks a hidden section in the canvas so
  * the editor can see it is hidden while its content stays there to edit. The storefront side is
  * MizzeySite\Blocks\SectionLibrary::hideHidden().
+ *
+ * In the Site Editor, whose settings are loaded once for every page and template it opens, it also offers only the
+ * library's sections while the front page (in any language) is the entity being edited, and gives the inserter
+ * back when another entity is opened. The post editor is narrowed on the server.
  */
 ( function ( wp ) {
 	const { addFilter } = wp.hooks;
@@ -57,6 +61,21 @@
 			wrapperProps,
 		} ) );
 	}, 'withMizzeyHiddenMark' );
+
+	/* The Site Editor: sections only while the front page (in any language) is the entity being edited. Its settings
+	   are loaded once for everything it opens, so the narrowing is asked of each insertion instead. */
+	const frontPages = ( ( window.mizzeySections && window.mizzeySections.frontPages ) || [] ).map( Number );
+	function editingFrontPage() {
+		const editor = wp.data.select( 'core/editor' );
+		return !! editor && editor.getCurrentPostType && editor.getCurrentPostType() === 'page' &&
+			frontPages.indexOf( Number( editor.getCurrentPostId() ) ) !== -1;
+	}
+	// Registered in every editor (this script loads in the head, before the body says which editor it is). In the
+	// post editor it agrees with the server, which has already narrowed the front page's settings.
+	addFilter( 'blockEditor.__unstableCanInsertBlockType', 'mizzey/front-page-sections', ( canInsert, blockType ) => {
+		const name = blockType && ( typeof blockType === 'string' ? blockType : blockType.name );
+		return canInsert && ( ! editingFrontPage() || isSection( name ) );
+	} );
 
 	addFilter( 'editor.BlockEdit', 'mizzey/section-show-setting', withShowSetting );
 	addFilter( 'editor.BlockListBlock', 'mizzey/section-hidden-mark', withHiddenMark );

@@ -521,3 +521,209 @@ msgstr ""
 #: mizzey-site/src/Security/XmlRpc.php:40
 msgid "XML-RPC is not available on this site."
 msgstr ""
+
+# Spec 066, slice 1: the theme's base components and the section library (K-4).
+#: mizzey-theme/inc/components.php:67
+#: mizzey-theme/inc/components.php:541
+msgid "Loading"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:115
+msgid "Working"
+msgstr ""
+
+#. translators: shown on a count badge when the number is over 99.
+#: mizzey-theme/inc/components.php:152
+msgid "99+"
+msgstr ""
+
+#. translators: %d: the discount in percent, shown as a tag beside a sale price, for example "-20%".
+#: mizzey-theme/inc/components.php:172
+#, php-format
+msgid "-%d%%"
+msgstr ""
+
+#. translators: 1: the photo shown, 2: the number of photos.
+#: mizzey-theme/inc/components.php:180
+#, php-format
+msgid "%1$d / %2$d"
+msgstr ""
+
+#. translators: %s: the name of an applied filter, for example a brand.
+#: mizzey-theme/inc/components.php:212
+#, php-format
+msgid "Remove %s"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:460
+#: mizzey-theme/inc/components.php:505
+#: mizzey-theme/inc/components.php:640
+msgid "Close"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:589
+msgid "Previous page"
+msgstr ""
+
+#. translators: %d: a page number in a list of results.
+#: mizzey-theme/inc/components.php:599
+#, php-format
+msgid "Page %d"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:604
+msgid "Next page"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:606
+msgid "Pages"
+msgstr ""
+
+#: mizzey-theme/inc/components.php:680
+msgid "completed"
+msgstr ""
+
+#. translators: 1: a button's name, such as Cart; 2: its count in words, such as "3 items".
+#: mizzey-theme/inc/components.php:112
+#, php-format
+msgid "%1$s, %2$s"
+msgstr ""
+
+#. translators: %d: how many, read after a button's name: cart items, chosen filters.
+#: mizzey-theme/inc/components.php:145
+#, php-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-site/src/Blocks/SectionLibrary.php:127
+msgid "Mizzey sections"
+msgstr ""
+
+#: src/Blocks/library.js:39
+msgid "Visibility"
+msgstr ""
+
+#: src/Blocks/library.js:42
+msgid "Show on the site"
+msgstr ""
+
+#: src/Blocks/library.js:44
+msgid "Hidden: visitors do not see this section. Its content is kept here."
+msgstr ""
+
+#: src/Blocks/library.js:45
+msgid "Visitors see this section."
+msgstr ""
+
+#: src/Blocks/library.js:58
+msgid "Hidden on the site"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:22
+msgid "Authenticity shield"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:23
+msgid "Delivery van"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:24
+msgid "Returns arrow"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:29
+msgid "Authentic products, guaranteed"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:29
+msgid "Authenticity guarantee"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:30
+msgid "Fast delivery"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:30
+msgid "Free delivery on orders over EGP 1,000"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:31
+msgid "Easy returns"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:31
+msgid "Return and refund policy"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:74
+#, js-format
+msgid "Item %d title"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:85
+#, js-format
+msgid "Item %d line"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:102
+msgid "Section"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:106
+msgid "Name read by screen readers"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:107
+msgid "Optional, in this page's language. For example: Why shop with us."
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:114
+#, js-format
+msgid "Item %d"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:118
+#, js-format
+msgid "Item %d mark"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:127
+#, js-format
+msgid "Item %d link"
+msgstr ""
+
+#: src/Blocks/trust-signals/edit.js:128
+msgid "Optional. The line links here; without a link it is plain text."
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block title"
+msgid "Trust signals"
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block description"
+msgid "Three reasons to shop with confidence, each with its mark, a short title and a line."
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "trust"
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "authentic"
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "delivery"
+msgstr ""
+
+#: src/Blocks/trust-signals/block.json
+msgctxt "block keyword"
+msgid "returns"
+msgstr ""

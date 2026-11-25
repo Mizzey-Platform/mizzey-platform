@@ -6,8 +6,10 @@
  *
  * On the component preview (mizzey-theme/tests/preview.php), in English (ltr) and Arabic (rtl), at 1440 and 390
  * wide, for the mini cart drawer, the phone menu drawer, the bottom sheet and the dialog: opening moves focus inside;
- * Tab and Shift+Tab stay inside; Escape closes and focus returns to the control that opened it; a press on the scrim
- * closes and focus returns; in Arabic the end drawer comes from the left and the start drawer from the right. With
+ * Escape closes and focus returns to the control that opened it; a press on the scrim
+ * closes and focus returns; Tab never reaches the page behind, and the page behind does not scroll; a text selection
+ * dragged from a field onto the scrim does not close the drawer; in Arabic the end drawer comes from the left and the
+ * start drawer from the right. With
  * reduced motion the drawer does not slide (its transform does not change), fades in 120 ms or less, and fades out
  * the same way instead of vanishing. Tabs move with the arrow keys, mirrored in Arabic. The board values a computed
  * style shows: the notice words (C1-Notices: 13/20, Arabic 14/24), the tab indicator's 14 px inset, and a steps
@@ -35,16 +37,29 @@ async function overlayChecks( page, id, dir, size ) {
 	check( await isOpen(), 'opens' );
 	check( await focusInside(), 'focus moves inside on open' );
 
-	let trapped = true;
+	// The page behind is inert (showModal): Tab may reach the browser's own controls, never the page behind.
+	const behind = () => page.evaluate( ( i ) => {
+		const el = document.activeElement;
+		return !! el && el !== document.body && ! document.getElementById( i ).contains( el );
+	}, id );
+	let reachedBehind = false;
 	for ( let i = 0; i < 8; i++ ) {
 		await page.keyboard.press( 'Tab' );
-		trapped = trapped && ( await focusInside() );
+		reachedBehind = reachedBehind || ( await behind() );
 	}
 	for ( let i = 0; i < 8; i++ ) {
 		await page.keyboard.press( 'Shift+Tab' );
-		trapped = trapped && ( await focusInside() );
+		reachedBehind = reachedBehind || ( await behind() );
 	}
-	check( trapped, 'Tab and Shift+Tab stay inside' );
+	check( ! reachedBehind, 'Tab and Shift+Tab never reach the page behind' );
+
+	// The page behind does not scroll while the overlay is open.
+	const scrollBefore = await page.evaluate( () => scrollY );
+	await page.mouse.move( 4, size.height / 2 );
+	await page.mouse.wheel( 0, 900 );
+	await page.waitForTimeout( 300 );
+	const locked = await page.evaluate( () => getComputedStyle( document.documentElement ).overflowY );
+	check( ( await page.evaluate( () => scrollY ) ) === scrollBefore && locked === 'hidden', `the page behind does not scroll (overflow ${ locked })` );
 
 	await page.keyboard.press( 'Escape' );
 	await page.waitForFunction( ( i ) => ! document.getElementById( i ).open, id, { timeout: 3000 } ).catch( () => {} );
@@ -75,7 +90,43 @@ async function overlayChecks( page, id, dir, size ) {
 	} else {
 		check( false, 'no part of the scrim was visible to press' );
 	}
+	if ( await isOpen() ) {
+		check( false, "is closed at the end of its checks" );
+		await page.evaluate( ( i ) => document.getElementById( i ).close(), id );
+	}
 	return out;
+}
+
+/* A text selection dragged out of a field onto the scrim does not close the drawer; after it closes the page scrolls
+   again. */
+async function dragAndScrollChecks( page, dir, size ) {
+	const where = `${ dir } ${ size.width } pv-menu`;
+	const trigger = page.locator( '[aria-controls="pv-menu"]' ).first();
+	await trigger.scrollIntoViewIfNeeded();
+	await trigger.click();
+	await page.waitForFunction( () => document.getElementById( 'pv-menu' ).open, null, { timeout: 3000 } ).catch( () => {} );
+	await page.waitForTimeout( 600 );
+	const field = page.locator( '#pv-menu input' ).first();
+	await field.fill( 'a drag that ends on the scrim' );
+	const box = await field.boundingBox();
+	const panel = await page.evaluate( () => document.querySelector( '#pv-menu .mizzey-overlay__panel' ).getBoundingClientRect().toJSON() );
+	const scrimX = dir === 'rtl' ? Math.max( 4, panel.left - 20 ) : Math.min( size.width - 4, panel.right + 20 );
+	await page.mouse.move( box.x + 4, box.y + box.height / 2 );
+	await page.mouse.down();
+	await page.mouse.move( scrimX, box.y + box.height / 2, { steps: 8 } );
+	await page.mouse.up();
+	await page.waitForTimeout( 400 );
+	const stillOpen = await page.evaluate( () => document.getElementById( 'pv-menu' ).open );
+	await page.keyboard.press( 'Escape' );
+	await page.waitForTimeout( 400 );
+	const before = await page.evaluate( () => scrollY );
+	await page.mouse.wheel( 0, -600 );
+	await page.waitForTimeout( 400 );
+	const after = await page.evaluate( () => scrollY );
+	return [
+		{ ok: stillOpen, what: `${ where }: a selection dragged from a field onto the scrim does not close the drawer` },
+		{ ok: after < before, what: `${ where }: once closed, the page scrolls again (${ before } to ${ after })` },
+	];
 }
 
 async function tabChecks( page, dir ) {
@@ -203,6 +254,7 @@ async function reducedMotionCheck( browser, base ) {
 					results.push( ...( await tabChecks( page, dir ) ) );
 				}
 				results.push( ...( await boardValueChecks( page, dir, size ) ) );
+				results.push( ...( await dragAndScrollChecks( page, dir, size ) ) );
 				await context.close();
 			}
 		}
