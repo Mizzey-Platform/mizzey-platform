@@ -43,6 +43,7 @@ add_action(
 
 require_once __DIR__ . '/inc/icons.php';
 require_once __DIR__ . '/inc/components.php';
+require_once __DIR__ . '/inc/header.php';
 
 /*
  * The token layer (spec 066, slice 1). tokens.css and fonts.css are generated from design/tokens/tokens.json and
@@ -51,7 +52,7 @@ require_once __DIR__ . '/inc/components.php';
  * sees is what a visitor sees. The web font faces themselves are declared in theme.json, which WordPress prints
  * inline in the head.
  */
-const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base', 'components'];
+const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base', 'components', 'header'];
 
 /*
  * The components' behaviour: one script module on the Interactivity API WordPress ships. It and the Interactivity
@@ -69,6 +70,15 @@ add_action(
             [['id' => '@wordpress/interactivity', 'import' => 'static']],
             is_file($file) ? (string) filemtime($file) : false
         );
+        // The header's own behaviour (spec 066, slice 2): the mega menu, the phone menu's levels, the Categories tab
+        // and the cart's live count. The header is on every page, so it is too.
+        $header = get_theme_file_path('assets/js/header.js');
+        wp_register_script_module(
+            'mizzey-theme/header',
+            get_theme_file_uri('assets/js/header.js'),
+            [['id' => '@wordpress/interactivity', 'import' => 'static']],
+            is_file($header) ? (string) filemtime($header) : false
+        );
     }
 );
 
@@ -76,6 +86,7 @@ add_action(
     'wp_enqueue_scripts',
     static function (): void {
         wp_enqueue_script_module('mizzey-theme/ui');
+        wp_enqueue_script_module('mizzey-theme/header');
     }
 );
 

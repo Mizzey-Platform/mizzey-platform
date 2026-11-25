@@ -1159,3 +1159,89 @@ msgstr[2] "خياران"
 msgstr[3] "%d خيارات"
 msgstr[4] "%d خيارًا"
 msgstr[5] "%d خيار"
+
+#: mizzey-theme/inc/header.php
+msgid "Search products and brands"
+msgstr "ابحث عن المنتجات والماركات"
+
+#: mizzey-theme/inc/header.php
+msgid "Search"
+msgstr "بحث"
+
+#: mizzey-theme/inc/header.php
+msgid "Help"
+msgstr "المساعدة"
+
+#: mizzey-theme/inc/header.php
+msgid "Account"
+msgstr "حسابي"
+
+#: mizzey-theme/inc/header.php
+msgid "Cart"
+msgstr "السلة"
+
+#: mizzey-theme/inc/header.php
+msgid "Cart, empty"
+msgstr "السلة فارغة"
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Cart, %d item"
+msgid_plural "Cart, %d items"
+msgstr[0] "السلة، %d منتج"
+msgstr[1] "السلة، منتج واحد"
+msgstr[2] "السلة، منتجان"
+msgstr[3] "السلة، %d منتجات"
+msgstr[4] "السلة، %d منتجًا"
+msgstr[5] "السلة، %d منتج"
+
+#: mizzey-theme/inc/header.php
+msgid "Menu"
+msgstr "القائمة"
+
+#: mizzey-theme/inc/header.php
+msgid "Main menu"
+msgstr "القائمة الرئيسية"
+
+#: mizzey-theme/inc/header.php
+msgid "All categories"
+msgstr "كل الأقسام"
+
+#: mizzey-theme/inc/header.php
+msgid "More"
+msgstr "المزيد"
+
+#: mizzey-theme/inc/header.php
+msgid "Shop by category"
+msgstr "تسوّق حسب القسم"
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Shop %s"
+msgstr "تسوّق %s"
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "Shop all %s"
+msgstr "تسوّق كل %s"
+
+#: mizzey-theme/inc/header.php
+#, php-format
+msgid "New in %s"
+msgstr "جديد في %s"
+
+#: mizzey-theme/inc/header.php
+msgid "Back"
+msgstr "رجوع"
+
+#: mizzey-theme/inc/header.php
+msgid "Home"
+msgstr "الرئيسية"
+
+#: mizzey-theme/inc/header.php
+msgid "Categories"
+msgstr "الأقسام"
+
+#: mizzey-theme/inc/header.php
+msgid "Shortcuts"
+msgstr "اختصارات"
