@@ -287,6 +287,25 @@ run(
 		}
 		$check( 4 === count( (array) ( $after['checks'] ?? array() ) ), 'the browser made every check after the change' );
 
+		// ---- AC-14: no sideways scroll on a phone, with no logo file and a long store name (as on staging) ---------
+		$logo = array( 'mod' => get_theme_mod( 'custom_logo' ), 'option' => get_option( 'site_logo' ), 'name' => get_option( 'blogname' ) );
+		$s->on_finish(
+			static function () use ( $logo ): void {
+				false === $logo['mod'] ? remove_theme_mod( 'custom_logo' ) : set_theme_mod( 'custom_logo', $logo['mod'] );
+				false === $logo['option'] ? delete_option( 'site_logo' ) : update_option( 'site_logo', $logo['option'] );
+				update_option( 'blogname', $logo['name'] );
+			}
+		);
+		remove_theme_mod( 'custom_logo' );
+		delete_option( 'site_logo' );
+		update_option( 'blogname', "{$tag} Mizzey (staging) demonstration store of the long name" );
+		$wide = t108_browser( array( 'part' => 'overflow' ) + $plan );
+		$check( empty( $wide['error'] ), 'the browser ran the phone widths' . ( empty( $wide['error'] ) ? '' : ': ' . substr( (string) $wide['error'], 0, 1500 ) ) );
+		foreach ( (array) ( $wide['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], (string) $row['what'] );
+		}
+		$check( 32 === count( (array) ( $wide['checks'] ?? array() ) ), 'the browser made every phone-width check (' . count( (array) ( $wide['checks'] ?? array() ) ) . ')' );
+
 		return $ok;
 	}
 );
