@@ -87,11 +87,12 @@ LAYER_SOURCES = {
     "staging/mu-plugins": (HERE / "mu-plugins", ("mizzey-staging.php",)),
     "integration/baseline": (BASELINE, ("setup.php", "ia-endpoints.php", "wpml-settings.php")),
 }
-SEED_SCRIPTS = ("10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
+SEED_SCRIPTS = ("05-scenario-leftovers.php", "10-users.php", "15-store-settings.php", "20-catalogue-sources.php",
                 "30-catalogue-translations.php", "40-orders.php", "50-reports.php", "60-home-page.php",
-                "70-sample-catalog.php", "65-site-parts.php")
+                "70-sample-catalog.php", "75-sample-reviews.php", "65-site-parts.php")
 # A step run more than once, each pass its own process: the sample catalogue writes its English records, then its
-# Arabic records (finding A11). The header (65) runs after it, so its menu can point at the sample categories.
+# Arabic records (finding A11). The sample reviews (75) follow, on both records; the header (65) runs after them, so
+# its menu can point at the sample categories. What a stopped scenario left behind (05) goes first.
 SEED_PASSES = {"70-sample-catalog.php": ((), ("translate",))}
 PARITY_FILES = ("wpml-remote-config.json", "wpml-development-settings.json")
 # The logo files the home page seed sets (seed/60-home-page.php). The brand identity is not public before launch, so
@@ -103,6 +104,8 @@ BRAND_FILES = ("logo-light.png", "logo-indigo.png")
 # ~/mizzey-staging/sample-catalog/: catalog.json and images/), copied there by hand, and reach the container through
 # the layer's sample-catalog/ folder.
 SAMPLE_PICTURES = (".jpg", ".jpeg", ".png", ".webp")
+# A sample product's video (SAMPLE-002's, made from its own photos) and its poster, in the catalogue's videos/ folder.
+SAMPLE_VIDEOS = (".mp4",)
 BOSTA_DISTRICTS = "bosta-districts.json"
 NOT_HERE = {
     "db-create": "the server creates the database and its account when it creates the site",
@@ -267,9 +270,10 @@ def layer_files() -> dict[str, Path]:
     sample = Path(os.environ.get("MIZZEY_STAGING_SAMPLE_DIR") or STATE / "sample-catalog")
     if (sample / "catalog.json").is_file():
         files["sample-catalog/catalog.json"] = sample / "catalog.json"
-        for picture in sorted((sample / "images").rglob("*")):
-            if picture.is_file() and picture.suffix.lower() in SAMPLE_PICTURES:
-                files[f"sample-catalog/{picture.relative_to(sample).as_posix()}"] = picture
+        for folder, kinds in (("images", SAMPLE_PICTURES), ("videos", SAMPLE_PICTURES + SAMPLE_VIDEOS)):
+            for picture in sorted((sample / folder).rglob("*")):
+                if picture.is_file() and picture.suffix.lower() in kinds:
+                    files[f"sample-catalog/{picture.relative_to(sample).as_posix()}"] = picture
     # Bosta's district list, which the staging plugin answers the carrier plugin's request from.
     districts = STATE / "parity" / BOSTA_DISTRICTS
     if districts.is_file():
