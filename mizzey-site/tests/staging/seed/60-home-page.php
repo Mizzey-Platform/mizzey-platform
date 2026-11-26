@@ -10,7 +10,8 @@
  *  - adds the artwork in home-art/ to the media library once, found again by its seed name on a later run;
  *  - sets the site logo (logo-light.png) and gives the hero the logo for Indigo grounds (logo-indigo.png), never
  *    recoloured, read from MIZZEY_STAGING_BRAND_DIR on the server (default ~/mizzey-staging/brand/), never from this
- *    repository; without them the logo is skipped with one line in the output;
+ *    repository; without them the logo is skipped with one line in the output; and sets the site icon
+ *    (site-icon.png, from the same folder) the same way;
  *  - marks the sample categories, brands and collection "Show on the home page", in order, with the boards' images;
  *  - flags sample products New, Trending and Best Seller, so the product sections have something to show;
  *  - builds the English home page and its Arabic translation from the library's sections, and sets it as the front
@@ -48,13 +49,18 @@ $art = static function ( string $name, string $dir = '' ): int {
 	}
 	$copy = wp_tempnam( basename( $files[0] ) );
 	copy( $files[0], $copy );
-	$id = media_handle_sideload( array( 'name' => basename( $files[0] ), 'tmp_name' => $copy ), 0, 'Sample image (staging)' );
+	$id = media_handle_sideload( array( 'name' => basename( $files[0] ), 'tmp_name' => $copy ), 0, 'Staging image' );
 	if ( is_wp_error( $id ) ) {
 		WP_CLI::error( $id->get_error_message() );
 	}
 	update_post_meta( (int) $id, '_mizzey_seed_art', $name );
 	return (int) $id;
 };
+
+// A picture an earlier run added keeps its file and takes the current title (the word "Sample" left the data).
+foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'inherit', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => '_mizzey_seed_art', 'title' => 'Sample image (staging)', 'suppress_filters' => true ) ) as $renamed ) {
+	wp_update_post( array( 'ID' => (int) $renamed, 'post_title' => 'Staging image' ) );
+}
 
 // ---- The logo ------------------------------------------------------------------------------------------------------
 // The brand identity is not public before launch, so the logo files are never in this repository: they wait on the
@@ -79,10 +85,26 @@ if ( $logo_light && $logo_indigo ) {
 	WP_CLI::log( sprintf( 'logo skipped: put %s in %s', implode( ' and ', array_map( static fn ( string $n, string $d ): string => "{$n}.png ({$d})", array_keys( $logo_files ), $logo_files ) ), $brand_dir ) );
 }
 
+// ---- The site icon ------------------------------------------------------------------------------------------------
+// The browser tab's and the phone's icon, WordPress's own site icon, from the same folder (site-icon.png, square, made
+// from the brand's monogram for favicons). Added once and reused; without it the icon is left as it is.
+$site_icon = $art( 'site-icon', $brand_dir );
+if ( $site_icon ) {
+	if ( (int) get_option( 'site_icon' ) !== $site_icon ) {
+		update_option( 'site_icon', $site_icon );
+	}
+} else {
+	WP_CLI::log( "site icon skipped: put site-icon.png in {$brand_dir}" );
+}
+
 // ---- Terms on the home page ----------------------------------------------------------------------------------------
 $show = static function ( string $taxonomy, string $slug, int $position, string $image ) use ( $art ): void {
 	$term = get_term_by( 'slug', $slug, $taxonomy );
 	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+	// Once the sample catalogue (step 70) has loaded its own terms, the placeholders stay off the home page.
+	if ( get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false, 'number' => 1, 'fields' => 'ids', 'meta_key' => '_mizzey_sample', 'meta_compare' => 'EXISTS' ) ) ) {
 		return;
 	}
 	update_term_meta( $term->term_id, HomeSections::ON_HOME, 'yes' );
@@ -226,4 +248,4 @@ if ( ! $ar ) {
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $en );
 
-WP_CLI::success( sprintf( 'home page %d (Arabic %d), logo %d, %d product records flagged', $en, $ar, $logo_light, $flagged ) );
+WP_CLI::success( sprintf( 'home page %d (Arabic %d), logo %d, site icon %d, %d product records flagged', $en, $ar, $logo_light, $site_icon, $flagged ) );

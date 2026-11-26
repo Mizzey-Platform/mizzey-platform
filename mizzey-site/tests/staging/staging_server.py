@@ -95,10 +95,10 @@ SEED_SCRIPTS = ("05-scenario-leftovers.php", "10-users.php", "15-store-settings.
 # its menu can point at the sample categories. What a stopped scenario left behind (05) goes first.
 SEED_PASSES = {"70-sample-catalog.php": ((), ("translate",))}
 PARITY_FILES = ("wpml-remote-config.json", "wpml-development-settings.json")
-# The logo files the home page seed sets (seed/60-home-page.php). The brand identity is not public before launch, so
+# The logo files and the site icon the home page seed sets (seed/60-home-page.php). The brand identity is not public before launch, so
 # they are never in the repository: they wait on the server in MIZZEY_STAGING_BRAND_DIR (default
 # ~/mizzey-staging/brand/), copied there by hand, and reach the container through the layer's brand/ folder.
-BRAND_FILES = ("logo-light.png", "logo-indigo.png")
+BRAND_FILES = ("logo-light.png", "logo-indigo.png", "site-icon.png")
 # The sample catalogue the Stage 2 boards draw (seed/70-sample-catalog.php): its names, brands and photos are not this
 # repository's to publish, so they wait on the server in MIZZEY_STAGING_SAMPLE_DIR (default
 # ~/mizzey-staging/sample-catalog/: catalog.json and images/), copied there by hand, and reach the container through

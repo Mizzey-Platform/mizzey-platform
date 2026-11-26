@@ -339,6 +339,16 @@ class TheStagingLayer(OnTheServer):
         served = [" ".join((s, *x)) for s in srv.SEED_SCRIPTS for x in srv.SEED_PASSES.get(s, ((),))]
         self.assertEqual(served, ran)
 
+    def test_the_site_icon_comes_from_the_server_beside_the_logo(self):
+        self.assertIn("site-icon.png", srv.BRAND_FILES)
+        brand = srv.STATE / "brand"
+        brand.mkdir(parents=True)
+        (brand / "site-icon.png").write_bytes(b"\x89PNG")
+        self.assertIn("brand/site-icon.png", srv.install_layer())
+        source = (srv.HERE / "seed" / "60-home-page.php").read_text(encoding="utf-8")
+        self.assertIn("$art( 'site-icon', $brand_dir )", source)
+        self.assertIn("update_option( 'site_icon',", source)
+
     def test_the_sample_video_and_its_poster_reach_the_layer(self):
         sample = srv.STATE / "sample-catalog"
         (sample / "videos").mkdir(parents=True)

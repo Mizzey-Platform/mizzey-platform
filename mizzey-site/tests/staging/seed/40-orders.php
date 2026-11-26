@@ -16,6 +16,15 @@
 defined( 'ABSPATH' ) || exit;
 defined( 'MIZZEY_STAGING' ) && MIZZEY_STAGING || WP_CLI::error( 'staging only' );
 
+// The street of an order an earlier run placed, renamed (the word "Sample" left the data on 26 November 2026).
+foreach ( wc_get_orders( array( 'limit' => -1, 'created_via' => 'staging-seed', 'status' => array_keys( wc_get_order_statuses() ) ) ) as $placed ) {
+	if ( $placed instanceof WC_Order && str_contains( $placed->get_billing_address_1() . $placed->get_shipping_address_1(), 'Sample Street' ) ) {
+		$placed->set_billing_address_1( str_replace( 'Sample Street', 'Tahrir Street', $placed->get_billing_address_1() ) );
+		$placed->set_shipping_address_1( str_replace( 'Sample Street', 'Tahrir Street', $placed->get_shipping_address_1() ) );
+		$placed->save();
+	}
+}
+
 if ( wc_get_orders( array( 'limit' => 1, 'return' => 'ids' ) ) ) {
 	echo wp_json_encode( array( 'orders' => 'already seeded' ) ), "\n";
 	return;
@@ -70,7 +79,7 @@ foreach ( $orders as $i => list( $status, $lang, $method, $lines, $days_ago, $ac
 		'last_name'  => sprintf( 'Customer %02d', $n ),
 		'email'      => sprintf( 'customer%02d@example.invalid', $n ),
 		'phone'      => $phones[ $i % count( $phones ) ],
-		'address_1'  => sprintf( '%d Sample Street', 10 + $n ),
+		'address_1'  => sprintf( '%d Tahrir Street', 10 + $n ),
 		'city'       => $cities[ $i % count( $cities ) ],
 		'state'      => 'C',
 		'postcode'   => '11511',

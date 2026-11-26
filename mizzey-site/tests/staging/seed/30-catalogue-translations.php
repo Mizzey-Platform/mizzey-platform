@@ -19,16 +19,16 @@ global $sitepress;
 
 $arabic_terms = array(
 	'product_cat'   => array(
-		'sample-care'        => 'عناية تجريبية',
-		'sample-home'        => 'منزل تجريبي',
-		'sample-accessories' => 'إكسسوارات تجريبية',
+		'sample-care'        => 'عناية للاختبار',
+		'sample-home'        => 'منزل للاختبار',
+		'sample-accessories' => 'إكسسوارات للاختبار',
 	),
 	'product_brand' => array(
-		'sample-brand-north' => 'علامة تجريبية شمال',
-		'sample-brand-south' => 'علامة تجريبية جنوب',
+		'sample-brand-north' => 'علامة اختبار شمال',
+		'sample-brand-south' => 'علامة اختبار جنوب',
 	),
 	'product_collection' => array(
-		'sample-collection' => 'مجموعة تجريبية',
+		'sample-collection' => 'مجموعة اختبار',
 	),
 );
 
@@ -46,6 +46,12 @@ foreach ( $arabic_terms as $taxonomy => $names ) {
 		$group = $sitepress->get_element_translations( $trid, $type );
 		if ( isset( $group['ar'] ) ) {
 			$term_map[ $taxonomy ][ (int) $source->term_id ] = (int) $group['ar']->term_id;
+			// Renamed on a later run (the word "sample" left the data on 26 November 2026); the slug stays.
+			$sitepress->switch_lang( 'ar', true );
+			$held = get_term( (int) $group['ar']->term_id, $taxonomy );
+			if ( $held instanceof WP_Term && $held->name !== $arabic ) {
+				wp_update_term( (int) $held->term_id, $taxonomy, array( 'name' => $arabic ) );
+			}
 			continue;
 		}
 		$sitepress->switch_lang( 'ar', true );
@@ -93,12 +99,12 @@ foreach ( $sources as $en_id ) {
 	// Release the duplicate, then give it its own Arabic name. The slug stays shared, as the baseline pages do.
 	delete_post_meta( $ar_id, '_icl_lang_duplicate_of' );
 	$number = preg_replace( '/\D+/', '', get_the_title( $en_id ) );
-	$name   = false !== strpos( get_the_title( $en_id ), 'Variable' ) ? 'منتج تجريبي بخيارات ' : 'منتج تجريبي ';
+	$name   = false !== strpos( get_the_title( $en_id ), 'Variable' ) ? 'منتج اختبار بخيارات ' : 'منتج اختبار ';
 	wp_update_post(
 		array(
 			'ID'           => $ar_id,
 			'post_title'   => $name . $number,
-			'post_excerpt' => 'منتج غير حقيقي لنسخة العرض التجريبية.',
+			'post_excerpt' => 'منتج غير حقيقي لنسخة العرض.',
 		)
 	);
 	foreach ( $term_map as $taxonomy => $pairs ) {

@@ -149,7 +149,7 @@ foreach ( $catalog['reviews'] as $row ) {
 	}
 	if ( ReviewEligibility::NOT_ELIGIBLE === ReviewEligibility::refusal( $customer, $product ) && ! $order instanceof WC_Order ) {
 		$order   = wc_create_order( array( 'customer_id' => $customer ) );
-		$address = array( 'first_name' => $reviewers[ $who ], 'last_name' => '', 'email' => 'sample-reviewer-' . $who . '@example.invalid', 'phone' => '01000000' . str_pad( (string) ( 100 + count( $customers ) ), 3, '0', STR_PAD_LEFT ), 'address_1' => '1 Sample Street', 'city' => 'Cairo', 'state' => 'C', 'postcode' => '11511', 'country' => 'EG' );
+		$address = array( 'first_name' => $reviewers[ $who ], 'last_name' => '', 'email' => 'sample-reviewer-' . $who . '@example.invalid', 'phone' => '01000000' . str_pad( (string) ( 100 + count( $customers ) ), 3, '0', STR_PAD_LEFT ), 'address_1' => '1 Tahrir Street', 'city' => 'Cairo', 'state' => 'C', 'postcode' => '11511', 'country' => 'EG' );
 		$order->add_product( wc_get_product( $line ), 1 );
 		$order->set_address( $address, 'billing' );
 		$order->set_address( $address, 'shipping' );
