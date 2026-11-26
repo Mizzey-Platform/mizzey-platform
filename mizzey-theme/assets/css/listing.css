@@ -4,12 +4,13 @@
 
    Phone and tablet: one column; the filters open in a drawer from the start edge. From 1024 wide: the 300 filter
    column beside the results, 24 apart (three cards in a row up to 1279, four from 1280). The numbers in the comments
-   are the boards'. */
+   are the boards'. The lower glow fades out by the listing's end, so the page meets the footer with no edge
+   (C1-Category-Desktop centres it well above the footer). */
 
 .mizzey-listing-page {
 	margin-block: 0;
 	background-image: radial-gradient(70% calc(var(--mizzey-layout-reading-width) * 0.62) at 50% 0%, var(--mizzey-color-glow-top) 0%, transparent 100%),
-		radial-gradient(70% calc(var(--mizzey-layout-reading-width) * 0.9) at 10% 100%, var(--mizzey-color-glow-lower) 0%, transparent 100%);
+		radial-gradient(70% calc(var(--mizzey-layout-reading-width) * 0.9) at 10% calc(100% - var(--mizzey-layout-reading-width) * 0.9), var(--mizzey-color-glow-lower) 0%, transparent 100%);
 }
 
 .mizzey-listing {
@@ -1110,8 +1111,11 @@ details.mizzey-filter:not([open]) {
 		margin-block-start: var(--mizzey-space-5);
 	}
 
+	/* The column ends 64 above the listing's end, however short the list (C1-Category-Desktop: column 1710, the end
+	   of "Showing" 1774, the footer 1846), so it never meets the footer. */
 	.mizzey-filters {
 		display: block;
+		margin-block-end: calc(var(--mizzey-space-6) * 2);
 	}
 
 	.mizzey-filters__panel {
