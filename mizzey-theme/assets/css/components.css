@@ -31,7 +31,8 @@
 }
 
 /* Text for assistive technology only. */
-.mizzey-visually-hidden {
+/* Doubled, so no page's stylesheet (a form label's margin on shop pages) moves it. */
+.mizzey-visually-hidden.mizzey-visually-hidden {
 	position: absolute;
 	inline-size: var(--mizzey-border-hairline);
 	block-size: var(--mizzey-border-hairline);
@@ -72,7 +73,8 @@
 		transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
 }
 
-.mizzey-button:active:not(:disabled) {
+.mizzey-button:active:not(:disabled),
+.mizzey-button.is-pressed:not(:disabled) {
 	transform: scale(var(--mizzey-motion-scale-press-button));
 	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
@@ -93,12 +95,19 @@
 	transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-button--primary:hover,
-.mizzey-button--primary:active {
+@media (hover: hover) {
+	.mizzey-button--primary:hover {
+		background-color: var(--mizzey-color-role-primary-hover);
+	}
+}
+
+.mizzey-button--primary:active,
+.mizzey-button--primary.is-pressed {
 	background-color: var(--mizzey-color-role-primary-hover);
 }
 
-.mizzey-button--primary:active::after {
+.mizzey-button--primary:active::after,
+.mizzey-button--primary.is-pressed::after {
 	opacity: 0.6;
 	transition: opacity var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
@@ -109,18 +118,23 @@
 	box-shadow: var(--mizzey-elevation-1);
 }
 
-.mizzey-button--secondary:hover {
-	background-color: var(--mizzey-color-indigo-50);
-	box-shadow: var(--mizzey-elevation-2), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+@media (hover: hover) {
+	.mizzey-button--secondary:hover {
+		background-color: var(--mizzey-color-indigo-50);
+		box-shadow: var(--mizzey-elevation-2), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+	}
 }
 
-.mizzey-button--secondary:active {
+.mizzey-button--secondary:active,
+.mizzey-button--secondary.is-pressed {
 	background-color: var(--mizzey-color-glow-top);
 	box-shadow: var(--mizzey-elevation-1);
 }
 
-.mizzey-button--text:hover {
-	background-color: var(--mizzey-color-indigo-50);
+@media (hover: hover) {
+	.mizzey-button--text:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-button--large {
@@ -146,8 +160,10 @@
 	font: var(--mizzey-type-label);
 }
 
-.mizzey-button--toolbar:hover {
-	background-color: var(--mizzey-color-indigo-50);
+@media (hover: hover) {
+	.mizzey-button--toolbar:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-button--icon {
@@ -157,12 +173,19 @@
 	padding: 0;
 }
 
-.mizzey-button--icon:hover,
-.mizzey-button--icon:active {
+@media (hover: hover) {
+	.mizzey-button--icon:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
+}
+
+.mizzey-button--icon:active,
+.mizzey-button--icon.is-pressed {
 	background-color: var(--mizzey-color-indigo-50);
 }
 
-.mizzey-button--icon:active:not(:disabled) {
+.mizzey-button--icon:active:not(:disabled),
+.mizzey-button--icon.is-pressed:not(:disabled) {
 	transform: scale(var(--mizzey-motion-scale-press-icon));
 	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
@@ -229,8 +252,10 @@
 	color: var(--mizzey-color-role-text-on-brand);
 }
 
-.mizzey-on-brand .mizzey-button--icon:hover {
-	background-color: var(--mizzey-color-neutral-on-brand-hover);
+@media (hover: hover) {
+	.mizzey-on-brand .mizzey-button--icon:hover {
+		background-color: var(--mizzey-color-neutral-on-brand-hover);
+	}
 }
 
 .mizzey-on-brand .mizzey-button:focus-visible {
@@ -494,7 +519,12 @@ textarea.mizzey-field__control {
 	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-select__option:hover,
+@media (hover: hover) {
+	.mizzey-select__option:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
+}
+
 .mizzey-select__option[aria-selected="true"] {
 	background-color: var(--mizzey-color-indigo-50);
 }
@@ -713,11 +743,14 @@ textarea.mizzey-field__control {
 	inset-block: calc((var(--mizzey-control-chip) - var(--mizzey-control-target-min)) / 2);
 }
 
-.mizzey-chip:hover {
-	background-color: var(--mizzey-color-indigo-50);
+@media (hover: hover) {
+	.mizzey-chip:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
-.mizzey-chip:active {
+.mizzey-chip:active,
+.mizzey-chip.is-pressed {
 	transform: scale(var(--mizzey-motion-scale-press-button));
 	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
@@ -733,8 +766,15 @@ textarea.mizzey-field__control {
 	color: var(--mizzey-color-neutral-muted);
 }
 
-.mizzey-chip--chosen,
-.mizzey-chip--chosen:hover {
+@media (hover: hover) {
+	.mizzey-chip--chosen:hover {
+		background-color: var(--mizzey-color-role-primary);
+		color: var(--mizzey-color-role-on-primary);
+		box-shadow: none;
+	}
+}
+
+.mizzey-chip--chosen {
 	background-color: var(--mizzey-color-role-primary);
 	color: var(--mizzey-color-role-on-primary);
 	box-shadow: none;
@@ -744,8 +784,16 @@ textarea.mizzey-field__control {
 	color: var(--mizzey-color-indigo-100);
 }
 
-.mizzey-chip--applied,
-.mizzey-chip--applied:hover {
+@media (hover: hover) {
+	.mizzey-chip--applied:hover {
+		padding-inline: var(--mizzey-space-4) var(--mizzey-space-2);
+		background-color: var(--mizzey-color-indigo-100);
+		color: var(--mizzey-color-role-primary);
+		box-shadow: none;
+	}
+}
+
+.mizzey-chip--applied {
 	padding-inline: var(--mizzey-space-4) var(--mizzey-space-2);
 	background-color: var(--mizzey-color-indigo-100);
 	color: var(--mizzey-color-role-primary);
@@ -1132,6 +1180,14 @@ textarea.mizzey-field__control {
 	animation: mizzey-breathe var(--mizzey-motion-loop-breathe) var(--mizzey-motion-easing-loop) infinite alternate;
 }
 
+/* It breathes only while the photo loads: once the well's photo has arrived (assets/js/header.js marks the well), the
+   mark stops and is not painted under the photo. */
+[data-mizzey-loaded] > .mizzey-zz,
+[data-mizzey-loaded] > * > .mizzey-zz {
+	animation: none;
+	visibility: hidden;
+}
+
 .mizzey-zz__indigo {
 	fill: var(--mizzey-color-brand-royal-indigo);
 }
@@ -1203,8 +1259,10 @@ textarea.mizzey-field__control {
 	transition: background-color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-pagination__item:hover {
-	background-color: var(--mizzey-color-indigo-50);
+@media (hover: hover) {
+	.mizzey-pagination__item:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-pagination__item:focus-visible {
@@ -1742,7 +1800,12 @@ textarea.mizzey-field__control {
 	transition: color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-tabs__tab:hover,
+@media (hover: hover) {
+	.mizzey-tabs__tab:hover {
+		color: var(--mizzey-color-role-primary);
+	}
+}
+
 .mizzey-tabs__tab[aria-selected="true"] {
 	color: var(--mizzey-color-role-primary);
 }
@@ -1892,8 +1955,11 @@ textarea.mizzey-field__control {
 @media (prefers-reduced-motion: reduce) {
 	.mizzey-button,
 	.mizzey-button:active:not(:disabled),
+	.mizzey-button.is-pressed:not(:disabled),
 	.mizzey-button--icon:active:not(:disabled),
-	.mizzey-chip:active {
+	.mizzey-button--icon.is-pressed:not(:disabled),
+	.mizzey-chip:active,
+	.mizzey-chip.is-pressed {
 		transform: none;
 	}
 

@@ -52,6 +52,15 @@ final class Section
     }
 
     /**
+     * Plain words, escaped, with each percentage in bold ("Up to 25%" with "25%" bold, as the deals board draws its
+     * line); Latin or Arabic-Indic digits, an optional decimal part.
+     */
+    public static function figures(string $words): string
+    {
+        return (string) preg_replace('/[0-9\x{0660}-\x{0669}]+(?:[.,\x{066B}][0-9\x{0660}-\x{0669}]+)?\s?[%\x{066A}]/u', '<strong>$0</strong>', esc_html($words));
+    }
+
+    /**
      * The section's root attributes, through the block's own wrapper.
      *
      * @param list<string>                     $classes

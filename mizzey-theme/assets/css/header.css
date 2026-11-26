@@ -7,12 +7,17 @@
 .mizzey-header {
 	position: relative;
 	z-index: 20;
+	background-color: var(--mizzey-color-role-surface);
 	color: var(--mizzey-color-role-text);
 }
 
 .mizzey-header a {
 	text-decoration: none;
 }
+
+/* One header on every page (the owner's report, 26 November 2026): its rules are scoped to the header, so the
+   stylesheets WooCommerce and the blocks load on shop pages (".woocommerce img { height: auto }" and the like) never
+   resize its logo or move its parts. */
 
 /* ---------------------------------------------------------------------------------------------------------------
    The bar: phone first (52 high: menu, logo, language, cart; the search row under it). */
@@ -51,8 +56,8 @@
 	color: var(--mizzey-color-role-primary);
 }
 
-.mizzey-header__logo-image,
-.mizzey-menu__logo img {
+.mizzey-header .mizzey-header__logo-image,
+.mizzey-menu .mizzey-menu__logo img {
 	display: block;
 	inline-size: auto;
 	block-size: var(--mizzey-control-logo-phone);
@@ -69,12 +74,16 @@
 	unicode-bidi: plaintext;
 }
 
-.mizzey-header__logo-image {
+.mizzey-header .mizzey-header__logo-image {
 	max-inline-size: 100%;
 	object-fit: contain;
 }
 
-.mizzey-header__top > .mizzey-header__logo,
+/* The logo is a 44 target in the middle of the 52 bar (C1-Home-Phone). */
+.mizzey-header__top > .mizzey-header__logo {
+	block-size: var(--mizzey-control-target-min);
+}
+
 .mizzey-header__actions {
 	block-size: var(--mizzey-control-header-phone);
 }
@@ -109,8 +118,15 @@
 	font: var(--mizzey-type-arabic-body-strong);
 }
 
+/* العربية in the bar: Tajawal 17 on a 24 line (C1-Home-Phone, C1-Home-Desktop); English on the Arabic page on 28
+   (set after the Latin font below). */
+.mizzey-header__language:lang(ar) {
+	line-height: var(--mizzey-space-5);
+}
+
 .mizzey-header__language:lang(en) {
 	font: var(--mizzey-type-latin-body-strong);
+	line-height: calc(var(--mizzey-space-5) + var(--mizzey-space-1));
 }
 
 .mizzey-header__help,
@@ -216,20 +232,21 @@
 	display: none;
 }
 
-/* The search field: a White pill with a hairline ring (level 1). */
+/* The search field: a White pill on level 1 with the Indigo 300 ring (C1-Home-Phone, C1-Home-Desktop); the words
+   8 after the icon. */
 .mizzey-header__search {
 	grid-area: search;
 	position: relative;
 	display: flex;
 	align-items: center;
-	gap: var(--mizzey-space-3);
+	gap: var(--mizzey-space-2);
 	block-size: var(--mizzey-control-search-phone);
 	margin-block: var(--mizzey-space-2) var(--mizzey-space-3);
 	margin-inline: var(--mizzey-space-3);
 	padding-inline: var(--mizzey-space-4);
 	border-radius: var(--mizzey-radius-pill);
 	background-color: var(--mizzey-color-brand-white);
-	box-shadow: var(--mizzey-elevation-1);
+	box-shadow: var(--mizzey-elevation-field);
 	color: var(--mizzey-color-role-primary);
 }
 
@@ -261,6 +278,12 @@
 
 .mizzey-header__search-input::-webkit-search-cancel-button {
 	appearance: none;
+}
+
+/* Without chips (the listing form: category, shop, search, account, pages), the header keeps 24 under the field, as
+   C1-Category-Phone draws it (128 high). */
+.mizzey-header--form-listing .mizzey-header__bar {
+	padding-block-end: var(--mizzey-space-3);
 }
 
 /* On the home page the chips sit 12 under the field, and 12 above the header's foot (C1-Home-Phone; the owner chose
@@ -301,14 +324,31 @@
 }
 
 /* Each chip's item is exactly the chip: no line box of its own, which Tajawal's taller lines grew by 3 in Arabic, so
-   the row stays 36 + 12 in both languages (C1-Home-Phone). */
+   the row stays 36 + 12 in both languages (C1-Home-Phone). The 36 pill takes a press over a 44 target, 4 over and
+   under it, as the board draws the chip inside its link. */
 .mizzey-header__chips li {
 	display: flex;
 	align-items: center;
 }
 
 .mizzey-header__chips .mizzey-chip {
+	position: relative;
+}
+
+.mizzey-header__chips .mizzey-chip::before {
+	content: "";
+	position: absolute;
+	inset-block: calc((var(--mizzey-control-target-min) - var(--mizzey-control-chip)) / -2);
+	inset-inline: 0;
+}
+
+.mizzey-header__chips .mizzey-chip {
 	font: var(--mizzey-type-label);
+}
+
+/* Arabic chips on a 24 line (C1-Home-Phone-Arabic). */
+.mizzey-header__chips .mizzey-chip:lang(ar) {
+	line-height: var(--mizzey-space-5);
 }
 
 .mizzey-header__chips .mizzey-icon--tag {
@@ -404,17 +444,24 @@
 		margin-inline-start: 0;
 	}
 
-	.mizzey-header__logo-image {
+	.mizzey-header .mizzey-header__logo-image {
 		block-size: var(--mizzey-control-logo-desktop);
 	}
 
+	/* 48 high, 12 under the bar's top and 12 over its foot on every page form, the home page's included. */
 	.mizzey-header__search,
+	.mizzey-header--form-home .mizzey-header__search,
 	.mizzey-header--form-compact:not(.is-search-open) .mizzey-header__search {
 		display: flex;
 		grid-column: 3 / 9;
 		grid-row: 1;
 		block-size: var(--mizzey-control-search-desktop);
 		margin: 0;
+	}
+
+	.mizzey-header__search-icon {
+		inline-size: var(--mizzey-control-icon);
+		block-size: var(--mizzey-control-icon);
 	}
 
 	.mizzey-header__actions {
@@ -434,7 +481,9 @@
 		display: none;
 	}
 
-	.mizzey-header__bar {
+	.mizzey-header__bar,
+	.mizzey-header--form-listing .mizzey-header__bar {
+		padding-block-end: 0;
 		box-shadow: none;
 	}
 
@@ -593,6 +642,60 @@
 		}
 	}
 
+	/* The section the page sits under (C1-Category-Desktop, C1-Product-Desktop): bold Royal Indigo over a 3 bar,
+	   rounded, 4 above the link's foot and as wide as the link. */
+	.mizzey-header__links .mizzey-header__link[aria-current] {
+		position: relative;
+		color: var(--mizzey-color-role-primary);
+		font-weight: var(--mizzey-font-weight-bold);
+	}
+
+	/* The underline that slides (the owner's design addition, 26 November 2026): one bar for the row, the same 3 bar
+	   4 above a link's foot, moved to the item under the pointer or in focus and back to the page's own item on the
+	   soft spring (450 ms); it fades in and out where the page has no item of its own. Logical insets: it follows the
+	   row in Arabic. With it running, the item's own bar steps aside. */
+	.mizzey-header__row-inner {
+		position: relative;
+	}
+
+	.mizzey-header__indicator {
+		position: absolute;
+		inset-block-start: calc(var(--mizzey-indicator-foot, 0px) - var(--mizzey-space-1) - var(--mizzey-border-indicator));
+		inset-inline-start: var(--mizzey-indicator-start, 0px);
+		inline-size: var(--mizzey-indicator-size, 0px);
+		block-size: var(--mizzey-border-indicator);
+		border-radius: var(--mizzey-border-indicator);
+		background-color: var(--mizzey-color-role-primary);
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			inset-inline-start var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft),
+			inline-size var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft),
+			opacity var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+	}
+
+	.mizzey-header__indicator.is-shown {
+		opacity: 1;
+	}
+
+	.mizzey-header__indicator.is-placing {
+		transition: none;
+	}
+
+	.mizzey-header__row.has-indicator .mizzey-header__links .mizzey-header__link[aria-current]::after {
+		content: none;
+	}
+
+	.mizzey-header__links .mizzey-header__link[aria-current]::after {
+		content: "";
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: var(--mizzey-space-1);
+		block-size: var(--mizzey-border-indicator);
+		border-radius: var(--mizzey-border-indicator);
+		background-color: currentColor;
+	}
+
 	.mizzey-header__more-button {
 		color: var(--mizzey-color-role-primary);
 	}
@@ -601,14 +704,24 @@
 		position: relative;
 	}
 
+	/* The list sits in the top layer (a popover), under "More" with its end edges aligned; header.js places it. It
+	   opens with opacity and a scale from 0.96 from its corner nearest the button, in 200 ms (C1-Motion-Playground,
+	   popover). */
 	.mizzey-header__more-list {
-		position: absolute;
-		z-index: 2;
-		inset-block-start: 100%;
-		inset-inline-end: 0;
+		position: fixed;
+		inset: auto;
+		inset-block-start: var(--mizzey-more-top, auto);
+		inset-inline-end: var(--mizzey-more-end, auto);
 		margin: 0;
 		padding: var(--mizzey-space-2);
+		border: 0;
+		color: var(--mizzey-color-role-text);
 		list-style: none;
+	}
+
+	.mizzey-header__more-list:popover-open {
+		transform-origin: calc(100% - var(--mizzey-origin-start)) 0;
+		animation: mizzey-pop var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
 	}
 
 	.mizzey-header__more-list .mizzey-header__link {
@@ -657,7 +770,7 @@
 		box-sizing: content-box;
 		max-inline-size: var(--mizzey-layout-content-width);
 		margin-inline: auto;
-		padding-block: var(--mizzey-space-5);
+		padding-block: var(--mizzey-space-5) var(--mizzey-space-6);
 		padding-inline: var(--mizzey-layout-margin-desktop);
 	}
 
@@ -678,8 +791,9 @@
 		display: flex;
 		align-items: center;
 		gap: var(--mizzey-space-3);
+		box-sizing: border-box;
 		min-block-size: var(--mizzey-control-target-preferred);
-		padding-block: var(--mizzey-space-1);
+		padding-block: 0;
 		padding-inline: var(--mizzey-space-2) var(--mizzey-space-3);
 		border-radius: var(--mizzey-radius-sm);
 		color: var(--mizzey-color-role-text);
@@ -757,8 +871,9 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--mizzey-space-2);
+		box-sizing: border-box;
 		min-block-size: var(--mizzey-control-target-preferred);
-		padding-block: var(--mizzey-space-1);
+		padding-block: 0;
 		padding-inline: var(--mizzey-space-4) var(--mizzey-space-3);
 		border-radius: var(--mizzey-radius-sm);
 		background-color: var(--mizzey-color-glow-lower);
@@ -833,6 +948,94 @@
 		background-image: var(--mizzey-gradient-deep);
 	}
 
+	/* Opening (C1-Motion-Playground, mega menu): opacity and an 8 px drop in 320 ms, the scrim fading in; the columns
+	   follow 30 ms apart (the grid stagger). Moving to another top category cross-fades its panel in place. */
+	.mizzey-mega:not([hidden]) {
+		animation: mizzey-mega-drop var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
+	}
+
+	.mizzey-mega__scrim:not([hidden]) {
+		animation: mizzey-mega-fade var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out) both;
+	}
+
+	.mizzey-mega:not([hidden]) .mizzey-mega__rows,
+	.mizzey-mega:not([hidden]) .mizzey-mega__panel:not([hidden]) > * {
+		animation: mizzey-mega-drop var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
+	}
+
+	.mizzey-mega:not([hidden]) .mizzey-mega__panel:not([hidden]) > :nth-child(1) {
+		animation-delay: var(--mizzey-motion-stagger-grid);
+	}
+
+	.mizzey-mega:not([hidden]) .mizzey-mega__panel:not([hidden]) > :nth-child(2) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 2);
+	}
+
+	.mizzey-mega:not([hidden]) .mizzey-mega__panel:not([hidden]) > :nth-child(n + 3) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 3);
+	}
+
+	.mizzey-mega.is-switching .mizzey-mega__panel:not([hidden]),
+	.mizzey-mega.is-switching .mizzey-mega__panel:not([hidden]) > * {
+		animation: mizzey-mega-fade var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) both;
+	}
+}
+
+@keyframes mizzey-mega-drop {
+	from {
+		opacity: 0;
+		transform: translateY(calc(var(--mizzey-motion-distance-2) * -1));
+	}
+}
+
+@keyframes mizzey-mega-fade {
+	from {
+		opacity: 0;
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The sticky header (C1-Motion-Playground): the strip, the bar and the chips stay on top of the page; scrolling down
+   past 200 px, the strip and the chips slide away in 200 ms and the header row stays; scrolling up, they return.
+   assets/js/header.js sets is-tucked on the header's template part and the strip's height as --mizzey-tuck. The part
+   itself is never moved by a transform, so the tab bar and the Categories view inside it stay fixed to the screen. */
+
+.wp-block-template-part:has(> .mizzey-header) {
+	position: sticky;
+	z-index: 20;
+	inset-block-start: 0;
+	transition: inset-block-start var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.wp-block-template-part.is-tucked:has(> .mizzey-header) {
+	inset-block-start: calc(var(--mizzey-tuck, var(--mizzey-control-strip-phone)) * -1);
+}
+
+.mizzey-header__bar {
+	position: relative;
+	z-index: 2;
+}
+
+.mizzey-header__chips {
+	position: relative;
+	z-index: 1;
+	transition: transform var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+/* Tucked, the chips' place lets the page through: only the bar takes a press. */
+.is-tucked > .mizzey-header {
+	pointer-events: none;
+}
+
+.is-tucked > .mizzey-header > :not(.mizzey-header__chips) {
+	pointer-events: auto;
+}
+
+.is-tucked .mizzey-header__chips {
+	visibility: hidden;
+	transform: translateY(-100%);
+	transition: transform var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out),
+		visibility var(--mizzey-motion-duration-reduced) linear var(--mizzey-motion-duration-4);
 }
 
 /* ---------------------------------------------------------------------------------------------------------------
@@ -1219,30 +1422,57 @@
 	inset-block-end: 0;
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
+	align-items: start;
+	box-sizing: border-box;
 	block-size: var(--mizzey-layout-tab-bar-height);
-	padding-block-end: max(var(--mizzey-space-2), env(safe-area-inset-bottom));
+	padding-block: 0 max(var(--mizzey-space-2), env(safe-area-inset-bottom));
+	padding-inline: var(--mizzey-space-2);
 	background-color: var(--mizzey-color-role-surface);
-	box-shadow: 0 calc(var(--mizzey-border-hairline) * -1) 0 0 var(--mizzey-color-role-border);
+	/* Level 2 cast upward, over the page (C1-Home-Phone). */
+	box-shadow: var(--mizzey-elevation-bar-up);
 }
 
-body:has(.mizzey-tabbar) {
-	padding-block-end: var(--mizzey-layout-tab-bar-height);
+/* A notice never covers the tab bar (staging review, 25 November 2026): whatever place a notice region takes at the
+   foot of the screen, it stands above the bar. The bar's height is offered as --mizzey-bottom-bar to anything else
+   fixed to the foot of a phone screen. */
+@media not (min-width: 1024px) {
+	body:has(.mizzey-tabbar) {
+		--mizzey-bottom-bar: var(--mizzey-layout-tab-bar-height);
+	}
+
+	body:has(.mizzey-tabbar) .mizzey-card-toasts {
+		margin-block-end: var(--mizzey-bottom-bar);
+	}
 }
 
+/* Each target 56 high: the 24 icon 4 from its top, the 8 row of the active mark, the 16 label (C1-Home-Phone). */
 .mizzey-tabbar__item {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: var(--mizzey-space-1);
+	block-size: calc(var(--mizzey-control-target-preferred) + var(--mizzey-space-2));
 	min-inline-size: 0;
 	padding: 0;
 	border: 0;
 	background: none;
 	color: var(--mizzey-color-neutral-muted);
-	font: var(--mizzey-type-caption);
+	font: var(--mizzey-type-badge);
+	letter-spacing: var(--mizzey-type-badge-letter-spacing);
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-tabbar__item:active,
+.mizzey-tabbar__item.is-pressed {
+	transform: scale(var(--mizzey-motion-scale-press-button));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-tabbar__label:lang(ar) {
+	line-height: calc(var(--mizzey-space-4) + var(--mizzey-space-1) / 2);
 }
 
 .mizzey-tabbar__label {
@@ -1252,56 +1482,95 @@ body:has(.mizzey-tabbar) {
 	white-space: nowrap;
 }
 
-.mizzey-tabbar__item[aria-current="page"],
+.mizzey-tabbar__item[aria-current],
 .mizzey-tabbar__item[aria-expanded="true"] {
 	color: var(--mizzey-color-role-primary);
 }
 
-/* While the Categories view is open, Home is not the place shown. */
-.mizzey-categories-open .mizzey-tabbar__item[aria-current="page"] {
+/* While the Categories view is open, the page's own tab is not the place shown. */
+.mizzey-categories-open .mizzey-tabbar__item[aria-current]:not([aria-expanded="true"]) {
 	color: var(--mizzey-color-neutral-muted);
 }
 
 .mizzey-tabbar__icon {
-	position: relative;
 	display: inline-flex;
 }
 
-.mizzey-tabbar__item[aria-current="page"] .mizzey-tabbar__icon::after,
-.mizzey-tabbar__item[aria-expanded="true"] .mizzey-tabbar__icon::after {
-	content: "";
-	position: absolute;
-	inset-block-start: calc(100% + var(--mizzey-border-hairline));
-	inset-inline-start: calc(50% - var(--mizzey-border-indicator));
-	inline-size: calc(var(--mizzey-border-indicator) * 2);
-	block-size: calc(var(--mizzey-border-indicator) * 2);
-	border-radius: var(--mizzey-radius-pill);
-	background-color: var(--mizzey-color-role-accent);
+.mizzey-tabbar__mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	block-size: var(--mizzey-control-tab-mark-row);
+	color: var(--mizzey-color-role-accent);
 }
 
-.mizzey-categories-open .mizzey-tabbar__item[aria-current="page"] .mizzey-tabbar__icon::after {
-	content: none;
+.mizzey-tabbar__dot {
+	display: block;
+	inline-size: var(--mizzey-control-tab-mark-inline);
+	block-size: var(--mizzey-control-tab-mark-block);
+	visibility: hidden;
+}
+
+.mizzey-tabbar__item[aria-current] .mizzey-tabbar__dot,
+.mizzey-tabbar__item[aria-expanded="true"] .mizzey-tabbar__dot {
+	visibility: visible;
+}
+
+.mizzey-categories-open .mizzey-tabbar__item[aria-current]:not([aria-expanded="true"]) .mizzey-tabbar__dot {
+	visibility: hidden;
 }
 
 .mizzey-tabbar__on,
+.mizzey-tabbar__item[aria-current] .mizzey-tabbar__rest,
 .mizzey-tabbar__item[aria-expanded="true"] .mizzey-tabbar__rest {
 	display: none;
 }
 
+.mizzey-tabbar__item[aria-current] .mizzey-tabbar__on,
 .mizzey-tabbar__item[aria-expanded="true"] .mizzey-tabbar__on {
 	display: inline-block;
 }
 
+/* Closed while a category is shown, the Categories tab keeps its filled, marked look (C1-Category-Phone). */
+.mizzey-categories-open .mizzey-tabbar__item[aria-current]:not([aria-expanded="true"]) .mizzey-tabbar__on {
+	display: none;
+}
+
+.mizzey-categories-open .mizzey-tabbar__item[aria-current]:not([aria-expanded="true"]) .mizzey-tabbar__rest {
+	display: inline-block;
+}
+
 /* The Categories view: between the header and the tab bar, the top categories as tiles, three across. */
+/* As C1-Menus-Phone (3, the Categories tab) draws it: on White, right under the header, whose chips step aside; the
+   heading 16 from the top, the tiles 8 under it, three across inside 12, each a 76 tile on the Indigo tint with no
+   shadow and its name under it, 8 inside its target; rows 4 apart. */
 .mizzey-categories {
 	position: fixed;
 	z-index: 18;
 	inset-block: var(--mizzey-categories-top, 0) var(--mizzey-layout-tab-bar-height);
 	inset-inline: 0;
-	padding: var(--mizzey-space-5) var(--mizzey-space-4);
+	padding: var(--mizzey-space-4) var(--mizzey-space-3);
 	overflow-y: auto;
 	overscroll-behavior: contain;
-	background-image: var(--mizzey-gradient-air);
+	background-color: var(--mizzey-color-role-surface);
+}
+
+.mizzey-categories-open .mizzey-header__chips {
+	display: none;
+}
+
+/* Without its chips, the header keeps 12 under the search field (C1-Menus-Phone, 3). */
+.mizzey-categories-open .mizzey-header--form-home .mizzey-header__bar {
+	padding-block-end: var(--mizzey-space-3);
+}
+
+/* The tiles of a row share its height, as drawn. */
+.mizzey-categories__grid > li {
+	display: flex;
+}
+
+.mizzey-categories__grid > li > .mizzey-categories__item {
+	flex: 1;
 }
 
 .mizzey-categories[hidden] {
@@ -1309,8 +1578,10 @@ body:has(.mizzey-tabbar) {
 }
 
 .mizzey-categories__title {
-	margin-block: 0 var(--mizzey-space-4);
+	margin-block: 0 var(--mizzey-space-2);
+	padding-inline: var(--mizzey-space-1);
 	font: var(--mizzey-type-h2);
+	letter-spacing: var(--mizzey-type-h2-letter-spacing);
 }
 
 .mizzey-categories__title:focus {
@@ -1320,7 +1591,7 @@ body:has(.mizzey-tabbar) {
 .mizzey-categories__grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--mizzey-space-5) var(--mizzey-space-2);
+	gap: var(--mizzey-space-1) var(--mizzey-space-2);
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -1331,6 +1602,8 @@ body:has(.mizzey-tabbar) {
 	flex-direction: column;
 	align-items: center;
 	gap: var(--mizzey-space-2);
+	padding: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-card);
 	color: var(--mizzey-color-role-text);
 	font: var(--mizzey-type-label);
 	text-align: center;
@@ -1344,8 +1617,7 @@ body:has(.mizzey-tabbar) {
 	aspect-ratio: 1;
 	overflow: hidden;
 	border-radius: var(--mizzey-radius-card);
-	background-color: var(--mizzey-color-brand-white);
-	box-shadow: var(--mizzey-elevation-1);
+	background-color: var(--mizzey-color-indigo-50);
 	color: var(--mizzey-color-indigo-300);
 }
 
@@ -1362,9 +1634,6 @@ body:has(.mizzey-tabbar) {
 		display: none;
 	}
 
-	body:has(.mizzey-tabbar) {
-		padding-block-end: 0;
-	}
 }
 
 .mizzey-tabbar a,
@@ -1375,7 +1644,21 @@ body:has(.mizzey-tabbar) {
 
 @media (prefers-reduced-motion: reduce) {
 	.mizzey-mega__row,
-	.mizzey-header__all {
+	.mizzey-header__all,
+	.mizzey-tabbar__item,
+	.wp-block-template-part:has(> .mizzey-header),
+	.mizzey-header__chips {
+		transition: none;
+	}
+
+	.mizzey-tabbar__item:active,
+	.mizzey-tabbar__item.is-pressed {
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-header__indicator {
 		transition: none;
 	}
 

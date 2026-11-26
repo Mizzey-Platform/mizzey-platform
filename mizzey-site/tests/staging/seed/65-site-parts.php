@@ -5,13 +5,16 @@
  * 2 and 3). Runs after 60-home-page.php, which sets the logo.
  *
  * Every value is sample content for the staging copy, not the client's: the links and words are the boards'
- * (C1-Global, C1-Home-Desktop, C1-Home-Phone-Arabic); a link with no page of its own on staging points at "#"; the
- * phone (+20 100 000 0000), email (example.com) and address are invented and carry no label, as the owner asked on
- * 26 November 2026 (no word "sample" in the data). The team replaces all of it in the Site Editor. It:
+ * (C1-Global, C1-Home-Desktop, C1-Home-Phone, C1-Home-Phone-Arabic); a link with no page of its own on staging points
+ * at "#"; the phone (+20 100 000 0000), email (hello@mizzey.com) and address (Cairo, Egypt) are plain demo values and
+ * carry no label, as the owner asked on 26 November 2026 (no word "sample" in the data; a link's description still
+ * prints as its tag when staff set one). The team replaces all of it in the Site Editor. It:
  *
  *  - makes the menus as WordPress navigation menus, one per language, the Arabic one a WPML translation of the
- *    English: the header's category row (slug `mizzey-header`), and the footer's Shop, Help, About, Legal and
- *    Customer care columns;
+ *    English: the header's category row (slug `mizzey-header`: the first six categories, then Offers and Brands, as
+ *    C1-Home-Desktop draws it), and the footer's Shop (every top category, twelve on the boards), Help, About, Legal
+ *    and Customer care columns; each Arabic link carries the Arabic category's own name;
+ *  - sets the header's Help link and the footer's legal line in each language (C1-Home-Desktop, C1-Home-Phone);
  *  - rebuilds the stored header and footer template parts from the theme's current parts/*.html on every run, adding
  *    only the menus, the strip's message and the logo for Indigo grounds, as staff would set them in the Site Editor
  *    (a stored part would otherwise freeze the markup of the release it was saved under);
@@ -51,9 +54,17 @@ $page_url = static function ( int $id ): string {
 $privacy = $page_url( (int) get_option( 'wp_page_for_privacy_policy' ) );
 $terms   = $page_url( function_exists( 'wc_terms_and_conditions_page_id' ) ? (int) wc_terms_and_conditions_page_id() : 0 );
 $shop    = (string) wc_get_page_permalink( 'shop' );
+// The store's policy pages (60-home-page.php makes them when missing), in each language; '#' when there is none.
+$policy = static function ( string $key, string $lang ): string {
+	$slug = array( 'authenticity' => 'authenticity-guarantee', 'shipping' => 'shipping-policy', 'returns' => 'returns-and-refunds' )[ $key ];
+	$page = get_page_by_path( $slug, OBJECT, 'page' );
+	$id   = $page instanceof WP_Post ? (int) apply_filters( 'wpml_object_id', $page->ID, 'page', false, $lang ) : 0;
+	return $id > 0 && 'publish' === get_post_status( $id ) ? (string) apply_filters( 'wpml_permalink', (string) get_permalink( $id ), $lang ) : '#';
+};
 
 /**
- * A navigation-link block. $item: [label, url] or [label, url, term id] for a category, or [label, url, 0, 'offer'].
+ * A navigation-link block. $item: [label, url] or [label, url, term id] for a category, or [label, url, 0, 'offer'],
+ * or [label, url, 0, '', description] for a link with a tag under it.
  */
 $link = static function ( array $item ): string {
 	$attrs = array( 'label' => $item[0], 'url' => $item[1], 'kind' => 'custom', 'isTopLevelLink' => true );
@@ -62,6 +73,9 @@ $link = static function ( array $item ): string {
 	}
 	if ( ! empty( $item[3] ) ) {
 		$attrs['className'] = 'is-style-' . HeaderMenu::OFFER_STYLE;
+	}
+	if ( ! empty( $item[4] ) ) {
+		$attrs['description'] = $item[4];
 	}
 	return serialize_block( array( 'blockName' => 'core/navigation-link', 'attrs' => $attrs, 'innerBlocks' => array(), 'innerHTML' => '', 'innerContent' => array() ) );
 };
@@ -135,11 +149,15 @@ foreach ( (array) get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' =>
 }
 asort( $cats );
 $cats = $cats ? array_keys( $cats ) : array( 'sample-care', 'sample-home', 'sample-accessories' );
-$cat_links = static function ( string $lang ) use ( $cats, $category ): array {
+$cat_links = static function ( string $lang, int $limit = 0 ) use ( $cats, $category ): array {
 	$out = array();
-	foreach ( $cats as $slug ) {
+	foreach ( $limit > 0 ? array_slice( $cats, 0, $limit ) : $cats as $slug ) {
 		list( $id, $url ) = $category( $slug, $lang );
+		// The term with exactly this id: under English, WPML would hand back the English term, and the Arabic menu would
+		// read the English names (staging review, 25 November 2026).
+		add_filter( 'wpml_disable_term_adjust_id', '__return_true' );
 		$term = $id ? get_term( $id, 'product_cat' ) : null;
+		remove_filter( 'wpml_disable_term_adjust_id', '__return_true' );
 		if ( $term instanceof WP_Term ) {
 			$out[] = array( html_entity_decode( $term->name ), $url, $id );
 		}
@@ -151,8 +169,8 @@ $cat_links = static function ( string $lang ) use ( $cats, $category ): array {
 $header = $nav(
 	HeaderMenu::SLUG,
 	array(
-		'en' => array( 'Mizzey header', array_merge( $cat_links( 'en' ), array( array( 'Offers', $shop, 0, 'offer' ), array( 'Brands', '#' ) ) ) ),
-		'ar' => array( 'قائمة ميزي', array_merge( $cat_links( 'ar' ), array( array( 'العروض', $shop, 0, 'offer' ), array( 'الماركات', '#' ) ) ) ),
+		'en' => array( 'Mizzey header', array_merge( $cat_links( 'en', 6 ), array( array( 'Offers', $shop, 0, 'offer' ), array( 'Brands', '#' ) ) ) ),
+		'ar' => array( 'قائمة ميزي', array_merge( $cat_links( 'ar', 6 ), array( array( 'العروض', $shop, 0, 'offer' ), array( 'الماركات', '#' ) ) ) ),
 	)
 );
 
@@ -161,15 +179,15 @@ $shop_col = $nav( 'mizzey-footer-shop', array( 'en' => array( 'Shop', $cat_links
 $help_col = $nav(
 	'mizzey-footer-help',
 	array(
-		'en' => array( 'Help', array( array( 'Contact us', '#' ), array( 'Help & FAQ', '#' ), array( 'Shipping policy', '#' ), array( 'Returns and refunds', '#' ) ) ),
-		'ar' => array( 'المساعدة', array( array( 'تواصل معنا', '#' ), array( 'المساعدة والأسئلة الشائعة', '#' ), array( 'سياسة الشحن', '#' ), array( 'الإرجاع والاسترداد', '#' ) ) ),
+		'en' => array( 'Help', array( array( 'Contact us', '#' ), array( 'Help & FAQ', '#' ), array( 'Shipping policy', $policy( 'shipping', 'en' ) ), array( 'Returns and refunds', $policy( 'returns', 'en' ) ) ) ),
+		'ar' => array( 'المساعدة', array( array( 'تواصل معنا', '#' ), array( 'المساعدة والأسئلة الشائعة', '#' ), array( 'سياسة الشحن', $policy( 'shipping', 'ar' ) ), array( 'الإرجاع والاسترداد', $policy( 'returns', 'ar' ) ) ) ),
 	)
 );
 $about_col = $nav(
 	'mizzey-footer-about',
 	array(
-		'en' => array( 'About', array( array( 'About us', '#' ), array( 'Authenticity guarantee', '#' ) ) ),
-		'ar' => array( 'عن ميزي', array( array( 'من نحن', '#' ), array( 'ضمان الأصالة', '#' ) ) ),
+		'en' => array( 'About', array( array( 'About us', '#' ), array( 'Authenticity guarantee', $policy( 'authenticity', 'en' ) ) ) ),
+		'ar' => array( 'عن ميزي', array( array( 'من نحن', '#' ), array( 'ضمان الأصالة', $policy( 'authenticity', 'ar' ) ) ) ),
 	)
 );
 $legal_col = $nav(
@@ -182,12 +200,12 @@ $legal_col = $nav(
 $care_col = $nav(
 	'mizzey-footer-care',
 	array(
-		'en' => array( 'Customer care', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ), array( '12 Tahrir Street, Cairo', '#' ) ) ),
-		'ar' => array( 'خدمة العملاء', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ), array( '12 شارع التحرير، القاهرة', '#' ) ) ),
+		'en' => array( 'Customer care', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@mizzey.com', 'mailto:hello@mizzey.com' ), array( 'Cairo, Egypt', '#' ) ) ),
+		'ar' => array( 'خدمة العملاء', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@mizzey.com', 'mailto:hello@mizzey.com' ), array( 'القاهرة، مصر', '#' ) ) ),
 	)
 );
 
-// ---- The WhatsApp number (specs/059): a sample, never a real line ----------------------------------------------------
+// ---- The WhatsApp number (specs/059): a demo number, never a real line ------------------------------------------------
 if ( '' === (string) get_option( ContactLinks::NUMBER, '' ) ) {
 	update_option( ContactLinks::NUMBER, '+20 100 000 0000' );
 }
@@ -208,11 +226,11 @@ $seeded = array(
 	'mizzey/announcement-strip' => array(
 		'variant'  => 'fixed',
 		'messages' => array(
-			'en' => array( array( 'text' => 'Free delivery on orders over EGP 1,000', 'label' => 'See details', 'url' => '#' ) ),
-			'ar' => array( array( 'text' => 'توصيل مجاني للطلبات فوق 1,000 ج.م', 'label' => 'التفاصيل', 'url' => '#' ) ),
+			'en' => array( array( 'text' => 'Free delivery on orders over EGP 1,000', 'label' => 'See details', 'url' => $policy( 'shipping', 'en' ) ) ),
+			'ar' => array( array( 'text' => 'توصيل مجاني للطلبات فوق 1,000 ج.م', 'label' => 'التفاصيل', 'url' => $policy( 'shipping', 'ar' ) ) ),
 		),
 	),
-	'mizzey/site-header'        => array( 'menu' => $header['en'], 'darkLogo' => $logo_indigo ),
+	'mizzey/site-header'        => array( 'menu' => $header['en'], 'darkLogo' => $logo_indigo, 'helpUrl' => '#' ),
 	'mizzey/site-footer'        => array(
 		'style'    => 'indigo',
 		'darkLogo' => $logo_indigo,
@@ -223,6 +241,10 @@ $seeded = array(
 			array( 'menus' => $legal_col, 'under' => true ),
 		),
 		'care'     => $care_col,
+		'legal'    => array(
+			'en' => '© 2026 Mizzey. Mizzey is a registered trademark.',
+			'ar' => '© 2026 ميزي. ميزي علامة تجارية مسجلة.',
+		),
 	),
 );
 

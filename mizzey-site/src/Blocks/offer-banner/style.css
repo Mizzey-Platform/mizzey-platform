@@ -60,6 +60,40 @@
 	overflow-wrap: anywhere;
 }
 
+.mizzey-offer__tag {
+	letter-spacing: var(--mizzey-type-caption-letter-spacing);
+}
+
+.mizzey-offer__tag:lang(ar) {
+	font-size: var(--mizzey-type-arabic-label-font-size);
+	line-height: calc(var(--mizzey-space-4) + var(--mizzey-space-1) / 2);
+}
+
+/* On a phone the banner's heading carries no tracking (C1-Home-Phone); from 1024 wide it keeps the heading's -0.02em
+   and sits 16 under its tag (C1-Home-Desktop). */
+.mizzey-offer .mizzey-offer__heading {
+	letter-spacing: var(--mizzey-type-caption-letter-spacing);
+}
+
+@media (min-width: 1024px) {
+	.mizzey-offer .mizzey-offer__heading {
+		letter-spacing: var(--mizzey-type-h2-letter-spacing);
+	}
+
+	.mizzey-offer .mizzey-offer__tag + .mizzey-offer__heading {
+		margin-block-start: var(--mizzey-space-4);
+	}
+}
+
+.mizzey-offer .mizzey-offer__button:lang(ar) {
+	line-height: calc(var(--mizzey-space-5) + var(--mizzey-space-1));
+}
+
+/* In Arabic the photo is mirrored, as C1-Home-Phone-Arabic draws it. */
+[dir="rtl"] .mizzey-offer__image {
+	transform: scaleX(-1);
+}
+
 .mizzey-offer__tag + .mizzey-offer__heading {
 	margin-block-start: var(--mizzey-space-3);
 }

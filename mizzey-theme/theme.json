@@ -294,9 +294,9 @@
 							"fontStyle": "normal",
 							"fontDisplay": "swap",
 							"src": [
-								"file:./assets/fonts/tajawal-300-arabic-92ae4edb.woff2"
+								"file:./assets/fonts/tajawal-300-arabic-a732fa1c.woff2"
 							],
-							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+0030-003A, U+00A0, U+00AB, U+00BB"
 						},
 						{
 							"fontFamily": "Tajawal",
@@ -304,9 +304,9 @@
 							"fontStyle": "normal",
 							"fontDisplay": "swap",
 							"src": [
-								"file:./assets/fonts/tajawal-400-arabic-05b9a65f.woff2"
+								"file:./assets/fonts/tajawal-400-arabic-2beba403.woff2"
 							],
-							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+0030-003A, U+00A0, U+00AB, U+00BB"
 						},
 						{
 							"fontFamily": "Tajawal",
@@ -314,9 +314,9 @@
 							"fontStyle": "normal",
 							"fontDisplay": "swap",
 							"src": [
-								"file:./assets/fonts/tajawal-500-arabic-1c95ce6a.woff2"
+								"file:./assets/fonts/tajawal-500-arabic-f376b497.woff2"
 							],
-							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+0030-003A, U+00A0, U+00AB, U+00BB"
 						},
 						{
 							"fontFamily": "Tajawal",
@@ -324,9 +324,9 @@
 							"fontStyle": "normal",
 							"fontDisplay": "swap",
 							"src": [
-								"file:./assets/fonts/tajawal-900-arabic-806f93d0.woff2"
+								"file:./assets/fonts/tajawal-900-arabic-d902482a.woff2"
 							],
-							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB"
+							"unicodeRange": "U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, U+002C-002E, U+0030-003A, U+00A0, U+00AB, U+00BB"
 						}
 					]
 				},
@@ -560,6 +560,16 @@
 					"slug": "elevation-1-soft",
 					"name": "Elevation 1 Soft",
 					"shadow": "0px 1px 2px 0px rgba(38,59,115,.06), 0px 1px 3px 1px rgba(38,59,115,.04)"
+				},
+				{
+					"slug": "elevation-field",
+					"name": "Elevation Field",
+					"shadow": "0px 1px 2px 0px rgba(38,59,115,.06), 0px 1px 3px 1px rgba(38,59,115,.04), 0px 0px 0px 1px #7B84A0"
+				},
+				{
+					"slug": "elevation-bar-up",
+					"name": "Elevation Bar Up",
+					"shadow": "0px -2px 6px 2px rgba(38,59,115,.06), 0px -1px 2px 0px rgba(38,59,115,.08)"
 				}
 			]
 		},

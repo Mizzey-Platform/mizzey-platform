@@ -45,14 +45,33 @@ function t109_browser( array $plan ): array {
 }
 
 /**
+ * Run the boards' checks (mizzey-site/tests/browser/_board.cjs) on a plan: { part, urls }.
+ *
+ * @return array<string,mixed>
+ */
+function t109_board( array $plan ): array {
+	$file = wp_tempnam( 't109-board' );
+	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	$out = array();
+	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/_board.cjs' ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out );
+	wp_delete_file( $file );
+	$json = json_decode( (string) end( $out ), true );
+	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
+}
+
+/**
  * A navigation menu's markup, as the Site Editor saves it.
  *
- * @param list<array{0:string,1:string}> $links Label and address.
+ * @param list<array{0:string,1:string,2?:string}> $links Label, address and, optionally, the link's description.
  */
 function t109_menu_markup( array $links ): string {
 	$out = '';
-	foreach ( $links as [ $label, $url ] ) {
-		$out .= '<!-- wp:navigation-link ' . wp_json_encode( array( 'label' => $label, 'type' => 'custom', 'url' => $url, 'kind' => 'custom', 'isTopLevelLink' => true ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' /-->';
+	foreach ( $links as $link ) {
+		$attrs = array( 'label' => $link[0], 'type' => 'custom', 'url' => $link[1], 'kind' => 'custom', 'isTopLevelLink' => true );
+		if ( ! empty( $link[2] ) ) {
+			$attrs['description'] = $link[2];
+		}
+		$out .= '<!-- wp:navigation-link ' . wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' /-->';
 	}
 	return $out;
 }
@@ -123,8 +142,9 @@ run(
 			'help-ar'  => t109_menu( 'ar', 'help', "{$tag} المساعدة", array( array( "{$tag} تواصل معنا", home_url( '/ar/s3-contact/' ) ) ) ),
 			'legal-en' => t109_menu( 'en', 'legal', "{$tag} Legal", array( array( "{$tag} Privacy policy", home_url( '/s3-privacy/' ) ), array( "{$tag} Cookie preferences", '#cookie-preferences' ) ) ),
 			'legal-ar' => t109_menu( 'ar', 'legal', "{$tag} قانوني", array( array( "{$tag} سياسة الخصوصية", home_url( '/ar/s3-privacy/' ) ), array( "{$tag} تفضيلات ملفات تعريف الارتباط", '#cookie-preferences' ) ) ),
-			'care-en'  => t109_menu( 'en', 'care', "{$tag} Customer care", array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ) ) ),
-			'care-ar'  => t109_menu( 'ar', 'care', "{$tag} خدمة العملاء", array( array( '+20 100 000 0000', 'tel:+201000000000' ) ) ),
+			// The address carries a description, which the footer shows as a tag under it (C1-Home-Phone, "Sample").
+			'care-en'  => t109_menu( 'en', 'care', "{$tag} Customer care", array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ), array( '12 Sample Street, Cairo', home_url( '/s3-address/' ), 'Sample' ) ) ),
+			'care-ar'  => t109_menu( 'ar', 'care', "{$tag} خدمة العملاء", array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( '12 شارع العيّنة، القاهرة', home_url( '/ar/s3-address/' ), 'عيّنة' ) ) ),
 			'unnamed'  => t109_menu( 'en', 'unnamed', "{$tag} Not in the footer", array( array( "{$tag} Should not show", home_url( '/s3-no/' ) ) ) ),
 		);
 		$s->on_finish(
@@ -227,6 +247,15 @@ run(
 			$check( true === $row['ok'], 'run 2: ' . (string) $row['what'] );
 		}
 		$check( count( (array) ( $second['checks'] ?? array() ) ) >= 30, 'run 2: the browser made every check (' . count( (array) ( $second['checks'] ?? array() ) ) . ')' );
+
+		// ---- The boards' numbers (staging review, 25 November 2026), Chromium and WebKit, 390 and 1440, both languages:
+		// the space above the footer, the language link in its own script, a link's tag under it. -------------------
+		$board = t109_board( array( 'part' => 'footer', 'urls' => array( 'en' => $plan['en'], 'ar' => $plan['ar'], 'scope' => $plan['scope'], 'consent' => array( 'name' => 'mizzey_consent', 'value' => 'denied' ) ) ) );
+		$check( empty( $board['error'] ), 'board: the browser ran' . ( empty( $board['error'] ) ? '' : ': ' . substr( (string) $board['error'], 0, 1500 ) ) );
+		foreach ( (array) ( $board['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], 'board: ' . (string) $row['what'] );
+		}
+		$check( count( (array) ( $board['checks'] ?? array() ) ) >= 40, 'board: the browser made every check (' . count( (array) ( $board['checks'] ?? array() ) ) . ')' );
 
 		return $ok;
 	}

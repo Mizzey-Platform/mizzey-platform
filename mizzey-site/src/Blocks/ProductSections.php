@@ -60,11 +60,14 @@ final class ProductSections
             return '';
         }
         $line = Section::plain($attributes['line'] ?? '');
+        // An optional tag beside the heading, as the boards draw one there (C1-Home-Phone, C1-Home-Desktop); none by default.
+        $tag = Section::plain($attributes['headingTag'] ?? '');
         $link = esc_url(self::link($attributes));
         // The line sits beside the heading on a desktop and under it on a phone (style.css), so it is in the head row.
         $head = Section::el('div', ['class' => ['mizzey-home__head', 'mizzey-deals__head']],
             ('' !== $heading ? Section::el('h2', ['class' => 'mizzey-home__heading'], esc_html($heading)) : '')
-            . ('' !== $line ? Section::el('p', ['class' => 'mizzey-deals__line'], esc_html($line)) : '')
+            . ('' !== $tag ? Section::el('span', ['class' => 'mizzey-deals__tag'], esc_html($tag)) : '')
+            . ('' !== $line ? Section::el('p', ['class' => 'mizzey-deals__line'], Section::figures($line)) : '')
             . ('' !== $link ? Section::el('a', ['class' => 'mizzey-home__all', 'href' => $link], esc_html__('View all', 'mizzey-site')) : ''));
         return sprintf(
             '<section %s>%s%s</section>',

@@ -43,14 +43,38 @@
 	text-align: center;
 }
 
+/* One line sits in the middle of the 36 strip whatever the script's line height: 36 in both languages, Arabic on a
+   24 line (C1-Home-Phone, C1-Home-Phone-Arabic). */
 .mizzey-announcement__text {
 	display: -webkit-box;
-	padding-block: var(--mizzey-space-2);
+	padding-block: calc((var(--mizzey-control-strip-phone) - 1lh) / 2);
 	min-inline-size: 0;
 	overflow: hidden;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
+}
+
+/* An amount in the message: Inter in both languages; its figures proportional in English and tabular in Arabic, as
+   C1-Home-Phone and C1-Home-Phone-Arabic draw them. */
+.mizzey-announcement__figure {
+	font-family: var(--mizzey-font-family-numeric);
+	unicode-bidi: isolate;
+}
+
+.mizzey-announcement__figure:lang(ar) {
+	font-variant-numeric: tabular-nums;
+}
+
+.mizzey-announcement__text:lang(ar),
+.mizzey-announcement__link:lang(ar) {
+	line-height: var(--mizzey-space-5);
+}
+
+/* Arabic names its 24 line here, as "1lh" in the padding came out 22 in both engines: 6 above and below, so two
+   lines make 60 (the boards draw no two-line Arabic strip; this keeps the one-line strip's space). */
+.mizzey-announcement__text:lang(ar) {
+	padding-block: calc((var(--mizzey-control-strip-phone) - var(--mizzey-space-5)) / 2);
 }
 
 .mizzey-announcement__link {
@@ -71,9 +95,10 @@
 	border-radius: var(--mizzey-radius-xs);
 }
 
-/* The slider: the message showing in place, the next waiting under it, the last one leaving upwards. */
+/* The slider: messages cross-fade with a 12 px rise (C1-Motion-Playground, strip slider): the next waits 12 under its
+   place, the last one leaves 12 upwards. */
 .mizzey-announcement--slider .mizzey-announcement__message {
-	transform: translateY(100%);
+	transform: translateY(var(--mizzey-motion-distance-3));
 	opacity: 0;
 	transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out),
 		opacity var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
@@ -85,7 +110,7 @@
 }
 
 .mizzey-announcement--slider .mizzey-announcement__message.is-leaving {
-	transform: translateY(-100%);
+	transform: translateY(calc(var(--mizzey-motion-distance-3) * -1));
 	opacity: 0;
 }
 
@@ -105,9 +130,11 @@
 	cursor: pointer;
 }
 
-.mizzey-announcement__pause:hover {
-	background-color: var(--mizzey-color-neutral-on-brand-hover);
-	border-radius: var(--mizzey-radius-pill);
+@media (hover: hover) {
+	.mizzey-announcement__pause:hover {
+		background-color: var(--mizzey-color-neutral-on-brand-hover);
+		border-radius: var(--mizzey-radius-pill);
+	}
 }
 
 .mizzey-announcement__icon-play,

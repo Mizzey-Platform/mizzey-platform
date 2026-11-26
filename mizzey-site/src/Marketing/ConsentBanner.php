@@ -96,11 +96,11 @@ final class ConsentBanner
         }
         $printed = true;
         printf(
-            '<div id="mizzey-consent" class="mizzey-consent" role="dialog" aria-live="polite" aria-label="%s" hidden><p class="mizzey-consent__text">%s <a class="mizzey-consent__preferences" href="#cookie-preferences">%s</a></p><p class="mizzey-consent__choices"><button type="button" class="mizzey-button mizzey-button--secondary mizzey-button--compact" data-mizzey-consent="denied">%s</button><button type="button" class="mizzey-button mizzey-button--primary mizzey-button--compact" data-mizzey-consent="granted">%s</button></p></div>',
+            '<div id="mizzey-consent" class="mizzey-consent" role="dialog" aria-live="polite" aria-label="%s" hidden><p class="mizzey-consent__text">%s <button type="button" class="mizzey-consent__preferences" data-wp-interactive="mizzey/ui" data-wp-context="{&quot;target&quot;:&quot;mizzey-consent-preferences&quot;}" data-wp-on--click="actions.open" aria-haspopup="dialog" aria-controls="mizzey-consent-preferences">%s</button></p><p class="mizzey-consent__choices"><button type="button" class="mizzey-button mizzey-button--secondary mizzey-consent__choice" data-mizzey-consent="denied">%s</button><button type="button" class="mizzey-button mizzey-button--primary mizzey-consent__choice" data-mizzey-consent="granted">%s</button></p></div>',
             esc_attr__('Cookie choices', 'mizzey-site'),
-            esc_html__('We use cookies to measure visits and to show you relevant offers on other sites. Essential cookies keep the store working and are always on.', 'mizzey-site'),
+            esc_html__('We use cookies to keep your cart, see how the store is used and show relevant ads.', 'mizzey-site'),
             esc_html__('Cookie preferences', 'mizzey-site'),
-            esc_html__('Essential only', 'mizzey-site'),
+            esc_html__('Decline', 'mizzey-site'),
             esc_html__('Accept all', 'mizzey-site')
         );
     }

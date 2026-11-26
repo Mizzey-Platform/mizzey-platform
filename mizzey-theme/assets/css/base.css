@@ -3,13 +3,27 @@
    (.mizzey-type--<role>); nothing literal lives here (K-3). Logical properties only, so this one stylesheet
    serves both reading directions. */
 
+/* The page: two soft glows on White, the upper one under the hero, the lower one past the middle of the page
+   (C1-Home-Phone, C1-Home-Desktop, C1-Category-Phone). */
 body {
 	font: var(--mizzey-type-body);
 	font-synthesis: none;
 	color: var(--mizzey-color-role-text);
 	background-color: var(--mizzey-color-role-page);
+	background-image:
+		radial-gradient(var(--mizzey-control-glow-top-inline) var(--mizzey-control-glow-top-block) at 50% var(--mizzey-control-glow-top-y-phone), var(--mizzey-color-glow-top), transparent),
+		radial-gradient(var(--mizzey-control-glow-lower-inline) var(--mizzey-control-glow-lower-block) at 10% 55%, var(--mizzey-color-glow-lower), transparent);
+	background-repeat: no-repeat;
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;
+}
+
+@media (min-width: 1024px) {
+	body {
+		background-image:
+			radial-gradient(var(--mizzey-control-glow-top-inline) var(--mizzey-control-glow-top-block) at 50% var(--mizzey-control-glow-top-y-desktop), var(--mizzey-color-glow-top), transparent),
+			radial-gradient(var(--mizzey-control-glow-lower-inline) var(--mizzey-control-glow-lower-block) at 10% 55%, var(--mizzey-color-glow-lower), transparent);
+	}
 }
 
 /* Prices, quantities, order numbers, countdowns and codes: Inter in both languages, tabular figures, never
@@ -97,6 +111,49 @@ body {
 	from {
 		opacity: 0;
 		transform: translateY(var(--mizzey-space-2));
+	}
+}
+
+/* Scroll reveal (the owner's ruling of 25 November 2026): a library section below the first screen fades in and
+   rises 12 px once, in 320 ms, when it enters the screen; a rail's cards follow 30 ms apart, the first six only.
+   assets/js/reveal.js marks the html element (mizzey-reveal) and the sections, so nothing is hidden without it, and
+   nothing on the first screen moves. Reduced motion: nothing hides, nothing moves. */
+@media (prefers-reduced-motion: no-preference) {
+	.mizzey-reveal [data-reveal="waiting"] {
+		opacity: 0;
+		transform: translateY(var(--mizzey-motion-distance-3));
+	}
+
+	.mizzey-reveal [data-reveal="in"],
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item {
+		animation: mizzey-reveal var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) both;
+	}
+
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item:nth-child(2) {
+		animation-delay: var(--mizzey-motion-stagger-grid);
+	}
+
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item:nth-child(3) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 2);
+	}
+
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item:nth-child(4) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 3);
+	}
+
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item:nth-child(5) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 4);
+	}
+
+	.mizzey-reveal [data-reveal="in"] .mizzey-products__item:nth-child(n + 6) {
+		animation-delay: calc(var(--mizzey-motion-stagger-grid) * 5);
+	}
+}
+
+@keyframes mizzey-reveal {
+	from {
+		opacity: 0;
+		transform: translateY(var(--mizzey-motion-distance-3));
 	}
 }
 

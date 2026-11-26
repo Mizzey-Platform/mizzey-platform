@@ -62,7 +62,7 @@ function readFooter( page ) {
 			const r = el.getBoundingClientRect();
 			return { x: r.x, y: r.y + scrollY, w: r.width, h: r.height, right: r.right, bottom: r.bottom + scrollY };
 		};
-		const links = [ ...footer.querySelectorAll( 'a' ) ].map( ( a ) => ( {
+		const links = [ ...footer.querySelectorAll( 'a, button.mizzey-footer__link' ) ].map( ( a ) => ( {
 			text: a.textContent.trim().replace( /\s+/g, ' ' ),
 			href: a.getAttribute( 'href' ),
 			box: box( a ),
@@ -180,8 +180,13 @@ async function footerChecks( browser, lang, width ) {
 	check( ( 'ar' === lang ) === ( 'rtl' === f.dir ), `NFR-04 ${ where } the page reads ${ f.dir }` );
 	check( f.overflow <= 0, `K-2 ${ where } nothing in the page runs wider than the screen (${ f.overflow })` );
 	if ( f.zz ) {
-		const end = 'ar' === lang ? f.zz.box.x <= f.box.x + f.box.w * 0.25 : f.zz.box.right >= f.box.x + f.box.w * 0.75;
-		check( end && f.zz.box.bottom >= f.box.bottom - 2 && 'none' === f.zz.transform && 'none' === f.zz.animation, `ZZ ${ where } the ZZ mark sits still in the footer's end corner, unmirrored (${ JSON.stringify( f.zz ) })` );
+		// As the client was shown it (the concept page; owner, 26 November 2026): desktop 570, its box 100 past the end
+		// edge and 216 past the foot; the phone 360, 142 past the end edge and 48 above the top.
+		const want = width < 1024 ? { size: 360, end: -142, top: -48 } : { size: 570, end: -100, bottom: -216 };
+		const end = 'ar' === lang ? f.zz.box.x - f.box.x : f.box.x + f.box.w - f.zz.box.right;
+		const near = ( a, b ) => Math.abs( a - b ) <= 1;
+		const place = near( f.zz.box.w, want.size ) && near( end, want.end ) && ( undefined === want.top ? near( f.box.bottom - f.zz.box.bottom, want.bottom ) : near( f.zz.box.y - f.box.y, want.top ) );
+		check( place && 'none' === f.zz.transform && 'none' === f.zz.animation && ( 'white' === plan.style ? '0.05' : '0.06' ) === f.zz.opacity, `ZZ ${ where } the ZZ mark sits still where the client was shown it, ${ JSON.stringify( want ) }, unmirrored (${ JSON.stringify( f.zz ) }, ${ end })` );
 	} else {
 		check( false, `ZZ ${ where } the ZZ mark is in the footer` );
 	}
@@ -211,14 +216,18 @@ async function footerChecks( browser, lang, width ) {
 		const grid = r( footer.querySelector( '.mizzey-footer__grid' ) );
 		const foot = r( footer.querySelector( '.mizzey-footer__foot' ) );
 		const links = [ ...footer.querySelectorAll( '.mizzey-footer__links .mizzey-footer__link' ) ];
-		const single = links.filter( ( a ) => r( a ).height < 50 );
+		// A link with a tag under it is two lines by design (48, the boards' Customer care rows): not a one-line link.
+		const single = links.filter( ( a ) => r( a ).height < 50 && ! a.classList.contains( 'mizzey-footer__link--tagged' ) );
 		const group = [ ...footer.querySelectorAll( '.mizzey-footer__group' ) ].find( ( g ) => g.querySelectorAll( '.mizzey-footer__column' ).length > 1 );
 		const stacked = group ? [ ...group.querySelectorAll( '.mizzey-footer__column' ) ].map( r ) : [];
 		const brand = r( footer.querySelector( '.mizzey-footer__brand' ) );
 		const language = r( footer.querySelector( '.mizzey-footer__language' ) );
 		const logo = r( footer.querySelector( '.mizzey-footer__logo' ) );
+		// The room the footer keeps at its foot for what is fixed there (the tab bar, the cookie bar), not the board's padding.
+		const bar = [ ...document.querySelectorAll( '.mizzey-tabbar' ) ].find( ( t ) => t.getBoundingClientRect().height > 0 );
+		const room = Math.max( bar ? bar.getBoundingClientRect().height : 0, parseFloat( getComputedStyle( document.body ).getPropertyValue( '--mizzey-consent-space' ) ) || 0 );
 		return {
-			padTop: parseFloat( cs.paddingTop ), padInline: parseFloat( cs.paddingLeft ), padBottom: parseFloat( cs.paddingBottom ),
+			padTop: parseFloat( cs.paddingTop ), padInline: parseFloat( cs.paddingLeft ), padBottom: parseFloat( cs.paddingBottom ) - room,
 			radius: parseFloat( cs.borderTopLeftRadius ), radiusEnd: parseFloat( cs.borderTopRightRadius ),
 			firstHeading: Math.round( firstHead.top - F.top ), headingHeight: Math.round( r( heads[ 0 ] ).height ),
 			linkHeights: [ ...new Set( single.map( ( a ) => Math.round( r( a ).height ) ) ) ],
@@ -226,7 +235,7 @@ async function footerChecks( browser, lang, width ) {
 			stackGap: stacked.length > 1 ? Math.round( stacked[ 1 ].top - stacked[ 0 ].bottom ) : null,
 			sectionGaps: [ ...new Set( columns.slice( 1 ).map( ( c, i ) => Math.round( c.top - columns[ i ].bottom ) ).filter( ( g ) => g > 0 ) ) ],
 			brandHeight: Math.round( brand.height ), languageFromLogo: Math.round( language.top - logo.top ),
-			footHeight: Math.round( foot.height ), footGap: Math.round( foot.top - grid.bottom ), footToBottom: Math.round( F.bottom - foot.bottom ),
+			footHeight: Math.round( foot.height ), footGap: Math.round( foot.top - grid.bottom ), footToBottom: Math.round( F.bottom - foot.bottom - room ),
 		};
 	}, SCOPE );
 	const near = ( a, b ) => Math.abs( a - b ) <= 1;
@@ -303,8 +312,12 @@ async function stripChecks( browser, lang, width ) {
 		};
 	}, SCOPE );
 	// One line: 36 on a phone, 40 on desktop; a long message takes two lines with 8 above and below (C1-Global B6).
-	const tall = 1 === sm.lines ? ( width < 1024 ? 36 : 40 ) : 16 + sm.lines * sm.line;
-	check( sm.lines <= 2 && Math.abs( sm.height - tall ) <= 1 && sm.size === ( 'ar' === lang ? 14 : 13 ) && '500' === sm.weight && ( null === sm.linkGap || ( 12 === sm.linkGap && 44 === sm.linkHeight ) ), `K-1 ${ where } the strip is ${ tall } high for ${ sm.lines } line(s), ${ sm.size }px 500, its link 12 after the words in a 44 target (${ JSON.stringify( sm ) })` );
+	// Two lines keep the one-line strip's space around the words: 36 less one line (8 and 8 in Latin, 6 and 6 for
+	// Tajawal's 24 line, C1-Home-Phone-Arabic).
+	// The boards draw no two-line Arabic strip. A Latin word in an Arabic line (the run's tag here, a brand name in a
+	// real message) is set in Inter inside Tajawal's 24 line, whose baselines differ, so each such line may grow by 1.
+	const tall = 1 === sm.lines ? ( width < 1024 ? 36 : 40 ) : 36 - sm.line + sm.lines * sm.line;
+	check( sm.lines <= 2 && Math.abs( sm.height - tall ) <= Math.max( 1, 'ar' === lang ? sm.lines : 1 ) && sm.size === ( 'ar' === lang ? 14 : 13 ) && '500' === sm.weight && ( null === sm.linkGap || ( 12 === sm.linkGap && 44 === sm.linkHeight ) ), `K-1 ${ where } the strip is ${ tall } high for ${ sm.lines } line(s), ${ sm.size }px 500, its link 12 after the words in a 44 target (${ JSON.stringify( sm ) })` );
 	await page.locator( `${ SCOPE } .mizzey-announcement` ).screenshot( { path: path.join( plan.shots, `s3-strip-${ plan.variant }-${ lang }-${ width }.png` ) } );
 	if ( 'slider' === plan.variant && 'en' === lang && width >= 1024 ) {
 		const first = s.current;
@@ -371,12 +384,17 @@ async function consentChecks( browser, lang, width ) {
 		const bar = document.getElementById( 'mizzey-consent' ).getBoundingClientRect();
 		const tabs = [ ...document.querySelectorAll( '.mizzey-tabbar' ) ].find( ( t ) => t.getBoundingClientRect().height > 0 );
 		const style = getComputedStyle( document.body );
+		const footer = document.querySelector( '.wp-block-template-part > .mizzey-footer' ) || document.querySelector( '.mizzey-footer' );
+		const legal = [ ...footer.querySelectorAll( '.mizzey-footer__foot' ) ].pop();
 		return {
 			barBottom: Math.round( bar.bottom ),
 			barTop: Math.round( bar.top ),
 			tabTop: tabs ? Math.round( tabs.getBoundingClientRect().top ) : null,
 			fromFoot: Math.round( window.innerHeight - bar.bottom ),
 			padding: Math.round( parseFloat( style.paddingBottom ) ),
+			// The footer's room under its last row: what it keeps for the bar, besides its own drawn padding.
+			footerRoom: Math.round( footer.getBoundingClientRect().bottom - legal.getBoundingClientRect().bottom - ( window.innerWidth < 1024 ? 16 : 0 ) ),
+			pageEnd: Math.round( document.documentElement.scrollHeight - ( window.scrollY + footer.getBoundingClientRect().bottom ) ),
 			room: Math.round( parseFloat( style.getPropertyValue( '--mizzey-consent-space' ) ) ),
 			reach: Math.round( window.innerHeight - bar.top ),
 		};
@@ -386,11 +404,11 @@ async function consentChecks( browser, lang, width ) {
 	} else {
 		check( null === place.tabTop && place.fromFoot < 40, `B3 ${ where } with no tab bar the cookie bar sits at the foot of the window, not lifted (${ JSON.stringify( place ) })` );
 	}
-	check( Math.abs( place.padding - place.reach ) <= 1, `MKT-10 ${ where } the page's foot room is the banner's reach once, the tab bar not counted twice (${ JSON.stringify( place ) })` );
+	check( Math.abs( place.footerRoom - place.reach ) <= 1 && 0 === place.padding && 0 === place.pageEnd, `MKT-10 ${ where } the footer keeps the banner's reach at its foot, once (the tab bar not counted twice), and nothing is left under the footer (${ JSON.stringify( place ) })` );
 	await page.screenshot( { path: path.join( plan.shots, `s3-consent-${ lang }-${ width }.png` ) } );
 	if ( width >= 1024 ) {
 		// The footer's own cookie preferences link opens the preferences; Accept all there is recorded as the banner's choice.
-		const opener = page.locator( `${ SCOPE } .mizzey-footer a[data-mizzey-consent-open]` ).first();
+		const opener = page.locator( `${ SCOPE } .mizzey-footer [data-mizzey-consent-open]` ).first();
 		check( ( await opener.count() ) > 0, `MKT-10 ${ where } the footer's cookie preferences link reopens the choice` );
 		check( 0 === ( await page.locator( `${ SCOPE } .mizzey-cookie-settings` ).count() ), `MKT-10 ${ where } with the preferences link in a column, the fallback "Cookie settings" link is not printed as well` );
 		if ( await opener.count() ) {

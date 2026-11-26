@@ -57,6 +57,21 @@ function t108_browser( array $plan ): array {
 	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
 }
 
+/**
+ * Run the boards' checks (mizzey-site/tests/browser/_board.cjs) on a plan: { part, urls }.
+ *
+ * @return array<string,mixed>
+ */
+function t108_board( array $plan ): array {
+	$file = wp_tempnam( 't108-board' );
+	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	$out = array();
+	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/_board.cjs' ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out );
+	wp_delete_file( $file );
+	$json = json_decode( (string) end( $out ), true );
+	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
+}
+
 /** A navigation menu's markup, as the Site Editor saves it. */
 function t108_menu( array $links ): string {
 	$out = '';
@@ -305,6 +320,53 @@ run(
 			$check( true === $row['ok'], (string) $row['what'] );
 		}
 		$check( 32 === count( (array) ( $wide['checks'] ?? array() ) ), 'the browser made every phone-width check (' . count( (array) ( $wide['checks'] ?? array() ) ) . ')' );
+
+		// ---- The boards' numbers (staging review, 25 November 2026) ---------------------------------------------------
+		// The header's menu as C1-Home-Desktop draws it: six categories, then Offers and Brands, which fit the row at
+		// 1440 and overflow into "More" at 1100. Checked in Chromium and WebKit at 390, 1100, 1280 and 1440, in both
+		// languages: the search field, the tab bar, the tooltips, the mega menu, "More", the sticky header, the press on
+		// touch and the page change (tests/browser/_board.cjs).
+		// Its Beauty is the run's Beauty category, so the row's mark of the page's section shows (C1-Category-Desktop).
+		$board_menu = static fn ( string $lang ): string => t108_menu(
+			array_map(
+				static fn ( string $label ): array => ( in_array( $label, array( 'Beauty', 'الجمال' ), true )
+					? array( 'label' => $label, 'url' => $link( $lang, 'ar' === $lang ? $beauty_ar : $beauty ), 'kind' => 'taxonomy', 'type' => 'product_cat', 'id' => 'ar' === $lang ? $beauty_ar : $beauty )
+					: array( 'label' => $label, 'url' => home_url( '/?s=' . rawurlencode( $label ) ), 'kind' => 'custom' ) ) + ( in_array( $label, array( 'Offers', 'العروض' ), true ) ? array( 'className' => 'is-style-offer' ) : array() ),
+				'ar' === $lang
+					? array( 'الجمال', 'الصحة والمنزل', 'الفيتامينات والمكملات', 'الرياضة والهواء الطلق', 'المنزل والمطبخ', 'البقالة', 'العروض', 'الماركات' )
+					: array( 'Beauty', 'Health & Household', 'Vitamins & Supplements', 'Sport & Outdoor', 'Home & Kitchen', 'Grocery', 'Offers', 'Brands' )
+			)
+		);
+		wp_update_post( array( 'ID' => $menu_en, 'post_content' => wp_slash( $board_menu( 'en' ) ) ) );
+		wp_update_post( array( 'ID' => $menu_ar, 'post_content' => wp_slash( $board_menu( 'ar' ) ) ) );
+		wp_cache_flush();
+		// One address per page type (the owner's report, 26 November 2026): the header and footer are the shared ones.
+		$pages = static fn ( string $lang ): array => (array) t108_in(
+			$lang,
+			static function () use ( $lang, $products, $beauty, $beauty_ar, $page, $link ): array {
+				$wc   = static fn ( string $name ): string => (string) get_permalink( (int) apply_filters( 'wpml_object_id', wc_get_page_id( $name ), 'page', true, $lang ) );
+				$home  = (string) apply_filters( 'wpml_home_url', home_url( '/' ) );
+				$pages = array(
+					'product'  => (string) get_permalink( (int) apply_filters( 'wpml_object_id', $products[0]->get_id(), 'product', true, $lang ) ),
+					'category' => $link( $lang, 'ar' === $lang ? $beauty_ar : $beauty ),
+					'shop'     => $wc( 'shop' ),
+					'cart'     => $wc( 'cart' ),
+					'checkout' => $wc( 'checkout' ),
+					'account'  => $wc( 'myaccount' ),
+					// The run's page exists in English only: an Arabic visit to it would be the English page.
+					'page'     => 'ar' === $lang ? '' : (string) get_permalink( $page ),
+					'search'   => add_query_arg( array( 's' => 'serum', 'post_type' => 'product' ), $home ),
+					'404'      => trailingslashit( $home ) . 's2-no-such-page/',
+				);
+				return array_filter( $pages );
+			}
+		);
+		$numbers = t108_board( array( 'part' => 'header', 'urls' => array( 'en' => $en['home'], 'ar' => $ar['home'], 'consent' => array( 'name' => 'mizzey_consent', 'value' => 'denied' ), 'pages' => array( 'en' => $pages( 'en' ), 'ar' => $pages( 'ar' ) ) ) ) );
+		$check( empty( $numbers['error'] ), 'board: the browser ran' . ( empty( $numbers['error'] ) ? '' : ': ' . substr( (string) $numbers['error'], 0, 1500 ) ) );
+		foreach ( (array) ( $numbers['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], 'board: ' . (string) $row['what'] );
+		}
+		$check( count( (array) ( $numbers['checks'] ?? array() ) ) >= 200, 'board: the browser made every check (' . count( (array) ( $numbers['checks'] ?? array() ) ) . ')' );
 
 		return $ok;
 	}

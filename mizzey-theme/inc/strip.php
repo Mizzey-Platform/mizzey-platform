@@ -126,7 +126,7 @@ function render(array $attributes): string
                 'inert'       => 0 !== $i,
                 'aria-hidden' => 0 !== $i ? 'true' : null,
             ],
-            element('span', ['class' => 'mizzey-announcement__text'], esc_html($message['text'])) . $link
+            element('span', ['class' => 'mizzey-announcement__text'], figures((string) $message['text'])) . $link
         );
     }
 
@@ -156,4 +156,15 @@ function render(array $attributes): string
         ],
         element('div', ['class' => 'mizzey-announcement__track'], $items) . $pause
     );
+}
+
+/**
+ * A message's words, escaped, each amount ("1,000", "250.50") in its own span, set in Inter in both languages as
+ * prices are (C1-System; C1-Home-Phone-Arabic draws "1,000" in the strip so).
+ */
+function figures(string $text): string
+{
+    // Only an amount standing as its own word: never digits inside a word ("t109"), an entity ("&#039;") or between
+    // two such words, where a span would let WordPress turn the hyphen between them into a dash.
+    return (string) preg_replace('/(?<![\p{L}\p{N}#&;-])[0-9]+(?:[,.][0-9]+)*(?![\p{L}\p{N}-])/u', '<span class="mizzey-announcement__figure">$0</span>', esc_html($text));
 }

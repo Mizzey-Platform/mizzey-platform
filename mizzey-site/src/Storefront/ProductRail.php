@@ -86,7 +86,7 @@ final class ProductRail
 
     private static function arrow(string $icon, string $label, string $listId, int $step): string
     {
-        $svg = function_exists('MizzeySite\Theme\Icons\icon') ? \MizzeySite\Theme\Icons\icon($icon, ['size' => 20]) : '';
+        $svg = function_exists('MizzeySite\Theme\Icons\icon') ? \MizzeySite\Theme\Icons\icon($icon, ['size' => 24]) : '';
 
         return ProductCard::el('button', [
             'type'              => 'button',

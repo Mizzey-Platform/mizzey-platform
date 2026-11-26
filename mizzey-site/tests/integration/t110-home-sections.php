@@ -55,6 +55,17 @@ function t110_browser( array $plan ): array {
 	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
 }
 
+/** Run the boards' checks (mizzey-site/tests/browser/_board.cjs) on a plan: { part, urls }. @return array<string,mixed> */
+function t110_board( array $plan ): array {
+	$file = wp_tempnam( 't110-board' );
+	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	$out = array();
+	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/_board.cjs' ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out );
+	wp_delete_file( $file );
+	$json = json_decode( (string) end( $out ), true );
+	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
+}
+
 /** An image drawn here, so nothing is downloaded. */
 function t110_image( Scenario $s, string $name, int $width, int $height ): int {
 	$image = imagecreatetruecolor( $width, $height );
@@ -225,7 +236,8 @@ run(
 		// A text field (not written in place) stores its words raw: "<" is a character there, never the start of a tag.
 		$lt_a     = 'Under <EGP 500';
 		$lt_b     = 'Save <50% today';
-		$survives = static fn ( string $html, string $words ): bool => str_contains( $html, esc_html( $words ) );
+		// The deals line sets a percentage in bold (Section::figures, as the board draws "25%"): the words stay whole.
+		$survives = static fn ( string $html, string $words ): bool => str_contains( str_replace( array( '<strong>', '</strong>' ), '', $html ), esc_html( $words ) );
 		$fields   = array(
 			'products heading'              => static fn ( string $w ): string => ProductSections::renderProducts( array( 'source' => 'products', 'products' => array( $sale ), 'heading' => $w ) ),
 			'deals heading'                 => static fn ( string $w ): string => ProductSections::renderDeals( array( 'source' => 'products', 'products' => array( $sale ), 'heading' => $w ) ),
@@ -337,6 +349,46 @@ run(
 		$stored_ar = t110_sections( $ar );
 		$s->note( '      stored Arabic sections: ' . wp_json_encode( $stored_ar, JSON_UNESCAPED_UNICODE ) );
 		$check( 3 === count( $stored_ar ) && "{$tag} الأصلي" === ( $stored_ar[0]['word'] ?? '' ), 'SSC-12 the Arabic front page holds its own sections and words' );
+
+		// ---- The boards' numbers (staging review, 25 November 2026) ---------------------------------------------------
+		// The front page in each language as C1-Home-Phone, C1-Home-Phone-Arabic and C1-Home-Desktop lay it out: the hero
+		// slider, the trust strip with its links, a rail, the collections, the deals band with its line, the brands with
+		// "All brands"; checked in Chromium and WebKit at 390 and 1440 (tests/browser/_board.cjs).
+		$block = static fn ( string $name, array $attrs ): array => array( 'blockName' => 'mizzey/' . $name, 'attrs' => $attrs, 'innerBlocks' => array(), 'innerHTML' => '', 'innerContent' => array() );
+		$board = static function ( array $w ) use ( $block, $slides ): string {
+			$hero = $slides;
+			foreach ( $hero as $i => $slide ) {
+				$hero[ $i ]['line'] = $w['line'];
+			}
+			return serialize_blocks(
+				array(
+					$block( 'hero', array( 'variant' => 'slider', 'slides' => $hero ) ),
+					$block( 'trust-signals', array( 'items' => $w['trust'] ) ),
+					$block( 'category-shortcuts', array( 'heading' => $w['cats'] ) ),
+					$block( 'products', array( 'heading' => $w['trending'], 'source' => 'badge', 'badge' => 'trending', 'link' => home_url( '/shop/' ) ) ),
+					$block( 'featured-collections', array( 'heading' => $w['collections'] ) ),
+					$block( 'deals', array( 'heading' => $w['deals'], 'line' => $w['deals_line'], 'source' => 'sale', 'link' => home_url( '/shop/' ) ) ),
+					$block( 'brand-highlights', array( 'heading' => $w['brands'], 'allLabel' => $w['all_brands'], 'allUrl' => home_url( '/brands/' ) ) ),
+				)
+			);
+		};
+		$url   = home_url( '/s5-authentic/' );
+		wp_update_post( array( 'ID' => $en, 'post_content' => wp_slash( $board( array(
+			'line' => 'Up to <strong>25%</strong> off selected supplements', 'cats' => 'Shop by category', 'trending' => 'Trending now', 'collections' => 'Featured collections',
+			'deals' => 'Deals of the week', 'deals_line' => 'Up to 25% off this week', 'brands' => 'Shop by brand', 'all_brands' => 'All brands',
+			'trust' => array( array( 'icon' => 'shield', 'title' => 'Authentic products', 'line' => 'Authenticity guarantee', 'url' => $url ), array( 'icon' => 'van', 'title' => 'Fast delivery', 'line' => 'Free delivery', 'url' => $url ), array( 'icon' => 'returns', 'title' => 'Easy returns', 'line' => 'Return policy', 'url' => $url ) ),
+		) ) ) ) );
+		wp_update_post( array( 'ID' => $ar, 'post_content' => wp_slash( $board( array(
+			'line' => 'خصم حتى <strong>25%</strong> على مكملات مختارة', 'cats' => 'تسوّق حسب القسم', 'trending' => 'الأكثر رواجًا الآن', 'collections' => 'مجموعات مختارة',
+			'deals' => 'عروض الأسبوع', 'deals_line' => 'خصم حتى 25% هذا الأسبوع', 'brands' => 'تسوّق حسب الماركة', 'all_brands' => 'كل الماركات',
+			'trust' => array( array( 'icon' => 'shield', 'title' => 'منتجات أصلية', 'line' => 'ضمان الأصالة', 'url' => $url ), array( 'icon' => 'van', 'title' => 'توصيل سريع', 'line' => 'توصيل مجاني', 'url' => $url ), array( 'icon' => 'returns', 'title' => 'إرجاع سهل', 'line' => 'سياسة الإرجاع', 'url' => $url ) ),
+		) ) ) ) );
+		$numbers = t110_board( array( 'part' => 'home', 'urls' => array( 'en' => t110_home( 'en' ), 'ar' => t110_home( 'ar' ), 'consent' => array( 'name' => 'mizzey_consent', 'value' => 'denied' ) ) ) );
+		$check( empty( $numbers['error'] ), 'board: the browser ran' . ( empty( $numbers['error'] ) ? '' : ': ' . substr( (string) $numbers['error'], 0, 1500 ) ) );
+		foreach ( (array) ( $numbers['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], 'board: ' . (string) $row['what'] );
+		}
+		$check( count( (array) ( $numbers['checks'] ?? array() ) ) >= 140, 'board: the browser made every check (' . count( (array) ( $numbers['checks'] ?? array() ) ) . ')' );
 
 		return $ok;
 	}

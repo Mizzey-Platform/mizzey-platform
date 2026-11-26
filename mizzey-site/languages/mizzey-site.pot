@@ -2827,3 +2827,15 @@ msgid "%d in your cart"
 msgid_plural "%d in your cart"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/Marketing/ConsentBanner.php
+msgid "We use cookies to keep your cart, see how the store is used and show relevant ads."
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "Label beside the heading"
+msgstr ""
+
+#: src/Blocks/deals/edit.js
+msgid "Optional. A short tag next to the heading, for example: This week."
+msgstr ""

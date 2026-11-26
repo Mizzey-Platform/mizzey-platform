@@ -16,14 +16,20 @@
  *   swipe still change the slide. The button's name always says what pressing it does.
  * - Only the slide shown can be reached by keyboard and read; the others are inert.
  *
- * How it moves is kept here, in MOTION, and in style.css under [data-motion]: another way from C1-Slider-Options is a
- * new name there and its own rules, nothing else.
+ * - It holds while it is off screen, too (C1-Motion-Playground: "pauses on hover, focus, touch and off screen").
+ * - The timer, the arrows and Play move to the next slide by a cross-fade (C1-Motion-Playground, hero slider): a copy
+ *   of the outgoing slide is laid over the row and fades out while the row stands at the incoming slide, whose image
+ *   and words arrive (style.css, .mizzey-hero__ghost and .is-arriving). Nothing travels across the screen; a finger's
+ *   swipe still moves the row 1:1.
+ *
+ * How it moves is kept here, in MOTION, and in style.css: another way from C1-Slider-Options is a new name there and
+ * its own rules, nothing else.
  */
 
 const MOTION = {
-	name: 'slide',
+	name: 'fade',
 	minSeconds: 6,
-	behavior: 'smooth',
+	fadeMs: 1000,
 };
 
 const calm = window.matchMedia( '(prefers-reduced-motion: reduce)' );
@@ -46,7 +52,8 @@ function setup( hero ) {
 	let moving = false;
 	let settle = 0;
 	let stopped = calm.matches;
-	const holds = { hover: false, focus: false, touch: false, hidden: false, press: false };
+	const holds = { hover: false, focus: false, touch: false, hidden: false, press: false, offscreen: false };
+	const viewport = hero.querySelector( '.mizzey-hero__viewport' ) || hero;
 
 	const rtl = () => getComputedStyle( track ).direction === 'rtl';
 	const held = () => stopped || Object.values( holds ).some( Boolean );
@@ -73,11 +80,31 @@ function setup( hero ) {
 		// The slide's start edge against the row's: its far edge in Arabic.
 		const edge = ( r ) => ( rtl() ? r.x + r.width : r.x );
 		const left = track.scrollLeft + edge( at ) - edge( box );
-		// The row passes the slides between while it moves: they are not "seen" until it stops.
+		// The row jumps: the scroll it causes is not a swipe.
 		moving = true;
 		window.clearTimeout( settle );
-		settle = window.setTimeout( () => ( moving = false ), 1500 );
-		track.scrollTo( { left, behavior: calm.matches ? 'auto' : MOTION.behavior } );
+		settle = window.setTimeout( () => ( moving = false ), 300 );
+		if ( ! calm.matches && target !== index ) {
+			// The outgoing slide, copied over the row, fades out; never read, focused or pressed.
+			const ghost = document.createElement( 'div' );
+			ghost.className = 'mizzey-hero__ghost';
+			ghost.setAttribute( 'aria-hidden', 'true' );
+			ghost.inert = true;
+			const copy = slides[ index ].cloneNode( true );
+			copy.querySelectorAll( '[id]' ).forEach( ( el ) => el.removeAttribute( 'id' ) );
+			copy.querySelectorAll( 'img' ).forEach( ( img ) => img.removeAttribute( 'loading' ) );
+			ghost.appendChild( copy );
+			viewport.querySelectorAll( '.mizzey-hero__ghost' ).forEach( ( old ) => old.remove() );
+			viewport.appendChild( ghost );
+			ghost.addEventListener( 'animationend', () => ghost.remove() );
+			window.setTimeout( () => ghost.remove(), MOTION.fadeMs );
+		}
+		track.scrollTo( { left, behavior: 'auto' } );
+		hero.classList.remove( 'is-arriving' );
+		if ( ! calm.matches ) {
+			void hero.offsetWidth; // start the arrival again for this slide
+			hero.classList.add( 'is-arriving' );
+		}
 		show( target );
 	}
 
@@ -111,6 +138,8 @@ function setup( hero ) {
 			const width = track.clientWidth || 1;
 			const seen = Math.round( Math.abs( track.scrollLeft ) / width );
 			if ( seen !== index && seen >= 0 && seen < slides.length ) {
+				// A swipe brought it: it is already in place, nothing arrives.
+				hero.classList.remove( 'is-arriving' );
 				show( seen );
 			}
 		} );
@@ -142,7 +171,6 @@ function setup( hero ) {
 		pause.addEventListener( 'click', () => setStopped( ! stopped ) );
 	}
 	name();
-	const viewport = hero.querySelector( '.mizzey-hero__viewport' ) || hero;
 	viewport.addEventListener( 'pointerenter', ( e ) => e.pointerType === 'mouse' && hold( 'hover', true ) );
 	viewport.addEventListener( 'pointerleave', ( e ) => e.pointerType === 'mouse' && hold( 'hover', false ) );
 	viewport.addEventListener( 'touchstart', () => hold( 'touch', true ), { passive: true } );
@@ -154,6 +182,9 @@ function setup( hero ) {
 	document.addEventListener( 'pointerdown', () => hold( 'press', true ), { capture: true, passive: true } );
 	[ 'pointerup', 'pointercancel' ].forEach( ( name ) => document.addEventListener( name, () => hold( 'press', false ), { capture: true, passive: true } ) );
 	holds.hidden = document.hidden;
+	if ( 'IntersectionObserver' in window ) {
+		new IntersectionObserver( ( entries ) => entries.forEach( ( entry ) => hold( 'offscreen', ! entry.isIntersecting ) ) ).observe( hero );
+	}
 	calm.addEventListener( 'change', () => {
 		if ( calm.matches ) {
 			setStopped( true );
