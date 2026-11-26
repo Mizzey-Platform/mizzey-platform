@@ -21,6 +21,7 @@ defined('ABSPATH') || exit;
  * - `POST mizzey/v1/wishlist/items/{id}/cart`    moves one to the cart, or says why it stays (409)
  * - `POST mizzey/v1/wishlist/from-cart`          `{ "key": "..." }` moves a cart line to the wishlist (CART-04)
  * - `GET  mizzey/v1/recently-viewed`             recently viewed products
+ * - `POST mizzey/v1/recently-viewed`             `{ "id": n }` records a guest's view, sent by the product page (RecentlyViewed)
  *
  * Register ids: WISH-01 to WISH-04, WISH-07. See specs/015-wishlist.
  */

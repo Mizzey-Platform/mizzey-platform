@@ -13,6 +13,7 @@ defined('ABSPATH') || exit;
 use Corex\Boot;
 use Corex\Http\ClientAddress;
 use MizzeySite\Security\SignupCheck;
+use MizzeySite\Security\WindowCounter;
 use Throwable;
 
 /**
@@ -192,9 +193,9 @@ final class SignupService
     /** Removes the counters of a network address and, when given, of emails. The scenarios use it to clean up. */
     public static function forget(string $address, string ...$emails): void
     {
-        delete_transient(self::key('address', self::network($address)));
+        WindowCounter::forget(self::key('address', self::network($address)));
         foreach ($emails as $email) {
-            delete_transient(self::key('email', self::normalise($email)));
+            WindowCounter::forget(self::key('email', self::normalise($email)));
         }
     }
 
@@ -269,8 +270,7 @@ final class SignupService
                 }
             }
             foreach ($counters as [$key]) {
-                $counter = self::read($key, $now, $limits['window']);
-                set_transient($key, ['count' => $counter['count'] + 1, 'until' => $counter['until']], max(1, $counter['until'] - $now));
+                WindowCounter::raise($key, $now, $limits['window']);
             }
 
             return '';
@@ -304,12 +304,8 @@ final class SignupService
     /** @return array{count:int,until:int} */
     private static function read(string $key, int $now, int $window): array
     {
-        $stored = get_transient($key);
-        if (! is_array($stored) || ! isset($stored['count'], $stored['until']) || (int) $stored['until'] <= $now) {
-            return ['count' => 0, 'until' => $now + $window];
-        }
-
-        return ['count' => (int) $stored['count'], 'until' => (int) $stored['until']];
+        // In the database, never in a transient: no object cache may hold a security counter (WindowCounter).
+        return WindowCounter::read($key, $now, $window);
     }
 
     private static function key(string $kind, string $value): string
