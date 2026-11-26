@@ -52,7 +52,7 @@ final class HeaderMenu
     /**
      * The links, in the menu's order, in the request's language.
      *
-     * @return list<array{label:string,url:string,offer:bool,image:string}>
+     * @return list<array{label:string,url:string,offer:bool,image:string,category:bool,image_id:int}>
      */
     public static function links(int $menu = 0): array
     {
@@ -91,7 +91,7 @@ final class HeaderMenu
 
     /**
      * @param array<int,array<string,mixed>>                               $blocks
-     * @param list<array{label:string,url:string,offer:bool,image:string}> $links
+     * @param list<array{label:string,url:string,offer:bool,image:string,category:bool,image_id:int}> $links
      */
     private static function collect(array $blocks, array &$links): void
     {
@@ -110,7 +110,7 @@ final class HeaderMenu
 
     /**
      * @param array<string,mixed> $attrs
-     * @return array{label:string,url:string,offer:bool,image:string}|null
+     * @return array{label:string,url:string,offer:bool,image:string,category:bool,image_id:int}|null
      */
     private static function link(array $attrs): ?array
     {
@@ -119,17 +119,25 @@ final class HeaderMenu
         if ('' === $label || '' === $url) {
             return null;
         }
-        $image = '';
+        $image    = '';
+        $imageId  = 0;
+        $category = false;
         if ('taxonomy' === ($attrs['kind'] ?? '') && (int) ($attrs['id'] ?? 0) > 0) {
-            $image = self::termImage((int) $attrs['id']);
+            $term     = get_term((int) $attrs['id']);
+            $category = $term instanceof \WP_Term && 'product_cat' === $term->taxonomy;
+            $image    = self::termImage((int) $attrs['id']);
+            $imageId  = $category ? CategoryImage::id((int) $attrs['id']) : 0;
         }
         $classes = preg_split('/\s+/', (string) ($attrs['className'] ?? '')) ?: [];
 
         return [
-            'label' => $label,
-            'url'   => $url,
-            'offer' => in_array('is-style-' . self::OFFER_STYLE, $classes, true),
-            'image' => $image,
+            'label'    => $label,
+            'url'      => $url,
+            'offer'    => in_array('is-style-' . self::OFFER_STYLE, $classes, true),
+            'image'    => $image,
+            // A category link shows its picture, or the placeholder when it has none (CategoryImage).
+            'category' => $category,
+            'image_id' => $imageId,
         ];
     }
 
@@ -150,12 +158,12 @@ final class HeaderMenu
     /**
      * With no menu, the top-level categories (specs/054) stand in.
      *
-     * @return list<array{label:string,url:string,offer:bool,image:string}>
+     * @return list<array{label:string,url:string,offer:bool,image:string,category:bool,image_id:int}>
      */
     private static function categoryLinks(): array
     {
         return array_map(
-            static fn (array $node): array => ['label' => (string) $node['name'], 'url' => (string) $node['url'], 'offer' => false, 'image' => (string) $node['image']],
+            static fn (array $node): array => ['label' => (string) $node['name'], 'url' => (string) $node['url'], 'offer' => false, 'image' => (string) $node['image'], 'category' => true, 'image_id' => (int) $node['image_id']],
             HeaderData::categories()
         );
     }

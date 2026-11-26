@@ -805,11 +805,39 @@ textarea.mizzey-field__control {
 	color: var(--mizzey-color-role-primary);
 }
 
-.mizzey-chip--category img {
+.mizzey-chip--category .mizzey-catimg {
 	display: block;
+	flex-shrink: 0;
 	inline-size: var(--mizzey-control-icon);
 	block-size: var(--mizzey-control-icon);
 	object-fit: contain;
+}
+
+.mizzey-chip--category .mizzey-catimg.is-empty {
+	border-radius: var(--mizzey-radius-pill);
+}
+
+/* A category picture whose box changes with the screen comes in a <picture>: the frame takes no box of its own. */
+.mizzey-catimg-frame {
+	display: contents;
+}
+
+/* A category with no picture, in every place that shows one (the owner's ruling of 26 November 2026): the product
+   card's "No image" state (C1-Components 10), the image glyph on the tint, in the place's own box; each place sets
+   the box (and the corners of the large ones). The 32 boxes of the menus' rows round their corners a little. The
+   element is named so the rule outweighs a place's own `display: block` for its picture. */
+span.mizzey-catimg.is-empty {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-indigo-300);
+}
+
+.mizzey-catimg.is-empty[data-place="row"] {
+	border-radius: var(--mizzey-radius-xs);
 }
 
 .mizzey-badge {

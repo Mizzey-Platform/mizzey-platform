@@ -130,7 +130,7 @@
 	background-color: var(--mizzey-color-brand-white);
 }
 
-.mizzey-listing__tile img {
+.mizzey-listing__tile .mizzey-catimg {
 	inline-size: 100%;
 	block-size: 100%;
 	object-fit: cover;

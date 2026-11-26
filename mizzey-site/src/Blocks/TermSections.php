@@ -11,6 +11,7 @@ namespace MizzeySite\Blocks;
 defined('ABSPATH') || exit;
 
 use MizzeySite\Catalogue\Collections;
+use MizzeySite\Storefront\CategoryImage;
 use MizzeySite\Storefront\HomeSections;
 
 /**
@@ -45,7 +46,7 @@ final class TermSections
         $tiles = '';
         foreach ($terms as $term) {
             $tiles .= Section::el('li', ['class' => 'mizzey-shortcuts__item'], Section::el('a', ['class' => 'mizzey-shortcuts__link', 'href' => esc_url((string) $term['url'])],
-                Section::el('span', ['class' => 'mizzey-shortcuts__image'], self::image((string) $term['image']))
+                Section::el('span', ['class' => 'mizzey-shortcuts__image'], CategoryImage::html((int) ($term['image_id'] ?? 0), 'shortcut', ['class' => 'mizzey-home__tile-image']))
                 . Section::el('span', ['class' => 'mizzey-shortcuts__name'], esc_html((string) $term['name']))));
         }
         $allUrl = trim((string) ($attributes['allUrl'] ?? ''));

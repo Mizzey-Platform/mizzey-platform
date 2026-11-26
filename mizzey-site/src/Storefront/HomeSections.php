@@ -184,6 +184,7 @@ final class HomeSections
                 'url'         => is_wp_error($url) ? '' : (string) $url,
                 'description' => wp_strip_all_tags((string) $term->description),
                 'image'       => $image > 0 ? (string) wp_get_attachment_image_url($image, 'woocommerce_thumbnail') : '',
+                'image_id'    => $image > 0 && wp_attachment_is_image($image) ? $image : 0,
                 'count'       => (int) $term->count,
             ];
         }
