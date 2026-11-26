@@ -85,11 +85,15 @@ class Fixture(unittest.TestCase):
             **{f"wp-content/plugins/{name}/{name}.php": "<?php // corex" for name in corex},
             "wp-content/plugins/corex-bookings/src/Booking.php": "<?php // a booking",
             "wp-content/themes/mizzey-theme/style.css": "/* theme */",
+            "wp-content/themes/mizzey-theme/assets/js/header.js":
+                "/**\n * The header.\n */\nconst a = 1; // kept\n\t// gone\nconst url = 'http://x';\n",
+            "wp-content/themes/mizzey-theme/assets/css/header.css": "/* The header. */\n.a { color: red; } /* kept */\n/*! licence */\n",
+            "wp-content/plugins/mizzey-site/lib/vendor.js": "/* theirs */\nx();\n",
             "wp-content/vendor/autoload.php": "<?php // autoload",
             "corex-release.json": json.dumps(described),
         }.items():
             (self.dist / path).parent.mkdir(parents=True, exist_ok=True)
-            (self.dist / path).write_text(body, encoding="utf-8")
+            (self.dist / path).write_bytes(body.encode("utf-8"))
         self.served = {
             rp.PLUGIN_URL.format(slug="woocommerce", version="11.1.0"):
                 plugin_zip("woocommerce", "woocommerce.php", "11.1.0"),
@@ -308,6 +312,30 @@ class TheCacheDropIns(Fixture):
     def test_a_built_tree_that_already_holds_one_at_wp_content_is_refused(self):
         (self.dist / "wp-content" / "object-cache.php").write_text("<?php // another", encoding="utf-8")
         self.refused("object-cache.php")
+
+
+class TheStorefrontAssetsAreSentWithoutOwnLineComments(Fixture):
+    """D-21: what a visitor downloads is the code; the repository keeps the comments."""
+
+    def archived(self, name: str) -> bytes:
+        self.pack()
+        with zipfile.ZipFile(self.out / "mizzey-v0.1.0.zip") as archive:
+            return archive.read(name)
+
+    def test_a_script_loses_its_own_line_comments_and_keeps_its_code(self):
+        self.assertEqual(self.archived("wp-content/themes/mizzey-theme/assets/js/header.js"),
+                         b"const a = 1; // kept\nconst url = 'http://x';\n")
+
+    def test_a_stylesheet_keeps_comments_after_code_and_licences(self):
+        self.assertEqual(self.archived("wp-content/themes/mizzey-theme/assets/css/header.css"),
+                         b".a { color: red; } /* kept */\n/*! licence */\n")
+
+    def test_the_theme_header_and_other_files_are_untouched(self):
+        self.assertEqual(self.archived("wp-content/themes/mizzey-theme/style.css"), b"/* theme */")
+        self.assertEqual(self.archived("wp-content/plugins/mizzey-site/lib/vendor.js"), b"/* theirs */\nx();\n")
+
+    def test_code_between_two_comments_on_one_line_stays(self):
+        self.assertEqual(rp.trim_comments("/* a */ go(); /* b */\n", True), "/* a */ go(); /* b */\n")
 
 
 class Refusals(Fixture):

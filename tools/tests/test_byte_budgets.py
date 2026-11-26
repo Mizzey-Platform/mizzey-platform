@@ -5,7 +5,8 @@ first storefront pull request, then enforced". The design's foundations budget t
 `test_theme_fonts.py`) and 8 KB of motion JavaScript, and say nothing of the rest; the numbers below are this slice's
 proposal, sized to leave the later slices of spec 066 room, and are the owner's to confirm.
 
-Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
+Counted, gzip-compressed at level 9, as the release ships each file, without its own-line comments (what a server
+sends; KB is 1024 bytes):
 
 - **Every page**: the theme's stylesheets (tokens, fonts, base, components), the theme's behaviour (`ui.js`, and
   `early-taps.js`, printed inline in the head), the
@@ -44,6 +45,8 @@ import re
 import unittest
 from pathlib import Path
 
+from tools.release_pack import trim_comments
+
 ROOT = Path(__file__).resolve().parents[2]
 THEME = ROOT / "mizzey-theme"
 SITE = ROOT / "mizzey-site"
@@ -76,7 +79,10 @@ def printed(source: str) -> str:
 def sent(path: Path) -> bytes:
     if path.name in INLINE and path.parent == THEME / "assets" / "js":
         return printed(path.read_text(encoding="utf-8")).encode()
-    return path.read_bytes()
+    if path.suffix not in (".css", ".js"):
+        return path.read_bytes()
+    # As the release ships it (tools/release_pack.py, trim_comments): without its own-line comments.
+    return trim_comments(path.read_bytes().decode("utf-8"), path.suffix == ".js").encode("utf-8")
 
 
 def gz(data: bytes) -> int:
