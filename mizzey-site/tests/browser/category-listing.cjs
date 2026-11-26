@@ -618,6 +618,50 @@ async function noScript( browser ) {
 	await phoneCtx.close();
 }
 
+/**
+ * The filter column and the footer (owner comment 12): on a list shorter than the column (two products) and on a full
+ * page, at 1440 and 1280, the column ends 64 above the listing's end and so at least 136 above the footer, as
+ * C1-Category-Desktop draws it (column 1710, footer 1846), and the page's background reaches the footer with no edge.
+ */
+async function footerClear( engine, name ) {
+	const browser = await engine.launch( 'chromium' === name ? loadPlaywright().launch : {} );
+	const few = `${ plan.url.en }?brands=${ encodeURIComponent( slug( 'nova', 'en' ) ) }&categories=${ encodeURIComponent( slug( 'minerals', 'en' ) ) }`;
+	for ( const width of [ 1440, 1280 ] ) {
+		for ( const [ what, url ] of [ [ 'two products', few ], [ 'a full page', plan.url.en ] ] ) {
+			const ctx = await context( browser, { viewport: { width, height: 900 } } );
+			const page = await ctx.newPage();
+			await page.goto( url, { waitUntil: 'load', timeout: T } );
+			await page.waitForTimeout( 500 );
+			const m = await page.evaluate( () => {
+				const b = ( s ) => { const e = document.querySelector( s ); if ( ! e ) { return null; } const r = e.getBoundingClientRect(); return { top: r.top + scrollY, bottom: r.bottom + scrollY }; };
+				return { panel: b( '.mizzey-filters__panel' ), listing: b( '.mizzey-listing-page' ), footer: b( '.mizzey-footer' ), cards: document.querySelectorAll( '.mizzey-listing__results .mizzey-card' ).length };
+			} );
+			const gap = m.panel && m.footer ? Math.round( m.footer.top - m.panel.bottom ) : null;
+			const end = m.panel && m.listing ? Math.round( m.listing.bottom - m.panel.bottom ) : null;
+			check( null !== gap && gap >= 136 && end >= 64, `${ name } ${ width } ${ what } (${ m.cards } cards), owner comment 12: the filter column ends 64 or more above the listing's end and never reaches the footer (to the listing's end ${ end }, to the footer ${ gap }; board 64 and 136)` );
+			// The background at the listing's last rows and in the space above the footer: the same colour, no edge.
+			const y = Math.round( m.listing.bottom );
+			const png = await page.screenshot( { clip: { x: 4, y: y - 3, width: 2, height: 6 }, fullPage: true } );
+			const shade = await page.evaluate( async ( data ) => {
+				const img = new Image();
+				img.src = `data:image/png;base64,${ data }`;
+				await img.decode();
+				const c = document.createElement( 'canvas' );
+				c.width = img.width;
+				c.height = img.height;
+				const x = c.getContext( '2d' );
+				x.drawImage( img, 0, 0 );
+				const px = ( r ) => [ ...x.getImageData( 0, r, 1, 1 ).data ].slice( 0, 3 );
+				return [ px( 0 ), px( img.height - 1 ) ];
+			}, png.toString( 'base64' ) );
+			const diff = Math.max( ...shade[ 0 ].map( ( v, i ) => Math.abs( v - shade[ 1 ][ i ] ) ) );
+			check( diff <= 2, `${ name } ${ width } ${ what }, owner comment 12: the background runs on into the space above the footer with no edge (above ${ shade[ 0 ].join( ',' ) }, below ${ shade[ 1 ].join( ',' ) })` );
+			await ctx.close();
+		}
+	}
+	await browser.close();
+}
+
 ( async () => {
 	const { pw, launch } = loadPlaywright();
 	const browser = await pw.chromium.launch( launch );
@@ -627,6 +671,8 @@ async function noScript( browser ) {
 			await phone( browser, l );
 		}
 		await noScript( browser );
+		await footerClear( pw.chromium, 'chromium' );
+		await footerClear( pw.webkit, 'webkit' );
 	} catch ( e ) {
 		check( false, `the run stopped: ${ String( e && e.stack ? e.stack : e ).slice( 0, 900 ) }` );
 	}
