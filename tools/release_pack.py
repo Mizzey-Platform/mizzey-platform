@@ -13,6 +13,10 @@ store also needs, at the versions `stack.lock.json` records, and writes two file
 What it adds. WooCommerce and the carrier plugin, from wordpress.org. The Arabic language packs of WordPress and
 of WooCommerce, from wordpress.org. `mizzey-release.json`, the manifest.
 
+What it trims. The storefront's own stylesheets and scripts (`TRIMMED`) are shipped without their comments that stand
+on lines of their own, which are about a third of their bytes (D-21's byte budgets count what is sent). A comment
+after code on the same line, and a `/*!` comment, stay. The repository keeps every comment.
+
 What it places. The site plugin's two cache drop-ins (`DROPINS`): WordPress loads its object cache and its page cache
 only from wp-content itself, so each is copied there from `mizzey-site/dropins/`, and the manifest names them.
 
@@ -87,6 +91,10 @@ SERVER_SUPPLIED = {
 COREX_CARRIED = ("corex-blocks", "corex-captcha", "corex-config", "corex-core", "corex-email", "corex-forms",
                  "corex-guides", "corex-media", "corex-ui")
 COREX_MANIFEST = "corex-release.json"
+# The storefront's own stylesheets and scripts, shipped without their own-line comments (`trim_comments`).
+TRIMMED = re.compile(r"^wp-content/(themes/mizzey-theme/assets|plugins/mizzey-site/(assets|src))/.+\.(css|js)$")
+_OWN_LINE_BLOCK = re.compile(r"^[ \t]*/\*(?!!)(?:(?!\*/).)*\*/[ \t]*\r?\n", re.M | re.S)
+_OWN_LINE_SLASHES = re.compile(r"^[ \t]*//[^\n]*\n", re.M)
 # wp-content file -> the site plugin's file it is copied from (NFR-02, mizzey-site/dropins/README.md).
 DROPINS = {
     "wp-content/advanced-cache.php": "wp-content/plugins/mizzey-site/dropins/advanced-cache.php",
@@ -365,6 +373,26 @@ def leave_out(contents: Contents, left_out: list[str]) -> None:
     contents.added[COREX_MANIFEST] = (json.dumps(described, indent=2) + "\n").encode("utf-8")
 
 
+def trim_comments(source: str, script: bool) -> str:
+    """A stylesheet or script without the comments that stand on lines of their own.
+
+    Only a comment that starts its line is taken out: there it cannot be inside a string, a regular expression or a
+    URL. A script's `//` lines go too, a stylesheet has none. `/*!` comments, which keep a licence, stay.
+    """
+    source = _OWN_LINE_BLOCK.sub("", source)
+    return _OWN_LINE_SLASHES.sub("", source) if script else source
+
+
+def trim_assets(contents: Contents) -> None:
+    """The storefront's own stylesheets and scripts, as they are sent: see `trim_comments`."""
+    for name in [n for n in contents.on_disk if TRIMMED.match(n)]:
+        source = contents.on_disk[name].read_bytes().decode("utf-8")
+        trimmed = trim_comments(source, name.endswith(".js"))
+        if trimmed != source:
+            del contents.on_disk[name]
+            contents.added[name] = trimmed.encode("utf-8")
+
+
 def add_dropins(contents: Contents) -> None:
     """The cache drop-ins, copied from the site plugin to where WordPress loads them."""
     for target, source in DROPINS.items():
@@ -377,6 +405,7 @@ def assemble(dist: Path, lock: dict, origin: Origin, left_out: list[str] | None 
     """Everything the archive will hold, except its manifest."""
     contents = Contents(tree_files(dist))
     leave_out(contents, left_out or [])
+    trim_assets(contents)
     add_dropins(contents)
     add_plugins(contents, lock, origin)
     add_language_packs(contents, lock, origin)
