@@ -8,6 +8,7 @@
  * - The phone menu's levels: a category with children opens its own level, Back returns to the row that opened it;
  *   closing the drawer starts it again at the first level. Opening the drawer, its modal focus and the return of
  *   focus are the base drawer's (store "mizzey/ui").
+ * - The phone menu's motion: the level push (overlay-motion.js), the entrance class, the control's expanded state.
  * - The Categories tab shows the categories between the header and the tab bar; Escape or the tab again closes it.
  * - The phone's search control (product, cart and checkout pages) opens the search row and focuses the field.
  * - The category row: what does not fit, and anything past the eighth link, moves under "More".
@@ -176,6 +177,38 @@ function refresh( ctx ) {
 		.catch( () => {} );
 }
 
+/* ---- The phone menu's motion (C1-Motion-Playground: "Overlays", "Phone menu, sub-level push") ------------------- */
+
+function showLevel( level, on ) {
+	level.hidden = level.inert = ! on;
+	level.setAttribute( 'aria-hidden', on ? 'false' : 'true' );
+}
+
+// The level push is overlay-motion.js's, loaded as the drawer opens; until then the levels switch at once.
+let motion = null;
+const loadMotion = () => import( 'mizzey-theme/overlay-motion' ).then( ( m ) => ( motion = m ) ).catch( () => {} );
+
+// Focus moved by the levels shows a ring after a key, never after a tap (blurred first, so none carries over).
+let byKey = false;
+document.addEventListener( 'keydown', () => ( byKey = true ), true );
+document.addEventListener( 'pointerdown', () => ( byKey = false ), true );
+function moveFocus( el ) {
+	document.activeElement.blur();
+	el.focus( { preventScroll: true, focusVisible: byKey } );
+}
+
+function pushLevel( from, to, forward ) {
+	// The entrance (the close button's turn, the stagger) is over: Back does not replay it.
+	from.closest( 'dialog' ).classList.remove( 'is-entering' );
+	if ( motion ) {
+		motion.pushLevel( from, to, forward, showLevel );
+		return;
+	}
+	showLevel( to, true );
+	showLevel( from, false );
+	loadMotion();
+}
+
 /* ---- The store ----------------------------------------------------------------------------------------------- */
 
 store( 'mizzey/header', {
@@ -283,12 +316,12 @@ store( 'mizzey/header', {
 			if ( ! from || ! to ) {
 				return;
 			}
-			from.hidden = true;
-			to.hidden = false;
+			pushLevel( from, to, true );
 			button.setAttribute( 'aria-expanded', 'true' );
-			const first = focusables( to )[ 0 ];
+			// Usable from the first frame: focus is on the new level's back button as it comes in.
+			const first = to.querySelector( '.mizzey-menu__back' ) || focusables( to )[ 0 ];
 			if ( first ) {
-				first.focus();
+				moveFocus( first );
 			}
 		},
 		levelBack() {
@@ -298,12 +331,11 @@ store( 'mizzey/header', {
 			if ( ! here || ! to ) {
 				return;
 			}
-			here.hidden = true;
-			to.hidden = false;
+			pushLevel( here, to, false );
 			const opener = to.querySelector( `[aria-controls="${ CSS.escape( from ) }"]` );
 			if ( opener ) {
 				opener.setAttribute( 'aria-expanded', 'false' );
-				opener.focus();
+				moveFocus( opener );
 			}
 		},
 
@@ -369,12 +401,32 @@ store( 'mizzey/header', {
 		},
 		initDrawer() {
 			const dialog = getElement().ref;
+			// The menu control reads expanded while the drawer is open and not leaving (ui.js's is-closing).
+			const control = () => document.querySelector( `.mizzey-header__menu[aria-controls="${ CSS.escape( dialog.id ) }"]` );
+			let wasOpen = dialog.open;
+			const follow = () => {
+				const open = dialog.open && ! dialog.classList.contains( 'is-closing' );
+				const button = control();
+				if ( button ) {
+					button.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+				}
+				if ( dialog.open && ! wasOpen ) {
+					dialog.classList.add( 'is-entering' );
+					loadMotion();
+				}
+				wasOpen = dialog.open;
+			};
+			new MutationObserver( follow ).observe( dialog, { attributes: true, attributeFilter: [ 'open', 'class' ] } );
+			follow();
 			// Closed, the drawer starts again at its first level.
 			dialog.addEventListener( 'close', () => {
-				dialog.querySelectorAll( '.mizzey-menu__level' ).forEach( ( level, i ) => {
-					level.hidden = i !== 0;
-				} );
+				dialog.classList.remove( 'is-entering' );
+				if ( motion ) {
+					motion.settlePush();
+				}
+				dialog.querySelectorAll( '.mizzey-menu__level' ).forEach( ( level, i ) => showLevel( level, i === 0 ) );
 				dialog.querySelectorAll( '.mizzey-menu__row[aria-expanded]' ).forEach( ( row ) => row.setAttribute( 'aria-expanded', 'false' ) );
+				follow();
 			} );
 		},
 	},
