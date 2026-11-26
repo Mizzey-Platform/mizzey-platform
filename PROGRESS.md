@@ -2,7 +2,21 @@
 
 Live status. First action each session: read this, then continue from **Next**.
 
-## Now (25 November 2026)
+## Now (26 November 2026)
+
+- **Stage 2 is built up to slice 12 except slices 7, 8 and 11.** Merged and on staging since 25 November: the
+  product page's gallery and buying area (slice 9, #571, then #580 and #585), the category listing (slice 6, #575),
+  the product page's details, reviews and rails (slice 10, #583), the mini cart (slice 12, #582), prices as the boards
+  draw them (#570), the home sign-up (HOME-09, #572), first taps, Safari drawers and lighter pages (#573), the card's
+  add sequence and in-cart count (#568, #586), the home page, header and footer corrected to the boards (#590), a
+  visible loading line (#581), and server caching (#587, #588; #591 goes out with the next release).
+- **Staging runs v0.1.46.** The page cache has been live since v0.1.45; the object cache waits for PhpRedis in the
+  shared PHP image. Staging data was brought to the boards (sample catalogue, eight collections, reviews, galleries,
+  a video, the site icon) and the word "Sample" is gone from it.
+- **The owner's rulings of 25 and 26 November** are recorded in `DECISIONS.md` (D-39). None is
+  client-confirmed.
+
+## Now (25 November 2026): history
 
 - **Stage 1 is approved** (3 November 2026). The storefront's function layer (specs/050 to specs/064) is merged
   and on staging.
@@ -16,7 +30,23 @@ Live status. First action each session: read this, then continue from **Next**.
   the home page (#566). Staging runs v0.1.31 with staging-only sample content (home page, menus, strip, logo); the
   logo files sit on the server, not in this repository.
 
-## Next (25 November 2026)
+## Next (26 November 2026)
+
+1. Category imagery: sharper, correctly cropped category pictures (mega menu panel, banners, tiles) and the
+   placeholder for a category without a picture, in the phone menu too.
+2. Slices 7 (collection and brand pages), 8 (search) and 11 (Quick Look) of specs/066.
+3. The home page's leftovers against its boards (the owner's comments of 26 November are live in v0.1.46 and their
+   board comparison on staging is being read), then "home page done, please review" to the owner.
+4. Open owner questions: how more than four featured collections show on the home page (a slider or a second row);
+   the wording of the "New in ..." pill beside "Shop all" in the mega menu; whether the gift-card panel shows its
+   gradient or its picture; whether the placeholder's tint or white shows on the tinted category banner; whether
+   staging's PHP runtime gets the PhpRedis extension for the object cache; whether the brands index the boards draw
+   (`/brand/`, reached from "All brands" and the header's "Brands") is built, given D-20 B8 (no index pages are
+   contracted); where a promotional banner sits on collection, brand and category pages (no board draws it).
+5. Closing Stage 2, as before: a tagged release on staging, the D-21 measurements, the browser check, then the
+   client's browse.
+
+## Next (25 November 2026): history
 
 1. Slices 6 to 12 of specs/066 (category listing, collection and brand, search, product page, Quick Look, mini
    cart), each one pull request compared with its boards with measured spacing (K-1 to K-8).

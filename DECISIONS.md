@@ -1928,7 +1928,7 @@ CoreX; anything commerce-related stays with WooCommerce; native WordPress and Wo
 | A7 | How are orders stopped during maintenance without breaking payment callbacks? | Through supported WooCommerce paths, callbacks kept open, hosting's emergency 503 kept, plus a check that flags conflicting visibility settings |
 | A8 | Contact form (CMS-04): CoreX forms? | Yes, CoreX forms with its email and bot protection, a thin Mizzey adapter only for a proven gap |
 | A9 | CoreX WebP copies (NFR-02)? | Serve them through supported integration; switch generation off if serving cannot be shown |
-| A10 | Signup prompt storage (HOME-09)? | One small signup and consent record as the working baseline; no implicit customer account and no campaign engine. Whether HOME-09 means marketing signup or account signup, and its wording, still needs client confirmation |
+| A10 | Signup prompt storage (HOME-09)? | One small signup and consent record as the working baseline; no implicit customer account and no campaign engine. Ruled by the owner on 25 November 2026: the sign-up is built as the boards draw it on this baseline (a small record, a read-only staff list, a welcome email with a leave link, no account, no export, no campaigns). Whether HOME-09 means marketing signup or account signup, and its wording, still needs client confirmation |
 | A11 | CoreX branding on the login screen and admin footer? | Mizzey or neutral through supported settings or hooks; reuse the authoritative site-logo asset where supported, without assuming automatic login-logo synchronisation. Never hide branding with CSS or edit CoreX |
 | A12 | Who sees and resolves the CoreX notifications inbox? | Only staff responsible for operational incidents; not the restricted Marketing access |
 | A13 | CoreX generator meta tag? | Remove it through its filter |
@@ -2486,3 +2486,33 @@ no fee, stage or date.
 | What starts | The Stage 2 shop front is built from specs/066, slice by slice, now that its design is closed (D-36). The design-first freeze of D-14 is lifted for Stage 2 only |
 | The client's written approval | The Project Plan (section 3.2) lists the client's written approval of the interface design as needed before Stage 2 starts. It is requested in writing; the client chose the direction on 24 November 2026. Building before that approval is the supplier's own choice and risk: it moves no date and no payment, and a change the client asks for in the approval is made in the screens |
 | Later stages | Each is drawn just before it is built (D-36), and its implementation starts when its design is closed |
+
+## 2026-11-26 - D-39: the owner's rulings of 25 and 26 November 2026 on the Stage 2 build
+
+**Status: the owner's rulings in chat, 25 and 26 November 2026. They are working defaults for the build; none of
+them is client-confirmed.** They add no register row, change no fee, stage or date, and are not Change Requests. The
+merged work they shaped is in `PROGRESS.md`.
+
+| Question | Ruling (the owner's, with its date) |
+|---|---|
+| The card's in-cart count (25 Nov) | After the add sequence's 1.5 s tick, the "+" on a product card shows how many of that product are in the cart (#586) |
+| Notices on a phone (25 Nov) | Toasts swipe away with a flick (#586) |
+| HOME-09, the home sign-up (25 Nov) | Built as the boards draw it, on the A10 baseline: one small sign-up and consent record, a read-only list for staff, a welcome email with a leave link, no customer account, no export, no campaigns (#572). The field, box, success and welcome words are working defaults; the client's wording stays open under A10 |
+| Price format (25 Nov) | "EGP 5,099" as the boards draw it, with a space after EGP and no ".00"; piasters are shown when present, so no amount is ever rounded; Arabic "5,099 ج.م" (#570). Question 1 of the overnight list is answered |
+| Scroll reveal (25 Nov) | A subtle reveal as sections scroll into view is a design addition the owner asked for, with its reduced-motion form |
+| Server caching on staging (25 Nov) | Yes: a Redis object cache through the Redis Object Cache drop-in (GPLv3, kept unchanged with its licence; the delivery as a whole stays GPLv3-compatible, WordPress being GPLv2 or later), downloaded with the owner's OK, and our own guest page cache (#587, #588, #591). Page cache live on staging in v0.1.45 (repeat guest visit 28 ms to first byte instead of 1.3 to 1.9 s); cart, account, search and signed-in visits are never stored. The object cache waits for PhpRedis in the shared PHP image, which changes every site on the server and is the owner's call. Server steps: `WP_CACHE` in the site's config, `REDIS_*` in the PHP-FPM environment, a separate Redis database per site |
+| Browsers for tests (25 Nov) | WebKit is installed beside Chromium, and every interactive component is checked in both |
+| Merge gate (25 Nov) | A Stage 2 change is compared with its boards by measurement before it merges; a difference is fixed or explained in the pull request |
+| Cookie bar sentence (25 Nov) | "We use cookies to keep your cart, see how the store is used and show relevant ads." |
+| Where boards disagree (25 Nov) | Badges follow the English board; the sale stays in the price line; a rail's "previous" is disabled at the start; slice 6's "Previous" is disabled on page 1; the brand row bleeds to the screen edge |
+| No "Sample" anywhere (26 Nov) | The word is removed from every page, tag, label, address and text. Staging data was cleaned (v0.1.40); the footer tags and the Deals label were removed in v0.1.46 (#590) |
+| The footer's ZZ mark (26 Nov) | Its size and place follow the design the client was shown (the Clay concept page), not another board; the phone footer is matched to its own boards |
+| The category picture placeholder (26 Nov) | A category without a picture shows the same glyph on the tint as the product "No image" state (C1-Components 10 and C1-Menus-Phone 12), drawn at each place's own size (menu level-1 row, category shortcut tile, header chip, category banner tile) so rows stay aligned, never an empty gap. Built after the home work merges |
+| The site icon (26 Nov) | Made from the brand pack's ZZ monogram, live on staging in v0.1.40 |
+| The phone gallery (26 Nov) | On a phone the product photo swipes left and right to change it; the thumbnails stay (#585) |
+| Script budgets (26 Nov, D-21) | The product page's scripts may weigh 50 KB gzip; every other page stays at 45 KB. The speed targets (LCP 2.0 s, TBT 150 ms) still gate it on staging (#583) |
+| What the release ships (26 Nov) | The release trims comments that stand on lines of their own from the storefront's own styles and scripts. The repository keeps them, and the byte budget counts the shipped files (#589) |
+
+Staging only, not a ruling: the "Free delivery" method (free shipping, minimum 1,000, first in zone 1) was added by
+hand on staging on 26 November so the strip and the mini cart can be seen working. The real store's rule stays the
+client's setting.
