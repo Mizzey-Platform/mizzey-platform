@@ -80,6 +80,8 @@ class Fixture(unittest.TestCase):
             "index.php": "<?php // front",
             "wp-includes/version.php": "<?php\n$wp_version = '7.1.2';\n",
             "wp-content/plugins/mizzey-site/mizzey-site.php": "<?php // site",
+            "wp-content/plugins/mizzey-site/dropins/object-cache.php": "<?php // object cache",
+            "wp-content/plugins/mizzey-site/dropins/advanced-cache.php": "<?php // page cache",
             **{f"wp-content/plugins/{name}/{name}.php": "<?php // corex" for name in corex},
             "wp-content/plugins/corex-bookings/src/Booking.php": "<?php // a booking",
             "wp-content/themes/mizzey-theme/style.css": "/* theme */",
@@ -280,6 +282,32 @@ class TheCoreXPluginsTheStoreDoesNotRun(Fixture):
         finally:
             sys.path.pop(0)
         self.assertEqual(sorted(staging.COREX_PLUGINS), list(rp.COREX_CARRIED))
+
+
+class TheCacheDropIns(Fixture):
+    """NFR-02: WordPress loads its object cache and page cache only from wp-content itself, so the release puts the
+    plugin's two drop-ins there."""
+
+    def test_the_plugin_drop_ins_are_placed_in_wp_content(self):
+        self.pack()
+        with zipfile.ZipFile(self.out / "mizzey-v0.1.0.zip") as archive:
+            self.assertEqual(archive.read("wp-content/object-cache.php"), b"<?php // object cache")
+            self.assertEqual(archive.read("wp-content/advanced-cache.php"), b"<?php // page cache")
+            self.assertIn("wp-content/plugins/mizzey-site/dropins/object-cache.php", archive.namelist())
+
+    def test_the_manifest_names_them(self):
+        self.assertEqual(self.pack()["manifest"]["dropins"], {
+            "wp-content/advanced-cache.php": "wp-content/plugins/mizzey-site/dropins/advanced-cache.php",
+            "wp-content/object-cache.php": "wp-content/plugins/mizzey-site/dropins/object-cache.php",
+        })
+
+    def test_a_tree_without_them_is_refused(self):
+        (self.dist / "wp-content" / "plugins" / "mizzey-site" / "dropins" / "advanced-cache.php").unlink()
+        self.refused("advanced-cache.php")
+
+    def test_a_built_tree_that_already_holds_one_at_wp_content_is_refused(self):
+        (self.dist / "wp-content" / "object-cache.php").write_text("<?php // another", encoding="utf-8")
+        self.refused("object-cache.php")
 
 
 class Refusals(Fixture):

@@ -13,6 +13,9 @@ store also needs, at the versions `stack.lock.json` records, and writes two file
 What it adds. WooCommerce and the carrier plugin, from wordpress.org. The Arabic language packs of WordPress and
 of WooCommerce, from wordpress.org. `mizzey-release.json`, the manifest.
 
+What it places. The site plugin's two cache drop-ins (`DROPINS`): WordPress loads its object cache and its page cache
+only from wp-content itself, so each is copied there from `mizzey-site/dropins/`, and the manifest names them.
+
 What it leaves out of the built tree. The CoreX plugins and add-ons the store does not run (`COREX_CARRIED` names
 the ones it does), so a site running the release cannot activate them. The manifest names them under
 `plugins.left_out`, and `corex-release.json` is rewritten to describe the archive as shipped.
@@ -84,6 +87,11 @@ SERVER_SUPPLIED = {
 COREX_CARRIED = ("corex-blocks", "corex-captcha", "corex-config", "corex-core", "corex-email", "corex-forms",
                  "corex-guides", "corex-media", "corex-ui")
 COREX_MANIFEST = "corex-release.json"
+# wp-content file -> the site plugin's file it is copied from (NFR-02, mizzey-site/dropins/README.md).
+DROPINS = {
+    "wp-content/advanced-cache.php": "wp-content/plugins/mizzey-site/dropins/advanced-cache.php",
+    "wp-content/object-cache.php": "wp-content/plugins/mizzey-site/dropins/object-cache.php",
+}
 # Written at runtime, so absent from the archive and linked to a writable place by the deploy.
 RUNTIME_WRITABLE = ("wp-content/uploads", "wp-content/languages/wpml")
 # Never in a release, wherever they came from. Compared with each path segment, lower case.
@@ -357,10 +365,19 @@ def leave_out(contents: Contents, left_out: list[str]) -> None:
     contents.added[COREX_MANIFEST] = (json.dumps(described, indent=2) + "\n").encode("utf-8")
 
 
+def add_dropins(contents: Contents) -> None:
+    """The cache drop-ins, copied from the site plugin to where WordPress loads them."""
+    for target, source in DROPINS.items():
+        if source not in contents.on_disk:
+            raise Refused(f"the built tree lacks {source}, the site plugin's {target.rsplit('/', 1)[1]} drop-in")
+        contents.add({target: contents.read(source)}, f"the {target.rsplit('/', 1)[1]} drop-in")
+
+
 def assemble(dist: Path, lock: dict, origin: Origin, left_out: list[str] | None = None) -> Contents:
     """Everything the archive will hold, except its manifest."""
     contents = Contents(tree_files(dist))
     leave_out(contents, left_out or [])
+    add_dropins(contents)
     add_plugins(contents, lock, origin)
     add_language_packs(contents, lock, origin)
     for guard in ("wp-content/index.php", "wp-content/plugins/index.php", "wp-content/themes/index.php"):
@@ -390,6 +407,7 @@ def build_manifest(build: Build, lock: dict, built: dict, contents: Contents) ->
                 for component, (slug, main_file) in SERVER_SUPPLIED.items()],
         },
         "themes": built["themes"],
+        "dropins": dict(sorted(DROPINS.items())),
         "language_packs": contents.packs,
         "runtime_writable": list(RUNTIME_WRITABLE),
         "not_in_this_archive": ["wp-config.php", *RUNTIME_WRITABLE,
