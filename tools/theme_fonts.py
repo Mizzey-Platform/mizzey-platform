@@ -17,7 +17,7 @@ found above the repository.
 It writes, under `<theme>/assets/`:
 
 - `fonts/<face>-<hash>.woff2`: Inter cut to Latin; Tajawal cut to Arabic plus the shared spaces, brackets and
-  punctuation, with its Latin letters and digits left out (Latin is always Inter). `<hash>` is the first eight hex
+  punctuation and its own digits 0 to 9, with its Latin letters left out (Latin words are always Inter). `<hash>` is the first eight hex
   digits of the file's SHA-256, so the file can be cached for a year; files of an earlier build are removed;
 - `fonts/Inter-OFL.txt`, `fonts/Tajawal-OFL.txt`: the licences, which travel with the files;
 - `fonts/fonts.json`: the faces (read by `tools/theme_tokens.py` into `theme.json`), the files each kind of page
@@ -50,8 +50,10 @@ THEME = ROOT / "mizzey-theme"
 
 LATIN = ("U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, "
          "U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD")
+# The Arabic cut keeps Tajawal's own digits 0 to 9 (with the , . % already in it): Arabic pages show digits in
+# Tajawal as the home boards draw them (the owner's ruling, 25 November 2026); Latin words stay Inter at 94%.
 ARABIC = ("U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200F, U+2010-2011, U+0020-0029, "
-          "U+002C-002E, U+003A, U+00A0, U+00AB, U+00BB")
+          "U+002C-002E, U+0030-003A, U+00A0, U+00AB, U+00BB")
 INTER_FEATURES = ["kern", "liga", "calt", "tnum", "case", "ccmp", "locl", "mark", "mkmk"]
 VARIABLE_LIMITS = {"wght": (300, 900), "opsz": 14}
 
