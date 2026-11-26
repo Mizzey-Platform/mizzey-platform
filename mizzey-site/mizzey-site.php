@@ -47,6 +47,7 @@ require_once __DIR__ . '/src/Storefront/ProductRail.php';
 require_once __DIR__ . '/src/Storefront/ProductBuy.php';
 require_once __DIR__ . '/src/Catalogue/AttributeSwatch.php';
 require_once __DIR__ . '/src/Storefront/Listing.php';
+require_once __DIR__ . '/src/Shipping/DeliveryDates.php';
 require_once __DIR__ . '/src/Search/Normalise.php';
 require_once __DIR__ . '/src/Search/Synonyms.php';
 require_once __DIR__ . '/src/Search/SearchIndex.php';
@@ -255,6 +256,8 @@ MizzeySite\Catalogue\AttributeSwatch::register();
 // The category listing's data over WooCommerce's product query, its drawer count and its filters without JavaScript:
 // specs/066, slice 6 (PLP-06 to PLP-22, SSC-04).
 MizzeySite\Storefront\Listing::register();
+// The delivery estimate as dates on the product page, counted in Cairo time (PDP-14): specs/066, slice 9.
+MizzeySite\Shipping\DeliveryDates::register();
 
 // The store's own product search, its index, its synonym list and its term log: specs/058-search.
 MizzeySite\Search\Synonyms::register();

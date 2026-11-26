@@ -76,12 +76,12 @@ function t112_image( Scenario $s, string $name, int $width, int $height, array $
  *
  * @return array<string,mixed>
  */
-function t112_browser( array $plan ): array {
+function t112_browser( array $plan, string $script = 'product-page.cjs' ): array {
 	$file = wp_tempnam( 't112-plan' );
 	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 	$out  = array();
 	$code = 0;
-	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/product-page.cjs' ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out, $code );
+	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/' . $script ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out, $code );
 	wp_delete_file( $file );
 	$json = json_decode( (string) end( $out ), true );
 	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
@@ -384,6 +384,49 @@ run(
 		}
 		$check( count( (array) ( $result['checks'] ?? array() ) ) >= 80, 'the browser made every check (' . count( (array) ( $result['checks'] ?? array() ) ) . ')' );
 		foreach ( (array) ( $result['shots'] ?? array() ) as $shot ) {
+			$s->note( '      screenshot: ' . $shot );
+		}
+
+		// ---- On a phone, Chromium and WebKit: nothing chosen, and back through the back-forward cache --------------
+		$a2 = new \WC_Product_Attribute();
+		$a2->set_name( 'Scent' );
+		$a2->set_options( array( 'Cedar', 'Rose' ) );
+		$a2->set_visible( true );
+		$a2->set_variation( true );
+		$nodef = new \WC_Product_Variable();
+		$nodef->set_name( "{$tag} Nothing chosen" );
+		$nodef->set_status( 'publish' );
+		$nodef->set_attributes( array( $a2 ) );
+		$nodef->save();
+		t112_english( $nodef->get_id(), 'product' );
+		$s->track_post( $nodef->get_id() );
+		foreach ( array( 'Cedar', 'Rose' ) as $scent ) {
+			$v = new \WC_Product_Variation();
+			$v->set_parent_id( $nodef->get_id() );
+			$v->set_attributes( array( 'scent' => $scent ) );
+			$v->set_regular_price( '700' );
+			$v->set_manage_stock( true );
+			$v->set_stock_quantity( 9 );
+			$v->save();
+			t112_english( $v->get_id(), 'product_variation' );
+			$s->track_post( $v->get_id() );
+		}
+		\WC_Product_Variable::sync( $nodef->get_id() );
+		$states = t112_browser(
+			array(
+				'tag'      => $tag,
+				'urls'     => array( 'nodefault' => get_permalink( $nodef->get_id() ), 'simple' => get_permalink( $bare->get_id() ), 'var' => get_permalink( $var->get_id() ) ),
+				'checkout' => wc_get_checkout_url(),
+				'shots'    => get_temp_dir(),
+			),
+			'product-page-states.cjs'
+		);
+		$check( empty( $states['error'] ), 'the phone states run' . ( empty( $states['error'] ) ? '' : ': ' . substr( (string) $states['error'], 0, 800 ) ) );
+		foreach ( (array) ( $states['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], (string) $row['what'] );
+		}
+		$check( count( (array) ( $states['checks'] ?? array() ) ) >= 18, 'the phone states run made every check (' . count( (array) ( $states['checks'] ?? array() ) ) . ')' );
+		foreach ( (array) ( $states['shots'] ?? array() ) as $shot ) {
 			$s->note( '      screenshot: ' . $shot );
 		}
 

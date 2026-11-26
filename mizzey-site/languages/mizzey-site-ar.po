@@ -2771,3 +2771,82 @@ msgstr "اللون الذي يظهر لهذا الخيار في صفحة الم�
 #: mizzey-site/src/Catalogue/AttributeSwatch.php
 msgid "Swatch colour"
 msgstr "لون الخيار"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+#, php-format
+msgid "Order now, get it by %s"
+msgstr "اطلب الآن، يصلك بحلول %s"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+#, php-format
+msgid "Order now, get it between %1$s and %2$s"
+msgstr "اطلب الآن، يصلك بين %1$s و%2$s"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgctxt "delivery date"
+msgid "D j M"
+msgstr "l j F"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Saturday"
+msgstr "السبت"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Sunday"
+msgstr "الأحد"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Monday"
+msgstr "الاثنين"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Tuesday"
+msgstr "الثلاثاء"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Wednesday"
+msgstr "الأربعاء"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Thursday"
+msgstr "الخميس"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Friday"
+msgstr "الجمعة"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Delivery date shown"
+msgstr "تاريخ التوصيل المعروض"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "A range: \"get it between Mon 30 Nov and Thu 3 Dec\""
+msgstr "مدة: «يصلك بين الاثنين 30 نوفمبر والخميس 3 ديسمبر»"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "One date, the latest: \"get it by Thu 3 Dec\""
+msgstr "تاريخ واحد، الأبعد: «يصلك بحلول الخميس 3 ديسمبر»"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "The dates come from the delivery estimate above, in working days."
+msgstr "تأتي التواريخ من تقدير التوصيل أعلاه، بأيام العمل."
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Delivery working days"
+msgstr "أيام عمل التوصيل"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Order cut-off time (Cairo)"
+msgstr "آخر موعد للطلب (بتوقيت القاهرة)"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "An order after this time, 24-hour clock, counts from the next working day."
+msgstr "الطلب بعد هذا الموعد، بنظام 24 ساعة، يُحسب من يوم العمل التالي."
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Holidays (no delivery)"
+msgstr "العطلات (بلا توصيل)"
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "One date a line, as 2026-12-25."
+msgstr "تاريخ في كل سطر، مثل 2026-12-25."
