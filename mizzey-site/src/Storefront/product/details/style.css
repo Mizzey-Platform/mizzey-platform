@@ -1,0 +1,1103 @@
+/* The lower product page (spec 066, slice 10), as C1-Product-Phone, C1-Product-Desktop and C1-Photo-Reviews draw it:
+   the jump-to bar, Details, Specifications, Reviews and the two rails. Every value is a token; logical properties
+   only, so Arabic is the mirror. The numbers in the comments are the boards'. */
+
+:where(.mizzey-details, .mizzey-details *) {
+	box-sizing: border-box;
+}
+
+.mizzey-details {
+	color: var(--mizzey-color-role-text);
+}
+
+.mizzey-details__title {
+	margin: 0;
+	font: var(--mizzey-type-h3-compact);
+	line-height: calc(var(--mizzey-space-5) + var(--mizzey-border-hairline));
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The jump-to bar: 32 under the key features, white across the phone, 48 links, the 3 underline inset 14. It sticks to
+   the top of the window once its resting place has scrolled away. */
+
+.mizzey-details__sentinel {
+	block-size: 0;
+}
+
+.mizzey-details__jump {
+	position: sticky;
+	z-index: 3;
+	inset-block-start: var(--mizzey-details-top, 0);
+	margin-block-start: var(--mizzey-space-6);
+	margin-inline: calc(var(--mizzey-layout-margin-phone) * -1);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	background-color: var(--mizzey-color-role-surface);
+	transition: box-shadow var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-details__jump.is-stuck {
+	box-shadow: var(--mizzey-elevation-2);
+}
+
+/* Three parts, or two when a part is left out (E9). */
+.mizzey-details__jump {
+	--mizzey-details-parts: 3;
+}
+
+.mizzey-details__jump--2 {
+	--mizzey-details-parts: 2;
+}
+
+.mizzey-details__jump-inner {
+	--mizzey-details-current: 0;
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(var(--mizzey-details-parts), minmax(0, 1fr));
+	border-block-end: var(--mizzey-border-hairline) solid var(--mizzey-color-neutral-hairline-strong);
+}
+
+.mizzey-details__jump-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-block-size: var(--mizzey-control-target-preferred);
+	padding-inline: var(--mizzey-space-2);
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-body-strong);
+	text-align: center;
+	text-decoration: none;
+	transition: color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-details__jump-link[aria-current="true"] {
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-details__jump-link:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: calc(var(--mizzey-focus-offset) * -1);
+}
+
+.mizzey-details__jump-bar {
+	position: absolute;
+	inset-block-end: calc(var(--mizzey-border-hairline) * -1);
+	inset-inline-start: calc(100% * var(--mizzey-details-current) / var(--mizzey-details-parts));
+	inline-size: calc(100% / var(--mizzey-details-parts));
+	padding-inline: var(--mizzey-control-tab-indicator-inset);
+	transition: inset-inline-start var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-details__jump-bar > span {
+	display: block;
+	block-size: var(--mizzey-border-indicator);
+	border-radius: var(--mizzey-border-indicator);
+	background-color: var(--mizzey-color-role-primary);
+}
+
+/* A link lands its part under the stuck bar. */
+.mizzey-details :is(#details, #specifications, #reviews) {
+	scroll-margin-block-start: calc(var(--mizzey-details-top, 0px) + var(--mizzey-control-target-preferred) + var(--mizzey-space-5));
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Details and Specifications: on a phone one under the other, 24 under the bar and 40 apart. */
+
+.mizzey-details__about {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-7);
+	margin-block-start: var(--mizzey-space-5);
+}
+
+.mizzey-details__body {
+	margin-block-start: var(--mizzey-space-3);
+	overflow-wrap: anywhere;
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-details__body > * {
+	margin-block: 0 var(--mizzey-space-4);
+}
+
+.mizzey-details__body > :last-child {
+	margin-block-end: 0;
+}
+
+/* "How to use:" and the like in the staff's text read Medium, as drawn. */
+.mizzey-details__body :is(strong, b) {
+	font-weight: var(--mizzey-font-weight-medium);
+}
+
+.mizzey-details__body :is(ul, ol) {
+	padding-inline-start: var(--mizzey-space-5);
+}
+
+.mizzey-details__body img {
+	max-inline-size: 100%;
+	block-size: auto;
+}
+
+/* On a phone: six lines, then "Read more" (A15). */
+.mizzey-details__body:not(.is-open) {
+	display: -webkit-box;
+	max-block-size: calc(var(--mizzey-space-9) * 2);
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 6;
+}
+
+.mizzey-details__more {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-label);
+	text-decoration: underline;
+	text-underline-offset: var(--mizzey-motion-distance-nudge);
+	cursor: pointer;
+}
+
+.mizzey-details__more[hidden] {
+	display: none;
+}
+
+.mizzey-details__more:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-details__specs dl {
+	margin: var(--mizzey-space-1) 0 0;
+}
+
+/* Each row 49: 12 above and below, the hairline under; the name 38 in 100, muted. */
+.mizzey-details__row {
+	display: flex;
+	gap: var(--mizzey-space-4);
+	padding-block: var(--mizzey-space-3);
+	border-block-end: var(--mizzey-border-hairline) solid var(--mizzey-color-role-border);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-details__row dt {
+	flex: 0 0 38%;
+	min-inline-size: 0;
+	color: var(--mizzey-color-role-text-muted);
+	overflow-wrap: anywhere;
+}
+
+.mizzey-details__row dd {
+	flex: 1;
+	min-inline-size: 0;
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Reviews. On a phone: the title, 12, the summary, then 16 between the toolbar, the cards, "Show all" and
+   "Write a review". */
+
+.mizzey-reviews {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-4);
+	margin-block-start: var(--mizzey-space-section);
+}
+
+.mizzey-reviews__side {
+	display: contents;
+}
+
+.mizzey-reviews__head {
+	margin-block-end: calc(var(--mizzey-space-1) * -1);
+}
+
+.mizzey-reviews__write {
+	order: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-reviews__main {
+	order: 3;
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-4);
+	min-inline-size: 0;
+}
+
+.mizzey-review-entry {
+	order: 5;
+}
+
+/* The summary: the score 99 wide, 24 from the bars. */
+.mizzey-reviews__summary {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-5);
+}
+
+.mizzey-reviews__score {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+}
+
+.mizzey-reviews__average {
+	display: flex;
+	align-items: baseline;
+	gap: var(--mizzey-space-2);
+	margin: 0;
+	white-space: nowrap;
+}
+
+.mizzey-reviews__number {
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-latin-h1);
+	font-family: var(--mizzey-font-family-numeric);
+}
+
+.mizzey-reviews__of {
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-reviews__count {
+	margin: var(--mizzey-space-1) 0 0;
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+}
+
+.mizzey-stars {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-stars__star {
+	position: relative;
+	display: inline-flex;
+}
+
+.mizzey-stars__star.is-empty {
+	color: var(--mizzey-color-indigo-200);
+}
+
+/* A half star: the outline in Indigo, its start half filled (4.6 on the board). */
+.mizzey-stars__star.is-half > .mizzey-icon path {
+	fill: none;
+}
+
+.mizzey-stars__half {
+	position: absolute;
+	inset: 0;
+	display: inline-flex;
+	color: var(--mizzey-color-role-primary);
+	clip-path: inset(0 50% 0 0);
+}
+
+[dir="rtl"] .mizzey-stars__half {
+	clip-path: inset(0 0 0 50%);
+}
+
+.mizzey-reviews__bars {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: var(--mizzey-space-1);
+	min-inline-size: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-reviews__bar {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	block-size: var(--mizzey-space-5);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-reviews__bar-star {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--mizzey-space-1);
+	flex: 0 0 var(--mizzey-space-6);
+	font-family: var(--mizzey-font-family-numeric);
+}
+
+.mizzey-reviews__bar-star .mizzey-icon {
+	color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-reviews__bar-track {
+	flex: 1;
+	block-size: var(--mizzey-space-2);
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+}
+
+.mizzey-reviews__bar-track > span {
+	display: block;
+	inline-size: var(--mizzey-bar);
+	block-size: 100%;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+}
+
+.mizzey-reviews__bar-count {
+	flex: 0 0 var(--mizzey-space-5);
+	color: var(--mizzey-color-role-text-muted);
+	font-family: var(--mizzey-font-family-numeric);
+	text-align: end;
+}
+
+/* "With photos" and the order, 48 high. */
+.mizzey-reviews__tools {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-3);
+	min-block-size: var(--mizzey-control-target-preferred);
+}
+
+.mizzey-reviews__sort {
+	display: flex;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+	margin-inline-start: auto;
+}
+
+/* Slice 1's select, fitted to the toolbar as drawn: "Sort by" beside the box; the box 48 high, its text's width
+   (146 for "Most recent"), radius 16, the light ring; the chevron 12 from the top; the list as wide as its longest
+   choice. */
+.mizzey-reviews__sort .mizzey-select {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-reviews__sort .mizzey-field__label {
+	margin: 0;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-label);
+	white-space: nowrap;
+}
+
+.mizzey-reviews__sort .mizzey-field__message {
+	display: none;
+}
+
+.mizzey-reviews__sort .mizzey-select__button {
+	inline-size: auto;
+	block-size: var(--mizzey-control-target-preferred);
+	padding-inline: var(--mizzey-space-4) var(--mizzey-space-7);
+	border: 0;
+	box-shadow: var(--mizzey-elevation-1-soft), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-role-border-control);
+	white-space: nowrap;
+}
+
+.mizzey-reviews__sort .mizzey-select__chevron {
+	inset-block-start: var(--mizzey-space-3);
+	inset-inline-end: var(--mizzey-space-3);
+}
+
+/* The chevron 20 here, as drawn in the toolbar. */
+.mizzey-reviews__sort .mizzey-select__chevron .mizzey-icon {
+	inline-size: var(--mizzey-control-count);
+	block-size: var(--mizzey-control-count);
+}
+
+.mizzey-reviews__sort .mizzey-select__list {
+	inset-inline: auto 0;
+	min-inline-size: max-content;
+}
+
+/* A review: white, the hairline inside, radius 20, 16 inside; 12 between cards. */
+.mizzey-reviews__list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-reviews__nothing {
+	margin: 0;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-review {
+	display: flex;
+	flex-direction: column;
+	padding: var(--mizzey-space-4);
+	border-radius: var(--mizzey-radius-card);
+	background-color: var(--mizzey-color-role-surface-raised);
+	box-shadow: inset 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-role-border);
+	scroll-margin-block-start: calc(var(--mizzey-details-top, 0px) + var(--mizzey-control-target-preferred) + var(--mizzey-space-5));
+}
+
+.mizzey-review__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-review__name {
+	min-inline-size: 0;
+	margin: 0;
+	overflow-wrap: anywhere;
+	font: var(--mizzey-type-body-strong);
+}
+
+.mizzey-review__date {
+	flex-shrink: 0;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+.mizzey-review__stars {
+	margin-block-start: var(--mizzey-space-1);
+}
+
+.mizzey-review__text {
+	margin-block-start: var(--mizzey-space-3);
+	overflow-wrap: anywhere;
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-review__text p {
+	margin: 0 0 var(--mizzey-space-2);
+}
+
+.mizzey-review__text p:last-child {
+	margin-block-end: 0;
+}
+
+/* The photos: 72 tiles, radius 12, 8 apart; past four, three and "+N". */
+.mizzey-review__photos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mizzey-space-2);
+	margin: var(--mizzey-space-3) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-reviews__photo {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-space-9);
+	block-size: var(--mizzey-space-9);
+	padding: 0;
+	overflow: hidden;
+	border: 0;
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-label);
+	cursor: zoom-in;
+}
+
+/* The photo fills its tile, whatever its shape. */
+.mizzey-reviews__photo img {
+	position: absolute;
+	inset: 0;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.mizzey-reviews__photo--more {
+	cursor: pointer;
+}
+
+.mizzey-reviews__photo:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-reviews__more-row {
+	display: flex;
+	flex-direction: column;
+}
+
+.mizzey-reviews__who {
+	margin: 0;
+	color: var(--mizzey-color-role-text-muted);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+/* No reviews yet (E8): the quiet panel, 20 inside on a phone, the empty stars, one line, "Write a review" 44 with the
+   Indigo ring. */
+.mizzey-reviews--none {
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-reviews__none {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--mizzey-space-3);
+	padding: calc(var(--mizzey-space-4) + var(--mizzey-space-1));
+	border-radius: var(--mizzey-radius-card);
+	background-color: var(--mizzey-color-role-surface-quiet);
+}
+
+.mizzey-stars--none {
+	gap: var(--mizzey-motion-distance-1);
+	color: var(--mizzey-color-indigo-200);
+}
+
+.mizzey-stars--none .mizzey-icon {
+	inline-size: var(--mizzey-control-count);
+	block-size: var(--mizzey-control-count);
+}
+
+.mizzey-reviews__none-text p {
+	margin: 0;
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+.mizzey-reviews__none-text .mizzey-reviews__none-title {
+	margin-block-end: var(--mizzey-space-3);
+	font: var(--mizzey-type-body-strong);
+}
+
+.mizzey-reviews__write-button.is-outlined {
+	block-size: var(--mizzey-control-button-compact);
+	box-shadow: inset 0 0 0 var(--mizzey-border-control) var(--mizzey-color-role-primary);
+}
+
+/* "Write a review" opened in place (E11). */
+.mizzey-review-entry {
+	padding: var(--mizzey-space-5);
+	border-radius: var(--mizzey-radius-card);
+	background-color: var(--mizzey-color-role-surface-quiet);
+}
+
+.mizzey-review-entry[hidden] {
+	display: none;
+}
+
+.mizzey-review-entry__form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-3);
+}
+
+.mizzey-review-entry__title {
+	margin: 0;
+	font: var(--mizzey-type-h3-compact);
+}
+
+.mizzey-review-entry__stars {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.mizzey-review-entry__star {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-review-entry__star input {
+	position: absolute;
+	opacity: 0;
+}
+
+/* The stars up to the one chosen are filled; the rest wait in the light Indigo. */
+.mizzey-review-entry__stars:has(input:checked) .mizzey-review-entry__star:has(input:checked) ~ .mizzey-review-entry__star,
+.mizzey-review-entry__stars:not(:has(input:checked)) .mizzey-review-entry__star {
+	color: var(--mizzey-color-indigo-200);
+}
+
+.mizzey-review-entry__star:has(input:focus-visible) {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-review-entry__label {
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-review-entry textarea {
+	min-block-size: var(--mizzey-control-textarea);
+	padding: var(--mizzey-space-4);
+	border: var(--mizzey-border-hairline) solid var(--mizzey-color-role-border-control);
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-input);
+	resize: vertical;
+}
+
+.mizzey-review-entry textarea:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* Photos (C1-Photo-Reviews): the chosen ones and "Add", 72 tiles 8 apart, "Add" dashed. */
+.mizzey-review-entry__photos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-review-entry__photos .mizzey-review-entry__label {
+	flex-basis: 100%;
+	margin: 0;
+}
+
+.mizzey-review-entry__photos .mizzey-review-entry__label span {
+	color: var(--mizzey-color-role-text-muted);
+	font-weight: var(--mizzey-font-weight-regular);
+}
+
+.mizzey-review-entry__chosen {
+	display: contents;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-review-entry__chosen img {
+	display: block;
+	inline-size: var(--mizzey-space-9);
+	block-size: var(--mizzey-space-9);
+	border-radius: var(--mizzey-radius-sm);
+	object-fit: cover;
+}
+
+.mizzey-review-entry__add {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--mizzey-space-1);
+	inline-size: var(--mizzey-space-9);
+	block-size: var(--mizzey-space-9);
+	border: var(--mizzey-border-hairline) dashed var(--mizzey-color-role-border-control);
+	border-radius: var(--mizzey-radius-sm);
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-caption);
+	cursor: pointer;
+}
+
+.mizzey-review-entry__add[hidden] {
+	display: none;
+}
+
+.mizzey-review-entry__add:has(input:focus-visible) {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+.mizzey-review-entry__error {
+	margin: 0;
+	color: var(--mizzey-color-role-danger);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-review-entry__error:empty {
+	display: none;
+}
+
+/* "Send review": the whole width; while it waits, the i-dot loader in place of its words. */
+.mizzey-review-entry__send {
+	position: relative;
+	inline-size: 100%;
+}
+
+.mizzey-review-entry__loader {
+	position: absolute;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+}
+
+.mizzey-review-entry__send.is-busy .mizzey-button__label {
+	visibility: hidden;
+}
+
+.mizzey-review-entry__send.is-busy .mizzey-review-entry__loader {
+	display: flex;
+}
+
+.mizzey-review-entry__note {
+	margin: 0;
+	font: var(--mizzey-type-body);
+}
+
+.mizzey-review-entry__sign-in {
+	color: var(--mizzey-color-role-link);
+	font-weight: var(--mizzey-font-weight-medium);
+}
+
+/* The photo viewer: the page dimmed, the photo on white, its number and who took it. */
+.mizzey-photo-viewer {
+	max-inline-size: calc(100% - var(--mizzey-space-6));
+	max-block-size: none;
+	padding: 0;
+	overflow: visible;
+	border: 0;
+	border-radius: var(--mizzey-radius-tile);
+	background-color: var(--mizzey-color-role-surface);
+	box-shadow: var(--mizzey-elevation-4);
+}
+
+.mizzey-photo-viewer::backdrop {
+	background-color: var(--mizzey-color-role-scrim);
+}
+
+.mizzey-photo-viewer__panel {
+	position: relative;
+	padding: var(--mizzey-space-5);
+}
+
+.mizzey-photo-viewer__img {
+	display: block;
+	max-inline-size: 100%;
+	max-block-size: var(--mizzey-control-product-stage);
+	margin-inline: auto;
+	border-radius: var(--mizzey-radius-field);
+	object-fit: contain;
+}
+
+.mizzey-photo-viewer__label {
+	position: absolute;
+	inset-block-end: var(--mizzey-space-3);
+	inset-inline-start: var(--mizzey-space-3);
+	margin: 0;
+	padding: var(--mizzey-space-1) var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	font: var(--mizzey-type-label);
+}
+
+.mizzey-photo-viewer__close,
+.mizzey-photo-viewer__step {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-target-min);
+	block-size: var(--mizzey-control-target-min);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-surface);
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+}
+
+.mizzey-photo-viewer__close {
+	inset-block-start: 0;
+	inset-inline-end: 0;
+	background: none;
+}
+
+.mizzey-photo-viewer__step {
+	inset-block-start: calc(50% - var(--mizzey-space-5));
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-photo-viewer__step--back {
+	inset-inline-start: calc(var(--mizzey-space-5) * -1);
+}
+
+.mizzey-photo-viewer__step--fwd {
+	inset-inline-end: calc(var(--mizzey-space-5) * -1);
+}
+
+[dir="rtl"] .mizzey-photo-viewer__step .mizzey-icon {
+	scale: -1 1;
+}
+
+.mizzey-photo-viewer.is-single .mizzey-photo-viewer__step {
+	display: none;
+}
+
+.mizzey-photo-viewer :is(.mizzey-photo-viewer__close, .mizzey-photo-viewer__step):focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The rails: slice 4's, 40 under the reviews and 32 apart on a phone, the heading 19 on 25 in a 48 row. */
+
+.mizzey-details__rail {
+	margin-block-start: var(--mizzey-space-section);
+}
+
+.mizzey-details__rail + .mizzey-details__rail {
+	margin-block-start: var(--mizzey-space-6);
+}
+
+.mizzey-details__rail .mizzey-products {
+	margin-block: 0;
+	padding-inline: 0;
+}
+
+.mizzey-details__rail .mizzey-products__head {
+	min-block-size: var(--mizzey-control-target-preferred);
+}
+
+.mizzey-details__rail .mizzey-products__heading {
+	font: var(--mizzey-type-h3-compact);
+	line-height: calc(var(--mizzey-space-5) + var(--mizzey-border-hairline));
+	letter-spacing: var(--mizzey-type-h1-letter-spacing);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The "all reviews" view (E8): the buying area steps aside; on a phone "Back" and the title, then the filters. */
+
+.mizzey-product-page:has(.mizzey-details--all) :is(.mizzey-buy, .mizzey-buy-bar) {
+	display: none;
+}
+
+.mizzey-details__back {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--mizzey-space-1);
+	min-block-size: var(--mizzey-control-target-min);
+	margin-inline-start: calc(var(--mizzey-space-1) * -1);
+	color: var(--mizzey-color-role-link);
+	font: var(--mizzey-type-body-strong);
+	text-decoration: none;
+}
+
+[dir="rtl"] .mizzey-details__back .mizzey-icon {
+	scale: -1 1;
+}
+
+.mizzey-details__all-head {
+	display: flex;
+	flex-direction: column;
+	gap: var(--mizzey-space-3);
+	margin-block-start: var(--mizzey-space-2);
+}
+
+.mizzey-details__all-title {
+	margin: 0;
+	font: var(--mizzey-type-h1);
+	letter-spacing: var(--mizzey-type-h1-letter-spacing);
+}
+
+.mizzey-details__filters {
+	display: flex;
+	gap: var(--mizzey-space-2);
+	margin-inline: calc(var(--mizzey-layout-margin-phone) * -1);
+	padding-block: var(--mizzey-space-1);
+	padding-inline: var(--mizzey-layout-margin-phone);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.mizzey-details--all .mizzey-reviews {
+	margin-block-start: var(--mizzey-space-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-details__jump,
+	.mizzey-details__jump-link,
+	.mizzey-details__jump-bar {
+		transition: none;
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   From 1024: the 1272 grid. The bar 72 under the buying area, 520 wide over a hairline across the grid, links 56;
+   Details 7 columns and Specifications 5; Reviews 4 and 8; the rails 72 apart. */
+
+@media (min-width: 1024px) {
+	.mizzey-details__title {
+		font: var(--mizzey-type-title);
+		font-weight: var(--mizzey-font-weight-black);
+	}
+
+	.mizzey-details__jump {
+		margin-block-start: var(--mizzey-space-9);
+		margin-inline: 0;
+		padding-inline: 0;
+		background-color: transparent;
+		box-shadow: 0 var(--mizzey-border-hairline) 0 0 var(--mizzey-color-role-border);
+	}
+
+	.mizzey-details__jump::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		inset-block: 0;
+		inset-inline: calc(var(--mizzey-layout-margin-desktop) * -1);
+		background-color: var(--mizzey-color-role-surface);
+		box-shadow: var(--mizzey-elevation-2);
+		opacity: 0;
+		transition: opacity var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+	}
+
+	.mizzey-details__jump.is-stuck {
+		box-shadow: none;
+	}
+
+	.mizzey-details__jump.is-stuck::before {
+		opacity: 1;
+	}
+
+	.mizzey-details__jump-inner {
+		inline-size: calc((var(--mizzey-layout-measure-caption) + var(--mizzey-space-7)) * var(--mizzey-details-parts) / 3);
+	}
+
+	.mizzey-details__jump-link {
+		min-block-size: var(--mizzey-control-button-large);
+	}
+
+	.mizzey-details :is(#details, #specifications, #reviews),
+	.mizzey-review {
+		scroll-margin-block-start: calc(var(--mizzey-details-top, 0px) + var(--mizzey-control-button-large) + var(--mizzey-space-6));
+	}
+
+	.mizzey-details__about {
+		display: grid;
+		grid-template-columns: repeat(var(--mizzey-layout-columns-desktop), minmax(0, 1fr));
+		align-items: start;
+		column-gap: var(--mizzey-layout-gutter-desktop);
+		margin-block-start: var(--mizzey-space-6);
+	}
+
+	.mizzey-details__text {
+		grid-column: span 7;
+		padding-inline-end: var(--mizzey-layout-gutter-desktop);
+	}
+
+	.mizzey-details__specs {
+		grid-column: span 5;
+	}
+
+	.mizzey-details__body:not(.is-open) {
+		display: block;
+		max-block-size: none;
+		-webkit-line-clamp: none;
+	}
+
+	.mizzey-details__more,
+	.mizzey-details__more[hidden] {
+		display: none;
+	}
+
+	.mizzey-reviews {
+		display: grid;
+		grid-template-columns: repeat(var(--mizzey-layout-columns-desktop), minmax(0, 1fr));
+		align-items: start;
+		column-gap: var(--mizzey-layout-gutter-desktop);
+		row-gap: var(--mizzey-space-5);
+	}
+
+	.mizzey-reviews__side {
+		display: flex;
+		flex-direction: column;
+		grid-column: 1 / span 4;
+		gap: var(--mizzey-space-5);
+	}
+
+	.mizzey-reviews__head {
+		margin-block-end: 0;
+	}
+
+	.mizzey-reviews__main,
+	.mizzey-review-entry,
+	.mizzey-reviews__none {
+		grid-column: 5 / span 8;
+	}
+
+	.mizzey-reviews__main {
+		gap: var(--mizzey-space-3);
+	}
+
+	.mizzey-reviews__write {
+		align-items: flex-start;
+	}
+
+	.mizzey-reviews__more-row {
+		flex-direction: row;
+		margin-block-start: var(--mizzey-space-1);
+	}
+
+	.mizzey-reviews--none .mizzey-reviews__side {
+		grid-row: 1;
+	}
+
+	.mizzey-reviews__none {
+		flex-direction: row;
+		align-items: center;
+		gap: var(--mizzey-space-5);
+		padding: var(--mizzey-space-5);
+	}
+
+	.mizzey-stars--none .mizzey-icon {
+		inline-size: var(--mizzey-space-5);
+		block-size: var(--mizzey-space-5);
+	}
+
+	.mizzey-reviews__none-text {
+		flex: 1;
+	}
+
+	.mizzey-reviews__none-text .mizzey-reviews__none-title {
+		margin-block-end: var(--mizzey-space-1);
+	}
+
+	.mizzey-details__rail {
+		margin-block-start: var(--mizzey-space-9);
+	}
+
+	.mizzey-details__rail + .mizzey-details__rail {
+		margin-block-start: var(--mizzey-space-9);
+	}
+
+	.mizzey-details__rail .mizzey-products__heading {
+		font: var(--mizzey-type-h2);
+		letter-spacing: var(--mizzey-type-h1-letter-spacing);
+	}
+
+	.mizzey-details__back {
+		display: none;
+	}
+
+	.mizzey-details__all-head {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--mizzey-space-5);
+		margin-block-start: 0;
+	}
+
+	.mizzey-details__filters {
+		flex-wrap: wrap;
+		margin-inline: 0;
+		padding-inline: 0;
+		overflow: visible;
+	}
+}

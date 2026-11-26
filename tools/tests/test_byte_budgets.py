@@ -54,7 +54,8 @@ RUNTIME_RECORDED = 16070  # gzip bytes of the runtime at WordPress 7.1.5, measur
 BUDGETS = {
     "every page": {"styles": 40 * KB, "scripts": 45 * KB, "images": 0},
     "home": {"styles": 60 * KB, "scripts": 45 * KB, "images": 60 * KB},
-    "product": {"styles": 60 * KB, "scripts": 45 * KB, "images": 0},
+    # Owner ruling 26 Nov 2026 (D-21): the product page alone may load 50 KB of scripts; the speed targets still gate it.
+    "product": {"styles": 60 * KB, "scripts": 50 * KB, "images": 0},
     "listing": {"styles": 60 * KB, "scripts": 45 * KB, "images": 0},
     # Slice 12: the mini cart's own files, loaded only where the header renders the cart control.
     "mini cart": {"styles": 20 * KB, "scripts": 25 * KB, "images": 0},

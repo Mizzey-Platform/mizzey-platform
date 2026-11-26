@@ -45,6 +45,8 @@ require_once __DIR__ . '/src/Stock/CardStock.php';
 require_once __DIR__ . '/src/Storefront/ProductCard.php';
 require_once __DIR__ . '/src/Storefront/ProductRail.php';
 require_once __DIR__ . '/src/Storefront/ProductBuy.php';
+require_once __DIR__ . '/src/Storefront/ProductReviews.php';
+require_once __DIR__ . '/src/Storefront/ProductDetails.php';
 require_once __DIR__ . '/src/Catalogue/AttributeSwatch.php';
 require_once __DIR__ . '/src/Storefront/Listing.php';
 require_once __DIR__ . '/src/Shipping/DeliveryDates.php';
@@ -251,6 +253,9 @@ MizzeySite\Storefront\ProductCard::register();
 
 // The product page's gallery and buying area (PDP-01 to PDP-11, PDP-14 to PDP-16, PDP-21, PDP-22): specs/066, slice 9.
 MizzeySite\Storefront\ProductBuy::register();
+// The lower product page: details, specifications, reviews with their photos, related and recently viewed (PDP-12, PDP-13,
+// PDP-17 to PDP-19, REV-04): specs/066, slice 10.
+MizzeySite\Storefront\ProductDetails::register();
 // The swatch colour staff give an attribute's value, which the product page shows (PDP-05): specs/066, slice 9.
 MizzeySite\Catalogue\AttributeSwatch::register();
 // The category listing's data over WooCommerce's product query, its drawer count and its filters without JavaScript:
