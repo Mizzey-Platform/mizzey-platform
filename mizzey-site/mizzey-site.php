@@ -76,6 +76,7 @@ require_once __DIR__ . '/src/Marketing/ProductFeed.php';
 require_once __DIR__ . '/src/Marketing/Events.php';
 require_once __DIR__ . '/src/Signups/SignupStoreError.php';
 require_once __DIR__ . '/src/Signups/SignupStore.php';
+require_once __DIR__ . '/src/Security/WindowCounter.php';
 require_once __DIR__ . '/src/Signups/SignupService.php';
 require_once __DIR__ . '/src/Signups/SignupRoutes.php';
 require_once __DIR__ . '/src/Signups/LeavePage.php';
@@ -190,6 +191,12 @@ require_once __DIR__ . '/src/Wishlist/GuestCookie.php';
 require_once __DIR__ . '/src/Wishlist/Wishlist.php';
 require_once __DIR__ . '/src/Wishlist/RecentlyViewed.php';
 require_once __DIR__ . '/src/Wishlist/WishlistRoutes.php';
+require_once __DIR__ . '/src/Performance/RedisFailure.php';
+require_once __DIR__ . '/src/Performance/RedisSettings.php';
+require_once __DIR__ . '/src/Performance/RedisLink.php';
+require_once __DIR__ . '/src/Performance/PageCacheRequest.php';
+require_once __DIR__ . '/src/Performance/PageCache.php';
+require_once __DIR__ . '/src/Performance/PageCachePurge.php';
 require_once __DIR__ . '/src/Emails/OrderLanguage.php';
 require_once __DIR__ . '/src/Emails/EmailAdditions.php';
 require_once __DIR__ . '/src/Emails/Shipped.php';
@@ -375,6 +382,10 @@ MizzeySite\Checkout\CheckoutOnce::register();
 MizzeySite\Wishlist\Wishlist::register();
 MizzeySite\Wishlist\RecentlyViewed::register();
 MizzeySite\Wishlist\WishlistRoutes::register();
+// The page cache's checks before a page is kept, and its purge on every change a page shows (NFR-02). The cache
+// itself answers from wp-content/advanced-cache.php, before WordPress; see mizzey-site/dropins/README.md.
+MizzeySite\Performance\PageCache::register();
+MizzeySite\Performance\PageCachePurge::register();
 MizzeySite\Orders\CancellationField::register();
 
 // The promotion engine: WooCommerce coupons plus the settings they lack (automatic, start date, maximum discount,

@@ -99,9 +99,11 @@ final class Banners
             'checked' => null !== $result && ! $sent && $result['optin'],
         ]);
         $hidden = self::input(['type' => 'hidden', 'name' => SignupService::FIELD_FORM, 'value' => '1'])
-            // The token printed here serves a visitor without JavaScript. The page may come from a shared cache, so the
-            // script asks for its own (SignupRoutes::token()), and a refused one comes back as "again", nothing lost.
-            . self::input(['type' => 'hidden', 'name' => SignupService::FIELD_TOKEN, 'value' => SignupCheck::issue(SignupService::ROUTE)])
+            // A page anyone can be sent carries no token: it is single-use, and the page may be served from the page
+            // cache to every visitor (NFR-02). The script asks for its own (SignupRoutes::token()). Without JavaScript
+            // the first press comes back as "again", the address kept, and only that answer, built for this visitor
+            // and never cached, carries a token for the second press.
+            . (null === $result ? '' : self::input(['type' => 'hidden', 'name' => SignupService::FIELD_TOKEN, 'value' => SignupCheck::issue(SignupService::ROUTE)]))
             . self::input(['type' => 'hidden', 'name' => SignupService::FIELD_LANG, 'value' => SignupService::language(apply_filters('wpml_current_language', null))])
             // A trap for scripts: a person never sees or reaches it, and it must arrive empty.
             . Section::el('span', ['class' => 'mizzey-signup__trap', 'aria-hidden' => 'true'], self::input(['type' => 'text', 'name' => SignupService::FIELD_TRAP, 'value' => '', 'tabindex' => '-1', 'autocomplete' => 'off']));

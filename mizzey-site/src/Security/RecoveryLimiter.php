@@ -30,7 +30,8 @@ use WP_User;
  *
  * Reading and raising the counters happens under one database lock, so parallel requests cannot all read the same
  * count and all pass (audit of 2 November 2026). A request that cannot take the lock within a few seconds is refused:
- * a rate limit fails closed.
+ * a rate limit fails closed. The counters are kept in the database (WindowCounter), never in a transient, so an
+ * object cache that is flushed, evicts or loses its server cannot reset them.
  *
  * Register id: NFR-05 (rate limiting). See specs/007-security-baseline, FR-006.
  */
@@ -109,8 +110,7 @@ final class RecoveryLimiter
                 }
             }
             foreach ($counters as [$key]) {
-                $counter = self::read($key, $now, $limits['window']);
-                set_transient($key, ['count' => $counter['count'] + 1, 'until' => $counter['until']], max(1, $counter['until'] - $now));
+                WindowCounter::raise($key, $now, $limits['window']);
             }
         } finally {
             $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock));
@@ -139,8 +139,8 @@ final class RecoveryLimiter
      */
     public static function forget(int $userId, string $address): void
     {
-        delete_transient(self::key('account', (string) $userId));
-        delete_transient(self::key('address', $address));
+        WindowCounter::forget(self::key('account', (string) $userId));
+        WindowCounter::forget(self::key('address', $address));
     }
 
     /**
@@ -148,12 +148,8 @@ final class RecoveryLimiter
      */
     private static function read(string $key, int $now, int $window): array
     {
-        $stored = get_transient($key);
-        if (! is_array($stored) || ! isset($stored['count'], $stored['until']) || (int) $stored['until'] <= $now) {
-            return ['count' => 0, 'until' => $now + $window];
-        }
-
-        return ['count' => (int) $stored['count'], 'until' => (int) $stored['until']];
+        // In the database, never in a transient: no object cache may hold a security counter (WindowCounter).
+        return WindowCounter::read($key, $now, $window);
     }
 
     private static function key(string $kind, string $value): string

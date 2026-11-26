@@ -111,7 +111,21 @@ run(
 		$check( 1 === preg_match( '/<input[^>]*type="email"[^>]*>/', $html, $field ) && str_contains( $field[0], 'autocomplete="email"' ) && 1 === preg_match( '/id="([^"]+)"/', $field[0], $fid ) && str_contains( $html, 'for="' . $fid[1] . '"' ) && str_contains( $html, '>Email address<' ), 'HOME-09 the email field is labelled "Email address", type email, autocomplete email' );
 		$check( 1 === preg_match( '/<input[^>]*type="checkbox"[^>]*>/', $html, $box ) && ! str_contains( $box[0], 'checked' ) && str_contains( $html, 'Email me news and offers. Optional, and separate from your account.' ), 'HOME-09 the optional box reads as drawn and starts unticked' );
 		$check( 1 === preg_match( '/<button[^>]*type="submit"[^>]*>.*?Sign up.*?<\/button>/s', $html ), 'HOME-09 the Sign up button submits the form' );
-		$check( 1 === preg_match( '/name="' . SignupService::FIELD_TOKEN . '" value="([^"]+)"/', $html, $tok ) && null !== SignupCheck::inspect( SignupService::ROUTE, html_entity_decode( $tok[1] ), '', time() + 10 ) && str_contains( $html, 'name="' . SignupService::FIELD_TRAP . '"' ) && str_contains( $html, 'method="post"' ), 'the form carries a timed single-use token for this form (Security\SignupCheck) and a trap field, and posts without JavaScript' );
+		$check( ! str_contains( $html, 'name="' . SignupService::FIELD_TOKEN . '"' ) && str_contains( $html, 'name="' . SignupService::FIELD_TRAP . '"' ) && str_contains( $html, 'method="post"' ), 'the form as every visitor is sent it carries no token (it is single-use and the page may come from the page cache, NFR-02), a trap field, and posts without JavaScript' );
+		// Without JavaScript, the first press therefore comes back as "again", the address kept; only that answer, built
+		// for this visitor and never cached, carries a timed single-use token for the second press.
+		$server = $_SERVER['REQUEST_METHOD'] ?? null;
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_POST = array( SignupService::FIELD_FORM => '1', SignupService::FIELD_EMAIL => "{$tag}-nojs@example.com", SignupService::FIELD_TRAP => '' ); // phpcs:ignore WordPress.Security.NonceVerification
+		SignupRoutes::posted();
+		$_POST = array(); // phpcs:ignore WordPress.Security.NonceVerification
+		if ( null === $server ) {
+			unset( $_SERVER['REQUEST_METHOD'] );
+		} else {
+			$_SERVER['REQUEST_METHOD'] = $server;
+		}
+		$answered = Banners::renderSignup( array( 'heading' => "{$tag} Stay in touch", 'ctaLabel' => 'Sign up' ) );
+		$check( 'again' === ( SignupRoutes::result()['state'] ?? '' ) && null === SignupStore::find( "{$tag}-nojs@example.com" ) && str_contains( $answered, 'value="' . esc_attr( "{$tag}-nojs@example.com" ) . '"' ) && 1 === preg_match( '/name="' . SignupService::FIELD_TOKEN . '" value="([^"]+)"/', $answered, $tok ) && null !== SignupCheck::inspect( SignupService::ROUTE, html_entity_decode( $tok[1] ), '', time() + 10 ), 'a press without a token comes back as "again" with the address kept and nothing stored, and that answer carries a timed single-use token for this form (Security\SignupCheck)' );
 		$check( 1 === preg_match( '/<h2[^>]*class="mizzey-signup__done-title"/', $html ), 'the success title is a heading, as the phone board draws it' );
 		$check( ! str_contains( $html, (string) wc_get_page_permalink( 'myaccount' ) ), 'the prompt no longer sends the visitor to the account page' );
 		$check( '' === Banners::renderSignup( array( 'heading' => '' ) ), 'without its heading the section renders nothing' );

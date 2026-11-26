@@ -265,8 +265,8 @@ async function run( engineName, engine ) {
 			check( done.doneText.includes( email ), `HOME-09 [${ engineName } cached page] the ${ visitor } visitor served the same cached HTML signs up (the script uses its own token)` );
 			await context.close();
 		}
-		// Without JavaScript: the first visitor spends the printed token; the second is asked for one more press, with
-		// the address kept, and that press signs up.
+		// Without JavaScript: a page every visitor is sent carries no token (NFR-02), so each visitor's first press is
+		// answered with one more press asked for, the address kept, and that press signs up.
 		const plainCached = cached;
 		for ( const visitor of [ 'first', 'second' ] ) {
 			const context = await browser.newContext( { viewport: { width: 390, height: 900 }, hasTouch: true, javaScriptEnabled: false } );
@@ -285,14 +285,14 @@ async function run( engineName, engine ) {
 			await page.waitForTimeout( 3500 );
 			await Promise.all( [ page.waitForNavigation( { timeout: TIMEOUT } ), page.locator( '.mizzey-signup__button' ).tap() ] );
 			let shown = await measure( page );
+			const kept = await page.inputValue( '.mizzey-signup__input' );
+			check( ! shown.done && shown.errorText === 'Your address is kept. Press Sign up again to finish.' && kept === email && shown.invalid !== 'true', `HOME-09 [${ engineName } no script, cached page] the ${ visitor } visitor's first press comes back with the address kept (${ kept }) and the words to press Sign up again ("${ shown.errorText }"), the field not marked invalid` );
 			if ( visitor === 'second' ) {
-				const kept = await page.inputValue( '.mizzey-signup__input' );
-				check( ! shown.done && shown.errorText === 'Your address is kept. Press Sign up again to finish.' && kept === email && shown.invalid !== 'true', `HOME-09 [${ engineName } no script, cached page] a token already used comes back with the address kept (${ kept }) and the words to press Sign up again ("${ shown.errorText }"), the field not marked invalid` );
 				await shoot( page, `${ engineName }-noscript-again` );
-				await page.waitForTimeout( 3500 );
-				await Promise.all( [ page.waitForNavigation( { timeout: TIMEOUT } ), page.locator( '.mizzey-signup__button' ).tap() ] );
-				shown = await measure( page );
 			}
+			await page.waitForTimeout( 3500 );
+			await Promise.all( [ page.waitForNavigation( { timeout: TIMEOUT } ), page.locator( '.mizzey-signup__button' ).tap() ] );
+			shown = await measure( page );
 			signedUp[ email ] = 'en';
 			check( shown.done && shown.doneText.includes( email ), `HOME-09 [${ engineName } no script, cached page] the ${ visitor } visitor ends signed up` );
 			await context.close();
@@ -305,6 +305,8 @@ async function run( engineName, engine ) {
 	await page.goto( plan.en, { waitUntil: 'load', timeout: TIMEOUT } );
 	await page.fill( '.mizzey-signup__input', 'sara@example' );
 	await Promise.all( [ page.waitForNavigation( { timeout: TIMEOUT } ), page.locator( '.mizzey-signup__button' ).tap() ] );
+	// The page carried no token; an address that is not one is still answered as such first (it is judged before the
+	// token), and that answer, built for this visitor, carries the token the next press uses.
 	const n = await measure( page );
 	check( n.error && n.errorText === 'Enter an email address like name@example.com.' && n.invalid === 'true' && n.fieldShadow.includes( DANGER ), `HOME-09 [${ engineName } no script] an invalid address comes back with the red field and the words` );
 	const plainEmail = `${ plan.tag }-${ engineName }-noscript@example.com`;
