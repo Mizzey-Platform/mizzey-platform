@@ -464,6 +464,14 @@ const find = ( view, type ) => view.sections.find( ( s ) => s.type === type ) ||
 			const ctx = await browser.newContext( { viewport: { width, height: width > 600 ? 900 : 844 }, isMobile: width < 600, hasTouch: width < 600 } );
 			const view = await ctx.newPage();
 			await view.goto( plan.en.view, { waitUntil: 'load', timeout: TIMEOUT } );
+			// Every section revealed (the scroll reveal, assets/js/reveal.js) and settled before anything is measured.
+			await view.evaluate( async () => {
+				for ( let y = 0; y < document.documentElement.scrollHeight; y += 400 ) {
+					window.scrollTo( 0, y );
+					await new Promise( ( resolve ) => setTimeout( resolve, 40 ) );
+				}
+				window.scrollTo( 0, 0 );
+			} );
 			await view.waitForTimeout( 1000 );
 			const got = await view.evaluate( measure );
 			for ( const [ key, want ] of Object.entries( BOARD[ width ] ) ) {

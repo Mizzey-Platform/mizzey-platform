@@ -8,9 +8,9 @@
    large button sit at its start side, 56 in and 48 from the top and bottom, on a soft white veil over a light image
    or in white over an Indigo one; the arrows sit either side of the pause button, the dots and the line, 12 under it.
 
-   The motion (data-motion="slide", the default C1-Hero-Banners draws): the row of slides scrolls and snaps; the
-   active slide's words slide in from the end side; the active dot is the only orange; the Indigo line fills over the
-   slide's seconds. Under reduced motion nothing moves. */
+   The motion (data-motion="fade", C1-Motion-Playground): the row of slides scrolls and snaps under a finger; the timer
+   and the arrows cross-fade to the next slide, its image settling 24 px and its words 60 ms apart; the active dot is
+   the only orange; the Indigo line fills over the slide's seconds. Under reduced motion nothing moves. */
 
 .mizzey-section.mizzey-hero {
 	position: relative;
@@ -267,20 +267,61 @@
 	}
 }
 
-/* ---- The default motion: the words of the slide coming in slide in from the end side ------------------------- */
+/* ---- The advance (C1-Motion-Playground, hero slider) ------------------------------------------------------------
+   The slides cross-fade: view.js lays a copy of the outgoing slide over the row and fades it out in 320 ms while the
+   row has already moved, without travelling, to the incoming slide; its image moves 24 px to rest in 450 ms and its
+   words (logo, headline, line, button) arrive 60 ms apart. A finger's swipe still moves the row 1:1. */
 
-.mizzey-hero[data-motion="slide"] .mizzey-hero__panel > * {
-	transition: translate var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out),
-		opacity var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out);
+.mizzey-hero__ghost {
+	position: absolute;
+	z-index: 0;
+	inset: 0;
+	display: flex;
+	pointer-events: none;
+	animation: mizzey-hero-out var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) forwards;
 }
 
-.mizzey-hero[data-motion="slide"] .mizzey-hero__slide:not(.is-active) .mizzey-hero__panel > * {
-	opacity: 0;
-	translate: calc(var(--mizzey-motion-distance-4) * var(--mizzey-dir)) 0;
+.mizzey-hero__ghost > .mizzey-hero__slide {
+	flex: 0 0 100%;
 }
 
-.mizzey-hero[data-motion="slide"] .mizzey-hero__track {
-	scroll-behavior: smooth;
+.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__image {
+	animation: mizzey-hero-image var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__panel > * {
+	animation: mizzey-hero-words var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out) both;
+}
+
+.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__panel > :nth-child(2) {
+	animation-delay: calc(var(--mizzey-motion-stagger-grid) * 2);
+}
+
+.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__panel > :nth-child(3) {
+	animation-delay: calc(var(--mizzey-motion-stagger-grid) * 4);
+}
+
+.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__panel > :nth-child(4) {
+	animation-delay: calc(var(--mizzey-motion-stagger-grid) * 6);
+}
+
+@keyframes mizzey-hero-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes mizzey-hero-image {
+	from {
+		transform: translateX(calc(var(--mizzey-motion-distance-4) * var(--mizzey-dir)));
+	}
+}
+
+@keyframes mizzey-hero-words {
+	from {
+		opacity: 0;
+		transform: translateX(calc(var(--mizzey-motion-distance-4) * var(--mizzey-dir)));
+	}
 }
 
 /* ---- From 1024 wide: the rounded banner ------------------------------------------------------------------------- */
@@ -309,6 +350,7 @@
 		position: absolute;
 		inset: 0;
 		block-size: auto;
+		border-radius: inherit;
 	}
 
 	/* The soft white veil over a light image, from the start side to 60% across. */
@@ -365,6 +407,15 @@
 		font-weight: var(--mizzey-font-weight-regular);
 	}
 
+	/* The Latin headline tighter (-0.03em) and the line 20 on 28 (C1-Home-Desktop); Arabic keeps its roles. */
+	.mizzey-hero__title:not(:lang(ar)) {
+		letter-spacing: var(--mizzey-control-hero-title-tracking-desktop);
+	}
+
+	.mizzey-hero__line:not(:lang(ar)) {
+		line-height: var(--mizzey-control-hero-line-leading-desktop);
+	}
+
 	.mizzey-hero .mizzey-hero__button {
 		margin-block-start: auto;
 		block-size: var(--mizzey-control-button-large);
@@ -381,8 +432,10 @@
 		content: none;
 	}
 
-	.mizzey-hero .mizzey-hero__button--on-dark:hover {
-		background-color: var(--mizzey-color-indigo-50);
+	@media (hover: hover) {
+		.mizzey-hero .mizzey-hero__button--on-dark:hover {
+			background-color: var(--mizzey-color-indigo-50);
+		}
 	}
 
 	.mizzey-hero .mizzey-hero__button--on-dark:focus-visible {
@@ -410,13 +463,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.mizzey-hero[data-motion] .mizzey-hero__track {
-		scroll-behavior: auto;
-	}
-
-	.mizzey-hero[data-motion] .mizzey-hero__panel > *,
 	.mizzey-hero__dot {
 		transition: none;
+	}
+
+	.mizzey-hero__ghost,
+	.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__image,
+	.mizzey-hero.is-arriving .mizzey-hero__slide.is-active .mizzey-hero__panel > * {
+		animation: none;
 	}
 
 	.mizzey-hero.is-running .mizzey-hero__progress-fill {

@@ -2,7 +2,8 @@
  * The deals section in the editor (spec 066, slice 5: HOME-07, HOME-10).
  *
  * A plain script on WordPress's globals: there is no build step in this repository. The canvas shows the Indigo panel
- * as the storefront renders it, cards included. The sidebar holds the heading, the line under it and where the
+ * as the storefront renders it, cards included. The sidebar holds the heading, an optional tag beside it, the line
+ * under it and where the
  * products come from (on sale, a badge, a category, a collection, the newest, or picked by hand). The layout is fixed
  * in style.css (G11).
  */
@@ -34,6 +35,7 @@
 					PanelBody,
 					{ title: __( 'Section', 'mizzey-site' ), initialOpen: true },
 					text( 'heading', __( 'Heading', 'mizzey-site' ), __( 'In this page\'s language. For example: Deals of the week.', 'mizzey-site' ) ),
+					text( 'headingTag', __( 'Label beside the heading', 'mizzey-site' ), __( 'Optional. A short tag next to the heading, for example: This week.', 'mizzey-site' ) ),
 					text( 'line', __( 'Line', 'mizzey-site' ), __( 'Optional. For example: Up to 25% off this week.', 'mizzey-site' ) ),
 					el( lib.SourceControls, { attributes, setAttributes } )
 				)

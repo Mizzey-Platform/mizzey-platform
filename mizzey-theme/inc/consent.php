@@ -15,8 +15,9 @@
  * and "denied" otherwise, so a visitor is never tracked further than they allowed. The switches open on the standing
  * choice. Any link to `#cookie-preferences` (the footer's, the banner's) opens the preferences.
  *
- * The banner covers no content: while it shows, the page gains room at its foot as tall as the banner
- * (`--mizzey-consent-space`, measured by assets/js/site-parts.js), so the end of the page scrolls clear above it.
+ * The banner covers no content: while it shows, the footer gains room at its own foot as tall as the banner reaches
+ * (`--mizzey-consent-space`, measured by assets/js/site-parts.js), so the end of the page scrolls clear above it and
+ * no empty band shows under the footer.
  *
  * Register ids: MKT-10, NFR-11. See specs/066-stage-2-shop-front, slice 3, and specs/043-measurement-tools.
  *
@@ -168,6 +169,8 @@ function preferences(): void
         'footer' => $foot,
         'close'  => true,
     ]);
+    // On a phone the preferences are a bottom sheet with a handle (C1-Global B3); from 600 wide a dialog, without one.
+    $html = preg_replace('/(<div class="mizzey-overlay__panel">)/', '$1<span class="mizzey-consent-preferences__handle" aria-hidden="true"></span>', $html, 1) ?? $html;
     // The preferences open from any link to #cookie-preferences; the store watches for it once the page is live.
     echo element('div', ['class' => 'mizzey-consent-preferences', 'data-wp-interactive' => 'mizzey/site', 'data-wp-init' => 'callbacks.consentInit'], $html); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
 }

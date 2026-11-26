@@ -41,6 +41,7 @@ use function MizzeySite\Theme\Components\attributes;
 use function MizzeySite\Theme\Components\chip;
 use function MizzeySite\Theme\Components\counter;
 use function MizzeySite\Theme\Components\element;
+use function MizzeySite\Theme\Components\idot;
 use function MizzeySite\Theme\Components\opens;
 use function MizzeySite\Theme\Components\tooltip;
 use function MizzeySite\Theme\Icons\icon;
@@ -317,7 +318,8 @@ function bar(array $d): string
     $actions .= account_link($d);
     $actions .= tooltip(
         element('a', ['class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__wishlist'), 'href' => esc_url((string) $d['wishlist']['url']), 'aria-label' => __('Wishlist', 'mizzey-site')], icon('heart')),
-        __('Wishlist', 'mizzey-site')
+        __('Wishlist', 'mizzey-site'),
+        'top'
     );
     if ('compact' === $d['form']) {
         $actions .= element(
@@ -337,7 +339,8 @@ function bar(array $d): string
             // An empty cart shows no count (C1-Global B2); the element stays for the live count to fill.
             . ($count > 0 ? counter($count) : element('span', ['class' => 'mizzey-count', 'aria-hidden' => 'true', 'hidden' => true], '0'))
         ),
-        __('Cart', 'mizzey-site')
+        __('Cart', 'mizzey-site'),
+        'top'
     );
 
     return element(
@@ -355,7 +358,8 @@ function account_link(array $d): string
     if ('' === $d['account']['name']) {
         return tooltip(
             element('a', ['class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__account'), 'href' => $url, 'aria-label' => __('Account', 'mizzey-site')], icon('user')),
-            __('Account', 'mizzey-site')
+            __('Account', 'mizzey-site'),
+            'top'
         );
     }
 
@@ -367,7 +371,8 @@ function account_link(array $d): string
             . element('span', ['class' => 'mizzey-visually-hidden'], esc_html__('Account', 'mizzey-site') . ': ')
             . element('span', ['class' => 'mizzey-header__account-name'], esc_html($d['account']['name']))
         ),
-        __('Account', 'mizzey-site')
+        __('Account', 'mizzey-site'),
+        'top'
     );
 }
 
@@ -386,14 +391,16 @@ function nav(array $d): string
         icon('grid', ['class' => 'mizzey-header__all-rest']) . icon('gridf', ['class' => 'mizzey-header__all-open']) . esc_html__('All categories', 'mizzey-site')
     );
 
-    $items = '';
+    $items   = '';
+    $section = section();
     foreach ($d['links'] as $link) {
+        $here   = '' !== $section['path'] && address((string) $link['url']) === $section['path'];
         $items .= element(
             'li',
             ['class' => 'mizzey-header__item'],
             element(
                 'a',
-                ['class' => 'mizzey-header__link' . ($link['offer'] ? ' mizzey-header__link--offer' : ''), 'href' => esc_url($link['url'])],
+                ['class' => 'mizzey-header__link' . ($link['offer'] ? ' mizzey-header__link--offer' : ''), 'href' => esc_url($link['url']), 'aria-current' => $here ? ($section['exact'] ? 'page' : 'true') : null],
                 ($link['offer'] ? icon('tag', ['size' => 22]) : '') . esc_html($link['label'])
             )
         );
@@ -403,10 +410,12 @@ function nav(array $d): string
         ['class' => 'mizzey-header__more', 'hidden' => true],
         element(
             'button',
-            ['type' => 'button', 'class' => classes('mizzey-header__link', 'mizzey-header__more-button'), 'aria-expanded' => 'false', 'aria-controls' => 'mizzey-header-more', 'data-wp-on--click' => 'actions.moreToggle'],
+            // The list is a popover in the top layer, so the row's clipping never cuts it (the owner's report, 25 November
+            // 2026); the browser opens and closes it, and closes it on Escape or a press outside.
+            ['type' => 'button', 'class' => classes('mizzey-header__link', 'mizzey-header__more-button'), 'aria-expanded' => 'false', 'aria-controls' => 'mizzey-header-more', 'popovertarget' => 'mizzey-header-more'],
             esc_html__('More', 'mizzey-site') . icon('down', ['size' => 20])
         )
-        . element('ul', ['class' => classes('mizzey-popover', 'mizzey-header__more-list'), 'id' => 'mizzey-header-more', 'hidden' => true])
+        . element('ul', ['class' => classes('mizzey-popover', 'mizzey-header__more-list'), 'id' => 'mizzey-header-more', 'popover' => 'auto'])
     );
 
     return element(
@@ -417,8 +426,48 @@ function nav(array $d): string
             ['class' => 'mizzey-header__row-inner'],
             element('div', ['class' => 'mizzey-header__row-start'], $all . element('span', ['class' => 'mizzey-header__divider', 'aria-hidden' => 'true']))
             . element('ul', ['class' => 'mizzey-header__links'], $items . $more)
+            // The underline that follows the pointer and the keyboard along the row (header.js).
+            . element('span', ['class' => 'mizzey-header__indicator', 'aria-hidden' => 'true'])
         )
     );
+}
+
+/**
+ * The row's section the page sits under, as C1-Category-Desktop and C1-Product-Desktop mark it: the top category of the
+ * category shown, or of the product's first category. The address path, and whether it is this very page.
+ *
+ * @return array{path:string,exact:bool}
+ */
+function section(): array
+{
+    $term = null;
+    if (function_exists('is_product_category') && is_product_category()) {
+        $term = get_queried_object();
+    } elseif (function_exists('is_product') && is_product()) {
+        $ids  = wc_get_product_cat_ids((int) get_queried_object_id());
+        $term = [] !== $ids ? get_term((int) $ids[0], 'product_cat') : null;
+    }
+    if (! $term instanceof \WP_Term) {
+        return ['path' => '', 'exact' => false];
+    }
+    $ancestors = get_ancestors($term->term_id, 'product_cat', 'taxonomy');
+    $top       = [] !== $ancestors ? get_term((int) end($ancestors), 'product_cat') : $term;
+    $url       = $top instanceof \WP_Term ? get_term_link($top) : '';
+
+    return [
+        'path'  => is_string($url) ? address($url) : '',
+        'exact' => $top instanceof \WP_Term && $top->term_id === $term->term_id && is_product_category(),
+    ];
+}
+
+/** An address without its host, to compare a menu link with a page (plain or pretty permalinks alike). */
+function address(string $url): string
+{
+    $parts = wp_parse_url($url);
+    $path  = untrailingslashit((string) ($parts['path'] ?? ''));
+    $query = (string) ($parts['query'] ?? '');
+
+    return '' === $path . $query ? '' : $path . ('' === $query ? '' : '?' . $query);
 }
 
 /** The phone's chips on the home page: the offer links first, then the menu's other links. */
@@ -759,14 +808,20 @@ function tabbar(array $d): string
 {
     $front = is_front_page();
     $named = '' !== $d['account']['name'];
+    // On a category, a brand or a collection, the Categories tab is the place shown (C1-Category-Phone, C1-Brand-Phone,
+    // C1-Collection-Phone); search and not-found mark no tab (C1-Search-Phone, C1-404-Phone).
+    $browsing = (function_exists('is_product_category') && is_product_category()) || is_tax(['product_brand', \MizzeySite\Catalogue\Collections::TAXONOMY]);
     $tab   = static fn (string $class, string $icon, string $label, array $attrs, string $tag = 'a'): string => element(
         $tag,
         ['class' => 'mizzey-tabbar__item ' . $class] + $attrs,
-        element('span', ['class' => 'mizzey-tabbar__icon'], $icon) . element('span', ['class' => 'mizzey-tabbar__label'], esc_html($label))
+        element('span', ['class' => 'mizzey-tabbar__icon'], $icon)
+        // The active tab's mark: the orange i-dot in an 8 row under the icon (C1-Home-Phone).
+        . element('span', ['class' => 'mizzey-tabbar__mark', 'aria-hidden' => 'true'], idot('mizzey-tabbar__dot'))
+        . element('span', ['class' => 'mizzey-tabbar__label'], esc_html($label))
     );
 
     $items = $tab('mizzey-tabbar__home', icon($front ? 'homef' : 'home'), __('Home', 'mizzey-site'), ['href' => esc_url($d['home']), 'aria-current' => $front ? 'page' : null])
-        . $tab('mizzey-tabbar__categories', icon('grid', ['class' => 'mizzey-tabbar__rest']) . icon('gridf', ['class' => 'mizzey-tabbar__on']), __('Categories', 'mizzey-site'), ['type' => 'button', 'aria-expanded' => 'false', 'aria-controls' => PANEL, 'data-wp-on--click' => 'actions.categoriesToggle'], 'button')
+        . $tab('mizzey-tabbar__categories', icon('grid', ['class' => 'mizzey-tabbar__rest']) . icon('gridf', ['class' => 'mizzey-tabbar__on']), __('Categories', 'mizzey-site'), ['type' => 'button', 'aria-expanded' => 'false', 'aria-controls' => PANEL, 'aria-current' => $browsing ? 'true' : null, 'data-wp-on--click' => 'actions.categoriesToggle'], 'button')
         . $tab('mizzey-tabbar__wishlist', icon('heart'), __('Wishlist', 'mizzey-site'), ['href' => esc_url((string) $d['wishlist']['url'])])
         . $tab('mizzey-tabbar__account', icon($named ? 'userf' : 'user'), $named ? (string) $d['account']['name'] : __('Account', 'mizzey-site'), ['href' => esc_url((string) $d['account']['url'])]);
 

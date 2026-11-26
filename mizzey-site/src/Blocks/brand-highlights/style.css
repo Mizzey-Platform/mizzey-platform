@@ -21,7 +21,9 @@
 	margin-block: 0;
 	margin-inline: calc(var(--mizzey-layout-margin-phone) * -1);
 	padding-block: 0;
-	padding-inline: var(--mizzey-layout-margin-phone);
+	/* On a phone the row bleeds from the screen's start edge, as C1-Home-Phone and C1-Home-Phone-Arabic draw it (the
+	   owner's ruling, 25 November 2026); it keeps the margin at its end. */
+	padding-inline: 0 var(--mizzey-layout-margin-phone);
 	overflow-x: auto;
 	scrollbar-width: none;
 	list-style: none;
@@ -71,10 +73,26 @@
 	line-height: var(--mizzey-control-chip);
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
 }
 
-.mizzey-brands__link:hover .mizzey-brands__chip {
-	background-color: var(--mizzey-color-indigo-50);
+.mizzey-brands__chip:lang(ar) {
+	font: var(--mizzey-type-latin-label);
+	font-family: var(--mizzey-font-family-latin), var(--mizzey-font-family-arabic);
+	line-height: var(--mizzey-control-chip);
+}
+
+@media (hover: hover) {
+	.mizzey-brands__link:hover .mizzey-brands__chip {
+		background-color: var(--mizzey-color-indigo-50);
+	}
+}
+
+/* A press shows within 100 ms, as a chip's does (C1-Home-Phone, the boards' press class). */
+.mizzey-brands__link:active .mizzey-brands__chip,
+.mizzey-brands__link.is-pressed .mizzey-brands__chip {
+	transform: scale(var(--mizzey-motion-scale-press-button));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
 
 @media (min-width: 600px) {
@@ -102,5 +120,12 @@
 		margin-inline: auto;
 		padding-inline: 0;
 		overflow: visible;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-brands__link:active .mizzey-brands__chip,
+	.mizzey-brands__link.is-pressed .mizzey-brands__chip {
+		transform: none;
 	}
 }

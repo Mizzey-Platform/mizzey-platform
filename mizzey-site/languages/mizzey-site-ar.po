@@ -3177,3 +3177,14 @@ msgstr[2] "%d في سلتك"
 msgstr[3] "%d في سلتك"
 msgstr[4] "%d في سلتك"
 msgstr[5] "%d في سلتك"
+
+msgid "We use cookies to keep your cart, see how the store is used and show relevant ads."
+msgstr "نستخدم ملفات الارتباط لحفظ سلتك وقياس الاستخدام وعرض إعلانات مناسبة."
+
+#: src/Blocks/deals/edit.js
+msgid "Label beside the heading"
+msgstr "تسمية بجانب العنوان"
+
+#: src/Blocks/deals/edit.js
+msgid "Optional. A short tag next to the heading, for example: This week."
+msgstr "اختياري. وسم قصير بجانب العنوان، مثل: هذا الأسبوع."

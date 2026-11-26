@@ -19,6 +19,10 @@
 	color: var(--mizzey-color-role-text-on-brand);
 }
 
+[dir="rtl"] .mizzey-section.mizzey-deals {
+	background-image: linear-gradient(225deg, var(--mizzey-color-indigo-700) 0%, var(--mizzey-color-brand-royal-indigo) 55%, var(--mizzey-color-indigo-500) 100%);
+}
+
 .mizzey-deals__head {
 	flex-wrap: wrap;
 	row-gap: 0;
@@ -26,11 +30,40 @@
 	padding-inline: var(--mizzey-layout-margin-phone);
 }
 
+/* On a phone the heading keeps the 48 row ("View all" a 44 target in it); the line follows under it (72 in all,
+   C1-Home-Phone). */
+.mizzey-deals__head .mizzey-home__heading {
+	display: flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-preferred);
+}
+
 .mizzey-deals__line {
 	order: 3;
 	flex-basis: 100%;
 	margin: 0;
 	font: var(--mizzey-type-body);
+}
+
+/* The optional tag beside the heading (none unless staff set one): 18 high, 8 inside, on White at 16% (C1-Home-Phone). */
+.mizzey-deals__tag {
+	flex-shrink: 0;
+	margin-inline-start: calc(var(--mizzey-space-2) - var(--mizzey-space-4));
+	padding-inline: var(--mizzey-space-2);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-neutral-on-brand-hairline);
+	font: var(--mizzey-type-caption);
+	white-space: nowrap;
+}
+
+/* "View all" keeps the row's end, after the tag. */
+.mizzey-deals__head .mizzey-home__heading {
+	flex-shrink: 1;
+}
+
+/* A percentage in the line is bold (Section::figures), as the board draws "25%". */
+.mizzey-deals__line strong {
+	font-weight: var(--mizzey-font-weight-bold);
 }
 
 .mizzey-deals .mizzey-products {
@@ -59,6 +92,10 @@
 	.mizzey-deals__line {
 		order: 0;
 		flex-basis: auto;
+	}
+
+	.mizzey-deals__head .mizzey-home__heading {
+		min-block-size: 0;
 	}
 
 	/* The cards 24 under the heading row and 40 above the panel's edge, as the board draws (the rail keeps 4 above

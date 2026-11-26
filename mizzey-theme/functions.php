@@ -91,14 +91,22 @@ add_action(
             [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy],
             is_file($file) ? (string) filemtime($file) : false
         );
+        // The scroll reveal (the owner's ruling of 25 November 2026): library sections below the first screen fade in
+        // and rise once. A plain module with no import, on the pages that can hold library sections.
+        $reveal = get_theme_file_path('assets/js/reveal.js');
+        wp_register_script_module('mizzey-theme/reveal', get_theme_file_uri('assets/js/reveal.js'), [], is_file($reveal) ? (string) filemtime($reveal) : false);
+        // The header's parts imported by header.js when first needed (D-21): the sticky header's tuck, "More" and the
+        // desktop row's sliding underline.
+        $later = get_theme_file_path('assets/js/header-lazy.js');
+        wp_register_script_module('mizzey-theme/header-lazy', get_theme_file_uri('assets/js/header-lazy.js'), [], is_file($later) ? (string) filemtime($later) : false);
         // The header's own behaviour (spec 066, slice 2): the mega menu, the phone menu's levels, the Categories tab
         // and the cart's live count. The header is on every page, so it is too.
         $header = get_theme_file_path('assets/js/header.js');
         wp_register_script_module(
             'mizzey-theme/header',
             get_theme_file_uri('assets/js/header.js'),
-            // The mini cart's script (slice 12) is imported by the header on the first press of the cart control.
-            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy, ['id' => 'mizzey-theme/mini-cart', 'import' => 'dynamic']],
+            // The mini cart's script (slice 12) and the header's lazy part are imported by the header when needed.
+            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy, ['id' => 'mizzey-theme/mini-cart', 'import' => 'dynamic'], ['id' => 'mizzey-theme/header-lazy', 'import' => 'dynamic']],
             is_file($header) ? (string) filemtime($header) : false
         );
     }
@@ -109,6 +117,9 @@ add_action(
     static function (): void {
         wp_enqueue_script_module('mizzey-theme/ui');
         wp_enqueue_script_module('mizzey-theme/header');
+        if (is_front_page() || is_page()) {
+            wp_enqueue_script_module('mizzey-theme/reveal');
+        }
     }
 );
 

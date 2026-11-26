@@ -40,7 +40,8 @@
 	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-shortcuts__link:active {
+.mizzey-shortcuts__link:active,
+.mizzey-shortcuts__link.is-pressed {
 	transform: scale(var(--mizzey-motion-scale-press-card));
 }
 
@@ -122,7 +123,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.mizzey-shortcuts__link:active {
+	.mizzey-shortcuts__link:active,
+	.mizzey-shortcuts__link.is-pressed {
 		transform: none;
 	}
 }

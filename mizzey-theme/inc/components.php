@@ -57,13 +57,20 @@ function element(string $tag, array $attributes, string $inner = ''): string
     return sprintf('<%1$s%2$s>%3$s</%1$s>', $tag, attributes($attributes), $inner);
 }
 
+/** One i-dot, the brand's dot shape, in the colour of the text around it. */
+function idot(string $class): string
+{
+    return sprintf(
+        '<svg class="%s" viewBox="680 406.75 73.5 63.25" fill="currentColor" focusable="false" aria-hidden="true"><path d="%s"/></svg>',
+        esc_attr($class),
+        'M692.62,406.81h48.33c8.47,0,14.5,8.22,11.96,16.3l-11.92,38c-1.64,5.23-6.49,8.79-11.97,8.79h-24.75c-5.52,0-10.38-3.6-12-8.87l-11.65-38C678.15,414.97,684.18,406.81,692.62,406.81Z'
+    );
+}
+
 /** The three i-dots, the middle one upside down. */
 function loader(array $args = []): string
 {
-    $dot = sprintf(
-        '<svg class="mizzey-loader__dot" viewBox="680 406.75 73.5 63.25" fill="currentColor" focusable="false" aria-hidden="true"><path d="%s"/></svg>',
-        'M692.62,406.81h48.33c8.47,0,14.5,8.22,11.96,16.3l-11.92,38c-1.64,5.23-6.49,8.79-11.97,8.79h-24.75c-5.52,0-10.38-3.6-12-8.87l-11.65-38C678.15,414.97,684.18,406.81,692.62,406.81Z'
-    );
+    $dot = idot('mizzey-loader__dot');
     $label = (string) ($args['label'] ?? __('Loading', 'mizzey-site'));
     return element(
         'span',

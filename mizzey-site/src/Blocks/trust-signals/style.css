@@ -5,14 +5,15 @@
    Phone: three equal columns inside the page margin, 8 apart; each item stacks its 40 disc (or the van) over its
    title, centred; the line is not shown, as the phone board draws. From 1024 wide: one row 72 high inside the
    desktop margin, each item centred in its third with a 48 disc 16 from its words, the title in body strong and the
-   line under it as a link, the middle third ruled with hairlines on both sides. The section keeps a small gap under
-   the hero above it (16, 24 from 1024 wide) and the section rhythm below it. */
+   line under it as a link, the middle third ruled with hairlines on both sides. The section sits 32 under the hero on
+   a phone; from 1024 wide its 72 row sits 24 under the hero's controls, its items 36 under them (C1-Home-Phone,
+   C1-Home-Desktop), with the section rhythm below it. */
 
-.mizzey-trust {
+.mizzey-section.mizzey-trust {
 	box-sizing: border-box;
 	inline-size: 100%;
 	max-inline-size: none;
-	margin-block: var(--mizzey-space-4) var(--mizzey-space-section);
+	margin-block: var(--mizzey-space-6) var(--mizzey-space-section);
 	margin-inline: 0;
 	padding-inline: var(--mizzey-layout-margin-phone);
 }
@@ -62,6 +63,8 @@
 	display: block;
 	inline-size: var(--mizzey-control-trust-van-phone);
 	block-size: auto;
+	aspect-ratio: 48 / 23;
+	object-fit: contain;
 }
 
 /* The returns arrow points back the way the page reads. */
@@ -86,7 +89,7 @@
 }
 
 @media (min-width: 1024px) {
-	.mizzey-trust {
+	.mizzey-section.mizzey-trust {
 		margin-block-start: var(--mizzey-space-5);
 		padding-inline: var(--mizzey-layout-margin-desktop);
 	}
@@ -120,6 +123,7 @@
 
 	.mizzey-trust__van {
 		inline-size: var(--mizzey-control-trust-van);
+		aspect-ratio: 56 / 27;
 	}
 
 	.mizzey-trust__title {

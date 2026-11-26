@@ -25,6 +25,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"headingTag": {
+			"type": "string",
+			"default": ""
+		},
 		"source": {
 			"type": "string",
 			"enum": [

@@ -70,7 +70,7 @@ final class Hero
                 'aria-roledescription' => $slider ? __('carousel', 'mizzey-site') : null,
                 'aria-label'           => '' !== $label ? $label : null,
                 'data-interval'        => $slider ? (string) $interval : null,
-                'data-motion'          => $slider ? 'slide' : null,
+                'data-motion'          => $slider ? 'fade' : null,
             ]),
             esc_attr($track),
             $html,
@@ -146,14 +146,14 @@ final class Hero
     /** The arrows, the pause button, the dots and the progress line under the slider. */
     private static function controls(string $track, int $total): string
     {
-        $icon = static fn (string $name): string => function_exists('MizzeySite\Theme\Icons\icon') ? \MizzeySite\Theme\Icons\icon($name, ['size' => 20]) : '';
+        $icon = static fn (string $name, int $size = 20): string => function_exists('MizzeySite\Theme\Icons\icon') ? \MizzeySite\Theme\Icons\icon($name, ['size' => $size]) : '';
         $dots = '';
         for ($i = 0; $i < $total; $i++) {
             $dots .= Section::el('span', ['class' => ['mizzey-hero__dot', 0 === $i ? 'is-active' : '']]);
         }
         $arrow = static fn (string $name, string $label, int $step): string => Section::el('button', [
             'type' => 'button', 'class' => 'mizzey-hero__arrow', 'aria-label' => $label, 'aria-controls' => $track, 'data-step' => (string) $step,
-        ], $icon($name));
+        ], $icon($name, 24));
 
         return Section::el('div', ['class' => 'mizzey-hero__controls'],
             $arrow('back', __('Previous slide', 'mizzey-site'), -1)

@@ -37,7 +37,8 @@
 	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
 }
 
-.mizzey-collections__link:active {
+.mizzey-collections__link:active,
+.mizzey-collections__link.is-pressed {
 	transform: scale(var(--mizzey-motion-scale-press-card));
 }
 
@@ -69,9 +70,26 @@
 	text-overflow: ellipsis;
 }
 
+/* Arabic: 8 before the words and Tajawal on an 18 line (C1-Home-Phone-Arabic). */
+.mizzey-collections__name:lang(ar) {
+	padding-inline-start: var(--mizzey-space-2);
+	line-height: calc(var(--mizzey-space-4) + var(--mizzey-space-1) / 2);
+}
+
+/* The chevron: 16 on a phone, 20 from 1024 wide, Royal Indigo (C1-Home-Phone, C1-Home-Desktop). */
 .mizzey-collections__name .mizzey-icon {
 	flex-shrink: 0;
+	inline-size: var(--mizzey-space-4);
+	block-size: var(--mizzey-space-4);
+	color: var(--mizzey-color-role-primary);
 	scale: var(--mizzey-dir) 1;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-collections__name .mizzey-icon {
+		inline-size: var(--mizzey-control-icon-dense);
+		block-size: var(--mizzey-control-icon-dense);
+	}
 }
 
 @media (min-width: 600px) {
@@ -100,7 +118,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.mizzey-collections__link:active {
+	.mizzey-collections__link:active,
+	.mizzey-collections__link.is-pressed {
 		transform: none;
 	}
 }

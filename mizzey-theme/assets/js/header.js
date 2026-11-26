@@ -33,12 +33,19 @@ const allButton = () => document.querySelector( '.mizzey-header__all' );
 
 /* ---- The mega menu ------------------------------------------------------------------------------------------- */
 
-function showPanel( row ) {
+function showPanel( row, { switching = false } = {} ) {
 	const root = mega();
 	if ( ! root || ! row ) {
 		return;
 	}
 	const id = JSON.parse( row.dataset.wpContext || '{}' ).panel;
+	const shown = root.querySelector( '.mizzey-mega__panel:not([hidden])' );
+	// Another top category cross-fades in place.
+	if ( switching && shown && shown.id !== id ) {
+		root.classList.remove( 'is-switching' );
+		void root.offsetWidth;
+		root.classList.add( 'is-switching' );
+	}
 	root.querySelectorAll( '.mizzey-mega__row' ).forEach( ( r ) => r.classList.toggle( 'is-active', r === row ) );
 	root.querySelectorAll( '.mizzey-mega__panel' ).forEach( ( p ) => {
 		p.hidden = p.id !== id;
@@ -54,6 +61,7 @@ function setMega( open, { focus = true } = {} ) {
 	const scrim = document.querySelector( '.mizzey-mega__scrim' );
 	const wasInside = root.contains( document.activeElement );
 	root.hidden = ! open;
+	root.classList.remove( 'is-switching' );
 	if ( scrim ) {
 		scrim.hidden = ! open;
 	}
@@ -86,6 +94,8 @@ function setCategories( open ) {
 	if ( ! panel || ! tab ) {
 		return;
 	}
+	// The chips step aside first: measured after.
+	document.documentElement.classList.toggle( 'mizzey-categories-open', open );
 	if ( open ) {
 		window.scrollTo( 0, 0 );
 		const bar = header();
@@ -93,7 +103,6 @@ function setCategories( open ) {
 	}
 	panel.hidden = ! open;
 	tab.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
-	document.documentElement.classList.toggle( 'mizzey-categories-open', open );
 	if ( open ) {
 		panel.querySelector( '.mizzey-categories__title' ).focus();
 	} else if ( panel.contains( document.activeElement ) ) {
@@ -266,6 +275,39 @@ function pushLevel( from, to, forward ) {
 	loadMotion();
 }
 
+const PRESSABLE = '.mizzey-button, .mizzey-chip, .mizzey-tabbar__item, .mizzey-shortcuts__link, .mizzey-collections__link, .mizzey-brands__link, .mizzey-card';
+
+function pressFeedback() {
+	let pressed = null;
+	const release = () => {
+		if ( pressed ) {
+			pressed.classList.remove( 'is-pressed' );
+			pressed = null;
+		}
+	};
+	document.addEventListener( 'pointerdown', ( event ) => {
+		release();
+		const el = event.button ? null : event.target.closest?.( PRESSABLE );
+		if ( ! el || el.matches( ':disabled, [aria-disabled="true"]' ) ) {
+			return;
+		}
+		pressed = el;
+		el.classList.add( 'is-pressed' );
+	}, { passive: true, capture: true } );
+	[ 'pointerup', 'pointercancel', 'dragstart', 'scroll' ].forEach( ( name ) => addEventListener( name, release, { passive: true, capture: true } ) );
+	addEventListener( 'blur', release );
+}
+
+function wells() {
+	const mark = ( img ) => img.complete && img.naturalWidth && img.parentElement?.setAttribute( 'data-mizzey-loaded', '' );
+	document.querySelectorAll( 'img' ).forEach( mark );
+	document.addEventListener( 'load', ( event ) => 'IMG' === event.target.tagName && mark( event.target ), true );
+}
+
+let lazy = null;
+const later = () => ( lazy = lazy || import( 'mizzey-theme/header-lazy' ).catch( () => null ) );
+const afterLoad = ( fn ) => ( 'complete' === document.readyState ? setTimeout( fn ) : addEventListener( 'load', () => setTimeout( fn ), { once: true } ) );
+
 /* ---- The store ----------------------------------------------------------------------------------------------- */
 
 store( 'mizzey/header', {
@@ -275,7 +317,7 @@ store( 'mizzey/header', {
 			setMega( ! megaOpen() );
 		} ),
 		megaShow() {
-			showPanel( getElement().ref );
+			showPanel( getElement().ref, { switching: true } );
 		},
 		megaClose() {
 			setMega( false, { focus: false } );
@@ -338,31 +380,13 @@ store( 'mizzey/header', {
 				setCategories( false );
 				document.querySelector( '.mizzey-tabbar__categories' ).focus();
 			}
-			const more = document.getElementById( 'mizzey-header-more' );
-			if ( more && ! more.hidden ) {
-				more.hidden = true;
-				const button = document.querySelector( '.mizzey-header__more-button' );
-				button.setAttribute( 'aria-expanded', 'false' );
-				button.focus();
-			}
 		} ),
 		outside: withSyncEvent( ( event ) => {
 			const root = mega();
 			if ( megaOpen() && ! root.contains( event.target ) && ! allButton().contains( event.target ) ) {
 				setMega( false, { focus: false } );
 			}
-			const more = document.getElementById( 'mizzey-header-more' );
-			if ( more && ! more.hidden && ! event.target.closest( '.mizzey-header__more' ) ) {
-				more.hidden = true;
-				document.querySelector( '.mizzey-header__more-button' ).setAttribute( 'aria-expanded', 'false' );
-			}
 		} ),
-		moreToggle() {
-			const button = getElement().ref;
-			const list = document.getElementById( 'mizzey-header-more' );
-			list.hidden = ! list.hidden;
-			button.setAttribute( 'aria-expanded', list.hidden ? 'false' : 'true' );
-		},
 
 		/* The phone menu's levels. */
 		levelOpen() {
@@ -416,6 +440,12 @@ store( 'mizzey/header', {
 		init() {
 			const ctx = getContext();
 			const root = getElement().ref;
+			const tuck = () => later().then( ( m ) => m && m.tuck( root ) );
+			addEventListener( 'scroll', tuck, { once: true, passive: true } );
+			afterLoad( tuck );
+			pressFeedback();
+			wells();
+			// The cart's count after a change made on the page.
 			const ask = () => refresh( ctx );
 			[ 'wc-blocks_added_to_cart', 'wc-blocks_removed_from_cart' ].forEach( ( name ) => document.body.addEventListener( name, ask ) );
 			document.addEventListener( 'mizzey-cart-changed', ( event ) => {
@@ -447,7 +477,15 @@ store( 'mizzey/header', {
 			// The category row's overflow, now and whenever its width changes.
 			const row = root.querySelector( '.mizzey-header__row' );
 			if ( row ) {
-				const fit = () => fitRow( row, Number( ctx.rowMax ) || 8 );
+				let settle = () => {};
+				const reached = () => later().then( ( m ) => m && ( settle = m.reached( row ) ) );
+				row.addEventListener( 'pointerenter', reached, { once: true } );
+				row.addEventListener( 'focusin', reached, { once: true } );
+				afterLoad( reached );
+				const fit = () => {
+					fitRow( row, Number( ctx.rowMax ) || 8 );
+					settle();
+				};
 				fit();
 				if ( window.ResizeObserver ) {
 					let width = row.clientWidth;

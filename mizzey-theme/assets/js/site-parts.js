@@ -8,10 +8,11 @@
  * its pause control stops and starts it, and play moves on at once, over any hold of that moment, until the next hold
  * begins. Under reduced motion it starts paused. A message that is not showing is inert.
  *
- * The preferences (inc/consent.php) open from any link to #cookie-preferences. They record nothing themselves: each
+ * The preferences (inc/consent.php) open from the "Cookie preferences" buttons (ui.js) and any link to
+ * #cookie-preferences. They record nothing themselves: each
  * choice presses the consent banner's own button (specs/043, consent.js), so the cookie, the consent mode update and
  * the data layer event stay the banner's. "Save choices" is "granted" only with Analytics and Marketing both on.
- * While the banner shows, the page keeps room at its foot as tall as the banner (--mizzey-consent-space).
+ * While the banner shows, the footer keeps room at its foot as tall as the banner reaches (--mizzey-consent-space).
  */
 import { store, getElement, withSyncEvent } from '@wordpress/interactivity';
 
@@ -88,15 +89,20 @@ function hold( state, reason, on ) {
 
 /* ---- The cookie preferences --------------------------------------------------------------------------------- */
 
+/** The switches show the stored choice. */
+function syncPreferences( dialog ) {
+	const granted = ( document.cookie.match( CONSENT ) || [] )[ 1 ] === 'granted';
+	dialog.querySelectorAll( '[data-mizzey-consent-category]:not(:disabled)' ).forEach( ( control ) => {
+		control.setAttribute( 'aria-checked', granted ? 'true' : 'false' );
+	} );
+}
+
 function openPreferences() {
 	const dialog = document.getElementById( DIALOG );
 	if ( ! dialog || dialog.open ) {
 		return;
 	}
-	const granted = ( document.cookie.match( CONSENT ) || [] )[ 1 ] === 'granted';
-	dialog.querySelectorAll( '[data-mizzey-consent-category]:not(:disabled)' ).forEach( ( control ) => {
-		control.setAttribute( 'aria-checked', granted ? 'true' : 'false' );
-	} );
+	syncPreferences( dialog );
 	dialog.showModal();
 }
 
@@ -173,6 +179,15 @@ store( 'mizzey/site', {
 			}
 		},
 		consentInit() {
+			// Opened by ui.js too: the switches follow the stored choice at each opening.
+			const dialog = document.getElementById( DIALOG );
+			if ( dialog ) {
+				new window.MutationObserver( () => {
+					if ( dialog.open ) {
+						syncPreferences( dialog );
+					}
+				} ).observe( dialog, { attributes: true, attributeFilter: [ 'open' ] } );
+			}
 			document.addEventListener( 'click', ( event ) => {
 				const link = event.target && event.target.closest ? event.target.closest( ANCHOR ) : null;
 				if ( link ) {

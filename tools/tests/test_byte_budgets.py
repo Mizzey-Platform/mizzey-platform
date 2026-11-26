@@ -112,7 +112,7 @@ def template_files() -> dict[str, dict[str, list[Path]]]:
     home = {
         "styles": every["styles"] + [THEME / "assets" / "css" / name for name in ("header.css", "mini-cart.css")] + [blocks / "library.css"]
         + sorted(blocks.glob("*/style.css")) + sorted(cards.glob("*/style.css")),
-        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / name for name in ("header.js", "after-load.js")]
+        "scripts": list(every["scripts"]) + [THEME / "assets" / "js" / name for name in ("header.js", "after-load.js", "reveal.js")]
         + sorted(blocks.glob("*/view.js")) + sorted(cards.glob("*/view.js")),
         "images": sorted((THEME / "assets" / "images").glob("*")),
     }

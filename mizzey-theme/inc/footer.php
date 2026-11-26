@@ -19,7 +19,8 @@
  * - **darkLogo**: the logo file for the Indigo footer (the brand's Royal BG artwork); the site logo serves White.
  *
  * Menus are WordPress's own `wp_navigation` (native first, M-4), made and edited by staff in the Site Editor, one per
- * language (SSC-08, SSC-12). A link whose address is `#cookie-preferences` reopens the consent choice of specs/043
+ * language (SSC-08, SSC-12). A link's description, set in the menu editor, shows as a small tag under its words
+ * (C1-Home-Phone draws one on the Customer care rows). A link whose address is `#cookie-preferences` reopens the consent choice of specs/043
  * and opens the cookie preferences; with no such link in any column, the legal line carries the banner's own
  * "Cookie settings" link, so the choice can always be reopened. A phone number or an email address stays on one
  * line, left to right, in both languages.
@@ -34,6 +35,7 @@ declare(strict_types=1);
 namespace MizzeySite\Theme\Footer;
 
 use function MizzeySite\Theme\Components\element;
+use function MizzeySite\Theme\Components\opens;
 use function MizzeySite\Theme\Components\zz;
 
 defined('ABSPATH') || exit;
@@ -112,7 +114,7 @@ function text(string $value): string
  * A menu's plain links, in order; a submenu's own links follow its label, flat.
  *
  * @param array<int,array<string,mixed>>       $blocks
- * @param list<array{label:string,url:string}> $links
+ * @param list<array{label:string,url:string,tag:string}> $links
  */
 function collect(array $blocks, array &$links): void
 {
@@ -121,7 +123,7 @@ function collect(array $blocks, array &$links): void
             $label = text((string) ($block['attrs']['label'] ?? ''));
             $url   = trim((string) ($block['attrs']['url'] ?? ''));
             if ('' !== $label && '' !== $url) {
-                $links[] = ['label' => $label, 'url' => $url];
+                $links[] = ['label' => $label, 'url' => $url, 'tag' => text((string) ($block['attrs']['description'] ?? ''))];
             }
         }
         if (! empty($block['innerBlocks'])) {
@@ -130,7 +132,7 @@ function collect(array $blocks, array &$links): void
     }
 }
 
-/** @return list<array{label:string,url:string}> */
+/** @return list<array{label:string,url:string,tag:string}> */
 function menu_links(\WP_Post $menu): array
 {
     $links = [];
@@ -139,13 +141,13 @@ function menu_links(\WP_Post $menu): array
     return $links;
 }
 
-/** One link: the cookie preferences opener, a phone or email kept left to right, or an ordinary link. */
-function link_html(string $label, string $url, bool &$opener): string
+/** One link: the cookie preferences opener, a phone or email kept left to right, or an ordinary link; its tag under it. */
+function link_html(string $label, string $url, bool &$opener, string $tag = ''): string
 {
     if (COOKIE_ANCHOR === $url) {
         $opener = true;
 
-        return element('a', ['class' => 'mizzey-footer__link', 'href' => COOKIE_ANCHOR, 'data-mizzey-consent-open' => '1'], esc_html($label));
+        return preferences_button($label, 'mizzey-footer__link');
     }
     $href = esc_url($url, ['http', 'https', 'tel', 'mailto']);
     if ('' === $href) {
@@ -154,8 +156,24 @@ function link_html(string $label, string $url, bool &$opener): string
     $inner = preg_match('/^(tel|mailto):/i', $url)
         ? element('span', ['class' => 'mizzey-footer__ltr', 'dir' => 'ltr'], esc_html($label))
         : esc_html($label);
+    if ('' !== $tag) {
+        return element('a', ['class' => implode(' ', ['mizzey-footer__link', 'mizzey-footer__link--tagged']), 'href' => $href], element('span', [], $inner) . element('span', ['class' => 'mizzey-footer__tag'], esc_html($tag)));
+    }
 
     return element('a', ['class' => 'mizzey-footer__link', 'href' => $href], $inner);
+}
+
+/**
+ * The control that reopens the consent choice (specs/043, data-mizzey-consent-open) and opens the cookie preferences:
+ * a button that looks like a link, opened through ui.js (opens()), so a phone's first tap acts (early taps).
+ */
+function preferences_button(string $label, string $class): string
+{
+    return element(
+        'button',
+        ['type' => 'button', 'class' => $class . ' mizzey-footer__button', 'data-mizzey-consent-open' => '1'] + opens('mizzey-consent-preferences'),
+        esc_html($label)
+    );
 }
 
 /**
@@ -238,7 +256,7 @@ function render(array $attributes): string
         );
     }
     foreach ($care_menu ? menu_links($care_menu) : [] as $link) {
-        $care_items[] = link_html($link['label'], $link['url'], $opener);
+        $care_items[] = link_html($link['label'], $link['url'], $opener, $link['tag']);
     }
     $care_heading = $care_menu ? text(get_the_title($care_menu)) : '';
     $care         = column('' !== $care_heading ? $care_heading : __('Customer care', 'mizzey-site'), $care_items);
@@ -254,7 +272,7 @@ function render(array $attributes): string
         $wide  = ! empty($setting['wide']);
         $items = [];
         foreach (menu_links($menu) as $link) {
-            $items[] = link_html($link['label'], $link['url'], $opener);
+            $items[] = link_html($link['label'], $link['url'], $opener, $link['tag']);
         }
         $html  = column(text(get_the_title($menu)), $items, $wide);
         if ('' === $html) {
@@ -279,7 +297,7 @@ function render(array $attributes): string
     $legal_words = '' !== $legal_words ? $legal_words : sprintf(__('© %1$s %2$s.', 'mizzey-site'), wp_date('Y'), get_bloginfo('name'));
     $legal       = element('p', ['class' => 'mizzey-footer__legal'], esc_html($legal_words));
     if (! $opener) {
-        $legal .= element('a', ['class' => implode(' ', ['mizzey-footer__link', 'mizzey-cookie-settings']), 'href' => COOKIE_ANCHOR, 'data-mizzey-consent-open' => '1'], esc_html__('Cookie settings', 'mizzey-site'));
+        $legal .= preferences_button(__('Cookie settings', 'mizzey-site'), implode(' ', ['mizzey-footer__link', 'mizzey-cookie-settings']));
     }
     // The banner's own footer link is not printed again (MizzeySite\Marketing\ConsentBanner::settingsLink).
     do_action('mizzey_footer_consent_link');

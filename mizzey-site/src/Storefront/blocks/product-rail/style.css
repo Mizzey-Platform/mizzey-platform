@@ -22,12 +22,15 @@
 	margin-inline: auto;
 }
 
+/* The heading row is 48 high, as every home section's (C1-Home-Phone, C1-Home-Desktop): the cards sit 16 under it on a
+   phone, 24 from 1024 wide (the list keeps 4 above its cards for their shadow). */
 .mizzey-products__head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--mizzey-space-4);
-	margin-block-end: var(--mizzey-space-3);
+	min-block-size: var(--mizzey-control-target-preferred);
+	margin-block-end: calc(var(--mizzey-space-4) - var(--mizzey-space-1));
 }
 
 .mizzey-products__heading {
@@ -43,7 +46,11 @@
 	flex-shrink: 0;
 }
 
+/* "View all": a 44 target. */
 .mizzey-products__all {
+	display: flex;
+	align-items: center;
+	min-block-size: var(--mizzey-control-target-min);
 	color: var(--mizzey-color-role-link);
 	font: var(--mizzey-type-body-strong);
 	text-decoration: underline;
@@ -153,7 +160,7 @@
 	}
 
 	.mizzey-products__head {
-		margin-block-end: var(--mizzey-space-4);
+		margin-block-end: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
 	}
 
 	.mizzey-products__arrows {
