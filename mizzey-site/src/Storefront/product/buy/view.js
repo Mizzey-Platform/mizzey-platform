@@ -1,25 +1,31 @@
 /**
- * The product page's gallery and buying area (spec 066, slice 9), on the WordPress Interactivity API: store
- * "mizzey/buy".
- *
- * - The options are the product's own attributes. A choice updates, in place and without moving anything, the
- *   legend, the price, the stock line, the message, Add to Cart, Buy Now's address, the quantity's limit, the buy bar,
- *   and the gallery when the variant has a photo of its own.
- * - Add to Cart posts to WooCommerce's Store API (`cart/add-item`), which asks the stock source (specs/062). While it
- *   waits the button shows the i-dot loader, its width kept; only the server's answer turns it into the tick with
- *   "Added", and only then is the cart's new count announced (`mizzey-cart-changed`, detail.count the server's
- *   items_count). A refusal brings the button back with a notice saying why.
- * - Buy Now is specs/055's address, with the quantity and the variant; it shows the loader while the store adds.
- * - The gallery shows one photo at a time and loads the others when they are shown, over the breathing ZZ; zoom opens
- *   them in a dialog; the video plays only when pressed, muted, with its controls.
- * - On a phone the buy bar comes up once Add to Cart has scrolled away.
- *
- * Every word shown comes from the server, translated (NFR-04a). No value here is a style.
+ * The product page's gallery and buying area (spec 066, slice 9; store "mizzey/buy"). What each part does is written
+ * in MizzeySite\Storefront\ProductBuy. Nothing claims success before the server answers; every word shown comes from
+ * the server, translated (NFR-04a); no value here is a style.
  */
 import { store, getElement, withSyncEvent } from '@wordpress/interactivity';
 
 const DESKTOP = '(min-width: 1024px)';
+
+// How the visitor is working the page: a touch or a mouse press shows no focus ring, the keyboard does (the owner's
+// rule of 26 November). Read by the stylesheet on the document's root.
+if ( typeof document !== 'undefined' && ! document.documentElement.dataset.mizzeyInput ) {
+	const root = document.documentElement;
+	root.dataset.mizzeyInput = 'pointer';
+	window.addEventListener( 'pointerdown', () => ( root.dataset.mizzeyInput = 'pointer' ), true );
+	window.addEventListener( 'keydown', ( event ) => {
+		if ( ! event.metaKey && ! event.ctrlKey && ! event.altKey ) {
+			root.dataset.mizzeyInput = 'keyboard';
+		}
+	}, true );
+}
 const openers = new WeakMap();
+// The zoom's gestures, fetched on the first zoom (preloaded when the zoom control or the photo is pressed).
+let zoomer = null;
+const zoomModule = () => ( zoomer = zoomer || import( state.zoomModule ) );
+// The thumbnail's flight to the cart and the share popover's place: after a press, so fetched on the first one.
+let mover = null;
+const motionModule = () => ( mover = mover || import( state.motionModule ) );
 const states = new WeakMap();
 
 /** The product's data, copied once from the server's context: the script changes this copy, never a reactive one. */
@@ -149,6 +155,7 @@ function refresh( root, ctx ) {
 	if ( stock && line ) {
 		const s = lead ? lead.state : '';
 		stock.dataset.state = s;
+		stock.hidden = ! lead;
 		line.textContent = ! lead ? '' : { out: words.out, unknown: words.unknown, low: which ? fill( words.lowWhich, lead.left, which ) : fill( words.low, lead.left ), in: which ? fill( words.inWhich, which ) : words.in }[ s ] || '';
 	}
 	// As the boards write it: "24 oz in Chocolate is sold out. Choose another flavour or size."
@@ -258,6 +265,8 @@ function buyNow( root, ctx ) {
 	}
 	const { done, variation } = current( ctx );
 	const ok = done && variation && variation.state !== 'out';
+	// Nothing chosen: no Buy Now at all (E4); a chosen variant sold out or not made: shown, and off.
+	link.hidden = ctx.variable && ! done;
 	const url = new URL( ctx.buyNow, window.location.href );
 	url.searchParams.set( 'quantity', String( ctx.qty ) );
 	if ( ctx.variable && variation ) {
@@ -365,7 +374,10 @@ function show( root, ctx ) {
 		label.hidden = false;
 	}
 	counter( root, ctx );
-	zoomImage( root, ctx );
+	const dialog = q( root, 'dialog.mizzey-zoom' );
+	if ( dialog && dialog.open && zoomer ) {
+		zoomer.then( ( z ) => z.zoomImage( root, ctx, key ) );
+	}
 }
 
 function watch( img, slide ) {
@@ -376,22 +388,6 @@ function watch( img, slide ) {
 	const done = () => slide.classList.add( 'is-loaded' );
 	img.addEventListener( 'load', done, { once: true } );
 	img.addEventListener( 'error', done, { once: true } );
-}
-
-function zoomImage( root, ctx ) {
-	const dialog = q( root, 'dialog.mizzey-zoom' );
-	if ( ! dialog || ! dialog.open ) {
-		return;
-	}
-	const key = list( root, ctx )[ ctx.index ];
-	const slide = q( root, `.mizzey-gallery__slide[data-index="${ key }"]` );
-	const img = q( dialog, '.mizzey-zoom__image' );
-	if ( slide && slide.dataset.full ) {
-		img.src = slide.dataset.full;
-		img.alt = ( q( slide, 'img' ) || {} ).alt || '';
-	}
-	q( dialog, '.mizzey-zoom__value' ).textContent = `${ ctx.zoom }%`;
-	img.style.scale = String( ctx.zoom / 100 );
 }
 
 function bar( root ) {
@@ -435,7 +431,8 @@ async function send( root, ctx, button ) {
 		const option = first && q( first, '.mizzey-buy__option' );
 		if ( option ) {
 			option.scrollIntoView( { block: 'center', behavior: window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ? 'auto' : 'smooth' } );
-			option.focus( { preventScroll: true } );
+			// After the press: a tap focuses the pressed button after its handlers.
+			setTimeout( () => option.focus( { preventScroll: true } ), 0 );
 		}
 		return;
 	}
@@ -480,7 +477,7 @@ async function send( root, ctx, button ) {
 		document.dispatchEvent( new CustomEvent( 'mizzey-cart-changed', { detail: { count: Number( answer.items_count ), cart: answer } } ) );
 		document.body.dispatchEvent( new CustomEvent( 'wc-blocks_added_to_cart', { bubbles: true } ) );
 		if ( window.matchMedia( DESKTOP ).matches ) {
-			fly( root );
+			motionModule().then( ( m ) => m.fly( root ) );
 			toast( 'added' );
 		}
 		setTimeout( () => {
@@ -492,29 +489,6 @@ async function send( root, ctx, button ) {
 		button.style.minInlineSize = '';
 		toast( 'error', state.words.failed );
 	}
-}
-
-/** After the answer, on a desktop: the photo's thumbnail flies to the header's cart (C1-Product-Desktop). */
-function fly( root ) {
-	const img = q( root, '.mizzey-gallery__slide.is-current img' );
-	const cart = document.querySelector( '.mizzey-header__cart' );
-	if ( ! img || ! cart || window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches || ! img.animate ) {
-		return;
-	}
-	const from = img.getBoundingClientRect();
-	const to = cart.getBoundingClientRect();
-	const ghost = img.cloneNode();
-	ghost.removeAttribute( 'srcset' );
-	ghost.className = 'mizzey-buy-fly';
-	ghost.alt = '';
-	document.body.appendChild( ghost );
-	const size = ghost.getBoundingClientRect();
-	const at = ( x, y ) => `translate(${ x - size.width / 2 }px, ${ y - size.height / 2 }px)`;
-	const css = getComputedStyle( ghost );
-	ghost.animate( [
-		{ transform: `${ at( from.x + from.width / 2, from.y + from.height / 2 ) } scale(1)`, opacity: 1 },
-		{ transform: `${ at( to.x + to.width / 2, to.y + to.height / 2 ) } scale(0.3)`, opacity: 0.4 },
-	], { duration: parseFloat( css.getPropertyValue( '--mizzey-buy-fly-time' ) ) || 0, easing: css.getPropertyValue( '--mizzey-buy-fly-easing' ).trim() || 'ease' } ).finished.then( () => ghost.remove(), () => ghost.remove() );
 }
 
 async function wishlist( ctx, root, on ) {
@@ -625,9 +599,17 @@ const { state } = store( 'mizzey/buy', {
 			}
 			const dialog = q( root, 'dialog.mizzey-zoom' );
 			ctx.zoom = 100;
+			ctx.panX = 0;
+			ctx.panY = 0;
 			openDialog( dialog, q( root, '.mizzey-gallery__zoom' ) );
-			show( root, ctx );
 			q( dialog, '.mizzey-zoom__close' ).focus();
+			zoomModule().then( ( z ) => {
+				if ( ! ctx.panning ) {
+					ctx.panning = true;
+					z.pan( root, ctx );
+				}
+				show( root, ctx );
+			} );
 		} ),
 		zoomClose: withSyncEvent( ( event ) => event.currentTarget.closest( 'dialog' ).close() ),
 		zoomBackdrop: withSyncEvent( ( event ) => {
@@ -643,8 +625,10 @@ const { state } = store( 'mizzey/buy', {
 		} ),
 		level: withSyncEvent( ( event ) => {
 			const ctx = data( event.currentTarget.closest( '.mizzey-buy' ) );
-			ctx.zoom = Math.max( 100, Math.min( 300, ctx.zoom + Number( event.currentTarget.dataset.level ) ) );
-			zoomImage( event.currentTarget.closest( '.mizzey-buy' ), ctx );
+			const dialog = event.currentTarget.closest( 'dialog' );
+			const by = Number( event.currentTarget.dataset.level );
+			// The level is read when the module has come, so two quick presses make two steps.
+			zoomModule().then( ( z ) => z.zoomAt( dialog, ctx, Math.round( ( ctx.zoom + by ) / 10 ) * 10 ) );
 		} ),
 		share: withSyncEvent( ( event ) => {
 			const button = event.currentTarget;
@@ -656,18 +640,16 @@ const { state } = store( 'mizzey/buy', {
 			}
 			const dialog = q( root, 'dialog.mizzey-share' );
 			openDialog( dialog, button );
-			if ( window.matchMedia( DESKTOP ).matches ) {
-				// Under Share, its end edge on Share's: the distance from the window's end edge, either direction.
-				const r = button.getBoundingClientRect();
-				const rtl = getComputedStyle( button ).direction === 'rtl';
-				// Under Share when it fits in the window, above it otherwise.
-				const panel = q( dialog, '.mizzey-share__panel' ).getBoundingClientRect();
-				const gap = parseFloat( getComputedStyle( q( dialog, '.mizzey-share__panel' ) ).paddingBlockStart ) || 0;
-				const below = r.bottom + gap + panel.height <= window.innerHeight;
-				dialog.style.setProperty( '--mizzey-pop-block', `${ below ? r.bottom : r.top - panel.height - gap * 2 }px` );
-				dialog.style.setProperty( '--mizzey-pop-inline', `${ rtl ? r.x : window.innerWidth - r.x - r.width }px` );
+			if ( ! window.matchMedia( DESKTOP ).matches ) {
+				copy.focus();
+				return;
 			}
-			copy.focus();
+			// Placed by Share once its place is known (the motion module, preloaded on the press), then focused.
+			dialog.classList.add( 'is-placing' );
+			motionModule().then( ( m ) => {
+				m.placeShare( dialog, button );
+				copy.focus();
+			} );
 		} ),
 		shareClose: withSyncEvent( ( event ) => event.currentTarget.closest( 'dialog' ).close() ),
 		shareBackdrop: withSyncEvent( ( event ) => {
@@ -703,6 +685,26 @@ const { state } = store( 'mizzey/buy', {
 				show( root, ctx );
 			}
 			bar( root );
+			qa( root, '.mizzey-gallery__zoom, .mizzey-gallery__slides' ).forEach( ( el ) => el.addEventListener( 'pointerdown', () => zoomModule(), { once: true } ) );
+			root.addEventListener( 'pointerdown', () => motionModule(), { once: true } );
+			root.addEventListener( 'keydown', () => motionModule(), { once: true } );
+			// A page put in the browser's back-forward cache comes back as it truly is: no button left in its loader
+			// or its tick (the header reads the cart's count again on the same event).
+			const settle = () => {
+				ctx.busy = false;
+				qa( root, '.mizzey-buy__add, .mizzey-buy-bar__add, .mizzey-buy__now' ).forEach( ( button ) => {
+					button.removeAttribute( 'aria-busy' );
+					button.classList.remove( 'is-done' );
+					button.style.minInlineSize = '';
+				} );
+				refresh( root, ctx );
+			};
+			window.addEventListener( 'pagehide', settle );
+			window.addEventListener( 'pageshow', ( event ) => {
+				if ( event.persisted ) {
+					settle();
+				}
+			} );
 		},
 	},
 } );

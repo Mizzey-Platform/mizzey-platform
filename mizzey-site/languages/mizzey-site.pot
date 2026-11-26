@@ -2449,3 +2449,82 @@ msgstr ""
 #: mizzey-site/src/Catalogue/AttributeSwatch.php
 msgid "Swatch colour"
 msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+#, php-format
+msgid "Order now, get it by %s"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+#, php-format
+msgid "Order now, get it between %1$s and %2$s"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgctxt "delivery date"
+msgid "D j M"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Saturday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Sunday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Monday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Tuesday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Wednesday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Thursday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Friday"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Delivery date shown"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "A range: \"get it between Mon 30 Nov and Thu 3 Dec\""
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "One date, the latest: \"get it by Thu 3 Dec\""
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "The dates come from the delivery estimate above, in working days."
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Delivery working days"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Order cut-off time (Cairo)"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "An order after this time, 24-hour clock, counts from the next working day."
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "Holidays (no delivery)"
+msgstr ""
+
+#: mizzey-site/src/Shipping/DeliveryDates.php
+msgid "One date a line, as 2026-12-25."
+msgstr ""

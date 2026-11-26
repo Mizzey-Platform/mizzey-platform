@@ -274,7 +274,7 @@ async function heldAdd( page, selector, where, hold = 1200 ) {
 			check( d.nowHref && d.nowHref.includes( `add-to-cart=${ plan.ids.simple }` ) && d.nowHref.includes( 'mizzey_buy_now=1' ), `PDP-09 [en 1440] Buy Now carries the product and the Buy Now flag of specs/055 (${ d.nowHref })` );
 			check( d.links && near( d.links.h, 44 ) && near( d.links.y - d.now.b, 8 ) && d.wish && d.share && near( d.wish.w, d.share.w, 1 ), `PDP-10, PDP-21 [en 1440] wishlist and share, 44 high, two halves, 8 under Buy Now (${ d.links && [ d.links.h, Math.round( d.links.y - d.now.b ), d.wish.w, d.share.w ] })` );
 			check( d.delivery && near( d.delivery.y - d.links.b, 24 ) && d.delivery.radius === '20px' && d.delivery.pad === '16px 16px 16px 16px', `PDP-14 [en 1440] the delivery box: 24 under, radius 20, padding 16 (${ d.delivery && [ Math.round( d.delivery.y - d.links.b ), d.delivery.radius, d.delivery.pad ] })` );
-			check( d.delivery && /Estimated delivery: 2 to 5 working days/.test( d.delivery.text ) && /Easy returns within 14 days/.test( d.delivery.text ) && d.returnsLink === plan.returns, `PDP-14, PDP-15 [en 1440] the estimate of specs/055 and the returns summary with its page (${ d.delivery && d.delivery.text }; ${ d.returnsLink })` );
+			check( d.delivery && /Order now, get it (by|between) [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}/.test( d.delivery.text ) && /Easy returns within 14 days/.test( d.delivery.text ) && d.returnsLink === plan.returns, `PDP-14, PDP-15 [en 1440] the estimate of specs/055 as dates ("Order now, get it ...") and the returns summary with its page (${ d.delivery && d.delivery.text }; ${ d.returnsLink })` );
 			check( d.features && near( d.features.y - d.delivery.b, 32 ) && d.featureItems === 3 && d.featuresTitle && d.featuresTitle.font === '20px/28px 900', `PDP-11 [en 1440] key features: 32 under, the title 20/28 Black, three points (${ d.features && [ Math.round( d.features.y - d.delivery.b ), d.featuresTitle && d.featuresTitle.font, d.featureItems ] })` );
 
 			// "Show full name" opens the whole name in place.
@@ -332,9 +332,29 @@ async function heldAdd( page, selector, where, hold = 1200 ) {
 			await shot( page, 'en-1440-zoom' );
 			await page.locator( '.mizzey-zoom__in' ).click();
 			await page.locator( '.mizzey-zoom__in' ).click();
+			await page.waitForFunction( () => document.querySelector( '.mizzey-zoom__value' ).textContent.trim() === '160%', null, { timeout: TIMEOUT } ).catch( () => {} );
 			await page.waitForTimeout( 300 );
-			const zoomed = await page.evaluate( () => ( { value: document.querySelector( '.mizzey-zoom__value' ).textContent.trim(), scale: getComputedStyle( document.querySelector( '.mizzey-zoom__image' ) ).scale } ) );
-			check( zoomed.value === '160%' && zoomed.scale === '1.6', `PDP-01 [en 1440] zoom in twice: 160% and the photo scaled (${ JSON.stringify( zoomed ) })` );
+			const zoomed = await page.evaluate( () => ( { value: document.querySelector( '.mizzey-zoom__value' ).textContent.trim(), scale: new DOMMatrix( getComputedStyle( document.querySelector( '.mizzey-zoom__image' ) ).transform ).a } ) );
+			check( zoomed.value === '160%' && Math.abs( zoomed.scale - 1.6 ) < 0.001, `PDP-01 [en 1440] zoom in twice: 160% and the photo scaled (${ JSON.stringify( zoomed ) })` );
+			// A mouse drag moves the zoomed photo (this square photo is taller than the wide frame at 160%, so it moves up
+			// and down; it is narrower, so it stays centred across); the wheel zooms at the pointer.
+			const view = await page.locator( '.mizzey-zoom__view' ).boundingBox();
+			const tf = () => page.evaluate( () => {
+				const m = new DOMMatrix( getComputedStyle( document.querySelector( '.mizzey-zoom__image' ) ).transform );
+				return [ m.e, m.f ];
+			} );
+			const [ x0, y0 ] = await tf();
+			await page.mouse.move( view.x + view.width / 2, view.y + view.height / 2 );
+			await page.mouse.down();
+			await page.mouse.move( view.x + view.width / 2 - 60, view.y + view.height / 2 - 60, { steps: 6 } );
+			await page.mouse.up();
+			await page.waitForTimeout( 900 );
+			const [ x1, y1 ] = await tf();
+			check( y1 < y0 - 30 && Math.abs( x1 - x0 ) < 0.5, `PDP-01 [en 1440] a mouse drag moves the zoomed photo where it is larger than the frame, and holds it where it is not (${ [ x0, y0 ] } to ${ [ x1, y1 ] })` );
+			await page.mouse.wheel( 0, -200 );
+			await page.waitForTimeout( 300 );
+			const wheeled = await page.evaluate( () => document.querySelector( '.mizzey-zoom__value' ).textContent.trim() );
+			check( parseInt( wheeled, 10 ) > 160, `PDP-01 [en 1440] the wheel zooms further in (${ wheeled })` );
 			await page.keyboard.press( 'Escape' );
 			await page.waitForTimeout( 400 );
 			const back = await page.evaluate( () => ( { open: !! document.querySelector( 'dialog.mizzey-zoom[open]' ), focus: document.activeElement && document.activeElement.classList.contains( 'mizzey-gallery__zoom' ) } ) );

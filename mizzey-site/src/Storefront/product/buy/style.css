@@ -519,6 +519,8 @@
 .mizzey-buy__from[hidden],
 .mizzey-buy__saving[hidden],
 .mizzey-buy__message[hidden],
+.mizzey-buy__stock[hidden],
+.mizzey-buy .mizzey-buy__now[hidden],
 .mizzey-buy-bar__cart[hidden] {
 	display: none;
 }
@@ -551,8 +553,10 @@
 	text-decoration: none;
 }
 
-.mizzey-buy__authentic a:hover {
-	text-decoration: underline;
+@media (hover: hover) {
+	.mizzey-buy__authentic a:hover {
+		text-decoration: underline;
+	}
 }
 
 .mizzey-buy__stock {
@@ -747,6 +751,47 @@
 	flex-direction: column;
 	gap: var(--mizzey-space-4);
 	margin-block-start: var(--mizzey-space-4);
+}
+
+/* On a phone the line that says what to do sits between the quantity and the button, 16 and 8 from them
+   (C1-Product-Phone E4 and frame 6). */
+@media (max-width: 1023px) {
+	.mizzey-buy__actions {
+		display: contents;
+	}
+
+	.mizzey-buy__qty {
+		order: 1;
+		margin-block-start: var(--mizzey-space-4);
+	}
+
+	.mizzey-buy__message {
+		order: 2;
+	}
+
+	.mizzey-buy .mizzey-buy__add {
+		order: 3;
+		margin-block-start: var(--mizzey-space-4);
+	}
+
+	.mizzey-buy__form:has(> .mizzey-buy__message:not([hidden])) .mizzey-buy__add {
+		margin-block-start: var(--mizzey-space-2);
+	}
+
+	.mizzey-buy .mizzey-buy__now {
+		order: 4;
+	}
+}
+
+/* From 1024 the line comes 24 under the options and the action row 8 under it (C1-Product-Desktop E4). */
+@media (min-width: 1024px) {
+	.mizzey-buy__message {
+		margin-block-start: var(--mizzey-space-5);
+	}
+
+	.mizzey-buy__form:has(> .mizzey-buy__message:not([hidden])) .mizzey-buy__actions {
+		margin-block-start: var(--mizzey-space-2);
+	}
 }
 
 .mizzey-buy__qty {
@@ -982,6 +1027,13 @@
 	color: var(--mizzey-color-role-link);
 	text-decoration: underline;
 	text-underline-offset: var(--mizzey-border-indicator);
+}
+
+/* The dates stand out in the line: Ink, Bold (the board's type scale has no semibold). */
+.mizzey-buy__date {
+	color: var(--mizzey-color-role-text);
+	font-weight: var(--mizzey-font-weight-bold);
+	white-space: nowrap;
 }
 
 .mizzey-buy__van {
@@ -1231,12 +1283,24 @@ body.has-buy-bar .mizzey-buy-toasts {
 	cursor: pointer;
 }
 
+/* The photo moves by script (drag, pinch, double tap, wheel, arrows); the browser's own scroll and pinch stay out. */
 .mizzey-zoom__view {
+	--mizzey-zoom-key-step: var(--mizzey-space-7);
 	position: relative;
 	flex: 1;
 	min-block-size: 0;
-	overflow: auto;
+	overflow: hidden;
 	background-color: var(--mizzey-color-indigo-50);
+	touch-action: none;
+	user-select: none;
+}
+
+.mizzey-zoom__view.is-zoomed {
+	cursor: grab;
+}
+
+.mizzey-zoom__view.is-zoomed:active {
+	cursor: grabbing;
 }
 
 .mizzey-zoom__image {
@@ -1245,7 +1309,8 @@ body.has-buy-bar .mizzey-buy-toasts {
 	block-size: 100%;
 	object-fit: contain;
 	transform-origin: center;
-	transition: scale var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out);
+	pointer-events: none;
+	-webkit-user-drag: none;
 }
 
 .mizzey-zoom__view .mizzey-gallery__arrow {
@@ -1342,6 +1407,11 @@ body.has-buy-bar .mizzey-buy-toasts {
 	background-color: var(--mizzey-color-role-scrim);
 }
 
+/* Unseen for the moment its place under Share is measured. */
+.mizzey-share.is-placing {
+	visibility: hidden;
+}
+
 .mizzey-share__panel {
 	display: flex;
 	flex-direction: column;
@@ -1425,9 +1495,14 @@ body.has-buy-bar .mizzey-buy-toasts {
 	cursor: pointer;
 }
 
-.mizzey-share__item:hover,
 .mizzey-share__item:focus-visible {
 	background-color: var(--mizzey-color-indigo-50);
+}
+
+@media (hover: hover) {
+	.mizzey-share__item:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-share__item:focus-visible,
@@ -1501,8 +1576,7 @@ body.has-buy-bar .mizzey-buy-toasts {
 @media (prefers-reduced-motion: reduce) {
 	.mizzey-gallery__slide,
 	.mizzey-gallery__loading,
-	.mizzey-buy-bar,
-	.mizzey-zoom__image {
+	.mizzey-buy-bar {
 		transition: none;
 	}
 
@@ -1520,4 +1594,25 @@ body.has-buy-bar .mizzey-buy-toasts {
 .mizzey-gallery-counter,
 .mizzey-gallery__showing {
 	unicode-bidi: plaintext;
+}
+
+/* After a touch or a mouse press no focus ring shows (the keyboard still shows it), and a touch leaves no hover
+   colour behind on the buttons of this page (the owner's rule of 26 November). */
+:root[data-mizzey-input="pointer"] :where(.mizzey-buy, .mizzey-buy-bar, .mizzey-zoom, .mizzey-share) :focus-visible {
+	outline: none;
+}
+
+:root[data-mizzey-input="pointer"] .mizzey-share__item:focus-visible {
+	background-color: transparent;
+}
+
+@media (hover: none) {
+	.mizzey-buy .mizzey-button--primary:hover:not(:active) {
+		background-color: var(--mizzey-color-role-primary);
+	}
+
+	.mizzey-buy .mizzey-button--secondary:hover:not(:active) {
+		background-color: var(--mizzey-color-brand-white);
+		box-shadow: var(--mizzey-elevation-1);
+	}
 }

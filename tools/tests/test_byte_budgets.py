@@ -13,7 +13,9 @@ Counted, gzip-compressed at level 9 (what a server sends; KB is 1024 bytes):
   (consent default and banner, tag manager, events, language cache). `ui.js` and the runtime load on every page on
   purpose: the header's drawers, which slice 2 builds, are on every page.
 - **Product**: every page, plus the header, the gallery and buying area (slice 9) and the product card and rail its
-  lower part carries (slice 10). The van in the delivery box is slice 1's image, counted on the home page.
+  lower part carries (slice 10). The buying area's modules fetched only after a press (`zoom.js`, the zoom's gestures,
+  on the first zoom; `motion.js`, the flight to the cart and the share popover's place, on the first press) are not
+  in the page's load. The van in the delivery box is slice 1's image, counted on the home page.
 - **Listing** (slice 6): every page, plus the header, the category listing's stylesheet and script, and the product
   card and grid it carries.
 - **Home**: every page, plus the header (slice 2), every library section's stylesheet and storefront module, the

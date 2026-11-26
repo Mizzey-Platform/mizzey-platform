@@ -490,7 +490,8 @@ final class ProductBuy
             $match = self::matching($context['variations'], $chosen);
             $shown = $match !== null ? (string) $match['state'] : '';
         }
-        $html .= self::el('p', ['class' => 'mizzey-buy__stock', 'data-state' => $shown, 'aria-live' => 'polite'], self::stockLine($variable, $stock, $context));
+        // No line while an option is missing, as E4 draws.
+        $html .= self::el('p', ['class' => 'mizzey-buy__stock', 'data-state' => $shown, 'aria-live' => 'polite', 'hidden' => $variable && $shown === ''], self::stockLine($variable, $stock, $context));
 
         // The form: WooCommerce's own add-to-cart post, so it works without a script.
         $form = self::el('input', ['type' => 'hidden', 'name' => 'add-to-cart', 'value' => (string) $product->get_id()]);
@@ -520,8 +521,10 @@ final class ProductBuy
         }
         $form .= self::el('div', ['class' => 'mizzey-buy__actions'], $actions . $add);
         if (! $out) {
+            // While an option is missing the boards draw no Buy Now (E4): it comes once a variant is chosen.
             $form .= self::el('a', [
                 'class' => ['mizzey-button', 'mizzey-button--secondary', 'mizzey-buy__now'],
+                'hidden'            => $variable && self::matching($context['variations'], $chosen) === null,
                 'href'              => esc_url((string) $page['buy_now']),
                 'data-wp-on--click' => 'actions.buyNow',
             ], self::el('span', ['class' => 'mizzey-buy__label'], esc_html__('Buy now', 'mizzey-site')) . self::loader());
@@ -689,7 +692,7 @@ final class ProductBuy
         $van  = function_exists('get_theme_file_uri') ? get_theme_file_uri(is_rtl() ? 'assets/images/van-rtl.webp' : 'assets/images/van.webp') : '';
         $html = '';
         if ((string) ($estimate['text'] ?? '') !== '') {
-            $html .= self::el('p', ['class' => 'mizzey-buy__estimate'], self::el('img', ['class' => 'mizzey-buy__van', 'src' => esc_url($van), 'alt' => '', 'width' => '64', 'height' => '31', 'loading' => 'lazy', 'decoding' => 'async'], '') . self::el('span', [], esc_html((string) $estimate['text'])));
+            $html .= self::el('p', ['class' => 'mizzey-buy__estimate'], self::el('img', ['class' => 'mizzey-buy__van', 'src' => esc_url($van), 'alt' => '', 'width' => '64', 'height' => '31', 'loading' => 'lazy', 'decoding' => 'async'], '') . self::el('span', ['class' => 'mizzey-buy__when'], \MizzeySite\Shipping\DeliveryDates::sentence(['min' => (int) ($estimate['min'] ?? 0), 'max' => (int) ($estimate['max'] ?? 0)])));
         }
         if ((string) ($returns['summary'] ?? '') !== '') {
             // As drawn: the line between, then the arrow, the summary and its page's link, 8 apart.
@@ -790,6 +793,10 @@ final class ProductBuy
         self::$stated = true;
         wp_interactivity_state(self::STORE, [
             'cartApi'     => esc_url_raw(rest_url('wc/store/v1/cart/add-item')),
+            // The zoom's gestures, a module of their own fetched on the first zoom, versioned by its change time.
+            'zoomModule'  => esc_url_raw(add_query_arg('ver', (string) filemtime(__DIR__ . '/product/buy/zoom.js'), plugins_url('product/buy/zoom.js', __FILE__))),
+            // The flight to the cart and the share popover's place, fetched on the first press.
+            'motionModule' => esc_url_raw(add_query_arg('ver', (string) filemtime(__DIR__ . '/product/buy/motion.js'), plugins_url('product/buy/motion.js', __FILE__))),
             'storeNonce'  => wp_create_nonce('wc_store_api'),
             'wishlistApi' => esc_url_raw(rest_url(WishlistRoutes::NS . '/wishlist/items')),
             'restNonce'   => wp_create_nonce('wp_rest'),
