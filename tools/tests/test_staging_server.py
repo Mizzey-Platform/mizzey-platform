@@ -321,6 +321,37 @@ class TheStagingLayer(OnTheServer):
         self.assertLess(steps.index("70-sample-catalog.php translate"), steps.index("65-site-parts.php"))
         self.assertEqual(len(srv.SEED_SCRIPTS) + 1, len(steps))
 
+    def test_scenario_leftovers_go_first_and_the_sample_reviews_follow_the_arabic_catalogue(self):
+        with mock.patch.object(srv, "load_credentials", return_value={}),                 mock.patch.object(srv, "save_credentials"):
+            srv.seed()
+        steps = [c.split("/staging/seed/")[1] for c in self.container.commands()
+                 if "eval-file" in c and "/staging/seed/" in c]
+        self.assertEqual("05-scenario-leftovers.php", steps[0])
+        self.assertLess(steps.index("70-sample-catalog.php translate"), steps.index("75-sample-reviews.php"))
+
+    def test_the_local_copy_seeds_in_the_same_order_as_the_server(self):
+        ran = []
+        with mock.patch.object(local, "load_credentials", return_value={}), \
+                mock.patch.object(local, "save_credentials"), \
+                mock.patch.object(local, "wp", side_effect=lambda *a, **k: ran.append(" ".join(
+                    [Path(a[1]).name, *a[2:]])) or "ok"):
+            local.seed()
+        served = [" ".join((s, *x)) for s in srv.SEED_SCRIPTS for x in srv.SEED_PASSES.get(s, ((),))]
+        self.assertEqual(served, ran)
+
+    def test_the_sample_video_and_its_poster_reach_the_layer(self):
+        sample = srv.STATE / "sample-catalog"
+        (sample / "videos").mkdir(parents=True)
+        (sample / "catalog.json").write_text('{"version": 1, "products": []}', encoding="utf-8")
+        (sample / "videos" / "sample-002.mp4").write_bytes(b"\x00\x00\x00\x18ftypmp42")
+        (sample / "videos" / "sample-002-poster.jpg").write_bytes(b"\xff\xd8")
+        (sample / "videos" / "notes.txt").write_text("not a video", encoding="utf-8")
+        installed = srv.install_layer()
+        for name in ("sample-catalog/videos/sample-002.mp4", "sample-catalog/videos/sample-002-poster.jpg"):
+            self.assertIn(name, installed)
+            self.assertTrue((srv.LAYER / name).is_file(), name)
+        self.assertNotIn("sample-catalog/videos/notes.txt", installed)
+
     def test_the_fingerprint_finds_the_settings_file_it_requires(self):
         srv.install_layer()
         source = (srv.LAYER / "staging" / "fingerprint.php").read_text(encoding="utf-8")
@@ -332,7 +363,8 @@ class TheStagingLayer(OnTheServer):
         # Scripts and data, and the pictures the seed adds: the home page's artwork and, from the server, the logo.
         pictures = [name for name in installed if (name.startswith("staging/seed/home-art/") and name.endswith(".webp"))
                     or (name.startswith("brand/") and name.endswith(".png"))
-                    or (name.startswith("sample-catalog/images/") and name.endswith(srv.SAMPLE_PICTURES))]
+                    or (name.startswith("sample-catalog/images/") and name.endswith(srv.SAMPLE_PICTURES))
+                    or (name.startswith("sample-catalog/videos/") and name.endswith(srv.SAMPLE_PICTURES + srv.SAMPLE_VIDEOS))]
         self.assertFalse([name for name in installed if not name.endswith((".php", ".json")) and name not in pictures])
         self.assertFalse([name for name in installed if "admin-visit.php" in name and "server-" not in name])
 

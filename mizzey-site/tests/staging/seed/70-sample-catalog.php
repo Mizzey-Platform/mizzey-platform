@@ -13,20 +13,23 @@
  *  - categories (with their subcategories), brands and collections, each with its Arabic term, description, image and
  *    banner; those the manifest numbers are shown on the home page in that order, and the placeholder terms step 60
  *    shows there (slugs starting `sample-` that this step did not make) are taken off it;
+ *  - the menus' category order, the manifest's (the boards'), as WooCommerce's own category order in both languages;
+ *    every other top category is taken out of the menus with the store's "Show in the main menu" setting (marked as
+ *    set by this step), so the menus list the boards' categories only;
  *  - the store attributes the products use (a global attribute per option, as the catalogue load makes them,
  *    specs/053), each value with its Arabic term;
  *  - simple and variable products, keyed by their SKU (`SAMPLE-` only), with price, sale price, stock, badges,
- *    attributes, key features (the short description), description, category, brand, collection and photo; each photo
- *    is added to the media library once and reused;
+ *    attributes, key features (the short description), description, category, brand, collection, photo, gallery and
+ *    video (an uploaded file with its poster); each file is added to the media library once and reused;
  *  - their Arabic records, through WooCommerce Multilingual's product editor as the catalogue load writes them, in a
  *    process of their own (finding A11: never created and translated in one process): the staging tool runs this file
  *    a second time with the argument `translate` (SEED_PASSES). A run that wrote no product translates in the same
  *    process, as nothing was created in it;
  *  - the home page's product sections (from step 60) set to the manifest's hand-picked lists, in each language.
  *
- * Ratings are not seeded: a review needs a customer with a delivered order (specs/020, D-17), so no sample review is
- * written. It never resets an account or a password, never deletes anything, and touches no product whose SKU does
- * not start with `SAMPLE-`. Staging only.
+ * Ratings come from real reviews, written by 75-sample-reviews.php (a review needs a customer with a delivered order,
+ * specs/020, D-17). It never resets an account or a password, never deletes anything, and touches no product whose
+ * SKU does not start with `SAMPLE-`. Staging only.
  *
  * @package MizzeySite\Tests\Staging
  */
@@ -39,6 +42,7 @@ defined( 'MIZZEY_STAGING' ) && MIZZEY_STAGING || WP_CLI::error( 'staging only' )
 
 use MizzeySite\Catalogue\ProductFields;
 use MizzeySite\I18n\ProductTranslationJob;
+use MizzeySite\Storefront\HeaderData;
 use MizzeySite\Storefront\HomeSections;
 use MizzeySite\Storefront\TermContent;
 
@@ -191,6 +195,8 @@ if ( 'sources' === $phase ) {
 		$rows = (array) ( $catalog[ $list ] ?? array() );
 		// Parents before children, whatever the manifest's order.
 		usort( $rows, static fn ( array $a, array $b ): int => (int) ( '' !== (string) ( $a['parent'] ?? '' ) ) <=> (int) ( '' !== (string) ( $b['parent'] ?? '' ) ) );
+		// The menus' order (WooCommerce's own category order, which the header reads) is the manifest's: the boards'.
+		$place = array_flip( array_map( static fn ( array $row ): string => sanitize_title( (string) $row['key'] ), $rows ) );
 		foreach ( $rows as $row ) {
 			$key    = sanitize_title( (string) $row['key'] );
 			$parent = (string) ( $row['parent'] ?? '' );
@@ -210,6 +216,49 @@ if ( 'sources' === $phase ) {
 			}
 			if ( (int) ( $row['home'] ?? 0 ) > 0 ) {
 				$home[ $taxonomy ][ $ids[0] ] = (int) $row['home'];
+			}
+			if ( 'product_cat' === $taxonomy ) {
+				foreach ( array_filter( $ids ) as $id ) {
+					if ( (int) get_term_meta( $id, 'order', true ) !== $place[ $key ] + 1 ) {
+						update_term_meta( $id, 'order', $place[ $key ] + 1 );
+					}
+				}
+			}
+		}
+	}
+
+	// In the menus: only the manifest's categories. Every other top category (step 20's placeholders, a catalogue load
+	// tried on staging) is taken out of the menus by the store's own "Show in the main menu" setting (HeaderData::HIDDEN),
+	// kept on the category in the main language or on an Arabic-only one, and marked so a later run, or a person, can
+	// tell this step set it. Its products, pages and scenarios are untouched. A manifest category it once hid is shown.
+	$hidden = array( 'hidden' => 0, 'shown' => 0 );
+	if ( isset( $catalog['categories'] ) ) {
+		$default = (int) get_option( 'default_product_cat', 0 );
+		// Each language's own list: WPML narrows a term query to the current language.
+		$tops = array();
+		foreach ( array( 'en', 'ar' ) as $lang ) {
+			$sitepress->switch_lang( $lang, true );
+			$tops = array_merge( $tops, (array) get_terms( array( 'taxonomy' => 'product_cat', 'parent' => 0, 'hide_empty' => false ) ) );
+		}
+		$sitepress->switch_lang( 'en', true );
+		foreach ( is_array( $tops ) ? $tops : array() as $top ) {
+			if ( ! $top instanceof WP_Term || $top->term_id === $default ) {
+				continue;
+			}
+			// The setting is read from the English category; an Arabic one with none (made in Arabic only) holds its own.
+			$original = (int) apply_filters( 'wpml_object_id', $top->term_id, 'product_cat', false, 'en' );
+			if ( $original > 0 && $original !== $top->term_id ) {
+				continue;
+			}
+			$ours = '' !== (string) get_term_meta( $top->term_id, MIZZEY_SAMPLE_MARK, true );
+			if ( ! $ours && 'yes' !== get_term_meta( $top->term_id, HeaderData::HIDDEN, true ) ) {
+				update_term_meta( $top->term_id, HeaderData::HIDDEN, 'yes' );
+				update_term_meta( $top->term_id, MIZZEY_SAMPLE_MARK . '_hidden', 'yes' );
+				++$hidden['hidden'];
+			} elseif ( $ours && get_term_meta( $top->term_id, MIZZEY_SAMPLE_MARK . '_hidden', true ) ) {
+				delete_term_meta( $top->term_id, HeaderData::HIDDEN );
+				delete_term_meta( $top->term_id, MIZZEY_SAMPLE_MARK . '_hidden' );
+				++$hidden['shown'];
 			}
 		}
 	}
@@ -331,9 +380,19 @@ if ( 'sources' === $phase ) {
 		$sku        = (string) $entry['sku'];
 		$variations = (array) ( $entry['variations'] ?? array() );
 		$image      = $media( (string) ( $entry['image'] ?? '' ), (string) $entry['name'] );
+		$gallery    = array_values( array_filter( array_map( static fn ( $photo ): int => $media( (string) $photo, (string) $entry['name'] ), (array) ( $entry['gallery'] ?? array() ) ) ) );
+		// The product video: an uploaded file, as staff add one (specs/036), with its poster as the file's own image.
+		$video = $media( (string) ( $entry['video'] ?? '' ), (string) $entry['name'] );
+		if ( $video ) {
+			$poster = $media( (string) ( $entry['video_poster'] ?? '' ), (string) $entry['name'] );
+			if ( $poster && (int) get_post_thumbnail_id( $video ) !== $poster ) {
+				set_post_thumbnail( $video, $poster );
+			}
+		}
+		$video_url  = $video ? (string) wp_get_attachment_url( $video ) : '';
 		$categories = array_map( static fn ( string $key ): int => $terms['product_cat'][ sanitize_title( $key ) ][0] ?? WP_CLI::error( "{$sku} names the category {$key}, which is not listed" ), (array) ( $entry['categories'] ?? array() ) );
 		$brand      = '' !== (string) ( $entry['brand'] ?? '' ) ? ( $terms['product_brand'][ sanitize_title( (string) $entry['brand'] ) ][0] ?? WP_CLI::error( "{$sku} names the brand {$entry['brand']}, which is not listed" ) ) : 0;
-		$fingerprint = $hash( array( $entry, $image, $categories, $brand, $in_collections[ $sku ] ?? array() ) );
+		$fingerprint = $hash( array( $entry, $image, $gallery, $video_url, $categories, $brand, $in_collections[ $sku ] ?? array() ) );
 		$id          = $product_id( $sku );
 		if ( $id && get_post_meta( $id, MIZZEY_SAMPLE_MARK . '_hash', true ) === $fingerprint ) {
 			++$made['unchanged'];
@@ -358,6 +417,8 @@ if ( 'sources' === $phase ) {
 		$p->set_short_description( $features( (array) ( $entry['features'] ?? array() ) ) );
 		$p->set_description( wpautop( esc_html( (string) ( $entry['description'] ?? '' ) ) ) );
 		$p->set_image_id( $image );
+		$p->set_gallery_image_ids( $gallery );
+		$p->update_meta_data( ProductFields::VIDEO, $video_url );
 		$p->set_category_ids( $categories );
 		$p->set_attributes( $product_attributes( array_merge( (array) ( $entry['attributes'] ?? array() ), $options ), array_keys( $options ) ) );
 		$p->update_meta_data( ProductFields::BADGES, array_values( array_intersect( ProductFields::BADGE_ORDER, (array) ( $entry['badges'] ?? array() ) ) ) );
@@ -430,7 +491,7 @@ if ( 'sources' === $phase ) {
 	// When this process wrote no product, nothing was created here and the translations may follow in it; otherwise
 	// they wait for the second pass, `eval-file 70-sample-catalog.php translate`, which the staging tool runs next.
 	$written = $made['created'] + $made['updated'];
-	$line    = sprintf( 'sample catalogue: %d products made, %d updated, %d unchanged, %d variations made', $made['created'], $made['updated'], $made['unchanged'], $made['variations'] );
+	$line    = sprintf( 'sample catalogue: %d products made, %d updated, %d unchanged, %d variations made; %d other categories taken out of the menus, %d shown again', $made['created'], $made['updated'], $made['unchanged'], $made['variations'], $hidden['hidden'], $hidden['shown'] );
 	if ( 0 === $written ) {
 		$phase = 'translate';
 	} else {
