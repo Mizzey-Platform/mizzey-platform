@@ -38,6 +38,7 @@ declare(strict_types=1);
 namespace MizzeySite\Theme\Header;
 
 use function MizzeySite\Theme\Components\attributes;
+use function MizzeySite\Theme\Components\category_image;
 use function MizzeySite\Theme\Components\chip;
 use function MizzeySite\Theme\Components\counter;
 use function MizzeySite\Theme\Components\element;
@@ -485,23 +486,14 @@ function chips(array $d): string
         $args = ['label' => $link['label'], 'url' => $link['url']];
         if ($link['offer']) {
             $args['icon'] = 'tag';
-        } elseif ('' !== $link['image']) {
-            $args['image'] = $link['image'];
+        } elseif (! empty($link['category'])) {
+            // A category's picture, or the placeholder when it has none (the owner's ruling of 26 November 2026).
+            $args['picture'] = category_image((int) ($link['image_id'] ?? 0), 'chip');
         }
         $items .= element('li', [], chip($args));
     }
 
     return element('nav', ['class' => 'mizzey-header__chips', 'aria-label' => __('Shop by category', 'mizzey-site')], element('ul', [], $items));
-}
-
-/** A category's small picture, decorative beside its name. */
-function thumb(string $url, int $size, string $class): string
-{
-    if ('' === $url) {
-        return element('span', ['class' => $class . ' is-empty', 'aria-hidden' => 'true']);
-    }
-
-    return sprintf('<img class="%1$s" src="%2$s" alt="" width="%3$d" height="%3$d" loading="lazy" decoding="async">', esc_attr($class), esc_url($url), $size);
 }
 
 /** The address of a category's newest products. */
@@ -533,7 +525,7 @@ function mega(array $d): string
                     'data-wp-on--focus'      => 'actions.megaShow',
                     'data-wp-on--mouseenter' => 'actions.megaShow',
                 ],
-                thumb((string) $node['image'], 32, 'mizzey-mega__icon')
+                category_image((int) $node['image_id'], 'row', ['class' => 'mizzey-mega__icon'])
                 . element('span', ['class' => 'mizzey-mega__name'], esc_html((string) $node['name']))
                 . ([] === $kids ? '' : icon('fwd', ['size' => 20, 'class' => 'mizzey-mega__chevron']))
             )
@@ -561,7 +553,7 @@ function mega_panel(array $node, string $id, bool $shown): string
         $body = element('h2', ['class' => 'mizzey-mega__title'], esc_html($name))
             . (has_description($node) ? element('p', ['class' => 'mizzey-mega__text'], esc_html(description($node))) : '')
             . element('a', ['class' => classes('mizzey-button', 'mizzey-button--primary', 'mizzey-button--compact', 'mizzey-mega__all'), 'href' => esc_url($url)], element('span', ['class' => 'mizzey-button__label'], esc_html($cta)))
-            . element('a', ['class' => classes('mizzey-mega__photo', 'mizzey-mega__photo--wide'), 'href' => esc_url($url), 'tabindex' => '-1', 'aria-hidden' => 'true'], '' === (string) $node['image'] ? '' : sprintf('<img src="%s" alt="" loading="lazy" decoding="async">', esc_url((string) $node['image'])));
+            . element('a', ['class' => classes('mizzey-mega__photo', 'mizzey-mega__photo--wide'), 'href' => esc_url($url), 'tabindex' => '-1', 'aria-hidden' => 'true'], category_image((int) $node['image_id'], 'mega-wide'));
 
         return element('div', ['class' => classes('mizzey-mega__panel', 'mizzey-mega__panel--single'), 'id' => $id, 'hidden' => ! $shown], $body);
     }
@@ -582,14 +574,13 @@ function mega_panel(array $node, string $id, bool $shown): string
     $all = sprintf(__('Shop all %s', 'mizzey-site'), $name);
     /* translators: %s: a category name, on the link to its newest products. */
     $new   = sprintf(__('New in %s', 'mizzey-site'), $name);
-    $photo = '' === (string) $node['image']
-        ? ''
-        : element(
-            'a',
-            ['class' => 'mizzey-mega__photo', 'href' => esc_url(newest($url))],
-            sprintf('<img src="%s" alt="" loading="lazy" decoding="async">', esc_url((string) $node['image']))
-            . element('span', ['class' => 'mizzey-mega__photo-pill'], esc_html($new) . icon('fwd', ['size' => 20]))
-        );
+    // The photo tile: the category's picture, or the placeholder when it has none (never an empty column).
+    $photo = element(
+        'a',
+        ['class' => 'mizzey-mega__photo', 'href' => esc_url(newest($url))],
+        category_image((int) $node['image_id'], 'mega')
+        . element('span', ['class' => 'mizzey-mega__photo-pill'], esc_html($new) . icon('fwd', ['size' => 20]))
+    );
 
     return element(
         'div',
@@ -698,7 +689,7 @@ function drawer_rows(array $nodes, string $parent, array &$levels, bool $icons =
     foreach ($nodes as $node) {
         $li    = null === $step ? [] : ['data-mizzey-step' => (string) min($step++, 5)];
         $kids  = (array) $node['children'];
-        $inner = ($icons ? thumb((string) $node['image'], 32, 'mizzey-menu__icon') : '')
+        $inner = ($icons ? category_image((int) $node['image_id'], 'row', ['class' => 'mizzey-menu__icon']) : '')
             . element('span', ['class' => 'mizzey-menu__name'], esc_html((string) $node['name']));
         if ([] === $kids) {
             // On the deeper levels every row carries its chevron, as C1-Menus-Phone draws them.
@@ -740,16 +731,13 @@ function drawer_level(array $node, string $id, string $parent, array &$levels): 
     $url  = (string) $node['url'];
     /* translators: %s: a category name, on the link to all of its products. */
     $all = sprintf(__('Shop all %s', 'mizzey-site'), $name);
-    if ('' !== (string) $node['image']) {
-        $shop = element(
-            'a',
-            ['class' => classes('mizzey-menu__all', 'mizzey-menu__banner'), 'href' => esc_url($url)],
-            sprintf('<img src="%s" alt="" loading="lazy" decoding="async">', esc_url((string) $node['image']))
-            . element('span', ['class' => 'mizzey-menu__banner-pill'], esc_html($all) . icon('fwd', ['size' => 20]))
-        );
-    } else {
-        $shop = element('a', ['class' => classes('mizzey-menu__all', 'mizzey-menu__all--plain'), 'href' => esc_url($url)], element('span', [], esc_html($all)) . icon('fwd', ['size' => 20]));
-    }
+    // The photo banner with "Shop all" on it: the category's picture, or the placeholder when it has none.
+    $shop = element(
+        'a',
+        ['class' => classes('mizzey-menu__all', 'mizzey-menu__banner'), 'href' => esc_url($url)],
+        category_image((int) $node['image_id'], 'banner')
+        . element('span', ['class' => 'mizzey-menu__banner-pill'], esc_html($all) . icon('fwd', ['size' => 20]))
+    );
     $head = element(
         'div',
         ['class' => 'mizzey-menu__head'],
@@ -842,7 +830,7 @@ function categories_panel(array $d): string
             element(
                 'a',
                 ['class' => 'mizzey-categories__item', 'href' => esc_url((string) $node['url'])],
-                element('span', ['class' => 'mizzey-categories__tile'], '' === (string) $node['image'] ? icon('grid-empty') : sprintf('<img src="%s" alt="" width="76" height="76" loading="lazy" decoding="async">', esc_url((string) $node['image'])))
+                element('span', ['class' => 'mizzey-categories__tile'], category_image((int) $node['image_id'], 'tile'))
                 . element('span', ['class' => 'mizzey-categories__name'], esc_html((string) $node['name']))
             )
         );

@@ -604,9 +604,10 @@ final class Listing
     }
 
     /**
-     * The banner card's image: the category's banner (specs/060), or its own image.
+     * The banner card's image: the category's banner (specs/060), or its own image, with its attachment id for
+     * CategoryImage.
      *
-     * @return array{url:string,alt:string,link:string}|null
+     * @return array{id:int,url:string,alt:string,link:string}|null
      */
     private static function image(\WP_Term $term): ?array
     {
@@ -615,10 +616,10 @@ final class Listing
             return null;
         }
         if (is_array($content['banner'] ?? null) && '' !== (string) $content['banner']['url']) {
-            return ['url' => (string) $content['banner']['url'], 'alt' => (string) $content['banner']['alt'], 'link' => (string) $content['banner']['link']];
+            return ['id' => (int) $content['banner']['id'], 'url' => (string) $content['banner']['url'], 'alt' => (string) $content['banner']['alt'], 'link' => (string) $content['banner']['link']];
         }
 
-        return '' !== (string) ($content['image'] ?? '') ? ['url' => (string) $content['image'], 'alt' => '', 'link' => ''] : null;
+        return '' !== (string) ($content['image'] ?? '') ? ['id' => (int) ($content['image_id'] ?? 0), 'url' => (string) $content['image'], 'alt' => '', 'link' => ''] : null;
     }
 
     /**

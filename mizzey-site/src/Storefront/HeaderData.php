@@ -113,6 +113,7 @@ final class HeaderData
                 'url'      => is_wp_error($url) ? '' : (string) $url,
                 'count'    => (int) $term->count,
                 'image'    => $image > 0 ? (string) wp_get_attachment_image_url($image, 'woocommerce_thumbnail') : '',
+                'image_id' => CategoryImage::id((int) $term->term_id),
                 'children' => self::categories((int) $term->term_id, $level + 1),
             ];
         }

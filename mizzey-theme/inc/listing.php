@@ -33,6 +33,7 @@ use MizzeySite\Storefront\ProductRail;
 
 use function MizzeySite\Theme\Components\attributes;
 use function MizzeySite\Theme\Components\button;
+use function MizzeySite\Theme\Components\category_image;
 use function MizzeySite\Theme\Components\check;
 use function MizzeySite\Theme\Components\chip;
 use function MizzeySite\Theme\Components\element;
@@ -165,17 +166,14 @@ function banner(array $view): string
         . ('' !== $view['description'] ? element('p', ['class' => 'mizzey-listing__description'], esc_html((string) $view['description'])) : '');
     $tile = '';
     if (is_array($view['image'])) {
-        $img  = sprintf('<img%s>', attributes([
-            'src'           => esc_url((string) $view['image']['url']),
-            'alt'           => esc_attr((string) $view['image']['alt']),
-            'width'         => '128',
-            'height'        => '128',
-            'decoding'      => 'async',
-            'fetchpriority' => 'high',
-        ]));
+        // The picture through the shared helper (its box, fit and sizes), first on the page, so not lazy.
+        $img  = category_image((int) $view['image']['id'], 'listing', ['alt' => (string) $view['image']['alt'], 'loading' => 'eager', 'fetchpriority' => 'high']);
         $tile = '' !== $view['image']['link']
             ? element('a', ['class' => 'mizzey-listing__tile', 'href' => esc_url((string) $view['image']['link'])], $img)
             : element('span', ['class' => 'mizzey-listing__tile'], $img);
+    } elseif ($view['term'] instanceof \WP_Term && 'product_cat' === $view['term']->taxonomy) {
+        // A category with no picture keeps its tile: the placeholder (the owner's ruling of 26 November 2026).
+        $tile = element('span', ['class' => 'mizzey-listing__tile'], category_image(0, 'listing'));
     }
 
     return element('section', ['class' => 'mizzey-listing__banner' . ('' === $tile ? ' is-plain' : ''), 'aria-labelledby' => 'mizzey-listing-title'], element('div', ['class' => 'mizzey-listing__intro', 'id' => 'mizzey-listing-title'], $intro) . $tile);

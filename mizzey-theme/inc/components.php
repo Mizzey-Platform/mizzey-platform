@@ -189,17 +189,33 @@ function gallery_counter(int $current, int $total): string
 }
 
 /**
+ * A category's picture in one of its places, or the placeholder when it has none: the plugin's one helper
+ * (MizzeySite\Storefront\CategoryImage, which holds each place's box, fit and sizes). Empty without the plugin.
+ *
+ * @param array<string,string> $attrs `class`, `alt`, `loading`, `fetchpriority`.
+ */
+function category_image(int $attachment, string $place, array $attrs = []): string
+{
+    return class_exists('MizzeySite\\Storefront\\CategoryImage') ? \MizzeySite\Storefront\CategoryImage::html($attachment, $place, $attrs) : '';
+}
+
+/**
  * A chip: a filter, the chosen one, an applied filter with its remove control, or a category with its icon.
  *
+ * A category chip's `picture` is category_image()'s markup (its picture, or the placeholder when it has none).
+ *
  * @param array{label: string, count?: int, url?: string, chosen?: bool, applied?: bool, image?: string,
- *              icon?: string, attrs?: array<string, string|int|bool|null>} $args
+ *              picture?: string, icon?: string, attrs?: array<string, string|int|bool|null>} $args
  */
 function chip(array $args): string
 {
     $label   = (string) $args['label'];
     $classes = ['mizzey-chip'];
     $inner   = '';
-    if (! empty($args['image'])) {
+    if (! empty($args['picture'])) {
+        $classes[] = 'mizzey-chip--category';
+        $inner    .= (string) $args['picture'];
+    } elseif (! empty($args['image'])) {
         $classes[] = 'mizzey-chip--category';
         $inner    .= sprintf('<img src="%s" alt="" width="24" height="24" loading="lazy" decoding="async">', esc_url((string) $args['image']));
     } elseif (! empty($args['icon'])) {

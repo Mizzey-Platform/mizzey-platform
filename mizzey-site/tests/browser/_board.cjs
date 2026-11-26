@@ -472,6 +472,7 @@ async function revealChecks( pw, urls, check ) {
 						const frames = [];
 						let timing = null;
 						let delays = [];
+						const midway = [];
 						target.scrollIntoView( { block: 'center' } );
 						const t0 = performance.now();
 						while ( performance.now() - t0 < 700 ) {
@@ -480,6 +481,16 @@ async function revealChecks( pw, urls, check ) {
 							const anim = target.getAnimations()[ 0 ];
 							if ( anim && ! timing ) {
 								timing = anim.effect.getTiming().duration;
+								// The fade read at a tenth, a quarter and half of its time (it eases out), the animation held
+								// still: a machine under load draws few frames, the curve is the same.
+								anim.pause();
+								const at = anim.currentTime;
+								for ( const part of [ 0.1, 0.25, 0.5 ] ) {
+									anim.currentTime = timing * part;
+									midway.push( Number( getComputedStyle( target ).opacity ) );
+								}
+								anim.currentTime = at;
+								anim.play();
 								delays = [ ...target.querySelectorAll( '.mizzey-products__item' ) ].slice( 0, 7 ).map( ( el ) => ( el.getAnimations()[ 0 ] ? el.getAnimations()[ 0 ].effect.getTiming().delay : null ) );
 							}
 						}
@@ -488,14 +499,15 @@ async function revealChecks( pw, urls, check ) {
 						await new Promise( ( resolve ) => setTimeout( resolve, 200 ) );
 						target.scrollIntoView( { block: 'center' } );
 						await new Promise( ( resolve ) => setTimeout( resolve, 120 ) );
-						return { frames, timing, delays, again: target.getAnimations().filter( ( a ) => a.playState === 'running' ).length, end: Number( getComputedStyle( target ).opacity ) };
+						return { frames, timing, delays, midway, again: target.getAnimations().filter( ( a ) => a.playState === 'running' ).length, end: Number( getComputedStyle( target ).opacity ) };
 					} );
 					if ( ! seen ) {
 						check( false, `K-1 ${ tag } a section below the first screen to reveal` );
 						continue;
 					}
-					const between = seen.frames.filter( ( o ) => o > 0.05 && o < 0.95 ).length;
-					check( seen.timing === 320 && between >= 2 && seen.end === 1, `K-1 ${ tag } a section below the fold fades in and rises once, 320 ms with frames between (${ seen.timing } ms, ${ between } frames between, ends at ${ seen.end })` );
+					const m = seen.midway;
+					const gradual = m.length === 3 && m[ 0 ] > 0.05 && m[ 0 ] < 0.95 && m[ 0 ] < m[ 1 ] && m[ 1 ] <= m[ 2 ];
+					check( seen.timing === 320 && gradual && seen.end === 1, `K-1 ${ tag } a section below the fold fades in and rises once, 320 ms, gradually (${ seen.timing } ms, at a tenth, a quarter and half ${ JSON.stringify( m.map( ( o ) => Math.round( o * 100 ) / 100 ) ) }, ends at ${ seen.end })` );
 					const want = [ 0, 30, 60, 90, 120, 150, 150, 150 ].slice( 0, seen.delays.length );
 					check( JSON.stringify( seen.delays ) === JSON.stringify( want ), `K-1 ${ tag } the rail's cards follow 30 ms apart, the first six only: ${ JSON.stringify( seen.delays ) }` );
 					check( seen.again === 0, `K-1 ${ tag } scrolled away and back, the section does not reveal again` );

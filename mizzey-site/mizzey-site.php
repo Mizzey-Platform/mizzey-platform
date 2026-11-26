@@ -30,6 +30,7 @@ require_once __DIR__ . '/src/I18n/RewriteRoot.php';
 require_once __DIR__ . '/src/I18n/CurrencyFormat.php';
 require_once __DIR__ . '/src/Storefront/AssetVersions.php';
 require_once __DIR__ . '/src/I18n/LanguagePreference.php';
+require_once __DIR__ . '/src/Storefront/CategoryImage.php';
 require_once __DIR__ . '/src/Storefront/HeaderData.php';
 require_once __DIR__ . '/src/Storefront/HeaderMenu.php';
 require_once __DIR__ . '/src/Storefront/ProductPage.php';

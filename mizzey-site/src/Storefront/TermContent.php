@@ -132,7 +132,9 @@ final class TermContent
             'url'         => is_wp_error($url) ? '' : (string) $url,
             'description' => (string) $term->description,
             'image'       => $image > 0 ? (string) wp_get_attachment_image_url($image, 'woocommerce_thumbnail') : '',
+            'image_id'    => $image > 0 && wp_attachment_is_image($image) ? $image : 0,
             'banner'      => $banner > 0 ? [
+                'id'   => $banner,
                 'url'  => (string) wp_get_attachment_image_url($banner, 'full'),
                 'alt'  => (string) get_post_meta($banner, '_wp_attachment_image_alt', true),
                 'link' => self::meta($term, self::BANNER_LINK),
