@@ -424,6 +424,10 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
   consent banner or a notice.
 - **Test first**: a browser test over a simple, a variable, a sold-out and a no-video product in both languages,
   failing on the native product page.
+- **Contract-first resolutions, follow-ups** (26 November 2026): where a board's sample line and the register or
+  specs/055 differ, the build follows the contract: the delivery estimate (a dated estimate from specs/055), the
+  sold-out wording, and share with X and email as specs/055 AC-5 requires. Each is a follow-up to show the owner
+  beside its board, not a decision to change a row.
 
 ### Slice 10: product page, details, reviews, related and recently viewed
 
@@ -456,6 +460,9 @@ listing). Slice 11 needs slice 9 (the buying area it reuses).
   opens from the cart control, traps and returns focus.
 - **Test first**: a browser test that fails until the drawer opens from the header, lists an added item with its
   option and price in each language, and its total equals the cart's.
+- **Contract-first resolution, follow-up** (26 November 2026): where specs/018's free-delivery rule counts items, the
+  progress line stays hidden, because the board draws only the money form. Which rule is right is the owner's
+  question (the strip's sample text says EGP 1,000).
 
 ### Closing Stage 2
 
