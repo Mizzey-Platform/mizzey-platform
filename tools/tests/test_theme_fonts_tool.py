@@ -111,8 +111,10 @@ class StaticInter(Fixture):
                  for face in manifest["faces"] if face["fontWeight"] == "400"}
         self.assertTrue({0x41, 0x30} <= cmaps["inter"])
         self.assertFalse({0x627, 0x628} & cmaps["inter"])
-        self.assertTrue({0x627, 0x628, 0x20, 0x2C} <= cmaps["tajawal"])
-        self.assertFalse({0x41, 0x30} & cmaps["tajawal"], "Latin letters and digits in Arabic come from Inter")
+        # Arabic pages show digits in Tajawal, as the home boards draw them (the owner's ruling, 25 November 2026);
+        # Latin letters stay Inter.
+        self.assertTrue({0x627, 0x628, 0x20, 0x2C, 0x30} <= cmaps["tajawal"])
+        self.assertFalse({0x41} & cmaps["tajawal"], "Latin letters in Arabic come from Inter")
 
     def test_every_face_swaps_and_names_its_range(self) -> None:
         for face in self.build()["faces"]:
