@@ -1,22 +1,19 @@
 /**
  * The header's behaviour (spec 066, slice 2), on the WordPress Interactivity API, store "mizzey/header".
  *
- * - The mega menu: "All categories" opens it under the header and dims the page; focus lands on the first row and
- *   stays inside; the arrow keys move between rows (the panel follows the row in focus or under the pointer) and
- *   into the panel; Escape, a press on the dimmed page or a click elsewhere closes it, and focus returns to the
- *   control when it was inside.
- * - The phone menu's levels: a category with children opens its own level, Back returns to the row that opened it;
- *   closing the drawer starts it again at the first level. Opening the drawer, its modal focus and the return of
- *   focus are the base drawer's (store "mizzey/ui").
+ * - The mega menu: "All categories" opens it and dims the page; focus lands on the first row and stays inside; the
+ *   arrow keys move between rows (the panel follows) and into the panel; Escape or a press outside closes it, and
+ *   focus returns to the control.
+ * - The phone menu's levels: a category with children opens its own level, Back returns; closing the drawer starts
+ *   it again at the first level. Its modal focus and the return of focus are the base drawer's (store "mizzey/ui").
  * - The phone menu's motion: the level push (overlay-motion.js), the entrance class, the control's expanded state.
  * - The Categories tab shows the categories between the header and the tab bar; Escape or the tab again closes it.
  * - The phone's search control (product, cart and checkout pages) opens the search row and focuses the field.
  * - The category row: what does not fit, and anything past the eighth link, moves under "More".
- * - The cart's count follows an add or a removal without a reload: on WooCommerce's own events (the classic
- *   "added_to_cart" and "removed_from_cart", the blocks' "wc-blocks_added_to_cart" and "wc-blocks_removed_from_cart")
- *   the header asks GET mizzey/v1/header and shows its answer; the product card's "mizzey-cart-changed" (slice 4)
- *   already carries the server's count, which is shown as it comes. The count changes only
- *   when the server has answered (C1-Motion-Playground: motion never claims success early).
+ * - The cart's count follows an add or a removal without a reload, only once the server has answered: on
+ *   WooCommerce's add and remove events the header asks GET mizzey/v1/header; "mizzey-cart-changed" (the product card,
+ *   the mini cart) carries the server's count.
+ * - The cart control opens the mini cart (slice 12), whose script is imported on its first press.
  */
 import { store, getContext, getElement, withSyncEvent } from '@wordpress/interactivity';
 
@@ -183,6 +180,18 @@ function showLevel( level, on ) {
 	level.hidden = level.inert = ! on;
 	level.setAttribute( 'aria-hidden', on ? 'false' : 'true' );
 }
+
+const miniCart = ( e ) => {
+	if ( document.getElementById( 'mizzey-mini-cart' ) && e.target.closest( '[aria-controls=mizzey-mini-cart]' ) ) {
+		const script = import( 'mizzey-theme/mini-cart' );
+		if ( e.type === 'click' ) {
+			e.preventDefault();
+			script.then( ( m ) => m.openMiniCart() );
+		}
+	}
+};
+document.addEventListener( 'click', miniCart );
+document.addEventListener( 'pointerdown', miniCart, { passive: true } );
 
 // The level push is overlay-motion.js's, loaded as the drawer opens; until then the levels switch at once.
 let motion = null;

@@ -221,7 +221,7 @@ function render(array $attributes = []): string
     ];
 
     $inner = bar($d) . nav($d) . chips($d) . mega($d) . element('div', ['class' => 'mizzey-mega__scrim', 'hidden' => true, 'data-wp-on--click' => 'actions.megaClose']);
-    $tail  = drawer($d) . ('compact' === $d['form'] ? '' : tabbar($d) . categories_panel($d));
+    $tail  = drawer($d) . ('compact' === $d['form'] ? '' : tabbar($d) . categories_panel($d)) . \MizzeySite\Theme\MiniCart\render();
 
     return element(
         'div',
@@ -330,7 +330,8 @@ function bar(array $d): string
     $actions .= tooltip(
         element(
             'a',
-            ['class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__cart'), 'href' => esc_url((string) $d['cart']['url'])],
+            // The control opens the mini cart (slice 12) where the page carries it, and is a link to the cart page.
+            ['class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__cart'), 'href' => esc_url((string) $d['cart']['url'])] + \MizzeySite\Theme\MiniCart\control_attributes(),
             icon('cart')
             . element('span', ['class' => classes('mizzey-visually-hidden', 'mizzey-header__cart-label')], esc_html(cart_label($count)))
             // An empty cart shows no count (C1-Global B2); the element stays for the live count to fill.
