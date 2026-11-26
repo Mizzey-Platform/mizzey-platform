@@ -306,17 +306,94 @@ function counter( root, ctx ) {
 	}
 }
 
-/** Show the photo (or the video) at ctx.index of the current list; load it if it has not been. */
-function show( root, ctx ) {
+/** A slide's photo, fetched now if it waited (a lazy image sized by the stylesheet may never be seen as on screen). */
+function load( slide ) {
+	const img = slide ? q( slide, 'img' ) : null;
+	if ( img && img.dataset.src ) {
+		img.loading = 'eager';
+		if ( img.dataset.srcset ) {
+			img.srcset = img.dataset.srcset;
+		}
+		img.src = img.dataset.src;
+		delete img.dataset.src;
+		delete img.dataset.srcset;
+	}
+	return img;
+}
+
+const slideAt = ( root, key ) => q( root, `.mizzey-gallery__slide[data-index="${ key }"]` );
+const phone = () => ! window.matchMedia( DESKTOP ).matches;
+
+/** On a phone, the photos either side of the shown one, so a swipe never uncovers an empty well. */
+function neighbours( root, ctx ) {
+	const items = list( root, ctx );
+	[ ctx.index - 1, ctx.index + 1 ].filter( ( i ) => i >= 0 && i < items.length ).forEach( ( i ) => {
+		const img = load( slideAt( root, items[ i ] ) );
+		if ( img ) {
+			watch( img, img.closest( '.mizzey-gallery__slide' ) );
+		}
+	} );
+}
+
+/**
+ * On a phone the photos are a row the finger scrolls (C1-Motion-Playground, "Image gallery, phone"): bring the shown
+ * one into the frame, smoothly unless motion is reduced or the row has just changed.
+ */
+function align( root, ctx, instant ) {
+	const row = q( root, '.mizzey-gallery__slides' );
+	const slide = slideAt( root, list( root, ctx )[ ctx.index ] );
+	if ( ! row || ! slide || ! phone() ) {
+		return;
+	}
+	const delta = slide.getBoundingClientRect().left - row.getBoundingClientRect().left;
+	if ( Math.abs( delta ) > 1 ) {
+		// The row glides (its stylesheet's smooth scroll, none under reduced motion), or jumps when it has just changed.
+		// A jump of more than one photo may pass the others: each stops a finger's fling, not this scroll.
+		row.classList.add( 'is-moving' );
+		row.classList.toggle( 'is-jumping', !! instant );
+		row.scrollBy( delta, 0 );
+		row.classList.remove( 'is-jumping' );
+	}
+}
+
+/** After the finger's scroll settles: the photo in the frame becomes the shown one, through show(). */
+function swiped( root, ctx ) {
+	const row = q( root, '.mizzey-gallery__slides' );
+	const items = list( root, ctx );
+	const start = row.getBoundingClientRect().left;
+	let best = null;
+	let gap = Infinity;
+	qa( row, '.mizzey-gallery__slide' ).filter( ( s ) => items.includes( s.dataset.index ) ).forEach( ( s ) => {
+		const d = Math.abs( s.getBoundingClientRect().left - start );
+		if ( d < gap ) {
+			gap = d;
+			best = s.dataset.index;
+		}
+	} );
+	const at = items.indexOf( best );
+	if ( at >= 0 && at !== ctx.index ) {
+		ctx.index = at;
+		show( root, ctx, 'swipe' );
+	}
+}
+
+/**
+ * Show the photo (or the video) at ctx.index of the current list; load it if it has not been. `from` is "swipe" when
+ * the finger has already put it in the frame.
+ */
+function show( root, ctx, from = '' ) {
 	const items = list( root, ctx );
 	if ( ! items.length ) {
 		return;
 	}
 	ctx.index = ( ctx.index + items.length ) % items.length;
 	const key = items[ ctx.index ];
+	const regrouped = items.join() !== ctx.row;
+	ctx.row = items.join();
 	qa( root, '.mizzey-gallery__slide' ).forEach( ( slide ) => {
 		const on = slide.dataset.index === key;
 		slide.classList.toggle( 'is-current', on );
+		slide.classList.toggle( 'is-out-of-set', ! items.includes( slide.dataset.index ) );
 		if ( on ) {
 			slide.removeAttribute( 'aria-hidden' );
 		} else {
@@ -329,17 +406,7 @@ function show( root, ctx ) {
 		if ( ! on ) {
 			return;
 		}
-		const img = q( slide, 'img' );
-		if ( img && img.dataset.src ) {
-			// Shown now: loaded now (a lazy image sized by the stylesheet may never be seen as on screen).
-			img.loading = 'eager';
-			if ( img.dataset.srcset ) {
-				img.srcset = img.dataset.srcset;
-			}
-			img.src = img.dataset.src;
-			delete img.dataset.src;
-			delete img.dataset.srcset;
-		}
+		const img = load( slide );
 		if ( img ) {
 			watch( img, slide );
 		}
@@ -374,6 +441,12 @@ function show( root, ctx ) {
 		label.hidden = false;
 	}
 	counter( root, ctx );
+	if ( phone() ) {
+		neighbours( root, ctx );
+		if ( from !== 'swipe' ) {
+			align( root, ctx, regrouped );
+		}
+	}
 	const dialog = q( root, 'dialog.mizzey-zoom' );
 	if ( dialog && dialog.open && zoomer ) {
 		zoomer.then( ( z ) => z.zoomImage( root, ctx, key ) );
@@ -388,6 +461,72 @@ function watch( img, slide ) {
 	const done = () => slide.classList.add( 'is-loaded' );
 	img.addEventListener( 'load', done, { once: true } );
 	img.addEventListener( 'error', done, { once: true } );
+}
+
+/** The phone's row of photos: the set's photos only, the shown one in the frame, and the finger's scroll followed. */
+function gallery( root, ctx ) {
+	const row = q( root, '.mizzey-gallery__slides' );
+	if ( ! row ) {
+		return;
+	}
+	const items = list( root, ctx );
+	ctx.row = items.join();
+	qa( row, '.mizzey-gallery__slide' ).forEach( ( s ) => s.classList.toggle( 'is-out-of-set', ! items.includes( s.dataset.index ) ) );
+	// A row that scrolls can be reached by the keyboard too, whose arrows then move it a photo at a time.
+	const reach = () => ( phone() ? row.setAttribute( 'tabindex', '0' ) : row.removeAttribute( 'tabindex' ) );
+	reach();
+	align( root, ctx, true );
+	let timer = 0;
+	const settle = () => {
+		clearTimeout( timer );
+		row.classList.remove( 'is-moving' );
+		swiped( root, ctx );
+	};
+	row.addEventListener( 'scroll', () => {
+		clearTimeout( timer );
+		timer = setTimeout( settle, 120 );
+	}, { passive: true } );
+	row.addEventListener( 'scrollend', settle );
+	// The next photo is fetched once the page has loaded (after its largest paint), or at the first touch.
+	const early = () => phone() && neighbours( root, ctx );
+	row.addEventListener( 'pointerdown', early, { passive: true } );
+	if ( document.readyState === 'complete' ) {
+		early();
+	} else {
+		window.addEventListener( 'load', early, { once: true } );
+	}
+	// The direction is read after a few pixels. Sideways at either end there is nothing to move: that pull is held, so
+	// the browser does not take it for Back; an upward drag is always the page's.
+	let from = null;
+	row.addEventListener( 'touchstart', ( e ) => {
+		from = e.touches.length === 1 ? { x: e.touches[ 0 ].clientX, y: e.touches[ 0 ].clientY, axis: '' } : null;
+	}, { passive: true } );
+	row.addEventListener( 'touchmove', ( e ) => {
+		if ( ! from || e.touches.length !== 1 || from.axis === 'y' ) {
+			return;
+		}
+		const dx = e.touches[ 0 ].clientX - from.x;
+		const dy = e.touches[ 0 ].clientY - from.y;
+		if ( ! from.axis ) {
+			if ( Math.max( Math.abs( dx ), Math.abs( dy ) ) < 6 ) {
+				return;
+			}
+			from.axis = Math.abs( dx ) > Math.abs( dy ) ? 'x' : 'y';
+		}
+		if ( from.axis !== 'x' || ! e.cancelable ) {
+			return;
+		}
+		const back = getComputedStyle( row ).direction === 'rtl' ? dx < 0 : dx > 0;
+		const at = Math.abs( row.scrollLeft );
+		if ( ( back && at <= 1 ) || ( ! back && at >= row.scrollWidth - row.clientWidth - 1 ) ) {
+			e.preventDefault();
+		}
+	}, { passive: false } );
+	// Back from the desktop layout (a turned tablet, a resized window): the shown photo goes back in the frame.
+	window.matchMedia( DESKTOP ).addEventListener( 'change', () => {
+		reach();
+		align( root, ctx, true );
+	} );
 }
 
 function bar( root ) {
@@ -685,6 +824,7 @@ const { state } = store( 'mizzey/buy', {
 				show( root, ctx );
 			}
 			bar( root );
+			gallery( root, ctx );
 			qa( root, '.mizzey-gallery__zoom, .mizzey-gallery__slides' ).forEach( ( el ) => el.addEventListener( 'pointerdown', () => zoomModule(), { once: true } ) );
 			root.addEventListener( 'pointerdown', () => motionModule(), { once: true } );
 			root.addEventListener( 'keydown', () => motionModule(), { once: true } );

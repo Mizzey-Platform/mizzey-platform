@@ -6,7 +6,9 @@
  * The fixture, every record named "s9-" and removed when the scenario ends:
  *
  * - a simple product with a 200 character name, a brand, a rating, a sale, three photos of far-apart shapes (2.27 wide,
- *   0.29 tall, square), key features in its short description, and no video;
+ *   0.29 tall, square), key features in its short description, and no video; one feature and one specification are a
+ *   list run together with commas and no spaces, as a real product on staging has it (the owner's report of 26
+ *   November: the page slid sideways on his phone);
  * - a variable product whose options are not size and colour: Pack (1 tub, 2 tubs) and Flavour (Vanilla, Chocolate,
  *   Unflavoured). Chocolate is sold out in every pack, 1 tub Unflavoured is on sale with 3 left, 2 tubs Unflavoured is
  *   not made, Vanilla has its own photo, 1 tub Vanilla is the default; it has a video;
@@ -159,7 +161,19 @@ run(
 		$simple->set_sale_price( '1500' );
 		$simple->set_image_id( $wide );
 		$simple->set_gallery_image_ids( array( $tall, $square ) );
-		$simple->set_short_description( $features );
+		// A real staging product's text: the list it pasted, commas and no spaces, must wrap on a phone.
+		$benefits = 'Hydrating,Hypoallergenic,Moisturizing,Nourishing,Replenishing,Shine,Smoothening,Soothing';
+		$simple->set_short_description( "<ul>
+<li>Collagen peptides, single ingredient</li>
+<li>Pasture raised and grass fed</li>
+<li>Product benefit: {$benefits}</li>
+</ul>" );
+		$benefit = new \WC_Product_Attribute();
+		$benefit->set_name( 'Product benefit' );
+		$benefit->set_options( array( $benefits ) );
+		$benefit->set_visible( true );
+		$benefit->set_variation( false );
+		$simple->set_attributes( array( $benefit ) );
 		$simple->set_manage_stock( true );
 		$simple->set_stock_quantity( 20 );
 		$simple->save();
@@ -390,7 +404,8 @@ run(
 			$s->note( '      screenshot: ' . $shot );
 		}
 
-		// ---- On a phone, Chromium and WebKit: nothing chosen, and back through the back-forward cache --------------
+		// ---- On a phone, Chromium and WebKit: nothing chosen, back through the back-forward cache, the gallery swiped, and
+		// no part of the page wider than the phone ---------------------------------------------------------------------
 		$a2 = new \WC_Product_Attribute();
 		$a2->set_name( 'Scent' );
 		$a2->set_options( array( 'Cedar', 'Rose' ) );
@@ -418,7 +433,13 @@ run(
 		$states = t112_browser(
 			array(
 				'tag'      => $tag,
-				'urls'     => array( 'nodefault' => get_permalink( $nodef->get_id() ), 'simple' => get_permalink( $bare->get_id() ), 'var' => get_permalink( $var->get_id() ) ),
+				'urls'     => array(
+					'nodefault'  => get_permalink( $nodef->get_id() ),
+					'simple'     => get_permalink( $bare->get_id() ),
+					'var'        => get_permalink( $var->get_id() ),
+					'gallery'    => get_permalink( $simple->get_id() ),
+					'gallery_ar' => $arabic['simple'] > 0 ? $ar_url( $arabic['simple'] ) : '',
+				),
 				'checkout' => wc_get_checkout_url(),
 				'shots'    => get_temp_dir(),
 			),
@@ -428,7 +449,7 @@ run(
 		foreach ( (array) ( $states['checks'] ?? array() ) as $row ) {
 			$check( true === $row['ok'], (string) $row['what'] );
 		}
-		$check( count( (array) ( $states['checks'] ?? array() ) ) >= 18, 'the phone states run made every check (' . count( (array) ( $states['checks'] ?? array() ) ) . ')' );
+		$check( count( (array) ( $states['checks'] ?? array() ) ) >= 60, 'the phone states run made every check (' . count( (array) ( $states['checks'] ?? array() ) ) . ')' );
 		foreach ( (array) ( $states['shots'] ?? array() ) as $shot ) {
 			$s->note( '      screenshot: ' . $shot );
 		}

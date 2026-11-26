@@ -11,7 +11,11 @@
  *    page.goBack(), and the restore must have come from the cache (pageshow with persisted true). Add to Cart's reset
  *    is checked on the same events while it waits for the server.
  *
- * Plan (JSON, first argument): { urls: { nodefault, simple }, checkout, shots, tag }. Prints { checks, shots }.
+ * 3. No ring and no stuck highlight after a touch; 4. zoom gestures; 5. the gallery swiped sideways and dragged
+ *    up, in English and Arabic, and no part of the page wider than the phone.
+ *
+ * Plan (JSON, first argument): { urls: { nodefault, simple, var, gallery, gallery_ar }, checkout, shots, tag }.
+ * Prints { checks, shots }.
  * Driven by t112. Playwright is test tooling on the developer's machine (see _theme-preview.cjs).
  */
 
@@ -241,6 +245,166 @@ const focusOnOption = ( page ) => page.evaluate( () => {
 				check( z4.value === '100%' && z5.value === '200%', `PDP-01 [${ where }] a double tap zooms out, another zooms in to 200% (${ z4.value }, ${ z5.value })` );
 				check( zp.errors.length === 0, `[${ where }] no script error in the zoom (${ JSON.stringify( zp.errors.slice( 0, 2 ) ) })` );
 				await zp.close();
+			}
+
+			// ---- 5. The gallery on a phone (the owner's iPhone report of 26 November): a sideways swipe moves to the
+			// next or the previous photo the way the language reads, as C1-Motion-Playground's "Image gallery, phone"
+			// draws it (native horizontal scroll with snap, the finger moves the image 1:1); an upward drag on the photo
+			// scrolls the page and leaves the photo; a tap still opens the zoom; and nothing on the page, with a long
+			// comma list in its key features and its specifications, makes the page wider than the phone.
+			// A finger on the photo's middle, moved dx and dy in ten steps. Chromium: real touch points, which the browser
+			// turns into its own scrolling (as a phone does). Playwright's WebKit cannot move a finger (and refuses the wheel
+			// on a mobile page), so there the same scroll is given as a trackpad's sideways wheel. `hold` stops before the
+			// finger is lifted, for the picture of a swipe under way.
+			const finger = async ( pg, dx, dy, hold = null ) => {
+				const box = await pg.locator( '.mizzey-gallery__stage' ).boundingBox();
+				const x = box.x + box.width / 2;
+				const y = box.y + box.height / 2;
+				if ( engine === 'chromium' ) {
+					const cdp = await ctx.newCDPSession( pg );
+					await cdp.send( 'Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [ { x, y } ] } );
+					for ( let i = 1; i <= 10; i++ ) {
+						await cdp.send( 'Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [ { x: x + ( dx * i ) / 10, y: y + ( dy * i ) / 10 } ] } );
+					}
+					if ( hold ) {
+						await pg.waitForTimeout( 100 );
+						await hold();
+					}
+					await cdp.send( 'Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] } );
+					await cdp.detach();
+				} else {
+					await pg.mouse.move( x, y );
+					await pg.mouse.wheel( -dx, -dy );
+				}
+				await pg.waitForTimeout( 1000 );
+			};
+			for ( const [ lang, url ] of [ [ 'en', plan.urls.gallery ], [ 'ar', plan.urls.gallery_ar ] ] ) {
+				if ( ! url ) {
+					continue;
+				}
+				const here = `${ where } ${ lang }`;
+				const gp = await open( ctx, url );
+				const wide = await gp.evaluate( () => {
+					const doc = document.documentElement;
+					// A box cut off by a parent that clips it (the footer's ZZ, a row of chips that scrolls) widens nothing.
+					const clipped = ( el ) => {
+						for ( let p = el.parentElement; p && p !== document.body; p = p.parentElement ) {
+							if ( getComputedStyle( p ).overflowX !== 'visible' ) {
+								return true;
+							}
+						}
+						return false;
+					};
+					const out = [ ...document.querySelectorAll( 'body *' ) ].filter( ( el ) => {
+						const r = el.getBoundingClientRect();
+						return r.width > 0 && ( r.right > innerWidth + 0.5 || r.left < -0.5 ) && ! el.closest( '[inert], dialog:not([open]), .screen-reader-text' ) && ! clipped( el );
+					} ).slice( 0, 4 ).map( ( el ) => `${ el.tagName.toLowerCase() }.${ el.className.toString().split( ' ' )[ 0 ] } ${ Math.round( el.getBoundingClientRect().left ) }..${ Math.round( el.getBoundingClientRect().right ) }` );
+					// Text running out of its own box does not widen the box: named here, to find the cause.
+					const spill = [ ...document.querySelectorAll( 'body *' ) ].filter( ( el ) => el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1 && getComputedStyle( el ).overflowX === 'visible' && ! el.closest( '.mizzey-gallery__slides' ) ).slice( -3 ).map( ( el ) => `${ el.tagName.toLowerCase() }.${ el.className.toString().split( ' ' )[ 0 ] } ${ el.clientWidth }<${ el.scrollWidth }` );
+					return { scroll: doc.scrollWidth, inner: innerWidth, body: document.body.scrollWidth, out, spill, list: !! [ ...document.querySelectorAll( '.mizzey-buy__features-text li, .mizzey-details__row dd' ) ].find( ( el ) => /Hydrating,Hypoallergenic/.test( el.textContent ) ) };
+				} );
+				check( wide.list && wide.scroll <= 390 && wide.scroll <= wide.inner && wide.body <= 390 && wide.out.length === 0, `PDP-12, PDP-14 [${ here }] a long comma list in the key features and the specifications wraps: the page is no wider than the phone (${ JSON.stringify( wide ) })` );
+				await gp.screenshot( { path: path.join( plan.shots, `${ plan.tag }-${ engine }-390-${ lang }-long-list.png` ), fullPage: true } );
+				shots.push( path.join( plan.shots, `${ plan.tag }-${ engine }-390-${ lang }-long-list.png` ) );
+
+				const rtl = lang === 'ar';
+				const at = () => gp.evaluate( () => {
+					const cur = document.querySelector( '.mizzey-gallery__slide.is-current' );
+					const ul = document.querySelector( '.mizzey-gallery__slides' ).getBoundingClientRect();
+					const r = cur ? cur.getBoundingClientRect() : { left: -1, right: -1 };
+					const thumb = document.querySelector( '.mizzey-gallery__thumb[aria-current="true"]' );
+					return {
+						index: cur ? cur.dataset.index : null,
+						counter: ( document.querySelector( '.mizzey-gallery-counter' ) || { textContent: '' } ).textContent.trim(),
+						thumb: thumb ? thumb.dataset.index : null,
+						open: [ ...document.querySelectorAll( '.mizzey-gallery__slide' ) ].filter( ( s ) => s.getAttribute( 'aria-hidden' ) !== 'true' ).length,
+						// The photo marked current is the one in the frame.
+						framed: Math.abs( r.left - ul.left ) < 2 && Math.abs( r.right - ul.right ) < 2,
+						y: Math.round( window.scrollY ),
+					};
+				} );
+				const drag = ( dx, dy ) => finger( gp, dx, dy );
+				const next = rtl ? 220 : -220;
+				const g0 = await at();
+				await drag( next, 0 );
+				const g1 = await at();
+				check( g0.counter.startsWith( '1' ) && g1.counter.startsWith( '2' ) && g1.index !== g0.index && g1.thumb === g1.index && g1.open === 1 && g1.framed, `PDP-01 [${ here }] a swipe ${ rtl ? 'to the right' : 'to the left' } shows the next photo: counter, thumbnail and the photo in the frame agree (${ JSON.stringify( { g0, g1 } ) })` );
+				await drag( -next, 0 );
+				const g2 = await at();
+				check( g2.counter.startsWith( '1' ) && g2.index === g0.index && g2.thumb === g0.index && g2.framed, `PDP-01 [${ here }] a swipe the other way goes back to the first photo (${ JSON.stringify( g2 ) })` );
+				// Before the first photo there is nothing: no wrap to the last (C1-Motion-Playground: native scroll).
+				await drag( -next, 0 );
+				const g3 = await at();
+				check( g3.index === g0.index && g3.framed, `PDP-01 [${ here }] a swipe back from the first photo stays on it (${ JSON.stringify( g3 ) })` );
+				// A vertical drag on the photo scrolls the page and leaves the photo.
+				await drag( 0, -300 );
+				const g4 = await at();
+				check( g4.y > g3.y + 100 && g4.index === g0.index && g4.counter === g3.counter, `PDP-01 [${ here }] an upward drag on the photo scrolls the page and does not change the photo (${ JSON.stringify( { from: g3.y, to: g4.y, index: g4.index } ) })` );
+				await gp.evaluate( () => window.scrollTo( 0, 0 ) );
+				await gp.waitForTimeout( 300 );
+				// A thumbnail still moves the frame to its photo; then a tap on the photo opens the zoom on it.
+				await gp.locator( '.mizzey-gallery__thumb:not([hidden]) >> nth=2' ).tap();
+				await gp.waitForTimeout( 900 );
+				const g5 = await at();
+				check( g5.counter.startsWith( '3' ) && g5.framed && g5.thumb === g5.index, `PDP-01 [${ here }] a thumbnail brings its photo into the frame (${ JSON.stringify( g5 ) })` );
+				await gp.locator( '.mizzey-gallery__slides' ).tap();
+				await gp.waitForTimeout( 800 );
+				const zoomed = await gp.evaluate( () => {
+					const d = document.querySelector( 'dialog.mizzey-zoom' );
+					return { open: !! d && d.open, counter: ( document.querySelector( '.mizzey-zoom__counter' ) || { textContent: '' } ).textContent.trim() };
+				} );
+				check( zoomed.open && zoomed.counter === g5.counter, `PDP-01 [${ here }] a tap on the photo still opens the zoom, on that photo (${ JSON.stringify( zoomed ) })` );
+				const ringed = await gp.evaluate( () => [ ...document.querySelectorAll( ':focus-visible' ) ].filter( ( el ) => getComputedStyle( el ).outlineStyle !== 'none' && parseFloat( getComputedStyle( el ).outlineWidth ) > 0 ).length );
+				check( ringed === 0, `NFR-11 [${ here }] after the swipes and taps no focus ring shows (${ ringed })` );
+				await gp.screenshot( { path: path.join( plan.shots, `${ plan.tag }-${ engine }-390-${ lang }-swiped.png` ) } );
+				shots.push( path.join( plan.shots, `${ plan.tag }-${ engine }-390-${ lang }-swiped.png` ) );
+				check( gp.errors.length === 0, `[${ here }] no script error in the gallery (${ JSON.stringify( gp.errors.slice( 0, 2 ) ) })` );
+				await gp.close();
+			}
+			// A product with options and a video: the row holds the shown set only, the video last; swiping to the end
+			// reaches the video and loads it then; a variant with its own photo regroups the row, back at its first.
+			if ( plan.urls.var ) {
+				const vp = await open( ctx, plan.urls.var );
+				const row = () => vp.evaluate( () => {
+					const ul = document.querySelector( '.mizzey-gallery__slides' );
+					const shown = [ ...ul.querySelectorAll( '.mizzey-gallery__slide' ) ].filter( ( s ) => s.getClientRects().length > 0 );
+					const cur = ul.querySelector( '.is-current' );
+					const r = cur.getBoundingClientRect();
+					const u = ul.getBoundingClientRect();
+					return {
+						inRow: shown.length,
+						counter: document.querySelector( '.mizzey-gallery-counter' ).textContent.trim(),
+						current: cur.dataset.index,
+						last: shown.length ? shown[ shown.length - 1 ].dataset.index : null,
+						media: !! ul.querySelector( '.mizzey-gallery__slide--video .mizzey-gallery__video' ),
+						framed: Math.abs( r.left - u.left ) < 2,
+					};
+				} );
+				const r0 = await row();
+				const total = Number( ( r0.counter.match( /\/\s*(\d+)/ ) || [] )[ 1 ] || 0 );
+				check( total > 1 && r0.inRow === total && r0.last === 'video' && ! r0.media, `PDP-01, PDP-02 [${ where }] the phone's row holds the shown set only, the video last and not loaded yet (${ JSON.stringify( r0 ) })` );
+				for ( let i = 1; i < total; i++ ) {
+					await finger( vp, -220, 0, i === 1 ? async () => {
+						await vp.screenshot( { path: path.join( plan.shots, `${ plan.tag }-${ engine }-390-mid-swipe.png` ) } );
+						shots.push( path.join( plan.shots, `${ plan.tag }-${ engine }-390-mid-swipe.png` ) );
+					} : null );
+				}
+				const r1 = await row();
+				check( r1.current === 'video' && r1.counter.startsWith( String( total ) ) && r1.media && r1.framed, `PDP-02 [${ where }] swiping to the end reaches the video, which loads then (${ JSON.stringify( r1 ) })` );
+				await finger( vp, -220, 0 );
+				const r2 = await row();
+				check( r2.current === 'video' && r2.framed, `PDP-01 [${ where }] past the last there is nothing: no wrap to the first (${ JSON.stringify( r2 ) })` );
+				await vp.evaluate( () => window.scrollTo( 0, 0 ) );
+				const option = vp.locator( '.mizzey-buy__option[aria-checked="false"]:not(.is-out)' ).first();
+				if ( await option.count() ) {
+					await option.tap();
+					await vp.waitForTimeout( 900 );
+					const r3 = await row();
+					const t3 = Number( ( r3.counter.match( /\/\s*(\d+)/ ) || [] )[ 1 ] || 0 );
+					check( t3 > 0 && r3.inRow === t3 && r3.framed, `PDP-01, PDP-05 [${ where }] after an option is chosen the row is the shown set and the shown photo is in the frame (${ JSON.stringify( r3 ) })` );
+				}
+				check( vp.errors.length === 0, `[${ where }] no script error in the gallery with options (${ JSON.stringify( vp.errors.slice( 0, 2 ) ) })` );
+				await vp.close();
 			}
 
 			// ---- 2. Back from checkout through the back-forward cache, after Buy Now's busy press -----------------
