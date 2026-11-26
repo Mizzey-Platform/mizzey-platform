@@ -52,6 +52,8 @@ require_once __DIR__ . '/inc/consent.php';
 require_once __DIR__ . '/inc/performance.php';
 // The category listing (spec 066, slice 6).
 require_once __DIR__ . '/inc/listing.php';
+// The mini cart, opened from the header's cart control (spec 066, slice 12).
+require_once __DIR__ . '/inc/mini-cart.php';
 
 /*
  * The token layer (spec 066, slice 1). tokens.css and fonts.css are generated from design/tokens/tokens.json and
@@ -95,7 +97,8 @@ add_action(
         wp_register_script_module(
             'mizzey-theme/header',
             get_theme_file_uri('assets/js/header.js'),
-            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy],
+            // The mini cart's script (slice 12) is imported by the header on the first press of the cart control.
+            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy, ['id' => 'mizzey-theme/mini-cart', 'import' => 'dynamic']],
             is_file($header) ? (string) filemtime($header) : false
         );
     }

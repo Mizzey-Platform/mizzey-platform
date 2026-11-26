@@ -1403,7 +1403,7 @@ msgstr "إيقاف الرسائل مؤقتًا"
 msgid "Play the messages"
 msgstr "تشغيل الرسائل"
 
-#: assets/js/site-parts-editor.js
+#: ../mizzey-theme/inc/mini-cart.php assets/js/site-parts-editor.js
 msgid "Remove"
 msgstr "إزالة"
 
@@ -2850,3 +2850,73 @@ msgstr "العطلات (بلا توصيل)"
 #: mizzey-site/src/Shipping/DeliveryDates.php
 msgid "One date a line, as 2026-12-25."
 msgstr "تاريخ في كل سطر، مثل 2026-12-25."
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Your cart"
+msgstr "سلتك"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Loading your cart"
+msgstr "جارٍ تحميل سلتك"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Your cart is empty"
+msgstr "سلتك فارغة"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Add something you like and it will wait for you here."
+msgstr "أضف ما يعجبك وسينتظرك هنا."
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Start shopping"
+msgstr "ابدأ التسوق"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Delivery and any code are worked out in the cart."
+msgstr "يُحسب التوصيل وأي كود في السلة."
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Checkout"
+msgstr "إتمام الشراء"
+
+#. translators: %s: an amount of money, such as EGP 530.
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgid "Add %s more for free delivery"
+msgstr "أضف %s للحصول على توصيل مجاني"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "You have free delivery"
+msgstr "توصيلك مجاني"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Free delivery reached"
+msgstr "وصلت إلى التوصيل المجاني"
+
+#. translators: %d: a percentage, how far the cart is towards free delivery.
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgid "%d percent of the way to free delivery"
+msgstr "قطعت %d بالمئة من الطريق إلى التوصيل المجاني"
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Something went wrong with your cart. Please try again."
+msgstr "حدث خطأ في سلتك. يرجى المحاولة مرة أخرى."
+
+#. translators: %d: how many items the cart holds, beside the mini cart's title ("Your cart 4 items").
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgctxt "mini cart count"
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d منتج"
+msgstr[1] "منتج واحد"
+msgstr[2] "منتجان"
+msgstr[3] "%d منتجات"
+msgstr[4] "%d منتجًا"
+msgstr[5] "%d منتج"
+
+#: mizzey-theme/inc/mini-cart.php
+msgctxt "between the options of a cart line"
+msgid ", "
+msgstr "، "

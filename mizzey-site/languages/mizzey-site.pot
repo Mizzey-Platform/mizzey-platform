@@ -1114,7 +1114,7 @@ msgstr ""
 msgid "Play the messages"
 msgstr ""
 
-#: assets/js/site-parts-editor.js
+#: ../mizzey-theme/inc/mini-cart.php assets/js/site-parts-editor.js
 msgid "Remove"
 msgstr ""
 
@@ -2527,4 +2527,74 @@ msgstr ""
 
 #: mizzey-site/src/Shipping/DeliveryDates.php
 msgid "One date a line, as 2026-12-25."
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Your cart"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Loading your cart"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Your cart is empty"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Add something you like and it will wait for you here."
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Start shopping"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Delivery and any code are worked out in the cart."
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Checkout"
+msgstr ""
+
+#. translators: %s: an amount of money, such as EGP 530.
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgid "Add %s more for free delivery"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "You have free delivery"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Free delivery reached"
+msgstr ""
+
+#. translators: %d: a percentage, how far the cart is towards free delivery.
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgid "%d percent of the way to free delivery"
+msgstr ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgid "Something went wrong with your cart. Please try again."
+msgstr ""
+
+#: mizzey-site/src/Invoices/InvoiceDocument.php mizzey-theme/inc/mini-cart.php
+msgid "Subtotal"
+msgstr ""
+
+#. translators: %d: how many items the cart holds, beside the mini cart's title ("Your cart 4 items").
+#: mizzey-theme/inc/mini-cart.php
+#, php-format
+msgctxt "mini cart count"
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-theme/inc/mini-cart.php
+msgctxt "between the options of a cart line"
+msgid ", "
 msgstr ""

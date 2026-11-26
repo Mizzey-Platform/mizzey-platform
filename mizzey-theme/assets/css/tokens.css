@@ -432,6 +432,11 @@
 	--mizzey-control-offer-desktop: 320px;
 	--mizzey-control-offer-media-phone: 200px;
 	--mizzey-control-offer-panel: 520px;
+	--mizzey-control-minicart-tile: 64px;
+	--mizzey-control-minicart-track: 6px;
+	--mizzey-control-minicart-van: 56px;
+	--mizzey-control-minicart-van-block: 27px;
+	--mizzey-control-minicart-tick: 20px;
 	--mizzey-control-brand-chip-max: 220px;
 	--mizzey-control-product-stage: 560px;
 	--mizzey-control-product-thumb: 88px;

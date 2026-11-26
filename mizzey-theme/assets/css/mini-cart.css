@@ -1,0 +1,642 @@
+/* The mini cart (spec 066, slice 12), as C1-Mini-Cart draws it. Below 1024 wide a bottom sheet: its top edge 56
+   from the top of the screen, its two top corners rounded 28. From 1024 a drawer out of the end edge (the start edge
+   in Arabic): full height, 420 wide, square on that edge, 28 on the two corners facing the page. Loaded only where
+   the header renders the cart control. Every value is a token; every side is logical. */
+
+/* ---- The sheet (phone) and the drawer (desktop) ------------------------------------------------------------------ */
+
+.mizzey-minicart {
+	align-items: flex-end;
+}
+
+.mizzey-minicart .mizzey-minicart__panel {
+	inline-size: 100%;
+	block-size: calc(100% - var(--mizzey-overlay-sheet-top));
+	border-radius: 0;
+	border-start-start-radius: var(--mizzey-radius-sheet);
+	border-start-end-radius: var(--mizzey-radius-sheet);
+}
+
+.mizzey-minicart:not([open]) .mizzey-minicart__panel {
+	transform: translateY(100%);
+}
+
+.mizzey-minicart[open] .mizzey-minicart__panel {
+	transition: transform var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-spring-soft);
+}
+
+@starting-style {
+	.mizzey-minicart[open] .mizzey-minicart__panel {
+		transform: translateY(100%);
+	}
+}
+
+@media (min-width: 1024px) {
+	.mizzey-minicart {
+		align-items: stretch;
+		justify-content: flex-end;
+	}
+
+	/* The drawer: level 3 and the hairline ring (C1-Mini-Cart measurements: "level 3 + hairline"). */
+	.mizzey-minicart .mizzey-minicart__panel {
+		box-shadow: var(--mizzey-elevation-3), 0 0 0 var(--mizzey-border-hairline) var(--mizzey-color-neutral-hairline);
+		inline-size: var(--mizzey-overlay-drawer);
+		block-size: 100%;
+		border-radius: 0;
+		border-start-start-radius: var(--mizzey-radius-drawer);
+		border-end-start-radius: var(--mizzey-radius-drawer);
+	}
+
+	.mizzey-minicart:not([open]) .mizzey-minicart__panel {
+		transform: translateX(calc(100% * var(--mizzey-dir)));
+	}
+
+	.mizzey-minicart[open] .mizzey-minicart__panel {
+		transition: transform var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft);
+	}
+
+	@starting-style {
+		.mizzey-minicart[open] .mizzey-minicart__panel {
+			transform: translateX(calc(100% * var(--mizzey-dir)));
+		}
+	}
+
+	.mizzey-minicart__handle {
+		display: none;
+	}
+}
+
+/* ---- Header: 64 high, the title 19/25 with the count beside it -------------------------------------------------- */
+
+.mizzey-minicart__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	block-size: var(--mizzey-overlay-drawer-header);
+	padding-inline: var(--mizzey-space-5) var(--mizzey-space-3);
+	box-shadow: 0 var(--mizzey-border-hairline) 0 var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-minicart__title:focus {
+	outline: none;
+}
+
+.mizzey-minicart__count {
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-caption);
+}
+
+/* ---- The list: padded 16 24 (16 on the phone), scrolling under a fixed header and footer ------------------------- */
+
+.mizzey-minicart__body {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-block-size: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+	padding: var(--mizzey-space-4);
+}
+
+.mizzey-minicart__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mizzey-minicart__line {
+	display: flex;
+	gap: var(--mizzey-space-3);
+	padding-block: var(--mizzey-space-3);
+	border-block-end: var(--mizzey-border-hairline) solid var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-minicart__tile {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-minicart-tile);
+	block-size: var(--mizzey-control-minicart-tile);
+	overflow: hidden;
+	border-radius: var(--mizzey-radius-field);
+	background-color: var(--mizzey-color-brand-white);
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-minicart__tile img:not([hidden]) {
+	display: block;
+	/* The photo is 48 square, 8 inside the 64 tile, shown whole. */
+	inline-size: calc(var(--mizzey-control-minicart-tile) - var(--mizzey-space-4));
+	block-size: calc(var(--mizzey-control-minicart-tile) - var(--mizzey-space-4));
+	object-fit: contain;
+}
+
+/* A product with no photo: the image line icon, muted, in the tile. */
+.mizzey-minicart__tile .mizzey-icon {
+	color: var(--mizzey-color-indigo-200);
+}
+
+.mizzey-minicart__tile img:not([hidden]) + .mizzey-icon {
+	display: none;
+}
+
+.mizzey-minicart__main {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.mizzey-minicart__top {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--mizzey-space-1);
+}
+
+/* The name: 13/20 medium, two lines held whatever its length (C1-Mini-Cart draws the name's block 40 high), any script. */
+.mizzey-minicart__name {
+	display: -webkit-box;
+	block-size: 2lh;
+	flex: 1;
+	min-inline-size: 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-label);
+	letter-spacing: var(--mizzey-type-label-letter-spacing);
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.mizzey-minicart__name:hover {
+	text-decoration: underline;
+}
+
+.mizzey-minicart__name:focus-visible,
+.mizzey-minicart .mizzey-stepper__button:focus-visible {
+	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* Remove: a 44 icon button whose target reaches into the line's padding. */
+.mizzey-minicart .mizzey-minicart__remove {
+	margin: calc(var(--mizzey-space-3) * -1);
+	margin-inline-start: 0;
+	color: var(--mizzey-color-neutral-muted);
+}
+
+.mizzey-minicart .mizzey-minicart__remove[aria-disabled="true"] {
+	background-color: transparent;
+	color: var(--mizzey-color-neutral-muted);
+	box-shadow: none;
+}
+
+.mizzey-minicart__option:not([hidden]) {
+	display: block;
+	margin-block-start: var(--mizzey-space-1);
+	overflow: hidden;
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-caption);
+	letter-spacing: var(--mizzey-type-caption-letter-spacing);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.mizzey-minicart__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-2);
+	margin-block-start: var(--mizzey-space-2);
+}
+
+.mizzey-minicart__price {
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-price);
+	letter-spacing: var(--mizzey-type-price-letter-spacing);
+	font-feature-settings: var(--mizzey-type-price-font-feature-settings);
+	white-space: nowrap;
+}
+
+/* The quantity: 140 by 52 on a raised pill, minus on the tint, plus in Indigo. */
+.mizzey-minicart .mizzey-stepper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-stepper-inline);
+	block-size: var(--mizzey-control-stepper-block);
+	padding: var(--mizzey-space-1);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-brand-white);
+	box-shadow: var(--mizzey-elevation-1);
+}
+
+.mizzey-minicart .mizzey-stepper__button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-stepper-button);
+	block-size: var(--mizzey-control-stepper-button);
+	padding: 0;
+	border: 0;
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-primary);
+	cursor: pointer;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-minicart .mizzey-minicart__more {
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+.mizzey-minicart .mizzey-stepper__button:active:not(:disabled) {
+	transform: scale(var(--mizzey-motion-scale-press-icon));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-minicart .mizzey-stepper__button:disabled {
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-indigo-300);
+	cursor: default;
+}
+
+.mizzey-minicart .mizzey-stepper__value {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	font: var(--mizzey-type-body-strong);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Updating: the i-dot loader in the quantity's place, 6 px dots 2 apart (the stepper's "Updating" state). */
+.mizzey-minicart__updating:not([hidden]) {
+	display: inline-flex;
+	opacity: 0.6;
+}
+
+.mizzey-minicart [aria-disabled="true"] {
+	cursor: progress;
+}
+
+.mizzey-minicart__updating .mizzey-loader {
+	gap: var(--mizzey-control-loader-gap-small);
+}
+
+.mizzey-minicart__updating .mizzey-loader__dot {
+	inline-size: var(--mizzey-control-loader-dot-small);
+}
+
+/* ---- Loading: three rows (the 64 tile, bars at 240 and 160, the price and the stepper's pill), in Glow top with the
+   board's sweep of light (C1-Mini-Cart C), from the end of reading in Arabic; still under reduced motion. ------------ */
+
+.mizzey-minicart .mizzey-skeleton {
+	position: relative;
+	overflow: hidden;
+	background-color: var(--mizzey-color-glow-top);
+	animation: none;
+}
+
+.mizzey-minicart .mizzey-skeleton::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(100deg, var(--mizzey-color-glow-top) 20%, color-mix(in srgb, var(--mizzey-color-brand-white) 75%, var(--mizzey-color-glow-top)) 50%, var(--mizzey-color-glow-top) 80%);
+	transform: translateX(calc(-100% * var(--mizzey-dir)));
+	animation: mizzey-minicart-sweep var(--mizzey-motion-loop-pulse) var(--mizzey-motion-easing-loop) infinite;
+}
+
+@keyframes mizzey-minicart-sweep {
+	to {
+		transform: translateX(calc(100% * var(--mizzey-dir)));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-minicart .mizzey-skeleton::after {
+		animation: none;
+	}
+}
+
+.mizzey-minicart__line--loading .mizzey-minicart__main {
+	gap: var(--mizzey-space-2);
+	padding-block-start: var(--mizzey-space-1);
+}
+
+.mizzey-minicart__line--loading .mizzey-minicart__row {
+	margin-block-start: calc(var(--mizzey-space-4) + var(--mizzey-space-1));
+}
+
+.mizzey-minicart__tile-skeleton {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-minicart-tile);
+	block-size: var(--mizzey-control-minicart-tile);
+	border-radius: var(--mizzey-radius-field);
+}
+
+.mizzey-minicart__stepper-skeleton {
+	flex-shrink: 0;
+	inline-size: var(--mizzey-control-stepper-inline);
+	block-size: var(--mizzey-control-stepper-block);
+}
+
+/* ---- Empty: the cart icon in a 96 disc, one sentence, one action, no footer ------------------------------------- */
+
+/* The board's empty frame: 8 between the disc, the title and the sentence, the sentence at most 280 wide, 16 under it. */
+.mizzey-minicart__empty .mizzey-empty__title {
+	margin-block-start: 0;
+}
+
+.mizzey-minicart__empty .mizzey-empty__text {
+	max-inline-size: calc(var(--mizzey-layout-measure-empty) - var(--mizzey-space-5) + var(--mizzey-space-1));
+	margin-block-end: var(--mizzey-space-4);
+}
+
+.mizzey-minicart__empty:not([hidden]) {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: center;
+}
+
+.mizzey-minicart__error:not([hidden]) {
+	margin: 0 0 var(--mizzey-space-3);
+	padding: var(--mizzey-space-3) var(--mizzey-space-4);
+	border-radius: var(--mizzey-radius-sm);
+	background-color: var(--mizzey-color-indigo-50);
+	color: var(--mizzey-color-role-danger);
+	font: var(--mizzey-type-notice);
+}
+
+/* ---- Free delivery: the message (13/20, the amount bold Indigo), 12 below it the 6 high track, the van 56 wide on
+   the end of the filled part; when reached the bar is full and the 20 tick disc stands after it. ------------------- */
+
+.mizzey-minicart__delivery {
+	--mizzey-minicart-fill: 0;
+	margin-block-start: var(--mizzey-space-4);
+}
+
+.mizzey-minicart__delivery-text {
+	display: block;
+	color: var(--mizzey-color-role-text);
+	font: var(--mizzey-type-label);
+	letter-spacing: var(--mizzey-type-label-letter-spacing);
+}
+
+.mizzey-minicart__delivery-amount {
+	color: var(--mizzey-color-role-primary);
+	font-weight: var(--mizzey-font-weight-bold);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.mizzey-minicart__track {
+	position: relative;
+	display: block;
+	margin-block-start: var(--mizzey-space-3);
+	padding-block-end: var(--mizzey-control-minicart-track);
+}
+
+.mizzey-minicart__rail,
+.mizzey-minicart__fill {
+	position: absolute;
+	inset-block-end: 0;
+	inset-inline-start: 0;
+	block-size: var(--mizzey-control-minicart-track);
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-minicart__rail {
+	inset-inline-end: 0;
+	background-color: var(--mizzey-color-indigo-100);
+}
+
+.mizzey-minicart__fill {
+	inline-size: calc(var(--mizzey-minicart-fill) * 100%);
+	background-color: var(--mizzey-color-role-primary);
+	transition: inline-size var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-minicart__van {
+	display: block;
+	inline-size: var(--mizzey-control-minicart-van);
+	block-size: var(--mizzey-control-minicart-van-block);
+	object-fit: contain;
+	margin-inline-start: max(0px, calc(var(--mizzey-minicart-fill) * 100% - var(--mizzey-control-minicart-van)));
+	transition: margin-inline-start var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out);
+}
+
+.mizzey-minicart__van--rtl,
+[dir="rtl"] .mizzey-minicart__van--ltr {
+	display: none;
+}
+
+[dir="rtl"] .mizzey-minicart__van--rtl {
+	display: block;
+}
+
+.mizzey-minicart__tick {
+	position: absolute;
+	inset-block-end: calc((var(--mizzey-control-minicart-track) - var(--mizzey-control-minicart-tick)) / 2);
+	inset-inline-end: calc((var(--mizzey-control-minicart-tick) + var(--mizzey-space-2)) * -1);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--mizzey-control-minicart-tick);
+	block-size: var(--mizzey-control-minicart-tick);
+	border-radius: var(--mizzey-radius-pill);
+	background-color: var(--mizzey-color-role-primary);
+	color: var(--mizzey-color-role-on-primary);
+}
+
+.mizzey-minicart__delivery.is-reached .mizzey-minicart__track {
+	margin-inline-end: calc(var(--mizzey-control-minicart-tick) + var(--mizzey-space-2));
+}
+
+.mizzey-minicart__delivery.is-reached .mizzey-minicart__tick {
+	display: flex;
+	animation: mizzey-minicart-pop var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-pop) var(--mizzey-motion-duration-9) both;
+}
+
+.mizzey-minicart__tick path {
+	stroke-dasharray: 24;
+}
+
+.mizzey-minicart__delivery.is-reached .mizzey-minicart__tick path {
+	stroke-dashoffset: 24;
+	animation: mizzey-draw var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-out) var(--mizzey-motion-duration-10) forwards;
+}
+
+/* Reaching it: the bar fills over 900 ms on the travel curve, then the tick pops in and draws (C1-Mini-Cart C). */
+.mizzey-minicart__delivery.is-reached .mizzey-minicart__fill {
+	transition-duration: var(--mizzey-motion-duration-9);
+	transition-timing-function: var(--mizzey-motion-easing-travel);
+}
+
+@keyframes mizzey-minicart-pop {
+	from {
+		opacity: 0;
+		transform: scale(0.4);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-minicart__delivery.is-reached .mizzey-minicart__tick,
+	.mizzey-minicart__delivery.is-reached .mizzey-minicart__tick path {
+		animation: none;
+		stroke-dashoffset: 0;
+	}
+}
+
+/* ---- Footer: padded 16 24 24 (16 16 24 on the phone, the bottom never under the home indicator) ------------------ */
+
+.mizzey-minicart__foot {
+	flex-shrink: 0;
+	padding: var(--mizzey-space-4) var(--mizzey-space-4) max(var(--mizzey-space-5), env(safe-area-inset-bottom));
+	box-shadow: 0 calc(var(--mizzey-border-hairline) * -1) 0 var(--mizzey-color-neutral-hairline);
+}
+
+.mizzey-minicart__foot[hidden] {
+	display: none;
+}
+
+.mizzey-minicart__total {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--mizzey-space-3);
+	font: var(--mizzey-type-body-strong);
+	letter-spacing: var(--mizzey-type-body-strong-letter-spacing);
+}
+
+.mizzey-minicart__subtotal {
+	color: var(--mizzey-color-role-primary);
+	font: var(--mizzey-type-price);
+	letter-spacing: var(--mizzey-type-price-letter-spacing);
+	font-feature-settings: var(--mizzey-type-price-font-feature-settings);
+	white-space: nowrap;
+}
+
+.mizzey-minicart__subtotal-skeleton {
+	inline-size: calc(var(--mizzey-space-9) + var(--mizzey-space-4));
+	block-size: var(--mizzey-space-4);
+}
+
+.mizzey-minicart__subtotal-skeleton[hidden] {
+	display: none;
+}
+
+.mizzey-minicart__note {
+	margin: var(--mizzey-space-2) 0 var(--mizzey-space-4);
+	color: var(--mizzey-color-neutral-muted);
+	font: var(--mizzey-type-label);
+	font-weight: var(--mizzey-font-weight-regular);
+	letter-spacing: var(--mizzey-type-label-letter-spacing);
+}
+
+.mizzey-minicart__actions {
+	display: flex;
+	gap: var(--mizzey-space-2);
+}
+
+.mizzey-minicart__actions .mizzey-button {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.mizzey-minicart__actions .mizzey-button[aria-disabled="true"] {
+	pointer-events: none;
+}
+
+.mizzey-minicart__actions .mizzey-button[aria-disabled="true"]::after {
+	content: none;
+}
+
+@media (min-width: 1024px) {
+	.mizzey-minicart__body {
+		padding: var(--mizzey-space-4) var(--mizzey-space-5);
+	}
+
+	.mizzey-minicart__foot {
+		padding-inline: var(--mizzey-space-5);
+	}
+}
+
+/* ---- Money and figures as the board sets them, in both languages: the digits in Inter, left to right, at the Latin
+   price and quantity sizes (16/24); an Arabic currency symbol in Tajawal ("5,200 ج.م"). Fixed rows hold the footer at
+   160 in either script (subtotal row 24, note 20). ------------------------------------------------------------------ */
+
+.mizzey-minicart__price,
+.mizzey-minicart__subtotal {
+	font: var(--mizzey-type-latin-price);
+	font-variant-numeric: tabular-nums;
+}
+
+.mizzey-minicart__money-digits {
+	font-family: var(--mizzey-font-family-latin);
+	white-space: pre;
+	font-variant-numeric: tabular-nums;
+}
+
+:root:lang(ar) .mizzey-minicart__money-symbol {
+	font-family: var(--mizzey-font-family-arabic);
+}
+
+.mizzey-minicart .mizzey-stepper__value {
+	font: var(--mizzey-type-latin-body-strong);
+	font-variant-numeric: tabular-nums;
+}
+
+/* The empty state's cart icon is drawn at 1.5 in its disc; the reached tick is 12 at 2.5 (C1-Mini-Cart C). */
+.mizzey-minicart__empty .mizzey-empty__disc svg {
+	stroke-width: 1.5;
+}
+
+.mizzey-minicart__tick svg {
+	stroke-width: 2.5;
+}
+
+.mizzey-minicart__total {
+	block-size: var(--mizzey-space-5);
+}
+
+.mizzey-minicart__note {
+	block-size: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
+	line-height: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
+}
+
+/* The Arabic option line: Tajawal 13/20, regular (C1-Mini-Cart B and E, Arabic). */
+:root:lang(ar) .mizzey-minicart__option {
+	font-weight: var(--mizzey-font-weight-regular);
+	line-height: calc(var(--mizzey-space-5) - var(--mizzey-space-1));
+}
+
+/* Loading bars at the board's widths: 240 and 160 for the name, 80 for the price; 12 and 16 high. */
+.mizzey-minicart__bar {
+	display: block;
+	flex-shrink: 0;
+	block-size: var(--mizzey-space-3);
+	border-radius: var(--mizzey-radius-pill);
+}
+
+.mizzey-minicart__bar--long {
+	inline-size: calc(var(--mizzey-space-9) * 3 + var(--mizzey-space-5));
+	max-inline-size: 100%;
+}
+
+.mizzey-minicart__bar--short {
+	inline-size: calc(var(--mizzey-space-9) * 2 + var(--mizzey-space-4));
+}
+
+.mizzey-minicart__bar--price {
+	inline-size: calc(var(--mizzey-space-9) + var(--mizzey-space-2));
+	block-size: var(--mizzey-space-4);
+}
