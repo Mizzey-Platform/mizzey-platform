@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mizzey/product-details",
+	"title": "Product details, reviews and rails",
+	"category": "woocommerce",
+	"icon": "text-page",
+	"description": "The lower product page: the jump-to bar, the full description, the specifications, the reviews with their photos, the related products and the recently viewed products.",
+	"textdomain": "mizzey-site",
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"className": false,
+		"inserter": false,
+		"reusable": false
+	},
+	"style": "file:./style.css",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

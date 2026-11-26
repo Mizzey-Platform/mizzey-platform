@@ -439,9 +439,11 @@ final class ProductBuy
         $html .= self::el('h1', ['class' => 'mizzey-buy__name', 'id' => 'mizzey-buy-name-' . $product->get_id()], esc_html($product->get_name()));
         $html .= self::el('button', ['type' => 'button', 'class' => 'mizzey-buy__more', 'aria-expanded' => 'false', 'aria-controls' => 'mizzey-buy-name-' . $product->get_id(), 'data-wp-on--click' => 'actions.more'], esc_html__('Show full name', 'mizzey-site'));
 
-        $count = (int) $product->get_review_count();
+        // One figure in every language: the approved reviews of the product and its translations (ProductReviews).
+        $rating = ProductReviews::rating($product);
+        $count  = $rating['count'];
         if ($count > 0) {
-            $average = number_format((float) $product->get_average_rating(), 1);
+            $average = number_format($rating['average'], 1);
             $html   .= self::el('p', ['class' => 'mizzey-buy__rating'],
                 self::icon('star', 16, 'mizzey-buy__star')
                 . self::el('span', ['class' => 'mizzey-buy__average', 'aria-hidden' => 'true'], esc_html($average))

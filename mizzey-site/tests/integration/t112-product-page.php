@@ -163,10 +163,13 @@ run(
 		$simple->set_manage_stock( true );
 		$simple->set_stock_quantity( 20 );
 		$simple->save();
-		update_post_meta( $simple->get_id(), '_wc_average_rating', '4.8' );
-		update_post_meta( $simple->get_id(), '_wc_review_count', 96 );
-		update_post_meta( $simple->get_id(), '_wcml_average_rating', '4.8' );
-		update_post_meta( $simple->get_id(), '_wcml_review_count', 96 );
+		// The rating line reads the approved reviews themselves (ProductReviews::rating, slice 10): five, averaging 4.8.
+		foreach ( array( 5, 5, 5, 5, 4 ) as $i => $stars ) {
+			$review = (int) wp_insert_comment( array( 'comment_post_ID' => $simple->get_id(), 'comment_author' => "Reviewer {$i}", 'comment_content' => 'Good.', 'comment_type' => 'review', 'comment_approved' => 1 ) );
+			update_comment_meta( $review, 'rating', $stars );
+			$s->on_finish( static fn () => wp_delete_comment( $review, true ) );
+		}
+		\WC_Comments::clear_transients( $simple->get_id() );
 		if ( $brand > 0 ) {
 			wp_set_object_terms( $simple->get_id(), array( $brand ), 'product_brand' );
 		}

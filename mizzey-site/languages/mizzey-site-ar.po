@@ -2920,3 +2920,238 @@ msgstr[5] "%d منتج"
 msgctxt "between the options of a cart line"
 msgid ", "
 msgstr "، "
+
+# Spec 066, slice 10: the lower product page, details, specifications, reviews and rails (K-4).
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "%1$s / %2$s, by %3$s"
+msgstr "%1$s / %2$s، بعدسة %3$s"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "+%s"
+msgstr "+%s"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Back to the product"
+msgstr "العودة إلى المنتج"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Bought it? Tell others what you think. Reviews appear after a quick check."
+msgstr "اشتريته؟ شارك رأيك مع الآخرين. تظهر التقييمات بعد مراجعة سريعة."
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Details"
+msgstr "التفاصيل"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Dimensions"
+msgstr "الأبعاد"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Filter reviews"
+msgstr "تصفية التقييمات"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Highest rating"
+msgstr "الأعلى تقييمًا"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "How was it?"
+msgstr "ما رأيك فيه؟"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Load more reviews"
+msgstr "عرض مزيد من التقييمات"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Lowest rating"
+msgstr "الأقل تقييمًا"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Most recent"
+msgstr "الأحدث"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "No reviews match this choice."
+msgstr "لا توجد تقييمات تطابق هذا الاختيار."
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "No reviews yet"
+msgstr "لا توجد تقييمات بعد"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "On this page"
+msgstr "في هذه الصفحة"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Only customers who bought this product can review it."
+msgstr "يمكن فقط للعملاء الذين اشتروا هذا المنتج تقييمه."
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "Photo %1$s of %2$s, by %3$s"
+msgstr "الصورة %1$s من %2$s، بعدسة %3$s"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Photos from this review"
+msgstr "صور من هذا التقييم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Read less"
+msgstr "عرض أقل"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Read more"
+msgstr "اقرأ المزيد"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Recently viewed"
+msgstr "شاهدتها مؤخرًا"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Review photo"
+msgstr "صورة التقييم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Reviews"
+msgstr "التقييمات"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Reviews by rating"
+msgstr "التقييمات حسب عدد النجوم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Specifications"
+msgstr "المواصفات"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Weight"
+msgstr "الوزن"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "What did you like, and what could be better?"
+msgstr "ما الذي أعجبك، وما الذي يمكن أن يكون أفضل؟"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "With photos"
+msgstr "بالصور"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Write a review"
+msgstr "اكتب تقييمًا"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "You may also like"
+msgstr "قد يعجبك أيضًا"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Your rating"
+msgstr "تقييمك بالنجوم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Your review"
+msgstr "تقييمك"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "out of 5"
+msgstr "من 5"
+
+#: mizzey-site/src/Storefront/ProductReviews.php
+msgid "A customer"
+msgstr "عميل"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "%d star"
+msgid_plural "%d stars"
+msgstr[0] "%d نجوم"
+msgstr[1] "%d نجمة"
+msgstr[2] "%d نجمة"
+msgstr[3] "%d نجوم"
+msgstr[4] "%d نجمة"
+msgstr[5] "%d نجمة"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "%s review"
+msgid_plural "%s reviews"
+msgstr[0] "لا تقييمات"
+msgstr[1] "تقييم واحد"
+msgstr[2] "تقييمان"
+msgstr[3] "%s تقييمات"
+msgstr[4] "%s تقييمًا"
+msgstr[5] "%s تقييم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "%s more photo"
+msgid_plural "%s more photos"
+msgstr[0] "%s صور أخرى"
+msgstr[1] "صورة أخرى"
+msgstr[2] "صورتان أخريان"
+msgstr[3] "%s صور أخرى"
+msgstr[4] "%s صورة أخرى"
+msgstr[5] "%s صورة أخرى"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "All %s review"
+msgid_plural "All %s reviews"
+msgstr[0] "كل التقييمات (%s)"
+msgstr[1] "كل التقييمات (%s)"
+msgstr[2] "كل التقييمات (%s)"
+msgstr[3] "كل التقييمات (%s)"
+msgstr[4] "كل التقييمات (%s)"
+msgstr[5] "كل التقييمات (%s)"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "Show all %s review"
+msgid_plural "Show all %s reviews"
+msgstr[0] "عرض كل التقييمات (%s)"
+msgstr[1] "عرض كل التقييمات (%s)"
+msgstr[2] "عرض كل التقييمات (%s)"
+msgstr[3] "عرض كل التقييمات (%s)"
+msgstr[4] "عرض كل التقييمات (%s)"
+msgstr[5] "عرض كل التقييمات (%s)"
+
+# Spec 066, slice 10: the review date format (K-4).
+#: mizzey-site/src/Storefront/ProductReviews.php
+msgid "j M Y"
+msgstr "j M Y"
+
+# Spec 066, slice 10: review photos and the sent state (K-4).
+#: mizzey-site/src/Storefront/ProductDetails.php
+#, php-format
+msgid "(optional, up to %d)"
+msgstr "(اختياري، حتى %d)"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Add"
+msgstr "إضافة"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Add photos"
+msgstr "إضافة صور"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Sending"
+msgstr "جارٍ الإرسال"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Send review"
+msgstr "إرسال التقييم"
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Thanks, your review is waiting for approval."
+msgstr "شكرًا لك، تقييمك في انتظار الموافقة."
+
+#: mizzey-site/src/Storefront/ProductDetails.php
+msgid "Photos"
+msgstr "الصور"
