@@ -71,11 +71,22 @@ const MIZZEY_THEME_STYLES = ['tokens', 'fonts', 'base', 'components', 'header'];
 add_action(
     'init',
     static function (): void {
+        // The overlays' drag to close and the phone menu's level push: imported by ui.js and header.js only when an
+        // overlay can need it (a press on an opener, an overlay opening, a touch on an open one), so it is named in
+        // the import map but not loaded with the page, and stays out of the page budgets (D-21).
+        $motion = get_theme_file_path('assets/js/overlay-motion.js');
+        wp_register_script_module(
+            'mizzey-theme/overlay-motion',
+            get_theme_file_uri('assets/js/overlay-motion.js'),
+            [],
+            is_file($motion) ? (string) filemtime($motion) : false
+        );
+        $lazy = ['id' => 'mizzey-theme/overlay-motion', 'import' => 'dynamic'];
         $file = get_theme_file_path('assets/js/ui.js');
         wp_register_script_module(
             'mizzey-theme/ui',
             get_theme_file_uri('assets/js/ui.js'),
-            [['id' => '@wordpress/interactivity', 'import' => 'static']],
+            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy],
             is_file($file) ? (string) filemtime($file) : false
         );
         // The header's own behaviour (spec 066, slice 2): the mega menu, the phone menu's levels, the Categories tab
@@ -84,7 +95,7 @@ add_action(
         wp_register_script_module(
             'mizzey-theme/header',
             get_theme_file_uri('assets/js/header.js'),
-            [['id' => '@wordpress/interactivity', 'import' => 'static']],
+            [['id' => '@wordpress/interactivity', 'import' => 'static'], $lazy],
             is_file($header) ? (string) filemtime($header) : false
         );
     }

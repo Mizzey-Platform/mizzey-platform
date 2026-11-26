@@ -126,10 +126,13 @@
 	white-space: nowrap;
 }
 
-.mizzey-header__language:hover,
-.mizzey-header__help:hover,
-.mizzey-header__account--named:hover {
-	background-color: var(--mizzey-color-indigo-50);
+/* Hover colours only where there is hover: none stays after a tap (owner rule, 26 Nov). */
+@media (hover: hover) {
+	.mizzey-header__language:hover,
+	.mizzey-header__help:hover,
+	.mizzey-header__account--named:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-header__account-name {
@@ -287,11 +290,13 @@
 	color: var(--mizzey-color-role-text-on-brand);
 }
 
-.mizzey-header--indigo .mizzey-header__bar .mizzey-button--icon:hover,
-.mizzey-header--indigo .mizzey-header__bar .mizzey-header__language:hover,
-.mizzey-header--indigo .mizzey-header__bar .mizzey-header__help:hover,
-.mizzey-header--indigo .mizzey-header__bar .mizzey-header__account--named:hover {
-	background-color: var(--mizzey-color-neutral-on-brand-hover);
+@media (hover: hover) {
+	.mizzey-header--indigo .mizzey-header__bar .mizzey-button--icon:hover,
+	.mizzey-header--indigo .mizzey-header__bar .mizzey-header__language:hover,
+	.mizzey-header--indigo .mizzey-header__bar .mizzey-header__help:hover,
+	.mizzey-header--indigo .mizzey-header__bar .mizzey-header__account--named:hover {
+		background-color: var(--mizzey-color-neutral-on-brand-hover);
+	}
 }
 
 .mizzey-header--indigo .mizzey-header__search {
@@ -448,8 +453,10 @@
 			color var(--mizzey-motion-duration-3) var(--mizzey-motion-easing-out);
 	}
 
-	.mizzey-header__all:hover {
-		background-color: var(--mizzey-color-indigo-50);
+	@media (hover: hover) {
+		.mizzey-header__all:hover {
+			background-color: var(--mizzey-color-indigo-50);
+		}
 	}
 
 	.mizzey-header__all[aria-expanded="true"] {
@@ -517,8 +524,10 @@
 		cursor: pointer;
 	}
 
-	.mizzey-header__link:hover {
-		color: var(--mizzey-color-role-primary);
+	@media (hover: hover) {
+		.mizzey-header__link:hover {
+			color: var(--mizzey-color-role-primary);
+		}
 	}
 
 	.mizzey-header__more-button {
@@ -545,8 +554,10 @@
 		border-radius: var(--mizzey-radius-sm);
 	}
 
-	.mizzey-header__more-list .mizzey-header__link:hover {
-		background-color: var(--mizzey-color-indigo-50);
+	@media (hover: hover) {
+		.mizzey-header__more-list .mizzey-header__link:hover {
+			background-color: var(--mizzey-color-indigo-50);
+		}
 	}
 
 	/* -----------------------------------------------------------------------------------------------------------
@@ -696,8 +707,10 @@
 		color: var(--mizzey-color-role-primary);
 	}
 
-	.mizzey-mega__child:hover {
-		background-color: var(--mizzey-color-indigo-50);
+	@media (hover: hover) {
+		.mizzey-mega__child:hover {
+			background-color: var(--mizzey-color-indigo-50);
+		}
 	}
 
 	.mizzey-mega__photo {
@@ -764,6 +777,8 @@
 
 .mizzey-menu .mizzey-menu__panel {
 	inline-size: min(var(--mizzey-overlay-drawer-phone), 100%);
+	/* A finger may drag the drawer back to its edge (header.js); the list still scrolls up and down. */
+	touch-action: pan-y;
 }
 
 .mizzey-menu__level {
@@ -878,8 +893,10 @@
 	cursor: pointer;
 }
 
-.mizzey-menu__row:hover {
-	background-color: var(--mizzey-color-indigo-50);
+@media (hover: hover) {
+	.mizzey-menu__row:hover {
+		background-color: var(--mizzey-color-indigo-50);
+	}
 }
 
 .mizzey-menu__name {
@@ -965,6 +982,121 @@
 	padding-inline: var(--mizzey-space-4) var(--mizzey-space-3);
 	color: var(--mizzey-color-role-primary);
 	font: var(--mizzey-type-body-strong);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+   The phone menu's motion (C1-Motion-Playground, "Overlays" and "Phone menu, sub-level push"; C1-Menus-Phone 1).
+   The drawer's own slide and scrim are the base overlay's (components.css); everything here stays in the panel.
+
+   The wave menu icon and the cross are one glyph: its two straight lines turn to the cross about the centre of the
+   24 box (the first moves down by 5.5 of 24 to the centre line first) and the wave fades. The header's control
+   turns with aria-expanded (header.js), at the drawer's pace: 450 on the soft spring in, 240 on ease-in out. The
+   first level's close draws the same turn while the drawer comes in. Never mirrored: the logo is never mirrored. */
+
+.mizzey-header__menu .mizzey-icon path,
+.mizzey-menu__close--morph .mizzey-icon path {
+	transform-box: view-box;
+	transform-origin: 50% 50%;
+}
+
+.mizzey-header__menu .mizzey-icon path {
+	transition: transform var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in),
+		opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in);
+}
+
+.mizzey-header__menu[aria-expanded="true"] .mizzey-icon path {
+	transition-duration: var(--mizzey-motion-duration-7);
+	transition-timing-function: var(--mizzey-motion-easing-spring-soft);
+}
+
+.mizzey-header__menu[aria-expanded="true"] .mizzey-icon path:nth-child(1),
+.mizzey-menu__close--morph .mizzey-icon path:nth-child(1) {
+	transform: rotate(45deg) translateY(22.9167%) scaleX(1.0607);
+}
+
+.mizzey-header__menu[aria-expanded="true"] .mizzey-icon path:nth-child(2),
+.mizzey-menu__close--morph .mizzey-icon path:nth-child(2) {
+	transform: rotate(-45deg) scaleX(1.0607);
+}
+
+.mizzey-header__menu[aria-expanded="true"] .mizzey-icon path:nth-child(3),
+.mizzey-menu__close--morph .mizzey-icon path:nth-child(3) {
+	opacity: 0;
+}
+
+.mizzey-menu.is-entering[open] .mizzey-menu__close--morph .mizzey-icon path {
+	animation: mizzey-menu-uncross var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-soft) backwards;
+}
+
+.mizzey-menu.is-entering[open] .mizzey-menu__close--morph .mizzey-icon path:nth-child(3) {
+	animation-name: mizzey-menu-wave-out;
+}
+
+@keyframes mizzey-menu-uncross {
+	from {
+		transform: none;
+	}
+}
+
+@keyframes mizzey-menu-wave-out {
+	from {
+		opacity: 1;
+	}
+}
+
+/* The content stagger as the drawer opens: the header, the rows and the foot rise 12 px and fade in, 320 on
+   ease-out, 40 apart, the first as the panel lands (450 less one step); only the first six stagger, the rest come
+   with the sixth (header.php numbers them in data-mizzey-step, 0 to 5). Only while the drawer is entering
+   (is-entering, header.js, until the first level push): Back does not replay it. No stagger on the way out. */
+.mizzey-menu.is-entering[open] [data-mizzey-step] {
+	animation: mizzey-menu-rise var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-out) backwards;
+	animation-delay: calc(var(--mizzey-motion-duration-7) - var(--mizzey-motion-stagger-list) + var(--mizzey-menu-step, 0) * var(--mizzey-motion-stagger-list));
+}
+
+.mizzey-menu [data-mizzey-step="1"] {
+	--mizzey-menu-step: 1;
+}
+
+.mizzey-menu [data-mizzey-step="2"] {
+	--mizzey-menu-step: 2;
+}
+
+.mizzey-menu [data-mizzey-step="3"] {
+	--mizzey-menu-step: 3;
+}
+
+.mizzey-menu [data-mizzey-step="4"] {
+	--mizzey-menu-step: 4;
+}
+
+.mizzey-menu [data-mizzey-step="5"] {
+	--mizzey-menu-step: 5;
+}
+
+@keyframes mizzey-menu-rise {
+	from {
+		opacity: 0;
+		transform: translateY(var(--mizzey-motion-distance-3));
+	}
+}
+
+/* The sub-level push (header.js animates it): the level going away keeps its place over the one coming in, and
+   the deeper of the two is on top, on the drawer's surface. */
+.mizzey-menu__level.is-over {
+	z-index: 1;
+	background-color: var(--mizzey-color-role-surface-raised);
+}
+
+.mizzey-menu__level.is-over:not(.is-leaving) {
+	position: relative;
+}
+
+.mizzey-menu__level.is-leaving {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	block-size: var(--mizzey-menu-level-size);
+	pointer-events: none;
 }
 
 /* The foot: language, account, wishlist, side by side. */
@@ -1182,5 +1314,13 @@ body:has(.mizzey-tabbar) {
 	.mizzey-mega__row,
 	.mizzey-header__all {
 		transition: none;
+	}
+
+	/* The phone menu: no turn, no rise; the end states show at once (the level push cross-fades, header.js). */
+	.mizzey-header__menu .mizzey-icon path,
+	.mizzey-menu.is-entering[open] .mizzey-menu__close--morph .mizzey-icon path,
+	.mizzey-menu.is-entering[open] [data-mizzey-step] {
+		transition: none;
+		animation: none;
 	}
 }

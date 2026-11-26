@@ -214,8 +214,9 @@ async function phoneMenu( page, lang, expected ) {
 	check( level && level.title.trim() === expected.parent && level.all === expected.parentUrl && same( level.children, expected.children ) && level.focus, `NAV-10 ${ where } a category opens its level: its name, "Shop all" and its children, with focus inside (${ JSON.stringify( level ) })` );
 	check( level && level.banner === expected.photo, `NAV-10 ${ where } the level shows the category's photo banner with "Shop all" on it` );
 	await page.locator( `${ drawer } .mizzey-menu__level:not([hidden]) .mizzey-menu__back` ).click();
-	await page.waitForTimeout( 300 );
-	const back = tagged( await names( page, `${ drawer } .mizzey-menu__level:not([hidden]) .mizzey-menu__row .mizzey-menu__name` ) );
+	// The push back takes 320 ms (C1-Motion-Playground); the level going away is aria-hidden from its first frame.
+	await page.waitForTimeout( 450 );
+	const back = tagged( await names( page, `${ drawer } .mizzey-menu__level:not([hidden]):not([aria-hidden="true"]) .mizzey-menu__row .mizzey-menu__name` ) );
 	check( same( back, expected.top ), `NAV-10 ${ where } back returns to the first level` );
 	// A tap on the scrim beside the drawer closes it, and focus returns to the menu control.
 	await page.mouse.click( lang === 'ar' ? 20 : 370, 450 );

@@ -280,7 +280,8 @@ function bar(array $d): string
 {
     $menu = element(
         'button',
-        ['type' => 'button', 'class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__menu'), 'aria-label' => __('Menu', 'mizzey-site')] + opens(DRAWER),
+        // aria-expanded follows the drawer (header.js), and the wave icon turns into the cross with it.
+        ['type' => 'button', 'class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-header__menu'), 'aria-label' => __('Menu', 'mizzey-site'), 'aria-expanded' => 'false'] + opens(DRAWER),
         icon('menu')
     );
 
@@ -581,24 +582,26 @@ function drawer(array $d): string
 {
     $levels = [];
     $top    = '';
+    // The open stagger's steps (header.css): the head 0, then the offers, the rows and the foot, six at most.
+    $step = 1;
     foreach ($d['links'] as $link) {
         if ($link['offer']) {
             $top .= element(
                 'a',
-                ['class' => 'mizzey-menu__offer', 'href' => esc_url($link['url'])],
+                ['class' => 'mizzey-menu__offer', 'href' => esc_url($link['url']), 'data-mizzey-step' => (string) min($step++, 5)],
                 icon('tag', ['size' => 22]) . element('span', ['class' => 'mizzey-menu__offer-name'], esc_html($link['label'])) . icon('fwd', ['size' => 20])
             );
         }
     }
-    $top   .= element('ul', ['class' => 'mizzey-menu__list'], drawer_rows($d['tree'], DRAWER . '-0', $levels));
+    $top   .= element('ul', ['class' => 'mizzey-menu__list'], drawer_rows($d['tree'], DRAWER . '-0', $levels, true, $step));
     $head   = element(
         'div',
-        ['class' => 'mizzey-menu__head'],
-        logo_html(['logo' => logo(0)] + $d, 'mizzey-menu__logo') . close_button()
+        ['class' => 'mizzey-menu__head', 'data-mizzey-step' => '0'],
+        logo_html(['logo' => logo(0)] + $d, 'mizzey-menu__logo') . close_button(true)
     );
     $first  = element('div', ['class' => 'mizzey-menu__level', 'id' => DRAWER . '-0'], $head . element('div', ['class' => 'mizzey-menu__body'], $top));
 
-    $panel = element('div', ['class' => classes('mizzey-overlay__panel', 'mizzey-menu__panel')], $first . implode('', $levels) . drawer_foot($d));
+    $panel = element('div', ['class' => classes('mizzey-overlay__panel', 'mizzey-menu__panel')], $first . implode('', $levels) . drawer_foot($d, min($step, 5)));
 
     return element(
         'dialog',
@@ -618,12 +621,18 @@ function drawer(array $d): string
     );
 }
 
-function close_button(): string
+/**
+ * The drawer's close. On the first level it carries the wave menu icon, which turns into the cross as the drawer
+ * opens (C1-Menus-Phone, frame 1; header.css); its label is "Close" from the start. The header's own menu control
+ * keeps its 24 icon.
+ */
+function close_button(bool $morph = false): string
 {
     return element(
         'button',
-        ['type' => 'button', 'class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-menu__close'), 'aria-label' => __('Close', 'mizzey-site'), 'data-wp-interactive' => 'mizzey/ui', 'data-wp-on--click' => 'actions.close'],
-        icon('close')
+        ['type' => 'button', 'class' => classes('mizzey-button', 'mizzey-button--icon', 'mizzey-menu__close', ...($morph ? ['mizzey-menu__close--morph'] : [])), 'aria-label' => __('Close', 'mizzey-site'), 'data-wp-interactive' => 'mizzey/ui', 'data-wp-on--click' => 'actions.close'],
+        // 20 in the 44 target, as C1-Menus-Phone draws the drawer's close (frames 1, 2 and 5).
+        icon($morph ? 'menu' : 'close', ['size' => 20])
     );
 }
 
@@ -633,23 +642,24 @@ function close_button(): string
  * @param list<array<string,mixed>> $nodes
  * @param list<string>              $levels
  */
-function drawer_rows(array $nodes, string $parent, array &$levels, bool $icons = true): string
+function drawer_rows(array $nodes, string $parent, array &$levels, bool $icons = true, ?int &$step = null): string
 {
     $rows = '';
     foreach ($nodes as $node) {
+        $li    = null === $step ? [] : ['data-mizzey-step' => (string) min($step++, 5)];
         $kids  = (array) $node['children'];
         $inner = ($icons ? thumb((string) $node['image'], 32, 'mizzey-menu__icon') : '')
             . element('span', ['class' => 'mizzey-menu__name'], esc_html((string) $node['name']));
         if ([] === $kids) {
             // On the deeper levels every row carries its chevron, as C1-Menus-Phone draws them.
             $chevron = $icons ? '' : icon('fwd', ['size' => 20, 'class' => 'mizzey-menu__chevron']);
-            $rows   .= element('li', [], element('a', ['class' => 'mizzey-menu__row' . ($icons ? '' : ' mizzey-menu__row--soft'), 'href' => esc_url((string) $node['url'])], $inner . $chevron));
+            $rows   .= element('li', $li, element('a', ['class' => 'mizzey-menu__row' . ($icons ? '' : ' mizzey-menu__row--soft'), 'href' => esc_url((string) $node['url'])], $inner . $chevron));
             continue;
         }
         $id    = DRAWER . '-' . (int) $node['id'];
         $rows .= element(
             'li',
-            [],
+            $li,
             element(
                 'button',
                 [
@@ -717,7 +727,7 @@ function drawer_level(array $node, string $id, string $parent, array &$levels): 
 }
 
 /** The drawer's foot: language, account, wishlist. */
-function drawer_foot(array $d): string
+function drawer_foot(array $d, int $step): string
 {
     $tiles = '';
     if (null !== $d['language']) {
@@ -740,7 +750,7 @@ function drawer_foot(array $d): string
         icon('heart') . element('span', [], esc_html__('Wishlist', 'mizzey-site'))
     );
 
-    return element('div', ['class' => 'mizzey-menu__foot'], $tiles);
+    return element('div', ['class' => 'mizzey-menu__foot', 'data-mizzey-step' => (string) $step], $tiles);
 }
 
 /** The phone tab bar: Home, Categories, Wishlist, Account. */

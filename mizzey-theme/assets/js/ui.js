@@ -67,6 +67,89 @@ document.addEventListener(
 
 const isRtl = ( el ) => getComputedStyle( el ).direction === 'rtl';
 
+/* Rings for the keyboard only (K-5): an overlay opened by a press focuses itself, closed by one it refocuses its
+   opener, both without a ring; watched on `open`, so overlays other scripts open follow too. Drag to close and the
+   level push are overlay-motion.js, loaded on a press on an opener, an overlay opening or a touch on one (D-21). */
+let byPointer = false;
+let pressed = null;
+let motion = null;
+let loading = null;
+function loadMotion() {
+	loading =
+		loading ||
+		import( 'mizzey-theme/overlay-motion' )
+			// No import map entry (the component preview): beside this file.
+			.catch( () => import( new URL( 'overlay-motion.js', import.meta.url ).href ) )
+			.then( ( m ) => {
+				m.init( closeOverlay );
+				return ( motion = m );
+			} );
+	return loading;
+}
+document.addEventListener( 'pointerdown', ( event ) => {
+	const t = event.target instanceof Element ? event.target : null;
+	byPointer = true;
+	pressed = t && t.closest( 'a[href], button, [tabindex], input, select, textarea, summary' );
+	if ( t && t.closest( '[aria-haspopup="dialog"]' ) ) {
+		loadMotion();
+	}
+	if ( t && 'touch' === event.pointerType && event.isPrimary && t.closest( 'dialog.mizzey-overlay[open] .mizzey-overlay__panel' ) ) {
+		( motion ? Promise.resolve( motion ) : loadMotion() ).then( ( m ) => m.start( event ) );
+	}
+}, true );
+document.addEventListener( 'keydown', () => {
+	byPointer = false;
+}, true );
+
+const openers = new WeakMap();
+
+// The mousedown sent after a touch (which already acted) does not move focus in an overlay.
+let touchUp = -1e4;
+document.addEventListener( 'pointerup', ( event ) => {
+	if ( 'touch' === event.pointerType ) {
+		touchUp = event.timeStamp;
+	}
+}, true );
+document.addEventListener( 'mousedown', ( event ) => {
+	const t = event.target;
+	if ( event.timeStamp - touchUp < 1000 && t instanceof Element && t.closest( 'dialog.mizzey-overlay[open]' ) && ! t.closest( 'input, textarea, select, [contenteditable]' ) ) {
+		event.preventDefault();
+	}
+}, true );
+
+const quietFocus = ( el ) => el.focus( { preventScroll: true, focusVisible: false } );
+
+new MutationObserver( ( records ) => {
+	for ( const { target: dialog } of records ) {
+		if ( ! ( dialog instanceof HTMLDialogElement ) || ! dialog.classList.contains( 'mizzey-overlay' ) ) {
+			continue;
+		}
+		if ( dialog.open ) {
+			loadMotion().then( ( m ) => m.release( dialog ) );
+			const opener = pressed && ! dialog.contains( pressed ) ? pressed : null;
+			if ( opener ) {
+				openers.set( dialog, opener );
+			}
+			if ( byPointer ) {
+				if ( ! dialog.hasAttribute( 'tabindex' ) ) {
+					dialog.tabIndex = -1;
+				}
+				quietFocus( dialog );
+			}
+		} else if ( byPointer ) {
+			// Only where the platform's return misses the opener (WebKit) or rings.
+			const opener = openers.get( dialog );
+			const active = document.activeElement;
+			if ( opener && opener.isConnected && ( active !== opener || opener.matches( ':focus-visible' ) ) ) {
+				if ( active === opener ) {
+					opener.blur();
+				}
+				quietFocus( opener );
+			}
+		}
+	}
+} ).observe( document.documentElement, { subtree: true, attributes: true, attributeFilter: [ 'open' ] } );
+
 function activateTab( tab ) {
 	const list = tab.closest( '[role="tablist"]' );
 	const tabs = [ ...list.querySelectorAll( '[role="tab"]' ) ];
