@@ -242,7 +242,7 @@
 	--mizzey-type-arabic-label-font-family: var(--mizzey-font-family-arabic);
 	--mizzey-type-arabic-label-font-weight: var(--mizzey-font-weight-medium);
 	--mizzey-type-arabic-label-font-size: 0.875rem;
-	--mizzey-type-arabic-label-line-height: 1.57;
+	--mizzey-type-arabic-label-line-height: 1.5714;
 	--mizzey-type-arabic-label-letter-spacing: 0;
 	--mizzey-type-arabic-label: var(--mizzey-type-arabic-label-font-weight) var(--mizzey-type-arabic-label-font-size)/var(--mizzey-type-arabic-label-line-height) var(--mizzey-type-arabic-label-font-family);
 	--mizzey-type-arabic-notice-font-family: var(--mizzey-font-family-arabic);
@@ -260,7 +260,7 @@
 	--mizzey-type-arabic-badge-font-family: var(--mizzey-font-family-arabic);
 	--mizzey-type-arabic-badge-font-weight: var(--mizzey-font-weight-medium);
 	--mizzey-type-arabic-badge-font-size: 0.8125rem;
-	--mizzey-type-arabic-badge-line-height: 1.38;
+	--mizzey-type-arabic-badge-line-height: 1.3846;
 	--mizzey-type-arabic-badge-letter-spacing: 0;
 	--mizzey-type-arabic-badge: var(--mizzey-type-arabic-badge-font-weight) var(--mizzey-type-arabic-badge-font-size)/var(--mizzey-type-arabic-badge-line-height) var(--mizzey-type-arabic-badge-font-family);
 	--mizzey-space-1: 0.25rem;
@@ -330,8 +330,11 @@
 	--mizzey-motion-loop-pulse: 1400ms;
 	--mizzey-motion-loop-breathe: 1600ms;
 	--mizzey-motion-delay-tooltip: 400ms;
+	--mizzey-motion-delay-busy: 400ms;
 	--mizzey-motion-life-toast: 5000ms;
 	--mizzey-motion-life-strip: 6000ms;
+	--mizzey-motion-hold-busy: 500ms;
+	--mizzey-motion-hold-added: 1500ms;
 	--mizzey-layout-columns-phone: 4;
 	--mizzey-layout-columns-tablet: 8;
 	--mizzey-layout-columns-desktop: 12;

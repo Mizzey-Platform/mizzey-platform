@@ -59,12 +59,12 @@ function t107_image( Scenario $s, string $name, int $width, int $height ): int {
  *
  * @return array<string,mixed>
  */
-function t107_browser( array $plan ): array {
+function t107_browser( array $plan, string $script = 'product-card.cjs' ): array {
 	$file = wp_tempnam( 't107-plan' );
 	file_put_contents( $file, wp_json_encode( $plan ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 	$out  = array();
 	$code = 0;
-	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/product-card.cjs' ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out, $code );
+	exec( 'node ' . escapeshellarg( dirname( __DIR__ ) . '/browser/' . $script ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $out, $code );
 	wp_delete_file( $file );
 	$json = json_decode( (string) end( $out ), true );
 	return is_array( $json ) ? $json : array( 'error' => implode( "\n", array_slice( $out, -20 ) ) );
@@ -118,8 +118,9 @@ run(
 		};
 		$long_name = $tag . ' ' . str_repeat( 'Long name to test the two line clamp with an ', 5 );
 		$long_name = mb_substr( $long_name, 0, 200 );
-		$wide_img  = t107_image( $s, $tag . '-wide', 900, 300 );
-		$tall_img  = t107_image( $s, $tag . '-tall', 300, 900 );
+		// The extreme shapes of the real catalogue (a lip balm 0.29, a wide set 2.27).
+		$wide_img  = t107_image( $s, $tag . '-wide', 908, 400 );
+		$tall_img  = t107_image( $s, $tag . '-tall', 290, 1000 );
 
 		$long = $make( $long_name, '470', array( 'set_image_id' => $wide_img, 'set_average_rating' => '4.7', 'set_review_count' => 305 ) );
 		$bare = $make( $tag . ' no image, no rating', '1180' );
@@ -131,6 +132,8 @@ run(
 		$two->save();
 		// A five-digit sale: the longest price the card must hold whole, on one line or stacked.
 		$big = $make( $tag . ' five-digit sale', '14999', array( 'set_sale_price' => '12499', 'set_image_id' => $wide_img ) );
+		// The longest price the store sells, on sale: EGP 99,999.99, struck, beside the "+" on every card width.
+		$top = $make( $tag . ' top price', '99999.99', array( 'set_sale_price' => '89999.99', 'set_image_id' => $wide_img ) );
 		$refused = $make( $tag . ' refused by the stock source', '650', array( 'set_manage_stock' => true, 'set_stock_quantity' => 3, 'set_low_stock_amount' => 5 ) );
 
 		// A variable product whose options are flavours: Vanilla, Chocolate (sold out), Unflavoured.
@@ -198,7 +201,15 @@ run(
 		$ledger[ $ledger_key ] = array( $refused->get_id(), -3 );
 		update_option( FixtureStockSource::LEDGER, $ledger, false );
 
-		$order = array( $long->get_id(), $sale->get_id(), $sold->get_id(), $low->get_id(), $var->get_id(), $two->get_id(), $bare->get_id(), $refused->get_id(), $big->get_id(), $pair->get_id() );
+		// The sale product in Arabic too, as every product of the store is: the Arabic page shows that twin, and an add
+		// from it reaches the cart (a product with no Arabic version is not kept in an Arabic cart).
+		do_action( 'wpml_admin_make_post_duplicates', $sale->get_id() );
+		$sale_ar = (int) apply_filters( 'wpml_object_id', $sale->get_id(), 'product', false, 'ar' );
+		if ( $sale_ar > 0 && $sale_ar !== $sale->get_id() ) {
+			$s->track_post( $sale_ar );
+		}
+
+		$order = array( $long->get_id(), $sale->get_id(), $sold->get_id(), $low->get_id(), $var->get_id(), $two->get_id(), $bare->get_id(), $refused->get_id(), $big->get_id(), $pair->get_id(), $top->get_id() );
 
 		// ---- The page, in English and in Arabic: a rail of the eight, then the same eight as a grid ----------------
 		$content = sprintf(
@@ -240,8 +251,10 @@ run(
 				'refused' => $refused->get_id(),
 				'big'     => $big->get_id(),
 				'pair'    => $pair->get_id(),
+				'top'     => $top->get_id(),
 			),
 			'variations' => $flavours,
+			'arIds'    => array( 'sale' => $sale_ar ),
 			'shots'    => get_temp_dir(),
 		);
 		$result = t107_browser( $plan );
@@ -254,6 +267,17 @@ run(
 		}
 		$check( count( (array) ( $result['checks'] ?? array() ) ) >= 40, 'the browser made every check (' . count( (array) ( $result['checks'] ?? array() ) ) . ')' );
 		foreach ( (array) ( $result['shots'] ?? array() ) as $shot ) {
+			$s->note( '      screenshot: ' . $shot );
+		}
+
+		// ---- The add sequence, the count on the card, the toast on a phone, a tap: Chromium and WebKit ----------
+		$motion = t107_browser( $plan, 'card-motion.cjs' );
+		$check( empty( $motion['error'] ), 'the motion run ran' . ( empty( $motion['error'] ) ? '' : ': ' . substr( (string) $motion['error'], 0, 1500 ) ) );
+		foreach ( (array) ( $motion['checks'] ?? array() ) as $row ) {
+			$check( true === $row['ok'], (string) $row['what'] );
+		}
+		$check( count( (array) ( $motion['checks'] ?? array() ) ) >= 150, 'the motion run made every check (' . count( (array) ( $motion['checks'] ?? array() ) ) . ')' );
+		foreach ( (array) ( $motion['shots'] ?? array() ) as $shot ) {
 			$s->note( '      screenshot: ' . $shot );
 		}
 

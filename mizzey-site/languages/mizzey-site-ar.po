@@ -3155,3 +3155,25 @@ msgstr "شكرًا لك، تقييمك في انتظار الموافقة."
 #: mizzey-site/src/Storefront/ProductDetails.php
 msgid "Photos"
 msgstr "الصور"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%1$d %2$s"
+msgid_plural "%1$d %2$s"
+msgstr[0] "%2$s: %1$d"
+msgstr[1] "%2$s: %1$d"
+msgstr[2] "%2$s: %1$d"
+msgstr[3] "%2$s: %1$d"
+msgstr[4] "%2$s: %1$d"
+msgstr[5] "%2$s: %1$d"
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%d in your cart"
+msgid_plural "%d in your cart"
+msgstr[0] "%d في سلتك"
+msgstr[1] "%d في سلتك"
+msgstr[2] "%d في سلتك"
+msgstr[3] "%d في سلتك"
+msgstr[4] "%d في سلتك"
+msgstr[5] "%d في سلتك"

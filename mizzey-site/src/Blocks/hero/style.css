@@ -120,13 +120,19 @@
 }
 
 .mizzey-hero .mizzey-hero__button {
+	position: relative;
+	z-index: 1;
 	margin-block-start: var(--mizzey-space-4);
 	block-size: var(--mizzey-control-button-compact);
 }
 
 /* ---- The slider's controls -------------------------------------------------------------------------------------- */
 
-/* On a phone the pause button, the dots and the line sit 16 from the slide's bottom, 12 under the button. */
+/* On a phone the pause button, the dots and the line sit 16 from the slide's bottom, 12 under the button
+   (C1-Home-Phone). The pause button's 44 target reaches 16 above that 12 high row, so 4 px of it lie under the
+   button's bottom edge: the button sits above the controls there (a touch on its edge follows its link), the pause
+   button draws no tap highlight and presses by a scale as the board does, and its keyboard ring is drawn inside the
+   target, clear of the button. */
 .mizzey-hero--slider .mizzey-hero__panel {
 	padding-block-end: calc(var(--mizzey-space-3) * 2 + var(--mizzey-space-4));
 }
@@ -182,6 +188,13 @@
 	background-color: transparent;
 	color: var(--mizzey-color-role-primary);
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	transition: transform var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-hero__pause:active {
+	transform: scale(var(--mizzey-motion-scale-press-icon));
+	transition: transform var(--mizzey-motion-duration-1) var(--mizzey-motion-easing-out);
 }
 
 .mizzey-hero__pause .mizzey-icon--play,
@@ -197,6 +210,15 @@
 .mizzey-hero__pause:focus-visible {
 	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
 	outline-offset: var(--mizzey-focus-offset);
+}
+
+/* The ring 8 inside the target: a 28 to 32 ring round the 20 icon, 2 clear of the button above. */
+.mizzey-hero__pause:focus-visible {
+	outline-offset: calc(var(--mizzey-space-2) * -1);
+}
+
+.mizzey-hero__arrow {
+	-webkit-tap-highlight-color: transparent;
 }
 
 .mizzey-hero__dots {
@@ -399,5 +421,11 @@
 
 	.mizzey-hero.is-running .mizzey-hero__progress-fill {
 		animation: none;
+	}
+
+	.mizzey-hero__pause,
+	.mizzey-hero__pause:active {
+		transform: none;
+		transition: none;
 	}
 }

@@ -8,7 +8,7 @@
  * - On touch, the button acts on the finger's lift (the primary pointer, moved under 10 px, under 500 ms, on the same
  *   button, not taken over by a scroll), and the click the browser may send after it is dropped: iOS Safari can skip
  *   that click when content on the page changes during the tap, and it is not needed. The button takes the focus
- *   first, as the tap would have given it, so a dialog it opens gives the focus back to it.
+ *   first, as the tap would have given it (without a ring, K-5), so a dialog it opens gives the focus back to it.
  * - It fails open: when the page's behaviour has not started 1.5 s after the load event (ui.js missing or stopped),
  *   it stops holding and acting for the page (the held tap is replayed once, to whatever did start), until ui.js
  *   reports ready after all.
@@ -66,7 +66,7 @@
 		}
 		own = 1;
 		try {
-			t.focus( { preventScroll: true } );
+			t.focus( { preventScroll: true, focusVisible: false } );
 			t.click();
 		} finally {
 			own = 0;

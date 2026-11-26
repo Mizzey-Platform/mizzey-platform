@@ -10,9 +10,14 @@
  * - The Categories tab shows the categories between the header and the tab bar; Escape or the tab again closes it.
  * - The phone's search control (product, cart and checkout pages) opens the search row and focuses the field.
  * - The category row: what does not fit, and anything past the eighth link, moves under "More".
- * - The cart's count follows an add or a removal without a reload, only once the server has answered: on
- *   WooCommerce's add and remove events the header asks GET mizzey/v1/header; "mizzey-cart-changed" (the product card,
- *   the mini cart) carries the server's count.
+ * - The cart's count follows an add or a removal without a reload: on WooCommerce's own events (the classic
+ *   "added_to_cart" and "removed_from_cart", the blocks' "wc-blocks_added_to_cart" and "wc-blocks_removed_from_cart")
+ *   the header asks GET mizzey/v1/header and shows its answer; "mizzey-cart-changed" (the product card, the mini
+ *   cart) already carries the server's count, which is shown when the product's flight lands (detail.landing ms
+ *   later), with the bump and the roll of C1-Motion-Playground: the badge swells on the bouncy spring while the old
+ *   number rolls out and the new one in, 12 px in the direction of the change. Under reduced motion it just changes.
+ *   The count changes only when the server has answered (motion never claims success early); a header read that
+ *   arrives while a flight is in the air waits for it.
  * - The cart control opens the mini cart (slice 12), whose script is imported on its first press.
  */
 import { store, getContext, getElement, withSyncEvent } from '@wordpress/interactivity';
@@ -144,13 +149,52 @@ function cartText( count, ctx ) {
 	return template.replace( '%d', String( count ) );
 }
 
-function showCount( count, ctx ) {
+const motionMs = ( name ) => {
+	const raw = getComputedStyle( document.documentElement ).getPropertyValue( name ).trim();
+	return ( raw.endsWith( 'ms' ) ? parseFloat( raw ) : parseFloat( raw ) * 1000 ) || 0;
+};
+
+/**
+ * The badge's number rolls from the old to the new one while the badge bumps (C1-Motion-Playground). The badge's text
+ * is the new number at once; the roll is drawn by its two pseudo-elements, so anything reading the count reads the
+ * server's number.
+ */
+function roll( badge, text, up ) {
+	const before = badge.textContent;
+	const wasHidden = badge.hidden;
+	badge.hidden = false;
+	badge.textContent = text;
+	if ( window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches || before === text ) {
+		return;
+	}
+	clearTimeout( Number( badge.dataset.rolling || 0 ) );
+	badge.classList.remove( 'is-bumping', 'is-rolling', 'is-down' );
+	if ( ! wasHidden ) {
+		badge.dataset.was = before;
+		badge.dataset.now = text;
+		badge.classList.toggle( 'is-down', ! up );
+		badge.classList.add( 'is-rolling' );
+	}
+	void badge.offsetWidth; // Start the bump again when one is still running.
+	badge.classList.add( 'is-bumping' );
+	badge.dataset.rolling = String( setTimeout( () => badge.classList.remove( 'is-bumping', 'is-rolling', 'is-down' ), motionMs( '--mizzey-motion-duration-7' ) ) );
+}
+
+function showCount( count, ctx, animate = false ) {
 	document.querySelectorAll( '.mizzey-header__cart' ).forEach( ( link ) => {
 		const badge = link.querySelector( '.mizzey-count' );
 		const label = link.querySelector( '.mizzey-header__cart-label' );
 		if ( badge ) {
-			badge.textContent = count > 99 ? badge.dataset.over || '99+' : String( count );
-			badge.hidden = count <= 0;
+			const text = count > 99 ? badge.dataset.over || '99+' : String( count );
+			const was = badge.hidden ? 0 : parseInt( badge.textContent, 10 ) || 0;
+			if ( animate && count > 0 ) {
+				roll( badge, text, count >= was );
+			} else {
+				clearTimeout( Number( badge.dataset.rolling || 0 ) );
+				badge.classList.remove( 'is-bumping', 'is-rolling', 'is-down' );
+				badge.textContent = text;
+				badge.hidden = count <= 0;
+			}
 		}
 		if ( label ) {
 			label.textContent = cartText( count, ctx );
@@ -159,15 +203,19 @@ function showCount( count, ctx ) {
 }
 
 let asking = null;
+// One truth: a Store API count (the card's event) wins over a header read asked before it, or while a product flies.
+let landingUntil = 0;
+let storeAt = -1;
 function refresh( ctx ) {
 	if ( asking ) {
 		asking.abort();
 	}
 	asking = new AbortController();
+	const asked = performance.now();
 	return fetch( ctx.rest, { credentials: 'same-origin', cache: 'no-store', headers: { 'X-WP-Nonce': ctx.nonce }, signal: asking.signal } )
 		.then( ( r ) => ( r.ok ? r.json() : null ) )
 		.then( ( data ) => {
-			if ( data && data.cart ) {
+			if ( data && data.cart && performance.now() >= landingUntil && storeAt < asked ) {
 				showCount( Number( data.cart.count ) || 0, ctx );
 			}
 		} )
@@ -368,14 +416,21 @@ store( 'mizzey/header', {
 		init() {
 			const ctx = getContext();
 			const root = getElement().ref;
-			// The cart's count after a change made on the page.
 			const ask = () => refresh( ctx );
 			[ 'wc-blocks_added_to_cart', 'wc-blocks_removed_from_cart' ].forEach( ( name ) => document.body.addEventListener( name, ask ) );
-			// The product card's event (slice 4) carries the server's count; the header shows it as told.
 			document.addEventListener( 'mizzey-cart-changed', ( event ) => {
 				const count = event.detail ? Number( event.detail.count ) : NaN;
+				const landing = event.detail ? Number( event.detail.landing ) || 0 : 0;
 				if ( Number.isFinite( count ) ) {
-					showCount( count, ctx );
+					if ( event.detail.cart ) {
+						storeAt = performance.now();
+					}
+					landingUntil = Math.max( landingUntil, performance.now() + landing );
+					if ( landing > 0 ) {
+						setTimeout( () => showCount( count, ctx, true ), landing );
+					} else {
+						showCount( count, ctx, true );
+					}
 				} else {
 					ask();
 				}

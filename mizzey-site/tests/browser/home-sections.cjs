@@ -269,6 +269,66 @@ function measure() {
 	return out;
 }
 
+/**
+ * The slider's controls on a phone (C1-Home-Phone): the row sits 12 under the button, as drawn; the pause button's
+ * 44 target reaches 16 above the 12 high row, so it overlaps the button's last 4 px. That strip stays the button's
+ * (a touch there follows the link), and nothing the controls draw touches the button: no grey tap highlight, the
+ * board's press (a scale), and a keyboard ring kept clear of it. A tap leaves no focus ring.
+ */
+async function heroControls( view, where ) {
+	const m = await view.evaluate( () => {
+		const slide = document.querySelector( '.mizzey-hero__slide.is-active' ) || document.querySelector( '.mizzey-hero__slide' );
+		const cta = slide && slide.querySelector( '.mizzey-hero__button' );
+		const pause = document.querySelector( '.mizzey-hero__pause' );
+		const row = document.querySelector( '.mizzey-hero__controls' );
+		if ( ! cta || ! pause || ! row ) {
+			return null;
+		}
+		const c = cta.getBoundingClientRect();
+		const p = pause.getBoundingClientRect();
+		const r = row.getBoundingClientRect();
+		const st = getComputedStyle( pause );
+		const width = parseFloat( st.outlineWidth ) || 2;
+		// The keyboard ring of the focused pause button, from its own outline offset.
+		pause.focus();
+		const offset = parseFloat( getComputedStyle( pause ).outlineOffset ) || 0;
+		pause.blur();
+		const ringTop = p.top - offset - width;
+		// Across the button's bottom strip, over the pause target, a touch reaches the button (on the pill's straight
+		// part: at its rounded ends that strip is outside the button).
+		const lo = Math.max( p.left, c.left + c.height / 2 ) + 1;
+		const hi = Math.min( p.right, c.right - c.height / 2 ) - 1;
+		const xs = hi > lo ? [ lo, ( lo + hi ) / 2, hi ] : [];
+		const hits = xs.map( ( x ) => {
+			const el = document.elementFromPoint( x, c.bottom - 1 );
+			return !! el && ( el === cta || cta.contains( el ) );
+		} );
+		return {
+			gap: Math.round( ( r.top - c.bottom ) * 10 ) / 10,
+			ctaBottom: Math.round( c.bottom ), pauseTop: Math.round( p.top ), rowTop: Math.round( r.top ),
+			ringClear: Math.round( ( ringTop - c.bottom ) * 10 ) / 10,
+			hits, overlap: p.left < c.right && p.right > c.left,
+			highlight: st.webkitTapHighlightColor || st.getPropertyValue( '-webkit-tap-highlight-color' ),
+		};
+	} );
+	if ( ! m ) {
+		return check( false, `[${ where }] the hero has its button and its controls` );
+	}
+	check( Math.abs( m.gap - 12 ) <= 1, `K-1 [${ where }] the controls row sits 12 under the button, as C1-Home-Phone draws (${ m.gap }: button bottom ${ m.ctaBottom }, row top ${ m.rowTop }, pause target top ${ m.pauseTop })` );
+	check( ! m.overlap || m.hits.every( Boolean ), `HOME-01 [${ where }] the button's bottom strip under the pause target stays the button's (${ JSON.stringify( m.hits ) })` );
+	if ( m.highlight !== '' ) {
+		// A WebKit build without the property (it is iOS Safari's) leaves it to the Chromium run.
+		check( /rgba\(0, 0, 0, 0\)|transparent/.test( m.highlight ), `HOME-01 [${ where }] the pause button draws no grey tap highlight over the button (${ m.highlight })` );
+	}
+	check( m.ringClear > 0, `NFR-11 [${ where }] the pause button's keyboard ring stays clear of the button (${ m.ringClear } px)` );
+	const pause = view.locator( '.mizzey-hero__pause' );
+	await pause.tap();
+	await view.waitForTimeout( 250 );
+	const ring = await pause.evaluate( ( e ) => ( { fv: e.matches( ':focus-visible' ), outline: getComputedStyle( e ).outlineStyle } ) );
+	check( ! ring.fv && ring.outline === 'none', `NFR-11 [${ where }] a tap on the pause button leaves no focus ring (${ JSON.stringify( ring ) })` );
+	await pause.tap();
+}
+
 const types = ( view ) => view.sections.map( ( s ) => s.type );
 const find = ( view, type ) => view.sections.find( ( s ) => s.type === type ) || { text: '', heading: '', links: [], images: 0 };
 
@@ -485,7 +545,27 @@ const find = ( view, type ) => view.sections.find( ( s ) => s.type === type ) ||
 			if ( lang === 'en' && width === 390 ) {
 				await view.screenshot( { path: path.join( plan.shots, `t110-${ lang }-${ width }.png` ), fullPage: true } ).catch( () => {} );
 			}
+			// The Arabic front page this scenario builds has a hero with no button; the Arabic controls are checked on a
+			// slider with one (the card fix's own page).
+			if ( width === 390 && lang === 'en' ) {
+				await heroControls( view, `${ lang } ${ width } chromium` );
+			}
 			await ctx.close();
+		}
+		// The same controls in WebKit (the owner tests on an iPhone).
+		const webkit = await playwright.pw.webkit.launch( { headless: true } ).catch( () => null );
+		check( !! webkit, 'WebKit launches for the phone checks' );
+		if ( webkit ) {
+			for ( const lang of [ 'en' ] ) {
+				const ctx = await webkit.newContext( { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } );
+				const view = await ctx.newPage();
+				await view.goto( plan[ lang ].view, { waitUntil: 'load', timeout: TIMEOUT } );
+				await view.waitForTimeout( 1500 );
+				await heroControls( view, `${ lang } 390 webkit` );
+				await view.locator( '.mizzey-hero' ).screenshot( { path: path.join( plan.shots, `t110-hero-${ lang }-390-webkit.png` ) } ).catch( () => {} );
+				await ctx.close();
+			}
+			await webkit.close();
 		}
 
 		// ---- The slider's motion ------------------------------------------------------------------------------------

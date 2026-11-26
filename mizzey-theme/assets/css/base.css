@@ -22,6 +22,12 @@ body {
 	unicode-bidi: isolate;
 }
 
+/* In Arabic the space before the pound and the pound itself ("ج.م") are Tajawal, as the Arabic boards draw them;
+   the amount stays Inter (the price formatter wraps both in .mizzey-price-unit, MizzeySite\I18n\CurrencyFormat). */
+.mizzey-price-unit:lang(ar) {
+	font-family: var(--mizzey-font-family-arabic);
+}
+
 /* Focus ring: Royal Indigo on light grounds, White on Indigo grounds (D-35). */
 :focus-visible {
 	outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);

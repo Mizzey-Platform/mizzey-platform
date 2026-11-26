@@ -95,6 +95,9 @@ final class ProductRail
             'aria-controls'     => $listId,
             'data-step'         => (string) $step,
             'data-wp-on--click' => 'actions.scroll',
+            // The pointer reaching an arrow fetches the card's on-first-use module, which does the scrolling.
+            'data-wp-on--pointerenter' => 'actions.warm',
+            'data-wp-on--pointerdown'  => 'actions.warm',
         ], $svg);
     }
 }

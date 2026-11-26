@@ -114,6 +114,58 @@ async function noPriceClipped( page, where ) {
 	check( cut.length === 0, `MER-07 [${ where }] no price or struck price is cut, in any card (${ JSON.stringify( cut.slice( 0, 3 ) ) })` );
 }
 
+/**
+ * No word or price in the foot reaches the "+"'s 44 target: wherever the price, the struck price, the sale tag or
+ * line 2 sit beside the target, they keep at least the foot's gap of 8 from it (the boards draw 24 to 32 from the 36
+ * disc for four-digit prices; a five-digit price with decimals needs the price's own line). Every card on the page.
+ */
+async function clearOfAdd( page, where ) {
+	const found = await page.evaluate( () => {
+		const out = [];
+		const touch = [];
+		const still = [];
+		const stepped = [];
+		let least = Infinity;
+		document.querySelectorAll( '.mizzey-card:not(.mizzey-card--skeleton)' ).forEach( ( card ) => {
+			const add = card.querySelector( '.mizzey-card__add' );
+			if ( ! add ) {
+				return;
+			}
+			const a = add.getBoundingClientRect();
+			card.querySelectorAll( '.mizzey-card__price, .mizzey-card__old, .mizzey-sale-tag, .mizzey-card__line, .mizzey-card__added, .mizzey-card__qty' ).forEach( ( el ) => {
+				if ( el.getClientRects().length === 0 || ! el.textContent.trim() ) {
+					return;
+				}
+				// The text's own extent, not its box: a grid item may be wider than its words.
+				const range = document.createRange();
+				range.selectNodeContents( el );
+				const r = range.getBoundingClientRect();
+				if ( r.bottom <= a.top || r.top >= a.bottom ) {
+					return;
+				}
+				const gap = Math.max( a.left - r.right, r.left - a.right );
+				least = Math.min( least, gap );
+				const row = `${ card.dataset.productId } ${ el.className.split( ' ' )[ 0 ] } "${ el.textContent.trim() }" ${ Math.round( gap * 10 ) / 10 }${ card.classList.contains( 'is-price-step' ) ? ' (stepped to 13)' : '' }`;
+				if ( gap <= 0.5 ) {
+					touch.push( row );
+				}
+				if ( gap < 8 - 0.5 ) {
+					// The board's step is one step: a price still too wide at 13 is listed, not hidden.
+					// On a card whose price already took the board's one step, the price and the struck price under it
+					// can still be under 8 (a five-digit price with piasters, on the narrowest card): listed, not hidden.
+					( card.classList.contains( 'is-price-step' ) && ( el.classList.contains( 'mizzey-card__price' ) || el.classList.contains( 'mizzey-card__old' ) ) ? still : out ).push( row );
+				}
+				if ( el.classList.contains( 'mizzey-card__price' ) && card.classList.contains( 'is-price-step' ) ) {
+					stepped.push( `${ card.dataset.productId } "${ el.textContent.trim() }" ${ getComputedStyle( el ).fontSize } gap ${ Math.round( gap * 10 ) / 10 }` );
+				}
+			} );
+		} );
+		return { out, touch, still, stepped, least: Math.round( least * 10 ) / 10 };
+	} );
+	check( found.touch.length === 0, `PLP-02 [${ where }] no price or word reaches the "+" target (least gap ${ found.least }): ${ JSON.stringify( found.touch.slice( 0, 4 ) ) }` );
+	check( found.out.length === 0, `C1-Components 06 [${ where }] at least 8 between every price or word and the "+", a long price stepped 16 to 13 (stepped: ${ JSON.stringify( found.stepped ) }; still under 8 at 13, the board's one step: ${ JSON.stringify( found.still ) }): ${ JSON.stringify( found.out.slice( 0, 4 ) ) }` );
+}
+
 /** The five-digit sale: on one line when price, struck price and tag fit; otherwise struck on line 2, tag on line 3. */
 async function bigSale( page, where, list ) {
 	const b = await measure( page, list, ID.big );
@@ -129,7 +181,9 @@ async function bigSale( page, where, list ) {
 /** The states every card shows, at one width and language. */
 async function states( page, where, width, list ) {
 	const m = {};
-	for ( const [ key, id ] of Object.entries( ID ) ) {
+	// The Arabic page shows the sale product's Arabic twin (the fixture gives it one).
+	const ids = where.startsWith( 'ar' ) && plan.arIds && plan.arIds.sale ? { ...ID, sale: plan.arIds.sale } : ID;
+	for ( const [ key, id ] of Object.entries( ids ) ) {
 		m[ key ] = await measure( page, list, id );
 	}
 	const all = Object.values( m );
@@ -196,6 +250,13 @@ async function states( page, where, width, list ) {
 	check( o.imgNatural && near( parseFloat( o.imgNatural.opacity ), 0.6, 0.01 ), `PLP-03 [${ where }] sold out shows the image at 60% (${ o.imgNatural ? o.imgNatural.opacity : '-' })` );
 	check( ! o.add && ! o.old && o.saleText === '', `PLP-03 [${ where }] sold out has no add button and no sale` );
 	check( m.var.addLabel && m.var.add, `PLP-04 [${ where }] a product with options has its add button ("${ m.var.addLabel }")` );
+	// One option: its values and its own name ("3 flavours"); two options: "2 options". Never the variations.
+	if ( ! rtl ) {
+		check( /\b3 flavours\b/.test( m.var.metaText ), `PLP-01 [${ where }] one option shows its values and its name: "${ m.var.metaText }"` );
+		check( /\b2 options\b/.test( m.pair.metaText ), `PLP-01 [${ where }] two options show "2 options" (not its 4 variations): "${ m.pair.metaText }"` );
+	} else {
+		check( /3/.test( m.var.metaText ) && ! /4/.test( m.pair.metaText.replace( /\(.*\)/, '' ) ), `PLP-01 [${ where }] the options line in Arabic: "${ m.var.metaText }", "${ m.pair.metaText }"` );
+	}
 	return m;
 }
 
@@ -288,6 +349,8 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		check( rail.visible === 6 && near( rail.width, 192, 2 ), `[en 1440] the rail shows six cards 192 wide on the 1272 grid (${ rail.visible }, ${ rail.width })` );
 		const firstBefore = await page.evaluate( () => document.querySelector( '.mizzey-products--rail .mizzey-products__list' ).scrollLeft );
 		await page.locator( '.mizzey-products--rail .mizzey-products__arrow' ).nth( 1 ).click();
+		// The scrolling is in the card's on-first-use module: wait for it to move, not for a fixed time.
+		await page.waitForFunction( ( was ) => document.querySelector( '.mizzey-products--rail .mizzey-products__list' ).scrollLeft > was, firstBefore, { timeout: 15000 } ).catch( () => null );
 		await page.waitForTimeout( 900 );
 		const firstAfter = await page.evaluate( () => document.querySelector( '.mizzey-products--rail .mizzey-products__list' ).scrollLeft );
 		check( firstAfter > firstBefore, `[en 1440] the next arrow scrolls the rail (${ firstBefore } to ${ firstAfter })` );
@@ -304,6 +367,38 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		await bigSale( page, 'en 1440 grid', 'grid' );
 		await bigSale( page, 'en 1440 rail', 'rail' );
 		await noPriceClipped( page, 'en 1440' );
+		await clearOfAdd( page, 'en 1440' );
+		// The desktop card against C1-Home-Desktop (192 wide) and C1-Category-Desktop: padding 12; the tag flush at 0,0;
+		// the well at 12, 168 high and the full inner width; the photo a centred 136 square; the name, the star and the
+		// price from 16.
+		const deskCard = await page.evaluate( ( ids ) => {
+			const c = document.querySelector( `.mizzey-products--rail .mizzey-card[data-product-id="${ ids.two }"]` );
+			const cr = c.getBoundingClientRect();
+			const x = ( el ) => ( el ? Math.round( ( el.getBoundingClientRect().left - cr.left ) * 10 ) / 10 : null );
+			const text = ( el ) => {
+				const range = document.createRange();
+				range.selectNodeContents( el );
+				return Math.round( ( range.getBoundingClientRect().left - cr.left ) * 10 ) / 10;
+			};
+			const n = getComputedStyle( c.querySelector( '.mizzey-card__name' ) );
+			const well = c.querySelector( '.mizzey-card__well' ).getBoundingClientRect();
+			const img = c.querySelector( 'img.mizzey-card__image' ).getBoundingClientRect();
+			const tag = c.querySelector( '.mizzey-corner-tag' ).getBoundingClientRect();
+			const long = document.querySelector( `.mizzey-products--rail .mizzey-card[data-product-id="${ ids.long }"]` );
+			return {
+				width: Math.round( cr.width ), padding: getComputedStyle( c ).paddingInlineStart, font: `${ n.fontSize }/${ n.lineHeight }`,
+				tag: [ Math.round( tag.left - cr.left ), Math.round( tag.top - cr.top ) ],
+				well: [ Math.round( well.left - cr.left ), Math.round( well.top - cr.top ), Math.round( well.width ), Math.round( well.height ) ],
+				img: [ Math.round( img.width * 10 ) / 10, Math.round( img.height * 10 ) / 10, Math.round( ( img.left + img.width / 2 - well.left - well.width / 2 ) * 10 ) / 10 ],
+				name: text( c.querySelector( '.mizzey-card__name a' ) ),
+				star: x( long.querySelector( '.mizzey-card__star' ) ) - x( long ),
+				price: text( c.querySelector( '.mizzey-card__price' ) ),
+			};
+		}, ID );
+		check( deskCard.font === '16px/24px' && deskCard.padding === '12px' && deskCard.well.join() === '12,12,168,168' && deskCard.tag.join() === '0,0',
+			`K-1 [en 1440] the desktop card as the page boards draw it: 192 wide, padding 12, the name 16/24, the well at 12,12 168 x 168, the tag at 0,0 (${ JSON.stringify( deskCard ) })` );
+		check( Math.abs( deskCard.img[ 1 ] - 136 ) <= 1 && Math.abs( deskCard.img[ 2 ] ) <= 0.5, `K-1 [en 1440] the photo is a centred 136 square in the well (${ deskCard.img.join( ' x ' ) }, ${ deskCard.img[ 2 ] } off centre)` );
+		check( deskCard.name === 16 && deskCard.price === 16 && Math.abs( deskCard.star - 16 ) <= 0.5, `K-1 [en 1440] the name, the rating's star and the price start 16 from the card's edge (${ deskCard.name }, ${ deskCard.star }, ${ deskCard.price })` );
 
 		const skeleton = await page.evaluate( () => {
 			const sk = document.querySelector( '.mizzey-card--skeleton' );
@@ -431,6 +526,7 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		await states( phone, 'en 390 grid', 390, 'grid' );
 		await bigSale( phone, 'en 390 grid', 'grid' );
 		await noPriceClipped( phone, 'en 390' );
+		await clearOfAdd( phone, 'en 390' );
 		await phone.locator( '.mizzey-products--grid' ).screenshot( { path: path.join( plan.shots, `${ plan.tag }-en-390-grid.png` ) } );
 		shots.push( path.join( plan.shots, `${ plan.tag }-en-390-grid.png` ) );
 		await phone.locator( `.mizzey-products--grid .mizzey-card[data-product-id="${ ID.var }"] .mizzey-card__add` ).click();
@@ -484,6 +580,7 @@ async function quickAdd( page, where, list, id, { hold = 0 } = {} ) {
 		const ar = await states( arPage, 'ar 390 grid', 390, 'grid' );
 		await bigSale( arPage, 'ar 390 grid', 'grid' );
 		await noPriceClipped( arPage, 'ar 390' );
+		await clearOfAdd( arPage, 'ar 390' );
 		check( ar.long && ar.long.dir === 'rtl', `FIX-04a [ar 390] the cards read right to left (${ ar.long ? ar.long.dir : '-' })` );
 		const arWords = await arPage.evaluate( () => {
 			const c = document.querySelector( '.mizzey-products--grid .mizzey-card.is-out' );
