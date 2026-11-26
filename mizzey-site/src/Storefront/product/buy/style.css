@@ -371,6 +371,56 @@
 	font: var(--mizzey-type-caption);
 }
 
+/* On a phone the photos sit in a row the finger scrolls, as C1-Motion-Playground's "Image gallery, phone" draws it:
+   native horizontal scroll with snap, the image moving 1:1 with the finger, one photo at a time, 8 apart, and no wrap
+   at either end. An upward drag still scrolls the page; Arabic's row starts on the right. The photos of another
+   variant's set are out of the row. */
+@media (max-width: 1023px) {
+	.mizzey-gallery__slides {
+		display: flex;
+		gap: var(--mizzey-space-2);
+		overflow-x: auto;
+		overflow-y: hidden;
+		overscroll-behavior-x: contain;
+		scroll-behavior: smooth;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		touch-action: pan-x pan-y;
+	}
+
+	.mizzey-gallery__slides.is-jumping {
+		scroll-behavior: auto;
+	}
+
+	.mizzey-gallery__slides::-webkit-scrollbar {
+		display: none;
+	}
+
+	.mizzey-gallery__slides:focus-visible {
+		border-radius: inherit;
+		outline: var(--mizzey-focus-width) solid var(--mizzey-color-role-focus);
+		outline-offset: calc(var(--mizzey-focus-offset) * -1);
+	}
+
+	.mizzey-gallery__slide {
+		position: relative;
+		flex: 0 0 100%;
+		opacity: 1;
+		visibility: visible;
+		scroll-snap-align: start;
+		scroll-snap-stop: always;
+		transition: none;
+	}
+
+	.mizzey-gallery__slides.is-moving .mizzey-gallery__slide {
+		scroll-snap-stop: normal;
+	}
+
+	.mizzey-gallery__slide.is-out-of-set {
+		display: none;
+	}
+}
+
 @media (min-width: 1024px) {
 	.mizzey-gallery__stage {
 		aspect-ratio: auto;
@@ -1055,9 +1105,12 @@
 	line-height: calc(var(--mizzey-space-5) + var(--mizzey-border-hairline));
 }
 
+/* A feature is the staff's text, often pasted: a list run together with commas and no spaces ("Hydrating,Shine,...")
+   breaks where it must instead of widening the page. */
 .mizzey-buy__features-text {
 	margin-block-start: var(--mizzey-space-3);
 	font: var(--mizzey-type-body);
+	overflow-wrap: anywhere;
 }
 
 .mizzey-buy__features-text p {
@@ -1574,6 +1627,10 @@ body.has-buy-bar .mizzey-buy-toasts {
    Reduced motion: the photos change at once; the bar, the tick and the heart do not move. */
 
 @media (prefers-reduced-motion: reduce) {
+	.mizzey-gallery__slides {
+		scroll-behavior: auto;
+	}
+
 	.mizzey-gallery__slide,
 	.mizzey-gallery__loading,
 	.mizzey-buy-bar {
