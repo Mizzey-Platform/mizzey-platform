@@ -161,10 +161,13 @@ final class PageCacheRequest
         return (string) ($languages[0] ?? 'en');
     }
 
-    /** The key of this request's page, without the site's prefix. */
+    /**
+     * The key of this request's page, without the site's prefix. It names the release too (the folder this file is
+     * read from: a deploy unpacks each release into its own), so a page stored by one release is never sent by the next.
+     */
     public function key(): string
     {
-        return 'page' . ':' . hash('sha256', implode('|', [$this->scheme, $this->host, $this->path, $this->language]));
+        return 'page' . ':' . hash('sha256', implode('|', [__DIR__, $this->scheme, $this->host, $this->path, $this->language]));
     }
 
     /** Whether the address is a product page, in any language. */

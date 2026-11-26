@@ -215,7 +215,7 @@ run(
 		}
 		$en = t121_rule( '/product/x/' );
 		$ar = t121_rule( '/ar/product/x/' );
-		$check( 'en' === $en->language && 'ar' === $ar->language && $en->key() !== $ar->key() && t121_rule( '/product/x/?utm_source=y' )->key() === $en->key(), 'the key is the scheme, host, path and language: English and Arabic apart, campaign parameters ignored' );
+		$check( 'en' === $en->language && 'ar' === $ar->language && $en->key() !== $ar->key() && t121_rule( '/product/x/?utm_source=y' )->key() === $en->key(), 'the key is the release, scheme, host, path and language: English and Arabic apart, campaign parameters ignored' );
 
 		// ---- The environment this needs ----------------------------------------------------------------------------
 		$settings = RedisSettings::fromEnvironment();
