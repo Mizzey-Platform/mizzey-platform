@@ -15,6 +15,8 @@
  * - **Order attribution** (WooCommerce's, on when its setting is on) loads after the page has loaded on a lean page,
  *   in the same order, with the consent switch of the site plugin unchanged; elsewhere it is WooCommerce's.
  * - **Emoji.** WordPress's emoji detection script and styles are not printed on the storefront.
+ * - **The navigation line.** The same inline script marks a navigation to another page of the store; base.css
+ *   draws a thin line at the top while the next page loads (the owner's design addition).
  *
  * Register ids: NFR-04 (performance, D-21). See specs/066-stage-2-shop-front, the checks every slice passes (K-6).
  *

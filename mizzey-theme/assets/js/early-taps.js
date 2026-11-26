@@ -14,9 +14,44 @@
  *   reports ready after all.
  * - Only button elements of type "button": links stay links and navigate, a submit button keeps its form. Mouse and
  *   keyboard keep using the click, so keyboard and screen reader use is unchanged.
+ * - The navigation line (the owner's design addition; its look and motion in base.css): a link or a form to another
+ *   page of the store that nothing on the page handled sets mizzey-nav on the html element after 150 ms, so a page
+ *   that opens at once shows nothing; leaving the page sets mizzey-nav-done, and a page brought back from the
+ *   back-forward cache clears both. A new tab, a download, a modified click and a jump within the page show none.
  */
-( function ( d ) {
+( function ( d, l ) {
 	var root = d.documentElement, held = null, drop = 0, own = 0, down = null, off = 0;
+	function nav( e, to ) {
+		to = new URL( to, l );
+		setTimeout( function () {
+			if ( ! e.defaultPrevented && to.origin === l.origin && ( to.pathname + to.search !== l.pathname + l.search || ! to.hash ) ) {
+				setTimeout( function () {
+					root.classList.add( 'mizzey-nav' );
+				}, 150 );
+			}
+		} );
+	}
+	function end( e ) {
+		if ( e.type !== 'pageshow' ) {
+			root.classList.add( 'mizzey-nav-done' );
+		} else if ( e.persisted ) {
+			root.classList.remove( 'mizzey-nav', 'mizzey-nav-done' );
+		}
+	}
+	d.addEventListener( 'click', function ( e ) {
+		var a = e.target.closest && e.target.closest( 'a[href]' );
+		if ( a && ! ( e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.hasAttribute( 'download' ) || ( a.target && a.target !== '_self' ) ) ) {
+			nav( e, a.href );
+		}
+	} );
+	d.addEventListener( 'submit', function ( e ) {
+		if ( ! e.target.target ) {
+			nav( e, e.target.action );
+		}
+	} );
+	addEventListener( 'pageswap', end );
+	addEventListener( 'pagehide', end );
+	addEventListener( 'pageshow', end );
 	function ready() {
 		return root.hasAttribute( 'data-mizzey-ready' );
 	}
@@ -91,4 +126,4 @@
 			}
 		}, 1500 );
 	} );
-} )( document );
+} )( document, location );

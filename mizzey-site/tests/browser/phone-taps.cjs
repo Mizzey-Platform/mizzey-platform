@@ -132,6 +132,13 @@ function touchOnly( page, sel ) {
 function startSampling( page, ms ) {
 	return page.evaluate( ( ms ) => {
 		window.__samples = [];
+		// The animations the panel ran, from its own events: they are sent whatever the frame rate.
+		window.__ran = [];
+		const panel = document.querySelector( '#mizzey-menu .mizzey-overlay__panel' );
+		if ( panel && ! panel.__t118 ) {
+			panel.__t118 = true;
+			panel.addEventListener( 'animationend', ( e ) => e.target === panel && window.__ran.push( e.animationName + ( document.getElementById( 'mizzey-menu' ).open ? ':open' : ':closed' ) ) );
+		}
 		const t0 = performance.now();
 		const frame = () => {
 			const d = document.getElementById( 'mizzey-menu' );
@@ -146,6 +153,7 @@ function startSampling( page, ms ) {
 	}, ms );
 }
 const samples = ( page ) => page.evaluate( () => window.__samples );
+const ran = ( page ) => page.evaluate( () => window.__ran || [] );
 const between = ( list, key, a, b ) => new Set( list.map( ( s ) => Number( s[ key ] ) ).filter( ( v ) => v > Math.min( a, b ) + 1 && v < Math.max( a, b ) - 1 ) ).size;
 const between01 = ( list ) => new Set( list.map( ( s ) => Number( s.o ) ).filter( ( v ) => v > 0.02 && v < 0.98 ) ).size;
 
@@ -269,8 +277,14 @@ async function motion( browser, lang ) {
 	const moving = list.filter( ( s ) => s.open );
 	// The way out is 240 ms: on a loaded machine a browser may paint few frames of it, so the check is that the
 	// out animation ran while the dialog was still open, then the dialog closed; the frames seen are reported.
-	const out = ( list, name ) => list.some( ( s ) => s.c && s.n === name );
+	// Headless WebKit on this machine paints the Arabic page at a few frames a second (no GPU compositing), so a 240 ms
+	// way out can pass between two frames there: the panel's own animationend, sent while the dialog is still open,
+	// shows the animation ran in full. The direction is checked on the frames that were painted.
+	let ended = await ran( page );
+	const out = ( list, name ) => list.some( ( s ) => s.c && s.n === name ) || ( engine === 'webkit' && ended.includes( `${ name }:open` ) );
 	check( out( moving, 'mizzey-overlay-slide-out' ) && ! ( await isOpen( page, 'mizzey-menu' ) ), `[${ lang }] the phone menu slides out before it closes (${ between( moving, 'x', away, home ) } positions between seen)` );
+	const xs = moving.filter( ( m ) => m.c ).map( ( m ) => m.x );
+	check( xs.every( ( v, i ) => i === 0 || ( lang === 'ar' ? v >= xs[ i - 1 ] : v <= xs[ i - 1 ] ) ), `[${ lang }] it leaves toward its own edge, the ${ lang === 'ar' ? 'right' : 'left' } (${ xs.join( ', ' ) })` );
 	check( await page.evaluate( ( sel ) => document.activeElement && document.activeElement.matches( sel ), MENU ), `[${ lang }] the focus is back on the menu button after it closes` );
 
 	await page.locator( MENU ).tap();
@@ -279,6 +293,7 @@ async function motion( browser, lang ) {
 	await page.keyboard.press( 'Escape' );
 	await sleep( 800 );
 	list = ( await samples( page ) ).filter( ( s ) => s.open );
+	ended = await ran( page );
 	check( out( list, 'mizzey-overlay-slide-out' ) && ! ( await isOpen( page, 'mizzey-menu' ) ), `[${ lang }] Escape closes the menu the same way, sliding out (${ between( list, 'x', away, home ) } positions between seen)` );
 	check( await page.evaluate( () => getComputedStyle( document.documentElement ).overflow !== 'hidden' ), `[${ lang }] the page scrolls again once the menu is closed` );
 	await context.close();
@@ -487,6 +502,146 @@ async function failOpen( browser ) {
 	}
 }
 
+/** The pixels of a PNG screenshot, as rows of [r, g, b] (8-bit RGB or RGBA, any filter). Enough for a 1 px strip. */
+function pixels( png ) {
+	const zlib = require( 'node:zlib' );
+	const width = png.readUInt32BE( 16 );
+	const height = png.readUInt32BE( 20 );
+	const channels = png[ 25 ] === 6 ? 4 : 3;
+	const chunks = [];
+	for ( let at = 8; at < png.length; ) {
+		const size = png.readUInt32BE( at );
+		if ( png.toString( 'ascii', at + 4, at + 8 ) === 'IDAT' ) {
+			chunks.push( png.subarray( at + 8, at + 8 + size ) );
+		}
+		at += size + 12;
+	}
+	const raw = zlib.inflateSync( Buffer.concat( chunks ) );
+	const stride = width * channels;
+	const rows = [];
+	let previous = Buffer.alloc( stride );
+	for ( let y = 0; y < height; y++ ) {
+		const type = raw[ y * ( stride + 1 ) ];
+		const line = Buffer.from( raw.subarray( y * ( stride + 1 ) + 1, ( y + 1 ) * ( stride + 1 ) ) );
+		for ( let i = 0; i < stride; i++ ) {
+			const left = i >= channels ? line[ i - channels ] : 0;
+			const up = previous[ i ];
+			const corner = i >= channels ? previous[ i - channels ] : 0;
+			const p = left + up - corner;
+			const pa = Math.abs( p - left );
+			const pb = Math.abs( p - up );
+			const pc = Math.abs( p - corner );
+			const add = [ 0, left, up, ( left + up ) >> 1, pa <= pb && pa <= pc ? left : pb <= pc ? up : corner ][ type ];
+			line[ i ] = ( line[ i ] + add ) & 255;
+		}
+		const row = [];
+		for ( let x = 0; x < width; x++ ) {
+			row.push( [ line[ x * channels ], line[ x * channels + 1 ], line[ x * channels + 2 ] ] );
+		}
+		rows.push( row );
+		previous = line;
+	}
+	return rows;
+}
+
+/** Where the line is painted on the screen's top row: how wide, and its first and last pixel. */
+async function lineOnScreen( page, cdp ) {
+	// Playwright waits for a pending navigation before it takes a screenshot in Chromium; the DevTools protocol takes
+	// it at once, which is what is on the screen while the next page is asked for.
+	const shot = cdp
+		? await cdp.send( 'Page.captureScreenshot', { format: 'png', clip: { x: 0, y: 1, width: 390, height: 1, scale: 1 } } ).then( ( r ) => Buffer.from( r.data, 'base64' ) ).catch( () => null )
+		: await page.screenshot( { clip: { x: 0, y: 1, width: 390, height: 1 }, scale: 'css' } ).catch( () => null );
+	if ( ! shot ) {
+		return null;
+	}
+	const row = pixels( shot )[ 0 ];
+	// Indigo #263B73: clearly bluer and darker than the white page. Read in CSS pixels whatever the device scale.
+	const ink = row.map( ( [ r, , b ] ) => b > r + 25 && r < 200 );
+	const k = 390 / row.length;
+	const first = ink.indexOf( true );
+	const last = ink.lastIndexOf( true );
+	return { width: Math.round( ink.filter( Boolean ).length * k ), first: first < 0 ? -1 : Math.round( first * k ), last: last < 0 ? -1 : Math.round( ( last + 1 ) * k ) - 1 };
+}
+
+/*
+ * The navigation line (owner's design addition): a thin Indigo line at the top while the next page loads. Not before
+ * 150 ms (a prefetched page opens with none), then it creeps forward; in Arabic it grows from the right; under reduced
+ * motion it is a full, still line that fades in. It takes no tap and moves nothing. Some engines stop the page's own
+ * timers and animations once the next page is requested, so the line is read from screenshots of the screen itself.
+ * A link the page handles itself (the cookie preferences) shows none.
+ */
+async function progress( browser ) {
+	for ( const [ lang, reduced ] of [ [ 'en', false ], [ 'ar', false ], [ 'en', true ] ] ) {
+		const { context, page } = await phone( browser, { lang, reduced } );
+		await page.goto( plan[ lang ], { waitUntil: 'load' } );
+		await ready( page );
+		const where = `[${ lang }${ reduced ? ', reduced motion' : '' }]`;
+		// Its look, with the class set by hand: fixed at the top, 3 px of Indigo, no taps, nothing moved.
+		const look = await page.evaluate( () => {
+			const top = () => document.querySelector( '.mizzey-header' ).getBoundingClientRect().top;
+			const header = top();
+			document.documentElement.classList.add( 'mizzey-nav' );
+			const cs = getComputedStyle( document.body, '::after' );
+			const out = { pos: cs.position, top: Math.round( parseFloat( cs.top ) ), h: Math.round( parseFloat( cs.height ) ), pe: cs.pointerEvents, bg: cs.backgroundColor, origin: cs.transformOrigin, moved: top() !== header };
+			document.documentElement.classList.remove( 'mizzey-nav' );
+			return out;
+		} );
+		check( look.pos === 'fixed' && look.top === 0 && look.h === 3 && look.pe === 'none' && look.bg === 'rgb(38, 59, 115)' && ! look.moved, `${ where } the line is 3 px of Indigo fixed at the top, takes no tap and moves nothing (${ JSON.stringify( look ) })` );
+		if ( ! reduced ) {
+			const x = parseFloat( look.origin );
+			check( lang === 'ar' ? x > 300 : x === 0, `${ where } it grows from the ${ lang === 'ar' ? 'right' : 'left' } (origin ${ look.origin })` );
+		}
+
+		// The next page is slow: a link to a page of the store whose answer is held back three seconds (any request for
+		// it, the prefetch the speculation rules may make included).
+		const target = await page.evaluate( () => {
+			const a = document.createElement( 'a' );
+			a.href = '/t118-slow-page/';
+			a.textContent = 'Slow page';
+			a.setAttribute( 'data-t118-link', '' );
+			a.style.cssText = 'position:fixed;inset-block-start:300px;inset-inline-start:20px;z-index:2147483000;padding:12px;background:#fff';
+			document.body.appendChild( a );
+			return a.href;
+		} );
+		await page.route( ( u ) => u.href === target, async ( route ) => {
+			await sleep( 3000 );
+			await route.fulfill( { status: 200, contentType: 'text/html', body: '<!doctype html><title>Slow page</title><p>Slow page</p>' } ).catch( () => {} );
+		} );
+		const cdp = engine === 'chromium' ? await context.newCDPSession( page ) : null;
+		await page.locator( '[data-t118-link]' ).first().click( { noWaitAfter: true } );
+		const early = await lineOnScreen( page, cdp );
+		await sleep( 350 );
+		const soon = await lineOnScreen( page, cdp );
+		await sleep( 900 );
+		const later = await lineOnScreen( page, cdp );
+		const fromEdge = ( l ) => ( lang === 'ar' ? 389 - l.last : l.first );
+		check( early && early.width === 0, `${ where } nothing shows in the first moment, so a page that opens at once shows none (${ JSON.stringify( early ) })` );
+		if ( reduced ) {
+			check( later && later.width > 380, `${ where } a full, still line while the page loads (${ JSON.stringify( soon ) } then ${ JSON.stringify( later ) })` );
+		} else {
+			check( soon && soon.width >= 70 && fromEdge( soon ) === 0, `${ where } the line shows within the first half second, from its start edge (${ JSON.stringify( soon ) })` );
+			// Chromium keeps the old page's animations running while the next page is requested; WebKit here holds them
+			// where they were, so there the line stays at its first fifth.
+			check( later && later.width < 390 && ( engine !== 'chromium' || later.width > soon.width ), `${ where } it creeps forward without reaching the end (${ soon && soon.width } px then ${ later && later.width } px)` );
+		}
+		await context.close();
+	}
+	// A link the page handles itself shows no line.
+	const { context, page } = await phone( browser );
+	await page.goto( plan.en, { waitUntil: 'load' } );
+	await ready( page );
+	const handled = await page.evaluate( () => {
+		const a = document.createElement( 'a' );
+		a.href = '#cookie-preferences';
+		a.textContent = 'Cookie settings';
+		document.querySelector( 'main, body' ).appendChild( a );
+		a.click();
+		return new Promise( ( resolve ) => setTimeout( () => resolve( document.documentElement.classList.contains( 'mizzey-nav' ) ), 600 ) );
+	} );
+	check( ! handled, 'a link the page handles itself (the cookie preferences) shows no line' );
+	await context.close();
+}
+
 ( async () => {
 	const found = playwright();
 	if ( ! found ) {
@@ -496,7 +651,7 @@ async function failOpen( browser ) {
 	const { pw, launch } = found;
 	const browser = await pw[ engine ].launch( launch );
 	try {
-		const steps = { early: () => earlyTaps( browser ), touches: () => touches( browser ), motionEn: () => motion( browser, 'en' ), motionAr: () => motion( browser, 'ar' ), sliders: () => sliders( browser ), navigation: () => navigation( browser ), consent: () => consent( browser ), failOpen: () => failOpen( browser ) };
+		const steps = { early: () => earlyTaps( browser ), touches: () => touches( browser ), motionEn: () => motion( browser, 'en' ), motionAr: () => motion( browser, 'ar' ), sliders: () => sliders( browser ), navigation: () => navigation( browser ), consent: () => consent( browser ), failOpen: () => failOpen( browser ), progress: () => progress( browser ) };
 		// T118_ONLY=sliders (or a comma-separated list) runs some of the steps, when one is being worked on.
 		const only = ( process.env.T118_ONLY || '' ).split( ',' ).filter( Boolean );
 		for ( const [ name, step ] of Object.entries( steps ) ) {

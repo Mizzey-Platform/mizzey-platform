@@ -52,6 +52,23 @@ BUDGETS = {
 }
 
 
+# Printed inline by mizzey-theme/inc/performance.php, without their header comment and with their whitespace taken
+# out: what a server sends of them is that printed form, so that is what is counted.
+INLINE = {"early-taps.js", "after-load.js"}
+
+
+def printed(source: str) -> str:
+    """An inline script as inc/performance.php prints it (its script() function, step for step)."""
+    source = re.sub(r"^\s*/\*\*.*?\*/", "", source, flags=re.S)
+    return re.sub(r"\s*([(){};,=:!&|<>?+\-])\s*", r"\1", re.sub(r"\s+", " ", source)).strip()
+
+
+def sent(path: Path) -> bytes:
+    if path.name in INLINE and path.parent == THEME / "assets" / "js":
+        return printed(path.read_text(encoding="utf-8")).encode()
+    return path.read_bytes()
+
+
 def gz(data: bytes) -> int:
     return len(gzip.compress(data, 9))
 
@@ -109,7 +126,7 @@ def totals() -> dict[str, dict[str, int]]:
     runtime, _ = runtime_size()
     out = {}
     for template, kinds in template_files().items():
-        out[template] = {kind: sum(gz(p.read_bytes()) for p in files) for kind, files in kinds.items()}
+        out[template] = {kind: sum(gz(sent(p)) for p in files) for kind, files in kinds.items()}
         out[template]["scripts"] += runtime
     return out
 
@@ -130,14 +147,13 @@ class EachTemplateStaysInsideItsBudget(unittest.TestCase):
     def test_the_early_taps_script_printed_in_the_head_stays_small(self) -> None:
         # As inc/performance.php prints it: no header comment, no whitespace next to punctuation. It is in every page's
         # head before anything else, so it is held to a few hundred bytes compressed.
-        source = (THEME / "assets" / "js" / "early-taps.js").read_text(encoding="utf-8")
-        source = re.sub(r"^\s*/\*\*.*?\*/", "", source, flags=re.S)
-        source = re.sub(r"\s*([(){};,=:!&|<>?+\-])\s*", r"\1", re.sub(r"\s+", " ", source)).strip()
+        source = printed((THEME / "assets" / "js" / "early-taps.js").read_text(encoding="utf-8"))
         self.assertNotIn("/*", source)
         # The punctuation is kept, only the space around it goes: the size checked is the size printed.
-        self.assertTrue(source.startswith("(function(d){var root=d.documentElement,"), source[:60])
-        self.assertLessEqual(len(source.encode()), 1536, "early-taps.js printed")
-        self.assertLessEqual(gz(source.encode()), 700, "early-taps.js printed, gzip")
+        self.assertTrue(source.startswith("(function(d,l){var root=d.documentElement,"), source[:60])
+        # The early taps (636 bytes compressed) and, since the owner's navigation line, its trigger (about 280 more).
+        self.assertLessEqual(len(source.encode()), 2304, "early-taps.js printed")
+        self.assertLessEqual(gz(source.encode()), 960, "early-taps.js printed, gzip")
 
     def test_the_sum_counts_compressed_bytes(self) -> None:
         self.assertLess(gz(b"a" * 10000), 100)
