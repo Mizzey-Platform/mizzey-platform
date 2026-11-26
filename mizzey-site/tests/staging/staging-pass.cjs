@@ -116,10 +116,10 @@ async function passIa(browser, record) {
 		['IA-31', 'Terms and conditions', '/terms-and-conditions/', '/ar/terms-and-conditions/'],
 		['IA-32', 'Offers and campaigns', '/offers/', '/ar/offers/'],
 		['IA-07', 'Product', '/product/sample-product-01/', '/ar/product/sample-product-01/'],
-		['IA-03', 'Category', '/product-category/sample-care/', '/ar/product-category/sample-care-ar/', 'Sample Care', 'عناية تجريبية'],
-		['IA-05', 'Brand', '/brand/sample-brand-north/', '/ar/brand/sample-brand-north-ar/', 'Sample Brand North', 'علامة تجريبية شمال'],
-		['IA-04', 'Collection', '/collection/sample-collection/', '/ar/collection/sample-collection-ar/', 'Sample Collection', 'مجموعة تجريبية'],
-		['IA-06', 'Search results', '/?s=Sample', '/ar/?s=Sample'],
+		['IA-03', 'Category', '/product-category/sample-care/', '/ar/product-category/sample-care-ar/', 'Test Care', 'عناية للاختبار'],
+		['IA-05', 'Brand', '/brand/sample-brand-north/', '/ar/brand/sample-brand-north-ar/', 'Test Brand North', 'علامة اختبار شمال'],
+		['IA-04', 'Collection', '/collection/sample-collection/', '/ar/collection/sample-collection-ar/', 'Test Collection', 'مجموعة اختبار'],
+		['IA-06', 'Search results', '/?s=Test', '/ar/?s=Test'],
 		['IA-16', 'Lost password', '/my-account/lost-password/', '/ar/my-account/lost-password-ar/'],
 	];
 	for (const [row, name, en, ar, termEn, termAr] of pages) {

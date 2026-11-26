@@ -6,7 +6,8 @@
  *
  * Every value is sample content for the staging copy, not the client's: the links and words are the boards'
  * (C1-Global, C1-Home-Desktop, C1-Home-Phone-Arabic); a link with no page of its own on staging points at "#"; the
- * phone, email and address are marked "(sample)". The team replaces all of it in the Site Editor. It:
+ * phone (+20 100 000 0000), email (example.com) and address are invented and carry no label, as the owner asked on
+ * 26 November 2026 (no word "sample" in the data). The team replaces all of it in the Site Editor. It:
  *
  *  - makes the menus as WordPress navigation menus, one per language, the Arabic one a WPML translation of the
  *    English: the header's category row (slug `mizzey-header`), and the footer's Shop, Help, About, Legal and
@@ -181,16 +182,21 @@ $legal_col = $nav(
 $care_col = $nav(
 	'mizzey-footer-care',
 	array(
-		'en' => array( 'Customer care', array( array( '+20 100 000 0000 (sample)', 'tel:+201000000000' ), array( 'hello@example.com (sample)', 'mailto:hello@example.com' ), array( '12 Sample Street, Cairo (sample)', '#' ) ) ),
-		'ar' => array( 'خدمة العملاء', array( array( '+20 100 000 0000 (عيّنة)', 'tel:+201000000000' ), array( 'hello@example.com (عيّنة)', 'mailto:hello@example.com' ), array( '12 شارع تجريبي، القاهرة (عيّنة)', '#' ) ) ),
+		'en' => array( 'Customer care', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ), array( '12 Tahrir Street, Cairo', '#' ) ) ),
+		'ar' => array( 'خدمة العملاء', array( array( '+20 100 000 0000', 'tel:+201000000000' ), array( 'hello@example.com', 'mailto:hello@example.com' ), array( '12 شارع التحرير، القاهرة', '#' ) ) ),
 	)
 );
 
 // ---- The WhatsApp number (specs/059): a sample, never a real line ----------------------------------------------------
 if ( '' === (string) get_option( ContactLinks::NUMBER, '' ) ) {
 	update_option( ContactLinks::NUMBER, '+20 100 000 0000' );
-	update_option( ContactLinks::MESSAGE . 'en', 'Hello Mizzey (sample number on the staging copy)' );
-	update_option( ContactLinks::MESSAGE . 'ar', 'مرحبًا ميزي (رقم تجريبي في نسخة العرض)' );
+}
+// The greeting, without the "sample" note an earlier run wrote (26 November 2026); one staff changed is kept.
+foreach ( array( 'en' => array( 'Hello Mizzey (sample number on the staging copy)', 'Hello Mizzey' ), 'ar' => array( 'مرحبًا ميزي (رقم تجريبي في نسخة العرض)', 'مرحبًا ميزي' ) ) as $lang => list( $old, $new ) ) {
+	$held = (string) get_option( ContactLinks::MESSAGE . $lang, '' );
+	if ( '' === $held || $old === $held ) {
+		update_option( ContactLinks::MESSAGE . $lang, $new );
+	}
 }
 
 // ---- The header and footer template parts, as staff would save them in the Site Editor -------------------------------

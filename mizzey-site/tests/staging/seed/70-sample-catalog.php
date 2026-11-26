@@ -114,7 +114,7 @@ $media = static function ( string $relative, string $alt ) use ( $dir ): int {
 	}
 	$copy = wp_tempnam( basename( $file ) );
 	copy( $file, $copy );
-	$id = media_handle_sideload( array( 'name' => basename( $file ), 'tmp_name' => $copy ), 0, 'Sample image (staging)' );
+	$id = media_handle_sideload( array( 'name' => basename( $file ), 'tmp_name' => $copy ), 0, 'Staging image' );
 	if ( is_wp_error( $id ) ) {
 		WP_CLI::error( $id->get_error_message() );
 	}
@@ -122,6 +122,11 @@ $media = static function ( string $relative, string $alt ) use ( $dir ): int {
 	update_post_meta( (int) $id, '_wp_attachment_image_alt', $alt );
 	return (int) $id;
 };
+
+// A picture an earlier run added keeps its file and takes the current title (the word "Sample" left the data).
+foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'inherit', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => MIZZEY_SAMPLE_MARK . '_image', 'title' => 'Sample image (staging)', 'suppress_filters' => true ) ) as $renamed ) {
+	wp_update_post( array( 'ID' => (int) $renamed, 'post_title' => 'Staging image' ) );
+}
 
 /**
  * A term this step makes, in English, found again by its slug; its Arabic term made or renamed beside it. The

@@ -2,7 +2,7 @@
 /**
  * Staging seed, step 2: the catalogue, source-language records only.
  *
- * Every product here is invented. Names say "Sample", SKUs start with DEMO-, and no brand, price or description
+ * Every product here is invented. Names say "Test", SKUs start with DEMO-, and no brand, price or description
  * is the client's. The set is shaped by what a review has to exercise, not by what the client sells:
  *
  *  - twelve simple products and two products with variants, across three categories and two brands;
@@ -36,6 +36,10 @@ $as_original = static function ( int $id, string $type, string $lang ) use ( $si
 $term = static function ( string $taxonomy, string $name, string $slug ) use ( $as_original ): int {
 	$found = get_term_by( 'slug', $slug, $taxonomy );
 	if ( $found ) {
+		// Renamed on a later run (the word "Sample" left the data on 26 November 2026); the slug stays.
+		if ( $found->name !== $name ) {
+			wp_update_term( (int) $found->term_id, $taxonomy, array( 'name' => $name ) );
+		}
 		return (int) $found->term_id;
 	}
 	$made = wp_insert_term( $name, $taxonomy, array( 'slug' => $slug ) );
@@ -47,16 +51,16 @@ $term = static function ( string $taxonomy, string $name, string $slug ) use ( $
 };
 
 $categories = array(
-	'care'      => $term( 'product_cat', 'Sample Care', 'sample-care' ),
-	'home'      => $term( 'product_cat', 'Sample Home', 'sample-home' ),
-	'accessory' => $term( 'product_cat', 'Sample Accessories', 'sample-accessories' ),
+	'care'      => $term( 'product_cat', 'Test Care', 'sample-care' ),
+	'home'      => $term( 'product_cat', 'Test Home', 'sample-home' ),
+	'accessory' => $term( 'product_cat', 'Test Accessories', 'sample-accessories' ),
 );
 $brands     = array(
-	'north' => $term( 'product_brand', 'Sample Brand North', 'sample-brand-north' ),
-	'south' => $term( 'product_brand', 'Sample Brand South', 'sample-brand-south' ),
+	'north' => $term( 'product_brand', 'Test Brand North', 'sample-brand-north' ),
+	'south' => $term( 'product_brand', 'Test Brand South', 'sample-brand-south' ),
 );
 
-$collection = $term( 'product_collection', 'Sample Collection', 'sample-collection' );
+$collection = $term( 'product_collection', 'Test Collection', 'sample-collection' );
 // The simple products placed in it, by number. A collection is curated by hand (ADM-57), so membership is a list.
 $in_collection = array( 1, 5, 9 );
 
@@ -76,7 +80,17 @@ $simple = array(
 	array( 12, 'accessory', 'south', '520', 7, null, '6220000000123' ),
 );
 
-$made = array( 'simple' => 0, 'variable' => 0, 'variations' => 0, 'single_language' => 0 );
+$made = array( 'simple' => 0, 'variable' => 0, 'variations' => 0, 'single_language' => 0, 'renamed' => 0 );
+
+/** The English record of a product an earlier run made, given its current name (its address stays). */
+$rename = static function ( string $sku, string $name ) use ( &$made ): void {
+	$id = (int) wc_get_product_id_by_sku( $sku );
+	$id = $id ? (int) apply_filters( 'wpml_object_id', $id, 'product', true, 'en' ) : 0;
+	if ( $id && get_the_title( $id ) !== $name ) {
+		wp_update_post( array( 'ID' => $id, 'post_title' => $name ) );
+		++$made['renamed'];
+	}
+};
 // Product or variation id => the cost this step wrote on it, checked against what the store holds at the end.
 $costs = array();
 
@@ -90,10 +104,11 @@ $place = static function ( int $id, int $category, ?int $brand ): void {
 foreach ( $simple as list( $n, $category, $brand, $price, $stock, $cost, $barcode ) ) {
 	$sku = sprintf( 'DEMO-S-%03d', $n );
 	if ( wc_get_product_id_by_sku( $sku ) ) {
+		$rename( $sku, sprintf( 'Test Product %02d', $n ) );
 		continue;
 	}
 	$p = new WC_Product_Simple();
-	$p->set_name( sprintf( 'Sample Product %02d', $n ) );
+	$p->set_name( sprintf( 'Test Product %02d', $n ) );
 	$p->set_sku( $sku );
 	$p->set_regular_price( $price );
 	$p->set_manage_stock( true );
@@ -128,6 +143,7 @@ $variable = array(
 foreach ( $variable as list( $n, $category, $brand, $sizes ) ) {
 	$sku = sprintf( 'DEMO-V-%03d', $n );
 	if ( wc_get_product_id_by_sku( $sku ) ) {
+		$rename( $sku, sprintf( 'Test Variable Product %02d', $n ) );
 		continue;
 	}
 	$attribute = new WC_Product_Attribute();
@@ -136,7 +152,7 @@ foreach ( $variable as list( $n, $category, $brand, $sizes ) ) {
 	$attribute->set_visible( true );
 	$attribute->set_variation( true );
 	$parent = new WC_Product_Variable();
-	$parent->set_name( sprintf( 'Sample Variable Product %02d', $n ) );
+	$parent->set_name( sprintf( 'Test Variable Product %02d', $n ) );
 	$parent->set_sku( $sku );
 	$parent->set_status( 'publish' );
 	$parent->set_attributes( array( $attribute ) );
@@ -166,9 +182,12 @@ foreach ( $variable as list( $n, $category, $brand, $sizes ) ) {
 
 // The item the concurrency harness sells the last units of (workstream item B6). Its stock is set by the
 // harness before each run.
+$rename( 'DEMO-LOAD-001', 'Test Product 99, concurrency test item' );
+$rename( 'DEMO-EN-ONLY', 'Test Product, English only' );
+$rename( 'DEMO-AR-ONLY', 'منتج اختبار، بالعربية فقط' );
 if ( ! wc_get_product_id_by_sku( 'DEMO-LOAD-001' ) ) {
 	$p = new WC_Product_Simple();
-	$p->set_name( 'Sample Product 99, concurrency test item' );
+	$p->set_name( 'Test Product 99, concurrency test item' );
 	$p->set_sku( 'DEMO-LOAD-001' );
 	$p->set_regular_price( '100' );
 	$p->set_manage_stock( true );
@@ -184,7 +203,7 @@ if ( ! wc_get_product_id_by_sku( 'DEMO-LOAD-001' ) ) {
 // One product in English only: it must still appear once in every report, in either language context.
 if ( ! wc_get_product_id_by_sku( 'DEMO-EN-ONLY' ) ) {
 	$p = new WC_Product_Simple();
-	$p->set_name( 'Sample Product, English only' );
+	$p->set_name( 'Test Product, English only' );
 	$p->set_sku( 'DEMO-EN-ONLY' );
 	$p->set_regular_price( '140' );
 	$p->set_manage_stock( true );
@@ -203,7 +222,7 @@ if ( ! wc_get_product_id_by_sku( 'DEMO-EN-ONLY' ) ) {
 if ( ! wc_get_product_id_by_sku( 'DEMO-AR-ONLY' ) ) {
 	$sitepress->switch_lang( 'ar', true );
 	$p = new WC_Product_Simple();
-	$p->set_name( 'منتج تجريبي، بالعربية فقط' );
+	$p->set_name( 'منتج اختبار، بالعربية فقط' );
 	$p->set_sku( 'DEMO-AR-ONLY' );
 	$p->set_regular_price( '160' );
 	$p->set_manage_stock( true );

@@ -88,9 +88,9 @@ fs.mkdirSync(OUT, { recursive: true });
 // when the store's "coming soon" screen stood in front of every store page.
 const PAGES = [
 	['home', '/', { text: { en: 'Placeholder', ar: 'Placeholder' } }],
-	['shop', '/shop/', { text: { en: 'Sample Product', ar: 'منتج تجريبي' } }],
-	['product', '/product/sample-product-01/', { text: { en: 'Sample Product 01', ar: 'منتج تجريبي 01' }, selector: 'form.cart, .wp-block-add-to-cart-form, .wc-block-add-to-cart-form' }],
-	['variable-product', '/product/sample-variable-product-01/', { text: { en: 'Sample Variable Product 01', ar: 'منتج تجريبي بخيارات 01' }, selector: 'form.variations_form, .variations' }],
+	['shop', '/shop/', { text: { en: 'Test Product', ar: 'منتج اختبار' } }],
+	['product', '/product/sample-product-01/', { text: { en: 'Test Product 01', ar: 'منتج اختبار 01' }, selector: 'form.cart, .wp-block-add-to-cart-form, .wc-block-add-to-cart-form' }],
+	['variable-product', '/product/sample-variable-product-01/', { text: { en: 'Test Variable Product 01', ar: 'منتج اختبار بخيارات 01' }, selector: 'form.variations_form, .variations' }],
 	['cart', '/cart/', { selector: '.wp-block-woocommerce-cart, .wc-block-cart, .woocommerce-cart-form, .cart-empty, .wp-block-woocommerce-empty-cart-block' }],
 	['account', '/my-account/', { selector: 'form.woocommerce-form-login, .woocommerce-MyAccount-navigation, form.login' }],
 	['about', '/about/', { text: { en: 'Placeholder', ar: 'Placeholder' } }],

@@ -12,6 +12,7 @@ pull request.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import unittest
@@ -56,6 +57,38 @@ class AScenarioLeftoverIsFoundByItsRunTag(unittest.TestCase):
                                               "t41-reviewer-55123@example.invalid", "t72adm4821@example.invalid"]).values()))
         self.assertFalse(any(match("address", ["customer01@example.invalid", "demo-customer@example.invalid",
                                                "t847286buyer@example.com", "sample-reviewer-omar@example.invalid"]).values()))
+
+
+class NoSampleWordInTheData(unittest.TestCase):
+    """The owner, 26 November 2026: no "Sample" word anywhere in staging's data (names, labels, descriptions,
+    addresses). The only places the old wording may stay are the lines that find it, to rename what an earlier run
+    wrote; slugs and SKUs keep their addresses."""
+
+    SEED = ROOT / "mizzey-site" / "tests" / "staging" / "seed"
+    # What an earlier run or the installation wrote, named only so a later run can find it and rename or remove it.
+    OLD = ("'Sample Street'", "'Sample image (staging)'", "'Sample Page'", "'Hello Mizzey (sample number on the staging copy)'",
+           "'مرحبًا ميزي (رقم تجريبي في نسخة العرض)'")
+
+    def written(self, path: Path) -> list[str]:
+        source = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+        lines = [line for line in source.splitlines() if not line.strip().startswith("//")]
+        found = []
+        for line in lines:
+            for literal in re.findall(r"'(?:[^'\\]|\\.)*'", line):
+                if literal in self.OLD or literal.startswith("'sample-") or literal.startswith("'SAMPLE-"):
+                    continue
+                if re.search(r"\bSample\b|\(sample|تجريبي|عيّنة|عينة", literal):
+                    found.append(f"{path.name}: {literal}")
+        return found
+
+    def test_no_seed_writes_the_word(self):
+        found = [hit for path in sorted(self.SEED.glob("*.php")) for hit in self.written(path)]
+        self.assertEqual([], found)
+
+    def test_the_checks_look_for_the_names_the_seeds_write(self):
+        for name in ("staging-pass.cjs", "browser-matrix.cjs"):
+            text = (self.SEED.parent / name).read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"'Sample (Product|Care|Brand|Collection|Variable)|تجريبي", name)
 
 
 if __name__ == "__main__":

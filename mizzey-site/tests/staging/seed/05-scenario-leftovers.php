@@ -13,7 +13,9 @@
  *  - products and their variations, in every language, by SKU;
  *  - coupons, by code;
  *  - orders whose billing address is a run tag at example.invalid;
- *  - users whose login is a run tag, with an example.invalid address, who own no content.
+ *  - users whose login is a run tag, with an example.invalid address, who own no content;
+ *  - WordPress's own "Sample Page", made by the installation with its example text (the owner, 26 November 2026: no
+ *    "Sample" in the data).
  *
  * Nothing else matches the pattern: the seeds' own records start with SAMPLE-, DEMO- or sample-, and the accounts
  * are client_operator, demo_customer, staging_admin and sample_reviewer_*. With the argument `dry-run` it only lists
@@ -29,7 +31,7 @@ require_once __DIR__ . '/_scenario-tags.php';
 
 global $wpdb;
 $dry  = isset( $args[0] ) && 'dry-run' === $args[0];
-$gone = array( 'terms' => array(), 'products' => array(), 'coupons' => array(), 'orders' => array(), 'users' => array(), 'kept' => array() );
+$gone = array( 'terms' => array(), 'products' => array(), 'coupons' => array(), 'orders' => array(), 'users' => array(), 'pages' => array(), 'kept' => array() );
 
 // The fixtures' own orders and products go whatever their stock reservation, as a scenario's clean-up removes them.
 add_filter( 'mizzey_order_stock_forget_permitted', '__return_true' );
@@ -104,6 +106,14 @@ foreach ( get_users( array( 'search' => '*@example.invalid', 'search_columns' =>
 	$dry || wp_delete_user( (int) $user->ID );
 }
 
+// ---- WordPress's own "Sample Page", which an installation makes and nobody uses (no "Sample" in the data) ---------
+foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'any', 'name' => 'sample-page', 'numberposts' => -1, 'suppress_filters' => true ) ) as $page ) {
+	if ( 'Sample Page' === $page->post_title && str_contains( (string) $page->post_content, 'This is an example page' ) ) {
+		$gone['pages'][] = (int) $page->ID;
+		$dry || wp_delete_post( $page->ID, true );
+	}
+}
+
 $counts = array_map( 'count', $gone );
 echo wp_json_encode( array( 'dry_run' => $dry ) + $gone ), "\n";
-WP_CLI::success( sprintf( 'scenario leftovers %s: %d terms, %d products, %d coupons, %d orders, %d users; %d kept', $dry ? 'found' : 'removed', $counts['terms'], $counts['products'], $counts['coupons'], $counts['orders'], $counts['users'], $counts['kept'] ) );
+WP_CLI::success( sprintf( 'scenario leftovers %s: %d terms, %d products, %d coupons, %d orders, %d users, %d default pages; %d kept', $dry ? 'found' : 'removed', $counts['terms'], $counts['products'], $counts['coupons'], $counts['orders'], $counts['users'], $counts['pages'], $counts['kept'] ) );
