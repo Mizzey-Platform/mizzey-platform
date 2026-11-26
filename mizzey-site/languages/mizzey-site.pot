@@ -2813,3 +2813,17 @@ msgstr ""
 #: mizzey-site/src/Storefront/ProductDetails.php
 msgid "Photos"
 msgstr ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%1$d %2$s"
+msgid_plural "%1$d %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mizzey-site/src/Storefront/ProductCard.php
+#, php-format
+msgid "%d in your cart"
+msgid_plural "%d in your cart"
+msgstr[0] ""
+msgstr[1] ""

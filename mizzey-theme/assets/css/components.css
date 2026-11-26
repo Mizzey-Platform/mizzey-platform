@@ -963,8 +963,32 @@ textarea.mizzey-field__control {
 }
 
 .mizzey-notice:hover .mizzey-notice__life,
-.mizzey-notice:focus-within .mizzey-notice__life {
+.mizzey-notice:focus-within .mizzey-notice__life,
+.mizzey-notice.is-held .mizzey-notice__life {
 	animation-play-state: paused;
+}
+
+/* A toast that can be swiped away sideways on a touch screen: it follows the finger (the script sets the drag), then
+   springs back on the soft spring, or slides out on the ease-in; under reduced motion it fades. The page still
+   scrolls up and down through it. */
+.mizzey-notice.is-swipeable {
+	touch-action: pan-y;
+	translate: var(--mizzey-notice-drag, 0) 0;
+}
+
+.mizzey-notice.is-returning {
+	transition: translate var(--mizzey-motion-duration-6) var(--mizzey-motion-easing-spring-soft);
+}
+
+.mizzey-notice.is-leaving {
+	opacity: 0;
+	transition: translate var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in),
+		opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-in);
+}
+
+.mizzey-notice.is-fading {
+	opacity: 0;
+	transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
 }
 
 /* The promo strip (its look; the slider is slice 3) and the store-wide notice strip. */

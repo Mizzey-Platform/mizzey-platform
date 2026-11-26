@@ -145,6 +145,69 @@
 	display: none;
 }
 
+/* An add lands: the count bumps to 1.25 on the bouncy spring in 450 ms, and the old number rolls out as the new one
+   rolls in, 12 px in the direction of the change, in 200 ms (C1-Motion-Playground, add to cart). */
+.mizzey-header__cart .mizzey-count.is-bumping {
+	animation: mizzey-count-bump var(--mizzey-motion-duration-7) var(--mizzey-motion-easing-spring-bouncy);
+}
+
+.mizzey-header__cart .mizzey-count.is-rolling {
+	display: inline-grid;
+	place-items: center;
+	overflow: hidden;
+	color: transparent;
+	--mizzey-roll: var(--mizzey-motion-distance-3);
+}
+
+.mizzey-header__cart .mizzey-count.is-down {
+	--mizzey-roll: calc(var(--mizzey-motion-distance-3) * -1);
+}
+
+/* The old number rolls out and the new one in, drawn over the badge's own text (which is already the new number). */
+.mizzey-header__cart .mizzey-count.is-rolling::before,
+.mizzey-header__cart .mizzey-count.is-rolling::after {
+	grid-area: 1 / 1;
+	color: var(--mizzey-color-role-on-accent);
+}
+
+.mizzey-header__cart .mizzey-count.is-rolling::before {
+	content: attr(data-was);
+	animation: mizzey-count-out var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out) forwards;
+}
+
+.mizzey-header__cart .mizzey-count.is-rolling::after {
+	content: attr(data-now);
+	animation: mizzey-count-in var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-spring-soft) both;
+}
+
+@keyframes mizzey-count-bump {
+	40% {
+		transform: scale(var(--mizzey-motion-scale-pop));
+	}
+}
+
+@keyframes mizzey-count-out {
+	to {
+		opacity: 0;
+		translate: 0 calc(var(--mizzey-roll) * -1);
+	}
+}
+
+@keyframes mizzey-count-in {
+	from {
+		opacity: 0;
+		translate: 0 var(--mizzey-roll);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mizzey-header__cart .mizzey-count.is-bumping,
+	.mizzey-header__cart .mizzey-count.is-rolling::before,
+	.mizzey-header__cart .mizzey-count.is-rolling::after {
+		animation: none;
+	}
+}
+
 /* Phone: only the language and the cart in the bar; the rest is in the drawer and the tab bar. */
 .mizzey-header__help,
 .mizzey-header__actions .mizzey-tooltip-host:has(.mizzey-header__account),

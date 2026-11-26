@@ -30,6 +30,10 @@ defined('ABSPATH') || exit;
  * screen says, so a staff change there does not change what customers read; the settings screen shows the ruled
  * values. The number of decimals, the stored prices and every total are left alone: this is display only.
  *
+ * In Arabic the non-breaking space and the pound are wrapped together in `.mizzey-price-unit`
+ * (`woocommerce_price_format`), so the theme sets them in Tajawal as the boards draw them while the amount stays
+ * Inter; the words read the same (`5,099 ج.م`).
+ *
  * WooCommerce writes the space of the Store API's prefix and suffix as a plain one, so it is made non-breaking there.
  * Its blocks (cart, checkout, mini cart) always pad the decimals and have no setting for it, so
  * `assets/price-display.js` takes the `.00` off the whole amounts they draw. The symbol is a translation, so an Arabic
@@ -60,6 +64,7 @@ final class CurrencyFormat
     {
         add_filter('option_woocommerce_currency_pos', [self::class, 'position'], 20);
         add_filter('woocommerce_currency_symbol', [self::class, 'symbol'], 20, 2);
+        add_filter('woocommerce_price_format', [self::class, 'format'], 20, 2);
         add_filter('wc_get_price_thousand_separator', [self::class, 'thousands'], 20);
         add_filter('wc_get_price_decimal_separator', [self::class, 'decimal'], 20);
         add_filter('woocommerce_price_trim_zeros', [self::class, 'trimZeros'], 20);
@@ -97,6 +102,24 @@ final class CurrencyFormat
 
         /* translators: The Egyptian pound's symbol, written beside a price. */
         return __('EGP', 'mizzey-site');
+    }
+
+    /**
+     * Arabic: the amount, then the non-breaking space and the pound in one span, so both can be set in the Arabic
+     * face (the amount stays in Inter). `%1$s` is the symbol, `%2$s` the amount, as in WooCommerce's own formats.
+     *
+     * @param mixed $format   WooCommerce's format for the position.
+     * @param mixed $position The currency position.
+     *
+     * @return mixed
+     */
+    public static function format(mixed $format, mixed $position): mixed
+    {
+        if (self::ARABIC_POSITION !== $position || ! self::arabic()) {
+            return $format;
+        }
+
+        return '%2$s<span class="mizzey-price-unit">' . self::NBSP . '%1$s</span>';
     }
 
     /**

@@ -139,11 +139,18 @@ final class ProductCard
             'variable'  => $variable,
             'added'     => false,
             'busy'      => false,
+            'loading'   => false,
             'loaded'    => false,
             'wished'    => $wished,
             'addLabel'  => $labels['add'],
             'wishLabel' => $wished ? $labels['wished'] : $labels['wish'],
             'labels'    => $labels,
+            // How many are in the cart, read from the cart once for the page (the script fills it); `cartIds` are the
+            // cart line ids that count for this card, in every language: the product and its variations.
+            'qty'       => 0,
+            'qtyText'   => '',
+            'qtyLine'   => '',
+            'cartIds'   => $out ? [] : self::cartIds($product),
         ];
         $picker = $product instanceof \WC_Product_Variable && $variable ? self::picker($product, $context) : '';
 
@@ -153,6 +160,7 @@ final class ProductCard
             'aria-pressed'               => $wished ? 'true' : 'false',
             'aria-label'                 => $context['wishLabel'],
             'data-wp-on--click'          => 'actions.wish',
+            'data-wp-on--pointerdown'    => 'actions.warm',
             'data-wp-bind--aria-pressed' => 'context.wished',
             'data-wp-bind--aria-label'   => 'context.wishLabel',
         ], self::icon('heart', 20, 'mizzey-card__heart-line') . self::icon('heart-filled', 20, 'mizzey-card__heart-fill'));
@@ -166,22 +174,29 @@ final class ProductCard
         }
         if (! $out) {
             $prices_html .= self::el('span', ['class' => 'mizzey-card__added', 'aria-hidden' => 'true'], self::icon('tick', 14, 'mizzey-card__added-tick') . esc_html__('Added', 'mizzey-site'));
+            // After the add, line 2 keeps how many are in the cart ("2 in your cart"; the owner's ruling, 25 Nov 2026).
+            $prices_html .= self::el('span', ['class' => 'mizzey-card__qty', 'data-wp-text' => 'context.qtyLine']);
         }
         if ($sale) {
             $prices_html .= self::saleTag((int) $prices['percent']);
         }
         $foot = self::el('span', ['class' => 'mizzey-card__prices'], $prices_html);
         if (! $out) {
-            $foot .= self::el('button', [
+            // The "+" and, beside it in the same place, the count bubble: outside the button, so the button's name is
+            // its label alone (the number is in that label's words and on line 2).
+            $foot .= self::el('span', ['class' => 'mizzey-card__action'], self::el('button', [
                 'type'                     => 'button',
                 'class'                    => 'mizzey-card__add',
                 'aria-label'               => $labels['add'],
                 'aria-haspopup'            => $variable ? 'dialog' : null,
                 'aria-controls'            => $variable ? (string) ($context['pickerId'] ?? '') : null,
                 'data-wp-on--click'        => 'actions.add',
+                'data-wp-on--pointerdown'  => 'actions.warm',
                 'data-wp-bind--aria-label' => 'context.addLabel',
                 'data-wp-bind--aria-busy'  => 'context.busy',
-            ], self::el('span', ['class' => 'mizzey-card__disc', 'aria-hidden' => 'true'], self::icon('plus', 20, 'mizzey-card__plus') . self::loader() . self::icon('tick', 20, 'mizzey-card__tick')));
+            ], self::el('span', ['class' => 'mizzey-card__disc', 'aria-hidden' => 'true'], self::icon('plus', 20, 'mizzey-card__plus') . self::loader() . self::icon('tick', 20, 'mizzey-card__tick')))
+                // The count bubble: the header's count badge, on the disc's top end corner.
+                . self::el('span', ['class' => ['mizzey-count', 'mizzey-card__bubble'], 'aria-hidden' => 'true', 'hidden' => true, 'data-wp-bind--hidden' => '!context.qty', 'data-wp-text' => 'context.qtyText']));
         }
 
         $inner = self::tag($product)
@@ -198,7 +213,10 @@ final class ProductCard
             'data-wp-context'           => (string) wp_json_encode($context),
             'data-wp-class--is-added'   => 'context.added',
             'data-wp-class--is-busy'    => 'context.busy',
+            'data-wp-class--is-loading' => 'context.loading',
+            'data-wp-class--has-qty'    => 'context.qty',
             'data-wp-class--is-wished'  => 'context.wished',
+            'data-wp-init'              => $out ? null : 'callbacks.quantity',
         ], $inner);
     }
 
@@ -302,16 +320,62 @@ final class ProductCard
                 $count
             )));
         }
-        if ($variable) {
-            $options = count($product->get_children());
+        if ($variable && $product instanceof \WC_Product_Variable) {
             if ($count > 0) {
                 $parts .= self::el('span', ['class' => 'mizzey-card__dot', 'aria-hidden' => 'true'], '&middot;');
             }
-            /* translators: %d: how many options (variations) a product has, shown on its card. */
-            $parts .= self::el('span', ['class' => 'mizzey-card__options'], esc_html(sprintf(_n('%d option', '%d options', $options, 'mizzey-site'), $options)));
+            $parts .= self::el('span', ['class' => 'mizzey-card__options'], esc_html(self::optionsLine($product)));
         }
 
         return self::el('p', ['class' => 'mizzey-card__meta'], $parts);
+    }
+
+    /**
+     * What a variable product offers, as the boards' "3 sizes": with one option (attribute), how many values the
+     * shopper picks from and the option's own name ("3 sizes", "2 flavours"); with two or more, "N options". The
+     * values are counted, never the variations (3 sizes is 3, whatever the variations), and no option is assumed.
+     */
+    public static function optionsLine(\WC_Product_Variable $product): string
+    {
+        $attributes = array_filter($product->get_variation_attributes(), static fn ($values): bool => [] !== (array) $values);
+        if (1 !== count($attributes)) {
+            $many = count($attributes);
+
+            /* translators: %d: how many options (such as size and flavour) a product has, shown on its card. */
+            return sprintf(_n('%d option', '%d options', $many, 'mizzey-site'), $many);
+        }
+        $name   = (string) array_key_first($attributes);
+        $values = count((array) $attributes[$name]);
+
+        return sprintf(
+            /* translators: 1: how many values of the product's one option there are, 2: the option's name, as the plural noun in English ("3 sizes"). Arabic may reorder it, for example "%2$s: %1$d". */
+            _n('%1$d %2$s', '%1$d %2$s', $values, 'mizzey-site'),
+            $values,
+            self::optionNoun(wc_attribute_label($name, $product), $values)
+        );
+    }
+
+    /**
+     * The option's name as the noun after a number: in English lower-cased and, past one, in the plural ("sizes",
+     * "flavours", "boxes", "capacities"); in another language the name as it is, which its translation places.
+     */
+    private static function optionNoun(string $label, int $count): string
+    {
+        if (0 !== strpos(determine_locale(), 'en')) {
+            return $label;
+        }
+        $noun = mb_strtolower($label);
+        if (1 === $count || '' === $noun) {
+            return $noun;
+        }
+        if (preg_match('/(?:s|x|z|ch|sh)$/u', $noun)) {
+            return $noun . 'es';
+        }
+        if (preg_match('/[^aeiou]y$/u', $noun)) {
+            return mb_substr($noun, 0, -1) . 'ies';
+        }
+
+        return $noun . 's';
     }
 
     private static function saleTag(int $percent): string
@@ -327,6 +391,13 @@ final class ProductCard
     private static function money(float $amount): string
     {
         return wp_kses(wc_price($amount), ['span' => ['class' => true], 'bdi' => []]);
+    }
+
+    /** The i-dot loader in a button's busy face (slice 1's loader, its words already beside it). */
+    private static function buttonLoader(): string
+    {
+        // Hidden from assistive technology: the button says "Adding" in words beside it.
+        return function_exists('MizzeySite\Theme\Components\loader') ? self::el('span', ['aria-hidden' => 'true', 'class' => 'mizzey-card-picker__dots'], \MizzeySite\Theme\Components\loader(['label' => __('Adding', 'mizzey-site')])) : '';
     }
 
     /** The i-dot loader of slice 1, shown in the disc while the server has not answered. */
@@ -429,12 +500,20 @@ final class ProductCard
         $thumb = (int) $product->get_image_id() > 0
             ? wp_get_attachment_image((int) $product->get_image_id(), 'woocommerce_gallery_thumbnail', false, ['alt' => '', 'loading' => 'lazy', 'class' => 'mizzey-card-picker__image'])
             : self::icon('image', 24);
-        $step  = static fn (int $by, string $label, string $icon): string => self::el('button', ['type' => 'button', 'class' => 'mizzey-stepper__button', 'aria-label' => $label, 'data-step' => (string) $by, 'data-wp-on--click' => 'actions.step'], self::icon($icon, 20));
+        $step  = static fn (int $by, string $label, string $icon): string => self::el('button', ['type' => 'button', 'class' => 'mizzey-stepper__button', 'aria-label' => $label, 'data-step' => (string) $by, 'data-wp-on--click' => 'actions.step'], self::icon($icon, 22));
         $stepper = self::el('div', ['class' => 'mizzey-stepper', 'role' => 'group', 'aria-label' => __('Quantity', 'mizzey-site')],
             $step(-1, __('Decrease quantity', 'mizzey-site'), 'minus')
             . self::el('span', ['class' => 'mizzey-stepper__value', 'aria-live' => 'polite'], '1')
             . $step(1, __('Increase quantity', 'mizzey-site'), 'plus'));
-        $add = self::el('button', ['type' => 'button', 'class' => ['mizzey-button', 'mizzey-button--primary', 'mizzey-button--compact', 'mizzey-card-picker__add'], 'data-wp-on--click' => 'actions.addChosen'], esc_html__('Add to cart', 'mizzey-site'));
+        // Busy while the server has not answered: from 400 ms the i-dot loader and "Adding" in the same width (the
+        // base button's busy face, C1-Motion-Playground).
+        $add = self::el('button', [
+            'type'                    => 'button',
+            'class'                   => ['mizzey-button', 'mizzey-button--primary', 'mizzey-card-picker__add'],
+            'data-wp-on--click'       => 'actions.addChosen',
+            'data-wp-bind--aria-busy' => 'context.loading',
+        ], self::el('span', ['class' => 'mizzey-card-picker__label'], esc_html__('Add to cart', 'mizzey-site'))
+            . self::el('span', ['class' => 'mizzey-card-picker__busy'], self::buttonLoader() . esc_html__('Adding', 'mizzey-site')));
 
         // The card's own controls live in the card's store inside slice 1's overlay, whose store closes it on a press
         // on the scrim; showModal() keeps focus inside and closes on Escape.
@@ -443,7 +522,9 @@ final class ProductCard
                 self::el('span', ['class' => 'mizzey-card-picker__thumb'], $thumb)
                 . self::el('span', ['class' => 'mizzey-card-picker__summary'], self::el('span', ['class' => 'mizzey-card-picker__title'], esc_html($product->get_name())) . self::el('span', ['class' => 'mizzey-card-picker__price'], esc_html($price))))
             . $groups);
-        $footer = self::el('div', ['class' => 'mizzey-card-picker__actions', 'data-wp-interactive' => self::STORE], $stepper . $add);
+        // A refusal keeps the sheet open and says why here (the page's notices would sit under the modal sheet).
+        $footer = self::el('p', ['class' => 'mizzey-card-picker__error', 'role' => 'alert', 'hidden' => true])
+            . self::el('div', ['class' => 'mizzey-card-picker__actions', 'data-wp-interactive' => self::STORE], $stepper . $add);
         $title  = __('Choose options', 'mizzey-site');
 
         if (function_exists('MizzeySite\Theme\Components\overlay')) {
@@ -513,6 +594,30 @@ final class ProductCard
         return true;
     }
 
+    /**
+     * The cart line ids that count for a card: the product, or every variation of a variable product, in every
+     * language WPML serves (a cart line carries the id of the language it was added in).
+     *
+     * @return list<int>
+     */
+    private static function cartIds(\WC_Product $product): array
+    {
+        $ids = $product instanceof \WC_Product_Variable ? array_map('intval', $product->get_children()) : [$product->get_id()];
+        $languages = array_keys((array) apply_filters('wpml_active_languages', null, ['skip_missing' => 0]));
+        $all       = $ids;
+        foreach ($ids as $id) {
+            $type = 'product_variation' === get_post_type($id) ? 'product_variation' : 'product';
+            foreach ($languages as $language) {
+                $twin = (int) apply_filters('wpml_object_id', $id, $type, false, (string) $language);
+                if ($twin > 0) {
+                    $all[] = $twin;
+                }
+            }
+        }
+
+        return array_values(array_unique($all));
+    }
+
     private static function canonical(int $productId): int
     {
         $canonical = CanonicalProduct::of($productId);
@@ -539,15 +644,38 @@ final class ProductCard
         self::$footer = true;
         wp_interactivity_state(self::STORE, [
             'cartApi'     => esc_url_raw(rest_url('wc/store/v1/cart/add-item')),
+            'cartRead'    => esc_url_raw(rest_url('wc/store/v1/cart')),
+            // The card's motion (the flight, the toast, the options sheet), loaded on first use with its own version.
+            'extras'      => esc_url_raw((string) AssetVersions::source(plugins_url('blocks/product-card/card-extras.js', __FILE__))),
             'storeNonce'  => wp_create_nonce('wc_store_api'),
             'wishlistApi' => esc_url_raw(rest_url(WishlistRoutes::NS . '/wishlist/items')),
             'restNonce'   => wp_create_nonce('wp_rest'),
             'words'       => [
                 'failed'     => __('This could not be added. Please try again.', 'mizzey-site'),
                 'wishFailed' => __('Your wishlist could not be changed. Please try again.', 'mizzey-site'),
+                'over'       => __('99+', 'mizzey-site'),
+                // Line 2 after an add, in each plural form the visitor's language has (picked by Intl.PluralRules).
+                'inCart'     => self::inCartLabels(),
             ],
         ]);
         add_action('wp_footer', [self::class, 'toasts']);
+    }
+
+    /**
+     * "N in your cart" in every CLDR plural category, so the script shows the right Arabic form for any number.
+     *
+     * @return array<string,string>
+     */
+    public static function inCartLabels(): array
+    {
+        $samples = ['zero' => 0, 'one' => 1, 'two' => 2, 'few' => 3, 'many' => 11, 'other' => 100];
+        $out     = [];
+        foreach ($samples as $category => $n) {
+            /* translators: %d: how many of this product are in the cart, shown on its card under the price. */
+            $out[$category] = _n('%d in your cart', '%d in your cart', $n, 'mizzey-site');
+        }
+
+        return $out;
     }
 
     /** Where the card's notices appear, and the two notices it clones: added to the cart, and an error. */
