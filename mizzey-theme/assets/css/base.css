@@ -117,10 +117,69 @@ body {
 .mizzey-icon__knockout-fill { fill: var(--mizzey-color-role-surface); }
 .mizzey-icon__accent { fill: var(--mizzey-color-role-accent); }
 
+/* The navigation line (the owner's design addition; assets/js/early-taps.js sets the classes): a thin Indigo line
+   at the very top, under the safe area, while the next page loads. It grows from the start edge (the right in Arabic),
+   creeping on towards the end without reaching it, then completes and fades when the page is swapped. It takes no tap
+   and moves nothing on the page. */
+.mizzey-nav body::after {
+	content: "";
+	position: fixed;
+	inset-block-start: env(safe-area-inset-top, 0);
+	inset-inline: 0;
+	z-index: 1000;
+	block-size: var(--mizzey-border-indicator);
+	background-color: var(--mizzey-color-brand-royal-indigo);
+	transform-origin: left center;
+	pointer-events: none;
+	animation: mizzey-nav-creep calc(var(--mizzey-motion-duration-10) * 8) var(--mizzey-motion-easing-out) both;
+}
+
+[dir="rtl"].mizzey-nav body::after {
+	transform-origin: right center;
+}
+
+.mizzey-nav.mizzey-nav-done body::after {
+	transform: scaleX(1);
+	opacity: 0;
+	animation: none;
+	transition: transform var(--mizzey-motion-duration-4) var(--mizzey-motion-easing-out),
+		opacity var(--mizzey-motion-duration-5) var(--mizzey-motion-easing-out) var(--mizzey-motion-duration-4);
+}
+
+/* It starts a fifth of the way along, so it shows at once even where a browser stops ticking animations while the
+   next page is requested. */
+@keyframes mizzey-nav-creep {
+	from {
+		transform: scaleX(0.2);
+	}
+
+	10% {
+		transform: scaleX(0.4);
+	}
+
+	to {
+		transform: scaleX(0.9);
+	}
+}
+
 /* The page change under reduced motion: the two 120 ms fades, no rise and no wait (C1-System 11). */
 @media (prefers-reduced-motion: reduce) {
 	::view-transition-new(root) {
 		animation: mizzey-page-fade var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out) both;
+	}
+
+	/* The navigation line: a still, full line, which fades when the page is swapped. */
+	.mizzey-nav body::after,
+	.mizzey-nav.mizzey-nav-done body::after {
+		transform: none;
+	}
+
+	.mizzey-nav body::after {
+		animation: none;
+	}
+
+	.mizzey-nav.mizzey-nav-done body::after {
+		transition: opacity var(--mizzey-motion-duration-2) var(--mizzey-motion-easing-out);
 	}
 }
 
